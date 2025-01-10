@@ -11,7 +11,7 @@
       <button class="ql-italic" />
       <button class="ql-underline" />
       <button class="ql-strike" />
-      <button v-if="showImageUpload" class="ql-image" />
+      <button class="ql-image" />
       <select class="ql-color" />
       <select class="ql-background" />
       <button class="ql-list" value="ordered" />
@@ -186,8 +186,6 @@ export default {
       isStudent: 'user/isStudent',
       userType: 'user/userType',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
-      isVolunteerImageUploadEnabled:
-        'featureFlags/isVolunteerImageUploadEnabled',
       isJoiningCall: 'liveMedia/isJoiningCall',
       unableToJoinCall: 'liveMedia/unableToJoinCall',
       sessionPartner: 'user/sessionPartner',
@@ -210,24 +208,8 @@ export default {
     isSocketReadyToRequestForDoc() {
       return [this.isConnected, this.currentSession?.id]
     },
-    volunteerImageAlertMessage() {
-      return this.isVolunteerImageUploadEnabled
-        ? 'Please upload images through the image button on the toolbar.'
-        : 'At this time, coaches cannot upload images for student safety reasons. Please direct the student to an online resource instead.'
-    },
-    showImageUpload() {
-      return (
-        this.isStudent ||
-        (this.isVolunteer && this.isVolunteerImageUploadEnabled)
-      )
-    },
   },
   mounted() {
-    if (this.isVolunteerImageUploadEnabled)
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_UPLOAD_SEEN, {
-        sessionType: 'DocumentEditorV2',
-      })
-
     this.quillEditor = markRaw(
       new Quill('#quill-container', {
         placeholder: 'Type or paste something...',
@@ -262,11 +244,8 @@ export default {
       })
     )
 
-    if (this.isVolunteer && this.isVolunteerImageUploadEnabled) {
+    if (this.isVolunteer) {
       this.quillEditor.getModule('toolbar').addHandler('image', async () => {
-        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
-          sessionType: 'DocumentEditorV2',
-        })
         this.$refs.fileDialog.openFileDialog()
       })
     }
@@ -293,7 +272,8 @@ export default {
     )
     this.quillEditor.root.addEventListener(
       volunteerAttemptedToAddImage,
-      () => alert(this.volunteerImageAlertMessage),
+      () =>
+        alert('Please upload images through the image button on the toolbar.'),
       false
     )
 
@@ -386,27 +366,15 @@ export default {
         const { isClean } =
           await ModerationService.checkIfImageIsClean(formData)
         if (!isClean) {
-          AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_CENSORED, {
-            sessionType: 'DocumentEditorV2',
-          })
           this.showImageUploadError(this.inappropriateImageErrorMessage)
           return
         }
       } catch (err) {
-        AnalyticsService.captureEvent(
-          EVENTS.VOLUNTEER_IMAGE_MODERATION_FAILED,
-          {
-            sessionType: 'DocumentEditorV2',
-          }
-        )
         this.showImageUploadError(this.failedToModerateImageMessage)
       }
       const range = this.quillEditor.getSelection()
       const b64 = await file2b64(file)
       this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_UPLOADED_IMAGE, {
-        sessionType: 'DocumentEditorV2',
-      })
     },
     showImageUploadError(message) {
       alert(message)

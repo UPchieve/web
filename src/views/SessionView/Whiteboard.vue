@@ -107,7 +107,6 @@
         <EraserIcon class="toolbar-item__svg" />
       </div>
       <div
-        v-if="showPhotoUpload"
         class="toolbar-item toolbar-item--photo"
         title="Upload photo"
         tabindex="0"
@@ -291,10 +290,9 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import axios from 'axios'
 import NetworkService from '@/services/NetworkService'
-import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import SelectionIcon from '@/assets/whiteboard_icons/selection.svg'
 import ClearIcon from '@/assets/whiteboard_icons/clear.svg'
 import ColorPickerIcon from '@/assets/whiteboard_icons/color_picker.svg'
@@ -433,14 +431,9 @@ export default {
   },
   emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
   computed: {
-    ...mapState({
-      isMobileApp: (state) => state.app.isMobileApp,
-    }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isWhiteboardEraserToolActive: 'featureFlags/isWhiteboardEraserToolActive',
-      isVolunteerImageUploadEnabled:
-        'featureFlags/isVolunteerImageUploadEnabled',
       userType: 'user/userType',
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
@@ -471,14 +464,6 @@ export default {
 
       return 'zwib-wrapper--default'
     },
-    showPhotoUpload() {
-      if (this.isStudent) {
-        return !(this.isMobileApp && isOutdatedMobileAppVersion())
-      } else if (this.isVolunteer) {
-        return this.isVolunteerImageUploadEnabled
-      }
-      return false
-    },
     isShapeSelected() {
       return (
         this.selectedTool === 'line' ||
@@ -496,11 +481,6 @@ export default {
     }
   },
   async mounted() {
-    if (this.isVolunteerImageUploadEnabled)
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_UPLOAD_SEEN, {
-        sessionType: 'Whiteboard',
-      })
-
     /*
      * This seems like an anti-pattern.
      * Any events sent before `created()` is called will be missed.
@@ -645,11 +625,6 @@ export default {
       this.showShapes = false
     },
     openFileDialog(event) {
-      if (this.isVolunteer) {
-        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_UPLOAD_IMAGE, {
-          sessionType: 'whiteboard',
-        })
-      }
       this.$refs.fileDialog.openFileDialog(event)
     },
     async showImageUploadError(message, timeMs) {
@@ -701,7 +676,6 @@ export default {
           const { isClean } =
             await ModerationService.checkIfImageIsClean(formData)
           if (!isClean) {
-            AnalyticsService.captureEvent(EVENTS.VOLUNTEER_IMAGE_CENSORED)
             this.showImageUploadError(
               'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org',
               6000
@@ -724,11 +698,6 @@ export default {
             },
           })
           this.insertPhoto(imageUrl)
-          if (this.isVolunteer) {
-            AnalyticsService.captureEvent(EVENTS.VOLUNTEER_UPLOADED_IMAGE, {
-              sessionType: 'whiteboard',
-            })
-          }
         }
       } catch (error) {
         this.showImageUploadError()
