@@ -187,18 +187,8 @@
 
       <div v-if="isVolunteer" class="cert-info contain">
         <div class="subheader-subjects">
-          <div
-            v-if="isMutedSubjectAlertsActive"
-            class="subheader-subjects--left"
-          >
-            Unlocked Subjects
-          </div>
-          <div v-else class="subheader-subjects--center">Unlocked Subjects</div>
-          <div
-            v-if="isMutedSubjectAlertsActive"
-            class="subheader-subjects--right"
-            data-testid="tutoring-alerts"
-          >
+          <div class="subheader-subjects--left">Unlocked Subjects</div>
+          <div class="subheader-subjects--right" data-testid="tutoring-alerts">
             Tutoring Alerts
           </div>
         </div>
@@ -227,11 +217,7 @@
                   {{ subjects[subject.name].displayName }}
                 </div>
               </div>
-              <div
-                v-if="isMutedSubjectAlertsActive"
-                class="subjects-right"
-                data-testid="toggle-buttons"
-              >
+              <div class="subjects-right" data-testid="toggle-buttons">
                 <toggle-button
                   :data-testid="`toggle-button-${subject.name}`"
                   :disabled="!activeEdit ? true : null"
@@ -314,7 +300,7 @@ export default {
       this.phone = this.user.phone
       this.smsConsent = this.user.smsConsent
     }
-    if (this.isMutedSubjectAlertsActive && this.isVolunteer) {
+    if (this.isVolunteer) {
       this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
     }
     this.setFlagsForEditingPhoneNumber()
@@ -334,7 +320,6 @@ export default {
       showNationalPhoneNumbersOnly: 'user/showNationalPhoneNumbersOnly',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
-      isMutedSubjectAlertsActive: 'featureFlags/isMutedSubjectAlertsActive',
     }),
     name() {
       const user = this.$store.state.user.user
@@ -510,7 +495,7 @@ export default {
               isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
               smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
             }
-            if (this.isMutedSubjectAlertsActive && this.isVolunteer) {
+            if (this.isVolunteer) {
               addToUserData.mutedSubjectAlerts =
                 reqBody.mutedSubjectAlerts ?? this.user.mutedSubjectAlerts
             }
@@ -537,7 +522,7 @@ export default {
         reqBody.smsConsent = this.smsConsent
       }
 
-      if (this.isMutedSubjectAlertsActive && this.isVolunteer) {
+      if (this.isVolunteer) {
         reqBody.mutedSubjectAlerts = this.newMutedSubjectAlerts
       }
       return reqBody

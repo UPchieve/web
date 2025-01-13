@@ -698,7 +698,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   GLEAP_SEGMENT_EXPERIMENTS: 'gleap-segment-experiments',
   CC_INTRO_COPY: 'cc-intro-copy',
   BF_INTRO_COPY: 'bf-intro-copy',
-  MUTED_SUBJECT_ALERTS: 'muted-subject-alerts',
   REFERRAL_COPY: 'referral-copy',
   SESSION_RECAP_DMS: 'session-recap-dms',
   DASHBOARD_REDESIGN: 'dashboard-redesign',

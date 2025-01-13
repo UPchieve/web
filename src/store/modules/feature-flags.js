@@ -8,7 +8,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
-      [POSTHOG_FEATURE_FLAGS.MUTED_SUBJECT_ALERTS]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_ELIGIBILITY_FORM_DESIGN]: false,
@@ -105,8 +104,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
     bfIntroCopy: (state) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
-    isMutedSubjectAlertsActive: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.MUTED_SUBJECT_ALERTS],
     isSessionRecapDmsActive: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS],
     showDashboardRedesign: (state) =>

@@ -31,6 +31,7 @@ describe('ProfileView', () => {
       userType: 'student',
       subjects: [],
       activeSubjects: [],
+      mutedSubjectAlerts: [],
     }
   })
 
@@ -233,15 +234,10 @@ describe('ProfileView', () => {
       [false, false],
     ])(
       'Should only show tutoring alerts column and toggle button when mute subject alert FF is on',
-      (mutedSubjectsAlert, expected) => {
+      (expected) => {
         const wrapper = getWrapper({
           user,
           subjects,
-          featureFlags: {
-            getters: {
-              isMutedSubjectAlertsActive: () => mutedSubjectsAlert,
-            },
-          },
         })
 
         expect(
@@ -259,18 +255,10 @@ describe('ProfileView', () => {
       [['algebraTwo'], undefined, 'true'],
     ])(
       'Should set toggle button value to false when subject is toggled off and true when it is toggled on',
-      async (mutedSubjects, valueBeforeToggle, valueAfterToggle) => {
+      async (valueBeforeToggle, valueAfterToggle) => {
         const wrapper = getWrapper({
-          user: {
-            ...user,
-            mutedSubjectAlerts: mutedSubjects,
-          },
+          user,
           subjects,
-          featureFlags: {
-            getters: {
-              isMutedSubjectAlertsActive: () => true,
-            },
-          },
         })
 
         const clickEditSaveButton = async (wrapper) => {

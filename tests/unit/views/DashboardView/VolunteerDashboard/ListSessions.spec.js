@@ -79,9 +79,6 @@ const getWrapper = async (overrides = {}) => {
       },
       featureFlags: {
         ...featureFlagsModule,
-        getters: {
-          isMutedSubjectAlertsActive: () => true,
-        },
       },
       notifications: {
         state: {
