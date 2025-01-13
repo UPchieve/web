@@ -116,8 +116,6 @@ export default {
       { context, sessions }
     ) {
       const user = this.state.user.user
-      const isMutedSubjectAlertsActive =
-        this.getters['featureFlags/isMutedSubjectAlertsActive']
 
       const cantJoinSessions =
         !sessions ||
@@ -149,10 +147,7 @@ export default {
 
         if (
           user.subjects.includes(subTopic) &&
-          !(
-            isMutedSubjectAlertsActive &&
-            user.mutedSubjectAlerts.includes(subTopic)
-          )
+          !user.mutedSubjectAlerts.includes(subTopic)
         ) {
           results.push(session)
         }

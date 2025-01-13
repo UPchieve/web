@@ -69,9 +69,6 @@ export default {
       ticks: (state) => state.volunteer.ticks,
       openSessions: (state) => state.volunteer.openSessions,
     }),
-    ...mapGetters({
-      isMutedSubjectAlertsActive: 'featureFlags/isMutedSubjectAlertsActive',
-    }),
   },
   watch: {
     ticks() {
