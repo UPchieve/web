@@ -9,6 +9,7 @@ import {
 } from './machines/screenShareMachine'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import { moderateScreenShare } from './moderation-tools'
 
 interface ScreenShareContext {
   targetElement: HTMLCanvasElement | HTMLVideoElement | null
@@ -27,6 +28,8 @@ export function createScreenShareActor({
   const zoomClient = store.state.liveMedia.zoomClient
   const state = ref(ScreenShareState.Initial)
   const context = reactive({ ...INITIAL_STATE })
+  const { beginScreenShareModeration, endScreenShareModeration } =
+    moderateScreenShare()
 
   const actions: {
     [key in ScreenShareActions]: (args: {
@@ -35,6 +38,7 @@ export function createScreenShareActor({
     }) => Promise<void>
   } = {
     [ScreenShareActions.DESTROY]: async () => {
+      endScreenShareModeration()
       await stream.stopShareScreen()
       await stream.stopShareView()
       store.commit('liveMedia/screenShare/setScreenShareActive', false)
@@ -83,17 +87,21 @@ export function createScreenShareActor({
     [ScreenShareActions.START_SCREEN_SHARE]: async ({ context }) => {
       try {
         await stream.startShareScreen(context.targetElement)
-        await send(ScreenShareEvent.CHOOSE_SCREEN)
+        await send(ScreenShareEvent.CHOOSE_SCREEN, {
+          targetElement: context.targetElement,
+        })
       } catch (error) {
         await send(ScreenShareEvent.CANCEL_SCREEN_SELECTION)
         store.commit('liveMedia/screenShare/setScreenShareActive', false)
         LoggerService.noticeError({ error }, 'Failed to start screenshare')
       }
     },
-    [ScreenShareActions.SHARING_SCREEN]: async () => {
+    [ScreenShareActions.SHARING_SCREEN]: async ({ context }) => {
+      beginScreenShareModeration(context.targetElement)
       AnalyticsService.captureEvent(EVENTS.SCREENSHARE_USER_SHARED_SCREEN)
     },
     [ScreenShareActions.STOP_SCREEN_SHARE]: async ({ context }) => {
+      endScreenShareModeration()
       await stream.stopShareScreen()
       AnalyticsService.captureEvent(EVENTS.SCREENSHARE_USER_STOPPED_SCREENSHARE)
       // TODO: is there a method for this?
@@ -129,6 +137,7 @@ export function createScreenShareActor({
       })
     },
     [ScreenShareActions.REMOVE_VIEWER]: async ({ context }) => {
+      endScreenShareModeration()
       await stream.stopShareView()
       AnalyticsService.captureEvent(
         EVENTS.SCREENSHARE_USER_STOPPED_VIEWING_SCREENSHARE

@@ -723,6 +723,12 @@ export default {
       this._errorHandler
     )
   },
+  checkIfVideoFrameIsClean(data) {
+    return httpPost(`${API_ROOT}/moderate/video-frame`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   feedback(data) {
     return httpPost(`${API_ROOT}/feedback`, data).then(
       this._successHandler,
