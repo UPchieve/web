@@ -28,4 +28,9 @@ export default {
     const res = await NetworkService.checkIfImageIsClean(formData)
     return res.data
   },
+
+  async checkIfVideoFrameIsClean(formData) {
+    const res = await NetworkService.checkIfVideoFrameIsClean(formData)
+    return res.data
+  },
 }

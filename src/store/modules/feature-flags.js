@@ -36,6 +36,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL]: false,
       [POSTHOG_FEATURE_FLAGS.SCREENSHARE]: false,
+      [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -51,6 +52,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: '',
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
+      [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
     },
     eligibleForChooseTutorType: false,
   },
@@ -177,6 +179,12 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL],
     isScreenshareEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SCREENSHARE],
+    videoModerationSampleInterval: (state) =>
+      state.payloadFlags[
+        POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL
+      ],
+    isVideoModerationEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {

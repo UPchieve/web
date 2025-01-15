@@ -729,6 +729,8 @@ export const POSTHOG_FEATURE_FLAGS = {
   CHOOSE_TUTOR_TYPE: 'choose-tutor-type',
   SESSION_AUDIO_CALL: 'session-audio-call',
   SCREENSHARE: 'screenshare',
+  VIDEO_MODERATION_SAMPLE_INTERVAL: 'video-moderation-sample-interval',
+  VIDEO_MODERATION_ENABLED: 'video-moderation-enabled',
 }
 
 export const ANALYTICS_REPORT_ROW = {
