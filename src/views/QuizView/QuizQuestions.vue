@@ -11,12 +11,23 @@
       <div v-if="questionNumber" class="question-number">
         Question {{ questionNumber }}
       </div>
-      <div class="questionText">{{ questionText }}</div>
-      <div class="question-image-container" v-if="imageSrc">
-        <div :style="imageStyle" class="question-image" />
+      <div class="questionText" data-testid="question-text">
+        {{ questionText }}
+      </div>
+      <div
+        class="question-image-container"
+        v-if="imageSrc"
+        data-testid="question-image-container"
+      >
+        <div
+          :style="imageStyle"
+          class="question-image"
+          data-testid="question-image"
+        />
         <image-expand-icon
           class="image-sizer-icon"
           @click="handleImageExpansion"
+          data-testid="expand-image"
         />
       </div>
       <div
@@ -24,10 +35,14 @@
         @click="handleImageExpansion"
         class="upc-modal question-image-modal"
       >
-        <div class="question-image-expanded-container">
+        <div
+          class="question-image-expanded-container"
+          data-testid="question-image-expanded-container"
+        >
           <image-collapse-icon
             class="image-sizer-icon"
             @click="handleImageExpansion"
+            data-testid="collapse-image"
           />
           <img :src="imageSrc" class="question-image--expanded" />
         </div>
@@ -46,6 +61,7 @@
             <label
               :for="item.val"
               :id="'answer-' + item.val"
+              :data-testid="`$answer-${item.val}`"
               class="answer-option--label"
             >
               {{ item.val }}. {{ item.txt }}
@@ -58,6 +74,7 @@
     <div class="btn-container">
       <button
         v-if="showPrevious"
+        data-testid="btn-question-previous"
         class="prev btn"
         type="button"
         @click.prevent="previous()"
@@ -92,6 +109,7 @@ import TrainingService from '@/services/TrainingService'
 import ProgressBar from './ProgressBar.vue'
 import ImageExpandIcon from '@/assets/image-expand.svg'
 import ImageCollapseIcon from '@/assets/image-collapse.svg'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   props: ['quizLength'],
@@ -122,7 +140,8 @@ export default {
   beforeUpdate() {
     // manually set questionText since MathJax's generated DOM elements interfere
     // with Vue's template engine when changing the text
-    document.querySelector('.questionText').innerHTML = this.questionText
+    const questionText = document.querySelector('.questionText')
+    if (questionText) questionText.innerHTML = this.questionText
   },
   updated() {
     this.rerenderMathJaxElements()
@@ -131,6 +150,12 @@ export default {
   methods: {
     clearMathJaxElements() {
       const quizBody = document.querySelector('.quiz-body')
+      if (!quizBody) {
+        LoggerService.noticeError(
+          'Missing quiz body - cannot clear MathJax elements'
+        )
+        return
+      }
 
       // Remove any MathJax-rendered elements from the DOM.
       // Do this before updating to avoid rendering artifacts being left behind
@@ -161,6 +186,12 @@ export default {
 
     rerenderMathJaxElements() {
       const quiz = document.querySelector('.quiz-body')
+      if (!quiz) {
+        LoggerService.noticeError(
+          'Missing quiz body - cannot rerender MathJax elements'
+        )
+        return
+      }
       const questionText = quiz.querySelector('.questionText')
       const answerChoices = quiz.querySelectorAll('.possible-answers div')
 
@@ -279,9 +310,9 @@ export default {
         this.isImageExpanded &&
         target &&
         target.classList.contains('question-image--expanded')
-      )
+      ) {
         return
-      else this.isImageExpanded = !this.isImageExpanded
+      } else this.isImageExpanded = !this.isImageExpanded
     },
   },
 }
