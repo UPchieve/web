@@ -47,6 +47,17 @@
         >
           <ErrorIcon class="screenshare-error" />
         </span>
+        <span
+          v-else-if="isLiveMediaBanned"
+          v-tooltip="{
+            text: 'Our automated moderation detected a potential policy issue with your shared content. For everyone’s safety, screen sharing has been temporarily disabled. We’ll manually review to confirm if this was a mistake. Thank you for your patience!',
+            position: 'top',
+            color: 'black',
+            open: screenShareErrorTooltipOpen,
+          }"
+        >
+          <ErrorIcon class="screenshare-error" />
+        </span>
         <button v-else @click="toggleScreenShareWindow">
           <StopScreenShareIcon
             v-if="isScreenSharing"
@@ -440,7 +451,11 @@ export default {
       isJoiningCall: 'liveMedia/isJoiningCall',
       unableToJoinCall: 'liveMedia/unableToJoinCall',
       sessionPartner: 'user/sessionPartner',
+      hasSpeakingPrivileges: 'liveMedia/audio/hasSpeakingPrivileges',
     }),
+    isLiveMediaBanned() {
+      return !this.hasSpeakingPrivileges
+    },
     showScreenShareTool() {
       // Show to students once a volunteer is sharing their screen
       // and show to volunteers right away
