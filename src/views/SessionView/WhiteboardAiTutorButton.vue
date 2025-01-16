@@ -18,7 +18,7 @@ onMounted(() => {
 <template>
   <button @click="emit('click')">
     <activity-dot v-if="showHasAiMessageIndicator" class="unread-indicator" />
-    <ChatBotIcon class="toolbar-item__svg" />
+    <ChatBotIcon class="toolbar-icon" />
   </button>
 </template>
 

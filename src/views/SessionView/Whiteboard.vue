@@ -76,38 +76,62 @@
         "
       />
       <div
-        class="toolbar-item toolbar-item--pick"
+        class="toolbar-item"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
         tabindex="0"
         @click="usePickTool"
         @keydown.enter="usePickTool"
       >
-        <SelectionIcon class="toolbar-item__svg" />
+        <PickToolIcon class="toolbar-icon--pick" />
       </div>
       <div
-        class="toolbar-item toolbar-item--brush"
-        title="Brush tool"
-        v-bind:class="selectedTool === 'brush' ? 'selected-tool' : ''"
+        class="toolbar-item"
+        title="Brushes"
         tabindex="0"
-        @click="useBrushTool"
-        @keydown.enter="useBrushTool"
+        @click="toggleBrushes"
+        @keydown.enter="toggleBrushes"
+        :class="
+          selectedTool === 'brush' || selectedTool === 'thin-brush'
+            ? 'selected-tool'
+            : ''
+        "
       >
-        <PenIcon class="toolbar-item__svg" />
+        <PenIcon class="toolbar-icon--pen" />
+        <div v-if="showBrushPicker" class="options-bar">
+          <div
+            class="toolbar-item option-item"
+            :class="selectedTool === 'brush' ? 'selected-tool' : ''"
+            tabindex="0"
+            @click="useBrushTool"
+            @keydown.enter="useBrushTool"
+          >
+            <ThickPenIcon class="toolbar-icon" />
+          </div>
+          <div
+            class="toolbar-item option-item"
+            :class="selectedTool === 'thin-brush' ? 'selected-tool' : ''"
+            tabindex="0"
+            @click="useThinBrushTool"
+            @keydown.enter="useThinBrushTool"
+          >
+            <ThinPenIcon class="toolbar-icon" />
+          </div>
+        </div>
       </div>
       <div
         v-if="isWhiteboardEraserToolActive"
-        class="toolbar-item toolbar-item--eraser"
+        class="toolbar-item"
         :class="selectedTool === 'eraser' ? 'selected-tool' : ''"
         title="Eraser"
         tabindex="0"
         @click="useEraserTool"
         @keydown.enter="useEraserTool"
       >
-        <EraserIcon class="toolbar-item__svg" />
+        <EraserIcon class="toolbar-icon" />
       </div>
       <div
-        class="toolbar-item toolbar-item--photo"
+        class="toolbar-item"
         title="Upload photo"
         tabindex="0"
         @click="openFileDialog"
@@ -119,85 +143,125 @@
           accept="image/*, image/heic"
           @file-selected="uploadPhoto"
         />
-        <PhotoUploadIcon class="toolbar-item__svg--photo" />
+        <PhotoUploadIcon class="toolbar-icon--photo" />
       </div>
       <div
-        class="toolbar-item toolbar-item--shapes"
+        class="toolbar-item"
         title="Shapes"
         tabindex="0"
         @click="toggleShapes"
         @keydown.enter="toggleShapes"
         :class="isShapeSelected ? 'selected-tool' : ''"
       >
-        <ShapesIcon class="toolbar-item__svg toolbar-item__svg--shapes" />
-        <div v-if="showShapes" class="shapes-bar">
+        <ShapesIcon class="toolbar-icon" />
+        <div v-if="showShapePicker" class="options-bar">
           <div
-            class="toolbar-item shapes-bar__toolbar-item"
+            class="toolbar-item option-item"
             :class="selectedTool === 'line' ? 'selected-tool' : ''"
             tabindex="0"
             @click="useLineTool"
             @keydown.enter="useLineTool"
           >
-            <line-icon class="shapes-bar__shape-icon" title="Line tool" />
+            <line-icon class="toolbar-icon--shape" title="Line tool" />
           </div>
           <div
-            class="toolbar-item shapes-bar__toolbar-item"
+            class="toolbar-item option-item"
+            :class="selectedTool === 'arrow' ? 'selected-tool' : ''"
+            tabindex="0"
+            @click="useArrowTool"
+            @keydown.enter="useArrowTool"
+          >
+            <arrow-icon class="toolbar-icon--shape" title="Arrow tool" />
+          </div>
+          <div
+            class="toolbar-item option-item"
             :class="selectedTool === 'circle' ? 'selected-tool' : ''"
             tabindex="0"
             @click="useCircleTool"
             @keydown.enter="useCircleTool"
           >
-            <circle-icon class="shapes-bar__shape-icon" title="Circle tool" />
+            <circle-icon class="toolbar-icon--shape" title="Circle tool" />
           </div>
           <div
-            class="toolbar-item shapes-bar__toolbar-item"
+            class="toolbar-item option-item"
             :class="selectedTool === 'polygon' ? 'selected-tool' : ''"
             tabindex="0"
             @click="useTriangleTool"
             @keydown.enter="useTriangleTool"
           >
-            <triangle-icon
-              class="shapes-bar__shape-icon"
-              title="Triangle tool"
-            />
+            <triangle-icon class="toolbar-icon--shape" title="Triangle tool" />
           </div>
           <div
-            class="toolbar-item shapes-bar__toolbar-item"
+            class="toolbar-item option-item"
             :class="selectedTool === 'rectangle' ? 'selected-tool' : ''"
             tabindex="0"
             @click="useRectangleTool"
             @keydown.enter="useRectangleTool"
           >
             <rectangle-icon
-              class="shapes-bar__shape-icon"
+              class="toolbar-icon--shape"
               title="Rectangle tool"
             />
+          </div>
+          <!-- TODO: Uncomment once we have a graph paper stamp. -->
+          <!-- <div -->
+          <!-- class="toolbar-item option-item" -->
+          <!-- :class="selectedTool === 'imagestamp' ? 'selected-tool' : ''" -->
+          <!-- tabindex="0" -->
+          <!-- @click="useXyGraphStampTool" -->
+          <!-- @keydown.enter="useXyGraphStampTool" -->
+          <!-- > -->
+          <!-- <xy-graph-icon class="toolbar-icon--shape" title="Graph paper" /> -->
+          <!-- </div> -->
+        </div>
+      </div>
+      <div
+        class="toolbar-item"
+        title="Text"
+        tabindex="0"
+        @click="toggleTextPicker"
+        @keydown.enter="toggleTextPicker"
+        :class="
+          selectedTool === 'small-text' || selectedTool === 'text'
+            ? 'selected-tool'
+            : ''
+        "
+      >
+        <TextIcon class="toolbar-icon" />
+        <div v-if="showTextPicker" class="options-bar">
+          <div
+            class="toolbar-item option-item"
+            :class="selectedTool === 'text' ? 'selected-tool' : ''"
+            title="Text"
+            tabindex="0"
+            @click="useTextTool"
+            @keydown.enter="useTextTool"
+          >
+            <TextIcon class="toolbar-icon" />
+          </div>
+          <div
+            class="toolbar-item option-item"
+            :class="selectedTool === 'small-text' ? 'selected-tool' : ''"
+            title="Small Text"
+            tabindex="0"
+            @click="useSmallTextTool"
+            @keydown.enter="useSmallTextTool"
+          >
+            <SmallTextIcon class="toolbar-icon" />
           </div>
         </div>
       </div>
       <div
-        class="toolbar-item toolbar-item--text"
-        :class="selectedTool === 'text' ? 'selected-tool' : ''"
-        title="Text"
-        tabindex="0"
-        @click="useTextTool"
-        @keydown.enter="useTextTool"
-      >
-        <TextIcon class="toolbar-item__svg" />
-      </div>
-      <div
-        class="toolbar-item toolbar-item--color-picker"
+        class="toolbar-item"
         title="Color picker"
         tabindex="0"
         @click="toggleColorPicker"
         @keydown.enter="toggleColorPicker"
       >
-        <ColorPickerIcon
-          class="toolbar-item__svg toolbar-item__svg--color-picker"
-        />
-        <div v-if="showColorPicker" class="color-bar">
+        <ColorPickerIcon class="toolbar-icon--color" />
+        <div v-if="showColorPicker" class="options-bar --color">
           <div
-            class="color-button"
+            class="toolbar-color"
             title="Black"
             style="background-color: rgba(10, 10, 10, 1)"
             tabindex="0"
@@ -205,15 +269,15 @@
             @keydown.enter="setColor('rgba(10, 10, 10, 1)')"
           ></div>
           <div
-            class="color-button"
+            class="toolbar-color"
             title="Navy"
-            style="background-color: rgba(38, 51, 104, 1)"
+            style="background-color: rgba(38, 51, 190, 1)"
             tabindex="0"
-            @click="setColor('rgba(38, 51, 104, 1)')"
-            @keydown.enter="setColor('rgba(38, 51, 104, 1)')"
+            @click="setColor('rgba(38, 51, 190, 1)')"
+            @keydown.enter="setColor('rgba(38, 51, 190, 1)')"
           ></div>
           <div
-            class="color-button"
+            class="toolbar-color"
             title="Red"
             style="background-color: rgba(244, 71, 71, 1)"
             tabindex="0"
@@ -221,7 +285,7 @@
             @keydown.enter="setColor('rgba(244, 71, 71, 1)')"
           ></div>
           <div
-            class="color-button"
+            class="toolbar-color"
             title="Sand"
             style="background-color: rgba(249, 227, 183, 1)"
             tabindex="0"
@@ -229,7 +293,7 @@
             @keydown.enter="setColor('rgba(249, 227, 183, 1)')"
           ></div>
           <div
-            class="color-button"
+            class="toolbar-color"
             title="Teal"
             style="background-color: rgba(123, 222, 201, 1)"
             tabindex="0"
@@ -237,50 +301,90 @@
             @keydown.enter="setColor('rgba(123, 222, 201, 1)')"
           ></div>
           <div
-            class="color-button"
+            class="toolbar-color"
             title="Light Blue"
             style="background-color: rgba(119, 151, 216, 1)"
             tabindex="0"
             @click="setColor('rgba(119, 151, 216, 1)')"
             @keydown.enter="setColor('rgba(119, 151, 216, 1)')"
           ></div>
+          <div
+            class="toolbar-color"
+            title="Magenta"
+            style="background-color: rgba(252, 30, 227, 1)"
+            tabindex="0"
+            @click="setColor('rgba(252, 30, 227, 1)')"
+            @keydown.enter="setColor('rgba(252, 30, 227, 1)')"
+          ></div>
+          <div
+            class="toolbar-color"
+            title="Highlighter Green"
+            style="background-color: rgba(20, 255, 20, 0.5)"
+            tabindex="0"
+            @click="setColor('rgba(20, 255, 20, 0.5)')"
+            @keydown.enter="setColor('rgba(20, 255, 20, 0.5)')"
+          ></div>
+          <div
+            class="toolbar-color"
+            title="Highlighter Orange"
+            style="background-color: rgba(255, 152, 3, 0.5)"
+            tabindex="0"
+            @click="setColor('rgba(255, 152, 3, 0.5)')"
+            @keydown.enter="setColor('rgba(255, 152, 3, 0.5)')"
+          ></div>
+          <div
+            class="toolbar-color"
+            title="Highlighter Yellow"
+            style="background-color: rgba(255, 255, 3, 0.5)"
+            tabindex="0"
+            @click="setColor('rgba(255, 255, 3, 0.5)')"
+            @keydown.enter="setColor('rgba(255, 255, 3, 0.5)')"
+          ></div>
+          <div
+            class="toolbar-color --transparent"
+            title="Transparent"
+            style="background-color: rgba(255, 255, 255, 0)"
+            tabindex="0"
+            @click="setColor('rgba(255, 255, 255, 0.0)')"
+            @keydown.enter="setColor('rgba(255, 255, 255, 0.0)')"
+          ></div>
         </div>
       </div>
       <div
-        class="toolbar-item toolbar-item--undo"
+        class="toolbar-item"
         title="Undo"
         tabindex="0"
         @click="undo"
         @keydown.enter="undo"
       >
-        <UndoIcon class="toolbar-item__svg" />
+        <UndoIcon class="toolbar-icon" />
       </div>
       <div
-        class="toolbar-item toolbar-item--redo"
+        class="toolbar-item"
         title="Redo"
         tabindex="0"
         @click="redo"
         @keydown.enter="redo"
       >
-        <RedoIcon class="toolbar-item__svg" />
+        <RedoIcon class="toolbar-icon" />
       </div>
       <div
-        class="toolbar-item toolbar-item--clear"
+        class="toolbar-item"
         title="Clear whiteboard"
         tabindex="0"
         @click="clearWhiteboard"
         @keydown.enter="clearWhiteboard"
       >
-        <ClearIcon class="toolbar-item__svg" />
+        <ClearIcon class="toolbar-icon" />
       </div>
       <div
-        class="toolbar-item toolbar-item--reset"
+        class="toolbar-item"
         title="Reset whiteboard"
         tabindex="0"
         @click="toggleResetWhiteboardModal"
         @keydown.enter="toggleResetWhiteboardModal"
       >
-        <ResetIcon class="toolbar-item__svg--reset" />
+        <ResetIcon class="toolbar-icon--reset" />
       </div>
     </div>
     <div v-if="isLoading" class="loading-overlay">
@@ -293,10 +397,12 @@
 import { mapGetters } from 'vuex'
 import axios from 'axios'
 import NetworkService from '@/services/NetworkService'
-import SelectionIcon from '@/assets/whiteboard_icons/selection.svg'
+import PickToolIcon from '@/assets/whiteboard_icons/selection.svg'
 import ClearIcon from '@/assets/whiteboard_icons/clear.svg'
 import ColorPickerIcon from '@/assets/whiteboard_icons/color_picker.svg'
 import PenIcon from '@/assets/whiteboard_icons/pen.svg'
+import ThickPenIcon from '@/assets/whiteboard_icons/thick_pen.svg'
+import ThinPenIcon from '@/assets/whiteboard_icons/thin_pen.svg'
 import UndoIcon from '@/assets/whiteboard_icons/undo.svg'
 import RedoIcon from '@/assets/whiteboard_icons/redo.svg'
 import DeleteSelectionIcon from '@/assets/whiteboard_icons/delete_selection.png'
@@ -305,13 +411,15 @@ import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import ErrorIcon from '@/assets/sidebar_icons/exclamation.svg'
 import FileDialog from '@/components/FileDialog.vue'
 import ShapesIcon from '@/assets/whiteboard_icons/shapes.svg'
-import TextIcon from '@/assets/whiteboard_icons/text.svg'
+import ArrowIcon from '@/assets/arrow.svg'
 import CircleIcon from '@/assets/whiteboard_icons/circle.svg'
 import RectangleIcon from '@/assets/whiteboard_icons/rectangle.svg'
 import TriangleIcon from '@/assets/whiteboard_icons/triangle.svg'
 import LineIcon from '@/assets/whiteboard_icons/line.svg'
 import ResetIcon from '@/assets/whiteboard_icons/reset.svg'
 import EraserIcon from '@/assets/whiteboard_icons/eraser.svg'
+import TextIcon from '@/assets/whiteboard_icons/text_tool.svg'
+import SmallTextIcon from '@/assets/whiteboard_icons/small_text_tool.svg'
 import Loader from '@/components/Loader.vue'
 import ResetWhiteboardModal from './ResetWhiteboardModal.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
@@ -336,22 +444,26 @@ export default {
   },
   components: {
     WhiteboardAiTutorButton,
-    SelectionIcon,
+    PickToolIcon,
     ClearIcon,
     ColorPickerIcon,
     PenIcon,
+    ThickPenIcon,
+    ThinPenIcon,
     UndoIcon,
     RedoIcon,
     PhotoUploadIcon,
     FileDialog,
     ShapesIcon,
-    TextIcon,
+    ArrowIcon,
     CircleIcon,
     RectangleIcon,
     TriangleIcon,
     LineIcon,
     ResetIcon,
     EraserIcon,
+    TextIcon,
+    SmallTextIcon,
     Loader,
     ResetWhiteboardModal,
     LoadingMessage,
@@ -408,25 +520,36 @@ export default {
   },
   data() {
     return {
+      // Zwibbler.
       zwibblerCtx: null,
-      selectedTool: '',
-      showColorPicker: false,
-      error: '',
-      showShapes: false,
-      isLoading: false,
       canvasHeight: 2800,
       canvasWidth: 1000,
-      pingPongInterval: null,
+      // Component state.
+      error: '',
+      isLoading: false,
       isConnected: false,
       hadConnectionIssue: false,
+      pingPongInterval: null,
+      uploadingPictureError: false,
+      imageUploadErrorMessage: 'Unable to upload the image',
+      screenShareErrorTooltipOpen: false,
+      // Tools.
+      // one-of: ai-tutor, pick, brush, thin-brush (i.e. brush), eraser (i.e. brush), line, arrow, circle, polygon (used for triangle), rectangle, imagestamp (used for xy graph), text, small-text (i.e. text)
+      selectedTool: '',
+      previouslySelectedTool: null,
+      // Tool option selection.
+      showBrushPicker: false,
+      showShapePicker: false,
+      showTextPicker: false,
+      showColorPicker: false,
+      // The tools that alter the default Zwibbler tool state.
+      selectedEraserTool: false,
+      selectedThinBrushTool: false,
+      selectedSmallTextTool: false,
+      // Resetting the whiteboard.
       showResetWhiteboardModal: false,
       shouldResetWhiteboard: false,
       resetWhiteboardError: false,
-      uploadingPictureError: false,
-      selectedEraserTool: false,
-      imageUploadErrorMessage: 'Unable to upload the image',
-      previouslySelectedTool: null,
-      screenShareErrorTooltipOpen: false,
     }
   },
   emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
@@ -453,23 +576,34 @@ export default {
       return this.aiWidgetHidden
     },
     toolClass() {
-      if (this.selectedTool === 'brush') return 'zwib-wrapper--brush'
-      if (this.selectedTool === 'pick') return 'zwib-wrapper--pick'
-      if (this.selectedTool === 'line') return 'zwib-wrapper--line'
-      if (this.selectedTool === 'circle') return 'zwib-wrapper--circle'
-      if (this.selectedTool === 'rectangle') return 'zwib-wrapper--rectangle'
-      if (this.selectedTool === 'polygon') return 'zwib-wrapper--triangle'
-      if (this.selectedTool === 'text') return 'zwib-wrapper--text'
-      if (this.selectedTool === 'eraser') return 'zwib-wrapper--eraser'
+      if (
+        this.selectedTool === 'brush' ||
+        this.selectedTool === 'thin-brush' ||
+        this.selectedTool === 'line' ||
+        this.selectedTool === 'arrow' ||
+        this.selectedTool === 'circle' ||
+        this.selectedTool === 'polygon' || // i.e. triangle
+        this.selectedTool === 'rectangle' ||
+        this.selectedTool === 'imagestamp' // i.e. xy_graph
+      ) {
+        return 'zwib-wrapper--crosshair-curor'
+      }
 
+      if (this.selectedTool === 'text' || this.selectedTool === 'small-text') {
+        return 'zwib-wrapper--text-cursor'
+      }
+
+      // For pick, eraser.
       return 'zwib-wrapper--default'
     },
     isShapeSelected() {
       return (
         this.selectedTool === 'line' ||
+        this.selectedTool === 'arrow' ||
         this.selectedTool === 'circle' ||
         this.selectedTool === 'polygon' ||
-        this.selectedTool === 'rectangle'
+        this.selectedTool === 'rectangle' ||
+        this.selectedTool === 'xy_graph'
       )
     },
   },
@@ -558,6 +692,22 @@ export default {
       this.zwibblerCtx.useBrushTool()
       this.maybeFocusZwibbler(event)
     },
+    useThinBrushTool(event) {
+      this.selectedThinBrushTool = true
+      this.zwibblerCtx.useBrushTool({ lineWidth: 3 })
+      this.maybeFocusZwibbler(event)
+    },
+    useEraserTool(event) {
+      const layer = this.zwibblerCtx.getActiveLayer()
+      this.selectedEraserTool = true
+      this.zwibblerCtx.useBrushTool({
+        lineWidth: 10,
+        strokeStyle: 'erase',
+        layer,
+      })
+      AnalyticsService.captureEvent(EVENTS.USER_CLICKED_WHITEBOARD_ERASER_TOOL)
+      this.maybeFocusZwibbler(event)
+    },
     useLineTool(event) {
       this.zwibblerCtx.useLineTool(
         {},
@@ -565,6 +715,10 @@ export default {
           singleLine: true,
         }
       )
+      this.maybeFocusZwibbler(event)
+    },
+    useArrowTool(event) {
+      this.zwibblerCtx.useArrowTool()
       this.maybeFocusZwibbler(event)
     },
     useCircleTool(event) {
@@ -579,38 +733,57 @@ export default {
       this.zwibblerCtx.useRectangleTool()
       this.maybeFocusZwibbler(event)
     },
+    useXyGraphStampTool(event) {
+      this.zwibblerCtx.useStampTool(
+        {
+          // TODO: Get Grace to create a graph paper stamp.
+          url: '',
+          lockSize: false,
+          width: 300,
+        },
+        false
+      )
+      this.maybeFocusZwibbler(event)
+    },
     useTextTool(event) {
       this.zwibblerCtx.useTextTool()
       this.maybeFocusZwibbler(event)
     },
-    useEraserTool(event) {
-      const layer = this.zwibblerCtx.getActiveLayer()
-      this.selectedEraserTool = true
-      this.zwibblerCtx.useBrushTool({
-        lineWidth: 10,
-        strokeStyle: 'erase',
-        layer,
-      })
-      AnalyticsService.captureEvent(EVENTS.USER_CLICKED_WHITEBOARD_ERASER_TOOL)
+    useSmallTextTool(event) {
+      this.selectedSmallTextTool = true
+      this.zwibblerCtx.useTextTool({ fontSize: 26, fontName: 'Arial' })
       this.maybeFocusZwibbler(event)
+    },
+    toggleBrushes() {
+      this.showBrushPicker = !this.showBrushPicker
+      this.showShapePicker = false
+      this.showTextPicker = false
+      this.showColorPicker = false
+    },
+    toggleShapes() {
+      this.showShapePicker = !this.showShapePicker
+      this.showBrushPicker = false
+      this.showTextPicker = false
+      this.showColorPicker = false
+    },
+    toggleTextPicker() {
+      this.showTextPicker = !this.showTextPicker
+      this.showBrushPicker = false
+      this.showShapePicker = false
+      this.showColorPicker = false
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker
-      this.showShapes = false
-      /* since the eraser is also a `brush`, let's assume the user
-       * doesn't want to erase in the color they just chose and automatically switch
-       * to the brush
+      this.showBrushPicker = false
+      this.showTextPicker = false
+      this.showShapePicker = false
+      /* Since the eraser is also a `brush`, let's assume the user
+       * doesn't want to erase in the color they just chose and
+       * automatically switch to the brush.
        */
-      if (
-        this.zwibblerCtx.getCurrentTool() === 'brush' &&
-        !this.showColorPicker
-      ) {
+      if (this.selectedTool === 'eraser' && !this.showColorPicker) {
         this.useBrushTool()
       }
-    },
-    toggleShapes() {
-      this.showShapes = !this.showShapes
-      this.showColorPicker = false
     },
     undo() {
       this.zwibblerCtx.undo()
@@ -621,8 +794,10 @@ export default {
       this.hideHoveredToolbars()
     },
     hideHoveredToolbars() {
+      this.showBrushPicker = false
+      this.showShapePicker = false
+      this.showTextPicker = false
       this.showColorPicker = false
-      this.showShapes = false
     },
     openFileDialog(event) {
       this.$refs.fileDialog.openFileDialog(event)
@@ -890,7 +1065,15 @@ export default {
           if (this.selectedEraserTool) {
             this.selectedEraserTool = false
             this.selectedTool = 'eraser'
-          } else this.selectedTool = toolname
+          } else if (this.selectedThinBrushTool) {
+            this.selectedThinBrushTool = false
+            this.selectedTool = 'thin-brush'
+          } else if (this.selectedSmallTextTool) {
+            this.selectedSmallTextTool = false
+            this.selectedTool = 'small-text'
+          } else {
+            this.selectedTool = toolname
+          }
           this.hideHoveredToolbars()
         })
       })
@@ -970,35 +1153,47 @@ export default {
       Then when the resizing ends, we restore the previous selection
     */
       if (current) {
-        this.previouslySelectedTool = this.zwibblerCtx.getCurrentTool()
+        this.previouslySelectedTool = this.selectedTool
         this.zwibblerCtx.useCustomTool(new WhiteboardNullTool())
         this.selectedTool = ''
       } else {
         this.selectedTool = this.previouslySelectedTool
         switch (this.selectedTool) {
+          case 'pick':
+            this.usePickTool()
+            break
           case 'brush':
             this.useBrushTool()
             break
-          case 'pick':
-            this.usePickTool()
+          case 'thin-brush':
+            this.userThinBrushTool()
+            break
+          case 'eraser':
+            this.useEraserTool()
             break
           case 'line':
             this.useLineTool()
             break
+          case 'arrow':
+            this.useArrowTool()
+            break
           case 'circle':
             this.useCircleTool()
             break
-          case 'triangle':
+          case 'polygon':
             this.useTriangleTool()
             break
           case 'rectangle':
             this.useRectangleTool()
             break
+          case 'stamp':
+            this.useXyGraphStampTool()
+            break
           case 'text':
             this.useTextTool()
             break
-          case 'eraser':
-            this.useEraserTool()
+          case 'small-text':
+            this.useSmallTextTool()
             break
           default:
             this.usePickTool()
@@ -1028,31 +1223,16 @@ export default {
   width: 100%;
   position: relative;
 
-  &--brush,
-  &--circle,
-  &--rectangle,
-  &--triangle {
-    .zwibbler-canvas-holder {
-      cursor: crosshair !important;
-    }
+  &--crosshair-cursor {
+    cursor: crosshair !important;
   }
 
-  &--pick {
-    .zwibbler-canvas-holder {
-      cursor: default !important;
-    }
+  &--text-cursor {
+    cursor: text !important;
   }
 
-  &--text {
-    .zwibbler-canvas-holder {
-      cursor: text !important;
-    }
-  }
-
-  &--default {
-    .zwibbler-canvas-holder {
-      cursor: default !important;
-    }
+  &--default-cursor {
+    cursor: default !important;
   }
 }
 
@@ -1144,75 +1324,52 @@ export default {
     background: #e2e2e2;
   }
 
+  .option-item {
+    border-radius: initial;
+    padding: 0.5em;
+
+    @include breakpoint-below('tiny') {
+      padding: 1em;
+    }
+  }
+}
+
+.toolbar-icon {
+  width: 25px;
+
+  &--pen {
+    width: 22px;
+  }
+
   &--pick {
-    & .toolbar-item__svg {
-      width: 26px;
-      height: 26px;
-
-      padding: 3px 0 0 3px;
-    }
+    padding: 3px 0 0 3px;
   }
 
-  &__svg {
+  &--photo {
+    height: 26px;
+  }
+
+  &--shape {
+    height: 20px;
     width: 20px;
-
-    &--photo {
-      height: 26px;
-    }
-
-    &--reset {
-      width: 28px;
-    }
-
-    &--shapes {
-      @include breakpoint-below('medium') {
-        height: 22px;
-        width: 22px;
-      }
-    }
-
-    &--color-picker {
-      height: 25px;
-      width: 25px;
-    }
   }
 
-  &--shapes {
-    position: relative;
+  &--color {
+    height: 25px;
+    width: 25px;
+  }
+
+  &--reset {
+    width: 28px;
   }
 }
 
-.selected-tool {
-  background-color: #d5d5d5;
-}
-
-.color-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  bottom: 58px;
-  display: flex;
-  justify-content: space-around;
-  background-color: #fff;
-  border: 1px solid #d8d8d8;
-  border-radius: 5px;
-  width: 200px;
-  padding: 10px 8px;
-  cursor: default;
-
-  @include breakpoint-latest-iphones {
-    bottom: 88px;
-  }
-}
-
-.color-button {
+.toolbar-color {
+  border: 2px solid #fff;
+  border-radius: 100%;
   height: 22px;
-  width: 22px;
-  border-radius: 22px;
   cursor: pointer;
-  border: solid 2px #fff;
-  transition: border-color 0.2s;
+  width: 22px;
 
   &:hover {
     border-color: #ccc;
@@ -1221,6 +1378,41 @@ export default {
   &:active {
     outline: none;
   }
+
+  &.--transparent {
+    border: 1px solid #444;
+    height: 18px;
+    margin-top: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
+    width: 18px;
+
+    &:hover {
+      outline: 2px solid #ccc;
+    }
+  }
+}
+
+.options-bar {
+  @include flex-container(row, space-around);
+  background-color: #fff;
+  border: 1px solid #d8d8d8;
+  border-radius: 5px;
+  bottom: 58px;
+  margin: 0;
+  position: absolute;
+
+  &.--color {
+    padding: 10px 8px;
+  }
+
+  @include breakpoint-latest-iphones {
+    bottom: 88px;
+  }
+}
+
+.selected-tool {
+  background-color: darken(#e2e2e2, 15%);
 }
 
 .upload-photo {
@@ -1231,39 +1423,6 @@ export default {
   color: $c-error-red;
   position: absolute;
   bottom: 65px;
-}
-
-.shapes-bar {
-  @include flex-container(row, space-around);
-  position: absolute;
-  left: -50px;
-  margin: 0 auto;
-  bottom: 58px;
-  background-color: #fff;
-  border: 1px solid #d8d8d8;
-  border-radius: 5px;
-
-  @include breakpoint-latest-iphones {
-    bottom: 88px;
-  }
-
-  &__toolbar-item {
-    border-radius: initial !important;
-    padding: 0.5em;
-
-    @include breakpoint-below('tiny') {
-      padding: 1em;
-    }
-  }
-
-  &__shape-icon {
-    width: 20px;
-    height: 20px;
-  }
-
-  & .selected-tool {
-    background-color: darken(#e2e2e2, 15%);
-  }
 }
 
 .loading-overlay {
