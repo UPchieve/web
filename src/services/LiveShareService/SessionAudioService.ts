@@ -122,7 +122,7 @@ const callStateDefinition: FSMDefinition = {
       },
     },
     [SessionAudioState.JoinedAsBanned]: {
-      actions: ['revokeSpeakingPrivileges'], // grant/revoke can maybe be a derived state
+      actions: ['revokeLiveMediaPrivileges'], // grant/revoke can maybe be a derived state
       on: {
         [SessionAudioEvent.UNBAN]: SessionAudioState.Joined,
         [SessionAudioEvent.LEAVE]: SessionAudioState.Leaving,
@@ -401,7 +401,7 @@ export class SessionAudioService {
     async joinChannelAsBanned() {
       try {
         await this.joinChannelCommon()
-        await this.revokeSpeakingPrivileges()
+        await this.revokeLiveMediaPrivileges()
         await SessionAudioService.send(SessionAudioEvent.JOINED)
       } catch (e) {
         LoggerService.noticeError(e)
@@ -482,7 +482,12 @@ export class SessionAudioService {
       )
     },
 
-    async revokeSpeakingPrivileges() {
+    async revokeLiveMediaPrivileges() {
+      if (store.state.liveMedia?.screenShareActor) {
+        await store.state.liveMedia?.screenShareActor?.send(
+          ScreenShareEvent.STOP_SCREEN_SHARE
+        )
+      }
       await store.dispatch('liveMedia/audio/updateMicMuted', true)
     },
 
