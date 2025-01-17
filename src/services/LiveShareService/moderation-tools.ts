@@ -2,41 +2,58 @@ import { ref } from 'vue'
 import ModerationService from '@/services/ModerationService'
 import LoggerService from '@/services/LoggerService'
 import store from '@/store'
+import pixelmatch from 'pixelmatch'
 
 // This is the size of the image that we want to send to subway for moderation
-//
-const TARGET_LARGEST_IMAGE_DIMENSION_IN_PIXELS = 1000
+const TARGET_LARGEST_IMAGE_DIMENSION_IN_PIXELS = 3000
 
-function captureFrameFromCanvas(canvas: HTMLCanvasElement): {
+function captureFrameFromCanvas(
+  canvas: HTMLCanvasElement,
+  imageData: ImageData
+): {
   binary: Blob
-  string: string
+  width: number
+  height: number
+  imageData: ImageData
 } {
-  const frame = canvas.toDataURL('image/png').split(';base64,')[1]
+  const frame = canvas.toDataURL('image/jpeg', 1.0).split(';base64,')[1]
   const binaryFrame = atob(frame)
   const bytes = new Uint8Array(binaryFrame.length)
   for (let i = 0; i < binaryFrame.length; i++) {
     bytes[i] = binaryFrame.charCodeAt(i)
   }
-  return { binary: new Blob([bytes], { type: 'image/png' }), string: frame }
-}
-const MAX_RECENT_MODERATED_FRAMES = 5
-const recentlyModeratedFrames = new Set<string>()
-function addModeratedFrame(frame: string): Set<string> {
-  if (recentlyModeratedFrames.size >= MAX_RECENT_MODERATED_FRAMES) {
-    // Remove the oldest element (first added)
-    const oldestFrame = [...recentlyModeratedFrames][0]
-    recentlyModeratedFrames.delete(oldestFrame)
+  return {
+    binary: new Blob([bytes], { type: 'image/jpeg' }),
+    width: canvas.width,
+    height: canvas.height,
+    imageData,
   }
-  recentlyModeratedFrames.add(frame)
-  return recentlyModeratedFrames
 }
+// 16 seems to be the standard size of cursors in OSX and Windows
+const CURSOR_WIDTH_IN_PIXELS = 16 * window.devicePixelRatio
+const CURSOR_HEIGHT_IN_PIXELS = 16 * window.devicePixelRatio
+const MAX_PIXELS_DIFFERENCE = CURSOR_WIDTH_IN_PIXELS * CURSOR_HEIGHT_IN_PIXELS
 
-function frameHasBeenModerated(frame: string): boolean {
-  const hasBeenModerated = recentlyModeratedFrames.has(frame)
-  if (!hasBeenModerated) {
-    addModeratedFrame(frame)
+const lastModeratedFrameBuffer = ref<null | Uint8ClampedArray>(null)
+async function shouldModerateFrame(
+  frame: ReturnType<typeof captureFrameFromCanvas>
+): Promise<boolean> {
+  const lastFrame = lastModeratedFrameBuffer.value
+  lastModeratedFrameBuffer.value = frame.imageData.data
+
+  if (lastFrame === null) {
+    return true
   }
-  return hasBeenModerated
+
+  const numDifferingPixels = pixelmatch(
+    lastFrame,
+    frame.imageData.data,
+    null,
+    frame.imageData.width,
+    frame.imageData.height
+  )
+
+  return numDifferingPixels > MAX_PIXELS_DIFFERENCE
 }
 
 async function moderateFrame(
@@ -44,7 +61,7 @@ async function moderateFrame(
 ): Promise<void> {
   try {
     // Basic check to prevent tons of duplicate moderation requests
-    if (!frameHasBeenModerated(frameToModerate.string)) {
+    if (await shouldModerateFrame(frameToModerate)) {
       const formData = new FormData()
       formData.append('frame', frameToModerate.binary)
       formData.append('sessionId', store.state.user.session.id)
@@ -74,15 +91,15 @@ function getScaledDimensions(dimensions: { width: number; height: number }): {
 function drawImage(
   canvas: HTMLCanvasElement,
   targetElement: HTMLVideoElement | HTMLCanvasElement
-) {
+): ImageData {
   const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
+  if (!ctx) throw new Error('Could not get 2d context')
   const { width, height } = getScaledDimensions({
     width: canvas.width,
     height: canvas.height,
   })
   ctx.drawImage(targetElement, 0, 0, width, height)
+  return ctx.getImageData(0, 0, width, height)
 }
 
 function processFrameForModeration({
@@ -92,8 +109,8 @@ function processFrameForModeration({
   canvas: HTMLCanvasElement
   targetElement: HTMLVideoElement | HTMLCanvasElement
 }): ReturnType<typeof captureFrameFromCanvas> {
-  drawImage(canvas, targetElement)
-  return captureFrameFromCanvas(canvas)
+  const imageData = drawImage(canvas, targetElement)
+  return captureFrameFromCanvas(canvas, imageData)
 }
 
 function startModeration({
