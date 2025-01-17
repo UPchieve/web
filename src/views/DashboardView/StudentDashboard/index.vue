@@ -20,7 +20,7 @@
         }}</a>
       </div>
       <large-button
-        v-if="aiBotMessage"
+        v-if="isStandaloneAiTutorEnabled"
         class="dashboard-notice ai-bot"
         :class="'dashboard-notice--downtime'"
         routeTo="/ai-tutor-conversations"
@@ -226,9 +226,13 @@ export default {
     }),
 
     aiBotMessage() {
-      return this.aiTutor && this.isMobileMode
+      return this.isStandaloneAiTutorEnabled && this.isMobileMode
         ? 'Try out our new AI Tutor'
         : null
+    },
+
+    isStandaloneAiTutorEnabled() {
+      return this.aiTutor && this.aiTutor.includes('stand-alone')
     },
 
     userAndOrbitalSegment() {
