@@ -604,10 +604,7 @@ export default {
           student?.id
         )
           .then((r) => {
-            this.aiWidgetEnabled = [
-              'stand-alone-in-session',
-              'stand-alone-in-session-handoff',
-            ].includes(r.isEnabled)
+            this.aiWidgetEnabled = r.isEnabled.includes('in-session')
             if (!localStorage.getItem('seen-ai-assisted-modal')) {
               this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
             }
