@@ -298,7 +298,13 @@ onMounted(() => {
       </div>
       <div v-else-if="step === 1" class="incentive-enrollment-modal">
         <header>
-          <h1 class="incentive-enrollment-modal__title">
+          <h1
+            v-if="user.isSchoolPartner"
+            class="incentive-enrollment-modal__title"
+          >
+            Earn $10 just for getting help! 💸
+          </h1>
+          <h1 v-else class="incentive-enrollment-modal__title">
             Earn ${{
               fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek * 10
             }}
@@ -306,7 +312,16 @@ onMounted(() => {
           </h1>
           <p
             class="incentive-enrollment-modal__body"
-            v-if="fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek === 1"
+            v-if="user.isSchoolPartner"
+          >
+            Complete 5 tutoring sessions by February 28th, and we'll send you a
+            $10 gift card! 👀
+          </p>
+          <p
+            class="incentive-enrollment-modal__body"
+            v-else-if="
+              fallIncentiveProgramPayload.maxQualifiedSessionsPerWeek === 1
+            "
           >
             This fall, for every week you have a tutoring session on UPchieve,
             we'll send you a $10 gift card—up to $100 total! 👀

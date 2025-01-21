@@ -7,6 +7,7 @@ import { ref, computed } from 'vue'
 
 const store = useStore()
 const showFallIncentiveEnrollmentModal = ref(false)
+const user = computed(() => store.state.user.user)
 const productFlags = computed(() => store.state.productFlags.flags)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 const fallIncentiveProgramPayload = computed(
@@ -14,12 +15,16 @@ const fallIncentiveProgramPayload = computed(
 )
 const fallIncentiveHeaderText = computed(() => {
   if (productFlags.value.fallIncentiveEnrollmentAt) {
+    if (user.value.isSchoolPartner)
+      return `Earn $10, complete 5 sessions by February 28th!`
     if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek === 1)
       return `You're enrolled in UPchieve's Fall Challenge! Earn $100 this fall & boost your grades`
     if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek > 1)
       return `You're enrolled in UPchieve's Fall Challenge! Earn $${fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek * 10} this week if you have ${fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek} sessions!`
   }
 
+  if (user.value.isSchoolPartner)
+    return `You're invited to earn $10 for completing 5 sessions by February 28th!`
   if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek === 1)
     return `You're invited to earn $10 for having a session each week!`
   if (fallIncentiveProgramPayload.value.maxQualifiedSessionsPerWeek > 1)
@@ -41,7 +46,7 @@ const toggleFallIncentiveEnrollmentModal = () => {
     </div>
     <a
       v-if="productFlags.fallIncentiveEnrollmentAt"
-      href="https://upchieve.org/upchieve-fall-challenge-2024"
+      href="https://upchieve.org/upchieve-10-challenge-2025"
       target="_blank"
       rel="noopener noreferrer"
       class="header-button"
