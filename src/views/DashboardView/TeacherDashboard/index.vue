@@ -14,9 +14,9 @@
       :topics="topics"
     />
     <Assignment v-else-if="this.view === 'assignment'" />
-    <div v-else class="main">
+    <div v-else>
       <div class="dashboard-banner">
-        <div class="dashboard-text">
+        <div>
           <h1>Welcome, {{ user.user.firstName }}!</h1>
           <p>
             UPchieve gives your students access to unlimited, 1:1 virtual
@@ -33,10 +33,12 @@
         <ClassImg class="dashboard-img" />
       </div>
       <!-- TODO: Add error message on error. -->
-      <loader v-if="isLoading" class="loader" />
+      <div v-if="isLoading" class="uc-row justify-center mt-5">
+        <loader></loader>
+      </div>
       <div v-else-if="!classes.length" class="empty-classes-container">
         <Checklist />
-        <p class="empty-classes-msg" data-testid="empty-classes-msg">
+        <p class="center" data-testid="empty-classes-msg">
           Providing extra help is about to get easier. Click here to get
           started!
         </p>
@@ -46,14 +48,14 @@
       </div>
       <div v-else-if="classes.length" class="classes-container">
         <div class="class-header">
-          <div class="class-header-text">
+          <div>
             <h1>My Classes</h1>
             <p>
               Manage your current classes, add new ones, and keep track of your
               students' progress.
             </p>
           </div>
-          <button class="add-class-btn" @click="openCreateTeacherClassModal()">
+          <button @click="openCreateTeacherClassModal()">
             + Add Class
           </button>
         </div>
@@ -330,11 +332,6 @@ export default {
   height: 100%;
 }
 
-.loader {
-  @include flex-container(column, center, center);
-  margin-top: 100px;
-}
-
 .dashboard-banner {
   @include flex-container(row, space-between, center);
   background: linear-gradient(to right, white, rgba(22, 210, 170, 0.1));
@@ -433,34 +430,30 @@ export default {
 }
 
 .classes-container {
-  width: 100%;
   margin: 0 auto;
   padding-bottom: 16px;
+  width: 100%;
 }
 
 .class-header {
   @include flex-container(row, space-between);
   margin: 30px 16px;
-}
 
-.class-header h1 {
-  font-size: 24px;
-}
+  h1 {
+    font-size: 24px;
+  }
 
-.class-header p {
-  color: #77778b;
-  margin-bottom: 0;
-}
+  p {
+    color: #77778b;
+    margin-bottom: 0;
+  }
 
-.add-class-btn {
-  padding: 10px 16px;
-  font-size: 16px;
-  align-self: center;
-  border: 1px solid #1855d1;
-  border-radius: 32px;
-}
-
-.empty-classes-msg {
-  text-align: center;
+  button {
+    align-self: center;
+    border: 1px solid #1855d1;
+    border-radius: 32px;
+    font-size: 16px;
+    padding: 10px 16px;
+  }
 }
 </style>
