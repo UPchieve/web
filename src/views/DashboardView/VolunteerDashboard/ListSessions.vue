@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import Case from 'case'
 
 export default {
