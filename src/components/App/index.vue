@@ -218,6 +218,7 @@ export default {
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
+      topics: (state) => state.subjects.topics,
       productFlags: (state) => state.productFlags.flags,
       isConnected: (state) => state.socket.isConnected,
     }),
@@ -259,6 +260,10 @@ export default {
 
         if (Object.entries(this.subjects).length === 0)
           this.$store.dispatch('subjects/getSubjects')
+
+        if (!this.topics.length) {
+          this.$store.dispatch('subjects/getTopics')
+        }
 
         this.$store.dispatch('user/getProgressReportOverviewSubjectStats')
       } else if (currentUserValue.id) {
