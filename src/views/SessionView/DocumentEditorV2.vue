@@ -51,6 +51,7 @@
           <ScreenShareIcon v-else />
         </button>
       </div>
+      <word-count class="ql-word-count" :text="text" />
     </div>
 
     <div id="quill-container"></div>
@@ -108,6 +109,7 @@ import ActivityDot from '@/components/ActivityDot.vue'
 import { ScreenShareState } from '@/services/LiveShareService/machines/screenShareMachine'
 import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
+import WordCount from '@/components/WordCount.vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
@@ -129,6 +131,7 @@ export default {
     ErrorIcon,
     ActivityDot,
     Spinner,
+    WordCount,
   },
   props: {
     sessionId: {
@@ -173,6 +176,7 @@ export default {
       failedToModerateImageMessage:
         'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.',
       showScreenShareErrorTooltip: false,
+      text: '',
     }
   },
   computed: {
@@ -342,6 +346,7 @@ export default {
           update: encode(update),
         })
       }
+      this.text = this.quillEditor.getText()
     },
     quillSelectionChange(range, oldRange, source) {
       if (source === 'user') {
@@ -435,6 +440,15 @@ export default {
 
   .ql-cursor-flag {
     display: none;
+  }
+
+  .ql-toolbar {
+    display: flex;
+  }
+
+  .ql-word-count {
+    margin-left: auto;
+    font-size: 14px;
   }
 }
 

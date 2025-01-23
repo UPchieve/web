@@ -16,6 +16,7 @@
       <select class="ql-background" />
       <button class="ql-list" value="ordered" />
       <button class="ql-list" value="bullet" />
+      <word-count class="ql-word-count" :text="text" />
     </div>
     <div id="quill-container"></div>
     <transition name="document-loading">
@@ -59,6 +60,7 @@ import {
 import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
 import { file2b64 } from '@/utils/fileToBase64'
+import WordCount from '@/components/WordCount.vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
@@ -68,6 +70,7 @@ export default {
     FileDialog,
     LoadingMessage,
     RefreshDocumentEditorModal,
+    WordCount,
   },
   props: {
     sessionId: {
@@ -88,6 +91,7 @@ export default {
         'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org.',
       failedToModerateImageMessage:
         'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.',
+      text: '',
     }
   },
   computed: {
@@ -244,6 +248,7 @@ export default {
           delta,
         })
       }
+      this.text = this.quillEditor.getText()
     },
 
     quillSelectionChange(range, oldRange, source) {
@@ -339,6 +344,14 @@ export default {
 
   .ql-cursor-flag {
     display: none;
+  }
+  .ql-toolbar {
+    display: flex;
+  }
+
+  .ql-word-count {
+    margin-left: auto;
+    font-size: 14px;
   }
 }
 
