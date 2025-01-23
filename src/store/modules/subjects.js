@@ -49,17 +49,22 @@ export default {
   namespaced: true,
   state: {
     subjects: {},
+    topics: [],
     training: {},
     isFetchingSubjects: false,
+    isFetchingTopics: false,
     isFetchingTraining: false,
     fetchingSubjectsError: false,
     fetchingTrainingError: false,
   },
   mutations: {
     setSubjects: (state, subjects) => (state.subjects = subjects),
+    setTopics: (state, topics) => (state.topics = topics),
     setTraining: (state, training) => (state.training = training),
     setIsFetchingSubjects: (state, isFetching) =>
       (state.isFetchingSubjects = isFetching),
+    setIsFetchingTopics: (state, isFetching) =>
+      (state.isFetchingTopics = isFetching),
     setIsFetchingTraining: (state, isFetching) =>
       (state.isFetchingTraining = isFetching),
     setFetchingSubjectsError: (state, hasError) =>
@@ -78,6 +83,17 @@ export default {
         commit('setFetchingSubjectsError', true)
       } finally {
         commit('setIsFetchingSubjects', false)
+      }
+    },
+    async getTopics({ commit }) {
+      try {
+        commit('setIsFetchingTopics', true)
+        const response = await backOff(() => NetworkService.getTopics())
+        commit('setTopics', response.data.topics)
+      } catch (err) {
+        LoggerService.noticeError(err)
+      } finally {
+        commit('setIsFetchingTopics', false)
       }
     },
     async getTrainingSubjects({ commit }) {
