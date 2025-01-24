@@ -160,6 +160,12 @@
               No goal found for this session
             </div>
           </div>
+          <router-link
+            class="session-history-link"
+            v-if="isVolunteer && previousSessionCountWithStudent > 0"
+            :to="`/sessions/history?studentId=${session.student.id}`"
+            >History with {{ session.student.firstName }}</router-link
+          >
           <question-mark-icon
             v-if="mobileMode"
             @click="openHelp"
@@ -365,6 +371,7 @@ export default {
       // NOTE: users can still view a shared screen in iOS safari, they just can't share their own screen
       getDisplayMediaSupported:
         typeof navigator.mediaDevices.getDisplayMedia !== 'undefined',
+      previousSessionCountWithStudent: 0,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -581,6 +588,14 @@ export default {
 
         if (getNotificationPermission() === 'default')
           this.showNotificationModal = true
+
+        if (this.isVolunteer) {
+          this.previousSessionCountWithStudent =
+            await SessionService.getTotalSessionsForPair({
+              volunteerId: this.session.volunteerId,
+              studentId: this.session.studentId,
+            })
+        }
       })
       .catch((err) => {
         if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
@@ -1013,6 +1028,17 @@ export default {
   }
 }
 
+.session-history-link {
+  @include font-category('subheading');
+  color: rgba(0, 0, 0);
+  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+
+  &:hover {
+    background-color: rgba(196, 196, 196, 0.2);
+  }
+}
+
 .auxiliary-container,
 .chat-container {
   @include breakpoint-above('medium') {
@@ -1116,7 +1142,6 @@ export default {
 .help-icon {
   width: 30px;
   height: 30px;
-  margin-left: auto;
   fill: $c-information-blue;
   transition: scale 0.2s ease-in-out;
 

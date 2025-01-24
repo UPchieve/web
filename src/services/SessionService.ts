@@ -161,4 +161,20 @@ export default {
         throw errorFromHttpResponse(resp)
       })
   },
+
+  getTotalSessionsForPair({
+    volunteerId,
+    studentId,
+  }: {
+    volunteerId: string
+    studentId: string
+  }) {
+    return NetworkService.getTotalSessionHistory({ volunteerId, studentId })
+      .then((res) => {
+        return res.data.total
+      })
+      .catch((error) => {
+        throw errorFromHttpResponse(error)
+      })
+  },
 }
