@@ -846,17 +846,17 @@ export default {
       `${API_ROOT}/students/favorite-volunteers/${volunteerId}`
     ).then(this._successHandler, this._errorHandler)
   },
-  getSessionHistory(page) {
-    return httpGet(`${API_ROOT}/sessions/history?page=${page}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+  getSessionHistory(page, filter) {
+    const queryParams = new URLSearchParams(filter).toString()
+    return httpGet(
+      `${API_ROOT}/sessions/history?page=${page}${queryParams.length ? `&${queryParams}` : ''}`
+    ).then(this._successHandler, this._errorHandler)
   },
-  getTotalSessionHistory() {
-    return httpGet(`${API_ROOT}/sessions/history/total`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+  getTotalSessionHistory(filter) {
+    const queryParams = new URLSearchParams(filter).toString()
+    return httpGet(
+      `${API_ROOT}/sessions/history/total${queryParams.length ? `?${queryParams}` : ''}`
+    ).then(this._successHandler, this._errorHandler)
   },
   getFavoriteVolunteers(page) {
     return httpGet(

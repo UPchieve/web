@@ -1,7 +1,17 @@
 <template>
   <div class="session-history">
     <section class="header">
-      <h1 class="title">Session History</h1>
+      <div class="header-container">
+        <h1 class="title">
+          {{ title }}
+        </h1>
+        <router-link
+          class="see-all-link"
+          v-if="isFiltered"
+          to="/sessions/history"
+          >see all session history</router-link
+        >
+      </div>
       <p v-if="!mobileMode" class="subtitle">
         {{
           isVolunteer
@@ -84,25 +94,27 @@
         </ul>
         <footer class="page-actions-container">
           <div class="page-actions">
-            <div
-              @click="() => getSessionHistory(page - 1)"
+            <button
+              @click="goToPreviousPage"
               :class="{ 'page-actions__stepper--disabled': isFirstPage }"
               class="page-actions__stepper"
+              :disabled="isFirstPage"
             >
               <caret-icon class="caret caret--previous" /><span>Previous</span>
-            </div>
+            </button>
             <div class="page-numbers">
               <span class="page-num page-num--active">
                 {{ page }}
               </span>
             </div>
-            <div
-              @click="() => getSessionHistory(page + 1)"
+            <button
+              @click="goToNextPage"
               :class="{ 'page-actions__stepper--disabled': isLastPage }"
               class="page-actions__stepper"
+              :disabled="isLastPage"
             >
               <span>Next</span><caret-icon class="caret caret--next" />
-            </div>
+            </button>
           </div>
         </footer>
       </section>
@@ -174,25 +186,27 @@
           </ul>
           <footer class="page-actions-container">
             <div class="page-actions">
-              <div
-                @click="() => getSessionHistory(page - 1)"
+              <button
+                @click="goToPreviousPage"
                 :class="isFirstPage && 'page-actions__stepper--disabled'"
                 class="page-actions__stepper"
+                :disabled="isFirstPage"
               >
                 <caret-icon class="caret caret--previous" />
-              </div>
+              </button>
               <div class="page-numbers">
                 <span class="page-num page-num--active">
                   {{ page }}
                 </span>
               </div>
-              <div
-                @click="() => getSessionHistory(page + 1)"
+              <button
+                @click="goToNextPage"
                 :class="isLastPage && 'page-actions__stepper--disabled'"
                 class="page-actions__stepper"
+                :disabled="isLastPage"
               >
                 <caret-icon class="caret caret--next" />
-              </div>
+              </button>
             </div>
           </footer>
         </section>
@@ -233,6 +247,7 @@ export default {
       mobileMode: 'app/mobileMode',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      sessionPartner: 'user/sessionPartner',
     }),
     isFirstPage() {
       return this.page === 1
@@ -242,36 +257,70 @@ export default {
       const totalPages = Math.ceil(this.total / sessionLimitPerPage)
       return totalPages === 0 ? 1 : totalPages
     },
+    isFiltered() {
+      return this.$route.query.volunteerId && this.$route.query.studentId
+    },
+    title() {
+      return this.isFiltered
+        ? `Session History with ${this.sessionPartner.firstname}`
+        : `Session History`
+    },
   },
   async created() {
     this.page = Number(this.$route.query.page ?? this.page)
-    await this.getTotalSessions()
-    await this.getSessionHistory(this.page)
+    const filter = this.getFilter()
+    await this.getTotalSessions(filter)
+    await this.fetchSessionHistory(this.page, filter)
+  },
+  watch: {
+    async '$route.query'(to, from) {
+      const volunteerId = to.volunteerId
+      const studentId = to.studentId
+      if (
+        to.page !== from.page ||
+        volunteerId !== from.volunteerId ||
+        studentId !== from.studentId
+      ) {
+        await this.getSessionHistory(
+          to.page ? Number(to.page) : 1,
+          this.getFilter()
+        )
+      }
+    },
   },
   methods: {
-    async getSessionHistory(page) {
-      if (page < 1 || page > this.totalPages) return
-
-      this.isFetchingSessions = true
-      this.$router.push({
-        path: '/sessions/history',
-        query: {
-          page,
-        },
-      })
-
+    getFilter() {
+      const filter = {}
+      const volunteerId = this.$route.query.volunteerId
+      const studentId = this.$route.query.studentId
+      if (volunteerId) filter.volunteerId = volunteerId
+      if (studentId) filter.studentId = studentId
+      return filter
+    },
+    goToNextPage() {
       AnalyticsService.captureEvent(
-        page > this.page
-          ? EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE
-          : EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE
+        EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE
       )
 
+      this.$router.push({
+        query: { ...this.$route.query, page: this.page + 1 },
+      })
+    },
+    goToPreviousPage() {
+      AnalyticsService.captureEvent(
+        EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE
+      )
+      this.$router.push({
+        query: { ...this.$route.query, page: this.page - 1 },
+      })
+    },
+    async getSessionHistory(page, filter) {
+      if (page < 1 || page > this.totalPages) return
+
       try {
-        const response = await backOff(() =>
-          NetworkService.getSessionHistory(page)
-        )
-        this.sessions = response.data.pastSessions
-        this.isLastPage = response.data.isLastPage
+        this.isFetchingSessions = true
+
+        await this.fetchSessionHistory(page, filter)
         this.page = page
       } catch (error) {
         this.handleError(error)
@@ -279,10 +328,21 @@ export default {
         this.isFetchingSessions = false
       }
     },
-    async getTotalSessions() {
+    async fetchSessionHistory(page, filter) {
       try {
         const response = await backOff(() =>
-          NetworkService.getTotalSessionHistory()
+          NetworkService.getSessionHistory(page, filter)
+        )
+        this.sessions = response.data.pastSessions
+        this.isLastPage = response.data.isLastPage
+      } catch (error) {
+        this.handleError(error)
+      }
+    },
+    async getTotalSessions(filter) {
+      try {
+        const response = await backOff(() =>
+          NetworkService.getTotalSessionHistory(filter)
         )
         this.total = response.data.total
       } catch (error) {
@@ -335,22 +395,23 @@ ul {
   list-style-type: none;
 }
 
-.header {
-  text-align: left;
+.header-container {
   margin-bottom: 2em;
-
   @include breakpoint-below('small') {
     margin-bottom: 0;
   }
 }
 
+.header {
+  text-align: left;
+}
+
 .title {
   font-weight: 500;
   font-size: 22px;
-  margin-bottom: 1em;
+  margin-bottom: 0;
 
   @include breakpoint-below('small') {
-    margin: 1em;
     font-size: 18px;
   }
 
@@ -691,5 +752,9 @@ ul {
     font-size: 12px;
     font-weight: 400;
   }
+}
+
+.see-all-link {
+  font-size: 18px;
 }
 </style>

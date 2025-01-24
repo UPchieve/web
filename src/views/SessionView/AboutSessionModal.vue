@@ -85,6 +85,7 @@ export default {
     ...mapGetters({
       isAboutThisSessionSurveyEnabled:
         'featureFlags/isAboutThisSessionSurveyActive',
+      isVolunteer: 'user/isVolunteer',
     }),
     ...mapState({
       session: (state) => state.user.session,
