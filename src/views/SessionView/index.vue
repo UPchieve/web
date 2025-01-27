@@ -588,14 +588,6 @@ export default {
 
         if (getNotificationPermission() === 'default')
           this.showNotificationModal = true
-
-        if (this.isVolunteer) {
-          this.previousSessionCountWithStudent =
-            await SessionService.getTotalSessionsForPair({
-              volunteerId: this.session.volunteerId,
-              studentId: this.session.studentId,
-            })
-        }
       })
       .catch((err) => {
         if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
@@ -606,17 +598,17 @@ export default {
       })
   },
   watch: {
-    session({ student }) {
+    async session(session, prevSession) {
       /*
        * Since this is only rolled out to students,
        * we have to check to see if the student involved in this
        * session is elgible, if they are, we can also enable it for
        * the volunteer
        */
-      if (student?.id) {
+      if (session.student?.id) {
         FeatureFlagService.isFeatureEnabledForUser(
           POSTHOG_FEATURE_FLAGS.AI_TUTOR,
-          student?.id
+          session.student.id
         )
           .then((r) => {
             this.aiWidgetEnabled = r.isEnabled.includes('in-session')
@@ -629,6 +621,20 @@ export default {
               `Failed to check if AI tutor is enabled for user=${student?.id}`,
               err
             )
+          })
+      }
+
+      if (
+        this.isVolunteer &&
+        session.volunteerId &&
+        !prevSession.volunteerId &&
+        session.studentId &&
+        !prevSession.studentId
+      ) {
+        this.previousSessionCountWithStudent =
+          await SessionService.getTotalSessionsForPair({
+            volunteerId: this.session.volunteerId,
+            studentId: this.session.studentId,
           })
       }
     },
