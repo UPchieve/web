@@ -13,7 +13,10 @@ class FeatureFlagService {
         api_host: 'https://p.upchieve.org',
         ui_host: 'app.posthog.com',
         persistence: 'localStorage+cookie',
-        loaded() {
+        async loaded() {
+          await FeatureFlagService.preloadPersonPropertiesToStore(
+            personProperties
+          )
           FeatureFlagService.setPersonProperties(personProperties)
           FeatureFlagService.listenForFlagReload()
           resolve()
@@ -113,6 +116,13 @@ class FeatureFlagService {
   static getFeatureFlagPayload(featureFlagKey) {
     return posthog.getFeatureFlagPayload(featureFlagKey)
   }
+
+  static async preloadPersonPropertiesToStore(props) {
+    const { default: store } = await import('@/store')
+    await store.dispatch('productFlags/addToProductFlags', {
+      fallIncentiveEnrollmentAt: props?.fallIncentiveEnrollmentAt,
+    })
+  }
 }
 
 class DevFeatureFlagService {
@@ -142,6 +152,11 @@ class DevFeatureFlagService {
     console.info('FeatureFlagService.setPersonPropertiesForFlags', props)
   }
 
+  static setPersonProperties(props) {
+    // eslint-disable-next-line no-console
+    console.info('FeatureFlagService.setPersonProperties', props)
+  }
+
   static isFeatureEnabled(featureFlagKey) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.isFeatureEnabled', featureFlagKey)
@@ -164,6 +179,11 @@ class DevFeatureFlagService {
   static getFeatureFlagPayload(featureFlagKey) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.getFeatureFlagPayload', featureFlagKey)
+  }
+
+  static async preloadPersonPropertiesToStore(props) {
+    // eslint-disable-next-line no-console
+    console.info('FeatureFlagService.preloadPersonPropertiesToStore', props)
   }
 }
 
