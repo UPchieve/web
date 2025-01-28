@@ -110,11 +110,13 @@ export function useSurvey(data: UseSurveyPayload) {
         survey.value = data.initialSurvey.survey
         surveyId.value = data.initialSurvey.surveyId
         surveyTypeId.value = data.initialSurvey.surveyTypeId
+        surveyRewardAmount.value = data.initialSurvey.rewardAmount ?? 0
       } else {
         const surveyDefinition = await getSurveyDefinition()
         survey.value = surveyDefinition.survey
         surveyId.value = surveyDefinition.surveyId
         surveyTypeId.value = surveyDefinition.surveyTypeId
+        surveyRewardAmount.value = surveyDefinition.rewardAmount ?? 0
       }
       buildUserResponse()
     } catch (err) {

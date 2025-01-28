@@ -4,6 +4,7 @@ import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
 import featureFlagsModule from '@/store/modules/feature-flags'
+import productFlagsModule from '@/store/modules/product-flags'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -120,6 +121,9 @@ const getWrapper = (options = {}) => {
       },
       featureFlags: {
         ...featureFlagsModule,
+      },
+      productFlags: {
+        ...productFlagsModule,
       },
     },
   })

@@ -10,17 +10,23 @@ import type {
   SurveyUserQuestionResponse,
 } from '@/services/SurveyService'
 
-const props = defineProps<{
-  question: SurveyQuestionDefinition
-  userResponse: SurveyUserQuestionResponse
-  updateUserResponse: (
-    questionId: number,
-    responseId: number | undefined,
-    response?: string
-  ) => void
-}>()
+const props = withDefaults(
+  defineProps<{
+    question: SurveyQuestionDefinition
+    userResponse: SurveyUserQuestionResponse
+    updateUserResponse: (
+      questionId: number,
+      responseId: number | undefined,
+      response?: string
+    ) => void
+    readOnly?: boolean
+  }>(),
+  {
+    readOnly: false,
+  }
+)
 
-const { question, userResponse, updateUserResponse } = toRefs(props)
+const { question, userResponse, updateUserResponse, readOnly } = toRefs(props)
 
 const isRowOfImages = computed(() => {
   const responses = question.value.responses
@@ -79,6 +85,7 @@ function calculateMinValue(question: string) {
           :responseId="response.responseId"
           :isSelected="isSelected(response)"
           @survey-image-click="updateUserResponse"
+          :readOnly="readOnly"
         />
 
         <SurveyRadio
@@ -95,6 +102,7 @@ function calculateMinValue(question: string) {
           :isOpenResponseDisabled="!isSelected(response)"
           :openResponseValue="userResponse.openResponse"
           @survey-radio-input="updateUserResponse"
+          :readOnly="readOnly"
         />
       </template>
 
@@ -115,6 +123,7 @@ function calculateMinValue(question: string) {
         :testid="'response-' + question.questionId"
         :isRequired="true"
         :blurEvent="'blur-event-' + question.questionId"
+        :readOnly="readOnly"
       />
       <FormInput
         v-else-if="question.questionType === QUESTION_TYPES.freeResponse"
@@ -128,6 +137,7 @@ function calculateMinValue(question: string) {
         :testid="'response-' + question.questionId"
         :isRequired="true"
         :blurEvent="'blur-event-' + question.questionId"
+        :readOnly="readOnly"
       />
     </div>
   </div>

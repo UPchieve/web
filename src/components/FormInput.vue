@@ -28,6 +28,7 @@
       :required="isRequired"
       :max="maxValue"
       :min="minValue"
+      :disabled="readOnly"
     />
   </div>
 </template>
@@ -85,6 +86,10 @@ export default {
     modelValue: {
       type: [String, Number],
       default: '',
+    },
+    readOnly: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['update:modelValue'],

@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
-import LargeButton from '@/components/LargeButton.vue'
+import useVuelidate from '@vuelidate/core'
+import { EVENTS } from '@/consts'
 import SurveyQuestion from '@/components/Surveys/SurveyQuestion.vue'
 import Loader from '@/components/Loader.vue'
 import { useSurvey } from '@/composables/useSurvey'
+import AnalyticsService from '@/services/AnalyticsService'
 import { SURVEY_TYPES } from '@/services/SurveyService'
 import type { SurveyDefinition } from '@/services/SurveyService'
 
-const props = defineProps<{ surveryDefiniton: SurveyDefinition }>()
+const props = defineProps<{
+  surveyDefiniton: SurveyDefinition
+  readOnly: boolean
+}>()
 
 const store = useStore()
+const v$ = useVuelidate()
 const {
   survey,
   userResponses,
@@ -21,7 +27,7 @@ const {
   updateUserResponse,
 } = useSurvey({
   surveyType: SURVEY_TYPES.IMPACT_STUDY,
-  initialSurvey: props.surveryDefiniton,
+  initialSurvey: props.surveyDefiniton,
 })
 
 const error = ref('')
@@ -30,16 +36,24 @@ const isSubmitting = ref(false)
 const loadingMessage = ref('')
 
 const mobileMode = computed(() => store.getters['app/mobileMode'])
+const isSurveyCompleteAndValid = computed(() => {
+  return (
+    isSurveyComplete.value && !v$.value.$invalid && hasUpdatedUserResponse.value
+  )
+})
 
 async function handleSurveySubmission() {
   error.value = ''
-  if (!isSurveyComplete.value || isSubmitting.value) return
+  if (!isSurveyCompleteAndValid.value || isSubmitting.value) return
 
   isSubmitting.value = true
   loadingMessage.value = 'Updating your answers...'
 
   try {
     await handleSurveySubmit()
+    AnalyticsService.captureEvent(
+      EVENTS.STUDENT_IMPACT_STUDY_SURVEY_RESPONSES_UPDATED
+    )
   } catch (err) {
     error.value = (err as Error).message
   } finally {
@@ -54,6 +68,10 @@ onMounted(async () => {
   } catch (err) {
     onMountError.value = (err as Error).message
   }
+})
+
+defineExpose({
+  handleSurveySubmission,
 })
 </script>
 
@@ -79,21 +97,13 @@ onMounted(async () => {
         :question="currentQuestion"
         :userResponse="userResponses[currentQuestion?.questionId]"
         :updateUserResponse="updateUserResponse"
+        :readOnly="readOnly"
       />
       <p v-if="error" class="error">
         {{ error || 'We were unable to submit your survey. Please try again.' }}
       </p>
 
       <div v-if="!mobileMode" class="impact-survey__separator" />
-      <div class="impact-survey-buttons">
-        <LargeButton
-          primary
-          @click="handleSurveySubmission"
-          :disabled="!isSurveyComplete || !hasUpdatedUserResponse ? true : null"
-        >
-          Update
-        </LargeButton>
-      </div>
     </section>
   </div>
 </template>

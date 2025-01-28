@@ -101,6 +101,14 @@
         <refer-friend-icon class="icon" />
       </sidebar-link>
 
+      <sidebar-link
+        v-if="isStudent && productFlags.impactStudyEnrollmentAt"
+        to="/rewards"
+        text="Rewards"
+      >
+        <rewards-sidebar-icon class="icon icon--rewards" />
+      </sidebar-link>
+
       <div v-if="!mobileMode" class="SidebarLinks-about">About UPchieve</div>
       <sidebar-link to="/contact" text="Contact us">
         <envelope-icon class="icon" />
@@ -132,6 +140,7 @@ import PortraitIcon from '@/assets/sidebar_icons/portrait.svg'
 import ReferFriendIcon from '@/assets/sidebar_icons/refer-friend-icon.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
 import YourProgressIcon from '@/assets/your-progress.svg'
+import RewardsSidebarIcon from '@/assets/rewards-sidebar-icon.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
@@ -154,6 +163,7 @@ export default {
     ReferFriendIcon,
     SlackLogoIcon,
     YourProgressIcon,
+    RewardsSidebarIcon,
     ActivityDot,
   },
   props: {
@@ -165,6 +175,7 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user.user,
+      productFlags: (state) => state.productFlags.flags,
     }),
     ...mapGetters({
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
@@ -233,5 +244,8 @@ export default {
 .icon {
   margin-right: 0.8em;
   width: 24px;
+  &--rewards {
+    height: 24px;
+  }
 }
 </style>

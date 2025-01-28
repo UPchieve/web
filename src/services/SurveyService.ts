@@ -53,7 +53,7 @@ export enum SURVEY_TYPES {
   POSTSESSION = 'postsession',
   PRESESSION = 'presession',
   PROGRESS_REPORT = 'progress-report',
-  IMPACT_STUDY = 'impact_study',
+  IMPACT_STUDY = 'impact-study',
 }
 
 /**

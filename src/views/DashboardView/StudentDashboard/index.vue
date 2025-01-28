@@ -42,6 +42,10 @@
       :closeModal="toggleFallIncentiveEnrollmentModal"
       :isFirstModalView="fallIncentiveProgramModalViewCount === 0"
     />
+    <impact-study-survey-modal
+      v-if="showImpactStudySurvey"
+      :closeModal="toggleImpactStudySurvey"
+    />
     <subject-selection />
 
     <onboarding-modal
@@ -61,8 +65,12 @@ import SubjectSelection from './SubjectSelection/index.vue'
 import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
+import ImpactStudySurveyModal from './ImpactStudySurveyModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
+import LoggerService from '@/services/LoggerService'
+import NetworkService from '@/services/NetworkService'
+import FeatureFlagService from '@/services/FeatureFlagService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
@@ -96,6 +104,7 @@ export default {
     TellThemCollegePrepModal,
     JoinedClassModal,
     FallIncentiveEnrollmentModal,
+    ImpactStudySurveyModal,
     ArrowIcon,
     LargeButton,
     StudentAssignments,
@@ -197,6 +206,7 @@ export default {
       showFallIncentiveEnrollmentModal: false,
       assignments: [],
       onboardingFrames: [],
+      showImpactStudySurvey: false,
     }
   },
   computed: {
@@ -222,6 +232,7 @@ export default {
       isCollegePrepAdEnabled: 'featureFlags/isCollegePrepAdEnabled',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
+      isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
       isMobileMode: 'app/mobileMode',
     }),
 
@@ -276,6 +287,9 @@ export default {
       this.showFallIncentiveEnrollmentModal =
         !this.showFallIncentiveEnrollmentModal
     },
+    toggleImpactStudySurvey() {
+      this.showImpactStudySurvey = !this.showImpactStudySurvey
+    },
     triggerIncentiveProgramBanner() {
       // Prioritize showing the in-session banner if there is a current session
       if (this.isSessionAlive) return
@@ -298,6 +312,49 @@ export default {
         0,
         3
       )
+    },
+    async processImpactStudySurvey() {
+      let didResetForNewSurvey = false
+      if (this.productFlags.impactStudyEnrollmentAt) {
+        try {
+          const [{ data: currentSurveyData }, { data: surveyResponseData }] =
+            await Promise.all([
+              NetworkService.getImpactStudySurvey(),
+              NetworkService.getImpactStudySurveyResponses(),
+            ])
+          // User has already filled out the survey
+          if (currentSurveyData.surveyId === surveyResponseData.surveyId) return
+
+          const isNewImpactStudySurveyForUser =
+            currentSurveyData.surveyId !== surveyResponseData.surveyId
+          if (surveyResponseData && isNewImpactStudySurveyForUser) {
+            const currentSurveyId = currentSurveyData.surveyId
+            const lastResetSurveyId =
+              Number(localStorage.getItem('lastImpactStudySurveyId')) || 0
+
+            // If this is the first time seeing the new survey, reset view count
+            if (currentSurveyId !== lastResetSurveyId) {
+              localStorage.setItem('lastImpactStudySurveyId', currentSurveyId)
+              localStorage.removeItem('impactStudySurveyModalViewCount')
+              AnalyticsService.captureEvent(
+                EVENTS.STUDENT_IMPACT_STUDY_NEW_SURVEY_RECEIVED,
+                {
+                  $set: { impactStudySurveyModalViewCount: 0 },
+                }
+              )
+              FeatureFlagService.setPersonPropertiesForFlags({
+                impactStudySurveyModalViewCount: 0,
+              })
+              didResetForNewSurvey = true
+            }
+          }
+        } catch (error) {
+          LoggerService.noticeError(error)
+        }
+      }
+
+      if (this.isImpactStudySurveyEnabled || didResetForNewSurvey)
+        this.showImpactStudySurvey = true
     },
   },
   watch: {
@@ -331,7 +388,7 @@ export default {
       }
     },
     hadASession: {
-      handler(currentValue, prevValue) {
+      async handler(currentValue, prevValue) {
         if (
           currentValue &&
           !prevValue &&
@@ -341,6 +398,8 @@ export default {
         ) {
           this.showTellThemCollegePrepModal = true
         }
+
+        if (currentValue && !prevValue) await this.processImpactStudySurvey()
       },
       deep: true,
     },

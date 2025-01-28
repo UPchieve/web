@@ -24,11 +24,25 @@ export async function enrollStudentToIncentiveProgram(
   })
 }
 
-// TODO: Add analytic events and get an enrollment date for the study and push to PostHog
 // TODO: We should be handling the error status within the NetworkService instead of here
-export async function impactStudyEnrollment(surveyId: number) {
+// TODO: Fix store type
+export async function impactStudyEnrollment(
+  store: Store<any>,
+  surveyId: number
+) {
   try {
-    return await NetworkService.impactStudyEnrollment(surveyId)
+    const {
+      data: { impactStudyEnrollmentAt },
+    } = await NetworkService.impactStudyEnrollment(surveyId)
+
+    if (impactStudyEnrollmentAt) {
+      AnalyticsService.captureEvent(EVENTS.STUDENT_IMPACT_STUDY_ENROLLED, {
+        $set: { impactStudyEnrollmentAt },
+      })
+      store.dispatch('productFlags/addToProductFlags', {
+        impactStudyEnrollmentAt,
+      })
+    }
   } catch (err) {
     const error =
       ((err as AxiosError).response?.data as { err?: string })?.err ??
