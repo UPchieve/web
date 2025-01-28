@@ -204,8 +204,8 @@ export default {
     },
 
     filterSessions(sessions, subjects, filters) {
-      const start = new Date(filters.sessionActivityFrom)
-      const end = new Date(filters.sessionActivityTo)
+      const start = new Date(filters.sessionActivityFrom + 'T00:00Z')
+      const end = new Date(filters.sessionActivityTo + 'T11:59:00Z')
       const filteredSubjects = Object.values(subjects)
         .filter(
           (subject) =>
@@ -213,7 +213,6 @@ export default {
             subject.topicName === filters.topic.name
         )
         .map((subject) => subject.name)
-      end.setHours(23, 59, 59, 999)
 
       const filtered = sessions.filter((session) => {
         const createdAt = new Date(session.createdAt)
