@@ -823,6 +823,12 @@ export default {
       this._errorHandler
     )
   },
+  getImpactStudySurveyResponses() {
+    return httpGet(`${API_ROOT}/survey/impact-study/responses`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   getUserProductFlags() {
     return httpGet(`${API_ROOT}/product-flags`).then(
       this._successHandler,
