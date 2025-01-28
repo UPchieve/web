@@ -37,6 +37,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL]: false,
       [POSTHOG_FEATURE_FLAGS.SCREENSHARE]: false,
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED]: false,
+      [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -185,6 +186,8 @@ export default {
       ],
     isVideoModerationEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED],
+    isImpactStudySurveyEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {

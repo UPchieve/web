@@ -2,8 +2,10 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import useVuelidate from '@vuelidate/core'
-import { QUESTION_TYPES, VERIFICATION_TYPE } from '@/consts'
+import { useRouter } from 'vue-router'
+import { EVENTS, QUESTION_TYPES, VERIFICATION_TYPE } from '@/consts'
 import CrossIcon from '@/assets/cross.svg'
+import UpdogStarIcon from '@/assets/updog-star.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import StepperComponent from '@/components/Stepper.vue'
 import Modal from '@/components/Modal.vue'
@@ -14,6 +16,8 @@ import Loader from '@/components/Loader.vue'
 import { useSurvey } from '@/composables/useSurvey'
 import { useVerification } from '@/composables/useVerification'
 import { useStepper } from '@/composables/useStepper'
+import AnalyticsService from '@/services/AnalyticsService'
+import FeatureFlagService from '@/services/FeatureFlagService'
 import { SURVEY_TYPES } from '@/services/SurveyService'
 import { impactStudyEnrollment } from '@/services/UserProductFlagsService'
 
@@ -27,6 +31,7 @@ const props = defineProps({
 })
 
 const store = useStore()
+const $router = useRouter()
 const v$ = useVuelidate()
 const {
   survey,
@@ -80,8 +85,16 @@ const isNextButtonDisabled = computed(() => {
   return false
 })
 
+const impactStudySurveyModalViewCount = computed(() => {
+  const viewCount = parseInt(
+    localStorage.getItem('impactStudySurveyModalViewCount') ?? ''
+  )
+  if (!isNaN(viewCount)) return viewCount
+  else return 0
+})
+
 function handleClose() {
-  // TODO: Add Analytic events
+  AnalyticsService.captureEvent(EVENTS.STUDENT_IMPACT_STUDY_SURVEY_MODAL_CLOSED)
   props.closeModal()
 }
 
@@ -130,12 +143,11 @@ async function handleSurveySubmission() {
   if (!isSurveyComplete.value || isSubmitting.value) return
 
   isSubmitting.value = true
-  loadingMessage.value = 'Saving your survey...'
+  loadingMessage.value = 'Saving your answers...'
 
   try {
     await handleSurveySubmit()
-    await impactStudyEnrollment(surveyId.value!)
-
+    await impactStudyEnrollment(store, surveyId.value!)
     modalView.value = 'complete'
   } catch (err) {
     error.value = (err as Error).message
@@ -145,9 +157,31 @@ async function handleSurveySubmission() {
   }
 }
 
+function goToRewards() {
+  $router.push('/rewards')
+}
+
+function handleModalViewCount() {
+  const updatedModalViewCount = impactStudySurveyModalViewCount.value + 1
+  localStorage.setItem(
+    'impactStudySurveyModalViewCount',
+    String(updatedModalViewCount)
+  )
+  AnalyticsService.captureEvent(
+    EVENTS.STUDENT_IMPACT_STUDY_SURVEY_MODAL_SHOWN,
+    {
+      $set: { impactStudySurveyModalViewCount: updatedModalViewCount },
+    }
+  )
+  FeatureFlagService.setPersonPropertiesForFlags({
+    impactStudySurveyModalViewCount: updatedModalViewCount,
+  })
+}
+
 onMounted(async () => {
   try {
     await initializeSurvey()
+    handleModalViewCount()
     if (user.value.isSchoolPartner && !user.value.proxyEmail)
       modalView.value = 'proxy-verify'
     else modalView.value = 'survey'
@@ -355,7 +389,8 @@ watch(modalView, () => {
       class="impact-study-questions"
     >
       <section class="impact-study-modal__section">
-        <div>Congrats! You have earned ${{ surveyRewardAmount }}</div>
+        <updog-star-icon class="updog" />
+        <div>Thanks! You have earned ${{ surveyRewardAmount }}</div>
       </section>
 
       <div v-if="!mobileMode" class="impact-study-modal__separator" />
@@ -366,6 +401,13 @@ watch(modalView, () => {
           @click="handleClose"
         >
           Close
+        </LargeButton>
+        <LargeButton
+          variant="primary"
+          class="impact-study-buttons--secondary-button"
+          @click="goToRewards"
+        >
+          See my rewards
         </LargeButton>
       </footer>
     </section>
@@ -455,6 +497,7 @@ watch(modalView, () => {
 }
 
 .cross-icon-container {
+  @include flex-container(row, flex-end);
   cursor: pointer;
   align-self: flex-end;
 }
@@ -500,5 +543,10 @@ watch(modalView, () => {
 
 .impact-study-error {
   color: $c-error-red;
+}
+
+.updog {
+  height: 100px;
+  width: 100px;
 }
 </style>

@@ -8,6 +8,7 @@
       :value="radioValue"
       :name="name"
       :checked="checked"
+      :disabled="readOnly"
     />
 
     <label :for="id" tabindex="0">
@@ -18,9 +19,9 @@
         type="text"
         tabindex="-1"
         @input="handleOpenResponse"
-        :disabled="isOpenResponseDisabled ? true : null"
+        :disabled="isOpenResponseDisabled || readOnly ? true : null"
         :value="openResponseValue"
-        :placeholder="isOpenResponseDisabled ? '' : placeholder"
+        :placeholder="isOpenResponseDisabled || readOnly ? '' : placeholder"
       />
     </label>
   </div>
@@ -69,6 +70,10 @@ export default {
     placeholder: {
       type: String,
       default: '',
+    },
+    readOnly: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['survey-radio-input'],

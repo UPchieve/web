@@ -1183,4 +1183,10 @@ export default {
       this._errorHandler
     )
   },
+  getUserRewards(offset) {
+    return httpGet(`${API_ROOT}/rewards?offset=${offset}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

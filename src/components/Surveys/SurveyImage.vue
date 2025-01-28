@@ -1,11 +1,18 @@
 <template>
-  <div class="survey-image__container" @click="handleImageClick">
+  <div
+    class="survey-image__container"
+    @click="handleImageClick"
+    role="button"
+    :disabled="readOnly"
+  >
     <img
       :src="src"
       class="survey-image__image"
       alt="image showing answer option, see label that appears when selected"
       :class="{
         'survey-image__image--not-selected': !isSelected,
+        'survey-image__image--read-only': readOnly,
+        'survey-image__image--not-selected-read-only': readOnly && !isSelected,
       }"
     />
     <div
@@ -13,6 +20,7 @@
       class="survey-image__label"
       :class="{
         'survey-image__label--show': isSelected,
+        'survey-image__label--read-only': readOnly,
       }"
     >
       {{ label }}
@@ -44,10 +52,15 @@ export default {
       type: [String, Number],
       required: true,
     },
+    readOnly: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['survey-image-click'],
   methods: {
     handleImageClick() {
+      if (this.readOnly) return
       this.$emit('survey-image-click', this.questionId, this.responseId)
     },
   },
@@ -96,6 +109,24 @@ export default {
     &--not-selected {
       filter: grayscale(1);
     }
+
+    &--read-only {
+      &:hover {
+        filter: initial;
+        transform: initial;
+        cursor: initial;
+
+        & + .survey-image__label {
+          visibility: hidden;
+        }
+      }
+    }
+
+    &--not-selected-read-only {
+      &:hover {
+        filter: grayscale(1);
+      }
+    }
   }
 
   &__label {
@@ -105,6 +136,10 @@ export default {
 
     &--show {
       visibility: initial;
+    }
+
+    &--read-only {
+      visibility: hidden;
     }
   }
 }

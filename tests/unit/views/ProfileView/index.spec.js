@@ -8,6 +8,7 @@ import UserService from '@/services/UserService'
 import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { vi } from 'vitest'
+import productFlagsModule from '@/store/modules/product-flags'
 
 describe('ProfileView', () => {
   let DEFAULT_FLAGS_GETTERS, DEFAULT_USER
@@ -53,6 +54,9 @@ describe('ProfileView', () => {
             ...DEFAULT_FLAGS_GETTERS,
             ...(overrides.featureFlags?.getters ?? {}),
           },
+        },
+        productFlags: {
+          ...productFlagsModule,
         },
         subjects: {
           ...subjectsModule,

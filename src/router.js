@@ -61,6 +61,7 @@ import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
 import BotChatView from './views/BotConversationsView/BotChatView.vue'
 import NewBotChat from './views/BotConversationsView/NewBotChat.vue'
+import RewardsView from './views/RewardsView.vue'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -535,6 +536,12 @@ const routes = [
         ],
       },
     ],
+  },
+  {
+    path: '/rewards',
+    name: 'RewardsView',
+    component: RewardsView,
+    meta: { protected: true },
   },
   {
     path: '/:pathMatch(.*)*',
