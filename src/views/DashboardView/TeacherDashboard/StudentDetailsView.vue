@@ -204,8 +204,8 @@ export default {
     },
 
     filterSessions(sessions, subjects, filters) {
-      const start = new Date(filters.sessionActivityFrom + 'T00:00Z')
-      const end = new Date(filters.sessionActivityTo + 'T11:59:00Z')
+      const start = new Date(filters.sessionActivityFrom + 'T00:00')
+      const end = new Date(filters.sessionActivityTo + 'T11:59:00')
       const filteredSubjects = Object.values(subjects)
         .filter(
           (subject) =>
