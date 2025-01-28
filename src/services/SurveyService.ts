@@ -9,18 +9,25 @@ export type SurveyResponseDefinition = {
   responseDisplayImage?: string
 }
 
+export type SurveryUserResponseDefinition = {
+  responseId?: number
+  response: string
+}
+
 export type SurveyQuestionDefinition = {
   displayPriority: number
   questionId: number
   questionText: string
   questionType: string
   responses: SurveyResponseDefinition[]
+  userResponse?: SurveryUserResponseDefinition
 }
 
 export type SurveyDefinition = {
   surveyId: number
   surveyTypeId: number
   survey: SurveyQuestionDefinition[]
+  rewardAmount?: number
 }
 
 export type SurveyUserQuestionResponse = {
@@ -74,6 +81,7 @@ function extractSurveyFromResponse(
       survey: data.survey,
       surveyId: data.surveyId,
       surveyTypeId: data.surveyTypeId,
+      rewardAmount: data.rewardAmount,
     }
 
   const nestedSurvey = data.survey
@@ -87,6 +95,7 @@ function extractSurveyFromResponse(
       survey: nestedSurvey.survey,
       surveyId: nestedSurvey.surveyId,
       surveyTypeId: nestedSurvey.surveyTypeId,
+      rewardAmount: nestedSurvey.rewardAmount,
     }
   }
 

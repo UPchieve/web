@@ -7,6 +7,7 @@ import {
   getImpactStudySurvey,
   submitSurvey,
   SURVEY_TYPES,
+  type SurveyDefinition,
 } from '@/services/SurveyService'
 import {
   type SurveyQuestionDefinition,
@@ -18,6 +19,7 @@ type UseSurveyPayload = {
   subject?: string
   sessionId?: string
   role?: string
+  initialSurvey?: SurveyDefinition
 }
 
 export function useSurvey(data: UseSurveyPayload) {
@@ -29,6 +31,7 @@ export function useSurvey(data: UseSurveyPayload) {
   const surveyTypeId = ref<number | undefined>(undefined)
   const surveyRewardAmount = ref(0)
   const userResponses = ref<SurveyUserResponsesMap>({})
+  const initialUserResponses = ref<SurveyUserResponsesMap>({})
 
   const isSurveyComplete = computed(() => {
     for (const question of survey.value) {
@@ -38,16 +41,31 @@ export function useSurvey(data: UseSurveyPayload) {
     return true
   })
 
+  const hasUpdatedUserResponse = computed(() => {
+    for (const questionId of Object.keys(userResponses.value)) {
+      const numQuestionId = Number(questionId)
+      if (
+        userResponses.value[numQuestionId].openResponse !==
+          initialUserResponses.value[numQuestionId].openResponse ||
+        userResponses.value[numQuestionId].responseId !==
+          initialUserResponses.value[numQuestionId].responseId
+      )
+        return true
+    }
+    return false
+  })
+
   function buildUserResponse() {
     const initialResponses: SurveyUserResponsesMap = {}
     survey.value.forEach((question) => {
       initialResponses[question.questionId] = {
-        responseId: undefined,
-        openResponse: '',
+        responseId: question.userResponse?.responseId ?? undefined,
+        openResponse: question.userResponse?.response ?? '',
       }
     })
 
     userResponses.value = initialResponses
+    initialUserResponses.value = initialResponses
   }
 
   function updateUserResponse(
@@ -88,10 +106,16 @@ export function useSurvey(data: UseSurveyPayload) {
   // relying on the components to first initialize the survey
   async function initializeSurvey() {
     try {
-      const surveyDefinition = await getSurveyDefinition()
-      survey.value = surveyDefinition.survey
-      surveyId.value = surveyDefinition.surveyId
-      surveyTypeId.value = surveyDefinition.surveyTypeId
+      if (data.initialSurvey) {
+        survey.value = data.initialSurvey.survey
+        surveyId.value = data.initialSurvey.surveyId
+        surveyTypeId.value = data.initialSurvey.surveyTypeId
+      } else {
+        const surveyDefinition = await getSurveyDefinition()
+        survey.value = surveyDefinition.survey
+        surveyId.value = surveyDefinition.surveyId
+        surveyTypeId.value = surveyDefinition.surveyTypeId
+      }
       buildUserResponse()
     } catch (err) {
       error.value =
@@ -138,6 +162,7 @@ export function useSurvey(data: UseSurveyPayload) {
     error,
     loadingMessage,
     isSurveyComplete,
+    hasUpdatedUserResponse,
     updateUserResponse,
     handleSurveySubmit,
     initializeSurvey,
