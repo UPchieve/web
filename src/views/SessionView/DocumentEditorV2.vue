@@ -91,9 +91,9 @@ import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEdito
 import {
   fileSizeTooBigEventName,
   ImageCompressor,
+  imageFailedModerationEventName,
   MAX_TOTAL_IMAGES,
   maxImagesEventName,
-  volunteerAttemptedToAddImage,
 } from '@/utils/quill-image-optimizer'
 import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
@@ -235,7 +235,7 @@ export default {
             maxWidth: 1000,
             maxHeight: 1000,
             imageType: 'image/webp',
-            isVolunteer: this.isVolunteer,
+            sessionId: this.sessionId,
           },
           cursors: {
             selectionChangeSource: 'cursor-api',
@@ -248,11 +248,9 @@ export default {
       })
     )
 
-    if (this.isVolunteer) {
-      this.quillEditor.getModule('toolbar').addHandler('image', async () => {
-        this.$refs.fileDialog.openFileDialog()
-      })
-    }
+    this.quillEditor.getModule('toolbar').addHandler('image', async () => {
+      this.$refs.fileDialog.openFileDialog()
+    })
 
     // Delegate tracking the contents of the doc to Yjs instead of Quill.
     this.doc = new Doc()
@@ -275,9 +273,8 @@ export default {
       false
     )
     this.quillEditor.root.addEventListener(
-      volunteerAttemptedToAddImage,
-      () =>
-        alert('Please upload images through the image button on the toolbar.'),
+      imageFailedModerationEventName,
+      () => this.showImageUploadError(this.inappropriateImageErrorMessage),
       false
     )
 

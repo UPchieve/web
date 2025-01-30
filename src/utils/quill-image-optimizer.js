@@ -1,11 +1,12 @@
 import { file2b64 } from '@/utils/fileToBase64'
+import ModerationService from '@/services/ModerationService'
 
 export const MAX_FILE_SIZE_KB = 750
 export const MAX_TOTAL_IMAGES = 5
 
 export const maxImagesEventName = 'max-images-limit'
 export const fileSizeTooBigEventName = 'file-size-limit'
-export const volunteerAttemptedToAddImage = 'volunteer-attempted-to-add-image'
+export const imageFailedModerationEventName = 'image-failed-moderation'
 
 const isSafari =
   /constructor/i.test(window.HTMLElement) ||
@@ -16,9 +17,7 @@ const isSafari =
 
 const maxImagesEvent = new Event(maxImagesEventName)
 const fileSizeEvent = new Event(fileSizeTooBigEventName)
-const volunteerAttemptedToAddImageEvent = new Event(
-  volunteerAttemptedToAddImage
-)
+const imageFailedModerationEvent = new Event(imageFailedModerationEventName)
 
 const getImagesFromDragEvent = (evt) => {
   return Array.from(evt?.dataTransfer?.files ?? []).filter((f) =>
@@ -132,37 +131,61 @@ const downscaleImage = async (
 }
 
 class ImageDrop {
-  constructor(quill, onNewDataUrl, isVolunteer) {
+  constructor(quill, onNewDataUrl, sessionId) {
     this.quill = quill
     this.onNewDataUrl = onNewDataUrl
-    this.isVolunteer = isVolunteer
+    this.sessionId = sessionId
     this.quill.root.addEventListener(
       'drop',
-      (e) => this.handleImageUpload(e, isVolunteer, () => this.handleDrop(e)),
+      (e) =>
+        this.handleImageUpload(e, sessionId, (image) =>
+          this.handleDropImage(image, e)
+        ),
       true
     )
     this.quill.root.addEventListener(
       'paste',
-      (e) => this.handleImageUpload(e, isVolunteer, () => this.handlePaste(e)),
+      (e) =>
+        this.handleImageUpload(e, sessionId, (image) =>
+          this.handlePasteImage(image)
+        ),
       true
     )
   }
 
-  async handleImageUpload(evt, isVolunteer, callback) {
-    // Prevent volunteers from uploading images
-    const isImageUpload =
-      (evt.type === 'drop' && getImagesFromDragEvent(evt).length) ||
-      (evt.type === 'paste' && getImagesFromPasteEvent(evt).length)
-    if (isVolunteer && isImageUpload) {
-      evt.preventDefault()
-      evt.stopImmediatePropagation()
-      this.quill.root.dispatchEvent(volunteerAttemptedToAddImageEvent)
+  async handleImageUpload(evt, sessionId, callback) {
+    const images =
+      evt.type === 'drop'
+        ? getImagesFromDragEvent(evt)
+        : evt.type === 'paste'
+          ? getImagesFromPasteEvent(evt)
+          : null
+    if (!images?.length) {
+      return
+    }
+
+    evt.preventDefault()
+    evt.stopImmediatePropagation()
+
+    const image = evt.type === 'paste' ? images[0].getAsFile() : images[0]
+    const isClean = await this.isImageClean(image, sessionId)
+    if (!isClean) {
+      this.quill.root.dispatchEvent(imageFailedModerationEvent)
     } else {
-      await callback()
+      await callback(image)
     }
   }
 
-  async handleDrop(evt) {
+  async isImageClean(imageFile, sessionId) {
+    const formData = new FormData()
+    formData.append('image', imageFile)
+    formData.append('sessionId', sessionId)
+    const { isClean } = await ModerationService.checkIfImageIsClean(formData)
+    return isClean
+  }
+
+  async handleDropImage(imageFile, evt) {
+    if (!imageFile) return
     if (!isValidImageCount(this.quill)) {
       this.quill.root.dispatchEvent(maxImagesEvent)
       return
@@ -180,9 +203,8 @@ class ImageDrop {
         )
       }
     }
-    const firstImage = getImagesFromDragEvent(evt)[0]
-    if (firstImage) {
-      const base64ImageSrc = await file2b64(firstImage)
+    if (imageFile) {
+      const base64ImageSrc = await file2b64(imageFile)
       this.onNewDataUrl(base64ImageSrc)
       return
     }
@@ -194,24 +216,13 @@ class ImageDrop {
     }
   }
 
-  async handlePaste(evt) {
+  async handlePasteImage(image) {
+    if (!image) return
     if (!isValidImageCount(this.quill)) {
       this.quill.root.dispatchEvent(maxImagesEvent)
       return
     }
-
-    const images = getImagesFromPasteEvent(evt)
-
-    const imagesNoHtml = images.filter((f) => f.type !== 'text/html')
-    if (!imagesNoHtml.length) {
-      return
-    }
-    evt.preventDefault()
-    const blob = images.pop()?.getAsFile()
-    if (!blob) {
-      return
-    }
-    const base64ImageSrc = await file2b64(blob)
+    const base64ImageSrc = await file2b64(image)
     this.onNewDataUrl(base64ImageSrc)
   }
 }
@@ -224,6 +235,7 @@ export class ImageCompressor {
       this.options.imageType = 'image/jpeg'
     }
     this.maxImages = options.maxImages ?? MAX_TOTAL_IMAGES
+    this.sessionId = options.sessionId
 
     const onImageDrop = async (dataUrl) => {
       if (!dataUrl) {
@@ -232,7 +244,7 @@ export class ImageCompressor {
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl)
       this.insertToEditor(dataUrlCompressed)
     }
-    this.imageDrop = new ImageDrop(quill, onImageDrop, this.options.isVolunteer)
+    this.imageDrop = new ImageDrop(quill, onImageDrop, this.sessionId)
     const toolbar = this.quill.getModule('toolbar')
     if (toolbar) {
       toolbar.addHandler('image', () => this.selectLocalImage())

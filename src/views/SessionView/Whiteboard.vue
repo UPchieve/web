@@ -858,20 +858,17 @@ export default {
         }
 
         // Moderate the image
-        if (this.isVolunteer) {
-          // TODO - Also moderate student images
-          const formData = new FormData()
-          formData.append('image', file)
-          formData.append('sessionId', this.sessionId)
-          const { isClean } =
-            await ModerationService.checkIfImageIsClean(formData)
-          if (!isClean) {
-            this.showImageUploadError(
-              'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org',
-              6000
-            )
-            return
-          }
+        const formData = new FormData()
+        formData.append('image', file)
+        formData.append('sessionId', this.sessionId)
+        const { isClean } =
+          await ModerationService.checkIfImageIsClean(formData)
+        if (!isClean) {
+          this.showImageUploadError(
+            'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org',
+            6000
+          )
+          return
         }
 
         const response = await NetworkService.getSessionPhotoUploadUrl(
