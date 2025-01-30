@@ -62,6 +62,7 @@ import Case from 'case'
 import BotChatView from './views/BotConversationsView/BotChatView.vue'
 import NewBotChat from './views/BotConversationsView/NewBotChat.vue'
 import RewardsView from './views/RewardsView.vue'
+import SurveysView from './views/SurveysView.vue'
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -541,6 +542,12 @@ const routes = [
     path: '/rewards',
     name: 'RewardsView',
     component: RewardsView,
+    meta: { protected: true },
+  },
+  {
+    path: '/surveys/:surveyType',
+    name: 'SurveysView',
+    component: SurveysView,
     meta: { protected: true },
   },
   {

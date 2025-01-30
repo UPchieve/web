@@ -26,6 +26,15 @@
         routeTo="/ai-tutor-conversations"
         >{{ aiBotMessage }}<arrow-icon></arrow-icon
       ></large-button>
+
+      <large-button
+        v-if="impactStudySurveyCache"
+        class="dashboard-notice"
+        :class="'dashboard-notice--info'"
+        routeTo="/surveys/impact-study"
+        >You almost earned ${{ impactStudySurveyCache.rewardAmount }}! Finish up
+        your survey <arrow-icon></arrow-icon
+      ></large-button>
     </div>
 
     <tell-them-college-prep-modal
@@ -71,7 +80,11 @@ import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FeatureFlagService from '@/services/FeatureFlagService'
-import { EVENTS, VERIFICATION_METHOD } from '@/consts'
+import {
+  EVENTS,
+  VERIFICATION_METHOD,
+  IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY,
+} from '@/consts'
 import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -272,6 +285,13 @@ export default {
       )
       if (!isNaN(viewCount)) return viewCount
       else return 0
+    },
+    impactStudySurveyCache() {
+      const cacheHit = localStorage.getItem(
+        IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY
+      )
+      if (cacheHit) return JSON.parse(cacheHit)
+      return undefined
     },
   },
   methods: {
@@ -486,6 +506,12 @@ export default {
 
   &--info {
     background-color: $c-information-blue;
+    color: #fff;
+    width: 100%;
+
+    svg {
+      fill: #fff;
+    }
   }
 
   &--downtime {

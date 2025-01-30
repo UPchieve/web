@@ -3,14 +3,12 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import useVuelidate from '@vuelidate/core'
 import { useRouter } from 'vue-router'
-import { EVENTS, QUESTION_TYPES, VERIFICATION_TYPE } from '@/consts'
+import { EVENTS, VERIFICATION_TYPE } from '@/consts'
 import CrossIcon from '@/assets/cross.svg'
 import UpdogStarIcon from '@/assets/updog-star.svg'
 import LargeButton from '@/components/LargeButton.vue'
-import StepperComponent from '@/components/Stepper.vue'
 import Modal from '@/components/Modal.vue'
 import FormEmail from '@/components/FormEmail.vue'
-import SurveyQuestion from '@/components/Surveys/SurveyQuestion.vue'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 import Loader from '@/components/Loader.vue'
 import { useSurvey } from '@/composables/useSurvey'
@@ -19,9 +17,9 @@ import { useStepper } from '@/composables/useStepper'
 import AnalyticsService from '@/services/AnalyticsService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { SURVEY_TYPES } from '@/services/SurveyService'
-import { impactStudyEnrollment } from '@/services/UserProductFlagsService'
 
-type ModalView = 'proxy-verify' | 'survey' | 'complete' | ''
+type ModalView = 'intro' | 'email-verify' | ''
+type EmailVerifyModalView = 'proxy' | 'email' | ''
 
 const props = defineProps({
   closeModal: {
@@ -33,18 +31,12 @@ const props = defineProps({
 const store = useStore()
 const $router = useRouter()
 const v$ = useVuelidate()
-const {
-  survey,
-  surveyId,
-  surveyRewardAmount,
-  userResponses,
-  isSurveyComplete,
-  initializeSurvey,
-  handleSurveySubmit,
-  updateUserResponse,
-} = useSurvey({ surveyType: SURVEY_TYPES.IMPACT_STUDY })
+const { surveyRewardAmount, initializeSurvey } = useSurvey({
+  surveyType: SURVEY_TYPES.IMPACT_STUDY,
+})
 const {
   proxyEmail,
+  email,
   sendCode,
   isSendingCodeDisabled,
   verificationCode,
@@ -52,15 +44,14 @@ const {
   resendCode,
   handleCodeConfirmation,
   isValidVerificationCode,
-} = useVerification({
-  verificationType: VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL,
-})
+  updateVerificationType,
+} = useVerification()
 
-const totalSteps = computed(() => survey.value.length)
-const { currentStep, isLastStep, isFirstStep, nextStep, prevStep, goToStep } =
-  useStepper(totalSteps)
+const totalSteps = 2
+const { currentStep, nextStep, goToStep } = useStepper(totalSteps)
 
 const modalView = ref<ModalView>('')
+const emailVerifyModalView = ref<EmailVerifyModalView>('')
 const error = ref('')
 const onMountError = ref('')
 const isSubmitting = ref(false)
@@ -71,19 +62,6 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
 const isValidInput = computed(
   () => !v$.value.$error && !v$.value.$silentErrors?.length
 )
-const currentQuestion = computed(() => survey.value[currentStep.value - 1])
-const isNextButtonDisabled = computed(() => {
-  if (!isValidInput.value) return true
-  const response = userResponses.value[currentQuestion.value?.questionId]
-  if (
-    (currentQuestion.value.questionType === QUESTION_TYPES.freeResponse &&
-      !response?.openResponse) ||
-    (currentQuestion.value.questionType !== QUESTION_TYPES.freeResponse &&
-      !response.responseId)
-  )
-    return true
-  return false
-})
 
 const impactStudySurveyModalViewCount = computed(() => {
   const viewCount = parseInt(
@@ -91,6 +69,13 @@ const impactStudySurveyModalViewCount = computed(() => {
   )
   if (!isNaN(viewCount)) return viewCount
   else return 0
+})
+
+const isEmailNeeded = computed(() => {
+  return (
+    (user.value.isSchoolPartner && !user.value.proxyEmail) ||
+    (!user.value.email && !user.value.verifiedEmail)
+  )
 })
 
 function handleClose() {
@@ -129,7 +114,7 @@ async function handleVerificationSubmit() {
 
   try {
     await handleCodeConfirmation()
-    modalView.value = 'survey'
+    goToSurveyPage()
   } catch (err) {
     error.value = (err as Error).message
   } finally {
@@ -138,27 +123,21 @@ async function handleVerificationSubmit() {
   }
 }
 
-async function handleSurveySubmission() {
-  error.value = ''
-  if (!isSurveyComplete.value || isSubmitting.value) return
-
-  isSubmitting.value = true
-  loadingMessage.value = 'Saving your answers...'
-
-  try {
-    await handleSurveySubmit()
-    await impactStudyEnrollment(store, surveyId.value!)
-    modalView.value = 'complete'
-  } catch (err) {
-    error.value = (err as Error).message
-  } finally {
-    isSubmitting.value = false
-    loadingMessage.value = ''
-  }
+function handleViewFromIntroView() {
+  if (user.value.isSchoolPartner && !user.value.proxyEmail) {
+    modalView.value = 'email-verify'
+    emailVerifyModalView.value = 'proxy'
+    updateVerificationType(VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL)
+  } else if (!user.value.email && !user.value.verifiedEmail) {
+    modalView.value = 'email-verify'
+    emailVerifyModalView.value = 'email'
+    updateVerificationType(VERIFICATION_TYPE.EMAIL_FOR_EMAIL)
+  } else goToSurveyPage()
 }
 
-function goToRewards() {
-  $router.push('/rewards')
+function goToSurveyPage() {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_VIEW_IMPACT_STUDY_SURVEY)
+  $router.push('/surveys/impact-study')
 }
 
 function handleModalViewCount() {
@@ -182,9 +161,7 @@ onMounted(async () => {
   try {
     await initializeSurvey()
     handleModalViewCount()
-    if (user.value.isSchoolPartner && !user.value.proxyEmail)
-      modalView.value = 'proxy-verify'
-    else modalView.value = 'survey'
+    modalView.value = 'intro'
   } catch (err) {
     onMountError.value = (err as Error).message
   }
@@ -216,24 +193,70 @@ watch(modalView, () => {
     />
 
     <section
-      v-else-if="modalView === 'proxy-verify'"
+      v-else-if="modalView === 'intro'"
+      class="impact-study-verification"
+    >
+      <div v-if="currentStep === 1" class="impact-study-verification">
+        <section>
+          <updog-star-icon class="updog" />
+          <h1 class="impact-study-modal__title">
+            Take our 5 min survey and earn ${{ surveyRewardAmount }}
+          </h1>
+
+          <p class="impact-study-modal__subtitle">
+            Help UPchieve learn how we can help students like you improve their
+            grades. We'll send you a ${{ surveyRewardAmount }} visa gift card!
+          </p>
+        </section>
+
+        <div v-if="!mobileMode" class="impact-study-modal__separator" />
+
+        <footer>
+          <div class="impact-study-buttons">
+            <LargeButton
+              class="impact-study-buttons--secondary-button"
+              @click="handleClose"
+            >
+              No, thanks
+            </LargeButton>
+            <LargeButton
+              class="impact-study-buttons--secondary-button impact-study-buttons--primary"
+              @click="handleViewFromIntroView"
+              primary
+              :showArrow="false"
+            >
+              {{ isEmailNeeded ? 'Next' : 'Start survey' }}
+            </LargeButton>
+          </div>
+          <RecaptchaCaption />
+        </footer>
+      </div>
+    </section>
+
+    <section
+      v-else-if="modalView === 'email-verify'"
       class="impact-study-verification"
     >
       <div v-if="currentStep === 1" class="impact-study-verification">
         <header>
           <h1 class="impact-study-modal__title">
-            Verify your personal email before earning ${{ surveyRewardAmount }}
-            💸
+            Verify your personal email before earning ${{ surveyRewardAmount }}!
           </h1>
           <p class="impact-study-modal__subtitle">
-            Your school email will not allow virtual gift cards so please enter
-            a personal email to send gift cards to!
+            We'll send your $10 gift card to your personal email
           </p>
         </header>
 
         <section class="impact-study-modal__section">
           <FormEmail
+            v-if="emailVerifyModalView === 'proxy'"
             v-model="proxyEmail"
+            :is-required="true"
+            label="Personal email"
+          />
+          <FormEmail
+            v-else
+            v-model="email"
             :is-required="true"
             label="Personal email"
           />
@@ -272,7 +295,7 @@ watch(modalView, () => {
       <div v-else-if="currentStep === 2" class="impact-study-verification">
         <header>
           <h1 class="impact-study-modal__title">
-            We just sent a verification code to
+            Enter your verification code
             <span class="impact-study-verification__send-to">{{
               proxyEmail
             }}</span>
@@ -282,8 +305,8 @@ watch(modalView, () => {
         <section class="impact-study-modal__section">
           <div class="uc-form-element">
             <label for="verification-code"
-              >Enter your 6-digit verification code</label
-            >
+              >You can find your 6-digit code in your email
+            </label>
             <input
               id="verification-code"
               class="uc-form-text-input"
@@ -331,85 +354,10 @@ watch(modalView, () => {
             :showArrow="false"
             primary
           >
-            Verify my personal email
+            Start survey
           </LargeButton>
         </footer>
       </div>
-    </section>
-
-    <section
-      v-else-if="modalView === 'survey' && survey.length"
-      class="impact-study-questions"
-    >
-      <div class="impact-study-modal__title">Your School Journey!</div>
-      <div class="impact-study-modal__subtitle">
-        Help us understand your school journey, earn ${{ surveyRewardAmount }}!
-      </div>
-      <StepperComponent
-        :totalSteps="survey.length"
-        :currentStep="currentStep"
-        class="impact-study-stepper"
-      />
-
-      <SurveyQuestion
-        :question="currentQuestion"
-        :userResponse="userResponses[currentQuestion?.questionId]"
-        :updateUserResponse="updateUserResponse"
-      />
-      <p v-if="error" class="impact-study-error">
-        {{ error || 'We were unable to submit your survey. Please try again.' }}
-      </p>
-
-      <div v-if="!mobileMode" class="impact-study-modal__separator" />
-      <div class="impact-study-buttons">
-        <LargeButton v-if="!isFirstStep" @click="prevStep"> Back </LargeButton>
-
-        <LargeButton
-          v-if="!isLastStep"
-          primary
-          @click="nextStep"
-          :disabled="isNextButtonDisabled ? true : null"
-        >
-          Next
-        </LargeButton>
-
-        <LargeButton
-          v-else-if="isLastStep"
-          primary
-          @click="handleSurveySubmission"
-          :disabled="!isSurveyComplete ? true : null"
-        >
-          Submit
-        </LargeButton>
-      </div>
-    </section>
-
-    <section
-      v-else-if="modalView === 'complete'"
-      class="impact-study-questions"
-    >
-      <section class="impact-study-modal__section">
-        <updog-star-icon class="updog" />
-        <div>Thanks! You have earned ${{ surveyRewardAmount }}</div>
-      </section>
-
-      <div v-if="!mobileMode" class="impact-study-modal__separator" />
-
-      <footer class="impact-study-buttons">
-        <LargeButton
-          class="impact-study-buttons--secondary-button"
-          @click="handleClose"
-        >
-          Close
-        </LargeButton>
-        <LargeButton
-          variant="primary"
-          class="impact-study-buttons--secondary-button"
-          @click="goToRewards"
-        >
-          See my rewards
-        </LargeButton>
-      </footer>
     </section>
   </modal>
 </template>

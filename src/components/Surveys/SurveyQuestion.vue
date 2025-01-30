@@ -4,6 +4,7 @@ import { QUESTION_TYPES } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
 import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
 import SurveyImage from '@/components/Surveys/SurveyImage.vue'
+import SurveyCheckbox from '@/components/Surveys/SurveyCheckbox.vue'
 import type {
   SurveyQuestionDefinition,
   SurveyResponseDefinition,
@@ -18,6 +19,10 @@ const props = withDefaults(
       questionId: number,
       responseId: number | undefined,
       response?: string
+    ) => void
+    updateUserResponseMultiselect: (
+      questionId: number,
+      responseId: number | undefined
     ) => void
     readOnly?: boolean
   }>(),
@@ -34,31 +39,53 @@ const isRowOfImages = computed(() => {
 })
 
 function isSelected(response: SurveyResponseDefinition) {
-  return (
-    userResponse.value.responseId === response.responseId ||
-    userResponse.value.openResponse === response.responseText
-  )
+  if (Array.isArray(userResponse.value.responseId))
+    return userResponse.value.responseId.find((r) => r === response.responseId)
+  else
+    return (
+      userResponse.value.responseId === response.responseId ||
+      userResponse.value.openResponse === response.responseText
+    )
 }
 
 function isGpaQuestion(question: string) {
-  return question === `What's your GPA right now?`
+  return question === `What is your current high school GPA?`
 }
 
 function isLowestGradeQuestion(question: string) {
   return question === `What's your lowest grade this semester?`
 }
 
+function isHowManyCoursesTakenQuestion(question: string) {
+  return (
+    question === `How many AP courses are you taking this year?` ||
+    question === `How many IB courses are you taking this year?` ||
+    question === `How many Dual enrollment courses are you taking this year?` ||
+    question === `How many Honors courses are you taking this year?`
+  )
+}
+
 function isNumberedResponseQuestion(question: string) {
-  return isGpaQuestion(question) || isLowestGradeQuestion(question)
+  return (
+    isGpaQuestion(question) ||
+    isLowestGradeQuestion(question) ||
+    isHowManyCoursesTakenQuestion(question)
+  )
 }
 
 function calculateMaxValue(question: string) {
-  if (isGpaQuestion(question)) return 4
+  if (isGpaQuestion(question)) return 5
   if (isLowestGradeQuestion(question)) return 100
+  if (isHowManyCoursesTakenQuestion(question)) return 10
 }
 
 function calculateMinValue(question: string) {
-  if (isGpaQuestion(question) || isLowestGradeQuestion(question)) return 0
+  if (
+    isGpaQuestion(question) ||
+    isLowestGradeQuestion(question) ||
+    isHowManyCoursesTakenQuestion(question)
+  )
+    return 0
 }
 </script>
 
@@ -103,6 +130,23 @@ function calculateMinValue(question: string) {
           :openResponseValue="userResponse.openResponse"
           @survey-radio-input="updateUserResponse"
           :readOnly="readOnly"
+        />
+        <SurveyCheckbox
+          v-else-if="question.questionType === QUESTION_TYPES.checkBox"
+          class="question__response question__response-checkbox"
+          :class="{
+            'question__response-checkbox-selected': isSelected(response),
+          }"
+          :data-testid="`survey-question-${response.responseText}`"
+          :key="`${response.responseId}-checkbox`"
+          :id="`${question.questionId}_${response.responseId}`"
+          :checkboxValue="response.responseId"
+          :name="question.questionId"
+          :checked="isSelected(response)"
+          :questionId="question.questionId"
+          :responseId="response.responseId"
+          :label="response.responseText"
+          @survey-checkbox-input="updateUserResponseMultiselect"
         />
       </template>
 
@@ -171,6 +215,18 @@ function calculateMinValue(question: string) {
 
       @include breakpoint-above('medium') {
         flex-basis: 20%;
+      }
+    }
+
+    &__response-checkbox {
+      border: solid 1px $c-border-grey;
+      border-radius: 5px;
+      margin: 1em;
+      padding: 1em;
+
+      &-selected {
+        background-color: $selected-green;
+        border-color: $c-accent;
       }
     }
   }

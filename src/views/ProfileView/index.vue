@@ -242,13 +242,6 @@
           </div>
         </div>
       </div>
-
-      <impact-study-survey
-        v-if="survey"
-        :surveyDefiniton="survey"
-        :readOnly="!activeEdit"
-        ref="impactSurvey"
-      />
     </div>
   </div>
 </template>
@@ -257,7 +250,6 @@
 import { mapGetters, mapState } from 'vuex'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
-import NetworkService from '@/services/NetworkService'
 import DeactivateAccountModal from '../DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
@@ -268,7 +260,6 @@ import Checkbox from '@/components/CheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import TrashIcon from '@/assets/trash.svg'
 import ToggleButton from '@/components/ToggleButton.vue'
-import ImpactStudySurvey from '@/components/ImpactStudySurvey.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 
 export default {
@@ -282,7 +273,6 @@ export default {
     VerificationModal,
     TrashIcon,
     ToggleButton,
-    ImpactStudySurvey,
   },
   data() {
     return {
@@ -301,10 +291,9 @@ export default {
       showSmsVerificationModal: false,
       smsConsent: false,
       newMutedSubjectAlerts: [],
-      survey: undefined,
     }
   },
-  async created() {
+  created() {
     this.isAllowingNotifications = getNotificationPermission() === 'granted'
     this.isAccountActive = !this.user.isDeactivated
     if (this.user.phone) {
@@ -314,10 +303,6 @@ export default {
     if (this.isVolunteer) {
       this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
     }
-    if (this.isStudent && this.productFlags.impactStudyEnrollmentAt) {
-      const { data } = await NetworkService.getImpactStudySurveyResponses()
-      if (data) this.survey = data
-    }
     this.setFlagsForEditingPhoneNumber()
   },
   computed: {
@@ -325,7 +310,6 @@ export default {
       user: (state) => state.user.user,
       subjects: (state) => state.subjects.subjects,
       isFetchingSubjects: (state) => state.subjects.isFetchingSubjects,
-      productFlags: (state) => state.productFlags.flags,
     }),
     ...mapGetters({
       userType: 'user/userType',
@@ -479,7 +463,7 @@ export default {
 
         // wait for save to succeed before coming out of edit mode
         UserService.setProfile(reqBody).then(
-          async () => {
+          () => {
             this.editBtnMsg = 'Edit'
             this.activeEdit = false
             this.saveFailed = false
@@ -521,13 +505,6 @@ export default {
                 this.showSmsVerificationModal = true
               }
             })
-
-            if (
-              this.$refs.impactSurvey &&
-              typeof this.$refs.impactSurvey.handleSurveySubmission ===
-                'function'
-            )
-              await this.$refs.impactSurvey.handleSurveySubmission()
           },
           () => {
             this.saveFailed = true

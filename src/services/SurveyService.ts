@@ -31,7 +31,7 @@ export type SurveyDefinition = {
 }
 
 export type SurveyUserQuestionResponse = {
-  responseId?: number
+  responseId?: number | number[]
   openResponse: string
 }
 
@@ -131,16 +131,26 @@ export async function submitSurvey(
   survey: SurveyDefinition,
   userResponses: SurveyUserResponsesMap
 ) {
-  const submissions: SurveyQuestionSubmission[] = survey.survey.map(
-    (question) => {
-      const response = userResponses[question.questionId]
-      return {
+  const submissions: SurveyQuestionSubmission[] = []
+
+  survey.survey.forEach((question) => {
+    const response = userResponses[question.questionId]
+    if (Array.isArray(response.responseId))
+      // Create separate submissions for multi select responses
+      response.responseId.forEach((respId) => {
+        submissions.push({
+          questionId: Number(question.questionId),
+          responseChoiceId: respId,
+          openResponse: response.openResponse,
+        })
+      })
+    else
+      submissions.push({
         questionId: Number(question.questionId),
         responseChoiceId: response.responseId ?? undefined,
         openResponse: response.openResponse,
-      }
-    }
-  )
+      })
+  })
 
   const payload: SurveySubmissionPayload = {
     surveyId: survey.surveyId as number,

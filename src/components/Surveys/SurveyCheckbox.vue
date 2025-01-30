@@ -65,6 +65,7 @@ label {
 }
 
 input[type='checkbox'] {
+  background-color: $upchieve-white;
   &:checked {
     background-color: $c-accent;
     color: white;
