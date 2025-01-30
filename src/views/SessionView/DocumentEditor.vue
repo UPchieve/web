@@ -55,7 +55,7 @@ import {
   maxImagesEventName,
   fileSizeTooBigEventName,
   MAX_TOTAL_IMAGES,
-  volunteerAttemptedToAddImage,
+  imageFailedModerationEventName,
 } from '@/utils/quill-image-optimizer'
 import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
@@ -133,7 +133,7 @@ export default {
             maxWidth: 1000,
             maxHeight: 1000,
             imageType: 'image/webp',
-            isVolunteer: this.isVolunteer,
+            sessionId: this.sessionId,
           },
           cursors: {
             selectionChangeSource: 'cursor-api',
@@ -147,11 +147,9 @@ export default {
       })
     )
 
-    if (this.isVolunteer) {
-      this.quillEditor.getModule('toolbar').addHandler('image', async () => {
-        this.$refs.fileDialog.openFileDialog()
-      })
-    }
+    this.quillEditor.getModule('toolbar').addHandler('image', async () => {
+      this.$refs.fileDialog.openFileDialog()
+    })
 
     this.quillEditor.root.addEventListener(
       maxImagesEventName,
@@ -170,9 +168,8 @@ export default {
       false
     )
     this.quillEditor.root.addEventListener(
-      volunteerAttemptedToAddImage,
-      () =>
-        alert('Please upload images through the image button on the toolbar.'),
+      imageFailedModerationEventName,
+      () => this.showImageUploadError(this.inappropriateImageErrorMessage),
       false
     )
 
