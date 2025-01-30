@@ -1,5 +1,12 @@
-import { ref, computed } from 'vue'
 import type { AxiosError } from 'axios'
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
+import {
+  EVENTS,
+  IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY,
+  QUESTION_TYPES,
+} from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import {
   getPostsessionSurvey,
@@ -8,11 +15,13 @@ import {
   submitSurvey,
   SURVEY_TYPES,
   type SurveyDefinition,
+  type SurveyUserQuestionResponse,
 } from '@/services/SurveyService'
-import {
-  type SurveyQuestionDefinition,
-  type SurveyUserResponsesMap,
+import type {
+  SurveyQuestionDefinition,
+  SurveyUserResponsesMap,
 } from '@/services/SurveyService'
+import { impactStudyEnrollment } from '@/services/UserProductFlagsService'
 
 type UseSurveyPayload = {
   surveyType: SURVEY_TYPES
@@ -32,11 +41,25 @@ export function useSurvey(data: UseSurveyPayload) {
   const surveyRewardAmount = ref(0)
   const userResponses = ref<SurveyUserResponsesMap>({})
   const initialUserResponses = ref<SurveyUserResponsesMap>({})
+  const store = useStore()
+
+  const isImpactStudySurvey = computed(() => {
+    return data.surveyType === SURVEY_TYPES.IMPACT_STUDY
+  })
 
   const isSurveyComplete = computed(() => {
     for (const question of survey.value) {
       const response = userResponses.value[question.questionId]
-      if (!response.responseId && !response.openResponse) return false
+      if (question.questionType === QUESTION_TYPES.checkBox) {
+        if (
+          !response.responseId ||
+          (Array.isArray(response.responseId) &&
+            response.responseId.length === 0)
+        )
+          return false
+      } else {
+        if (!response.responseId && !response.openResponse) return false
+      }
     }
     return true
   })
@@ -55,12 +78,56 @@ export function useSurvey(data: UseSurveyPayload) {
     return false
   })
 
+  function storeImpactStudyResponsesToCache(
+    userResponses: SurveyUserResponsesMap
+  ) {
+    localStorage.setItem(
+      IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY,
+      JSON.stringify({
+        rewardAmount: surveyRewardAmount.value,
+        responses: userResponses,
+      })
+    )
+  }
+
   function buildUserResponse() {
     const initialResponses: SurveyUserResponsesMap = {}
+    let cachedResponses: Record<string, SurveyUserQuestionResponse> | undefined
+    if (isImpactStudySurvey.value) {
+      const cacheHit = localStorage.getItem(
+        IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY
+      )
+      if (cacheHit)
+        cachedResponses = JSON.parse(cacheHit).responses as Record<
+          string,
+          SurveyUserQuestionResponse
+        >
+    }
+
     survey.value.forEach((question) => {
+      const strQuestionId = question.questionId.toString()
+      let responseId: number | number[] | undefined
+      let openResponse: string = ''
+
+      if (question.userResponse) {
+        responseId = question.userResponse.responseId
+        openResponse = question.userResponse.response
+      } else if (
+        isImpactStudySurvey.value &&
+        cachedResponses?.[strQuestionId]
+      ) {
+        responseId = cachedResponses[strQuestionId].responseId
+        openResponse = cachedResponses[strQuestionId].openResponse
+      }
+
+      if (question.questionType === QUESTION_TYPES.checkBox) {
+        if (typeof responseId === 'number') responseId = [responseId]
+        else if (!responseId || !Array.isArray(responseId)) responseId = []
+      }
+
       initialResponses[question.questionId] = {
-        responseId: question.userResponse?.responseId ?? undefined,
-        openResponse: question.userResponse?.response ?? '',
+        responseId,
+        openResponse,
       }
     })
 
@@ -80,6 +147,41 @@ export function useSurvey(data: UseSurveyPayload) {
         openResponse: response,
       },
     }
+    if (isImpactStudySurvey.value)
+      storeImpactStudyResponsesToCache(userResponses.value)
+  }
+
+  function updateUserResponseMultiselect(
+    questionId: number,
+    responseId: number
+  ) {
+    const currentResponse = userResponses.value[questionId]?.responseId
+
+    let updatedResponses: number[] = []
+
+    if (Array.isArray(currentResponse)) {
+      if (currentResponse.includes(responseId))
+        // Deselect if it's the same response
+        updatedResponses = currentResponse.filter((id) => id !== responseId)
+      else updatedResponses = [...currentResponse, responseId]
+    } else if (typeof currentResponse === 'number') {
+      if (currentResponse === responseId)
+        // Deselect if it's the same response
+        updatedResponses = []
+      // Convert to array with both responses
+      else updatedResponses = [currentResponse, responseId]
+    }
+
+    userResponses.value = {
+      ...userResponses.value,
+      [questionId]: {
+        ...userResponses.value[questionId],
+        responseId: updatedResponses,
+      },
+    }
+
+    if (isImpactStudySurvey.value)
+      storeImpactStudyResponsesToCache(userResponses.value)
   }
 
   function getSurveyDefinition() {
@@ -145,6 +247,13 @@ export function useSurvey(data: UseSurveyPayload) {
         },
         userResponses.value
       )
+      AnalyticsService.captureEvent(EVENTS.USER_SURVEY_SUBMITTED, {
+        surveyType: data.surveyType,
+      })
+      if (isImpactStudySurvey.value) {
+        await impactStudyEnrollment(store, surveyId.value)
+        localStorage.removeItem(IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY)
+      }
     } catch (err) {
       error.value =
         ((err as AxiosError).response?.data as { err?: string })?.err ||
@@ -165,7 +274,9 @@ export function useSurvey(data: UseSurveyPayload) {
     loadingMessage,
     isSurveyComplete,
     hasUpdatedUserResponse,
+    isImpactStudySurvey,
     updateUserResponse,
+    updateUserResponseMultiselect,
     handleSurveySubmit,
     initializeSurvey,
     buildUserResponse,

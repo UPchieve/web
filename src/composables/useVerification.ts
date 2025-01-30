@@ -21,12 +21,12 @@ import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
 
 type UseVerificationPayload = {
-  verificationType: VERIFICATION_TYPE
+  verificationType?: VERIFICATION_TYPE
   phone?: string
   forSignup?: boolean
 }
 
-export function useVerification(data: UseVerificationPayload) {
+export function useVerification(data: UseVerificationPayload = {}) {
   const store = useStore()
 
   const email = ref('')
@@ -34,25 +34,32 @@ export function useVerification(data: UseVerificationPayload) {
   const phoneInput = ref<PhoneResults>({ isValid: false })
   const proxyEmail = ref('')
   const verificationCode = ref('')
+  const verificationType = ref(data.verificationType ?? '')
   const hasResentCode = ref(false)
   const error = ref('')
 
+  const isEmailVerificationType = computed(
+    () =>
+      verificationType.value === VERIFICATION_TYPE.EMAIL_FOR_SIGNUP ||
+      verificationType.value === VERIFICATION_TYPE.EMAIL_FOR_EMAIL
+  )
+
+  const isProxyEmailVerificationType = computed(
+    () => verificationType.value === VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL
+  )
+
   const validationRules = {
     email: {
-      required: requiredIf(
-        () => data.verificationType === VERIFICATION_TYPE.EMAIL_FOR_SIGNUP
-      ),
+      required: requiredIf(() => isEmailVerificationType.value),
       email: helpers.withMessage('Not a valid email address', emailValidator),
     },
     proxyEmail: {
-      required: requiredIf(
-        () => data.verificationType === VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL
-      ),
+      required: requiredIf(() => isProxyEmailVerificationType.value),
       email: helpers.withMessage('Not a valid email address', emailValidator),
     },
     phone: {
       required: requiredIf(
-        () => data.verificationType === VERIFICATION_TYPE.PHONE_NUMBER
+        () => verificationType.value === VERIFICATION_TYPE.PHONE_NUMBER
       ),
     },
     verificationCode: {
@@ -97,7 +104,7 @@ export function useVerification(data: UseVerificationPayload) {
   const mobileMode = computed(() => store.getters['app/mobileMode'])
 
   const isSendingCodeDisabled = computed(() => {
-    switch (data.verificationType) {
+    switch (verificationType.value) {
       case VERIFICATION_TYPE.PHONE_NUMBER:
         return (
           !isValidPhone.value ||
@@ -106,6 +113,7 @@ export function useVerification(data: UseVerificationPayload) {
         )
 
       case VERIFICATION_TYPE.EMAIL_FOR_SIGNUP:
+      case VERIFICATION_TYPE.EMAIL_FOR_EMAIL:
         return v$.value.email.$invalid
 
       case VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL:
@@ -117,13 +125,14 @@ export function useVerification(data: UseVerificationPayload) {
   })
 
   const verificationTarget = computed(() => {
-    switch (data.verificationType) {
+    switch (verificationType.value) {
       case VERIFICATION_TYPE.PHONE_NUMBER:
         return {
           sendTo: phone.value,
           verificationMethod: VERIFICATION_METHOD.SMS,
         }
       case VERIFICATION_TYPE.EMAIL_FOR_SIGNUP:
+      case VERIFICATION_TYPE.EMAIL_FOR_EMAIL:
         return {
           sendTo: email.value,
           verificationMethod: VERIFICATION_METHOD.EMAIL,
@@ -151,7 +160,7 @@ export function useVerification(data: UseVerificationPayload) {
       await NetworkService.sendVerification({
         sendTo: verificationTarget.value.sendTo,
         verificationMethod: verificationTarget.value.verificationMethod,
-        verificationType: data.verificationType,
+        verificationType: verificationType.value,
       })
       AnalyticsService.captureEvent(
         isResending
@@ -171,21 +180,15 @@ export function useVerification(data: UseVerificationPayload) {
 
   function handleUserVerifiedUpdate() {
     let updates = {}
-    if (data.verificationType === VERIFICATION_TYPE.PHONE_NUMBER)
+    if (verificationType.value === VERIFICATION_TYPE.PHONE_NUMBER)
       updates = {
         phone: phone.value,
         phoneVerified: true,
       }
 
-    if (
-      data.verificationType === VERIFICATION_TYPE.EMAIL_FOR_SIGNUP ||
-      data.verificationType === VERIFICATION_TYPE.EMAIL_FOR_PROXY_EMAIL
-    )
+    if (isEmailVerificationType.value || isProxyEmailVerificationType.value)
       updates = {
-        email:
-          data.verificationType === VERIFICATION_TYPE.EMAIL_FOR_SIGNUP
-            ? email.value
-            : proxyEmail.value,
+        email: isEmailVerificationType.value ? email.value : proxyEmail.value,
         emailVerified: true,
       }
 
@@ -210,7 +213,7 @@ export function useVerification(data: UseVerificationPayload) {
       } = await AuthService.confirmVerification({
         sendTo: verificationTarget.value.sendTo,
         verificationMethod: verificationTarget.value.verificationMethod,
-        verificationType: data.verificationType,
+        verificationType: verificationType.value,
         verificationCode: verificationCode.value,
         forSignup: data.forSignup ?? false,
       })
@@ -232,6 +235,10 @@ export function useVerification(data: UseVerificationPayload) {
     }
   }
 
+  function updateVerificationType(type: VERIFICATION_TYPE) {
+    verificationType.value = type
+  }
+
   return {
     email,
     phone,
@@ -249,5 +256,6 @@ export function useVerification(data: UseVerificationPayload) {
     resendCode,
     handleCodeConfirmation,
     onPhoneInputUpdate,
+    updateVerificationType,
   }
 }
