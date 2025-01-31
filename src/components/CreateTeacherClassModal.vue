@@ -1,51 +1,46 @@
 <template>
   <modal :closeModal="close">
-    <div :class="['modal-container', { expanded: isDropdownOpen }]">
-      <h1>Create a New Class</h1>
-      <p>Fill out the details below to set up your new class.</p>
-      <FormInput
-        v-model="className"
-        placeholder="Class Name"
-        :blurEvent="EVENTS.TEACHER_INPUT_CLASS_NAME"
-      />
-      <FormSelect
-        :name="'topic'"
-        :placeholder="'Choose a subject'"
-        :optionTextField="'displayName'"
-        :reduce="(option) => option.name"
-        :getSelectOptions="() => topics"
-        v-model="selectedTopic"
-        required="false"
-        :blur-event="EVENTS.TEACHER_SELECTED_CLASS_TOPIC"
-        @open="handleDropdownOpen(true)"
-        @close="handleDropdownOpen(false)"
-      />
-      <div class="buttons">
-        <button class="uc-form-button cancel-button" @click="close()">
-          Cancel
-        </button>
-        <button
-          class="uc-form-button"
-          @click="accept()"
-          :disabled="!isFormValid"
-        >
-          Create Class
-        </button>
-      </div>
+    <h1>Create a New Class</h1>
+    <p>
+      Fill out the details below to set up your new class and start teaching.
+    </p>
+    <FormInput
+      v-model="className"
+      placeholder="Class Name"
+      label="Class Name"
+      name="class-name"
+      :blurEvent="EVENTS.TEACHER_INPUT_CLASS_NAME"
+    />
+    <IonicSelect
+      v-model="selectedTopic"
+      placeholder="Subject"
+      label="Subject"
+      name="topic"
+      optionTextField="displayName"
+      :options="sortedTopics"
+    />
+    <div class="buttons">
+      <button class="uc-form-button cancel-button" @click="close()">
+        Cancel
+      </button>
+      <button class="uc-form-button" @click="accept()" :disabled="!isFormValid">
+        Create Class
+      </button>
     </div>
   </modal>
 </template>
 
 <script>
-import FormInput from '@/components/FormInput.vue'
-import Modal from '@/components/Modal.vue'
-import NetworkService from '@/services/NetworkService'
-import AnalyticsService from '@/services/AnalyticsService'
-import FormSelect from '@/components/FormSelect.vue'
+// TODO: Merge this component with 'EditTeacherClassModal'.
+import { mapState } from 'vuex'
 import { EVENTS } from '@/consts'
+import FormInput from '@/components/FormInput.vue'
+import IonicSelect from '@/components/IonicSelect.vue'
+import Modal from '@/components/Modal.vue'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
-  components: { FormInput, Modal, FormSelect },
+  components: { FormInput, IonicSelect, Modal },
   name: 'CreateTeacherClassModal',
 
   props: {
@@ -57,11 +52,9 @@ export default {
 
   data() {
     return {
-      isLoading: false,
       className: '',
-      selectedTopic: '',
-      topics: [],
-      isDropdownOpen: false,
+      selectedTopic: null,
+      sortedTopics: [],
       EVENTS,
     }
   },
@@ -70,48 +63,33 @@ export default {
     isFormValid() {
       return this.selectedTopic && this.className
     },
+    ...mapState({
+      topics: (state) => state.subjects.topics,
+    }),
   },
 
   async created() {
-    const topics = [
-      ...this.modalData.topics,
+    this.sortedTopics = [
+      ...this.topics,
       { name: 'other', displayName: 'Other' },
     ]
-    this.topics = topics.sort((a, b) => a.dashboardOrder - b.dashboardOrder)
+    this.sortedTopics.sort((a, b) => a.dashboardOrder - b.dashboardOrder)
   },
 
   methods: {
-    reduceOption(option) {
-      return option
-    },
-
-    handleDropdownOpen(isOpen) {
-      this.isDropdownOpen = isOpen
-    },
-
     close() {
       this.$store.dispatch('app/modal/hide')
     },
 
-    async getTopics() {
-      const {
-        data: { topics },
-      } = await NetworkService.getTopics()
-      return topics
-    },
-
     accept() {
-      const topic = this.topics.find(
-        (topic) => topic.name === this.selectedTopic
-      )
       AnalyticsService.captureEvent(EVENTS.TEACHER_CREATED_CLASS, {
         className: this.className,
-        topicId: topic.id,
-        topicName: topic.displayName,
+        topicId: this.selectedTopic.id,
+        topicName: this.selectedTopic.displayName,
       })
       this.modalData.createTeacherClass({
         className: this.className,
-        topicId: topic.id,
+        topicId: this.selectedTopic.id,
       })
       this.$store.dispatch('app/modal/hide')
     },
@@ -120,6 +98,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 0;
+  text-align: start;
+}
+
+p {
+  color: $c-secondary-grey;
+  font-size: 16px;
+  margin-bottom: 4px;
+  margin-top: 8px;
+  text-align: start;
+}
+
 .buttons {
   @include flex-container(row, right, flex-end);
   gap: 20px;
@@ -128,34 +121,12 @@ export default {
 
 .buttons button {
   width: auto;
-  padding: 20px;
+  padding: 20px 24px;
 }
 
 .cancel-button {
   border: 1px solid #000000;
   background-color: white;
   color: #000;
-}
-
-.modal-container {
-  text-align: left;
-  overflow: hidden;
-  height: auto;
-}
-
-.modal-container.expanded {
-  min-height: 400px;
-}
-
-.modal-container:not(.expanded) {
-  height: auto;
-}
-
-.modal-container h1 {
-  font-size: 24px;
-}
-
-.modal-container p {
-  color: #77778b;
 }
 </style>

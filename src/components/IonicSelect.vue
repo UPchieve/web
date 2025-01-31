@@ -8,6 +8,7 @@
       :id="props.name"
       class="select-input"
       label-placement="floating"
+      :placeholder="placeholder"
       interface="popover"
       :label="props.options.length ? undefined : 'No options available'"
       :multiple="props.multiple"

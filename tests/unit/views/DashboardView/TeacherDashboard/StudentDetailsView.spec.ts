@@ -4,23 +4,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import router from '@/router'
 import { createStore } from 'vuex'
+import flushPromises from 'flush-promises'
 import subjectsModule from '@/store/modules/subjects'
 import moment from 'moment'
 
-const topics = [
-  {
-    id: 1,
-    name: 'math',
-    displayName: 'Math',
-  },
-  {
-    id: 2,
-    name: 'science',
-    displayName: 'Science',
-  },
-]
-
-const classInfo = {
+const algebraClassInfo = {
   id: 'classId',
   userId: 'userId',
   name: 'Algebra 1',
@@ -28,6 +16,17 @@ const classInfo = {
   topicId: 1,
   active: true,
   totalStudents: 2,
+  createdAt: '2024-07-22T22:31:36.124Z',
+  updatedAt: '2024-07-22T22:31:36.124Z',
+}
+const bioClassInfo = {
+  id: 'classId2',
+  userId: 'userId2',
+  name: 'Bio',
+  code: '5COL57',
+  topicId: 2,
+  active: true,
+  totalStudents: 3,
   createdAt: '2024-07-22T22:31:36.124Z',
   updatedAt: '2024-07-22T22:31:36.124Z',
 }
@@ -73,12 +72,17 @@ const sessionDetails = [
   },
 ]
 
-const getWrapper = async ({ data = {} }) => {
+const getWrapper = async ({ data = {}, classInfo = algebraClassInfo }) => {
   const store = createStore({
     modules: {
       subjects: {
+        ...subjectsModule,
+        actions: {
+          awaitTopics: () => {
+            return
+          },
+        },
         state: {
-          ...subjectsModule,
           subjects: {
             algebraOne: {
               id: 2,
@@ -95,6 +99,18 @@ const getWrapper = async ({ data = {} }) => {
               topicName: 'science',
             },
           },
+          topics: [
+            {
+              id: 1,
+              name: 'math',
+              displayName: 'Math',
+            },
+            {
+              id: 2,
+              name: 'science',
+              displayName: 'Science',
+            },
+          ],
         },
       },
     },
@@ -105,9 +121,8 @@ const getWrapper = async ({ data = {} }) => {
       plugins: [store, router],
     },
     props: {
-      className: 'Algebra 1',
+      className: classInfo.name,
       classInfo,
-      topics,
     },
   })
 
@@ -130,8 +145,10 @@ describe('Student Details View', () => {
   })
 
   test('Shows student sessions for default filters', async () => {
-    const wrapper = await getWrapper({})
-    await wrapper.vm.getStudentSessionDetails()
+    const wrapper = await getWrapper({ classInfo: algebraClassInfo })
+
+    await flushPromises()
+
     expect(wrapper.vm.sessions).toHaveLength(1)
     expect(wrapper.vm.sessions[0].id).toEqual(sessionDetails[0].id)
   })
@@ -139,9 +156,12 @@ describe('Student Details View', () => {
   test('Filters sessions with just biology', async () => {
     const wrapper = await getWrapper({
       data: { filters: { topic: { name: 'science' } } },
+      classInfo: bioClassInfo,
     })
-    await wrapper.vm.submitFilter()
 
+    await flushPromises()
+
+    expect(wrapper.vm.filters.topic.name).toBe('science')
     expect(wrapper.vm.sessions).toHaveLength(1)
     expect(wrapper.vm.sessions[0].id).toEqual('session-3')
     expect(wrapper.vm.sessions[0].sessionSubject).toEqual('Biology')
@@ -156,8 +176,10 @@ describe('Student Details View', () => {
             .format('YYYY-MM-DD'),
         },
       },
+      classInfo: algebraClassInfo,
     })
-    await wrapper.vm.submitFilter()
+
+    await flushPromises()
 
     expect(wrapper.vm.sessions).toHaveLength(2)
     expect(wrapper.vm.sessions[0].id).toEqual('session-1')
@@ -176,6 +198,7 @@ describe('Student Details View', () => {
     })
 
     const wrapper = await getWrapper({})
+    await flushPromises()
     expect(wrapper.vm.sessions).toHaveLength(0)
     expect(wrapper.vm.isLoading).toBe(false)
   })

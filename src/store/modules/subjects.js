@@ -96,6 +96,23 @@ export default {
         commit('setIsFetchingTopics', false)
       }
     },
+    async awaitTopics({ state }) {
+      return new Promise((resolve) => {
+        if (state.topics.length) {
+          resolve()
+          return
+        }
+        const unsub = this.subscribe((mutation, state) => {
+          if (
+            mutation.type === 'subjects/setTopics' &&
+            state.subjects.topics.length
+          ) {
+            unsub()
+            resolve()
+          }
+        })
+      })
+    },
     async getTrainingSubjects({ commit }) {
       try {
         commit('setIsFetchingTraining', true)
@@ -129,6 +146,15 @@ export default {
     },
     allSubtopicNames: (state) => {
       return Object.keys(state.subjects)
+    },
+    topicIdToTopic: (state) => {
+      return state.topics.reduce((topics, topic) => {
+        topics[topic.id] = {
+          displayName: topic.displayName,
+          iconLink: topic.iconLink,
+        }
+        return topics
+      }, {})
     },
     sessionRequestTopicCards: (state, getters, rootState, rootGetters) => {
       const rolledOutSubjects =

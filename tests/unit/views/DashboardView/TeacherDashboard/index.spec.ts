@@ -4,40 +4,8 @@ import { createStore } from 'vuex'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import userModule from '@/store/modules/user'
+import subjectsModule from '@/store/modules/subjects'
 import NetworkService from '@/services/NetworkService'
-
-const getWrapper = async (overrides = {}) => {
-  const store = createStore({
-    modules: {
-      user: {
-        ...userModule,
-        state: {
-          user: {
-            ...userModule.state,
-            id: 'userId',
-            firstName: 'Teacher',
-            userType: 'teacher',
-          },
-        },
-      },
-    },
-  })
-
-  const wrapper = mount(TeacherDashboard, {
-    global: { plugins: [store, router] },
-  })
-
-  const formattedTopics = await TeacherDashboard.methods.formatTopics()
-
-  wrapper.setData({
-    ...wrapper.vm.$data,
-    isLoading: false,
-    formattedTopics,
-    ...overrides,
-  })
-
-  return wrapper
-}
 
 const topics = [
   {
@@ -90,6 +58,42 @@ const topics = [
     trainingOrder: 6,
   },
 ]
+
+const getWrapper = async (overrides = {}) => {
+  const store = createStore({
+    modules: {
+      user: {
+        ...userModule,
+        state: {
+          user: {
+            ...userModule.state,
+            id: 'userId',
+            firstName: 'Teacher',
+            userType: 'teacher',
+          },
+        },
+      },
+      subjects: {
+        ...subjectsModule,
+        state: {
+          topics,
+        },
+      },
+    },
+  })
+
+  const wrapper = mount(TeacherDashboard, {
+    global: { plugins: [store, router] },
+  })
+
+  wrapper.setData({
+    ...wrapper.vm.$data,
+    isLoading: false,
+    ...overrides,
+  })
+
+  return wrapper
+}
 
 describe('Teacher Dashboard', () => {
   const classes = [
