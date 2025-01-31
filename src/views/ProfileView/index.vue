@@ -177,8 +177,22 @@
             </div>
           </div>
 
-          <div class="container-section resetBtn">
-            <router-link to="/resetpassword" class="prompt"
+          <hr v-if="isPartnerTeacher" />
+          <div v-if="isPartnerTeacher" class="uc-column">
+            <button class="sync-clever-btn" @click="syncClever">
+              <clever-logo class="mr-2" />
+              {{ user.lastSuccessfulCleverSync ? 'Resync' : 'Sync' }} Clever
+            </button>
+            <div class="last-clever-sync" v-if="user.lastSuccessfulCleverSync">
+              Last successful Clever sync:
+              {{ new Date(user.lastSuccessfulCleverSync).toLocaleString() }}
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="uc-column">
+            <router-link to="/resetpassword" class="resetBtn"
               >Reset password</router-link
             >
           </div>
@@ -250,6 +264,7 @@
 import { mapGetters, mapState } from 'vuex'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
+import { Provider, signInWithSso } from '@/services/SsoService'
 import DeactivateAccountModal from '../DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
@@ -258,6 +273,7 @@ import Loader from '@/components/Loader.vue'
 import VerificationModal from '../VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
+import CleverLogo from '@/assets/clever_logo.svg'
 import TrashIcon from '@/assets/trash.svg'
 import ToggleButton from '@/components/ToggleButton.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
@@ -272,6 +288,7 @@ export default {
     Loader,
     VerificationModal,
     TrashIcon,
+    CleverLogo,
     ToggleButton,
   },
   data() {
@@ -321,6 +338,9 @@ export default {
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
     }),
+    isPartnerTeacher() {
+      return this.isTeacher && this.user.isSchoolPartner
+    },
     name() {
       const user = this.$store.state.user.user
       return user.firstname || this.userType
@@ -422,6 +442,13 @@ export default {
 
     async updateVerifiedPhoneInfo() {
       this.shouldSeeSmsConsentCheckbox = this.isStudent
+    },
+
+    syncClever() {
+      signInWithSso({
+        provider: Provider.CLEVER,
+        email: this.user.email,
+      })
     },
 
     /**
@@ -759,14 +786,15 @@ button:hover {
 }
 
 .resetBtn {
-  padding: 20px 0 5px;
-  a {
-    color: darken($c-error-red, 25%);
+  border: 1px solid $c-error-red;
+  border-radius: 20px;
+  color: darken($c-error-red, 25%);
+  padding: 10px 20px;
+  width: fit-content;
 
-    &:hover {
-      text-decoration: none;
-      color: darken($c-error-red, 40%);
-    }
+  &:hover {
+    background-color: lighten($c-error-red, 30%);
+    text-decoration: none;
   }
 }
 
@@ -870,5 +898,24 @@ button:hover {
 .sms-consent {
   display: flex;
   align-items: baseline;
+}
+
+.sync-clever-btn {
+  background-color: $upchieve-white;
+  color: $c-information-blue;
+  height: fit-content;
+  padding: 10px 20px 10px 0;
+  width: fit-content;
+
+  &:hover {
+    background-color: $upchieve-white;
+    color: $c-information-blue;
+    text-decoration: underline;
+  }
+}
+
+.last-clever-sync {
+  color: $c-secondary-grey;
+  font-size: 14px;
 }
 </style>
