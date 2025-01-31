@@ -80,11 +80,7 @@ import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FeatureFlagService from '@/services/FeatureFlagService'
-import {
-  EVENTS,
-  VERIFICATION_METHOD,
-  IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY,
-} from '@/consts'
+import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -96,6 +92,7 @@ import Student_Onboarding_Frame1 from '@/assets/student_onboarding_frames/Studen
 import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.svg'
 import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.svg'
 import Student_Onboarding_Frame4 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.svg'
+import { getImpactStudyCacheKey } from '@/utils/cache-keys'
 
 const defaultHeaderData = {
   component: 'DefaultHeader',
@@ -288,7 +285,7 @@ export default {
     },
     impactStudySurveyCache() {
       const cacheHit = localStorage.getItem(
-        IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY
+        getImpactStudyCacheKey(this.user.id)
       )
       if (cacheHit) return JSON.parse(cacheHit)
       return undefined

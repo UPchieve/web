@@ -1,11 +1,7 @@
 import type { AxiosError } from 'axios'
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
-import {
-  EVENTS,
-  IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY,
-  QUESTION_TYPES,
-} from '@/consts'
+import { EVENTS, QUESTION_TYPES } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import {
@@ -22,6 +18,7 @@ import type {
   SurveyUserResponsesMap,
 } from '@/services/SurveyService'
 import { impactStudyEnrollment } from '@/services/UserProductFlagsService'
+import { getImpactStudyCacheKey } from '@/utils/cache-keys'
 
 type UseSurveyPayload = {
   surveyType: SURVEY_TYPES
@@ -42,6 +39,10 @@ export function useSurvey(data: UseSurveyPayload) {
   const userResponses = ref<SurveyUserResponsesMap>({})
   const initialUserResponses = ref<SurveyUserResponsesMap>({})
   const store = useStore()
+  const user = computed(() => store.state.user.user)
+  const impactStudyCacheKey = computed(() =>
+    getImpactStudyCacheKey(user.value.id)
+  )
 
   const isImpactStudySurvey = computed(() => {
     return data.surveyType === SURVEY_TYPES.IMPACT_STUDY
@@ -82,7 +83,7 @@ export function useSurvey(data: UseSurveyPayload) {
     userResponses: SurveyUserResponsesMap
   ) {
     localStorage.setItem(
-      IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY,
+      impactStudyCacheKey.value,
       JSON.stringify({
         rewardAmount: surveyRewardAmount.value,
         responses: userResponses,
@@ -94,9 +95,7 @@ export function useSurvey(data: UseSurveyPayload) {
     const initialResponses: SurveyUserResponsesMap = {}
     let cachedResponses: Record<string, SurveyUserQuestionResponse> | undefined
     if (isImpactStudySurvey.value) {
-      const cacheHit = localStorage.getItem(
-        IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY
-      )
+      const cacheHit = localStorage.getItem(impactStudyCacheKey.value)
       if (cacheHit)
         cachedResponses = JSON.parse(cacheHit).responses as Record<
           string,
@@ -252,7 +251,7 @@ export function useSurvey(data: UseSurveyPayload) {
       })
       if (isImpactStudySurvey.value) {
         await impactStudyEnrollment(store, surveyId.value)
-        localStorage.removeItem(IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY)
+        localStorage.removeItem(impactStudyCacheKey.value)
       }
     } catch (err) {
       error.value =
