@@ -247,10 +247,9 @@ export default {
 
         await this.$store.dispatch('productFlags/getUserProductFlags')
         const userProps = this.getUserPropsForAnalytics()
-        FeatureFlagService.setPersonPropertiesForFlags(userProps)
-
         AnalyticsService.identify(currentUserValue.id, userProps)
         LoggerService.identify(currentUserValue.id)
+        FeatureFlagService.setPersonPropertiesForFlags(userProps)
 
         if (this.mobileMode && !this.isMobileApp && this.isStudent) {
           this.$store.dispatch('app/banner/show', {
