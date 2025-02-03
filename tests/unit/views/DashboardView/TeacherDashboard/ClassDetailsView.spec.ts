@@ -5,6 +5,7 @@ import router from '@/router'
 import NetworkService from '@/services/NetworkService'
 import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
+import subjectsModule from '@/store/modules/subjects'
 import featureFlagsModule from '@/store/modules/feature-flags'
 
 type Overrides = {
@@ -19,6 +20,9 @@ const getWrapper = async (overrides: Overrides = {}) => {
       },
       featureFlags: {
         ...featureFlagsModule,
+      },
+      subjects: {
+        ...subjectsModule,
       },
     },
   })

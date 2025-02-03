@@ -1,5 +1,5 @@
 <template>
-  <div class="teacher-dashboard">
+  <div>
     <div class="main">
       <div class="student-header">
         <button class="back-btn" @click="backToClassDetails()">
