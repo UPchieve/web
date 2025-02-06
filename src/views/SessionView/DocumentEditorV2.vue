@@ -41,10 +41,10 @@
         </span>
         <Spinner
           v-else-if="isJoiningCall"
-          height="20"
-          width="20"
-          container-height="20"
-          container-width="20"
+          :height="20"
+          :width="20"
+          :container-height="20"
+          :container-width="20"
         />
         <button v-else @click="toggleScreenShare">
           <StopScreenShareIcon v-if="isSharingScreen" />
@@ -495,5 +495,9 @@ export default {
   @include breakpoint-below('small') {
     left: -100px;
   }
+}
+
+select svg {
+  pointer-events: none;
 }
 </style>
