@@ -371,4 +371,8 @@ export default {
     background-color: rgba(110, 140, 171, 0.87);
   }
 }
+
+select svg {
+  pointer-events: none;
+}
 </style>
