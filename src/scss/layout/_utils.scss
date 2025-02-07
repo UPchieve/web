@@ -61,6 +61,10 @@
   }
 }
 
+.flex-2 {
+  flex: 2;
+}
+
 .w-full {
   width: 100%;
 }
@@ -91,4 +95,16 @@
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.inline-block {
+  display: inline-block;
 }

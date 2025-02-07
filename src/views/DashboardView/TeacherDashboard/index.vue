@@ -32,7 +32,6 @@
         </div>
         <ClassImg class="dashboard-img" />
       </div>
-      <!-- TODO: Add error message on error. -->
       <div v-if="isLoading" class="uc-row justify-center mt-5">
         <loader></loader>
       </div>
@@ -55,57 +54,55 @@
               students' progress.
             </p>
           </div>
-          <button @click="openCreateTeacherClassModal()">
-            + Add Class
-          </button>
+          <button @click="openCreateTeacherClassModal()">+ Add Class</button>
         </div>
         <div class="classes-container" data-testid="classes-container">
           <loader v-if="isLoading" />
-          <table v-else class="classes-table">
-            <tr>
-              <th>Subject</th>
-              <th>Class</th>
-              <th>Students</th>
-              <th>Class Code</th>
-              <th>Details</th>
-            </tr>
-            <tr v-for="teacherClass in classes" :key="teacherClass.id">
-              <td>
-                <img
-                  :src="
-                    teacherClass.topicId
-                      ? topicIdToTopic[teacherClass.topicId].iconLink
-                      : ''
-                  "
-                  :alt="altImageText"
-                  class="subject-icon"
-                />
-                <span>
-                  {{
-                    teacherClass.topicId
-                      ? topicIdToTopic[teacherClass.topicId].displayName
-                      : 'Other'
-                  }}
-                </span>
-              </td>
-              <td>{{ teacherClass.name }}</td>
-              <td>{{ teacherClass.totalStudents || '0' }}</td>
-              <td>
-                <button @click="openTeacherCodeModal(teacherClass.code)">
-                  <ExternalPage /> View Code
-                </button>
-              </td>
-              <td>
-                <button
-                  class="view-details-btn"
-                  @click="viewDetails(teacherClass)"
-                  :data-testid="`class-details-btn-${teacherClass.id}`"
+          <div
+            v-for="teacherClass in classes"
+            :key="teacherClass.id"
+            class="teacher-class-card"
+            @click="viewDetails(teacherClass)"
+            :data-testid="`class-details-${teacherClass.id}`"
+          >
+            <div class="subject-icon-container">
+              <img
+                v-if="teacherClass.topicId"
+                :src="topicIdToTopic[teacherClass.topicId].iconLink"
+                :alt="altImageText"
+                class="subject-icon relative"
+                aria-hidden
+              />
+              <task-badge v-else class="subject-icon" aria-hidden />
+              <clever-logo v-if="teacherClass.cleverId" class="clever-logo" />
+            </div>
+            <div class="uc-column justify-center flex-2 ml-4 mr-4">
+              <div class="uc-row">
+                <span class="class-name">{{ teacherClass.name }}</span>
+                <span class="class-topic">{{
+                  teacherClass.topicId
+                    ? topicIdToTopic[teacherClass.topicId].displayName
+                    : 'Other'
+                }}</span>
+
+                <a
+                  v-if="!teacherClass.cleverId"
+                  @click.stop="openTeacherCodeModal(teacherClass.code)"
+                  class="class-code-link"
                 >
-                  Class Details <RightArrow />
-                </button>
-              </td>
-            </tr>
-          </table>
+                  <ExternalPage /> View Code
+                </a>
+              </div>
+              <span class="class-num-students">
+                {{ teacherClass.totalStudents || 0 }} Student{{
+                  teacherClass.totalStudents !== 1 ? 's' : ''
+                }}
+              </span>
+            </div>
+            <button @click.stop="openCreateAssignmentModal(teacherClass)">
+              Assign Tutoring
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -127,14 +124,16 @@ import StudentDetails from './StudentDetailsView.vue'
 import Assignment from './AssignmentView.vue'
 import ClassImg from '@/assets/class.svg'
 import Checklist from '@/assets/Checklist.svg'
+import CleverLogo from '@/assets/clever_logo.svg'
 import ExternalPage from '@/assets/ExternalPage.svg'
-import RightArrow from '@/assets/RightArrow.svg'
+import TaskBadge from '@/assets/task-badge.svg'
 import OnboardingModal from '@/components/OnboardingModal.vue'
 import TeacherOnboarding_Frame1 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame1.svg'
 import TeacherOnboarding_Frame2 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame2.svg'
 import TeacherOnboarding_Frame3 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame3.svg'
 import TeacherOnboarding_Frame4 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame4.svg'
 import { mapState, mapGetters } from 'vuex'
+import { toastController } from '@ionic/vue'
 import { EVENTS } from '@/consts'
 import _ from 'lodash'
 
@@ -147,12 +146,16 @@ export default {
     Assignment,
     ClassImg,
     Checklist,
+    CleverLogo,
     ExternalPage,
-    RightArrow,
+    TaskBadge,
     OnboardingModal,
   },
 
   computed: {
+    ...mapGetters({
+      topicIdToTopic: 'subjects/topicIdToTopic',
+    }),
     ...mapState({
       user: (state) => state.user,
       subjects: (state) => state.subjects.subjects,
@@ -168,7 +171,6 @@ export default {
     return {
       view: null,
       classes: [],
-      error: '',
       isLoading: true,
       classId: '',
       studentId: '',
@@ -253,6 +255,16 @@ export default {
   },
 
   methods: {
+    async showToast(message, isError) {
+      const toast = await toastController.create({
+        message,
+        color: isError ? 'danger' : 'dark',
+        duration: 2000,
+        position: 'bottom',
+      })
+      await toast.present()
+    },
+
     async getClassInfo(classId) {
       try {
         const {
@@ -260,9 +272,10 @@ export default {
         } = await NetworkService.getTeacherClassById(classId)
         return teacherClass
       } catch (err) {
-        this.error =
-          err.response.data.err ??
+        const error =
+          err?.response?.data?.err ??
           'Unable to get class information. Please refresh the page and try again.'
+        this.showToast(error, true)
       }
     },
 
@@ -275,9 +288,10 @@ export default {
         // TODO: Filter by active vs. not active; Have a tab to switch between the two.
         this.classes = teacherClasses.filter((c) => !c.deactivatedOn)
       } catch (err) {
-        this.error =
-          err.response.data.err ??
+        const error =
+          err?.response?.data?.err ??
           'Unable to load your classes. Please refresh the page and try again.'
+        this.showToast(error, true)
       } finally {
         this.isLoading = false
       }
@@ -291,7 +305,8 @@ export default {
         } = await NetworkService.createTeacherClass(className, topicId)
         this.classes.push({ ...teacherClass })
       } catch (err) {
-        this.error = err.response.data.err ?? 'Unable to create class.'
+        const error = err?.response?.data?.err ?? 'Unable to create class.'
+        this.showToast(error, true)
       } finally {
         this.isLoading = false
       }
@@ -314,6 +329,49 @@ export default {
           code,
         },
       })
+    },
+
+    openCreateAssignmentModal(teacherClass) {
+      AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_OPEN_CREATE_MODAL)
+      this.$store.dispatch('app/modal/show', {
+        component: 'CreateAndEditAssignmentModal',
+        data: {
+          onAssignmentCreated: this.handleAssignmentCreated,
+          classes: this.classes,
+          currentClass: teacherClass,
+          topics: this.topics,
+        },
+      })
+    },
+
+    // TODO: Move to service method.
+    async handleAssignmentCreated({
+      assignmentData,
+      selectedClasses,
+      selectedStudents,
+    }) {
+      try {
+        const classIds = selectedClasses.map(
+          (selectedClass) => selectedClass.id
+        )
+        const studentIds =
+          selectedStudents.length > 0
+            ? selectedStudents.map((selectedStudent) => selectedStudent.id)
+            : []
+        await Promise.all(
+          classIds.map(async (classId) => {
+            const assignmentInfo = { classId, ...assignmentData, studentIds }
+            const {
+              data: { assignment },
+            } = await NetworkService.createAssignment(assignmentInfo)
+            return { ...assignment, studentIds }
+          })
+        )
+        this.showToast('Assignment created.')
+      } catch (err) {
+        const error = err?.response?.data?.err ?? 'Unable to create assignment.'
+        this.showToast(error, true)
+      }
     },
 
     viewDetails(teacherClass) {
@@ -424,13 +482,9 @@ export default {
   font-weight: 500;
 }
 
-.subject-icon {
-  width: 15%;
-  margin-right: 10px;
-}
-
 .classes-container {
   margin: 0 auto;
+  overflow-x: scroll;
   padding-bottom: 16px;
   width: 100%;
 }
@@ -454,6 +508,74 @@ export default {
     border-radius: 32px;
     font-size: 16px;
     padding: 10px 16px;
+  }
+}
+
+.teacher-class-card {
+  @include flex-container(row, start, space-between);
+  background: #fff;
+  border-radius: 9px;
+  border: 1px solid $border-grey;
+  color: $c-soft-black;
+  min-width: 680px;
+  margin-bottom: 15px;
+  padding: 24px;
+
+  &:hover {
+    background-color: $c-background-blue;
+    border-color: $c-information-blue;
+    cursor: pointer;
+  }
+
+  .subject-icon-container {
+    position: relative;
+  }
+
+  .subject-icon {
+    height: 65px;
+    width: 65px;
+  }
+
+  .class-name {
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .class-topic {
+    font-size: 20px;
+    margin-left: 28px;
+  }
+
+  .class-code-link {
+    color: $c-information-blue;
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 28px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .class-num-students {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  button {
+    align-self: center;
+    background: $c-information-blue;
+    border-radius: 20px;
+    color: white;
+    padding: 12px 20px;
+  }
+
+  .clever-logo {
+    bottom: -4px;
+    position: absolute;
+    right: -4px;
+    width: 22px;
   }
 }
 </style>
