@@ -144,7 +144,7 @@ describe('Teacher Dashboard', () => {
       .mockResolvedValue({ data: { teacherClasses: classes } })
     const wrapper = await getWrapper({ classes })
     const classDetailsBtn = wrapper.find(
-      `[data-testid="class-details-btn-${classes[0].id}"]`
+      `[data-testid="class-details-${classes[0].id}"]`
     )
     classDetailsBtn.trigger('click')
     expect(routerPushSpy).toHaveBeenCalledOnce()
