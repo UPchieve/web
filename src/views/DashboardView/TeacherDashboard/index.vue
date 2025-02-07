@@ -336,54 +336,50 @@ export default {
 }
 
 .dashboard-banner {
-  @include flex-container(row);
-  background-color: #fff;
-  border-color: #000;
+  @include flex-container(row, space-between, center);
+  background: linear-gradient(to right, white, rgba(22, 210, 170, 0.1));
   border-radius: 8px;
   color: #343440;
+  padding: 28px;
   width: 100%;
-  padding: 24px;
-  width: 100%;
-  height: 225px;
-  justify-content: left;
-  background: linear-gradient(to right, white, rgba(22, 210, 170, 0.1));
-}
 
-.dashboard-text {
-  align-self: center;
-}
-.dashboard-text p {
-  margin-right: 20px;
-}
+  @include breakpoint-below('small') {
+    @include flex-container(column, center, center);
+  }
 
-.dashboard-banner a {
-  align-self: flex-start;
-  padding-left: 0;
-  color: #1855d1;
-  font-size: 16px;
-  font-weight: 500;
-}
+  p {
+    margin-right: 20px;
+  }
 
-.dashboard-img {
-  height: 100%;
+  a {
+    color: #1855d1;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .dashboard-img {
+    height: 100%;
+
+    @include breakpoint-below('small') {
+      margin-top: 24px;
+    }
+  }
 }
 
 .empty-classes-container {
   @include flex-container(column, center, center);
-  margin: 24px;
-  align-content: center;
-  height: 300px;
-}
+  margin: 50px;
 
-.empty-classes-container p {
-  margin: 12px;
-  color: #77778b;
-  width: 300px;
-  font-size: 16px;
-}
+  p {
+    color: #77778b;
+    font-size: 16px;
+    margin: 12px;
+    width: 300px;
+  }
 
-.empty-classes-container button {
-  width: 200px;
+  button {
+    width: 200px;
+  }
 }
 
 .classes-table {
