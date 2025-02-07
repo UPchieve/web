@@ -69,25 +69,3 @@ export const topics = {
     displayName: 'UPchieve Training',
   },
 }
-
-/**
- * Object containing subtopic information from all topics
- */
-export function allSubtopics() {
-  let subtopicObj = {}
-
-  for (let topic in topics) {
-    if (Object.prototype.hasOwnProperty.call(topics, topic)) {
-      subtopicObj = Object.assign(subtopicObj, topics[topic].subtopics)
-    }
-  }
-
-  return subtopicObj
-}
-
-/**
- * Array of all subtopic names
- */
-export function allSubtopicNames() {
-  return Object.keys(allSubtopics())
-}

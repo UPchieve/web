@@ -23,12 +23,7 @@
             <FormSelect
               class="topics-dropdown"
               :name="'topic'"
-              :placeholder="
-                filters.topic.name !== 'other'
-                  ? topics.find((topic) => topic.name === filters.topic.name)
-                      .displayName
-                  : 'Select Subject'
-              "
+              :placeholder="subjectPlaceholder"
               :optionTextField="'displayName'"
               :reduce="(option) => option.name"
               :getSelectOptions="
@@ -118,10 +113,12 @@ export default {
         sessionActivityFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
       },
+      subjectPlaceholder: '',
     }
   },
   computed: {
     ...mapState({
+      topics: (state) => state.subjects.topics,
       subjects: (state) => state.subjects.subjects,
     }),
   },
@@ -130,25 +127,13 @@ export default {
     className: {
       type: String,
     },
-    topics: {
-      type: Array,
-    },
     classInfo: {
       type: Object,
     },
   },
 
   async created() {
-    if (!this.classInfo.topicId) {
-      this.filters.topic.name = 'other'
-    } else {
-      for (const topic of this.topics) {
-        if (topic.id === this.classInfo.topicId) {
-          this.filters.topic.name = topic.name
-        }
-      }
-    }
-
+    // TODO: Clean-up routing: Shouldn't need these checks.
     if (this.$route.params.studentId) {
       this.classId = this.$route.params.classId
       this.studentId = this.$route.params.studentId
@@ -158,6 +143,17 @@ export default {
     } else {
       this.$router.push(`/dashboard/teacher`)
     }
+
+    await this.$store.dispatch('subjects/awaitTopics')
+    if (this.classInfo.topicId) {
+      const topic = this.topics.find((t) => t.id === this.classInfo.topicId)
+      this.filters.topic.name = topic.name
+      this.subjectPlaceholder = topic.displayName
+    } else {
+      this.filters.topic.name = 'other'
+      this.subjectPlaceholder = 'All Subjects'
+    }
+
     this.sessions = await this.getStudentSessionDetails()
   },
 
@@ -198,6 +194,7 @@ export default {
       } catch (err) {
         err.response.data.err ??
           'Unable to get sessions. Please refresh the page and try again.'
+        return []
       } finally {
         this.isLoading = false
       }

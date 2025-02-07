@@ -72,7 +72,7 @@
                 <img
                   :src="
                     teacherClass.topicId
-                      ? formattedTopics[teacherClass.topicId].iconLink
+                      ? topicIdToTopic[teacherClass.topicId].iconLink
                       : ''
                   "
                   :alt="altImageText"
@@ -81,7 +81,7 @@
                 <span>
                   {{
                     teacherClass.topicId
-                      ? formattedTopics[teacherClass.topicId].displayName
+                      ? topicIdToTopic[teacherClass.topicId].displayName
                       : 'Other'
                   }}
                 </span>
@@ -132,7 +132,7 @@ import TeacherOnboarding_Frame1 from '@/assets/teacher_onboarding_frames/Teacher
 import TeacherOnboarding_Frame2 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame2.svg'
 import TeacherOnboarding_Frame3 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame3.svg'
 import TeacherOnboarding_Frame4 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame4.svg'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
 import _ from 'lodash'
 
@@ -154,7 +154,11 @@ export default {
     ...mapState({
       user: (state) => state.user,
       subjects: (state) => state.subjects.subjects,
+      topics: (state) => state.subjects.topics,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
+    }),
+    ...mapGetters({
+      topicIdToTopic: 'subjects/topicIdToTopic',
     }),
   },
 
@@ -165,8 +169,6 @@ export default {
       error: '',
       isLoading: true,
       classId: '',
-      topics: [],
-      formattedTopics: {},
       studentId: '',
       currentClassInfo: {},
       showOnboardingModal: false,
@@ -194,7 +196,7 @@ export default {
   },
 
   async created() {
-     this.pages = [
+    this.pages = [
       {
         step: 1,
         heading:
@@ -221,7 +223,7 @@ export default {
         image: TeacherOnboarding_Frame4,
       },
     ]
-    this.topics = await this.getTopics()
+    // TODO: Clean-up routing.
     if (
       this.$route.params.classId &&
       !this.$route.params.studentId &&
@@ -245,7 +247,6 @@ export default {
       this.view = ''
     }
 
-    this.formattedTopics = await this.formatTopics()
     await this.getTeacherClasses()
   },
 
@@ -280,25 +281,6 @@ export default {
       }
     },
 
-    async getTopics() {
-      const {
-        data: { topics },
-      } = await NetworkService.getTopics()
-      return topics
-    },
-
-    async formatTopics() {
-      const topics = await this.getTopics()
-      const allTopics = topics.reduce((topics, topic) => {
-        topics[topic.id] = {
-          displayName: topic.displayName,
-          iconLink: topic.iconLink,
-        }
-        return topics
-      }, {})
-      return allTopics
-    },
-
     async createTeacherClass({ className, topicId }) {
       this.isLoading = true
       try {
@@ -318,7 +300,6 @@ export default {
         component: 'CreateTeacherClassModal',
         data: {
           createTeacherClass: this.createTeacherClass,
-          topics: this.topics,
         },
       })
       AnalyticsService.captureEvent(EVENTS.TEACHER_OPENED_CREATE_CLASS_MODAL)

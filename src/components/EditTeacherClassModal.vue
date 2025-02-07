@@ -15,11 +15,11 @@
       label="Class Name"
     />
     <IonicSelect
-      name="topic"
+      v-model="currentTopic"
       label="Subject"
+      name="topic"
       optionTextField="displayName"
       :options="topics"
-      v-model="currentTopic"
     />
     <div class="buttons-container">
       <button class="uc-form-button cancel-button" @click="close()">
@@ -33,6 +33,8 @@
 </template>
 
 <script>
+// TODO: Merge this component with 'CreateTeacherClassModal'.
+import { mapState } from 'vuex'
 import FormInput from '@/components/FormInput.vue'
 import Modal from '@/components/Modal.vue'
 import IonicSelect from '@/components/IonicSelect.vue'
@@ -53,8 +55,6 @@ export default {
     return {
       isLoading: false,
       className: this.modalData.classInfo.name,
-      topics: [],
-      isDropdownOpen: false,
       currentTopic: {},
     }
   },
@@ -63,14 +63,15 @@ export default {
     isFormValid() {
       return this.currentTopic && this.className
     },
+    ...mapState({
+      topics: (state) => state.subjects.topics,
+    }),
   },
 
   created() {
-    this.topics = this.modalData.topics
     this.currentTopic = this.topics.filter(
       (topic) => topic.id === this.modalData.classInfo.topicId
     )[0]
-    this.topics.sort((a, b) => a.dashboardOrder - b.dashboardOrder)
   },
 
   methods: {
