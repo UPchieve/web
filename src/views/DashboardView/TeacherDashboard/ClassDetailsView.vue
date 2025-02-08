@@ -8,12 +8,22 @@
         </button>
         <div class="class-info">
           <div class="start-col">
+            <img
+              v-if="classInfo.topicId"
+              :src="topicIdToTopic[classInfo.topicId]?.iconLink"
+              :alt="altImageText"
+              class="subject-icon"
+              aria-hidden
+            />
+            <task-badge v-else class="subject-icon" aria-hidden />
+            <clever-logo v-if="classInfo.cleverId" class="clever-logo" />
             <h1>{{ className }}</h1>
             <span class="students-text"
               >{{ classInfo.totalStudents || '0' }}
               {{ classInfo.totalStudents == 1 ? 'student' : 'students' }}</span
             >
             <button
+              v-if="!classInfo.cleverId"
               class="open-teacher-code-modal"
               @click="openTeacherCodeModal"
             >
@@ -53,15 +63,28 @@
       </div>
       <div v-if="isSelected === 'classDetails'" class="classes-container">
         <loader v-if="isLoading" />
-        <div v-else-if="!students.length" class="empty-sessions-container">
-          <Checklist />
-          <p data-testid="no-students-msg">
-            You currently don't have any students in this class. Click here to
-            share the code with your students!
-          </p>
-          <button class="uc-form-button" @click="openTeacherCodeModal">
-            Get Code
-          </button>
+        <div v-else-if="!students.length">
+          <div v-if="classInfo.cleverId" class="empty-sessions-container">
+            <p>We can't seem to find any students in your Clever class</p>
+            <p class="sub-text">
+              If this is a mistake, try Clever Resync or reach out to your
+              partnership manager.
+            </p>
+          </div>
+          <div v-else class="empty-sessions-container">
+            <Checklist />
+            <p data-testid="no-students-msg" class="sub-text">
+              You currently don't have any students in this class. Click here to
+              share the code with your students!
+            </p>
+            <button
+              v-if="!classInfo.cleverId"
+              class="uc-form-button"
+              @click="openTeacherCodeModal"
+            >
+              Get Code
+            </button>
+          </div>
         </div>
         <table v-else class="classes-table">
           <tr>
@@ -71,7 +94,7 @@
             <th>Last Session</th>
             <th>Details</th>
             <th></th>
-            <th></th>
+            <th v-if="!classInfo.cleverId"></th>
           </tr>
           <tr
             v-for="student in students"
@@ -91,7 +114,7 @@
                 View Details
               </button>
             </td>
-            <td>
+            <td v-if="!classInfo.cleverId">
               <div class="menu-button">
                 <button @click="openStudentMenu(student)">
                   <MenuButtonsIcon />
@@ -236,12 +259,14 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
 import Check from '@/assets/check.svg'
+import CleverLogo from '@/assets/clever_logo.svg'
 import Arrow from '@/assets/RightArrow.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Pencil from '@/assets/pencil.svg'
@@ -260,6 +285,7 @@ export default {
     Checklist,
     AssignmentIcon,
     Check,
+    CleverLogo,
     Arrow,
     Pencil,
     MenuButtonsIcon,
@@ -328,6 +354,12 @@ export default {
     } else if (!this.$route.params.classId) {
       this.$router.push('/dashboard')
     }
+  },
+
+  computed: {
+    ...mapGetters({
+      topicIdToTopic: 'subjects/topicIdToTopic',
+    }),
   },
 
   methods: {
@@ -744,21 +776,27 @@ export default {
 
 .empty-sessions-container {
   @include flex-container(column, center, center);
-  margin: 24px;
-  align-content: center;
   height: 300px;
-}
 
-.empty-sessions-container p {
-  margin: 12px;
-  color: #77778b;
-  width: 300px;
-  font-size: 16px;
-  text-align: center;
-}
+  p {
+    color: $c-soft-black;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
 
-.empty-sessions-container button {
-  width: 200px;
+    &.sub-text {
+      font-size: 16px;
+      margin: 12px;
+      color: $c-secondary-grey;
+      font-weight: 400;
+      width: 400px;
+    }
+  }
+
+  button {
+    width: 200px;
+  }
 }
 
 .class-code-text {
@@ -1102,5 +1140,12 @@ export default {
     height: 20px;
     width: auto;
   }
+}
+
+.subject-icon,
+.clever-logo {
+  height: 28px;
+  margin-right: 4px;
+  width: 28px;
 }
 </style>
