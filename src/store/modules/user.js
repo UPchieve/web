@@ -504,7 +504,10 @@ export default {
             rootState.featureFlags.eligibleForChooseTutorType
         }
       } else if (getters.isTeacher) {
-        // TODO: TEACHER PROFILES.
+        if (state.user.isSchoolPartner) {
+          userProps.schoolPartner = state.user.schoolName
+        }
+        userProps.usesClever = state.user.usesClever
       }
 
       // Although 'fallIncentiveEnrollmentAt' is only relevant to student users,
