@@ -10,6 +10,8 @@ import {
   getButtonElement,
   getAlreadyHaveAccountElements,
   getSubmitResponseDefault as getSubmitResponse,
+  createAccountWithClever,
+  getSsoButton,
 } from '@/services/SignUpService'
 import { getLinkElement, getRouterLinkElement } from '.'
 import router from '@/router'
@@ -199,6 +201,15 @@ function getAccountPageDetails() {
       }),
       getRow('mt-4', getTextElement('h1', 'Your school is eligible! 🎉')),
       getRow('mt-3', getTextElement('h2', 'Finish creating your account')),
+      getRow('mt-3', getSsoButton(createAccountWithClever, 'Clever', 'clever')),
+      getRow(
+        'justify-center italic mt-3',
+        getTextElement(
+          'p',
+          'By clicking the button above, you agree to our User Agreement'
+        )
+      ),
+      getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } }),
       getRow(
         'mt-3 uc-column-sm',
         getInputElement(
