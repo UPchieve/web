@@ -192,11 +192,6 @@ function createAccountWithGoogle(data) {
   return createAccountWithSso('google', data)
 }
 
-function createAccountWithClever(data) {
-  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLEVER)
-  return createAccountWithSso('clever', data)
-}
-
 function isParentGuardianSignUp(to: RouteLocation) {
   // @ts-ignore
   return to.params.parent === true || to.params.parent === 'true'

@@ -127,6 +127,11 @@ export function continueToAccountPage(data: Object) {
   return getSubmitResponseDefault(SignUpPage.account, data)
 }
 
+export function createAccountWithClever(data) {
+  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLEVER)
+  return createAccountWithSso('clever', data)
+}
+
 export function createAccountWithSso(
   provider: 'google' | 'clever',
   data: any
