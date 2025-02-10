@@ -63,7 +63,7 @@
     "pino-http": "^8.2.0",
     "pixelmatch": "^6.0.0",
     "portal-gun": "git://github.com/claydotio/portal-gun.git",
-    "posthog-js": "^1.116.6",
+    "posthog-js": "^1.216.1",
     "pre-commit": "^1.2.2",
     "promise-retry": "^1.1.1",
     "quill": "^2.0.2",
