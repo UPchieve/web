@@ -62,7 +62,8 @@
         <div class="user-detail__title">
           {{ user.firstName }} {{ user.lastName }}
         </div>
-        <div class="user-detail__subtitle">ID: {{ user.id }}</div>
+        <div class="user-detail__subtitle mb-0">ID: {{ user.id }}</div>
+        <div class="user-detail__subtitle">Type: {{ user.userType }}</div>
         <div class="user-detail__section">
           <div class="user-detail__section-title">Joined</div>
           <div>{{ createdAt }}</div>
