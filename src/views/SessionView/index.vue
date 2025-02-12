@@ -18,16 +18,25 @@
         @resizing="resizingAiWidget"
       />
       <screen-share
-        v-if="hasJoinedZoomCall && this.isScreenshareEnabled"
+        v-if="
+          isScreenshareEnabled &&
+          meetingActor.snapshot.context.sessionId &&
+          !!mobileMode
+            ? this.$refs.sessionContentsContainerMobile
+            : this.$refs.auxiliaryContainer
+        "
         :class="{ 'display-none': !screenShareActive }"
         :isVolunteer="isVolunteer"
-        :firstName="isVolunteer ? user.firstName : session.volunteer.firstName"
-        :can-share-screen="isVolunteer"
-        :container-ref="
+        :firstName="
+          isVolunteer ? user?.firstName : session?.volunteer?.firstName ?? ''
+        "
+        :canShareScreen="isVolunteer"
+        :containerRef="
           mobileMode
             ? this.$refs.sessionContentsContainerMobile
             : this.$refs.auxiliaryContainer
         "
+        :meetingActor="meetingActor"
         @dragging="(value) => (draggingScreenShare = value)"
         @resizing="(value) => (resizingScreenShare = value)"
       />
@@ -64,11 +73,15 @@
           :screenShareAvailable="
             isSessionInProgress &&
             isScreenshareEnabled &&
-            getDisplayMediaSupported
+            getDisplayMediaSupported &&
+            meetingHasNotEnded
           "
           @toggleScreenShareWindow="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
+          :isJoiningCall="isJoiningCall"
+          :unableToJoinCall="unableToJoinCall"
         />
+
         <document-editor-v2
           v-else-if="
             auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR &&
@@ -78,8 +91,13 @@
           :isAiWidgetEnabled="aiWidgetEnabled"
           :onWidgetClicked="toggleAiWidget"
           :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
-          :isScreenShareEnabled="isScreenshareEnabled"
+          :isScreenShareEnabled="
+            isSessionInProgress && isScreenshareEnabled && meetingHasNotEnded
+          "
           @toggleScreenShareWindow="toggleScreenShareWindow"
+          :isScreenSharing="isScreenSharing"
+          :isJoiningCall="isJoiningCall"
+          :unableToJoinCall="unableToJoinCall"
         />
         <document-editor
           v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
@@ -283,12 +301,15 @@ import ZoomSessionChatHeader from '@/components/ScreenShare/ZoomSessionChatHeade
 import Spinner from '@/components/Spinner.vue'
 import { SessionAudioState } from '@/services/LiveShareService/SessionAudioService'
 import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
-import { ScreenShareState } from '@/services/LiveShareService/machines/screenShareMachine'
+import { useActor } from '@xstate/vue'
+import { createBrowserInspector } from '@statelyai/inspect'
+import * as MeetingMachine from '@/state-machines/meeting-machine'
+import { ref } from 'vue'
 
 const activeHeaderData = {
   component: 'SessionHeader',
 }
-
+const meetingActor = ref(null)
 export default {
   name: 'session-view',
   components: {
@@ -310,6 +331,14 @@ export default {
     FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
     ZoomSessionChatHeader,
+  },
+  setup() {
+    const options =
+      import.meta.env.NODE_ENV === 'development'
+        ? { inspect: createBrowserInspector().inspect }
+        : {}
+
+    meetingActor.value = useActor(MeetingMachine.create(), options)
   },
   created() {
     if (this.mobileMode) {
@@ -333,6 +362,7 @@ export default {
     Gleap.removeCustomData('sessionId')
     Gleap.showFeedbackButton(true)
     window.removeEventListener('resize', this.handleResize)
+    this.meetingActor.actorRef.send({ type: 'meeting_ended' })
   },
   /*
    * @notes
@@ -372,6 +402,7 @@ export default {
       getDisplayMediaSupported:
         typeof navigator.mediaDevices.getDisplayMedia !== 'undefined',
       previousSessionCountWithStudent: 0,
+      meetingActor,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -394,9 +425,6 @@ export default {
       productFlags: (state) => state.productFlags.flags,
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
-      isScreenSharing: (state) =>
-        state.liveMedia?.screenShareActor?.state ===
-        ScreenShareState.SharingScreen,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -411,11 +439,38 @@ export default {
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       currentTutorBotConversation: 'botConversations/currentConversation',
-      screenShareActive: 'liveMedia/screenShare/screenShareActive',
       isSessionInProgress: 'user/isSessionInProgress',
       sessionPartner: 'user/sessionPartner',
       isScreenshareEnabledFeatureFlag: 'featureFlags/isScreenshareEnabled',
     }),
+    isScreenSharing() {
+      return this.meetingActor.snapshot.matches(
+        'JoinMeeting.SharingVideoControl.SharingMyScreen'
+      )
+    },
+    isJoiningCall() {
+      return this.meetingActor?.snapshot?.hasTag('loadingScreenShare') ?? true
+    },
+    meetingHasNotEnded() {
+      return !this.meetingActor?.snapshot?.matches('Ended')
+    },
+    unableToJoinCall() {
+      return (
+        this.meetingActor.snapshot.matches('JoinMeetingFailure') ||
+        this.meetingActor.snapshot.matches('FetchingMeetingFailure')
+      )
+    },
+    screenShareActive() {
+      return (
+        this.meetingActor.snapshot.matches(
+          'JoinedMeeting.ScreenShareControl.SharingMyScreen'
+        ) ||
+        (this.meetingActor.snapshot.matches(
+          'JoinedMeeting.ScreenShareControl.ViewingPartnerScreenShare'
+        ) &&
+          this.meetingActor.snapshot.context.showPartnerScreenShare)
+      )
+    },
     aiTutorSetupProps() {
       return {
         currentTutorBotConversationSessionId:
@@ -534,6 +589,15 @@ export default {
     promise
       .then(async (sessionId) => {
         this.sessionId = sessionId
+        this.meetingActor.actorRef.start()
+        this.meetingActor.actorRef.send({ type: 'set_session_id', sessionId })
+        if (this.session.volunteerId) {
+          this.meetingActor.actorRef.send({
+            type: 'session_started',
+            isAudioEligible: this.isSessionAudioCallEnabled,
+            isScreenshareEligible: this.isScreenshareEnabled,
+          })
+        }
 
         const transferringFromTutorBot = Object.prototype.hasOwnProperty.call(
           this.$route.query,
@@ -752,19 +816,34 @@ export default {
     },
     // Once session has ended, show chatbot to tutor
     async 'session.endedAt'(newValue, oldValue) {
-      if (newValue && !oldValue) this.sessionHasEnded = true
+      if (newValue && !oldValue) {
+        this.sessionHasEnded = true
+        this.meetingActor.actorRef.send({ type: 'meeting_ended' })
+      }
     },
 
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
         await this.fetchSessionAudioFlag()
         await this.fetchScreenshareFlag()
+        this.meetingActor.actorRef.send({
+          type: 'session_started',
+          isAudioEligible: this.isSessionAudioCallEnabled,
+          isScreenshareEligible: this.isScreenshareEnabled,
+        })
       }
     },
   },
   methods: {
     toggleScreenShareWindow() {
-      this.$store.dispatch('liveMedia/screenShare/toggleScreenShareWindow')
+      if (this.isVolunteer) {
+        if (this.screenShareActive) {
+          // TODO could makea toggle_screen_share event to get rid of this conditional
+          this.meetingActor.send({ type: 'stop_share_screen' })
+        } else {
+          this.meetingActor.send({ type: 'share_screen' })
+        }
+      }
     },
     async fetchSessionAudioFlag() {
       if (!this.sessionPartner?.id) return

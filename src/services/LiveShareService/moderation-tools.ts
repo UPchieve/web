@@ -121,8 +121,9 @@ function startModeration({
   sampleInterval: number
 }): ReturnType<typeof setInterval> {
   const captureCanvas = document.createElement('canvas')
-  captureCanvas.width = targetElement.width
-  captureCanvas.height = targetElement.height
+  const { width, height } = targetElement.getBoundingClientRect()
+  captureCanvas.width = width
+  captureCanvas.height = height
   moderateFrame(
     processFrameForModeration({ canvas: captureCanvas, targetElement })
   )

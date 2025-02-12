@@ -112,13 +112,14 @@ export default {
       dispatch('audio/updatePartnerZoomUser', { zoomUser, wasPreviouslyMuted })
     },
 
-    async bannedFromLiveMedia({ dispatch }) {
+    async bannedFromLiveMedia({ dispatch, state }) {
       await dispatch(
         'user/addToUser',
         { banType: 'live_media' },
         { root: true }
       )
       await SessionAudioService.send(SessionAudioEvent.BAN)
+      state.screenShareActor?.send({ type: 'ban_user_from_live_media' })
     },
 
     partnerBannedFromLiveMedia({ commit }) {

@@ -1191,4 +1191,16 @@ export default {
       this._errorHandler
     )
   },
+  getOrCreateSessionMeeting(sessionId) {
+    return httpPost(`${API_ROOT}/sessions/${sessionId}/meeting`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  endSessionMeeting(sessionId) {
+    return httpPut(`${API_ROOT}/sessions/${sessionId}/meeting}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }
