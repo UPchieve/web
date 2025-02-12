@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import PartnerInfo from './PartnerInfo.vue'
 import TalkButton from './TalkButton.vue'
 import { useStore } from 'vuex'
@@ -12,6 +12,20 @@ import EndSessionButton from '@/components/EndSessionButton.vue'
 import ReportSessionButton from '@/components/ReportSessionButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+
+const emit = defineEmits<{
+  (e: 'toggleMuteSelf'): void
+  (e: 'toggleMutePartner'): void
+  (e: 'audioUiLoaded', audioElement: HTMLAudioElement): void
+}>()
+
+const props = defineProps<{
+  isMyMicMuted: boolean
+  isSpeakerMuted: boolean
+  isPartnerSpeaking: boolean
+  partnerPresence: string
+  partnerMicStatus: string
+}>()
 
 const store = useStore()
 const userType = computed(
@@ -26,7 +40,10 @@ const isStartingAudio = computed(
 
 SessionAudioService.start()
 
+const meetingAudio = ref<HTMLAudioElement>()
+
 onMounted(async () => {
+  emit('audioUiLoaded', meetingAudio.value)
   AnalyticsService.captureEvent(EVENTS.VOICE_CHAT_USER_SAW_ZOOM_CHAT_HEADER)
 })
 
@@ -34,27 +51,47 @@ onUnmounted(async () => {
   // NOTE: for now, do not keep the zoom call open when they navigate away
   await SessionAudioService.send(SessionAudioEvent.LEAVE)
 })
+const useChimeMeetings = computed(
+  () => store.getters['featureFlags/isChimeMeetingEnabled']
+)
 
-const isPartnerSpeaking = computed(
-  () => store.state.liveMedia.audio.isPartnerSpeaking
+const isPartnerSpeaking = computed(() =>
+  useChimeMeetings.value
+    ? props.isPartnerSpeaking
+    : store.state.liveMedia.audio.isPartnerSpeaking
 )
-const isSpeakerMuted = computed(
-  () => store.state.liveMedia.audio.isSpeakerMuted
+const isSpeakerMuted = computed(() =>
+  useChimeMeetings.value
+    ? props.isSpeakerMuted
+    : store.state.liveMedia.audio.isSpeakerMuted
 )
-const isMicMuted = computed(() => store.state.liveMedia.audio.isMicMuted)
 
 const toggleMuteSpeaker = async () => {
-  await store.dispatch('liveMedia/audio/toggleMuteSpeaker')
+  if (useChimeMeetings.value) {
+    emit('toggleMutePartner')
+  } else {
+    await store.dispatch('liveMedia/audio/toggleMuteSpeaker')
+  }
 }
 const toggleMuteMic = async () => {
-  await store.dispatch('liveMedia/audio/toggleMuteMic')
+  if (useChimeMeetings.value) {
+    emit('toggleMuteSelf')
+  } else {
+    await store.dispatch('liveMedia/audio/toggleMuteMic')
+  }
 }
 
-const partnerStatus = computed(
-  () => store.getters['liveMedia/audio/partnerStatus']
+const partnerPresence = computed(() =>
+  useChimeMeetings.value
+    ? props.partnerPresence
+    : store.getters['liveMedia/audio/partnerStatus']
 )
 const isSpeaking = computed(() => store.state.liveMedia.audio.isSpeaking)
-const micState = computed(() => store.state.liveMedia.audio.micState)
+const micState = computed(() => {
+  return useChimeMeetings.value
+    ? props.partnerMicStatus
+    : store.state.liveMedia.audio.micState
+})
 const hasSpeakingPrivileges = computed(
   () => store.getters['liveMedia/audio/hasSpeakingPrivileges']
 )
@@ -74,18 +111,22 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
 
 <template>
   <div class="zoom">
+    <audio v-if="useChimeMeetings" ref="meetingAudio" :muted="isSpeakerMuted" />
     <PartnerAvatar
       :isPartnerSpeaking="isPartnerSpeaking"
       :isSpeakerMuted="isSpeakerMuted"
       :userType="userType"
       :sessionPartnerFirstName="sessionPartnerFirstName"
-      :partnerIsInAudioChannel="partnerIsInAudioChannel"
+      :partnerIsInAudioChannel="
+        useChimeMeetings ? true : partnerIsInAudioChannel
+      "
       @toggleMuteSpeaker="toggleMuteSpeaker"
     />
     <PartnerInfo
       class="grow"
       :userType="userType"
-      :partnerStatus="partnerStatus"
+      :partnerPresence="partnerPresence"
+      :partnerMicStatus="partnerMicStatus"
       :audioCallSupported="audioCallSupported"
     />
     <div class="session-buttons" :class="userType">
@@ -103,7 +144,11 @@ render the session control buttons in here-->
         :end-text="'End'"
       />
       <TalkButton
-        :isMicMuted="isMicMuted"
+        :isMicMuted="
+          useChimeMeetings
+            ? props.isMyMicMuted
+            : store.state.liveMedia.audio.isMicMuted
+        "
         :isSpeaking="isSpeaking"
         :micState="micState"
         :hasSpeakingPrivileges="hasSpeakingPrivileges"

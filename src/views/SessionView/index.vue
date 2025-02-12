@@ -124,8 +124,14 @@
         <ZoomSessionChatHeader
           v-if="isSessionInProgress && isSessionAudioCallEnabled"
           class="zoom-container"
-          :sessionId="sessionId"
-          :isStudent="isStudent"
+          :isMyMicMuted="isMyMicMuted"
+          :isSpeakerMuted="isSpeakerMuted"
+          :isPartnerSpeaking="isPartnerSpeaking"
+          :partnerPresence="partnerPresence"
+          :partnerMicStatus="partnerMicStatus"
+          @toggleMuteSelf="toggleMuteSelf"
+          @toggleMutePartner="toggleMutePartner"
+          @audioUiLoaded="onAudioUiLoaded"
         />
       </div>
       <div
@@ -425,6 +431,7 @@ export default {
       productFlags: (state) => state.productFlags.flags,
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
+      isPartnerOnline: (state) => state.session.isPartnerOnline,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -470,6 +477,49 @@ export default {
         ) &&
           this.meetingActor.snapshot.context.showPartnerScreenShare)
       )
+    },
+    snapshot() {
+      return meetingActor?.value.snapshot
+    },
+    isMyMicMuted() {
+      return (
+        this.snapshot.matches('JoinedMeeting.MicControl') &&
+        !this.snapshot.matches('JoinedMeeting.MicControl.MicUnmuted')
+      )
+    },
+    isSpeakerMuted() {
+      return !this.snapshot.matches(
+        'JoinedMeeting.SpeakerControl.SpeakerUnmuted'
+      )
+    },
+    isPartnerSpeaking() {
+      const activeSpeakerIds = this.snapshot.context.activeSpeakerIds
+      const partnerId = this.snapshot.context.partnerAttendeeId
+      return activeSpeakerIds.includes(partnerId)
+    },
+    partnerPresence() {
+      const name = this.sessionPartner.firstname
+      return this.isPartnerSpeaking
+        ? `${name} is speaking`
+        : this.isPartnerOnline
+          ? 'In session'
+          : 'Away'
+    },
+    isPartnerLiveMediaBanned() {
+      const currentSession = this.session
+      if (this.isStudent) return currentSession?.volunteerBannedFromLiveMedia
+      else return currentSession?.studentBannedFromLiveMedia
+    },
+    partnerMicStatus() {
+      const name = this.sessionPartner.firstname
+      const isMuted = this.snapshot.context.isPartnerMicMuted
+      const hasReceivedAudioFromPartner =
+        this.snapshot.context.hasReceivedPartnerAudio
+      if (this.isPartnerLiveMediaBanned) return `${name}'s mic is censored`
+      else if (!hasReceivedAudioFromPartner)
+        return `${name}'s mic is unavailable`
+      else if (isMuted) return `${name} has muted their mic`
+      else return ''
     },
     aiTutorSetupProps() {
       return {
@@ -835,6 +885,18 @@ export default {
     },
   },
   methods: {
+    toggleMuteSelf() {
+      this.meetingActor?.send({ type: 'toggle_mute_self' })
+    },
+    toggleMutePartner() {
+      this.meetingActor?.send({ type: 'toggle_mute_partner' })
+    },
+    onAudioUiLoaded(audioElement) {
+      this.meetingActor?.send({
+        type: 'audio_ui_loaded',
+        audioOutputElement: audioElement,
+      })
+    },
     toggleScreenShareWindow() {
       if (this.isVolunteer) {
         if (this.screenShareActive) {

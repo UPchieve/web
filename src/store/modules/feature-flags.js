@@ -38,6 +38,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SCREENSHARE]: false,
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
+      [POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -188,6 +189,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED],
     isImpactStudySurveyEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
+    isChimeMeetingEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {

@@ -9,12 +9,12 @@ import { EVENTS } from '@/consts'
 const store = useStore()
 const props = defineProps<{
   userType: 'student' | 'volunteer'
-  partnerStatus: string | null
+  partnerPresence: string | null
   audioCallSupported: boolean
+  partnerMicStatus: string
 }>()
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
-const micStatus = computed(() => store.getters['liveMedia/audio/micStatus'])
 
 const onMouseEnterAudioStatus = () => {
   AnalyticsService.captureEvent(
@@ -30,10 +30,10 @@ const onMouseEnterAudioStatus = () => {
         {{ sessionPartner.firstname
         }}<span
           class="disabled-mic"
-          v-if="micStatus && props.audioCallSupported"
+          v-if="props.partnerMicStatus && props.audioCallSupported"
           @mouseenter="onMouseEnterAudioStatus"
           v-tooltip="{
-            text: micStatus,
+            text: props.partnerMicStatus,
             color: 'black',
             position: 'bottom',
           }"
@@ -41,7 +41,7 @@ const onMouseEnterAudioStatus = () => {
         /></span>
       </div>
       <div class="status">
-        {{ props.partnerStatus }}
+        {{ props.partnerPresence }}
       </div>
     </div>
   </div>
