@@ -47,7 +47,7 @@
           :container-width="20"
         />
         <button v-else @click="toggleScreenShare">
-          <StopScreenShareIcon v-if="isSharingScreen" />
+          <StopScreenShareIcon v-if="isScreenSharing" />
           <ScreenShareIcon v-else />
         </button>
       </div>
@@ -106,7 +106,6 @@ import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
 import ErrorIcon from '@/assets/sidebar_icons/exclamation.svg'
 import LoggerService from '@/services/LoggerService'
 import ActivityDot from '@/components/ActivityDot.vue'
-import { ScreenShareState } from '@/services/LiveShareService/machines/screenShareMachine'
 import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
 import WordCount from '@/components/WordCount.vue'
@@ -161,6 +160,18 @@ export default {
       type: Boolean,
       default: false,
     },
+    isScreenSharing: {
+      type: Boolean,
+      default: false,
+    },
+    isJoiningCall: {
+      type: Boolean,
+      default: false,
+    },
+    unableToJoinCall: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -191,7 +202,6 @@ export default {
       userType: 'user/userType',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isJoiningCall: 'liveMedia/isJoiningCall',
-      unableToJoinCall: 'liveMedia/unableToJoinCall',
       sessionPartner: 'user/sessionPartner',
       mobileMode: 'app/mobileMode',
     }),
@@ -201,12 +211,6 @@ export default {
       return (
         this.isScreenShareEnabled &&
         (this.isVolunteer || (this.isStudent && this.unableToJoinCall))
-      )
-    },
-    isSharingScreen() {
-      return (
-        this.$store.state.liveMedia.screenShareActor?.state ===
-        ScreenShareState.SharingScreen
       )
     },
     isSocketReadyToRequestForDoc() {

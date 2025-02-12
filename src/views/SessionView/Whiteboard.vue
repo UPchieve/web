@@ -28,10 +28,10 @@
       <div v-if="showScreenShareTool" class="toolbar-item" tabindex="0">
         <Spinner
           v-if="isJoiningCall"
-          height="24"
-          width="24"
-          container-height="24"
-          container-width="24"
+          :height="24"
+          :width="24"
+          :container-height="24"
+          :container-width="24"
         />
         <span
           v-else-if="unableToJoinCall"
@@ -58,7 +58,7 @@
         >
           <ErrorIcon class="screenshare-error" />
         </span>
-        <button v-else @click="toggleScreenShareWindow">
+        <button class="toolbar-item" v-else @click="toggleScreenShareWindow">
           <StopScreenShareIcon
             v-if="isScreenSharing"
             class="toolbar-item__svg"
@@ -528,6 +528,14 @@ export default {
       type: Boolean,
       required: true,
     },
+    isJoiningCall: {
+      type: Boolean,
+      required: true,
+    },
+    unableToJoinCall: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -571,13 +579,11 @@ export default {
       userType: 'user/userType',
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
-      isJoiningCall: 'liveMedia/isJoiningCall',
-      unableToJoinCall: 'liveMedia/unableToJoinCall',
       sessionPartner: 'user/sessionPartner',
-      hasSpeakingPrivileges: 'liveMedia/audio/hasSpeakingPrivileges',
+      isBanned: 'user/banType',
     }),
     isLiveMediaBanned() {
-      return !this.hasSpeakingPrivileges
+      return this.isBanned
     },
     showScreenShareTool() {
       // Show to students once a volunteer is sharing their screen

@@ -10,6 +10,7 @@ export default {
     'import.meta.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS': JSON.stringify(
       process.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS
     ),
+    global: {},
   },
   optimizeDeps: {
     exclude: ['maz-ui'],

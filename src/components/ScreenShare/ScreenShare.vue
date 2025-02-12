@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, toRef } from 'vue'
+import { computed, onMounted, ref, toRef } from 'vue'
 import { useStore } from 'vuex'
-import { ScreenShareEvent } from '@/services/LiveShareService/machines/screenShareMachine'
 import ImageExpand from '@/assets/image-expand.svg'
 import ImageCollapse from '@/assets/image-collapse.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import type { useActor } from '@xstate/vue'
+import { create } from '@/state-machines/meeting-machine'
 
 const emit = defineEmits(['dragging', 'resizing'])
 
@@ -19,14 +20,10 @@ const props = defineProps<{
   canShareScreen: boolean
   isVolunteer: boolean
   containerRef: object
+  meetingActor: ReturnType<typeof useActor<ReturnType<typeof create>>>
 }>()
-const stream = store.state.liveMedia.zoomClient.getMediaStream()
-const useVideoElement =
-  props.isVolunteer && stream.isStartShareScreenWithVideoElement()
-const screenShareActor = store.state.liveMedia.screenShareActor
 
-const screenShareCanvas = ref<HTMLCanvasElement>()
-const screenShareVideo = ref<HTMLVideoElement>()
+const meetingVideo = ref<HTMLVideoElement>()
 const screenShareWindow = ref()
 const sizeState = ref<'minimized' | 'maximized' | 'user-sized'>('user-sized')
 
@@ -45,13 +42,10 @@ const previousWidth = ref<number>(MINIMUM_WIDTH)
 const previousHeight = ref<number | string>('auto')
 
 onMounted(() => {
-  const targetElement = useVideoElement
-    ? screenShareVideo.value
-    : screenShareCanvas.value
-  screenShareActor.send(ScreenShareEvent.VIEWER_READY, { targetElement })
-})
-onUnmounted(async () => {
-  await screenShareActor.send(ScreenShareEvent.VIEWER_REMOVED)
+  props.meetingActor.send({
+    type: 'video_ui_loaded',
+    videoOutputElement: meetingVideo.value!,
+  })
 })
 
 const windowHeader = ref()
@@ -150,18 +144,7 @@ const resize = (x, y, requestedWidth) => {
       v-show="sizeState !== 'minimized'"
       ref="windowContent"
     >
-      <video
-        v-if="useVideoElement"
-        height="auto"
-        width="auto"
-        ref="screenShareVideo"
-      ></video>
-      <canvas
-        v-else
-        width="auto"
-        height="auto"
-        ref="screenShareCanvas"
-      ></canvas>
+      <video height="auto" width="auto" ref="meetingVideo"></video>
     </div>
   </vue-draggable-resizable>
 </template>

@@ -19,6 +19,7 @@ const gleapUrl = 'https://*.gleap.io'
 const gleapWss = 'wss://ws.gleap.io'
 const orbitalUrl = 'https://*.useorbital.com'
 const zoomUrls = ['https://zoom.us', 'https://*.zoom.us', 'wss://*.zoom.us']
+const awsChimeUrls = ['https://*.chime.aws', 'wss://*.chime.aws']
 
 // connect sources
 const googleConnectUrls = [
@@ -110,6 +111,7 @@ const connectSrc = [
   gleapWss,
   orbitalUrl,
   ...zoomUrls,
+  ...awsChimeUrls,
   `wss://${config.host}`,
   `https://${config.host}`,
 ]
