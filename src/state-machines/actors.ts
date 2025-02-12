@@ -14,6 +14,7 @@ import { fromCallback, fromPromise } from 'xstate'
 import type { Context, Events, Attendee } from './meeting-machine'
 import { moderateScreenShare } from '@/services/LiveShareService/moderation-tools'
 import store from '@/store'
+import { CustomActiveSpeakerPolicy } from '@/utils/CustomActiveSpeakerPolicy'
 
 export const fetchChimeMeeting = fromPromise(
   async ({ input }: { input: { sessionId: string | null } }) => {
@@ -118,7 +119,26 @@ export const joinMeeting = fromCallback(
     }
     sendBack: (event: Events) => void
   }) => {
+    const sendBackToParent = (e: Events) => input.parent.send(e)
     const { meetingSession, partnerAttendeeId, attendee } = input.context
+
+    // This is hoisted up here because we may need to either attach this handler right away if there already
+    // is a partner attendee, or later when a new one is added (which is handled in its own handler)
+    const subscribeToPartnerVolumeChanges = (partnerAttendeeId: string) => {
+      meetingSession!.audioVideo.realtimeSubscribeToVolumeIndicator(
+        partnerAttendeeId,
+        (
+          _attendeeId: string,
+          _volume: number | null,
+          muted: boolean | null // null indicates no change
+        ) => {
+          if (muted !== null) {
+            sendBackToParent({ type: 'partner_mute_change', muted })
+          }
+          sendBackToParent({ type: 'received_partner_audio_info' })
+        }
+      )
+    }
 
     const partnerAddedObserver = (attendeeId: string) => {
       if (
@@ -127,8 +147,8 @@ export const joinMeeting = fromCallback(
       ) {
         return
       }
-
-      sendBack({ type: 'new_partner_attendee', attendeeId })
+      subscribeToPartnerVolumeChanges(attendeeId)
+      sendBackToParent({ type: 'new_partner_attendee', attendeeId })
     }
 
     meetingSession!.audioVideo.realtimeSubscribeToAttendeeIdPresence(
@@ -138,10 +158,10 @@ export const joinMeeting = fromCallback(
     const meetingStartedObserver = {
       eventDidReceive(name: EventName) {
         if (name === 'meetingStartSucceeded') {
-          sendBack({ type: 'meeting_started' })
+          sendBackToParent({ type: 'meeting_started' })
         }
         if (name === 'meetingEnded') {
-          sendBack({ type: 'meeting_ended' })
+          sendBackToParent({ type: 'meeting_ended' })
         }
       },
     }
@@ -153,20 +173,41 @@ export const joinMeeting = fromCallback(
       parent: input.parent,
     })
 
+    if (partnerAttendeeId) {
+      subscribeToPartnerVolumeChanges(partnerAttendeeId)
+    }
+
+    const activeSpeakerCallback = (speakerIds) => {
+      sendBackToParent({ type: 'active_speakers_changed', speakerIds })
+    }
+    meetingSession!.audioVideo.subscribeToActiveSpeakerDetector(
+      new CustomActiveSpeakerPolicy(),
+      activeSpeakerCallback
+    )
+
     const unsubscribeAll = async () => {
       meetingSession!.audioVideo.realtimeUnsubscribeToAttendeeIdPresence(
         partnerAddedObserver
       )
       meetingSession!.eventController!.removeObserver(meetingStartedObserver)
+      meetingSession!.audioVideo.unbindAudioElement()
+      meetingSession!.audioVideo.realtimeUnsubscribeFromVolumeIndicator(
+        partnerAttendeeId ?? ''
+      )
+      meetingSession!.audioVideo.unsubscribeFromActiveSpeakerDetector(
+        activeSpeakerCallback
+      )
       unsubscribeScreenShareHandler()
-
       await meetingSession!.audioVideo.stopContentShare()
       input.context.endScreenShareModeration()
       input.context.meetingSession!.audioVideo.stop()
       store.commit('liveMedia/setScreenShareActor', null)
     }
+
     sendBack({ type: 'set_unsubscribe_all', unsubscribeAll })
+
     meetingSession!.audioVideo.start()
+    meetingSession!.audioVideo.realtimeMuteLocalAudio()
   }
 )
 
@@ -191,5 +232,44 @@ export const stopShareMyScreen = fromPromise(
   async ({ input }: { input: { context: Context } }) => {
     await input.context.meetingSession!.audioVideo.stopContentShare()
     input.context.endScreenShareModeration()
+  }
+)
+
+export const requestMicAccess = fromPromise(
+  async ({
+    input: { meetingSession },
+  }: {
+    input: { meetingSession: DefaultMeetingSession }
+  }) => {
+    meetingSession.audioVideo.setDeviceLabelTrigger(
+      async () =>
+        await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        })
+    )
+    const audioInputDevices =
+      await meetingSession.audioVideo.listAudioInputDevices()
+    if (!audioInputDevices) throw new Error('No audio input devices available')
+    await meetingSession.audioVideo.startAudioInput(audioInputDevices[0])
+  }
+)
+
+export const requestSpeakerAccess = fromPromise(
+  async ({
+    input: { meetingSession, audioOutputElement },
+  }: {
+    input: {
+      meetingSession: DefaultMeetingSession
+      audioOutputElement: HTMLAudioElement
+    }
+  }) => {
+    await meetingSession.audioVideo.bindAudioElement(audioOutputElement)
+    // Start in listen-only mode
+    // See https://aws.github.io/amazon-chime-sdk-js/modules/apioverview.html#implement-a-view-onlyobserverspectator-experience
+    meetingSession.audioVideo.setDeviceLabelTrigger(() =>
+      Promise.resolve(new MediaStream())
+    )
+    await meetingSession.audioVideo.listAudioInputDevices()
+    meetingSession.audioVideo.start()
   }
 )

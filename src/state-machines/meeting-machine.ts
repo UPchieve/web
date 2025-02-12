@@ -7,6 +7,8 @@ import {
   isBannedFromLiveMedia,
   startingShareMyScreen,
   stopShareMyScreen,
+  requestMicAccess,
+  requestSpeakerAccess,
 } from './actors'
 import store from '@/store'
 import LoggerService from '@/services/LoggerService'
@@ -42,6 +44,9 @@ export type Context = {
   isBanned: boolean
   contentShareStream: MediaStream | null
   endScreenShareModeration: () => void
+  isPartnerMicMuted: boolean
+  activeSpeakerIds: string[]
+  hasReceivedPartnerAudio: boolean // We use this to determine if we know the partner's mic status or not.
 }
 
 export type Events =
@@ -49,13 +54,19 @@ export type Events =
   | { type: 'video_ui_loaded'; videoOutputElement: HTMLVideoElement }
   | { type: 'meeting_started' }
   | { type: 'new_partner_attendee'; attendeeId: string }
-  | { type: 'set_unsubscribe_all'; unsubscribeAll: () => void }
+  | { type: 'set_unsubscribe_all'; unsubscribeAll: () => Promise<void> }
   | { type: 'set_session_id'; sessionId: string }
   | { type: 'partner_shared_screen' }
   | { type: 'partner_stopped_sharing_screen' }
   | { type: 'meeting_ended' }
   | { type: 'share_screen' }
   | { type: 'stop_share_screen' }
+  | { type: 'session_started' }
+  | { type: 'toggle_mute_self' }
+  | { type: 'toggle_mute_partner' }
+  | { type: 'active_speakers_changed'; speakerIds: string[] }
+  | { type: 'partner_mute_change'; muted: boolean }
+  | { type: 'received_partner_audio_info' }
   | {
       type: 'session_started'
       isAudioEligible: boolean
@@ -82,6 +93,8 @@ export function create() {
       isBannedFromLiveMedia,
       startingShareMyScreen,
       stopShareMyScreen,
+      requestMicAccess,
+      requestSpeakerAccess,
     },
     actions: {
       entry: ({ self }) => {
@@ -123,6 +136,9 @@ export function create() {
       isScreenshareEligible: false,
       contentShareStream: null,
       endScreenShareModeration: () => {},
+      isPartnerMicMuted: true,
+      activeSpeakerIds: [],
+      hasReceivedPartnerAudio: false,
     }),
     initial: 'FetchingState',
     entry: { type: 'entry' },
@@ -159,25 +175,25 @@ export function create() {
           target: 'CheckingLiveMediaEligibility',
         },
         states: {
-          // LoadingAudioUI: {
-          //   initial: 'Waiting',
-          //   states: {
-          //     Waiting: {
-          //       on: {
-          //         audio_ui_loaded: {
-          //           target: 'Loaded',
-          //           actions: assign({
-          //             audioOutputElement: ({ context, event }) =>
-          //               (context.audioOutputElement = event.audioOutputElement),
-          //           }),
-          //         },
-          //       },
-          //     },
-          //     Loaded: {
-          //       type: 'final',
-          //     },
-          //   },
-          // }, // @TODO triggered in an onMount of the session header
+          LoadingAudioUI: {
+            initial: 'Waiting',
+            states: {
+              Waiting: {
+                on: {
+                  audio_ui_loaded: {
+                    target: 'Loaded',
+                    actions: assign({
+                      audioOutputElement: ({ context, event }) =>
+                        (context.audioOutputElement = event.audioOutputElement),
+                    }),
+                  },
+                },
+              },
+              Loaded: {
+                type: 'final',
+              },
+            },
+          },
           LoadingVideoUI: {
             initial: 'Waiting',
             description: `this state waits for the <video> element to be
@@ -215,7 +231,7 @@ export function create() {
           },
           WaitingForSessionStart: {
             initial: 'Waiting',
-            description: `this state waits for the UPChieve session to start (e.g. volunteer joins)`,
+            description: `this state waits for the UPChieve session to be matched (e.g. volunteer joins)`,
             states: {
               Waiting: {
                 on: {
@@ -264,7 +280,7 @@ export function create() {
                   meeting: ({ event }) => event.output.meeting,
                   attendee: ({ event }) => event.output.attendee,
                   partnerAttendeeId: ({ event }) =>
-                    event.output.partnerAttendeeId?.AttendeeId ?? null,
+                    event.output.partnerAttendee?.AttendeeId ?? null,
                   retryCount: 0,
                 }),
               },
@@ -449,8 +465,151 @@ export function create() {
               },
             },
           },
-          MicControl: {},
-          SpeakerControl: {},
+          MicControl: {
+            description: `State machine that manages the user's microphone`,
+            initial: 'Waiting',
+            states: {
+              Waiting: {
+                description: 'Waiting for the user to request to use their mic',
+                on: {
+                  toggle_mute_self: {
+                    target: 'CheckingEligibility',
+                  },
+                },
+              },
+              CheckingEligibility: {
+                description: `Request mic permissions and start the user's audio input, or move them to an ineligible
+                state if no audio input device is available or they deny permissions.`,
+                invoke: {
+                  id: 'MicControl.CheckingEligibility:checkMicEligibility',
+                  src: 'requestMicAccess',
+                  input: ({ context }) => ({
+                    meetingSession: context.meetingSession!,
+                  }),
+                  onDone: {
+                    target: 'MicUnmuted',
+                  },
+                  onError: {
+                    target: 'MicPermissionsDenied',
+                  },
+                },
+              },
+              MicUnmuted: {
+                entry: [
+                  ({ context }) => {
+                    context.meetingSession?.audioVideo.realtimeUnmuteLocalAudio()
+                  },
+                ],
+                on: {
+                  toggle_mute_self: {
+                    target: 'MicMuted',
+                  },
+                },
+              },
+              MicMuted: {
+                entry: [
+                  ({ context }) => {
+                    context.meetingSession?.audioVideo.realtimeMuteLocalAudio()
+                  },
+                ],
+                on: {
+                  toggle_mute_self: {
+                    target: 'MicUnmuted',
+                  },
+                },
+              },
+              MicPermissionsDenied: {
+                description: 'Failed to get mic permissions',
+                on: {
+                  toggle_mute_self: {
+                    target: 'CheckingEligibility',
+                  },
+                },
+              },
+            },
+          },
+          SpeakerControl: {
+            description: `State machine that manages the user's speaker controls (muting/unmuting the other person)`,
+            initial: 'Waiting',
+            states: {
+              Waiting: {
+                description: `Waiting for the user to attempt to interact with the speaker.`,
+                on: {
+                  toggle_mute_partner: {
+                    target: 'RequestSpeakerAccess',
+                  },
+                },
+              },
+              RequestSpeakerAccess: {
+                invoke: {
+                  id: 'SpeakerControl.RequestSpeakerAccess#requestSpeakerAccess',
+                  src: 'requestSpeakerAccess',
+                  input: ({ context }) => ({
+                    meetingSession: context.meetingSession!,
+                    audioOutputElement: context.audioOutputElement!,
+                  }),
+                  onDone: {
+                    target: 'SpeakerUnmuted',
+                  },
+                  onError: {
+                    target: 'SpeakerPermissionsDenied',
+                  },
+                },
+              },
+              SpeakerUnmuted: {
+                on: {
+                  toggle_mute_partner: {
+                    target: 'SpeakerMuted',
+                  },
+                },
+              },
+              SpeakerMuted: {
+                on: {
+                  toggle_mute_partner: {
+                    target: 'SpeakerUnmuted',
+                  },
+                },
+              },
+              SpeakerPermissionsDenied: {
+                description: 'Failed to get speaker permissions',
+                on: {
+                  toggle_mute_partner: {
+                    target: 'RequestSpeakerAccess',
+                  },
+                },
+              },
+            },
+          },
+        },
+        on: {
+          active_speakers_changed: {
+            actions: [
+              assign({
+                activeSpeakerIds: (input) => input.event.speakerIds,
+                isPartnerMicMuted: (input) =>
+                  // If the partner is speaking, they can't be muted.
+                  input.event.speakerIds.includes(
+                    input.context.partnerAttendeeId
+                  )
+                    ? false
+                    : input.context.isPartnerMicMuted,
+              }),
+            ],
+          },
+          partner_mute_change: {
+            actions: [
+              assign({
+                isPartnerMicMuted: (input) => input.event.muted,
+              }),
+            ],
+          },
+          received_partner_audio_info: {
+            actions: [
+              assign({
+                hasReceivedPartnerAudio: () => true,
+              }),
+            ],
+          },
         },
       },
       Banned: {
