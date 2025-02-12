@@ -473,14 +473,16 @@ export default {
       this._errorHandler
     )
   },
-  adminGetSchools({ name, state, city, page }) {
+  adminGetSchools({ name, state, city, ncesId, isPartner, page }) {
     const queryParams = new URLSearchParams({
       name,
       state,
       city,
+      ncesId,
+      isPartner,
       page,
     }).toString()
-    return httpGet(`${ELIGIBILITY_API_ROOT}/schools?${queryParams}`).then(
+    return httpGet(`${ADMIN_ROOT}/schools?${queryParams}`).then(
       this._successHandler,
       this._errorHandler
     )
