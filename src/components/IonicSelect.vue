@@ -112,7 +112,7 @@ const props = defineProps({
   isRequired: {
     type: Boolean,
     default: false,
-  }
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])

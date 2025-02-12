@@ -1,5 +1,5 @@
 <template>
-  <div v-if="school._id" class="school-detail">
+  <div v-if="school.id" class="school-detail">
     <admin-edit-school
       v-if="isEditMode"
       :school="school"
@@ -23,7 +23,8 @@
         <div class="school-detail__title">
           {{ school.name }}
         </div>
-        <div class="school-detail__subtitle">ID: {{ school._id }}</div>
+        <div class="school-detail__subtitle">ID: {{ school.id }}</div>
+        <div class="school-detail__subtitle">NCES Id: {{ school.ncesId }}</div>
         <div class="school-detail__section">
           <div class="school-detail__section-title">City</div>
           <div>{{ school.city }}</div>
@@ -130,7 +131,7 @@ export default {
       } = event
 
       const data = {
-        schoolId: this.school._id,
+        schoolId: this.school.id,
         isApproved: checked,
       }
 
@@ -150,7 +151,7 @@ export default {
       } = event
 
       const data = {
-        schoolId: this.school._id,
+        schoolId: this.school.id,
         isPartner: checked,
       }
 
