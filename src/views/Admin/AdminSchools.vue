@@ -1,40 +1,57 @@
 <template>
   <div class="schools">
     <div class="schools__search-panel">
-      <div class="schools__input-row">
-        <label for="name" class="uc-form-label">School name</label>
-        <input id="name" type="text" v-model="name" />
-      </div>
-
-      <div class="schools__input-row">
-        <label for="city" class="uc-form-label">School city</label>
-        <input id="city" type="text" v-model="city" />
-      </div>
-
-      <div class="schools__input-row">
-        <label class="uc-form-label">School state</label>
-        <v-select
-          class="schools__v-select--state"
-          id="state"
+      <form @submit.prevent="submitQuery">
+        <FormInput
+          v-model="name"
+          label="School Name"
+          placeholder="School Name"
+          :isRequired="false"
+        />
+        <FormInput
+          v-model="city"
+          label="School City"
+          placeholder="School City"
+          :isRequired="false"
+        />
+        <FormInput
+          v-model="ncesId"
+          label="NCES Id"
+          placeholder="NCES Id"
+          :isRequired="false"
+        />
+        <IonicSelect
           v-model="state"
+          label="School State"
+          name="state"
+          placeholder="School State"
+          optionTextField="label"
           :options="states"
-          label="label"
-          :searchable="true"
           :reduce="(option) => option.value"
         />
-      </div>
+        <IonicSelect
+          v-model="isPartner"
+          name="isPartner"
+          label="Is Partner School"
+          placeholder="Is Partner School"
+          optionTextField="label"
+          :options="isPartnerOptions"
+          :reduce="(option) => option.value"
+        />
 
-      <div>
-        <button class="uc-form-button" type="button" @click="submitQuery">
+        <button class="uc-form-button" type="submit" @click="submitQuery">
           Search
         </button>
-      </div>
+      </form>
     </div>
-    <template v-if="schools.length > 0">
+    <loader v-if="isLoading" class="uc-column justify-center items-center" />
+    <div v-else>
       <div class="list-wrapper">
         <div class="list">
           <page-control
             :page="page"
+            :perPageLimit="limit"
+            :totalCount="totalCount"
             :isFirstPage="isFirstPage"
             :isLastPage="isLastPage"
             @nextPage="nextPage"
@@ -56,51 +73,62 @@
           </table>
         </div>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
 <script>
+import { toastController } from '@ionic/vue'
 import NetworkService from '@/services/NetworkService'
+import FormInput from '@/components/FormInput.vue'
+import IonicSelect from '@/components/IonicSelect.vue'
+import Loader from '@/components/Loader.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
 import SchoolListItem from '@/components/Admin/SchoolListItem.vue'
 import { STATES_WITH_ABBREVIATIONS } from '@/consts'
 
-const getSchools = async (data) => {
-  const {
-    data: { schools, isLastPage },
-  } = await NetworkService.adminGetSchools(data)
-  return { schools, isLastPage }
-}
-
 export default {
   name: 'AdminSchools',
-  components: { SchoolListItem, PageControl },
+  components: {
+    FormInput,
+    IonicSelect,
+    Loader,
+    PageControl,
+    SchoolListItem,
+  },
+
   data() {
     return {
+      isLoading: false,
       page: 1,
+      limit: 15,
+      totalCount: undefined,
       isLastPage: true,
       schools: [],
       name: '',
       city: '',
+      ncesId: '',
       state: '',
+      isPartner: '',
+      isPartnerOptions: [
+        { label: 'True', value: 'true' },
+        { label: 'False', value: 'false' },
+        { label: 'All', value: '' },
+      ],
     }
   },
   async created() {
     const {
-      query: { page: pageQuery, name, city, state },
+      query: { page: pageQuery, name, city, ncesId, state, isPartner },
     } = this.$route
-    const page = parseInt(pageQuery) || this.page
-    this.name = name || this.name
-    this.city = city || this.city
-    this.state = state || this.state
-    this.$nextTick(() => {
-      document
-        .querySelector('.schools__search-panel')
-        .addEventListener('keydown', this.keyboardListener)
-    })
+    this.page = parseInt(pageQuery ?? this.page)
+    this.name = name ?? this.name
+    this.city = city ?? this.city
+    this.ncesId = ncesId ?? this.ncesId
+    this.state = state ?? this.state
+    this.isPartner = isPartner ?? this.isPartner
 
-    this.setPage(page)
+    await this.getSchools()
   },
   computed: {
     isFirstPage() {
@@ -127,30 +155,41 @@ export default {
       this.getSchools()
     },
     async getSchools() {
-      const data = {
-        name: this.name,
-        city: this.city,
-        state: this.state ? this.state : '',
-      }
-      this.$router.push({
-        path: '/admin/schools',
-        query: {
-          ...data,
+      this.isLoading = true
+
+      try {
+        const queryData = {
+          name: this.name,
+          city: this.city,
+          state: this.state,
+          ncesId: this.ncesId,
+          isPartner: this.isPartner,
           page: this.page,
-        },
-      })
-      const { schools, isLastPage } = await getSchools({
-        ...data,
-        page: this.page,
-      })
-      this.schools = schools
-      this.isLastPage = isLastPage
-    },
-    keyboardListener(event) {
-      const { key, target } = event
-      const { tagName } = target
-      if (key === 'Enter' && tagName === 'INPUT') {
-        this.getSchools()
+        }
+        this.$router.push({
+          path: '/admin/schools',
+          query: queryData,
+        })
+
+        const {
+          data: { totalCount, schools, isLastPage },
+        } = await NetworkService.adminGetSchools({
+          ...queryData,
+          limit: this.limit,
+        })
+        this.totalCount = totalCount
+        this.schools = schools
+        this.isLastPage = isLastPage
+      } catch (err) {
+        const toast = await toastController.create({
+          message: 'Failed to get schools.',
+          color: 'danger',
+          duration: 2000,
+          position: 'bottom',
+        })
+        await toast.present()
+      } finally {
+        this.isLoading = false
       }
     },
   },
@@ -158,34 +197,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-input,
-select {
-  width: 300px;
-  padding: 0.4em 0;
-  padding-left: 0.5em;
-  border: 1px solid $c-border-grey;
-}
-
 .schools {
   background-color: #fff;
   margin: 10px;
   padding: 10px;
   border-radius: 8px;
-  text-align: left;
 
   @include breakpoint-above('medium') {
     margin: 40px;
     padding: 40px;
   }
 
-  &__input-row {
-    margin-bottom: 1em;
-    margin-left: 0;
-  }
-
-  &__v-select--state {
-    display: inline-block;
-    width: 300px;
+  &__search-panel {
+    margin: auto;
+    max-width: 700px;
   }
 }
 
@@ -195,11 +220,6 @@ select {
 
 .list {
   width: 100%;
-}
-
-.uc-form-label {
-  width: 100px;
-  text-align: left;
 }
 
 .uc-form-button {

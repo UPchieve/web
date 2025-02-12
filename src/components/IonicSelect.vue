@@ -32,7 +32,7 @@
                 props.optionTextField ? option[props.optionTextField] : option
               "
               class="select-text"
-              :value="option"
+              :value="props.reduce ? props.reduce(option) : option"
             >
               {{
                 props.optionTextField ? option[props.optionTextField] : option
@@ -46,7 +46,7 @@
             :key="
               props.optionTextField ? option[props.optionTextField] : option
             "
-            :value="option"
+            :value="props.reduce ? props.reduce(option) : option"
             class="select-text"
           >
             {{ props.optionTextField ? option[props.optionTextField] : option }}
@@ -109,11 +109,15 @@ const props = defineProps({
     required: false,
     default: null,
   },
+  isRequired: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 const emit = defineEmits(['update:modelValue'])
 
-const updateValue = (event: any) => {
+function updateValue(event: CustomEvent) {
   emit('update:modelValue', event.detail.value)
 }
 </script>

@@ -11,7 +11,7 @@
     </div>
     <div class="page-control__center">
       <div v-if="showPageNumber" class="page-control__title">
-        Page {{ page }}
+        Page {{ page }}{{ total }}
       </div>
     </div>
     <div class="page-control__right">
@@ -28,11 +28,21 @@ export default {
 
   props: {
     page: Number,
+    totalCount: Number,
+    perPageLimit: Number,
     isFirstPage: Boolean,
     isLastPage: Boolean,
     showPageNumber: { type: Boolean, default: true },
   },
   emits: ['nextPage', 'previousPage'],
+  computed: {
+    total() {
+      if (!this.totalCount) return
+      if (!this.perPageLimit) return ' / ' + this.totalCount + ' total'
+      const totalPages = Math.ceil(this.totalCount / this.perPageLimit)
+      return ' of ' + totalPages
+    },
+  },
   methods: {
     nextPage() {
       this.$emit('nextPage')
