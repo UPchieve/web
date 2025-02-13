@@ -5,18 +5,6 @@
         <img class="DefaultHeader-user-info-avatar" :src="avatarUrl" alt="" />
         <span class="DefaultHeader-user-info-name">{{ name }}</span>
       </div>
-
-      <div class="DefaultHeader-menu-container">
-        <hamburger-button :tabindex="0" data-testid="mobile-header-hamburger" />
-        <activity-dot
-          v-if="
-            hasUnreadProgressOverviewReports &&
-            isProgressReportsActive &&
-            isStudent
-          "
-          class="DefaultHeader-menu-notification"
-        />
-      </div>
     </template>
 
     <template v-else>
@@ -30,12 +18,9 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import LogoImageUrl from '@/assets/header_logo.png'
-import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
-import ActivityDot from '@/components/ActivityDot.vue'
 
 export default {
   name: 'default-header',
-  components: { HamburgerButton, ActivityDot },
   data() {
     return { logoUrl: LogoImageUrl }
   },
@@ -44,7 +29,6 @@ export default {
       user: (state) => state.user.user,
     }),
     ...mapGetters({
-      isStudent: 'user/isStudent',
       avatarUrl: 'user/avatarUrl',
       mobileMode: 'app/mobileMode',
       name: 'user/firstName',
@@ -74,7 +58,7 @@ export default {
 
 .DefaultHeader-user-info {
   @include flex-container(row, center, center);
-  @include child-spacing(left, 12px);
+  @include child-spacing(left, 8px);
 
   &-avatar {
     border-radius: 50%;
@@ -84,20 +68,6 @@ export default {
 
   &-name {
     @include font-category('heading');
-  }
-}
-
-.DefaultHeader {
-  &-menu {
-    &-container {
-      position: relative;
-    }
-
-    &-notification {
-      position: absolute;
-      top: 0;
-      right: -5px;
-    }
   }
 }
 </style>
