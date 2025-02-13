@@ -30,7 +30,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import LogoImageUrl from '@/assets/header_logo.png'
-import HamburgerButton from '../HamburgerButton.vue'
+import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 import ActivityDot from '@/components/ActivityDot.vue'
 
 export default {

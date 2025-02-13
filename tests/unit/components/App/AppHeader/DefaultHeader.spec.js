@@ -2,7 +2,7 @@ import { RouterLinkStub, shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
-import DefaultHeader from '@/components/App/AppHeader/DefaultHeader/index.vue'
+import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
 import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 
 const getWrapper = (mobileMode = false) => {

@@ -7,7 +7,7 @@
 <script>
 import { mapState } from 'vuex'
 import HeaderTemplate from './HeaderTemplate.vue'
-import DefaultHeader from './DefaultHeader/index.vue'
+import DefaultHeader from './DefaultHeader.vue'
 import SessionHeader from './SessionHeader.vue'
 import RejoinSessionHeader from './RejoinSessionHeader.vue'
 import WaitingPeriodHeader from './WaitingPeriodHeader.vue'
