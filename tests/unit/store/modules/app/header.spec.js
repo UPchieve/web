@@ -43,13 +43,13 @@ describe('`app/header` store module', () => {
       const commit = vi.fn()
       const payload = { component: 'component', data: {} }
       actions.show({ commit }, payload)
-      expect(commit).toHaveBeenNthCalledWith(1, 'setIsShown', true)
       expect(commit).toHaveBeenNthCalledWith(
-        2,
+        1,
         'setComponent',
         payload.component
       )
-      expect(commit).toHaveBeenNthCalledWith(3, 'setData', payload.data)
+      expect(commit).toHaveBeenNthCalledWith(2, 'setData', payload.data)
+      expect(commit).toHaveBeenNthCalledWith(3, 'setIsShown', true)
     })
 
     it('hide', () => {
