@@ -1,6 +1,6 @@
 <template>
   <tr
-    @click="() => this.$router.push(`/admin/school/${school._id}`)"
+    @click="() => this.$router.push(`/admin/school/${school.id}`)"
     class="list-item"
   >
     <td>{{ school.name }}</td>

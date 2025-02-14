@@ -468,7 +468,7 @@ export default {
     ).then(this._successHandler, this._errorHandler)
   },
   adminGetSchool(schoolId) {
-    return httpGet(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`).then(
+    return httpGet(`${ADMIN_ROOT}/school/${schoolId}`).then(
       this._successHandler,
       this._errorHandler
     )

@@ -67,7 +67,7 @@
             </tr>
             <school-list-item
               v-for="school in schools"
-              :key="school._id"
+              :key="school.id"
               :school="school"
             />
           </table>
