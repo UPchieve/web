@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import LargeButton from '@/components/LargeButton.vue'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import { onMounted } from 'vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'

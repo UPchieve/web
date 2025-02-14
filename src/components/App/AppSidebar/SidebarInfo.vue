@@ -15,17 +15,11 @@
 <script>
 import Case from 'case'
 import { mapGetters, mapState } from 'vuex'
-import StudentIcon from '@/assets/student-icon.svg'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
 
 export default {
   props: {
     authenticated: Boolean,
     name: String,
-  },
-  components: {
-    StudentIcon,
-    VolunteerIcon,
   },
   computed: {
     ...mapState({
@@ -34,6 +28,7 @@ export default {
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       userType: 'user/userType',
+      avatar: 'user/avatar',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
@@ -74,17 +69,6 @@ export default {
       }
 
       return status
-    },
-    avatar() {
-      if (this.isVolunteer) {
-        return VolunteerIcon
-      } else if (this.isStudent) {
-        return StudentIcon
-      } else if (this.isTeacher) {
-        // TODO: TEACHER PROFILES.
-        return VolunteerIcon
-      }
-      return ''
     },
   },
 }

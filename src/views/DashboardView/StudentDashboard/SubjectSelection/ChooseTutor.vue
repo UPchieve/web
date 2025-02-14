@@ -50,7 +50,7 @@
 <script>
 import LargeButton from '@/components/LargeButton.vue'
 import CrossIcon from '@/assets/cross.svg'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'

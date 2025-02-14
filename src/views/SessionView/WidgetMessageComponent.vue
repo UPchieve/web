@@ -2,8 +2,8 @@
 import { MESSAGE_ALIGNMENT } from '../BotConversationsView/BotChatMessages.vue'
 import GenerationFeedback from '../BotConversationsView/GenerationFeedback.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
-import StudentIcon from '@/assets/student-icon.svg'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import SystemMessage from '../BotConversationsView/SystemMessage.vue'
 
 const { alignment, message } = defineProps<{

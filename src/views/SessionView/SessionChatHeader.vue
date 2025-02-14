@@ -62,8 +62,8 @@
 <script>
 // TODO: This file needs to be refactored to remove session logic from this component
 import { mapState, mapGetters } from 'vuex'
-import StudentIcon from '@/assets/student-icon.svg'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import TroubleMatchingModal from '@/views/SessionView/TroubleMatchingModal.vue'

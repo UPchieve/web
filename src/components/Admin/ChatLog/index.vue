@@ -28,8 +28,8 @@
 
 <script>
 import ChatMessage from './ChatMessage.vue'
-import StudentIcon from '@/assets/student-icon.svg'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 
 export default {
   name: 'ChatLog',
