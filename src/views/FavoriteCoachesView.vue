@@ -94,7 +94,7 @@ import { mapState, mapGetters } from 'vuex'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import NetworkService from '@/services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
-import CoachIcon from '@/assets/volunteer-icon.svg'
+import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import HeartIcon from '@/assets/heart.svg'
 
 export default {

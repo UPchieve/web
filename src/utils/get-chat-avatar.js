@@ -1,6 +1,6 @@
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
-import StudentIcon from '@/assets/student-icon.svg'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 
 function getChatAvatar(userId, studentId, volunteerId) {
   if (userId === studentId) return StudentIcon

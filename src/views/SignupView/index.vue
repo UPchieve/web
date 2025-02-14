@@ -126,9 +126,9 @@ import NetworkService from '@/services/NetworkService'
 import { UserType } from '@/services/SignUpService'
 import { getPageDetails as getStudentPageDetails } from '@/services/SignUpService/StudentSignUpService'
 import { getPageDetails as getTeacherPageDetails } from '@/services/SignUpService/TeacherSignUpService'
-import StudentAvatar from '@/assets/student-avatar.svg'
-import VolunteerAvatar from '@/assets/volunteer-avatar.svg'
-import TeacherAvatar from '@/assets/teacher-avatar.svg'
+import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
+import VolunteerAvatar from '@/assets/user_avatars/volunteer-avatar.svg'
+import TeacherAvatar from '@/assets/user_avatars/teacher-avatar.svg'
 import { EVENTS } from '@/consts'
 
 export default {

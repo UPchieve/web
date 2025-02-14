@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import StudentIcon from '@/assets/student-icon.svg'
 import { vTooltip } from 'maz-ui'
-import VolunteerIcon from '@/assets/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import SpeakerIcon from '@/assets/voice_message_icons/speaker.svg'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import { computed } from 'vue'

@@ -333,7 +333,6 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
-      avatarUrl: 'user/avatarUrl',
       showNationalPhoneNumbersOnly: 'user/showNationalPhoneNumbersOnly',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',

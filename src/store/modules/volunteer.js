@@ -1,5 +1,5 @@
 import sendWebNotification from '@/utils/send-web-notification'
-import StudentIcon from '@/assets/student-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 
 export default {

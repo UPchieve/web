@@ -86,7 +86,7 @@ import FormDateInput from '@/components/FormDateInput.vue'
 import FormSelect from '@/components/FormSelect.vue'
 import NetworkService from '@/services/NetworkService'
 import { mapState } from 'vuex'
-import StudentAvatar from '@/assets/student-avatar.svg'
+import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import moment from 'moment'
 
 export default {

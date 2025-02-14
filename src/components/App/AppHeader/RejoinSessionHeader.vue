@@ -37,7 +37,6 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      avatarUrl: 'user/avatarUrl',
       name: 'user/firstName',
       sessionPath: 'user/sessionPath',
     }),
