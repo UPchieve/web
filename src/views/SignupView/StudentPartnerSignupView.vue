@@ -549,7 +549,6 @@ export default {
     }
   },
   async created() {
-    this.$store.dispatch('app/hideNavigation')
     await this.getSignupSources()
   },
   data() {

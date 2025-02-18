@@ -89,7 +89,6 @@ export default {
     SsoButton,
   },
   created() {
-    this.$store.dispatch('app/hideNavigation')
     localStorage.removeItem('isSSOSignUpRedirect')
     this.formPageTemplateLayout = this.useNewSignUpFlow
       ? 'panel-left-50p'

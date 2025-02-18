@@ -39,8 +39,6 @@ export default {
     TopicChip,
   },
   async beforeMount() {
-    this.$store.dispatch('app/sidebar/hide')
-    this.$store.dispatch('app/header/hide')
     if (Object.entries(this.training).length === 0)
       await this.$store.dispatch('subjects/getTrainingSubjects')
   },

@@ -17,10 +17,6 @@ import ReferenceForm from '@/components/ReferenceForm.vue'
 export default {
   name: 'ReferenceView',
   components: { ReferenceForm },
-  mounted() {
-    this.$store.dispatch('app/sidebar/hide')
-    this.$store.dispatch('app/header/hide')
-  },
 }
 </script>
 

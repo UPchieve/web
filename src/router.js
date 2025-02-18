@@ -122,24 +122,25 @@ const routes = [
     path: '/login',
     name: 'LoginView',
     component: LoginView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, hideNavigation: true },
   },
   {
     path: '/logout',
     name: 'LogoutView',
     component: LogoutView,
+    meta: { hideNavigation: true },
   },
   {
     path: '/reference-form/:referenceId',
     name: 'ReferenceView',
     component: ReferenceView,
-    meta: { authOptional: true },
+    meta: { authOptional: true, hideNavigation: true },
   },
   {
     path: '/join-class/:classCode?',
     name: 'JoinClassView',
     component: JoinClassView,
-    meta: { authOptional: true },
+    meta: { authOptional: true, hideNavigation: true },
   },
   {
     path: '/signup',
@@ -152,7 +153,7 @@ const routes = [
     path: '/sign-up/:userType?/:step?',
     name: 'SignupView',
     component: SignupView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, hideNavigation: true },
     props: true,
     beforeEnter: async (to, from, next) => {
       switch (to.params.userType) {
@@ -174,13 +175,13 @@ const routes = [
     path: '/signup/student/:partnerId',
     name: 'StudentPartnerSignupView',
     component: StudentPartnerSignupView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, hideNavigation: true },
   },
   {
     path: '/signup/volunteer/:partnerId',
     name: 'VolunteerPartnerSignupView',
     component: VolunteerPartnerSignupView,
-    meta: { loggedOutOnly: true },
+    meta: { loggedOutOnly: true, hideNavigation: true },
   },
   {
     path: '/sessions/history',
@@ -200,11 +201,13 @@ const routes = [
     path: '/resetpassword',
     name: 'ResetPasswordView',
     component: ResetPasswordView,
+    meta: { hideNavigation: true },
   },
   {
     path: '/setpassword',
     name: 'SetPasswordView',
     component: SetPasswordView,
+    meta: { hideNavigation: true },
     props: (route) => ({ token: route.query.token }),
   },
   {
@@ -249,7 +252,7 @@ const routes = [
     path: '/session/:topic/:subTopic/:sessionId?',
     name: 'SessionView',
     component: SessionView,
-    meta: { protected: true },
+    meta: { protected: true, hideNavigation: true },
   },
   {
     path: '/ai-tutor-conversations',
@@ -490,7 +493,7 @@ const routes = [
     path: '/welcome',
     name: 'WelcomePage',
     component: WelcomePage,
-    meta: { protected: true },
+    meta: { protected: true, hideNavigation: true },
   },
   {
     path: '/sessions/progress',
@@ -634,7 +637,13 @@ router.beforeEach((to, from, next) => {
 
 // Called after each route change
 router.afterEach((to, from) => {
-  if (to.name !== from.name) store.dispatch('app/showNavigation')
+  if (to.name !== from.name) {
+    if (to.meta.hideNavigation) {
+      store.dispatch('app/hideNavigation')
+    } else {
+      store.dispatch('app/showNavigation')
+    }
+  }
   store.dispatch('app/modal/hide')
 
   // Google Analytics.

@@ -271,9 +271,6 @@ export default {
         return next('/sign-up')
       })
   },
-  created() {
-    this.$store.dispatch('app/hideNavigation')
-  },
   data() {
     return {
       volunteerPartner: {
