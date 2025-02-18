@@ -81,7 +81,7 @@ export default {
       }
 
       try {
-        await NetworkService.adminUpdateSchool(this.school._id, data)
+        await NetworkService.adminUpdateSchool(this.school.id, data)
 
         this.getSchool()
         this.toggleEditMode()
