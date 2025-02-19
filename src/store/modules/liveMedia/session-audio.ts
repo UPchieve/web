@@ -284,7 +284,10 @@ export default {
     },
     resetState: ({ commit }) => commit('resetState'),
 
-    inProgressCaptionMessage: ({ commit, rootState, state }, payload) => {
+    inProgressCaptionMessage: (
+      { commit, rootState, state, rootGetters },
+      payload
+    ) => {
       const isPartnerMessage = payload.displayName !== rootState.user.user.id
       const isFromBeforeMute =
         state.lastMessageIdBeforeMute === payload.msgId ||
@@ -304,15 +307,14 @@ export default {
           text: payload.text,
           zoomMessageId: payload.msgId,
           msgId: payload.msgId,
-          userType:
-            rootState.user.user.type === 'student' ? 'volunteer' : 'student',
+          userType: rootGetters['user/userType'],
           user: payload.displayName,
         })
         commit('setPartnerCaptionsCurrentMessageId', payload.msgId)
       }
     },
     setCaptionMessage: async (
-      { state, commit, dispatch, rootState },
+      { state, commit, dispatch, rootState, rootGetters },
       payload
     ) => {
       if (!payload) return
@@ -365,8 +367,7 @@ export default {
             contents: payload.text,
             type: 'audio-transcription',
             user: payload.displayName,
-            userType:
-              rootState.user.user.type === 'student' ? 'volunteer' : 'student',
+            userType: rootGetters['user/userType'],
             zoomMessageId: payload.msgId,
           },
           { root: true }
