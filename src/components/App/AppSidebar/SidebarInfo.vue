@@ -1,14 +1,15 @@
 <template>
-  <div class="SidebarInfo">
-    <template v-if="authenticated">
+  <div v-if="isAuthenticated">
+    <div class="SidebarInfo" :class="{ mobile: mobileMode }">
       <component class="SidebarInfo-avatar" :is="avatar" />
-      <div class="SidebarInfo-name">{{ name }}</div>
-      <div class="SidebarInfo-type">{{ type }}</div>
-      <div v-if="!isTeacher" class="SidebarInfo-status">
+      <div class="SidebarInfo-name">{{ firstName }}</div>
+      <div v-if="!mobileMode" class="SidebarInfo-type">{{ type }}</div>
+      <div v-if="!isTeacher && !mobileMode" class="SidebarInfo-status">
         <div class="SidebarInfo-status-circle" :class="sessionStatus.class" />
         <div class="SidebarInfo-status-text">{{ sessionStatus.text }}</div>
       </div>
-    </template>
+    </div>
+    <hr v-if="mobileMode" />
   </div>
 </template>
 
@@ -17,21 +18,20 @@ import Case from 'case'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
-  props: {
-    authenticated: Boolean,
-    name: String,
-  },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
     }),
     ...mapGetters({
+      firstName: 'user/firstName',
+      isAuthenticated: 'user/isAuthenticated',
       isSessionAlive: 'user/isSessionAlive',
       userType: 'user/userType',
       avatar: 'user/avatar',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
+      mobileMode: 'app/mobileMode',
     }),
     type() {
       return Case.capital(this.userType ?? 'User')
@@ -80,6 +80,21 @@ export default {
   @include flex-container(column, $align-items: flex-start);
   @include child-spacing(top, $spacing);
 
+  &.mobile {
+    @include flex-container(row, start, center);
+
+    .SidebarInfo-avatar {
+      $mobile-size: 60px;
+      height: $mobile-size;
+      width: $mobile-size;
+    }
+
+    .SidebarInfo-name {
+      margin-top: 0;
+      margin-left: 10px;
+    }
+  }
+
   &-avatar {
     $size: 80px;
     border-radius: 50%;
@@ -121,5 +136,11 @@ export default {
       }
     }
   }
+}
+
+hr {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border: 2px solid $c-background-grey;
 }
 </style>
