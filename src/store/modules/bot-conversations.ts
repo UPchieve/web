@@ -85,12 +85,15 @@ export default {
         commit('setIsFetchingConversation', false)
       }
     },
-    async sendMessage({ commit, rootState, state, getters }, message) {
+    async sendMessage(
+      { commit, rootState, state, getters, rootGetters },
+      message
+    ) {
       commit('clearErrors')
       commit('setMessageIsSending', true)
       try {
         const userId = rootState.user.user.id
-        const senderUserType = rootState.user.user.type
+        const senderUserType = rootGetters['user/userType']
         const sessionId = state.currentConversation.sessionId
         const currentSessionId = rootState.user.session.id
         const isStandAloneBotConversation =
@@ -129,7 +132,7 @@ export default {
       }
     },
     async createConversation(
-      { commit, rootState },
+      { commit, rootState, rootGetters },
       {
         message,
         subjectId,
@@ -141,7 +144,7 @@ export default {
       commit('setIsFetchingConversation', true)
       try {
         const userId = rootState.user.user.id
-        const senderUserType = rootState.user.user.type
+        const senderUserType = rootGetters['user/userType']
         const results = await NetworkService.createTutorBotSession({
           userId,
           sessionId,
