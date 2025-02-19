@@ -25,39 +25,40 @@ export const axiosInstance = axios.create({
   baseURL: config.serverRoot,
 })
 
-async function getRecaptchaToken(action) {
+async function getRecaptchaToken(action: string) {
   return new Promise((resolve, reject) => {
     grecaptcha.ready(() => {
       grecaptcha.execute(config.googleRecaptchaKey, { action }).then(
-        (token) => resolve(token),
+        (token: string) => resolve(token),
         () => reject()
       )
     })
   })
 }
 
-async function getAdditionalConfig(action) {
+async function getAdditionalConfig(action: string) {
   const token = await getRecaptchaToken(action)
   return { headers: { 'g-recaptcha-response': token } }
 }
 
-export async function httpGet(path, config) {
+export async function httpGet(path: string, config?) {
   return axiosInstance.get(path, config)
 }
 
-export async function httpPost(path, data, config) {
+// TODO: Use generics instead of Object.
+export async function httpPost(path: string, data: Object, config?) {
   return axiosInstance.post(path, data, config)
 }
 
-export async function httpPut(path, data, config) {
+export async function httpPut(path: string, data: Object, config?) {
   return axiosInstance.put(path, data, config)
 }
 
-export async function httpPatch(path, data, config) {
+export async function httpPatch(path: string, data: Object, config?) {
   return axiosInstance.patch(path, data, config)
 }
 
-export async function httpDelete(path, config) {
+export async function httpDelete(path: string, config?) {
   return axiosInstance.delete(path, config)
 }
 
