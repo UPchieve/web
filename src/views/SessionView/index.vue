@@ -187,7 +187,7 @@
           <router-link
             class="session-history-link"
             v-if="isVolunteer && previousSessionCountWithStudent > 0"
-            :to="`/sessions/history?studentId=${session.student.id}`"
+            :to="`/sessions/history?studentId=${session.student.id}&volunteerId=${session.volunteer.id}`"
             >History with {{ session.student.firstName }}</router-link
           >
           <question-mark-icon
@@ -712,7 +712,7 @@ export default {
       })
   },
   watch: {
-    async session(session, prevSession) {
+    async session(session) {
       /*
        * Since this is only rolled out to students,
        * we have to check to see if the student involved in this
@@ -738,13 +738,7 @@ export default {
           })
       }
 
-      if (
-        this.isVolunteer &&
-        session.volunteerId &&
-        !prevSession.volunteerId &&
-        session.studentId &&
-        !prevSession.studentId
-      ) {
+      if (this.isVolunteer && session.volunteerId) {
         this.previousSessionCountWithStudent =
           await SessionService.getTotalSessionsForPair({
             volunteerId: this.session.volunteerId,

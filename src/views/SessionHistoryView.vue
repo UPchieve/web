@@ -6,10 +6,10 @@
           {{ title }}
         </h1>
         <router-link
-          class="see-all-link"
           v-if="isFiltered"
+          class="see-all-link"
           to="/sessions/history"
-          >see all session history</router-link
+          >See all session history</router-link
         >
       </div>
       <p v-if="!mobileMode" class="subtitle">
