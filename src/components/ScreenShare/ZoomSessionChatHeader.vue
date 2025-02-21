@@ -25,6 +25,12 @@ const props = defineProps<{
   isPartnerSpeaking: boolean
   partnerPresence: string
   partnerMicStatus: string
+  unableToJoinCall: boolean
+  isJoiningCall: boolean
+  isBanned: boolean
+  unableToJoinAudio: boolean
+  isSpeaking: boolean
+  micState: 'prompt' | 'granted' | 'denied'
 }>()
 
 const store = useStore()
@@ -38,8 +44,6 @@ const isStartingAudio = computed(
   () => store.state.liveMedia.audio.isStartingAudio
 )
 
-SessionAudioService.start()
-
 const meetingAudio = ref<HTMLAudioElement>()
 
 onMounted(async () => {
@@ -51,9 +55,15 @@ onUnmounted(async () => {
   // NOTE: for now, do not keep the zoom call open when they navigate away
   await SessionAudioService.send(SessionAudioEvent.LEAVE)
 })
+
 const useChimeMeetings = computed(
   () => store.getters['featureFlags/isChimeMeetingEnabled']
 )
+
+// Do not initiate zoom if we're using chime
+if (!useChimeMeetings.value) {
+  SessionAudioService.start()
+}
 
 const isPartnerSpeaking = computed(() =>
   useChimeMeetings.value
@@ -86,25 +96,39 @@ const partnerPresence = computed(() =>
     ? props.partnerPresence
     : store.getters['liveMedia/audio/partnerStatus']
 )
-const isSpeaking = computed(() => store.state.liveMedia.audio.isSpeaking)
+const isSpeaking = computed(() => {
+  return useChimeMeetings.value
+    ? props.isSpeaking
+    : store.state.liveMedia.audio.isSpeaking
+})
 const micState = computed(() => {
   return useChimeMeetings.value
-    ? props.partnerMicStatus
+    ? props.micState
     : store.state.liveMedia.audio.micState
 })
-const hasSpeakingPrivileges = computed(
-  () => store.getters['liveMedia/audio/hasSpeakingPrivileges']
+const hasSpeakingPrivileges = computed(() =>
+  useChimeMeetings.value
+    ? !props.isBanned
+    : store.getters['liveMedia/audio/hasSpeakingPrivileges']
 )
 const partnerIsInAudioChannel = computed(
   () => store.getters['liveMedia/audio/partnerIsInAudioChannel']
 )
 
-const audioCallSupported = computed(
-  () => store.getters['liveMedia/audio/audioCallSupported']
+const audioCallSupported = computed(() =>
+  useChimeMeetings.value
+    ? !props.unableToJoinCall
+    : store.getters['liveMedia/audio/audioCallSupported']
 )
-const isJoining = computed(() => store.getters['liveMedia/audio/isJoining'])
-const isActiveInAnotherTab = computed(
-  () => store.getters['liveMedia/audio/isActiveInAnotherTab']
+const isJoiningCall = computed(() =>
+  useChimeMeetings.value
+    ? props.isJoiningCall
+    : store.getters['liveMedia/audio/isJoining']
+)
+const isActiveInAnotherTab = computed(() =>
+  useChimeMeetings.value
+    ? false
+    : store.getters['liveMedia/audio/isActiveInAnotherTab']
 )
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 </script>
@@ -121,6 +145,10 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
         useChimeMeetings ? true : partnerIsInAudioChannel
       "
       @toggleMuteSpeaker="toggleMuteSpeaker"
+      :unableToJoinCall="
+        useChimeMeetings && (unableToJoinCall || unableToJoinAudio)
+      "
+      :isJoiningCall="useChimeMeetings && isJoiningCall"
     />
     <PartnerInfo
       class="grow"
@@ -153,9 +181,12 @@ render the session control buttons in here-->
         :micState="micState"
         :hasSpeakingPrivileges="hasSpeakingPrivileges"
         :audioCallSupported="audioCallSupported"
-        :isJoining="isJoining"
+        :isJoiningCall="useChimeMeetings && isJoiningCall"
         :isActiveInAnotherTab="isActiveInAnotherTab"
         :isStartingAudio="isStartingAudio"
+        :unableToJoinCall="
+          useChimeMeetings && (unableToJoinCall || unableToJoinAudio)
+        "
         @toggleMuteMic="toggleMuteMic"
       />
     </div>

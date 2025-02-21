@@ -177,15 +177,49 @@ export const joinMeeting = fromCallback(
       subscribeToPartnerVolumeChanges(partnerAttendeeId)
     }
 
-    const activeSpeakerCallback = (speakerIds) => {
-      sendBackToParent({ type: 'active_speakers_changed', speakerIds })
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+    const activeSpeakerCallback = (speakerIds: string[]) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      if (speakerIds.length === 0) {
+        timeoutId = setTimeout(() => {
+          sendBackToParent({ type: 'active_speakers_changed', speakerIds })
+        }, 1000)
+      } else {
+        sendBackToParent({ type: 'active_speakers_changed', speakerIds })
+      }
     }
+
     meetingSession!.audioVideo.subscribeToActiveSpeakerDetector(
       new CustomActiveSpeakerPolicy(),
       activeSpeakerCallback
     )
 
+    const transcriptionObserver = (event) => {
+      if (!event.results) return
+      // https://docs.aws.amazon.com/chime-sdk/latest/dg/process-msgs.html
+      // eventually, we can use the `entities` value (in alternatives) to identify PII for moderation
+      for (const result of event.results) {
+        if (result.isPartial) {
+          store.dispatch(
+            'liveMedia/audio/inProgressCaptionMessageChime',
+            result
+          )
+        } else {
+          store.dispatch('liveMedia/audio/setCaptionMessageChime', result)
+        }
+      }
+    }
+
+    meetingSession!.audioVideo.transcriptionController?.subscribeToTranscriptEvent(
+      transcriptionObserver
+    )
+
     const unsubscribeAll = async () => {
+      meetingSession!.audioVideo.transcriptionController?.unsubscribeFromTranscriptEvent(
+        transcriptionObserver
+      )
       meetingSession!.audioVideo.realtimeUnsubscribeToAttendeeIdPresence(
         partnerAddedObserver
       )

@@ -14,12 +14,22 @@ const props = defineProps<{
   isSpeakerMuted: boolean
   sessionPartnerFirstName: string
   partnerIsInAudioChannel: boolean
+  unableToJoinCall: boolean
+  isJoiningCall: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'toggleMuteSpeaker'): void
 }>()
 const tooltipText = computed(() => {
+  if (props.unableToJoinCall) {
+    return 'Unable to join call'
+  }
+
+  if (props.isJoiningCall) {
+    return 'Joining audio..'
+  }
+
   return props.isSpeakerMuted
     ? `Click to unmute ${props.sessionPartnerFirstName}`
     : `Click to mute ${props.sessionPartnerFirstName}`
@@ -42,11 +52,13 @@ const onMouseEnterPartnerAvatar = () => {
 <template>
   <button
     v-if="props.partnerIsInAudioChannel"
+    :disabled="props.unableToJoinCall || props.isJoiningCall"
     class="partner-status"
     :class="{
       volunteer: props.userType === 'student',
       muted: props.isSpeakerMuted,
       speaking: props.isPartnerSpeaking,
+      'unable-to-join-call': props.unableToJoinCall || props.isJoiningCall,
     }"
     @click="onClickPartnerAvatar"
     @mouseenter="onMouseEnterPartnerAvatar"
@@ -179,5 +191,23 @@ button.partner-status:hover .speaker-icon {
 
 button.partner-status:hover .mute-line {
   transform: scale(1.25) rotate(-45deg);
+}
+
+// Disabled styles
+.partner-status.unable-to-join-call .mute-line,
+.partner-status.unable-to-join-call:hover .mute-line {
+  transform: scale(1) rotate(-45deg);
+  filter: brightness(65%);
+}
+
+.partner-status.unable-to-join-call .icon-container,
+.partner-status.unable-to-join-call .icon-container:hover {
+  filter: brightness(65%);
+}
+
+.partner-status.unable-to-join-call .speaker-icon,
+.partner-status.unable-to-join-call.muted:hover .speaker-icon {
+  transform: scale(1);
+  filter: brightness(65%);
 }
 </style>
