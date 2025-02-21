@@ -12,9 +12,10 @@ const props = defineProps<{
   micState: 'denied' | 'granted' | 'prompt'
   hasSpeakingPrivileges: boolean
   audioCallSupported: boolean
-  isJoining: boolean
+  isJoiningCall: boolean
   isActiveInAnotherTab: boolean
   isStartingAudio: boolean
+  unableToJoinCall: boolean
 }>()
 const emit = defineEmits<{
   (e: 'toggleMuteMic'): void
@@ -24,17 +25,22 @@ const isDisabled = computed(() => {
     props.micState === 'denied' ||
     !props.hasSpeakingPrivileges ||
     !props.audioCallSupported ||
-    props.isJoining ||
-    props.isActiveInAnotherTab
+    props.isJoiningCall ||
+    props.isActiveInAnotherTab ||
+    props.unableToJoinCall
   )
 })
 const tooltipText = computed(() => {
+  if (props.unableToJoinCall) {
+    return 'Unable to join call'
+  }
+
   if (props.isActiveInAnotherTab) {
     return 'Audio controls are enabled in another tab'
   }
 
   if (props.micState === 'denied') {
-    return 'Mic disabled'
+    return 'Mic permission denied'
   }
 
   if (!props.hasSpeakingPrivileges) {
@@ -68,7 +74,8 @@ const onMouseEnterMicButton = () => {
 <template>
   <div class="start-call-container" :class="{ muted: props.isMicMuted }">
     <Spinner
-      v-if="props.isJoining || props.isStartingAudio"
+      v-if="props.isJoiningCall || props.isStartingAudio"
+      class="spinner"
       :container-height="48"
       :container-width="48"
       :width="36"
@@ -131,7 +138,8 @@ const onMouseEnterMicButton = () => {
   }
 }
 
-.speak-button::before {
+.speak-button::before,
+.spinner::before {
   border-radius: 3px;
   font-size: 14px;
   font-weight: 500;

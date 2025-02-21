@@ -74,7 +74,8 @@
             isSessionInProgress &&
             isScreenshareEnabled &&
             getDisplayMediaSupported &&
-            meetingHasNotEnded
+            meetingHasNotEnded &&
+            !unableToJoinCall
           "
           @toggleScreenShareWindow="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
@@ -129,6 +130,12 @@
           :isPartnerSpeaking="isPartnerSpeaking"
           :partnerPresence="partnerPresence"
           :partnerMicStatus="partnerMicStatus"
+          :unableToJoinCall="unableToJoinCall"
+          :isBanned="isLiveMediaBanned"
+          :isJoiningCall="isJoiningCall"
+          :unableToJoinAudio="unableToJoinAudio"
+          :isSpeaking="isSpeaking"
+          :micState="micState"
           @toggleMuteSelf="toggleMuteSelf"
           @toggleMutePartner="toggleMutePartner"
           @audioUiLoaded="onAudioUiLoaded"
@@ -308,7 +315,6 @@ import Spinner from '@/components/Spinner.vue'
 import { SessionAudioState } from '@/services/LiveShareService/SessionAudioService'
 import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
 import { useActor } from '@xstate/vue'
-import { createBrowserInspector } from '@statelyai/inspect'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
 import { ref } from 'vue'
 
@@ -339,12 +345,17 @@ export default {
     ZoomSessionChatHeader,
   },
   setup() {
-    const options =
-      import.meta.env.NODE_ENV === 'development'
-        ? { inspect: createBrowserInspector().inspect }
-        : {}
+    /*
+      NOTE: to use xstate live machine inspector:
 
-    meetingActor.value = useActor(MeetingMachine.create(), options)
+      // import the inspector
+      import { createBrowserInspector } from '@statelyai/inspect'
+
+      // pass the inspector to the actor
+      const options = { inspect: createBrowserInspector().inspect }
+      meetingActor.value = useActor(MeetingMachine.create(), options)
+    */
+    meetingActor.value = useActor(MeetingMachine.create())
   },
   created() {
     if (this.mobileMode) {
@@ -432,6 +443,8 @@ export default {
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
       isPartnerOnline: (state) => state.session.isPartnerOnline,
+      everShownDisplayCallStatus: (state) =>
+        state.liveMedia.audio.everShownDisplayCallStatus,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -449,23 +462,47 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       sessionPartner: 'user/sessionPartner',
       isScreenshareEnabledFeatureFlag: 'featureFlags/isScreenshareEnabled',
+      useChimeMeetings: ['featureFlags/isChimeMeetingEnabled'],
     }),
+    micState() {
+      if (
+        this.meetingActor.snapshot.matches(
+          'JoinedMeeting.MicControl.MicPermissionsDenied'
+        )
+      ) {
+        return 'denied'
+      }
+      if (
+        this.meetingActor.snapshot.matches(
+          'JoinedMeeting.MicControl.MicUnmuted'
+        ) ||
+        this.meetingActor.snapshot.matches('JoinedMeeting.MicControl.MicMuted')
+      ) {
+        return 'granted'
+      }
+
+      return 'prompt'
+    },
+
     isScreenSharing() {
       return this.meetingActor.snapshot.matches(
         'JoinMeeting.SharingVideoControl.SharingMyScreen'
       )
     },
     isJoiningCall() {
-      return this.meetingActor?.snapshot?.hasTag('loadingScreenShare') ?? true
+      return (
+        this.meetingActor?.snapshot?.hasTag('loadingScreenShare') ||
+        this.meetingActor?.snapshot?.hasTag('loadingAudioCall')
+      )
     },
     meetingHasNotEnded() {
       return !this.meetingActor?.snapshot?.matches('Ended')
     },
     unableToJoinCall() {
-      return (
-        this.meetingActor.snapshot.matches('JoinMeetingFailure') ||
-        this.meetingActor.snapshot.matches('FetchingMeetingFailure')
-      )
+      return this.meetingActor?.snapshot?.hasTag('unableToJoinCall')
+    },
+    unableToJoinAudio() {
+      return this.meetingActor?.snapshot?.hasTag('unableToJoinAudio')
     },
     screenShareActive() {
       return (
@@ -482,10 +519,7 @@ export default {
       return meetingActor?.value.snapshot
     },
     isMyMicMuted() {
-      return (
-        this.snapshot.matches('JoinedMeeting.MicControl') &&
-        !this.snapshot.matches('JoinedMeeting.MicControl.MicUnmuted')
-      )
+      return !this.snapshot.matches('JoinedMeeting.MicControl.MicUnmuted')
     },
     isSpeakerMuted() {
       return !this.snapshot.matches(
@@ -494,8 +528,13 @@ export default {
     },
     isPartnerSpeaking() {
       const activeSpeakerIds = this.snapshot.context.activeSpeakerIds
-      const partnerId = this.snapshot.context.partnerAttendeeId
+      const partnerId = this.snapshot.context.partnerAttendeeId ?? ''
       return activeSpeakerIds.includes(partnerId)
+    },
+    isSpeaking() {
+      const activeSpeakerIds = this.snapshot.context.activeSpeakerIds
+      const myId = this.snapshot.context.attendee?.AttendeeId ?? ''
+      return activeSpeakerIds.includes(myId)
     },
     partnerPresence() {
       const name = this.sessionPartner.firstname
@@ -504,6 +543,11 @@ export default {
         : this.isPartnerOnline
           ? 'In session'
           : 'Away'
+    },
+    isLiveMediaBanned() {
+      const currentSession = this.session
+      if (this.isStudent) return currentSession?.studentBannedFromLiveMedia
+      else return currentSession?.volunteerBannedFromLiveMedia
     },
     isPartnerLiveMediaBanned() {
       const currentSession = this.session
@@ -712,6 +756,21 @@ export default {
       })
   },
   watch: {
+    isPartnerSpeaking(newVal) {
+      if (newVal && !this.everShownDisplayCallStatus && this.isSpeakerMuted) {
+        this.$store.commit('liveMedia/audio/setDisplayCallStatus', {
+          type: 'partner-speaking',
+          icon: 'speaker',
+          main: `${this.sessionPartner.firstName} is speaking`,
+          secondary: `Click ${this.sessionPartner.firstName}'s icon to listen`,
+          fadeOutAfterMs: 3000,
+        })
+        this.$store.commit(
+          'liveMedia/audio/setEverShownDisplayCallStatus',
+          true
+        )
+      }
+    },
     async session(session) {
       /*
        * Since this is only rolled out to students,

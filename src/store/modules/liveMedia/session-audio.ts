@@ -284,6 +284,47 @@ export default {
     },
     resetState: ({ commit }) => commit('resetState'),
 
+    inProgressCaptionMessageChime: (
+      { commit, rootState, rootGetters },
+      payload: {
+        resultId: string
+        alternatives: {
+          transcript: string
+          items: {
+            attendee: { externalUserId: string }
+            type: 'pronunciation' | 'punctuation'
+          }[]
+        }[]
+      }
+    ) => {
+      const mostConfident = payload.alternatives[0]
+      const { transcript, items } = mostConfident
+      const userId = items[0].attendee.externalUserId
+      const isPartnerMessage = userId !== rootState.user.user.id
+      if (isPartnerMessage) {
+        commit('setPartnerInProgressCaptionMessage', {
+          text: transcript,
+          zoomMessageId: payload.resultId, // can we get rid of zoomMessageId and just use msgId?
+          msgId: payload.resultId,
+          userType:
+            rootGetters['user/userType'] === 'student'
+              ? 'volunteer'
+              : 'student',
+          user: userId,
+        })
+        commit('setPartnerCaptionsCurrentMessageId', payload.resultId)
+      } else {
+        commit('setMyInProgressCaptionMessage', {
+          text: transcript,
+          zoomMessageId: payload.resultId, // can we get rid of zoomMessageId and just use msgId?
+          msgId: payload.resultId,
+          userType: rootGetters['user/userType'],
+          user: userId,
+        })
+        commit('setCaptionsCurrentMessageId', payload.resultId)
+      }
+    },
+
     inProgressCaptionMessage: (
       { commit, rootState, state, rootGetters },
       payload
@@ -313,6 +354,67 @@ export default {
         commit('setPartnerCaptionsCurrentMessageId', payload.msgId)
       }
     },
+    setCaptionMessageChime: async (
+      { commit, dispatch, rootState },
+      payload: {
+        resultId: string
+        endTimeMs: number
+        alternatives: {
+          transcript: string
+          items: {
+            attendee: { externalUserId: string }
+            type: 'pronunciation' | 'punctuation'
+          }[]
+        }[]
+      }
+    ) => {
+      const mostConfident = payload.alternatives[0]
+      const { transcript, items } = mostConfident
+      const userId = items[0].attendee.externalUserId
+      const isPartnerMessage = userId !== rootState.user.user.id
+      if (isPartnerMessage) {
+        commit('setPartnerCaptionsCurrentMessageId', payload.resultId)
+        await dispatch(
+          'user/addPendingMessage',
+          {
+            contents: transcript,
+            type: 'audio-transcription',
+            user: userId,
+            userType:
+              rootState.user.user.type === 'student' ? 'volunteer' : 'student',
+            zoomMessageId: payload.resultId,
+          },
+          { root: true }
+        )
+        commit('setPartnerInProgressCaptionMessage', null)
+      } else {
+        commit('setCaptionsCurrentMessageId', payload.resultId)
+        await dispatch(
+          'user/addPendingMessage',
+          {
+            contents: transcript,
+            type: 'audio-transcription',
+            user: userId,
+            userType: rootState.user.user.userType,
+            zoomMessageId: payload.resultId,
+          },
+          { root: true }
+        )
+        socket.emit('message', {
+          sessionId: rootState.user.session.id,
+          // `userIdentity` doesn't come back in this payload :/
+          // co-op displayName as our userId
+          user: { id: userId, _id: userId },
+          message: transcript,
+          source: '',
+          type: 'audio-transcription',
+          saidAt: new Date(payload.endTimeMs).toISOString(),
+          zoomMessageId: payload.resultId,
+        })
+        commit('setMyInProgressCaptionMessage', null)
+      }
+    },
+
     setCaptionMessage: async (
       { state, commit, dispatch, rootState, rootGetters },
       payload

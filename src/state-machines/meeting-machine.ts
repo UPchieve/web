@@ -1,5 +1,5 @@
 import { DefaultMeetingSession } from 'amazon-chime-sdk-js'
-import { assign, setup } from 'xstate'
+import { assign, fromCallback, setup } from 'xstate'
 import {
   fetchChimeMeeting,
   createMeetingSession,
@@ -47,6 +47,7 @@ export type Context = {
   isPartnerMicMuted: boolean
   activeSpeakerIds: string[]
   hasReceivedPartnerAudio: boolean // We use this to determine if we know the partner's mic status or not.
+  transcriptionStarted: boolean
 }
 
 export type Events =
@@ -61,7 +62,6 @@ export type Events =
   | { type: 'meeting_ended' }
   | { type: 'share_screen' }
   | { type: 'stop_share_screen' }
-  | { type: 'session_started' }
   | { type: 'toggle_mute_self' }
   | { type: 'toggle_mute_partner' }
   | { type: 'active_speakers_changed'; speakerIds: string[] }
@@ -73,11 +73,18 @@ export type Events =
       isScreenshareEligible: boolean
     }
   | { type: 'ban_user_from_live_media' }
+  | { type: 'transcription_not_started' }
+  | { type: 'transcription_started' }
 
 export function create() {
   return setup({
     types: {
-      tags: {} as 'loadingScreenShare' | 'error',
+      tags: {} as
+        | 'loadingScreenShare'
+        | 'error'
+        | 'loadingAudioCall'
+        | 'unableToJoinCall'
+        | 'unableToJoinAudioCall',
       context: {} as Context,
       events: {} as Events,
       input: {} as { sessionId: string },
@@ -103,7 +110,10 @@ export function create() {
       incrementRetryCount: assign({
         retryCount: ({ context }) => context.retryCount + 1,
       }),
-      setupOnStop: ({ self }, params: { unsubscribeAll: () => void }) => {
+      setupOnStop: (
+        { self },
+        params: { unsubscribeAll: () => Promise<void> }
+      ) => {
         // this is the only way to clean up when a machine is stopped
         const sub = self.subscribe({
           complete: async () => {
@@ -139,6 +149,7 @@ export function create() {
       isPartnerMicMuted: true,
       activeSpeakerIds: [],
       hasReceivedPartnerAudio: false,
+      transcriptionStarted: false,
     }),
     initial: 'FetchingState',
     entry: { type: 'entry' },
@@ -169,7 +180,7 @@ export function create() {
     states: {
       // Parallel machine that exits when all the UI and data we need are loaded
       FetchingState: {
-        tags: ['loadingScreenShare'],
+        tags: ['loadingScreenShare', 'loadingAudioCall'],
         type: 'parallel',
         onDone: {
           target: 'CheckingLiveMediaEligibility',
@@ -262,12 +273,25 @@ export function create() {
           },
         ],
       },
+
       IneligibleForLiveMedia: {
-        type: 'final',
+        tags: ['unableToJoinCall'],
+        description: `This state is reached when the user is not eligible for either audio
+        or screenshare (posthog flags). Since that can change, we need to handle transitioning
+        out of this state when the user becomes eligible.`,
+        on: {
+          session_started: {
+            target: 'CheckingLiveMediaEligibility',
+            actions: assign({
+              isAudioEligible: ({ event }) => event.isAudioEligible,
+              isScreenshareEligible: ({ event }) => event.isScreenshareEligible,
+            }),
+          },
+        },
       },
       FetchingChimeMeeting: {
         initial: 'Loading',
-        tags: ['loadingScreenShare'],
+        tags: ['loadingScreenShare', 'loadingAudioCall'],
         states: {
           Loading: {
             invoke: {
@@ -282,6 +306,8 @@ export function create() {
                   partnerAttendeeId: ({ event }) =>
                     event.output.partnerAttendee?.AttendeeId ?? null,
                   retryCount: 0,
+                  transcriptionStarted: ({ event }) =>
+                    event.output.transcriptionStarted,
                 }),
               },
               onError: {
@@ -296,6 +322,7 @@ export function create() {
             },
           },
           RetryFetchingChimeMeeting: {
+            tags: ['loadingScreenShare', 'loadingAudioCall'],
             after: {
               timeout: [
                 {
@@ -316,7 +343,7 @@ export function create() {
         },
       },
       CreatingMeetingSession: {
-        tags: ['loadingScreenShare'],
+        tags: ['loadingScreenShare', 'loadingAudioCall'],
         invoke: {
           id: 'CreatingMeetingSession:createMeetingSession',
           src: 'createMeetingSession',
@@ -339,7 +366,7 @@ export function create() {
         },
       },
       JoiningMeeting: {
-        tags: ['loadingScreenShare'],
+        tags: ['loadingScreenShare', 'loadingAudioCall'],
         invoke: {
           id: 'JoiningMeeting:joinMeeting',
           src: 'joinMeeting',
@@ -467,21 +494,50 @@ export function create() {
           },
           MicControl: {
             description: `State machine that manages the user's microphone`,
-            initial: 'Waiting',
+            initial: 'CheckingEligibility',
             states: {
+              AudioCallUnavailable: {
+                type: 'final',
+                tags: ['unableToJoinAudioCall'],
+              },
+
+              CheckingEligibility: {
+                on: {
+                  transcription_not_started: {
+                    target: 'AudioCallUnavailable',
+                  },
+                  transcription_started: {
+                    target: 'Waiting',
+                  },
+                },
+                invoke: {
+                  src: fromCallback(({ input, sendBack }) => {
+                    if (input.transcriptionStarted) {
+                      sendBack({ type: 'transcription_started' })
+                    } else {
+                      sendBack({ type: 'transcription_not_started' })
+                    }
+                  }),
+                  input: ({ context }) => ({
+                    transcriptionStarted: context.transcriptionStarted,
+                  }),
+                },
+              },
+
               Waiting: {
                 description: 'Waiting for the user to request to use their mic',
                 on: {
                   toggle_mute_self: {
-                    target: 'CheckingEligibility',
+                    target: 'RequestingMicAccess',
                   },
                 },
               },
-              CheckingEligibility: {
+              RequestingMicAccess: {
+                tags: ['loadingAudioCall'],
                 description: `Request mic permissions and start the user's audio input, or move them to an ineligible
                 state if no audio input device is available or they deny permissions.`,
                 invoke: {
-                  id: 'MicControl.CheckingEligibility:checkMicEligibility',
+                  id: 'MicControl.RequestingMicAccess:requestMicAccess',
                   src: 'requestMicAccess',
                   input: ({ context }) => ({
                     meetingSession: context.meetingSession!,
@@ -522,7 +578,7 @@ export function create() {
                 description: 'Failed to get mic permissions',
                 on: {
                   toggle_mute_self: {
-                    target: 'CheckingEligibility',
+                    target: 'RequestingMicAccess',
                   },
                 },
               },
@@ -541,6 +597,7 @@ export function create() {
                 },
               },
               RequestSpeakerAccess: {
+                tags: ['loadingAudioCall'],
                 invoke: {
                   id: 'SpeakerControl.RequestSpeakerAccess#requestSpeakerAccess',
                   src: 'requestSpeakerAccess',
@@ -588,6 +645,7 @@ export function create() {
                 activeSpeakerIds: (input) => input.event.speakerIds,
                 isPartnerMicMuted: (input) =>
                   // If the partner is speaking, they can't be muted.
+                  input.context.partnerAttendeeId &&
                   input.event.speakerIds.includes(
                     input.context.partnerAttendeeId
                   )
@@ -622,7 +680,7 @@ export function create() {
           },
         },
       },
-      UnableToJoinMeeting: { type: 'final' },
+      UnableToJoinMeeting: { type: 'final', tags: ['unableToJoinCall'] },
       Ended: { type: 'final' },
     },
   })
