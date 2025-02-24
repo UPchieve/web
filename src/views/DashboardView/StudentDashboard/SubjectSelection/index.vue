@@ -1,8 +1,5 @@
 <template>
   <div class="SubjectSelection">
-    <p v-if="hasWaitingPeriod" class="waiting-period">
-      {{ waitingPeriodMessage }}
-    </p>
     <h2 v-if="showDashboardRedesign">
       Choose from all of our available subjects!
     </h2>
@@ -43,10 +40,6 @@ import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
 import Loader from '@/components/Loader.vue'
 import RecentSubjects from './RecentSubjects.vue'
 
-const defaultHeaderData = {
-  component: 'DefaultHeader',
-}
-
 export default {
   name: 'subject-selection',
   components: { SubjectCard, Loader, RecentSubjects },
@@ -56,9 +49,6 @@ export default {
   data() {
     return {
       disableSubjectCard: false,
-      waitingPeriodTimeoutId: null,
-      hasWaitingPeriod: false,
-      waitingPeriodTimeLeft: 0,
     }
   },
   computed: {
@@ -75,14 +65,8 @@ export default {
       topicCards: 'subjects/sessionRequestTopicCards',
       showDashboardRedesign: 'user/showDashboardRedesign',
       isMostRecentSubjectsActive: 'featureFlags/isMostRecentSubjectsActive',
-      sessionRequestCooldownMinutes: 'session/sessionRequestCooldownMinutes',
+      hasCooldown: 'session/hasCooldown',
     }),
-    waitingPeriodMessage() {
-      const countdown = this.sessionRequestCooldownMinutes
-      const minuteTextFormat = countdown === 1 ? 'minute' : 'minutes'
-
-      return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
-    },
     cards() {
       const cards = [...this.topicCards]
       if (!this.showDashboardRedesign) {
@@ -106,51 +90,10 @@ export default {
     },
     isCardDisabled() {
       return (
-        this.disableSubjectCard ||
+        this.hasCooldown ||
         this.isSessionAlive ||
         this.user.banType === 'complete'
       )
-    },
-  },
-  watch: {
-    // This component mounts before the lastestSession and isSessionAlive
-    // have a value in the store - watch for updates
-    latestSession() {
-      this.checkOrEnforceWaitingPeriod()
-    },
-  },
-  methods: {
-    checkOrEnforceWaitingPeriod() {
-      const cooldownMinutes = this.sessionRequestCooldownMinutes
-      if (cooldownMinutes) {
-        const cooldownMs = cooldownMinutes * 1000 * 60
-        if (!this.mobileMode) {
-          this.disableSubjectCard = true
-          const waitingHeaderData = {
-            component: 'WaitingPeriodHeader',
-            data: {
-              timeLeft: cooldownMinutes,
-            },
-          }
-          this.$store.dispatch('app/header/show', waitingHeaderData)
-          this.waitingPeriodTimeoutId = setTimeout(() => {
-            this.disableSubjectCard = false
-            this.$store.dispatch('app/header/show', defaultHeaderData)
-          }, cooldownMs)
-        } else {
-          // Show the waiting period message above the subject cards for mobile users
-          this.hasWaitingPeriod = true
-          this.disableSubjectCard = true
-          this.waitingPeriodTimeLeft = cooldownMinutes
-
-          this.waitingPeriodTimeoutId = setTimeout(() => {
-            this.hasWaitingPeriod = false
-            this.disableSubjectCard = false
-          }, cooldownMs)
-        }
-      } else {
-        this.hasWaitingPeriod = false
-      }
     },
   },
 }

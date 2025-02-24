@@ -31,18 +31,18 @@ describe('Session store', () => {
     })
   }
 
-  describe('sessionRequestCooldownMinutes', () => {
-    it('Returns undefined when there is no prior session', () => {
+  describe('calculateCooldown', () => {
+    it('Returns undefined when there is no prior session', async () => {
       const store = getStore({
         state: {
           latestSession: {},
         },
       })
-      const cooldown = store.getters['session/sessionRequestCooldownMinutes']
-      expect(cooldown).toBeUndefined()
+      const cooldown = await store.dispatch('session/calculateCooldown')
+      expect(cooldown).toBe(0)
     })
 
-    it('Returns undefined when there is an ongoing session', () => {
+    it('Returns undefined when there is an ongoing session', async () => {
       const store = getStore({
         state: {
           latestSession: {
@@ -50,11 +50,11 @@ describe('Session store', () => {
           },
         },
       })
-      const cooldown = store.getters['session/sessionRequestCooldownMinutes']
-      expect(cooldown).toBeUndefined()
+      const cooldown = await store.dispatch('session/calculateCooldown')
+      expect(cooldown).toBe(0)
     })
 
-    it('Returns 0 when the session was ended by the volunteer', () => {
+    it('Returns 0 when the session was ended by the volunteer', async () => {
       const store = getStore({
         state: {
           latestSession: {
@@ -63,11 +63,11 @@ describe('Session store', () => {
           },
         },
       })
-      const cooldown = store.getters['session/sessionRequestCooldownMinutes']
-      expect(cooldown).toEqual(0)
+      const cooldown = await store.dispatch('session/calculateCooldown')
+      expect(cooldown).toBe(0)
     })
 
-    it('Returns 0 when session was ended by student 6 minutes ago', () => {
+    it('Returns 0 when session was ended by student 6 minutes ago', async () => {
       const createdAt = new Date(currentTime)
       createdAt.setMinutes(createdAt.getMinutes() - 6)
       const store = getStore({
@@ -79,11 +79,11 @@ describe('Session store', () => {
           },
         },
       })
-      const cooldown = store.getters['session/sessionRequestCooldownMinutes']
-      expect(cooldown).toEqual(0)
+      const cooldown = await store.dispatch('session/calculateCooldown')
+      expect(cooldown).toBe(0)
     })
 
-    it('Returns 0 when session was ended by student exactly 5 minutes ago', () => {
+    it('Returns 0 when session was ended by student exactly 5 minutes ago', async () => {
       const createdAt = new Date(currentTime)
       createdAt.setMinutes(createdAt.getMinutes() - 5)
       const store = getStore({
@@ -95,11 +95,11 @@ describe('Session store', () => {
           },
         },
       })
-      const cooldown = store.getters['session/sessionRequestCooldownMinutes']
-      expect(cooldown).toEqual(0)
+      const cooldown = await store.dispatch('session/calculateCooldown')
+      expect(cooldown).toBe(0)
     })
 
-    it('Returns 1 when session was ended by student 4 minutes ago', () => {
+    it('Returns 1 when session was ended by student 4 minutes ago', async () => {
       const createdAt = new Date(currentTime)
       createdAt.setMinutes(createdAt.getMinutes() - 4)
       const store = getStore({
@@ -111,11 +111,11 @@ describe('Session store', () => {
           },
         },
       })
-      const cooldown = store.getters['session/sessionRequestCooldownMinutes']
-      expect(cooldown).toEqual(1)
+      const cooldown = await store.dispatch('session/calculateCooldown')
+      expect(cooldown).toBe(1)
     })
 
-    it('Returns 2 when session was ended by student 3.5 minutes ago', () => {
+    it('Returns 2 when session was ended by student 3.5 minutes ago', async () => {
       const createdAt = new Date(currentTime)
       createdAt.setMinutes(
         createdAt.getMinutes() - 3,
@@ -130,8 +130,8 @@ describe('Session store', () => {
           },
         },
       })
-      const cooldown = store.getters['session/sessionRequestCooldownMinutes']
-      expect(cooldown).toEqual(2)
+      const cooldown = await store.dispatch('session/calculateCooldown')
+      expect(cooldown).toBe(2)
     })
   })
 })

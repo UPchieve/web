@@ -28,9 +28,13 @@ export const rejoinSession = (router, sessionPath) => {
  * Ends the current session.
  * @param {object} context
  */
+// TODO: Cleanup - not clear that this method is
+// meant for the "RejoinSession" header/modal only.
+// Also cleanup all the state.
 export const endSession = (context) => {
-  const sessionId = context.$store.state.user.session._id
-  SessionService.endSession(sessionId)
+  const sessionId = context.$store.state.user.session.id
+  const subTopic = context.$store.state.user.session.subTopic
+  SessionService.endSession(sessionId, subTopic, context.$store)
     .then(() => {
       context.$router.replace('/')
       context.$store.dispatch('user/fetch', context)

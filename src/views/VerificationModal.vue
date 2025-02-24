@@ -117,10 +117,6 @@ export default {
       type: Function,
       required: true,
     },
-    onCloseSuccess: {
-      type: Function,
-      required: false,
-    },
   },
   data() {
     return {
@@ -250,7 +246,6 @@ export default {
     },
     async completeModal() {
       this.closeModal()
-      this.onCloseSuccess()
       const updates = {}
       if (this.verificationMethod === VERIFICATION_METHOD.EMAIL) {
         updates.emailVerified = true

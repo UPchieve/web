@@ -163,15 +163,6 @@ import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
 import Loader from '@/components/Loader.vue'
-import { VERIFICATION_METHOD } from '@/consts'
-
-const defaultHeaderData = {
-  component: 'DefaultHeader',
-}
-
-const rejoinHeaderData = {
-  component: 'RejoinSessionHeader',
-}
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -192,13 +183,6 @@ export default {
   },
 
   watch: {
-    isSessionAlive(isAlive) {
-      if (!isAlive) {
-        this.$store.dispatch('app/header/show', defaultHeaderData)
-      } else {
-        this.$store.dispatch('app/header/show', rejoinHeaderData)
-      }
-    },
     allSubjectNames: {
       handler(currValue, prevValue) {
         const isNowLoaded = currValue.length && !prevValue?.length
@@ -211,25 +195,6 @@ export default {
   async created() {
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal()
-    }
-
-    if (this.isSessionAlive) {
-      this.$store.dispatch('app/header/show', rejoinHeaderData)
-    } else if (!this.user.emailVerified) {
-      this.$store.dispatch('app/header/show', {
-        component: 'VerificationHeader',
-        data: {
-          verificationMethod: VERIFICATION_METHOD.EMAIL,
-          phoneOrEmailToVerify: this.user.email,
-        },
-      })
-    }
-
-    // TODO: move globally to show banner in all pages
-    if (this.user && this.user.banType === 'complete') {
-      this.$store.dispatch('app/header/show', {
-        component: 'BannedHeader',
-      })
     }
   },
   data() {

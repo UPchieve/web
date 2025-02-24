@@ -27,9 +27,11 @@ function getMessagesAfterVolunteerJoined(session) {
 }
 
 export default {
-  async endSession(sessionId: string, subTopic: string) {
+  async endSession(sessionId: string, subTopic: string, store) {
     try {
       await NetworkService.endSession({ sessionId })
+      // TODO: Just return the mutated session in `NetworkService.endSession`.
+      store?.dispatch('session/fetchLatestSession')
     } catch (err) {
       if (err?.response?.data?.err !== 'Session has already ended') {
         throw err
@@ -55,7 +57,8 @@ export default {
     const isStudent = store.getters['user/isStudent']
     await this.endSession(
       store.state.user.session.id,
-      store.state.user.session.subTopic
+      store.state.user.session.subTopic,
+      store
     )
     store.dispatch('user/sessionDisconnected')
     // Do not send the user directly to the feedback page if they can leave DMs

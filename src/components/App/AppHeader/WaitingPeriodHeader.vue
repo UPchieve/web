@@ -7,25 +7,20 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'waiting-period-header',
-  props: {
-    headerData: Object,
-  },
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      sessionRequestCooldownMinutes: 'session/sessionRequestCooldownMinutes',
+    }),
+    ...mapState({
+      cooldownMinutes: (state) => state.session.cooldownMinutes,
     }),
     message() {
-      // TODO: implement a better timer and transition to the default header from this timer
-      // instead of from within the dashboard
-      const countdown = this.sessionRequestCooldownMinutes
-      const minuteTextFormat = countdown === 1 ? 'minute' : 'minutes'
-
-      return `You must wait at least ${countdown} ${minuteTextFormat} before requesting a new session.`
+      const minuteTextFormat = this.cooldownMinutes === 1 ? 'minute' : 'minutes'
+      return `You must wait at least ${this.cooldownMinutes} ${minuteTextFormat} before requesting a new session.`
     },
   },
 }

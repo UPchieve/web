@@ -11,11 +11,11 @@
         class="menu-notification"
       />
       <hamburger-button
-        :class="{ white: headerComponent !== 'DefaultHeader' }"
+        :class="{ white: headerComponent !== 'default-header' }"
         data-testid="mobile-header-hamburger"
       />
     </div>
-    <component v-bind:is="headerComponent" :header-data="headerData" />
+    <component :is="headerComponent" />
   </div>
 </template>
 
@@ -46,12 +46,81 @@ export default {
   },
   computed: {
     ...mapState({
-      headerComponent: (state) => state.app.header.component || 'DefaultHeader',
-      headerData: (state) => state.app.header.data,
+      user: (state) => state.user.user,
+      showHeader: (state) => state.app.header.isShown,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      isSessionAlive: 'user/isSessionAlive',
+      isStudent: 'user/isStudent',
+      hasCooldown: 'session/hasCooldown',
+      isFallIncentiveProgramEnabled:
+        'featureFlags/isFallIncentiveProgramEnabled',
     }),
+
+    headerComponent() {
+      if (this.showBannedHeader) {
+        return 'banned-header'
+      }
+
+      if (this.showInSessionHeader) {
+        this.$store.commit(
+          'app/header/setIsShown',
+          this.isSessionView ? !this.mobileMode : true
+        )
+        return 'session-header'
+      }
+
+      if (this.showRejoinSessionHeader) {
+        return 'rejoin-session-header'
+      }
+
+      if (this.showWaitingPeriodHeader) {
+        return 'waiting-period-header'
+      }
+
+      if (this.showFallIncentiveHeader) {
+        return 'fall-incentive-header'
+      }
+
+      if (this.showVerificationHeader) {
+        return 'verification-header'
+      }
+
+      return 'default-header'
+    },
+
+    showBannedHeader() {
+      return this.user && this.user.banType === 'complete'
+    },
+
+    showInSessionHeader() {
+      return this.isSessionView || this.isFeedbackView
+    },
+
+    isSessionView() {
+      return this.$route.name === 'SessionView'
+    },
+
+    isFeedbackView() {
+      return this.$route.name === 'FeedbackView'
+    },
+
+    showRejoinSessionHeader() {
+      return this.isSessionAlive
+    },
+
+    showWaitingPeriodHeader() {
+      return this.hasCooldown
+    },
+
+    showFallIncentiveHeader() {
+      return this.isStudent && this.isFallIncentiveProgramEnabled
+    },
+
+    showVerificationHeader() {
+      return !this.user.emailVerified
+    },
   },
 }
 </script>
