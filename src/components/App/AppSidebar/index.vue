@@ -6,14 +6,9 @@
       'AppSidebar--collapsed': mobileMode && isSidebarCollapsed,
     }"
   >
-    <div class="AppSidebar-content">
-      <div class="uc-column">
-        <sidebar-info
-          v-if="!mobileMode"
-          style="margin-bottom: 64px"
-          :authenticated="isAuthenticated"
-          :name="user.firstname"
-        />
+    <div class="AppSidebar-content" :class="{ mobile: mobileMode }">
+      <div>
+        <sidebar-info class="sidebar-info" />
 
         <sidebar-links
           :authenticated="isAuthenticated"
@@ -25,9 +20,10 @@
 
       <div
         v-if="isAuthenticated"
-        :class="finalLinkClass"
-        v-on:click="logout"
-        v-on:keydown.enter="logout"
+        class="logout-link"
+        type="button"
+        @click="logout"
+        @keydown.enter="logout"
         :tabindex="isSidebarCollapsed && mobileMode ? -1 : 0"
       >
         Log out
@@ -55,12 +51,6 @@ export default {
       isAuthenticated: 'user/isAuthenticated',
       mobileMode: 'app/mobileMode',
     }),
-    finalLinkClass() {
-      return {
-        'AppSidebar-final-link': true,
-        'AppSidebar-final-link--desktop': !this.mobileMode,
-      }
-    },
   },
   methods: {
     logout() {
@@ -102,20 +92,34 @@ $transition: transform 700ms;
 }
 
 .AppSidebar-content {
+  @include flex-container(column);
   height: 100%;
   padding: 40px 20px 40px 30px;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
 
-.AppSidebar-final-link {
-  @include font-category('display-small');
-  cursor: pointer;
+  .sidebar-info {
+    margin-bottom: 64px;
+  }
 
-  &--desktop {
+  .logout-link {
     @include font-category('button');
+    padding-top: 20px;
+    padding-bottom: 5px;
+  }
+
+  &.mobile {
+    padding-top: 20px;
+
+    .sidebar-info {
+      margin-bottom: 24px;
+    }
+
+    .logout-link {
+      @include font-category('display-small');
+    }
   }
 }
 </style>

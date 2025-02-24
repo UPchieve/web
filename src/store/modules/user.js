@@ -1,7 +1,5 @@
 import Case from 'case'
 import { some } from 'lodash-es'
-import StudentAvatarUrl from '@/assets/defaultavatar3.png'
-import VolunteerAvatarUrl from '@/assets/defaultavatar4.png'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import TeacherIcon from '@/assets/user_avatars/teacher-icon.svg'
 import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
@@ -320,16 +318,6 @@ export default {
     },
   },
   getters: {
-    // TODO(alex.lindsay): Remove in banners clean-up.
-    avatarUrl: (_state, getters) => {
-      if (getters.isVolunteer) {
-        return VolunteerAvatarUrl
-      } else if (getters.isStudent) {
-        return StudentAvatarUrl
-      } else if (getters.isTeacher) {
-        return VolunteerAvatarUrl
-      }
-    },
     avatar(_state, getters) {
       if (getters.isVolunteer) {
         return VolunteerIcon

@@ -75,16 +75,12 @@ describe('AppSidebar', () => {
       expect(content.exists()).toBe(true)
 
       const info = content.findComponent(SidebarInfo)
-      expect(info.exists()).toBe(false)
+      expect(info.exists()).toBe(true)
 
       const links = content.findComponent(SidebarLinks)
       expect(links.exists()).toBe(true)
 
-      // Final link
-      expect(content.find('.AppSidebar-final-link').exists()).toBe(true)
-      expect(content.find('.AppSidebar-final-link--desktop').exists()).toBe(
-        false
-      )
+      expect(content.find('.logout-link').exists()).toBe(true)
     })
 
     it('desktop', () => {
@@ -100,11 +96,7 @@ describe('AppSidebar', () => {
       const links = content.findComponent(SidebarLinks)
       expect(links.exists()).toBe(true)
 
-      // Final link
-      expect(content.find('.AppSidebar-final-link').exists()).toBe(true)
-      expect(content.find('.AppSidebar-final-link--desktop').exists()).toBe(
-        true
-      )
+      expect(content.find('.logout-link').exists()).toBe(true)
     })
   })
 })
