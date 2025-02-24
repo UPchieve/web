@@ -1,7 +1,6 @@
 <template>
   <div :class="isNewHeader.class">
     <template v-if="mobileMode">
-      <hamburger-button class="left white" :tabindex="0" />
       <hyperlink-button primary reverse @click="showModal">{{
         message
       }}</hyperlink-button>
@@ -27,13 +26,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import * as sessionUtils from '@/utils/session'
-import HamburgerButton from './HamburgerButton.vue'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'rejoin-session-header',
-  components: { HamburgerButton, HyperlinkButton, LargeButton },
+  components: { HyperlinkButton, LargeButton },
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -119,15 +117,5 @@ export default {
   &--redesign {
     color: $c-soft-black;
   }
-}
-
-.left {
-  left: 15px;
-  position: absolute;
-  top: 15px;
-}
-
-.white {
-  fill: white;
 }
 </style>

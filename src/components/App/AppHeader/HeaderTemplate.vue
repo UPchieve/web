@@ -24,18 +24,11 @@ export default {
   left: 0;
   z-index: get-z('header');
 
+  overflow: hidden;
+
   @include breakpoint-above('medium') {
     border-radius: 0;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-  }
-
-  &--activeSession {
-    background-color: $c-warning-orange;
-  }
-
-  &--banned {
-    justify-content: center;
-    background-color: $c-banned-grey;
   }
 }
 </style>

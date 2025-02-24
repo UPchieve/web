@@ -3,7 +3,6 @@ import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
-import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 
 const getWrapper = (mobileMode = false) => {
   const store = createStore(
@@ -43,9 +42,6 @@ describe('DefaultHeader', () => {
     expect(name.exists()).toBe(true)
     expect(name.element.tagName).toBe('SPAN')
     expect(name.text()).toBe('Tester')
-
-    // Hamburger
-    expect(wrapper.findComponent(HamburgerButton).exists()).toBe(true)
   })
 
   it('renders expected elements when not in mobile mode', () => {

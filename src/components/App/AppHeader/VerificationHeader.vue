@@ -1,11 +1,5 @@
 <template>
   <div id="verification-header">
-    <hamburger-button
-      v-if="mobileMode"
-      class="left white"
-      :tabindex="0"
-      data-testid="mobile-header-hamburger"
-    />
     <span id="header-message"
       >Your account {{ verificationMethodText }} is unverified.
     </span>
@@ -26,9 +20,8 @@
 import LargeButton from '@/components/LargeButton.vue'
 import VerificationModal from '@/views/VerificationModal.vue'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
-import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 
 export default {
   name: 'VerificationHeader',
@@ -45,16 +38,13 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
     }),
-    ...mapGetters({
-      mobileMode: 'app/mobileMode',
-    }),
     verificationMethodText() {
       return this.headerData.verificationMethod === VERIFICATION_METHOD.SMS
         ? 'phone number'
         : 'email address'
     },
   },
-  components: { VerificationModal, LargeButton, HamburgerButton },
+  components: { VerificationModal, LargeButton },
   data() {
     return {
       showVerificationModal: false,
@@ -80,21 +70,19 @@ export default {
 
 <style lang="scss" scoped>
 #verification-header {
+  @include header-child;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   text-align: center;
   background-color: $c-warning-orange;
-  gap: 24px;
 
   #header-message {
     color: $upchieve-white;
     margin-left: auto;
     font-weight: 500;
   }
-
-  @include header-child;
 }
 
 #verify-button {
@@ -110,15 +98,5 @@ export default {
   &:hover {
     background-color: darken($upchieve-white, 5%);
   }
-}
-
-.left {
-  left: 15px;
-  position: absolute;
-  top: 15px;
-}
-
-.white {
-  fill: white;
 }
 </style>

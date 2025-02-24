@@ -2,7 +2,6 @@
 import { useStore } from 'vuex'
 import ArrowIcon from '@/assets/arrow.svg'
 import FallIncentiveEnrollmentModal from '@/views/DashboardView/StudentDashboard/FallIncentiveEnrollmentModal.vue'
-import HamburgerButton from './HamburgerButton.vue'
 import { ref, computed } from 'vue'
 
 const store = useStore()
@@ -40,7 +39,6 @@ const toggleFallIncentiveEnrollmentModal = () => {
 
 <template>
   <div class="header">
-    <hamburger-button v-if="mobileMode" class="left white" :tabindex="0" />
     <div class="header-message" :class="{ 'header-message-small': mobileMode }">
       <span>{{ fallIncentiveHeaderText }}</span>
     </div>
@@ -111,15 +109,5 @@ const toggleFallIncentiveEnrollmentModal = () => {
   height: 16px;
   width: 16px;
   margin-left: 0.6em;
-}
-
-.left {
-  left: 15px;
-  position: absolute;
-  top: 15px;
-}
-
-.white {
-  fill: white;
 }
 </style>

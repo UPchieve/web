@@ -1,9 +1,8 @@
 <template>
   <div class="WaitingPeriod">
-    <div v-if="mobileMode" class="WaitingPeriod-message--mobile">
+    <div class="WaitingPeriod-message" :class="{ mobile: mobileMode }">
       {{ message }}
     </div>
-    <div v-else class="WaitingPeriod-message">{{ message }}</div>
   </div>
 </template>
 
@@ -34,10 +33,10 @@ export default {
 
 <style lang="scss" scoped>
 .WaitingPeriod {
-  margin: 0 auto;
+  @include header-child;
+  @include flex-container(row, center, center);
   text-align: center;
 
-  @include header-child;
   background-color: $c-warning-orange;
 }
 
@@ -45,7 +44,7 @@ export default {
   @include font-category('display-small');
   color: white;
 
-  &--mobile {
+  &.mobile {
     @include font-category('body');
   }
 }
