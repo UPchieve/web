@@ -2,6 +2,7 @@ import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
+import * as SignUpService from '@/services/SignUpService'
 import {
   SignUpPage,
   getRow,
@@ -10,7 +11,6 @@ import {
   getButtonElement,
   getAlreadyHaveAccountElements,
   getSubmitResponseDefault as getSubmitResponse,
-  createAccountWithClever,
   getSsoButton,
 } from '@/services/SignUpService'
 import { getLinkElement, getRouterLinkElement } from '.'
@@ -276,6 +276,13 @@ async function createAccount(data) {
       return submitResponse
     }
   }
+}
+
+function createAccountWithClever(data) {
+  AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT, {
+    provider: 'clever',
+  })
+  return SignUpService.createAccountWithClever(data)
 }
 
 export async function beforeEnter(to, from, next) {

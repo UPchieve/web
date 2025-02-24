@@ -2,13 +2,13 @@ import store from '@/store'
 import { GRADES, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
+import * as SignUpService from '@/services/SignUpService'
 import {
   UserType,
   SignUpPage,
   getFilteredPageDetails,
   getSubmitResponseDefault,
   continueToAccountPage,
-  createAccountWithSso,
   getRow,
   getTextElement,
   getButtonElement,
@@ -188,8 +188,17 @@ async function createAccount(data) {
 }
 
 function createAccountWithGoogle(data) {
-  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
-  return createAccountWithSso('google', data)
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
+    provider: 'google',
+  })
+  return SignUpService.createAccountWithGoogle(data)
+}
+
+export function createAccountWithClever(data) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
+    provider: 'clever',
+  })
+  return SignUpService.createAccountWithClever(data)
 }
 
 function isParentGuardianSignUp(to: RouteLocation) {
