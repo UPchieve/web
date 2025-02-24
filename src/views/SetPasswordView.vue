@@ -84,9 +84,6 @@ export default {
   props: {
     token: String,
   },
-  created() {
-    this.$store.dispatch('app/hideNavigation')
-  },
   data() {
     return {
       msg: '',

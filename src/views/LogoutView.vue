@@ -19,9 +19,6 @@ export default {
   components: {
     FormPageTemplate,
   },
-  created() {
-    this.$store.dispatch('app/hideNavigation')
-  },
   computed: {
     ...mapState({
       isMobileApp: (state) => state.app.isMobileApp,

@@ -19,8 +19,6 @@ const $store = useStore()
 const $route = useRoute()
 const $router = useRouter()
 
-$store.dispatch('app/hideNavigation')
-
 const authenticatedUserEmail = ref<string>($store.state.user.user?.email)
 const verifyUser = ref<boolean>(!!authenticatedUserEmail.value)
 

@@ -359,7 +359,6 @@ export default {
   },
   created() {
     if (this.mobileMode) {
-      this.$store.dispatch('app/hideNavigation')
       try {
         Gleap.showFeedbackButton(false)
       } catch {
@@ -367,7 +366,6 @@ export default {
       }
     } else {
       this.$store.dispatch('app/header/show', activeHeaderData)
-      this.$store.dispatch('app/sidebar/hide')
     }
 
     window.addEventListener('resize', this.handleResize)

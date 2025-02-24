@@ -155,8 +155,6 @@ export default {
   },
 
   async created() {
-    this.$store.dispatch('app/hideNavigation')
-
     const referralCode = this.$route.query.referral
     if (referralCode) {
       this.isCheckingReferral = true
