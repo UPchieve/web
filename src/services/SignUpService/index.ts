@@ -1,8 +1,8 @@
-import config from '@/config'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
+import { Provider, signInWithSso } from '@/services/SsoService'
 
 export enum SignUpPage {
   account = 'account',
@@ -127,27 +127,22 @@ export function continueToAccountPage(data: Object) {
   return getSubmitResponseDefault(SignUpPage.account, data)
 }
 
-export function createAccountWithClever(data) {
-  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLEVER)
-  return createAccountWithSso('clever', data)
+export function createAccountWithGoogle(data) {
+  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
+  return createAccountWithSso(Provider.GOOGLE, data)
 }
 
-export function createAccountWithSso(
+export function createAccountWithClever(data) {
+  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLEVER)
+  return createAccountWithSso(Provider.CLEVER, data)
+}
+
+function createAccountWithSso(
   provider: 'google' | 'clever',
   data: any
 ): SubmitActionResponse {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
-    provider,
-  })
   try {
-    const params = new URLSearchParams({
-      provider,
-    })
-    for (const key of Object.keys(data)) {
-      if (data[key]) params.append(key, data[key])
-    }
-    const url = `${config.serverRoot}/auth/sso?${params.toString()}`
-    window.location.replace(url)
+    signInWithSso({ provider, ...data })
     return [null, null]
   } catch (err) {
     LoggerService.noticeError(err)
