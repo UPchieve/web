@@ -64,18 +64,20 @@ describe('`app` store module', () => {
   describe('actions', () => {
     it('showNavigation', () => {
       expect(typeof actions.showNavigation).toBe('function')
+      const commit = vi.fn()
       const dispatch = vi.fn()
-      actions.showNavigation({ dispatch })
-      expect(dispatch).toHaveBeenNthCalledWith(1, 'header/show')
-      expect(dispatch).toHaveBeenNthCalledWith(2, 'sidebar/show')
+      actions.showNavigation({ commit, dispatch })
+      expect(commit).toHaveBeenCalledWith('header/setIsShown', true)
+      expect(dispatch).toHaveBeenCalledWith('sidebar/show')
     })
 
     it('hideNavigation', () => {
       expect(typeof actions.hideNavigation).toBe('function')
+      const commit = vi.fn()
       const dispatch = vi.fn()
-      actions.hideNavigation({ dispatch })
-      expect(dispatch).toHaveBeenNthCalledWith(1, 'header/hide')
-      expect(dispatch).toHaveBeenNthCalledWith(2, 'sidebar/hide')
+      actions.hideNavigation({ commit, dispatch })
+      expect(commit).toHaveBeenCalledWith('header/setIsShown', false)
+      expect(dispatch).toHaveBeenCalledWith('sidebar/hide')
     })
 
     it('windowResize', () => {

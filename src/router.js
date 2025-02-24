@@ -294,7 +294,7 @@ const routes = [
     path: '/feedback/:sessionId',
     name: 'FeedbackView',
     component: FeedbackView,
-    meta: { protected: true },
+    meta: { protected: true, hideNavigation: true },
   },
   {
     path: '/verify',

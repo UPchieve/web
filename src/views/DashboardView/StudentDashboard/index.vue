@@ -80,7 +80,7 @@ import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FeatureFlagService from '@/services/FeatureFlagService'
-import { EVENTS, VERIFICATION_METHOD } from '@/consts'
+import { EVENTS } from '@/consts'
 import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -93,18 +93,6 @@ import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Studen
 import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.svg'
 import Student_Onboarding_Frame4 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.svg'
 import { getImpactStudyCacheKey } from '@/utils/cache-keys'
-
-const defaultHeaderData = {
-  component: 'DefaultHeader',
-}
-
-const activeHeaderData = {
-  component: 'RejoinSessionHeader',
-}
-
-const bannedHeaderData = {
-  component: 'BannedHeader',
-}
 
 export default {
   name: 'student-dashboard',
@@ -121,25 +109,6 @@ export default {
     OnboardingModal,
   },
   async created() {
-    if (this.isSessionAlive) {
-      this.$store.dispatch('app/header/show', activeHeaderData)
-    } else if (
-      !this.user.emailVerified &&
-      !this.isFallIncentiveProgramEnabled
-    ) {
-      this.$store.dispatch('app/header/show', {
-        component: 'VerificationHeader',
-        data: {
-          verificationMethod: VERIFICATION_METHOD.EMAIL,
-          phoneOrEmailToVerify: this.user.email,
-        },
-      })
-    } else if (this.isFallIncentiveProgramEnabled)
-      this.triggerIncentiveProgramBanner()
-    else if (this.assignments.length) {
-      this.$store.dispatch('app/header/show')
-    }
-
     if (
       this.shouldSeeIncentiveModalForFirstTime ||
       this.shouldSeeIncentiveModalForSecondTime
@@ -168,11 +137,6 @@ export default {
       this.isCollegePrepAdEnabled
     )
       this.showTellThemCollegePrepModal = true
-
-    // TODO: move globally to show banner in all pages
-    if (this.user && this.user.banType === 'complete') {
-      this.$store.dispatch('app/header/show', bannedHeaderData)
-    }
 
     const classCode = localStorage.getItem('joinedClassCode')
     if (classCode) {
@@ -307,14 +271,6 @@ export default {
     toggleImpactStudySurvey() {
       this.showImpactStudySurvey = !this.showImpactStudySurvey
     },
-    triggerIncentiveProgramBanner() {
-      // Prioritize showing the in-session banner if there is a current session
-      if (this.isSessionAlive) return
-      this.$store.dispatch('app/header/show', {
-        component: 'FallIncentiveHeader',
-      })
-      Gleap.trackEvent('fall-incentive-program')
-    },
     triggerIncentiveEnrollmentModal() {
       if (this.showFallIncentiveEnrollmentModal) return
       localStorage.setItem(
@@ -392,18 +348,6 @@ export default {
         })
       }
     },
-    isSessionAlive(isAlive) {
-      if (!isAlive) {
-        this.$store.dispatch('app/header/show', defaultHeaderData)
-        if (
-          this.isFallIncentiveProgramEnabled &&
-          this.user.banType !== 'complete'
-        )
-          this.triggerIncentiveProgramBanner()
-      } else {
-        this.$store.dispatch('app/header/show', activeHeaderData)
-      }
-    },
     hadASession: {
       async handler(currentValue, prevValue) {
         if (
@@ -441,15 +385,15 @@ export default {
     },
     isFallIncentiveProgramEnabled(currentValue, prevValue) {
       if (!currentValue && prevValue) {
-        this.$store.dispatch('app/header/show', {
-          component: 'DefaultHeader',
-        })
         this.showFallIncentiveEnrollmentModal = false
         AnalyticsService.captureEvent(
           EVENTS.STUDENT_FALL_INCENTIVE_PROGRAM_ACCESS_REVOKED
         )
       }
-      if (currentValue && !prevValue) this.triggerIncentiveProgramBanner()
+
+      if (currentValue && !prevValue) {
+        Gleap.trackEvent('fall-incentive-program')
+      }
     },
     shouldSeeIncentiveModalForFirstTime(currentValue, prevValue) {
       if (currentValue && !prevValue) this.triggerIncentiveEnrollmentModal()

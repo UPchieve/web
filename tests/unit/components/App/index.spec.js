@@ -52,9 +52,10 @@ describe('App', () => {
     ])
   })
 
-  it('conditionally renders `AppHeader`', () => {
+  it('conditionally shows `AppHeader`', () => {
     const wrapper = getWrapper({ showHeader: false })
-    expect(wrapper.findComponent(AppHeader).exists()).toBe(false)
+    expect(wrapper.findComponent(AppHeader).exists()).toBe(true)
+    expect(wrapper.findComponent(AppHeader).isVisible()).toBe(false)
 
     const routerViewWrapper = wrapper.find('.App-router-view-wrapper')
     expect(routerViewWrapper.classes('App-router-view-wrapper--header')).toBe(

@@ -3,7 +3,7 @@
     <ion-app>
       <ion-content>
         <refresh-app-alert />
-        <app-header v-if="showHeader" />
+        <app-header v-show="showHeader" />
         <app-sidebar v-if="showSidebar" />
         <app-modal v-if="showModal" />
         <app-banner v-if="showBanner" />
@@ -257,6 +257,10 @@ export default {
           })
         }
 
+        if (this.isStudent) {
+          this.$store.dispatch('session/fetchLatestSession')
+        }
+
         if (Object.entries(this.subjects).length === 0)
           this.$store.dispatch('subjects/getSubjects')
 
@@ -280,9 +284,10 @@ export default {
     },
 
     /**
-     * On route transition, fetch current session (for students, also most recent session)
+     * On route transition, fetch current session.
      * @todo: Fetch these much less frequently (only once).
      * @todo: Consolidate with the logic in router.
+     * @todo: Consolidate with latestSession.
      */
     $route(to, from) {
       // Capture PostHog pageviews on route transitions
@@ -290,10 +295,6 @@ export default {
       if (to.path !== '/logout' && this.userAuthenticated) {
         if (!this.isTeacher) {
           this.$store.dispatch('user/fetchSession', this)
-        }
-
-        if (this.isStudent) {
-          this.$store.dispatch('session/fetchLatestSession', this)
         }
       }
     },

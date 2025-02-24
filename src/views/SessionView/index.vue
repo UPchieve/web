@@ -318,9 +318,6 @@ import { useActor } from '@xstate/vue'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
 import { ref } from 'vue'
 
-const activeHeaderData = {
-  component: 'SessionHeader',
-}
 const meetingActor = ref(null)
 export default {
   name: 'session-view',
@@ -364,10 +361,7 @@ export default {
       } catch {
         LoggerService.noticeError('Failed when hiding Gleap feedback button')
       }
-    } else {
-      this.$store.dispatch('app/header/show', activeHeaderData)
     }
-
     window.addEventListener('resize', this.handleResize)
   },
   beforeUnmount() {
@@ -1002,11 +996,7 @@ export default {
     },
     handleResize() {
       if (this.mobileMode) {
-        this.$store.dispatch('app/hideNavigation')
         if (!this.auxiliaryOpen) this.aiWidgetHidden = true
-      } else {
-        this.$store.dispatch('app/header/show', activeHeaderData)
-        this.$store.dispatch('app/sidebar/hide')
       }
     },
     toggleAuxiliary() {

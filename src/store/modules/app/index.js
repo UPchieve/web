@@ -33,12 +33,12 @@ export default {
     setShowCsrfRefreshAlert: (state, val) => (state.showCsrfRefreshAlert = val),
   },
   actions: {
-    showNavigation: ({ dispatch }) => {
-      dispatch('header/show')
+    showNavigation: ({ commit, dispatch }) => {
+      commit('header/setIsShown', true)
       dispatch('sidebar/show')
     },
-    hideNavigation: ({ dispatch }) => {
-      dispatch('header/hide')
+    hideNavigation: ({ commit, dispatch }) => {
+      commit('header/setIsShown', false)
       dispatch('sidebar/hide')
     },
 

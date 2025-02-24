@@ -9,9 +9,8 @@
     <VerificationModal
       v-if="showVerificationModal"
       :close-modal="onModalClosed"
-      :verification-method="headerData.verificationMethod"
-      :phone-or-email-to-verify="headerData.phoneOrEmailToVerify"
-      :on-close-success="hideHeader"
+      :verification-method="verificationMethod"
+      :phone-or-email-to-verify="user.email"
     />
   </div>
 </template>
@@ -25,23 +24,15 @@ import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   name: 'VerificationHeader',
-  props: {
-    headerData: {
-      type: Object,
-      required: true,
-    },
-  },
   computed: {
-    VERIFICATION_METHOD() {
-      return VERIFICATION_METHOD
-    },
     ...mapState({
       user: (state) => state.user.user,
     }),
+    verificationMethod() {
+      return VERIFICATION_METHOD.EMAIL
+    },
     verificationMethodText() {
-      return this.headerData.verificationMethod === VERIFICATION_METHOD.SMS
-        ? 'phone number'
-        : 'email address'
+      return 'email address'
     },
   },
   components: { VerificationModal, LargeButton },
@@ -60,9 +51,6 @@ export default {
     },
     onModalClosed() {
       this.showVerificationModal = false
-    },
-    async hideHeader() {
-      await this.$store.dispatch('app/header/hide')
     },
   },
 }
