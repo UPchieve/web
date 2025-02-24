@@ -3,7 +3,6 @@ import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import AppHeader from '@/components/App/AppHeader/index.vue'
-import HeaderTemplate from '@/components/App/AppHeader/HeaderTemplate.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
 import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
@@ -22,16 +21,9 @@ const getWrapper = (state = {}) => {
 }
 
 describe('AppHeader', () => {
-  it('renders HeaderTemplate', () => {
-    const state = { data: {} }
-    const wrapper = getWrapper(state)
-    const modal = wrapper.findComponent(HeaderTemplate)
-    expect(modal.exists()).toBe(true)
-  })
-
   it('renders DefaultHeader', () => {
     const state = { component: 'DefaultHeader', data: {} }
-    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const wrapper = getWrapper(state).findComponent(AppHeader)
     const modal = wrapper.findComponent(DefaultHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.attributes('header-data')).toBeDefined()
@@ -39,7 +31,7 @@ describe('AppHeader', () => {
 
   it('renders RejoinSessionHeader', () => {
     const state = { component: 'RejoinSessionHeader', data: {} }
-    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const wrapper = getWrapper(state).findComponent(AppHeader)
     const modal = wrapper.findComponent(RejoinSessionHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.attributes('header-data')).toBeDefined()
@@ -47,7 +39,7 @@ describe('AppHeader', () => {
 
   it('renders BannedHeader', () => {
     const state = { component: 'BannedHeader', data: {} }
-    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const wrapper = getWrapper(state).findComponent(AppHeader)
     const modal = wrapper.findComponent(BannedHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.attributes('header-data')).toBeDefined()
@@ -58,7 +50,7 @@ describe('AppHeader', () => {
       component: 'WaitingPeriodHeader',
       data: { timeLeft: 1000 * 60 * 4 },
     }
-    const wrapper = getWrapper(state).findComponent(HeaderTemplate)
+    const wrapper = getWrapper(state).findComponent(AppHeader)
     const modal = wrapper.findComponent(WaitingPeriodHeader)
     expect(modal.exists()).toBe(true)
     expect(modal.props().headerData).toEqual(state.data)

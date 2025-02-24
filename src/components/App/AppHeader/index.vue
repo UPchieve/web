@@ -1,5 +1,5 @@
 <template>
-  <header-template>
+  <div class="HeaderTemplate">
     <div v-if="mobileMode" class="menu-container">
       <!-- TOOD: Also show notification if has assignment? -->
       <activity-dot
@@ -16,7 +16,7 @@
       />
     </div>
     <component v-bind:is="headerComponent" :header-data="headerData" />
-  </header-template>
+  </div>
 </template>
 
 <script>
@@ -26,7 +26,6 @@ import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
 import FallIncentiveHeader from '@/components/App/AppHeader/FallIncentiveHeader.vue'
 import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
-import HeaderTemplate from '@/components/App/AppHeader/HeaderTemplate.vue'
 import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.vue'
 import SessionHeader from '@/components/App/AppHeader/SessionHeader.vue'
 import VerificationHeader from '@/components/App/AppHeader/VerificationHeader.vue'
@@ -40,7 +39,6 @@ export default {
     DefaultHeader,
     FallIncentiveHeader,
     HamburgerButton,
-    HeaderTemplate,
     RejoinSessionHeader,
     SessionHeader,
     VerificationHeader,
@@ -59,6 +57,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.HeaderTemplate {
+  @include bind-app-header-height(height);
+  @include flex-container(row, space-between, center);
+
+  background-color: white;
+  border-radius: 0px 0px 20px 20px;
+  width: 100%;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: get-z('header');
+
+  overflow: hidden;
+
+  @include breakpoint-above('medium') {
+    border-radius: 0;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+  }
+}
+
 .menu-container {
   left: 15px;
   position: absolute;
