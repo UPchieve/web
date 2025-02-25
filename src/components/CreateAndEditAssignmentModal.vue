@@ -273,13 +273,13 @@ export default {
     },
 
     async createAssignment() {
-      let assignmentData = {
+      const assignmentData = {
         description: this.description,
         title: this.assignmentName,
         numberOfSessions: this.numSessions,
         minDurationInMinutes: this.numMinutes,
-        dueDate: moment(this.dueDate).toDate(),
-        startDate: moment(this.startDate).toDate(),
+        dueDate: moment(this.dueDate).startOf('day').toDate(),
+        startDate: moment(this.startDate).endOf('day').toDate(),
         isRequired: false,
         subjectId: this.selectedSessionToComplete.id,
       }

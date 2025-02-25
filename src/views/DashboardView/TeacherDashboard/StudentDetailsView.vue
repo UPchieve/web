@@ -21,6 +21,7 @@
           <label class="select-label"
             >Select Subject
             <FormSelect
+              v-if="topics.length"
               class="topics-dropdown"
               :name="'topic'"
               :placeholder="subjectPlaceholder"
@@ -202,7 +203,7 @@ export default {
 
     filterSessions(sessions, subjects, filters) {
       const start = new Date(filters.sessionActivityFrom + 'T00:00')
-      const end = new Date(filters.sessionActivityTo + 'T11:59:00')
+      const end = new Date(filters.sessionActivityTo + 'T23:59:59')
       const filteredSubjects = Object.values(subjects)
         .filter(
           (subject) =>
