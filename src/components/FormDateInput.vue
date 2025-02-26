@@ -21,7 +21,7 @@
       }"
       type="date"
       v-model="date"
-      @input="$emit('update:modelValue', new Date($event.target.value))"
+      @input="$emit('update:modelValue', $event.target.value)"
       :required="isRequired"
       :min="formattedMinDate"
     />
