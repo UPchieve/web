@@ -703,7 +703,7 @@ export async function beforeEnter(to, from, next) {
       }
     } catch (err) {
       // TODO: Don't throw an error if a partner with the key does not exist.
-      if (err.response.status !== 422) {
+      if ((err as NetworkError).status !== 422) {
         LoggerService.noticeError(err)
       }
       delete to.query.partner
