@@ -15,6 +15,7 @@ const getWrapper = async (data = {}) => {
   wrapper.setData({
     ...wrapper.vm.$data,
     ...data,
+    isLoading: false,
   })
 
   return wrapper
@@ -55,6 +56,9 @@ describe('Assignment View', () => {
     NetworkService.getStudentAssignmentCompletion = vi
       .fn()
       .mockResolvedValue({ data: { studentAssignments } })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
     await router.push(
       `/dashboard/teacher/class/class-id/assignment/assignment-1`
     )

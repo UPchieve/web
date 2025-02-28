@@ -347,6 +347,12 @@ export default {
       },
     }).then(this._successHandler, this._errorHandler)
   },
+  async getAssignmentDocuments(assignmentId) {
+    return httpGet(`${API_ROOT}/assignment/${assignmentId}/documents`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   saveVoiceMessage(sessionId, formData) {
     return httpPost(
       `${API_ROOT}/session/${sessionId}/voice-message`,
