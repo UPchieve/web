@@ -375,6 +375,7 @@ export default {
     },
 
     viewDetails(teacherClass) {
+      AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CLASS_ON_DASH)
       this.classId = teacherClass.id
       this.currentClassInfo = teacherClass
       this.currentClassName = teacherClass.name
