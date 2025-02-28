@@ -1113,6 +1113,13 @@ export default {
         const {
           data: { assignment },
         } = await NetworkService.getAssignmentForSession(sessionId)
+        if (assignment) {
+          const {
+            data: { assignmentDocuments },
+          } = await NetworkService.getAssignmentDocuments(assignment.id)
+          assignment.docs = assignmentDocuments
+        }
+
         this.studentAssignment = assignment
       } catch (err) {
         this.isLoadingSessionMetadata = false
