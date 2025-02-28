@@ -111,7 +111,14 @@ export default {
         topic: {
           name: '',
         },
-        sessionActivityFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+        sessionActivityFrom: moment()
+          .month('August')
+          .date(1)
+          .subtract(
+            moment().isBefore(moment().month('August').date(1), 'day') ? 1 : 0,
+            'year'
+          )
+          .format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
       },
       subjectPlaceholder: '',
