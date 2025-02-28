@@ -6,14 +6,14 @@
     </p>
     <FormInput
       v-model="className"
-      placeholder="Class Name"
+      placeholder="Class Name (e.g., Algebra I - Period 3)"
       label="Class Name"
       name="class-name"
       :blurEvent="EVENTS.TEACHER_INPUT_CLASS_NAME"
     />
     <IonicSelect
       v-model="selectedTopic"
-      placeholder="Subject"
+      placeholder="Select a subject"
       label="Subject"
       name="topic"
       optionTextField="displayName"

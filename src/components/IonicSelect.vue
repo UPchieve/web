@@ -7,8 +7,8 @@
     <ion-select
       :id="props.name"
       class="select-input"
-      label-placement="floating"
-      :placeholder="placeholder"
+      label-placement="stacked"
+      :placeholder="props.placeholder"
       interface="popover"
       :label="props.options.length ? undefined : 'No options available'"
       :multiple="props.multiple"

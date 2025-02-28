@@ -389,6 +389,7 @@ export default {
 .teacher-dashboard {
   padding: 30px;
   height: 100%;
+  background-color: #fbfbfc;
 }
 
 .dashboard-banner {
