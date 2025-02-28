@@ -158,6 +158,9 @@ describe('StudentClassesView', () => {
         assignments: [],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -230,6 +233,9 @@ describe('StudentClassesView', () => {
         assignments: [],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -253,6 +259,9 @@ describe('StudentClassesView', () => {
         assignments: [],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -273,6 +282,9 @@ describe('StudentClassesView', () => {
       data: {
         assignments: [],
       },
+    })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
     })
 
     const wrapper = getWrapper()
@@ -316,6 +328,9 @@ describe('StudentClassesView', () => {
           .concat(class2Assignments),
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -358,6 +373,9 @@ describe('StudentClassesView', () => {
         assignments: [pastAssignment, currentAssignment],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -393,6 +411,9 @@ describe('StudentClassesView', () => {
       data: {
         assignments: [assignmentMiddle, assignmentLast, assignmentFirst],
       },
+    })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
     })
 
     const wrapper = getWrapper()
@@ -446,6 +467,9 @@ describe('StudentClassesView', () => {
         assignments: [assignmentMiddle, assignmentLast, assignmentFirst],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -489,6 +513,9 @@ describe('StudentClassesView', () => {
         assignments: [assignmentInFuture],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -516,6 +543,9 @@ describe('StudentClassesView', () => {
       data: {
         assignments: [completedAssignment],
       },
+    })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
     })
 
     const wrapper = getWrapper()
@@ -547,6 +577,9 @@ describe('StudentClassesView', () => {
         assignments: [completedAssignment],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -577,6 +610,9 @@ describe('StudentClassesView', () => {
         assignments: [incompleteAssignment],
       },
     })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
 
     const wrapper = getWrapper()
     await flushPromises()
@@ -606,6 +642,9 @@ describe('StudentClassesView', () => {
       data: {
         assignments: [assignment],
       },
+    })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
     })
 
     const wrapper = getWrapper()
@@ -640,6 +679,9 @@ describe('StudentClassesView', () => {
       data: {
         assignments: [assignment],
       },
+    })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
     })
 
     const wrapper = getWrapper()
