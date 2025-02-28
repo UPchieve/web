@@ -77,17 +77,61 @@
             :minValue="1"
           />
         </div>
-        <div class="uc-form-element w-full">
-          <div class="uc-row justify-between">
-            <label for="description-input">Instructions</label>
+        <div class="uc-form-element">
+          <div class="upload-files">
+            <label for="upload-pdf">Upload Assignment Documents</label>
+            <div class="file-dialog">
+              <div
+                title="Upload photo"
+                tabindex="0"
+                @click="openFileDialog"
+                @keydown.enter="openFileDialog"
+              >
+                <FileDialog
+                  ref="fileDialog"
+                  class="upload-photo"
+                  accept="image/*, application/pdf"
+                  @file-selected="uploadDocument"
+                  @file-too-large="handleFileTooLarge"
+                  :multiple="true"
+                  :sizeLimitMB="maxSizeLimit"
+                />
+
+                <div class="upload-button">
+                  <span class="upload-text">Click to upload</span
+                  ><PhotoUploadIcon class="toolbar-icon--photo" />
+                </div>
+              </div>
+              <div class="uploaded-files" v-if="files.length > 0">
+                <div
+                  v-for="(file, index) in files"
+                  :key="index"
+                  class="file-item"
+                >
+                  <span class="file-name">{{ file.name }}</span>
+                  <button
+                    class="delete-file"
+                    @click="deleteFile(index)"
+                    title="Remove file"
+                  >
+                    x
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          <textarea
-            type="text"
-            id="description"
-            class="description-input"
-            name="description"
-            v-model="description"
-          ></textarea>
+          <div class="uc-form-element w-full">
+            <div class="uc-row justify-between">
+              <label for="description-input">Instructions</label>
+            </div>
+            <textarea
+              type="text"
+              id="description"
+              class="description-input"
+              name="description"
+              v-model="description"
+            ></textarea>
+          </div>
         </div>
       </div>
       <div class="right-btns">
@@ -115,10 +159,19 @@ import FormInput from '@/components/FormInput.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
 import IonicSelect from '@/components/IonicSelect.vue'
 import Modal from '@/components/Modal.vue'
+import FileDialog from '@/components/FileDialog.vue'
+import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
-  components: { Modal, FormInput, FormDateInput, IonicSelect },
+  components: {
+    Modal,
+    FormInput,
+    FormDateInput,
+    IonicSelect,
+    FileDialog,
+    PhotoUploadIcon,
+  },
   name: 'CreateAndEditAssignmentModal',
 
   props: {
@@ -172,6 +225,8 @@ export default {
       isEdit: false,
       assignmentId: '',
       removedStudents: [],
+      files: [],
+      maxSizeLimit: 5,
     }
   },
 
@@ -218,6 +273,28 @@ export default {
   methods: {
     close() {
       this.$store.dispatch('app/modal/hide')
+    },
+
+    openFileDialog(event) {
+      this.$refs.fileDialog.openFileDialog(event)
+    },
+
+    async uploadDocument(eventData) {
+      const files = eventData.files
+      files.forEach((file) => {
+        this.files.push(file)
+      })
+    },
+
+    deleteFile(index) {
+      this.files.splice(index, 1)
+    },
+
+    handleFileTooLarge(files) {
+      const fileNames = files.map((file) => file.name).join(', ')
+      alert(
+        `${fileNames} ${files.length > 1 ? `are` : `is`} too large! Max size allowed is ${this.maxSizeLimit} MB. Please try again.`
+      )
     },
 
     getActiveSubjects(allSubj) {
@@ -288,6 +365,7 @@ export default {
         const selectedStudentIds = this.selectedStudents.map(
           (student) => student.id
         )
+
         const studentsToRemove = currentStudentsAssigned.filter(
           (id) => !selectedStudentIds.includes(id)
         )
@@ -301,6 +379,7 @@ export default {
           studentsToAdd,
           studentsToRemove,
           selectedStudents: selectedStudentIds,
+          files: this.files,
         })
         this.$store.dispatch('app/modal/hide')
       } else {
@@ -308,6 +387,7 @@ export default {
           assignmentData,
           selectedClasses: this.selectedClasses,
           selectedStudents: this.selectedStudents,
+          files: this.files,
         })
         AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
         this.$store.dispatch('app/modal/hide')
@@ -394,5 +474,63 @@ export default {
 .uc-form-button,
 .save-button {
   width: auto;
+}
+
+.upload-files {
+  @include flex-container(column, center, flex-start);
+  width: 100%;
+
+  .file-dialog {
+    @include flex-container(row, flex-start, center);
+    width: 100%;
+    margin: 8px;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    .upload-button {
+      @include flex-container(row, center, flex-end);
+      gap: 6px;
+      margin-left: 6px;
+
+      .upload-text {
+        font-size: 12px;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .uploaded-files {
+    width: 100%;
+    margin-left: 1rem;
+
+    .file-item {
+      @include flex-container(row, flex-start, center);
+      font-size: 12px;
+      width: 100%;
+
+      .file-name {
+        margin-right: 1rem;
+        word-break: break-all;
+      }
+
+      .delete-file {
+        background: none;
+      }
+    }
+  }
+}
+
+.uc-form-element {
+  width: 100%;
+
+  .uc-row {
+    justify-content: space-between;
+  }
+
+  .description-input {
+    width: 100%;
+  }
 }
 </style>

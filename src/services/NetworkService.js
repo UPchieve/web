@@ -333,6 +333,20 @@ export default {
       this._errorHandler
     )
   },
+  uploadFiles({ assignmentId, files }) {
+    const formData = new FormData()
+    formData.append('assignmentId', assignmentId)
+
+    files.forEach((file) => {
+      formData.append('files', file)
+    })
+
+    return httpPut(`${API_ROOT}/assignment/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }).then(this._successHandler, this._errorHandler)
+  },
   saveVoiceMessage(sessionId, formData) {
     return httpPost(
       `${API_ROOT}/session/${sessionId}/voice-message`,
