@@ -494,6 +494,7 @@ export default {
       assignmentData,
       selectedClasses,
       selectedStudents,
+      files,
     }) {
       try {
         const classIds = selectedClasses.map(
@@ -518,15 +519,19 @@ export default {
         if (selectedClassAssignment) {
           this.assignments.push(selectedClassAssignment)
         }
-        const assignmentIds = this.assignments.map(
-          (assignment) => assignment.id
-        )
+        const assignmentIds = assignments.map((assignment) => assignment.id)
         const studentAssignments = this.mapStudentAssignments(assignmentIds)
 
         this.assignmentsCompletion = this.getAssignmentCompletion(
           this.assignments,
           studentAssignments
         )
+
+        if (files.length) {
+          assignmentIds.forEach(async (assignmentId) => {
+            await NetworkService.uploadFiles({ assignmentId, files })
+          })
+        }
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to create assignment.'
       }
@@ -548,14 +553,15 @@ export default {
       studentsToAdd,
       studentsToRemove,
       selectedStudents,
+      files,
     }) {
       try {
         const {
           data: { assignment },
         } = await NetworkService.editAssignment({
           ...assignmentData,
-          studentsToAdd,
-          studentsToRemove,
+          studentsToAdd: studentsToAdd,
+          studentsToRemove: studentsToRemove,
         })
         //Changes the assignment info in the UI
         const updatedAssignments = this.assignments.map((assnmt) =>
@@ -564,7 +570,9 @@ export default {
             : assnmt
         )
         this.assignments = updatedAssignments
-
+        const assignmentIds = updatedAssignments.map(
+          (assignment) => assignment.id
+        )
         const getStudentAssignments = await this.mapStudentAssignments([
           assignment.id,
         ])
@@ -574,6 +582,12 @@ export default {
             assignment.id,
             getStudentAssignments
           )
+
+        if (files.length) {
+          assignmentIds.forEach(async (assignmentId) => {
+            await NetworkService.uploadFiles({ assignmentId, files })
+          })
+        }
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to edit assignment.'
       }

@@ -3,6 +3,8 @@
     type="file"
     class="hidden-file-input"
     :accept="accept"
+    :multiple="multiple"
+    :sizeLimitMB="sizeLimitMB"
     @change="handleFileSelect"
   />
 </template>
@@ -14,6 +16,14 @@ export default {
       type: String,
       required: true,
     },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
+    sizeLimitMB: {
+      type: Number,
+      required: false,
+    },
   },
   data() {
     return {
@@ -21,7 +31,7 @@ export default {
       fileSelectionEvent: null,
     }
   },
-  emits: ['file-selected'],
+  emits: ['file-selected', 'file-too-large'],
   methods: {
     openFileDialog(event) {
       this.dialogOpeningEvent = event
@@ -29,9 +39,24 @@ export default {
     },
     handleFileSelect(event) {
       this.fileSelectionEvent = event
+      const files = event.target.files
+
+      const filesArr = Array.from(event.target.files)
+      if (this.sizeLimitMB) {
+        const oversizedFiles = filesArr.filter(
+          (file) => file.size > this.sizeLimitMB * 1024 * 1024
+        )
+
+        if (oversizedFiles.length > 0) {
+          this.$emit('file-too-large', oversizedFiles)
+          return
+        }
+      }
+
       this.$emit('file-selected', {
         dialogOpeningEvent: this.dialogOpeningEvent,
         fileSelectionEvent: this.fileSelectionEvent,
+        files: [...files],
       })
     },
   },
