@@ -2,8 +2,9 @@
   <div>
     <div class="main">
       <div class="student-header">
+        <button class="back-btn" @click="backToClasses()">Classes</button>
         <button class="back-btn" @click="backToClassDetails()">
-          Class Details
+          > Class Details
         </button>
         <span class="student-details"> > Student Details</span>
         <div class="student-info">
@@ -159,6 +160,9 @@ export default {
   },
 
   methods: {
+    backToClasses() {
+      this.$router.push(`dashboard/teacher`)
+    },
     backToClassDetails() {
       this.$router.push(`/dashboard/teacher/class/${this.classId}`)
     },
@@ -234,7 +238,6 @@ export default {
 <style lang="scss" scoped>
 .main {
   @include flex-container(column, center);
-  margin: 40px;
 }
 
 .back-btn {

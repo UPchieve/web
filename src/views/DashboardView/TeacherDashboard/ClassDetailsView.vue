@@ -2,10 +2,12 @@
   <div class="class-details-view" ref="classDetails">
     <div class="main">
       <div class="class-header">
-        <button class="back-btn" @click="backToClasses()">
-          <Arrow style="display: inline; transform: scale(-1, 1)" /> Back to
-          your classes
-        </button>
+        <div class="breadcrumbs">
+          <button class="back-to-classes" @click="backToClasses()">
+            Classes
+          </button>
+          <span class="class-details"> > Class Details</span>
+        </div>
         <div class="class-info">
           <div class="start-col">
             <img
@@ -267,7 +269,6 @@ import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
 import Check from '@/assets/check.svg'
 import CleverLogo from '@/assets/clever_logo.svg'
-import Arrow from '@/assets/RightArrow.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Pencil from '@/assets/pencil.svg'
 import moment from 'moment'
@@ -286,7 +287,6 @@ export default {
     AssignmentIcon,
     Check,
     CleverLogo,
-    Arrow,
     Pencil,
     MenuButtonsIcon,
     VerticalMenuButtonsIcon,
@@ -408,7 +408,7 @@ export default {
             }
             const timeTutored =
               hoursTutored > 0
-                ? `${hoursTutored} hour(s) and ${Math.round(minTutored)} minute(s)`
+                ? `${hoursTutored} hr and ${Math.round(minTutored)} m`
                 : `${Math.round(minTutored)} minutes`
             return {
               ...student,
@@ -760,7 +760,6 @@ export default {
 <style lang="scss" scoped>
 .main {
   @include flex-container(column, center);
-  margin-top: 40px;
   flex-grow: 1;
 }
 
@@ -769,9 +768,17 @@ export default {
   padding: 0;
 }
 
-.class-header {
-  margin-left: 40px;
-  margin-right: 40px;
+.breadcrumbs {
+  @include flex-container(row, flex-start, center);
+  font-size: 14px;
+
+  .back-to-classes {
+    color: $c-information-blue;
+  }
+
+  .class-details {
+    color: #666f7d;
+  }
 }
 
 .empty-sessions-container {
@@ -801,7 +808,7 @@ export default {
 
 .class-code-text {
   margin-left: 5px;
-  color: #1855d1;
+  color: $c-information-blue;
 }
 
 .class-header p {
@@ -810,7 +817,7 @@ export default {
 
 .class-info {
   @include flex-container(row, space-between, left);
-  margin-bottom: 10px;
+  margin: 20px 0 10px 0;
 
   h1 {
     font-size: 24px;
@@ -850,7 +857,7 @@ export default {
   padding: 6px;
 }
 .create-assignment-btn {
-  background-color: #1855d1;
+  background-color: $c-information-blue;
   border-radius: 24px;
   padding: 10px 16px;
   color: #ffffff;
@@ -859,7 +866,7 @@ export default {
 
 .open-teacher-code-modal {
   font-size: 15px;
-  color: #1855d1;
+  color: $c-information-blue;
 }
 
 .students-text {
@@ -867,7 +874,7 @@ export default {
 }
 
 .classes-container {
-  margin: 16px 40px 0 40px;
+  margin-top: 16px;
   flex-grow: 1;
 }
 
@@ -899,17 +906,9 @@ export default {
 .view-details-btn {
   padding: 8px 14px;
   font-size: 14px;
-  color: #1855d1;
+  color: $c-information-blue;
   align-self: center;
   font-weight: 500;
-}
-
-.back-btn {
-  @include flex-container(row, center, center);
-  gap: 8px;
-  color: #1855d1;
-  margin-bottom: 16px;
-  font-size: 14px;
 }
 
 .assignments-container {
@@ -1001,7 +1000,7 @@ export default {
     .no-students-assigned {
       padding-left: 0;
       margin-top: 1.25rem;
-      color: #1855d1;
+      color: $c-information-blue;
       font-weight: 500;
       text-align: left;
     }
@@ -1052,7 +1051,6 @@ export default {
     padding-bottom: 0.8em;
     font-size: 16px;
     margin-bottom: -4px;
-    margin-left: 40px;
     border-bottom: 4px solid transparent;
     padding-right: 0.5em;
     text-align: left;
