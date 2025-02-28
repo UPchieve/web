@@ -38,6 +38,14 @@ onMounted(async () => {
         data: { assignment },
       } = await NetworkService.getAssignmentById(props.assignmentId)
       currentAssignment.value = assignment
+
+      const {
+        data: { assignmentDocuments },
+      } = await NetworkService.getAssignmentDocuments(props.assignmentId)
+
+      if (assignmentDocuments.length && currentAssignment.value) {
+        currentAssignment.value.docs = assignmentDocuments
+      }
     } catch (err) {
       errorMessage.value =
         ((err as AxiosError).response?.data as { err?: string })?.err ??
@@ -125,6 +133,25 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
           <span class="light-bold mr-1">Tutoring Session:</span>
           {{ getAssignmentTutoringDetails(currentAssignment) }}
         </div>
+        <div
+          v-if="currentAssignment.docs?.length"
+          class="assignment-uploads-container"
+        >
+          <p>
+            <strong class="bold-text">Assignment Documents:</strong>
+          </p>
+          <div class="documents-list">
+            <div
+              v-for="doc in currentAssignment.docs"
+              :key="doc.name"
+              class="document-item"
+            >
+              <a :href="doc.url" target="_blank" class="document-link">
+                {{ doc.name }}
+              </a>
+            </div>
+          </div>
+        </div>
         <div class="line-divider"></div>
         <div class="uc-column mt-3">
           <p class="bold">Instructions:</p>
@@ -181,5 +208,25 @@ p {
 .uc-form-button {
   padding: 12px 24px 12px 24px;
   width: fit-content;
+}
+
+.assignment-uploads-container {
+  @include flex-container(row, flex-start, center);
+}
+
+.documents-list {
+  margin-left: 8px;
+  margin-bottom: 16px;
+}
+
+.document-link {
+  color: $c-information-blue;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+
+  &:hover {
+    color: darken($c-information-blue, 10%);
+  }
 }
 </style>

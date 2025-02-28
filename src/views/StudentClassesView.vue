@@ -46,6 +46,7 @@ export type Assignment = {
   subjectId: number
   subjectName: string
   title?: string
+  docs?: { contentType: string; name: string; url: string }[]
 }
 
 const isLoading = ref<boolean>(true)
@@ -75,6 +76,15 @@ onMounted(async () => {
 
     allStudentClasses.value = getClassesWithAssignments(classes, assignments)
     updateCurrentClassSelected()
+
+    await Promise.all(
+      assignments.map(async (assignment: Assignment) => {
+        const {
+          data: { assignmentDocuments },
+        } = await NetworkService.getAssignmentDocuments(assignment.id)
+        assignment.docs = assignmentDocuments
+      })
+    )
   } catch (err) {
     errorMessage.value =
       ((err as AxiosError).response?.data as { err?: string })?.err ??
