@@ -149,7 +149,7 @@ describe('Student Details View', () => {
 
     await flushPromises()
 
-    expect(wrapper.vm.sessions).toHaveLength(1)
+    expect(wrapper.vm.sessions).toHaveLength(2)
     expect(wrapper.vm.sessions[0].id).toEqual(sessionDetails[0].id)
   })
 
