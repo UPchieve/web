@@ -275,19 +275,19 @@ export default {
 
   &.volunteer {
     .img-container {
-      background: #fedf85;
+      background: $c-volunteer;
     }
   }
 
   &.student {
     .img-container {
-      background: #f9bef9;
+      background: $c-student;
     }
   }
 
   &.teacher {
     .img-container {
-      background: #76e5fd;
+      background: $c-teacher;
     }
   }
 
