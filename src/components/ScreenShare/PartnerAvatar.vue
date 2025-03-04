@@ -126,13 +126,13 @@ const onMouseEnterPartnerAvatar = () => {
 
 .icon-container {
   grid-area: 1 / 1 / 2 / 2;
-  background-color: #f9bef9;
+  background-color: $c-student;
   border-radius: 3px;
   padding: 4px;
 }
 
 .volunteer .icon-container {
-  background-color: #76e5fd;
+  background-color: $c-volunteer;
 }
 
 .icon {

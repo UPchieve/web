@@ -264,7 +264,7 @@ export default {
 }
 
 .img-container {
-  background: #f9bef9;
+  background: $c-student;
   width: 40px;
   height: 40px;
   display: flex;
