@@ -28,7 +28,6 @@ variables:
     when: on_success
     paths:
       - dist/
-  allow_failure: false
   before_script:
     - npm ci
     - apt update && apt install -y curl gnupg
@@ -47,15 +46,14 @@ build_staging_artifact:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
-# TODO: Uncomment once production environment is set up.
-# build_production_artifact:
-#   extends: .build_artifact
-#   environment:
-#     name: production
-#   variables:
-#     DOPPLER_TOKEN: $DOPPLER_TOKEN_PRODUCTION
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+build_production_artifact:
+  extends: .build_artifact
+  environment:
+    name: production
+  variables:
+    DOPPLER_TOKEN: $DOPPLER_TOKEN_PRODUCTION
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
 .deploy:
   stage: deploy
@@ -81,35 +79,32 @@ deploy_staging:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
-# TODO: Uncomment once production environment is set up.
-# deploy_production:
-#   extends: .deploy
-#   environment:
-#     name: production
-#   resource_group: production
-#   allow_failure: false
-#   variables:
-#     API_TOKEN: $AZURE_SWA_API_TOKEN_PRODUCTION
-#   needs:
-#     - job: build_production_artifact
-#       artifacts: true
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
-#       when: manual
+deploy_production:
+  extends: .deploy
+  environment:
+    name: production
+  resource_group: production
+  variables:
+    API_TOKEN: $AZURE_SWA_API_TOKEN_PRODUCTION
+  needs:
+    - job: build_production_artifact
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+      when: manual
 
-# TODO: Uncomment once production environment is set up.
-# tag_commit_production:
-#   stage: post-deploy
-#   image: registry.gitlab.com/gitlab-org/release-cli:latest
-#   needs:
-#     - job: deploy_production
-#   script:
-#     - echo 'Tag commit $CI_COMMIT_SHA'
-#   release:
-#     tag_name: 'deployed-$(date +%Y-%m-%d_%H-%M-%S)'
-#     description: 'Deployed from GitLab CI.'
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+tag_commit_production:
+  stage: post-deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: deploy_production
+  script:
+    - echo 'Tag commit $CI_COMMIT_SHA'
+  release:
+    tag_name: 'deployed-$(date +%Y-%m-%d_%H-%M-%S)'
+    description: 'Deployed from GitLab CI.'
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
 ### TODO: Clean-up: Delete the following. ###
 build_production:
