@@ -2,6 +2,7 @@ import errcode from 'err-code'
 import promiseRetry from 'promise-retry'
 import config from '../config'
 import axios from 'axios'
+import type { AxiosError } from 'axios'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -19,6 +20,11 @@ const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000
 const FAULT_TOLERANT_HTTP_MAX_RETRIES = 10
 
 const grecaptcha = window.grecaptcha
+
+export type NetworkError = {
+  status: number
+  msg: string
+}
 
 export const axiosInstance = axios.create({
   withCredentials: true,
@@ -68,6 +74,12 @@ export default {
   },
   _errorHandler(res) {
     return Promise.reject(res)
+  },
+  _axiosErrorHandler(res: AxiosError): Promise<NetworkError> {
+    return Promise.reject({
+      status: res.response?.status,
+      msg: (res.response?.data as { err?: string })?.err,
+    })
   },
   _faultTolerantHttp(method, onRetry, url, data) {
     const promiseToRetry = () => {
@@ -157,10 +169,10 @@ export default {
       )}`
     ).then(this._successHandler, this._errorHandler)
   },
-  getStudentPartner(partnerId) {
+  getStudentPartner(partnerKey: string) {
     return httpGet(
-      `${AUTH_ROOT}/partner/student?partnerId=${encodeURIComponent(partnerId)}`
-    ).then(this._successHandler, this._errorHandler)
+      `${AUTH_ROOT}/partner/student?partnerId=${encodeURIComponent(partnerKey)}`
+    ).then(this._successHandler, this._axiosErrorHandler)
   },
   checkHealth() {
     return httpGet(`${VERSION_ROOT}/version.json`).then(

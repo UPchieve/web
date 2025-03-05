@@ -523,7 +523,7 @@ export default {
         return next((_this) => (_this.studentPartner = studentPartner))
       })
       .catch((err) => {
-        if (err?.response?.status !== 404) {
+        if (err.status !== 404) {
           // we shouldn't get 422 here, since semantics of GET request are expected
           // to be correct regardless of user input
           LoggerService.noticeError(err)
