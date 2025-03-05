@@ -58,7 +58,12 @@
         >
           <ErrorIcon class="screenshare-error" />
         </span>
-        <button class="toolbar-item" v-else @click="toggleScreenShareWindow">
+        <button
+          class="toolbar-item"
+          v-else
+          @click="toggleScreenShareWindow"
+          :class="selectedTool === 'screen-share' ? 'selected-tool' : ''"
+        >
           <StopScreenShareIcon
             v-if="isScreenSharing"
             class="toolbar-item__svg"
@@ -660,6 +665,7 @@ export default {
           userType: this.userType,
         }
       )
+      this.usePickTool()
       this.$emit('toggleScreenShareWindow')
     },
     toggleScreenShareErrorTooltip() {
@@ -1326,12 +1332,12 @@ export default {
     padding: 0;
   }
 
-  &:first-child {
-    border-radius: 8px 0 0 8px;
-  }
-
   &:last-child {
     border-radius: 0 8px 8px 0;
+  }
+
+  &:first-child {
+    border-radius: 8px 0 0 8px;
   }
 
   &:hover {

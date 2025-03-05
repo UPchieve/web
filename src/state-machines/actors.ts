@@ -70,6 +70,11 @@ function startScreenShareObserver({
   const sendBack = (e: Events) => parent.send(e)
   const screenShareObserver = {
     videoTileDidUpdate: (tileState: VideoTileState) => {
+      sendBack({
+        type: 'set_screen_share_dimensions',
+        width: tileState.videoStreamContentWidth ?? 0,
+        height: tileState.videoStreamContentHeight ?? 0,
+      })
       if (!tileState.boundAttendeeId) return // Ignore unbound tiles
       const myId = attendee?.AttendeeId
       if (tileState.isContent && myId) {
@@ -251,13 +256,37 @@ export const isBannedFromLiveMedia = fromPromise(async () => {
   }
 })
 
+// @ts-ignore
+const canKeepScreenFocus = typeof CaptureController !== 'undefined'
+
+async function getStream(input: { context: Context }) {
+  /*
+    Chrome and Edge browsers support the CaptureController API, which allows us to keep the screen
+    in focus (rather than jumping to the shared window) when starting a screen share.
+  */
+  if (canKeepScreenFocus) {
+    // @ts-ignore
+    const controller = new CaptureController()
+    controller.setFocusBehavior('no-focus-change')
+    const contentShareStream = await navigator.mediaDevices.getDisplayMedia({
+      // @ts-ignore
+      controller,
+    })
+
+    return await input.context.meetingSession!.audioVideo.startContentShare(
+      contentShareStream
+    )
+  } else {
+    return await input.context.meetingSession!.audioVideo.startContentShareFromScreenCapture()
+  }
+}
+
 export const startingShareMyScreen = fromPromise(
   async ({ input }: { input: { context: Context } }) => {
     const { beginScreenShareModeration, endScreenShareModeration } =
       moderateScreenShare()
     beginScreenShareModeration(input.context.videoOutputElement)
-    const contentShareStream =
-      await input.context.meetingSession!.audioVideo.startContentShareFromScreenCapture()
+    const contentShareStream = await getStream(input)
     return { contentShareStream, endScreenShareModeration }
   }
 )
