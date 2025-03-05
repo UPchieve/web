@@ -523,7 +523,13 @@ export default {
     isSpeaking() {
       const activeSpeakerIds = this.snapshot.context.activeSpeakerIds
       const myId = this.snapshot.context.attendee?.AttendeeId ?? ''
-      return activeSpeakerIds.includes(myId)
+      const isSpeaking = activeSpeakerIds.includes(myId)
+      if (isSpeaking) {
+        AnalyticsService.captureEvent(
+          EVENTS.VOICE_CHAT_USER_SPOKE_IN_AUDIO_CHANNEL
+        )
+      }
+      return isSpeaking
     },
     partnerPresence() {
       const name = this.sessionPartner.firstname
