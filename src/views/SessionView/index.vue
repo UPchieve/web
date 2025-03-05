@@ -30,15 +30,12 @@
         :firstName="
           isVolunteer ? user?.firstName : session?.volunteer?.firstName ?? ''
         "
-        :canShareScreen="isVolunteer"
-        :containerRef="
-          mobileMode
-            ? this.$refs.sessionContentsContainerMobile
-            : this.$refs.auxiliaryContainer
-        "
         :meetingActor="meetingActor"
         @dragging="(value) => (draggingScreenShare = value)"
         @resizing="(value) => (resizingScreenShare = value)"
+        :screenShareWidth="meetingActor.snapshot.context.screenShareWidth"
+        :screenShareHeight="meetingActor.snapshot.context.screenShareHeight"
+        :screenShareActive="screenShareActive"
       />
       <div
         class="auxiliary-container"
@@ -478,7 +475,7 @@ export default {
 
     isScreenSharing() {
       return this.meetingActor.snapshot.matches(
-        'JoinMeeting.SharingVideoControl.SharingMyScreen'
+        'JoinedMeeting.ScreenShareControl.SharingMyScreen'
       )
     },
     isJoiningCall() {
@@ -1145,7 +1142,6 @@ export default {
   width: 100%;
   position: relative; /*[1]*/
   height: 100%; /*[1]*/
-
   &--whiteboard {
     .toggleButton.back {
       bottom: calc(100% - 140px);
@@ -1174,6 +1170,7 @@ export default {
 .session-contents-container {
   height: 100%;
   background: $c-background-grey;
+  position: relative;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: minmax(min-content, max-content) 1fr;

@@ -48,6 +48,8 @@ export type Context = {
   activeSpeakerIds: string[]
   hasReceivedPartnerAudio: boolean // We use this to determine if we know the partner's mic status or not.
   transcriptionStarted: boolean
+  screenShareWidth: number | undefined
+  screenShareHeight: number | undefined
 }
 
 export type Events =
@@ -75,7 +77,7 @@ export type Events =
   | { type: 'ban_user_from_live_media' }
   | { type: 'transcription_not_started' }
   | { type: 'transcription_started' }
-
+  | { type: 'set_screen_share_dimensions'; width: number; height: number }
 export function create() {
   return setup({
     types: {
@@ -150,6 +152,8 @@ export function create() {
       activeSpeakerIds: [],
       hasReceivedPartnerAudio: false,
       transcriptionStarted: false,
+      screenShareWidth: undefined,
+      screenShareHeight: undefined,
     }),
     initial: 'FetchingState',
     entry: { type: 'entry' },
@@ -175,6 +179,12 @@ export function create() {
             unsubscribeAll: event.unsubscribeAll,
           }),
         },
+      },
+      set_screen_share_dimensions: {
+        actions: assign({
+          screenShareWidth: ({ event }) => event.width,
+          screenShareHeight: ({ event }) => event.height,
+        }),
       },
     },
     states: {
