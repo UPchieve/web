@@ -222,6 +222,7 @@ export default {
 
       socket.on('sessions/partner:in-session', (isOnline) => {
         this.dispatch('session/onlineStatusForPartner', isOnline)
+        if (!isOnline) commit('setIsTyping', false)
       })
 
       socket.on('sessions:partner-banned-from-live-media', () => {
