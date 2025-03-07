@@ -81,7 +81,10 @@ onBeforeMount(async () => {
     >
       <updog-star-icon class="updog--small" />
 
-      <div class="survey__submitted" v-if="isImpactStudySurvey">
+      <div
+        class="survey__submitted"
+        v-if="isImpactStudySurvey && surveyRewardAmount"
+      >
         <h2>You have earned ${{ surveyRewardAmount }}</h2>
         <div class="impact-study-modal__separator" />
 
