@@ -133,7 +133,7 @@ export default {
       socket.on('sessions', async (sessions) => {
         if (rootGetters['user/isVolunteer']) {
           this.dispatch('volunteer/handleIncomingSessions', {
-            context: { router },
+            context: { $router: router },
             sessions,
           })
         }
