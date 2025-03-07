@@ -376,6 +376,7 @@ $padding-horizontal: 45px;
 
 .assignment-detail-container {
   padding: 30px 45px;
+  background-color: #fbfbfc;
 }
 
 h1 {
