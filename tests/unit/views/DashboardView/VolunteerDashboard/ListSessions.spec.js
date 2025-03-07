@@ -94,7 +94,7 @@ const getWrapper = async (overrides = {}) => {
     },
   })
   const mockVueContext = {
-    router: {
+    $router: {
       currentRoute: {
         value: {
           path: '/dashboard',

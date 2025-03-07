@@ -25,7 +25,7 @@ export default {
       const { type, subTopic, id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
       if (type && subTopic && id) {
-        context.router.push(path)
+        context.$router.push(path)
       } else {
         dispatch('user/clearSession')
       }
@@ -44,7 +44,7 @@ export default {
       })
       const isMobile = rootGetters['app/mobileMode']
       const isDashboard =
-        context.router.currentRoute.value.path === '/dashboard'
+        context.$router.currentRoute.value.path === '/dashboard'
       if (isDashboard && isMobile) {
         return
       }
