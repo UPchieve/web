@@ -1,0 +1,132 @@
+<template>
+  <div class="header">
+    <div
+      class="header-message uc-row"
+      :class="{ 'mobile-header-message': mobileMode }"
+    >
+      <div class="emoji">🌟</div>
+      Interested in becoming a volunteer tutor on UPchieve?
+      <div class="emoji">📚</div>
+    </div>
+    <LargeButton class="ml-auto" @click="toggleShowInfoModal">
+      Become a tutor!
+    </LargeButton>
+    <Modal v-if="showModal" class="more-info-modal">
+      <h3 class="heading">How it works</h3>
+      <span class="main-message">
+        <ul>
+          <li>
+            <span class="emoji">🙌</span>
+            &nbsp;Your account will have access to <strong>both</strong> Student
+            Mode and Volunteer Mode.
+          </li>
+          <li>
+            <span class="emoji">🎓</span>
+            &nbsp;In <strong>Student Mode</strong>, you can request help from
+            tutors whenever you need it, just like you can now.
+          </li>
+          <li>
+            <span class="emoji">🍎</span>
+            &nbsp;In <strong>Volunteer Mode</strong>, you will receive training
+            for the subjects you're interested in tutoring for. Then you can
+            help other students on UPchieve!
+          </li>
+          <li>
+            <span class="emoji">🔄</span>
+            &nbsp;<strong
+              >You can switch between Student Mode and Volunteer Mode at any
+              time!</strong
+            >
+          </li>
+        </ul>
+      </span>
+      <div class="buttons">
+        <LargeButton @click="toggleShowInfoModal">No thanks</LargeButton>
+        <LargeButton variant="primary" @click="becomeAVolunteer"
+          >Become a Volunteer Tutor!</LargeButton
+        >
+      </div>
+    </Modal>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import LargeButton from '@/components/LargeButton.vue'
+import Modal from '@/components/Modal.vue'
+import { useRouter } from 'vue-router'
+import NetworkService from '@/services/NetworkService'
+import { useStore } from 'vuex'
+
+const router = useRouter()
+const store = useStore()
+const showModal = ref<boolean>(false)
+const toggleShowInfoModal = () => (showModal.value = !showModal.value)
+
+const becomeAVolunteer = async () => {
+  try {
+    await NetworkService.addVolunteerRoleForStudent()
+    await NetworkService.switchActiveRole('volunteer')
+    if (router.currentRoute.value.path === '/dashboard') router.go(0)
+    else await router.replace('/dashboard')
+  } catch (err) {
+    // @TODO
+  }
+}
+
+const mobileMode = computed(() => store.getters['app/mobileMode'])
+</script>
+
+<style lang="scss" scoped>
+.header {
+  @include header-child;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: $c-information-blue;
+
+  .header-message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: $upchieve-white;
+    font-weight: 500;
+    margin-left: auto;
+  }
+
+  .mobile-header-message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: $upchieve-white;
+    font-weight: 500;
+    font-size: 14px;
+    margin-left: auto;
+  }
+
+  .main-message {
+    ul {
+      text-align: left;
+    }
+
+    li {
+      margin-bottom: 1rem;
+      list-style-type: none;
+    }
+  }
+
+  .emoji {
+    font-size: 22px;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 80%;
+    align-self: center;
+    margin: 0 auto;
+    gap: 16px;
+  }
+}
+</style>

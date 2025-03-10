@@ -12,6 +12,13 @@
             subject.
           </p>
           <p class="welcome-page-description">(Unlimited attempts! 😊)</p>
+          <div class="switch-account-mode" v-if="isStudentVolunteer">
+            Don't want to do this now?&nbsp;<SwitchAccountModeButton
+              user-type="volunteer"
+              :user-id="user.id"
+              message="Switch back to Student View"
+            />.
+          </div>
           <div class="welcome-page-topic-grid">
             <topic-chip
               v-for="(card, index) in topicCards"
@@ -32,10 +39,12 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import TopicChip from '@/components/TopicChip.vue'
+import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
 
 export default {
-  name: 'welcome-page',
+  name: 'volunteer-welcome-page',
   components: {
+    SwitchAccountModeButton,
     TopicChip,
   },
   async beforeMount() {
@@ -58,13 +67,10 @@ export default {
       topicCards: 'subjects/quizTopicCards',
       hasCertification: 'user/hasCertification',
       passedUpchieve101: 'user/passedUpchieve101',
+      isStudentsBecomeVolunteersEnabled:
+        'featureFlags/isStudentsBecomeVolunteersEnabled',
+      isStudentVolunteer: 'user/isStudentVolunteer',
     }),
-    inProgress() {
-      return (
-        this.user.trainingCourses.upchieve101.progress > 0 &&
-        !this.completed101Training
-      )
-    },
     completed101Training() {
       return this.user.trainingCourses.upchieve101.progress === 100
     },
@@ -182,5 +188,11 @@ export default {
   &-description {
     margin-bottom: 0;
   }
+}
+
+.switch-account-mode {
+  display: flex;
+  flex-direction: row;
+  font-weight: $font-weight-medium;
 }
 </style>

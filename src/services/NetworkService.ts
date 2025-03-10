@@ -1236,4 +1236,16 @@ export default {
       this._errorHandler
     )
   },
+  addVolunteerRoleForStudent() {
+    return httpPost(`${API_ROOT}/user/roles/volunteer`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
+  switchActiveRole(activeRole) {
+    return httpPut(`${API_ROOT}/user/roles/active`, { activeRole }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

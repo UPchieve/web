@@ -30,6 +30,7 @@ import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.
 import SessionHeader from '@/components/App/AppHeader/SessionHeader.vue'
 import VerificationHeader from '@/components/App/AppHeader/VerificationHeader.vue'
 import WaitingPeriodHeader from '@/components/App/AppHeader/WaitingPeriodHeader.vue'
+import BecomeAVolunteerHeader from '@/components/App/AppHeader/BecomeAVolunteerHeader.vue'
 
 export default {
   name: 'app-header',
@@ -43,6 +44,7 @@ export default {
     SessionHeader,
     VerificationHeader,
     WaitingPeriodHeader,
+    BecomeAVolunteerHeader,
   },
   computed: {
     ...mapState({
@@ -56,6 +58,9 @@ export default {
       hasCooldown: 'session/hasCooldown',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
+      isStudentsBecomeVolunteersEnabled:
+        'featureFlags/isStudentsBecomeVolunteersEnabled',
+      hasVolunteerRole: 'user/hasVolunteerRole',
     }),
 
     headerComponent() {
@@ -81,6 +86,10 @@ export default {
 
       if (this.showFallIncentiveHeader) {
         return 'fall-incentive-header'
+      }
+
+      if (this.showBecomeAVolunteerHeader) {
+        return 'become-a-volunteer-header'
       }
 
       if (this.showVerificationHeader) {
@@ -116,6 +125,14 @@ export default {
 
     showFallIncentiveHeader() {
       return this.isStudent && this.isFallIncentiveProgramEnabled
+    },
+
+    showBecomeAVolunteerHeader() {
+      return (
+        this.user.userType === 'student' &&
+        !this.hasVolunteerRole &&
+        this.isStudentsBecomeVolunteersEnabled
+      )
     },
 
     showVerificationHeader() {

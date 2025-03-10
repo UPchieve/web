@@ -304,7 +304,10 @@ const routes = [
     beforeEnter: (to, from, next) => {
       getUser()
         .then(() => {
-          if (store.getters['user/isVerified']) {
+          if (
+            store.getters['user/isVerified'] &&
+            !store.getters['user/isInStudentVolunteerVerifyFlow']
+          ) {
             next('/dashboard')
           } else {
             next()
@@ -601,7 +604,10 @@ router.beforeEach((to, from, next) => {
               redirect: to.fullPath,
             },
           })
-        } else if (!store.getters['user/isVerified']) {
+        } else if (
+          !store.getters['user/isVerified'] ||
+          store.getters['user/isInStudentVolunteerVerifyFlow']
+        ) {
           const route = '/verify'
           if (to.path.indexOf(route) !== -1) next()
           else
