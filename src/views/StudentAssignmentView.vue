@@ -19,6 +19,7 @@ const props = defineProps({
   assignment: { type: Object, required: false },
   goBack: { type: Function, required: false },
   startSession: { type: Function, required: false },
+  isStudent: { type: Boolean, required: false, default: true },
 })
 
 const isLoading = ref<boolean>(false)
@@ -124,10 +125,16 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
         <h1>{{ currentAssignment.title }}</h1>
         <div class="uc-row mt-4 items-center justify-start">
           <calendar-icon class="cal-icon mr-2" />
-          <span class="light-bold mr-1">Start Date:</span>
-          {{ formatDate(currentAssignment.startDate) }}
-          <span class="light-bold ml-2 mr-1">Due Date:</span>
-          {{ formatDate(currentAssignment.dueDate) }}
+          <div v-if="isStudent">
+            <span class="light-bold mr-1">Start Date:</span>
+            {{ formatDate(currentAssignment.startDate) }}
+          </div>
+          <div>
+            <span :class="['light-bold', 'mr-1', isStudent ? 'ml-2' : '']"
+              >Due Date:</span
+            >
+            {{ formatDate(currentAssignment.dueDate) }}
+          </div>
         </div>
         <div class="mt-2 mb-2">
           <span class="light-bold mr-1">Tutoring Session:</span>
