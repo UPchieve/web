@@ -1,7 +1,7 @@
 <template>
   <div v-if="isAuthenticated">
     <div class="SidebarInfo" :class="{ mobile: mobileMode }">
-      <div class="SidebarInfo-user uc-row">
+      <div class="SidebarInfo-user">
         <component class="SidebarInfo-avatar" :is="avatar" />
         <div class="SidebarInfo-name">{{ firstName }}</div>
       </div>
