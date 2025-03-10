@@ -40,6 +40,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
+      [POSTHOG_FEATURE_FLAGS.TEACHER_SESSION_RECAPS]: true,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -194,6 +195,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME],
     isStudentsBecomeVolunteersEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
+    isTeacherSessionRecapsEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_SESSION_RECAPS],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {
