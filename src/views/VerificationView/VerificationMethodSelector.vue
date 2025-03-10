@@ -1,6 +1,6 @@
 <template>
   <div id="verification-method-selector__container">
-    <fieldset>
+    <fieldset v-if="!forceSmsVerification">
       <legend>How would you like to receive your verification code?</legend>
       <div class="radio-options">
         <div id="email-radio" class="radio-option">
@@ -34,7 +34,10 @@
     <div
       id="phone-number-input-container"
       data-testid="phone-number-input-container"
-      v-if="verificationInputs.method === VERIFICATION_METHOD.SMS"
+      v-if="
+        verificationInputs.method === VERIFICATION_METHOD.SMS ||
+        forceSmsVerification
+      "
     >
       <label for="phone-number-input">Enter your phone number</label>
       <maz-phone-number-input
@@ -69,6 +72,11 @@ export default {
       type: Object,
       required: true,
     },
+    forceSmsVerification: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
   emits: ['update:modelValue'],
   data() {
@@ -82,6 +90,7 @@ export default {
     handlePhoneUpdate($event) {
       this.verificationInputs = {
         ...this.verificationInputs,
+        method: VERIFICATION_METHOD.SMS,
         phoneInputInfo: $event,
       }
     },

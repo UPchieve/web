@@ -336,10 +336,18 @@ export default {
       [getters.firstName, getters.lastName].join(' '),
 
     userType: (state) => state.user.userType,
+    userRoles: (state) =>
+      state.user.roleContext?.roles ?? [state.user.userType],
     isVolunteer: (state) => isVolunteerUserType(state.user.userType),
     isStudent: (state) => isStudentUserType(state.user.userType),
     isTeacher: (state) => isTeacherUserType(state.user.userType),
     isAdmin: (state) => state.user.isAdmin,
+    isStudentVolunteer: (_state, getters) =>
+      getters.userRoles.includes('student') &&
+      getters.userRoles.includes('volunteer'),
+
+    hasVolunteerRole: (_state, getters) =>
+      getters.userRoles.includes('volunteer'),
 
     isAuthenticated: (state) => !!(state.user && state.user.id),
 
@@ -379,6 +387,12 @@ export default {
       } else {
         return state.session.volunteer
       }
+    },
+
+    roleInCurrentSession: (state) => {
+      if (!state.session) return undefined
+      const studentId = state.session.student.id
+      return studentId === state.user.id ? 'student' : 'volunteer'
     },
 
     isSessionAlive: (state) => {
@@ -433,7 +447,16 @@ export default {
       return (
         !state.user.isOnboarded &&
         getters.isVolunteer &&
-        !getters.hasCertification
+        !getters.hasCertification &&
+        !!state.user.phone
+      )
+    },
+
+    isInStudentVolunteerVerifyFlow: (state, getters) => {
+      return (
+        getters.isVolunteer && // in volunteer mode
+        getters.userRoles.includes('student') && // but also a student account
+        (!state.user.phone || !state.user.phoneVerified) // unverified phone number
       )
     },
 
@@ -466,14 +489,33 @@ export default {
       }
 
       if (state.user?.ratings) {
+        // Old schema for accounts w/ only one role (student or volunteer)
         userProps.averageRatingSelfReported =
-          state.user.ratings.selfReportedRating.average
+          state.user.ratings?.selfReportedRating?.average ?? 0
         userProps.averageRatingPartnerReported =
-          state.user.ratings.partnerReportedRating.average
+          state.user.ratings?.partnerReportedRating?.average ?? 0
         userProps.totalSelfReportedRatings =
-          state.user.ratings.selfReportedRating.total
+          state.user.ratings?.selfReportedRating?.total ?? 0
         userProps.totalPartnerReportedRatings =
-          state.user.ratings.partnerReportedRating.total
+          state.user.ratings?.partnerReportedRating?.total ?? 0
+
+        // New schema for accounts w/ multiple roles
+        userProps.averageSelfReportedStudentRating =
+          state.user.ratings?.selfReportedStudentRating?.average ?? 0
+        userProps.totalSelfReportedStudentRatings =
+          state.user.ratings?.selfReportedStudentRating?.total ?? 0
+        userProps.averageSelfReportedVolunteerRating =
+          state.user.ratings?.selfReportedVolunteerRating?.average ?? 0
+        userProps.totalSelfReportedVolunteerRatings =
+          state.user.ratings?.selfReportedVolunteerRating?.total ?? 0
+        userProps.averagePartnerReportedStudentRating =
+          state.user.ratings?.partnerReportedStudentRating?.average ?? 0
+        userProps.totalPartnerReportedStudentRatings =
+          state.user.ratings?.partnerReportedStudentRating?.total ?? 0
+        userProps.averagePartnerReportedVolunteerRating =
+          state.user.ratings?.partnerReportedVolunteerRating?.average ?? 0
+        userProps.totalPartnerReportedVolunteerRatings =
+          state.user.ratings?.partnerReportedVolunteerRating?.total ?? 0
       }
 
       if (getters.isVolunteer) {

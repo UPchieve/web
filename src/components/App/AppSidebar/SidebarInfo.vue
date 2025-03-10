@@ -1,9 +1,17 @@
 <template>
   <div v-if="isAuthenticated">
     <div class="SidebarInfo" :class="{ mobile: mobileMode }">
-      <component class="SidebarInfo-avatar" :is="avatar" />
-      <div class="SidebarInfo-name">{{ firstName }}</div>
+      <div class="SidebarInfo-user uc-row">
+        <component class="SidebarInfo-avatar" :is="avatar" />
+        <div class="SidebarInfo-name">{{ firstName }}</div>
+      </div>
       <div v-if="!mobileMode" class="SidebarInfo-type">{{ type }}</div>
+      <SwitchAccountModeButton
+        v-if="isStudentVolunteer"
+        :user-id="user.id"
+        :user-type="userType"
+        class="switch-account-mode-button"
+      />
       <div v-if="!isTeacher && !mobileMode" class="SidebarInfo-status">
         <div class="SidebarInfo-status-circle" :class="sessionStatus.class" />
         <div class="SidebarInfo-status-text">{{ sessionStatus.text }}</div>
@@ -16,8 +24,10 @@
 <script>
 import Case from 'case'
 import { mapGetters, mapState } from 'vuex'
+import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
 
 export default {
+  components: { SwitchAccountModeButton },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
@@ -32,6 +42,7 @@ export default {
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
       mobileMode: 'app/mobileMode',
+      isStudentVolunteer: 'user/isStudentVolunteer',
     }),
     type() {
       return Case.capital(this.userType ?? 'User')
@@ -81,7 +92,18 @@ export default {
   @include child-spacing(top, $spacing);
 
   &.mobile {
-    @include flex-container(row, start, center);
+    @include flex-container(column, start, center);
+
+    .SidebarInfo-user {
+      display: flex;
+      flex-direction: row;
+      align-self: start;
+      align-items: center;
+    }
+
+    .switch-account-mode-button {
+      align-self: start;
+    }
 
     .SidebarInfo-avatar {
       $mobile-size: 60px;

@@ -37,6 +37,8 @@ export default {
       mobileMode: 'app/mobileMode',
       name: 'user/firstName',
       sessionPath: 'user/sessionPath',
+      userType: 'user/userType',
+      roleInCurrentSession: 'user/roleInCurrentSession',
     }),
     message() {
       return `You have a chat in session${this.mobileMode ? '' : '.'}`
@@ -58,7 +60,12 @@ export default {
       })
     },
     rejoin() {
-      sessionUtils.rejoinSession(this.$router, this.sessionPath)
+      sessionUtils.rejoinSession(
+        this.$router,
+        this.sessionPath,
+        this.userType,
+        this.roleInCurrentSession
+      )
     },
     end() {
       sessionUtils.endSession(this)

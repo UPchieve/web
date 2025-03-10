@@ -5,12 +5,26 @@
         {{ error }}
       </div>
 
-      <!-- If sms-verification is enabled, give the user the option to choose verification method in step 1-->
+      <div v-if="forceSmsVerification" class="student-volunteer-info">
+        <span class="uc-form-header">Let's verify your phone number.</span>
+        <div
+          class="switch-account-mode"
+          :class="{ 'switch-account-mode-mobile': mobileMode }"
+        >
+          Want to set this up later?&nbsp;
+          <SwitchAccountModeButton
+            :user-type="userType"
+            :user-id="user.id"
+            :message="`Switch back to Student View.`"
+          />
+        </div>
+      </div>
       <verification-method-selector
-        v-if="step === 1 && isSmsVerificationEnabled"
+        v-if="step === 1 && (isSmsVerificationEnabled || forceSmsVerification)"
         data-testid="verification-method-selector"
         :email="user.email"
         v-model="verificationInputs"
+        :forceSmsVerification="forceSmsVerification"
       />
 
       <!-- Verify code -->
@@ -95,10 +109,12 @@ import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
+import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
 
 export default {
   name: 'VerificationView',
   components: {
+    SwitchAccountModeButton,
     RecaptchaCaption,
     FormPageTemplate,
     Loader,
@@ -118,7 +134,7 @@ export default {
     }
   },
   beforeMount() {
-    if (this.isSmsVerificationEnabled) {
+    if (this.isSmsVerificationEnabled || this.isStudentVolunteer) {
       this.step = 1
     } else {
       this.step = 2
@@ -128,8 +144,14 @@ export default {
   },
   mounted() {
     this.$store.dispatch('app/hideNavigation')
+    if (this.forceSmsVerification) {
+      this.verificationInputs.method = VERIFICATION_METHOD.SMS
+    }
   },
   computed: {
+    forceSmsVerification() {
+      return this.isStudentVolunteer && this.isStudentsBecomeVolunteersEnabled
+    },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
     },
@@ -141,6 +163,11 @@ export default {
       isSmsVerificationEnabled: 'featureFlags/isSmsVerificationEnabled', // Whether SMS verification is enabled across the app
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
+      isStudentsBecomeVolunteersEnabled:
+        'featureFlags/isStudentsBecomeVolunteersEnabled',
+      userType: 'user/userType',
+      isStudentVolunteer: 'user/isStudentVolunteer',
+      mobileMode: 'app/mobileMode',
     }),
     sendTo() {
       if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
@@ -230,8 +257,9 @@ export default {
             userUpdates.emailVerified = true
             AnalyticsService.captureEvent(EVENTS.EMAIL_VERIFIED)
           }
-          this.$store.dispatch('user/firstDashboardVisit', true)
-          this.$store.dispatch('user/addToUser', userUpdates)
+          if (!this.isStudentVolunteer)
+            await this.$store.dispatch('user/firstDashboardVisit', true)
+          await this.$store.dispatch('user/addToUser', userUpdates)
 
           if (this.isAutoFlowUser) {
             this.$router.push('/welcome')
@@ -310,5 +338,19 @@ export default {
 
 .uc-form {
   justify-content: space-between;
+}
+
+.student-volunteer-info {
+  padding-bottom: 16px;
+  gap: 16px;
+
+  .switch-account-mode {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .switch-account-mode-mobile {
+    display: inherit;
+  }
 }
 </style>

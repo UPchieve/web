@@ -24,6 +24,8 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       sessionPath: 'user/sessionPath',
+      userType: 'user/userType',
+      roleInCurrentSession: 'user/roleInCurrentSession',
     }),
   },
   watch: {
@@ -34,7 +36,12 @@ export default {
   },
   methods: {
     rejoin() {
-      sessionUtils.rejoinSession(this.$router, this.sessionPath)
+      sessionUtils.rejoinSession(
+        this.$router,
+        this.sessionPath,
+        this.userType,
+        this.roleInCurrentSession
+      )
     },
     end() {
       sessionUtils.endSession(this)
