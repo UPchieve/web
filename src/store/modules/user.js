@@ -346,6 +346,9 @@ export default {
       getters.userRoles.includes('student') &&
       getters.userRoles.includes('volunteer'),
 
+    hasStudentRole: (_state, getters) =>
+      getters.userRoles.includes('student'),
+
     hasVolunteerRole: (_state, getters) =>
       getters.userRoles.includes('volunteer'),
 
@@ -486,6 +489,8 @@ export default {
         totalSessions: state.user.pastSessions.length,
         banType: state.user.banType,
         isTestUser: state.user.isTestUser,
+        hasStudentRole: getters.hasStudentRole,
+        hasVolunteerRole: getters.hasVolunteerRole,
       }
 
       if (state.user?.ratings) {
