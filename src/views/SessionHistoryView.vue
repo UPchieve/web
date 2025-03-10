@@ -1,18 +1,16 @@
 <template>
   <div class="session-history">
-    <section class="header">
-      <div class="header-container">
-        <h1 class="title">
-          {{ title }}
-        </h1>
-        <router-link
-          v-if="isFiltered"
-          class="see-all-link"
-          to="/sessions/history"
-          >See all session history</router-link
+    <div class="header-container">
+      <h1>
+        {{ title }}
+        <a
+          v-if="isFilteredFromSession"
+          class="uc-link ml-4"
+          @click="clearFilters"
+          >See all session history</a
         >
-      </div>
-      <p v-if="!mobileMode" class="subtitle">
+      </h1>
+      <p>
         {{
           isVolunteer
             ? 'On this page you can review your past sessions on UPchieve'
@@ -21,8 +19,43 @@
         favorited coaches when they're available.`
         }}
       </p>
-    </section>
-    <div v-if="!mobileMode" class="container">
+    </div>
+    <div v-if="!isFilteredFromSession" class="filters">
+      <form @submit.prevent="filter">
+        <form-input
+          v-model="filters.firstName"
+          name="firstName"
+          :placeholder="`${isVolunteer ? 'Student' : 'Coach'} First Name`"
+          :is-required="false"
+        />
+        <ionic-select
+          v-if="subjectsByTopics.length"
+          v-model="filters.subjectName"
+          name="subject"
+          placeholder="Subject"
+          :options="subjectsByTopics"
+          :multiple="false"
+          optionTextField="displayName"
+          groupField="topicName"
+          group="subjects"
+          :reduce="(option) => option.name"
+        />
+        <div class="btn-container">
+          <large-button
+            class="w-full"
+            variant="primary-blue"
+            show-arrow="false"
+            @click="filter"
+            >Filter</large-button
+          >
+          <large-button class="w-full" variant="secondary" @click="clearFilters"
+            >Clear filters</large-button
+          >
+        </div>
+      </form>
+    </div>
+
+    <div v-if="!mobileMode" class="session-container">
       <section>
         <div class="spacing--grid spacing--grid-4 session-list__headers">
           <span>SUBJECT</span>
@@ -30,20 +63,16 @@
           <span>{{ isVolunteer ? 'STUDENT' : 'COACH' }}</span>
           <span>SESSION RECAP</span>
         </div>
-        <div v-if="error">
-          <h1 class="title title--body">
-            {{ error }}
-          </h1>
+        <div v-if="error" class="info">
+          {{ error }}
         </div>
         <loader
           v-else-if="isFetchingSessions"
           message="Retrieving your session history"
           class="session-history-loader"
         />
-        <div v-else-if="hasNoPastSessions()" class="session-list">
-          <h1 class="title title--body">
-            Looks like you haven't had any sessions in the past 12 months.
-          </h1>
+        <div v-else-if="!this.sessions.length" class="info">
+          You don't haven't had any sessions matching the filters.
         </div>
         <ul class="session-list" v-else>
           <li v-for="(session, index) in sessions" :key="session._id">
@@ -82,8 +111,7 @@
               </div>
               <div class="session-list__session-recap">
                 <large-button
-                  primary
-                  class="session-list__session-recap__button"
+                  variant="outlined"
                   @click="routeToSessionRecap(session.id)"
                   >Session Recap</large-button
                 >
@@ -122,20 +150,16 @@
     <div v-if="mobileMode">
       <div class="mobile-container">
         <section>
-          <div v-if="error">
-            <h1 class="title title--body">
-              {{ error }}
-            </h1>
+          <div v-if="error" class="info">
+            {{ error }}
           </div>
           <loader
             v-else-if="isFetchingSessions"
             message="Retrieving your session history"
             class="session-history-loader"
           />
-          <div v-else-if="hasNoPastSessions()">
-            <h1 class="title title--body mobile-session-list">
-              Looks like you haven't had any sessions in the past 12 months.
-            </h1>
+          <div v-else-if="!this.sessions.length" class="info">
+            You don't haven't had any sessions matching the filters.
           </div>
           <ul v-else class="mobile-session-list">
             <li v-for="(session, index) in sessions" :key="session._id">
@@ -216,30 +240,43 @@
 </template>
 
 <script>
-import NetworkService from '../services/NetworkService'
-import CaretIcon from '@/assets/caret.svg'
-import FavoritingToggle from '../components/FavoritingToggle.vue'
-import LargeButton from '../components/LargeButton.vue'
-import { mapGetters } from 'vuex'
 import moment from 'moment'
-import Loader from '@/components/Loader.vue'
-import { backOff } from 'exponential-backoff'
-import LoggerService from '@/services/LoggerService'
-import AnalyticsService from '@/services/AnalyticsService'
+import { mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
+import CaretIcon from '@/assets/caret.svg'
+import AnalyticsService from '@/services/AnalyticsService'
+import LoggerService from '@/services/LoggerService'
+import NetworkService from '@/services/NetworkService'
+import FavoritingToggle from '@/components/FavoritingToggle.vue'
+import FormInput from '@/components/FormInput.vue'
+import IonicSelect from '@/components/IonicSelect.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import Loader from '@/components/Loader.vue'
 
 export default {
   name: 'session-history-view',
-  components: { CaretIcon, FavoritingToggle, LargeButton, Loader },
+  components: {
+    CaretIcon,
+    FavoritingToggle,
+    FormInput,
+    IonicSelect,
+    LargeButton,
+    Loader,
+  },
   data() {
     return {
       sessions: [],
-      hasNext: false,
-      total: 0,
+      filters: {
+        firstName: '',
+        subjectName: '',
+        studentId: '',
+        volunteerId: '',
+      },
+      page: 1,
+      totalCount: 0,
       isFetchingSessions: false,
       isLastPage: false,
       error: '',
-      page: 1,
     }
   },
   computed: {
@@ -248,6 +285,7 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       sessionPartner: 'user/sessionPartner',
+      subjectsByTopics: 'subjects/subjectsByTopics',
     }),
     isFirstPage() {
       return this.page === 1
@@ -257,102 +295,88 @@ export default {
       const totalPages = Math.ceil(this.total / sessionLimitPerPage)
       return totalPages === 0 ? 1 : totalPages
     },
-    isFiltered() {
-      return this.$route.query.volunteerId && this.$route.query.studentId
+    isFilteredFromSession() {
+      return this.$route.query.studentId && this.$route.query.volunteerId
     },
     title() {
-      return this.isFiltered
+      return this.isFilteredFromSession
         ? `Session History with ${this.sessionPartner.firstname}`
         : `Session History`
     },
   },
   async created() {
-    this.page = Number(this.$route.query.page ?? this.page)
-    const filter = this.getFilter()
-    await this.getTotalSessions(filter)
-    await this.fetchSessionHistory(this.page, filter)
-  },
-  watch: {
-    async '$route.query'(to, from) {
-      const volunteerId = to.volunteerId
-      const studentId = to.studentId
-      if (
-        to.page !== from.page ||
-        volunteerId !== from.volunteerId ||
-        studentId !== from.studentId
-      ) {
-        await this.getSessionHistory(
-          to.page ? Number(to.page) : 1,
-          this.getFilter()
-        )
-      }
-    },
+    const {
+      query: { page, firstName, subjectName, studentId, volunteerId },
+    } = this.$route
+
+    this.page = parseInt(page ?? this.page)
+    this.filters.studentId = studentId ?? this.filters.studentId
+    this.filters.volunteerId = volunteerId ?? this.filters.volunteerId
+    this.filters.firstName = firstName ?? this.filters.firstName
+    this.filters.subjectName = subjectName ?? this.filters.subjectName
+
+    await this.fetchSessionHistory()
   },
   methods: {
-    getFilter() {
-      const filter = {}
-      const volunteerId = this.$route.query.volunteerId
-      const studentId = this.$route.query.studentId
-      if (volunteerId) filter.volunteerId = volunteerId
-      if (studentId) filter.studentId = studentId
-      return filter
-    },
     goToNextPage() {
+      if (this.isLastPage) return
+
       AnalyticsService.captureEvent(
         EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE
       )
 
-      this.$router.push({
-        query: { ...this.$route.query, page: this.page + 1 },
-      })
+      this.page++
+      this.fetchSessionHistory()
     },
     goToPreviousPage() {
+      if (this.page === 0) return
+
       AnalyticsService.captureEvent(
         EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE
       )
-      this.$router.push({
-        query: { ...this.$route.query, page: this.page - 1 },
-      })
+      this.page--
+      this.fetchSessionHistory()
     },
-    async getSessionHistory(page, filter) {
-      if (page < 1 || page > this.totalPages) return
+    clearFilters() {
+      this.filters.firstName = ''
+      this.filters.subjectName = ''
+      this.filters.studentId = ''
+      this.filters.volunteerId = ''
+      this.page = 1
 
+      this.fetchSessionHistory()
+    },
+    filter() {
+      this.page = 1
+      this.fetchSessionHistory()
+    },
+    async fetchSessionHistory() {
+      this.isFetchingSessions = true
       try {
-        this.isFetchingSessions = true
+        this.$router.push({
+          query: { page: this.page, ...this.filters },
+        })
 
-        await this.fetchSessionHistory(page, filter)
-        this.page = page
+        const queryFilters = {
+          [`${this.isVolunteer ? 'student' : 'volunteer'}FirstName`]:
+            this.filters.firstName,
+          subjectName: this.filters.subjectName,
+          studentId: this.filters.studentId,
+          volunteerId: this.filters.volunteerId,
+        }
+        const {
+          data: { pastSessions, isLastPage, totalCount },
+        } = await NetworkService.getSessionHistory(this.page, queryFilters)
+        this.sessions = pastSessions
+        this.isLastPage = isLastPage
+        this.totalCount = totalCount
       } catch (error) {
-        this.handleError(error)
+        LoggerService.noticeError(error.response.data.err)
+        this.error =
+          'We were unable to load your history. Please try again later.'
       } finally {
         this.isFetchingSessions = false
       }
-    },
-    async fetchSessionHistory(page, filter) {
-      try {
-        const response = await backOff(() =>
-          NetworkService.getSessionHistory(page, filter)
-        )
-        this.sessions = response.data.pastSessions
-        this.isLastPage = response.data.isLastPage
-      } catch (error) {
-        this.handleError(error)
-      }
-    },
-    async getTotalSessions(filter) {
-      try {
-        const response = await backOff(() =>
-          NetworkService.getTotalSessionHistory(filter)
-        )
-        this.total = response.data.total
-      } catch (error) {
-        this.handleError(error)
-      }
-    },
-    handleError(error) {
-      LoggerService.noticeError(error.response.data.err)
-      this.error =
-        'We were unable to load your history. Please try again later.'
     },
     getSessionTime(sessionCreatedAt) {
       return moment(sessionCreatedAt).format('l @ h:mm A')
@@ -363,9 +387,6 @@ export default {
     getSessionDuration(timeTutored) {
       const duration = Math.ceil(timeTutored / (1000 * 60))
       return duration
-    },
-    hasNoPastSessions() {
-      return this.total === 0
     },
     updateFavoritedVolunteers(volunteerId, isFavorited) {
       this.sessions = this.sessions.map((session) => ({
@@ -394,47 +415,11 @@ ul {
   margin: auto;
   list-style-type: none;
 }
-
-.header-container {
-  margin-bottom: 2em;
-  @include breakpoint-below('small') {
-    margin-bottom: 0;
-  }
-}
-
-.header {
-  text-align: left;
-}
-
-.title {
-  font-weight: 500;
-  font-size: 22px;
-  margin-bottom: 0;
-
-  @include breakpoint-below('small') {
-    font-size: 18px;
-  }
-
-  &--body {
-    text-align: center;
-    margin: 3em 1em 0 1em;
-  }
-}
-
-.subtitle {
-  @include font-category('heading');
-  color: $c-secondary-grey;
-}
-
 .session-history {
-  padding: 53px;
+  padding: 2.5rem;
 
   @include breakpoint-below('large') {
     padding: 1em;
-  }
-
-  @include breakpoint-below('small') {
-    padding: 0;
   }
 
   &-loader {
@@ -443,13 +428,58 @@ ul {
   }
 }
 
-.container {
-  padding: 0;
-  margin: 0;
+.header-container {
+  margin-bottom: 2rem;
+
+  h1 {
+    @include font-category('heading');
+    font-weight: 500;
+    margin-bottom: 1rem;
+
+    @include breakpoint-below('small') {
+      font-size: 18px;
+    }
+  }
+
+  @include breakpoint-below('small') {
+    margin-bottom: 1rem;
+  }
+
+  p {
+    @include font-category('body');
+    color: $c-secondary-grey;
+  }
+}
+
+.filters {
   background-color: white;
   border: 1px solid $c-border-grey;
-  border-radius: 8px 8px 16px 16px;
-  min-width: 100%;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  max-width: 700px;
+  padding: 20px;
+  width: 100%;
+
+  .btn-container {
+    @include flex-container(row, space-between, center);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+.info {
+  @include flex-container(row, center, center);
+  font-weight: 500;
+  font-size: 22px;
+  margin: 3rem 1rem 0 1rem;
+  text-align: center;
+}
+
+.session-container {
+  background-color: white;
+  border: 1px solid $c-border-grey;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .spacing--grid {
@@ -471,7 +501,6 @@ ul {
 
 .session-list {
   padding: 0 2em;
-  min-height: 600px;
 
   @include breakpoint-below('large') {
     padding-right: 1.5em;
@@ -533,35 +562,10 @@ ul {
 
   &__session-recap {
     @include flex-container(row, center, center);
-
-    &__button {
-      border-color: $c-information-blue;
-      background: #fff;
-      color: $c-information-blue;
-      fill: $c-information-blue;
-
-      &:hover {
-        background-color: rgba(24, 85, 209, 0.1);
-        color: $c-information-blue;
-        fill: $c-information-blue;
-      }
-
-      &:active {
-        background-color: $c-information-blue;
-        color: #fff;
-        fill: #fff;
-      }
-
-      @include breakpoint-below('large') {
-        transform: scale(0.8, 0.8);
-      }
-    }
   }
 }
 
 .subject {
-  text-align: left;
-
   @include font-category('heading');
   @include breakpoint-below('large') {
     font-size: 16px;
@@ -591,7 +595,6 @@ ul {
   &-time-tutored {
     @include font-category('helper-text');
     color: $c-secondary-grey;
-    text-align: left;
   }
 }
 
@@ -696,13 +699,13 @@ ul {
   margin: 0;
   background-color: white;
   border: 1px solid $c-border-grey;
-  border-radius: 8px 8px 16px 16px;
+  border-radius: 20px;
   min-width: 100%;
 }
 
 .mobile-session-list {
   padding: 0;
-  min-height: 500px;
+
   &__partner-name {
     font-weight: 500;
     font-size: 14px;

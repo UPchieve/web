@@ -85,6 +85,48 @@ export default {
   }
 }
 
+.LargeButton-primary-blue {
+  @extend %LargeButton;
+
+  background: $c-information-blue;
+  color: white;
+
+  &:hover {
+    background: darken($c-information-blue, 5%);
+    color: $c-background-grey;
+  }
+
+  &:disabled {
+    background: $c-background-grey;
+    color: $c-disabled-grey;
+  }
+
+  &--reverse {
+    background: white;
+    color: $c-information-blue;
+  }
+}
+
+.LargeButton-outlined {
+  @extend %LargeButton;
+
+  background: white;
+  border-color: $c-information-blue;
+  color: $c-information-blue;
+
+  &:hover,
+  &:active {
+    background: lighten($c-information-blue, 50%);
+    color: $c-information-blue;
+  }
+
+  &:disabled {
+    background: $c-background-grey;
+    border-color: $c-disabled-grey;
+    color: $c-disabled-grey;
+  }
+}
+
 .LargeButton-secondary {
   @extend %LargeButton;
 

@@ -129,6 +129,16 @@ export default {
     },
   },
   getters: {
+    subjectsByTopics: (state) => {
+      const subjects = Object.values(state.subjects)
+      return state.topics.map((t) => {
+        return {
+          topicId: t.id,
+          topicName: t.displayName,
+          subjects: subjects.filter((s) => s.topicId === t.id),
+        }
+      })
+    },
     // TODO: remove in subjects-database-hydration flag cleanup
     allSubtopics: (state) => {
       let subtopicObj = {}
