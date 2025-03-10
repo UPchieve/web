@@ -744,6 +744,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   IMPACT_STUDY_SURVEY: 'impact-study-survey',
   USE_AWS_CHIME: 'use-aws-chime',
   STUDENTS_BECOME_VOLUNTEERS: 'students-become-volunteers',
+  TEACHER_SESSION_RECAPS: 'teacher-session-recaps',
 }
 
 export const ANALYTICS_REPORT_ROW = {

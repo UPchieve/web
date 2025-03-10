@@ -69,12 +69,22 @@
             <th># of Messages</th>
             <th>Session Date</th>
             <th>Session Length</th>
+            <th v-if="isTeacherSessionRecapsEnabled">Session Recap</th>
           </tr>
           <tr v-for="session in sessions" :key="session.id">
             <td>{{ session.sessionSubject }}</td>
             <td>{{ session.messageCount }}</td>
             <td>{{ formatTimestamp(session.createdAt) }}</td>
             <td>{{ session.length }} Minutes</td>
+            <td v-if="isTeacherSessionRecapsEnabled">
+              <button
+                class="view-session-btn"
+                @click="goToSessionRecap(session.id)"
+              >
+                View Session
+                <external-page class="external-page-icon" />
+              </button>
+            </td>
           </tr>
         </table>
       </div>
@@ -87,9 +97,10 @@ import Loader from '@/components/Loader.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
 import FormSelect from '@/components/FormSelect.vue'
 import NetworkService from '@/services/NetworkService'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import moment from 'moment'
+import ExternalPage from '@/assets/ExternalPage.svg'
 
 export default {
   name: 'student-details',
@@ -98,6 +109,7 @@ export default {
     StudentAvatar,
     FormDateInput,
     FormSelect,
+    ExternalPage,
   },
 
   data() {
@@ -129,6 +141,10 @@ export default {
     ...mapState({
       topics: (state) => state.subjects.topics,
       subjects: (state) => state.subjects.subjects,
+    }),
+    ...mapGetters({
+      isTeacherSessionRecapsEnabled:
+        'featureFlags/isTeacherSessionRecapsEnabled',
     }),
   },
 
@@ -172,6 +188,9 @@ export default {
     },
     backToClassDetails() {
       this.$router.push(`/dashboard/teacher/class/${this.classId}`)
+    },
+    goToSessionRecap(sessionId) {
+      window.open(`/sessions/${sessionId}/recap`, '_blank')
     },
 
     formatTimestamp(timestamp) {
@@ -264,12 +283,10 @@ export default {
 }
 
 .img-container {
+  @include flex-container(column, flex-end, center);
   background: $c-student;
   width: 40px;
   height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
   border-radius: 50%;
   overflow: hidden;
 }
@@ -376,9 +393,7 @@ export default {
 }
 
 .date-label {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  @include flex-container(column, center, flex-start);
   margin-right: 10px;
 }
 
@@ -390,5 +405,18 @@ export default {
   border: 1px solid #343440;
   border-radius: 32px;
   font-weight: 500;
+}
+
+.view-session-btn {
+  padding: 8px 14px;
+  font-size: 14px;
+  color: $c-information-blue;
+  align-self: center;
+  font-weight: 500;
+}
+
+.external-page-icon {
+  width: 16px;
+  height: 16px;
 }
 </style>

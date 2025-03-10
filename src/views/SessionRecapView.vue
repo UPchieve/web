@@ -31,12 +31,12 @@
               {{ getSessionTime(session.createdAt) }}
             </div>
             <span class="card-detail__title">{{
-              isVolunteer ? 'Student:' : 'Coach:'
+              isVolunteer || isTeacher ? 'Student:' : 'Coach:'
             }}</span>
             <div class="card-detail card-detail__sub-container">
               <div class="card-detail">
                 {{
-                  isVolunteer
+                  isVolunteer || isTeacher
                     ? session.studentFirstName
                     : session.volunteerFirstName
                 }}
@@ -222,6 +222,7 @@ export default {
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      isTeacher: 'user/isTeacher',
       mobileMode: 'app/mobileMode',
     }),
     whiteboardDimensions() {
