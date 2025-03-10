@@ -47,6 +47,7 @@ export type Assignment = {
   subjectName: string
   title?: string
   docs?: { contentType: string; name: string; url: string }[]
+  className?: string
 }
 
 const isLoading = ref<boolean>(true)

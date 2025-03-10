@@ -170,7 +170,7 @@
               @click="showAssignmentDetail"
               role="button"
             >
-              Assignment details
+              {{ isStudent ? `Your assignment` : `About the session` }}
               <caret-icon class="caret" />
             </div>
             <div
@@ -269,6 +269,7 @@
       v-if="showAssignmentDetailModal"
       :closeModal="toggleAssignmentDetailModal"
       :assignment="studentAssignment"
+      :isStudent="isStudent"
     />
     <fall-incentive-review-warning-modal
       v-if="showFallIncentiveReviewWarningModal"
