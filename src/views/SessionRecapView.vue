@@ -336,7 +336,7 @@ export default {
   },
   beforeUnmount() {
     socket.emit('sessions/recap:leave', { sessionId: this.session.id })
-    this.zwibblerCtx.destroy()
+    this.zwibblerCtx?.destroy()
   },
   methods: {
     getSessionTime(sessionCreatedAt) {

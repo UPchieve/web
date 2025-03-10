@@ -118,6 +118,7 @@ export default {
 <style lang="scss">
 .heart-icon {
   &-favorited {
+    cursor: pointer;
     fill: $c-shadow-warn;
     transition: all 0.3s ease-in-out;
 
@@ -129,10 +130,6 @@ export default {
       transform: scale(0.9);
     }
 
-    &:hover {
-      cursor: pointer;
-    }
-
     &:hover path {
       stroke: $c-active-heart;
       fill: $c-active-heart;
@@ -140,6 +137,7 @@ export default {
   }
 
   &-unfavorited {
+    cursor: pointer;
     transition: all 0.3s ease-in-out;
 
     &:hover path {
