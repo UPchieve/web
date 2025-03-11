@@ -352,6 +352,9 @@ export default {
     hasVolunteerRole: (_state, getters) =>
       getters.userRoles.includes('volunteer'),
 
+    hasTeacherRole: (_state, getters) =>
+      getters.userRoles.includes('teacher'),
+
     isAuthenticated: (state) => !!(state.user && state.user.id),
 
     isVerified: (state) => state.user.verified,
@@ -491,6 +494,7 @@ export default {
         isTestUser: state.user.isTestUser,
         hasStudentRole: getters.hasStudentRole,
         hasVolunteerRole: getters.hasVolunteerRole,
+        hasTeacherRole: getters.hasTeacherRole,
       }
 
       if (state.user?.ratings) {
