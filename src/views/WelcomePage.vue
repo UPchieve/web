@@ -40,6 +40,8 @@
 import { mapState, mapGetters } from 'vuex'
 import TopicChip from '@/components/TopicChip.vue'
 import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'volunteer-welcome-page',
@@ -78,6 +80,10 @@ export default {
 
   methods: {
     handleTopicClick(topicName) {
+      if (this.isStudentVolunteer)
+        AnalyticsService.captureEvent(
+          EVENTS.ROLE_SWITCHING_USER_SELECTED_SUBJECT
+        )
       const topicCard = this.topicCards.find((card) => card.topic === topicName)
       this.$store.dispatch('app/modal/show', {
         component: 'SubjectSelectionModal',

@@ -260,6 +260,20 @@ export default {
             action: quizEvent,
             subject: this.category,
           })
+          if (this.isStudentVolunteer) {
+            AnalyticsService.captureEvent(
+              data.passed
+                ? EVENTS.ROLE_SWITCHING_USER_PASSED_CERTIFICATION_QUIZ
+                : EVENTS.ROLE_SWITCHING_USER_FAILED_CERTIFICATION_QUIZ,
+              {
+                quiz: this.quizName,
+              }
+            )
+            AnalyticsService.captureEvent(
+              EVENTS.ROLE_SWITCHING_USER_COMPLETED_CERTIFICATION_QUIZ
+            )
+          }
+
           if (data.passed) {
             const updatedCerts = Object.assign(this.user.certifications, {
               [this.category]: { passed: true, tries: data.tries },

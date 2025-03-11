@@ -346,8 +346,7 @@ export default {
       getters.userRoles.includes('student') &&
       getters.userRoles.includes('volunteer'),
 
-    hasStudentRole: (_state, getters) =>
-      getters.userRoles.includes('student'),
+    hasStudentRole: (_state, getters) => getters.userRoles.includes('student'),
 
     hasVolunteerRole: (_state, getters) =>
       getters.userRoles.includes('volunteer'),

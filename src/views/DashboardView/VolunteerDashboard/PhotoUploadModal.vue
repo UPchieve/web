@@ -99,7 +99,10 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
     }),
-    ...mapGetters({ mobileMode: 'app/mobileMode' }),
+    ...mapGetters({
+      mobileMode: 'app/mobileMode',
+      isStudentVolunteer: 'user/isStudentVolunteer',
+    }),
   },
   methods: {
     async addPhoto(event) {
@@ -140,6 +143,10 @@ export default {
           AnalyticsService.captureEvent(EVENTS.PHOTO_ID_ADDED, {
             event: EVENTS.PHOTO_ID_ADDED,
           })
+          if (this.isStudentVolunteer)
+            AnalyticsService.captureEvent(
+              EVENTS.ROLE_SWITCHING_USER_UPLOADED_PHOTO_ID
+            )
           this.closeModal()
         } else {
           this.error = 'Sorry, we had trouble uploading your photo.'
