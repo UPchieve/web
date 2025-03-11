@@ -495,6 +495,7 @@ export default {
         hasStudentRole: getters.hasStudentRole,
         hasVolunteerRole: getters.hasVolunteerRole,
         hasTeacherRole: getters.hasTeacherRole,
+        occupation: state.user.occupation?.join(', '),
       }
 
       if (state.user?.ratings) {
