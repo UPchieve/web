@@ -57,6 +57,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
+      [POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION]: '',
     },
     eligibleForChooseTutorType: false,
   },
@@ -197,6 +198,10 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
     isTeacherSessionRecapsEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_SESSION_RECAPS],
+    tutorFeedbackToTeacherQuestion: (state) =>
+      state.payloadFlags[
+        POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION
+      ],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {
