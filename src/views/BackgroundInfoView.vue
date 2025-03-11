@@ -294,7 +294,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { COUNTRIES, STATES, EVENTS } from '@/consts'
@@ -361,6 +361,9 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user.user,
+    }),
+    ...mapGetters({
+      isStudentVolunteer: 'user/isStudentVolunteer',
     }),
     hasCompletedBackgroundInfo() {
       return (
@@ -446,6 +449,10 @@ export default {
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_COMPLETED, {
           event: EVENTS.BACKGROUND_INFORMATION_COMPLETED,
         })
+        if (this.isStudentVolunteer)
+          AnalyticsService.captureEvent(
+            EVENTS.ROLE_SWITCHING_USER_COMPLETED_BACKGROUND_INFO_FORM
+          )
 
         if (this.user.volunteerPartnerOrg)
           AnalyticsService.captureEvent(EVENTS.ACCOUNT_APPROVED, {

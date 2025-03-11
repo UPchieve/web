@@ -18,6 +18,8 @@ import LoggerService from '@/services/LoggerService'
 import Modal from '@/components/Modal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { useStore } from 'vuex'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   userType: 'student' | 'volunteer'
@@ -40,6 +42,12 @@ const switchRole = async () => {
   try {
     const response = await NetworkService.switchActiveRole(
       props.userType === 'volunteer' ? 'student' : 'volunteer'
+    )
+    const newRole = response.data.activeRole
+    AnalyticsService.captureEvent(
+      newRole === 'volunteer'
+        ? EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_VOLUNTEER_MODE
+        : EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_STUDENT_MODE
     )
     const { user } = response.data
     store.commit('user/updateUser', user)

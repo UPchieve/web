@@ -441,6 +441,7 @@ export default {
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      isStudentVolunteer: 'user/isStudentVolunteer',
       isSessionOver: 'user/isSessionOver',
       isSessionAlive: 'user/isSessionAlive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
@@ -640,6 +641,17 @@ export default {
       this.$route.params.topic
     )
     if (!isValid) return this.$router.push('/dashboard')
+
+    if (this.isStudentVolunteer) {
+      if (this.isVolunteer)
+        AnalyticsService.captureEvent(
+          EVENTS.ROLE_SWITCHING_USER_JOINED_SESSION_AS_VOLUNTEER
+        )
+      else if (this.isStudent)
+        AnalyticsService.captureEvent(
+          EVENTS.ROLE_SWITCHING_USER_JOINED_SESSION_AS_STUDENT
+        )
+    }
 
     const id = this.$route.params.sessionId
     const assignmentId = this.$route.query.assignmentId

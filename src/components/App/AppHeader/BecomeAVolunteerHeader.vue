@@ -51,22 +51,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
 import { useRouter } from 'vue-router'
 import NetworkService from '@/services/NetworkService'
 import { useStore } from 'vuex'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 const router = useRouter()
 const store = useStore()
 const showModal = ref<boolean>(false)
-const toggleShowInfoModal = () => (showModal.value = !showModal.value)
+const toggleShowInfoModal = () => {
+  showModal.value = !showModal.value
+  if (showModal.value)
+    AnalyticsService.captureEvent(EVENTS.ROLE_SWITCHING_USER_CLICKED_BANNER)
+}
 
 const becomeAVolunteer = async () => {
+  AnalyticsService.captureEvent(
+    EVENTS.ROLE_SWITCHING_USER_CLICKED_BECOME_A_VOLUNTEER
+  )
   try {
     await NetworkService.addVolunteerRoleForStudent()
     await NetworkService.switchActiveRole('volunteer')
+    AnalyticsService.captureEvent(
+      EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_VOLUNTEER_MODE
+    )
     if (router.currentRoute.value.path === '/dashboard') router.go(0)
     else await router.replace('/dashboard')
   } catch (err) {
@@ -75,6 +87,9 @@ const becomeAVolunteer = async () => {
 }
 
 const mobileMode = computed(() => store.getters['app/mobileMode'])
+onMounted(() => {
+  AnalyticsService.captureEvent(EVENTS.ROLE_SWITCHING_USER_SAW_BANNER)
+})
 </script>
 
 <style lang="scss" scoped>
