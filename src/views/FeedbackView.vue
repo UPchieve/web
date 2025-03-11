@@ -203,6 +203,17 @@
               </div>
             </li>
           </div>
+          <li v-if="tutorFeedbackToTeacherQuestion">
+            <div class="question__section-header">Notes For Their Teacher</div>
+            <div class="question__title">
+              {{ tutorFeedbackToTeacherQuestion }}
+            </div>
+            <feedback-textarea
+              id="tutor-feedback-for-teacher"
+              class="mt-4"
+              @input="(response) => (tutorFeedbackToTeacher = response)"
+            />
+          </li>
         </ul>
 
         <p v-if="error" class="feedback__error">{{ error }}</p>
@@ -260,6 +271,7 @@ export default {
       allQuestions: [],
       error: '',
       userResponse: {},
+      tutorFeedbackToTeacher: '',
     }
   },
   computed: {
@@ -267,6 +279,8 @@ export default {
       userType: 'user/userType',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      tutorFeedbackToTeacherQuestion:
+        'featureFlags/tutorFeedbackToTeacherQuestion',
     }),
     ...mapState({
       subjects: (state) => state.subjects.subjects,
@@ -353,6 +367,12 @@ export default {
         this.isFavoriteCoachLimitReached = response.data.remaining === 0
       }
     }
+
+    if (this.tutorFeedbackToTeacherQuestion)
+      AnalyticsService.captureEvent(
+        EVENTS.VOLUNTEER_SHOWN_FEEDBACK_TO_TEACHER_QUESTION
+      )
+
     this.isLoading = false
   },
   methods: {
@@ -550,6 +570,15 @@ export default {
           )
         )
       }
+
+      if (this.tutorFeedbackToTeacher)
+        AnalyticsService.captureEvent(
+          EVENTS.VOLUNTEER_SUBMITTED_FEEDBACK_TO_TEACHER,
+          {
+            response: this.tutorFeedbackToTeacher,
+            sessionId: this.session.id,
+          }
+        )
 
       const responses = await Promise.allSettled(requests)
       // if there is an error in saving, display it; don't block progression if the error is in favoriting
