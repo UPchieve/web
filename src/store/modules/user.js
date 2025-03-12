@@ -351,8 +351,7 @@ export default {
     hasVolunteerRole: (_state, getters) =>
       getters.userRoles.includes('volunteer'),
 
-    hasTeacherRole: (_state, getters) =>
-      getters.userRoles.includes('teacher'),
+    hasTeacherRole: (_state, getters) => getters.userRoles.includes('teacher'),
 
     isAuthenticated: (state) => !!(state.user && state.user.id),
 
