@@ -8,9 +8,7 @@
       Interested in becoming a volunteer tutor on UPchieve?
       <div class="emoji">📚</div>
     </div>
-    <LargeButton class="ml-auto" @click="toggleShowInfoModal">
-      Become a tutor!
-    </LargeButton>
+    <LargeButton @click="toggleShowInfoModal"> Become a tutor! </LargeButton>
     <Modal v-if="showModal" class="more-info-modal">
       <h3 class="heading">How it works</h3>
       <span class="main-message">
@@ -42,7 +40,10 @@
       </span>
       <div class="buttons">
         <LargeButton @click="toggleShowInfoModal">No thanks</LargeButton>
-        <LargeButton variant="primary" @click="becomeAVolunteer"
+        <LargeButton
+          :show-arrow="false"
+          variant="primary"
+          @click="becomeAVolunteer"
           >Become a Volunteer Tutor!</LargeButton
         >
       </div>
@@ -137,11 +138,11 @@ onMounted(() => {
   .buttons {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    width: 80%;
-    align-self: center;
+    justify-content: center;
+    width: 100%;
     margin: 0 auto;
     gap: 16px;
+    padding-top: 16px;
   }
 }
 </style>
