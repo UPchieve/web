@@ -3,6 +3,8 @@ import AnalyticsService from './AnalyticsService'
 import { EVENTS } from '../consts'
 import type { Store } from 'vuex'
 import type { AxiosError } from 'axios'
+import type { RootState } from '@/store'
+import LoggerService from './LoggerService'
 
 // TODO: Fix `store` type
 export async function enrollStudentToIncentiveProgram(
@@ -48,5 +50,18 @@ export async function impactStudyEnrollment(
       ((err as AxiosError).response?.data as { err?: string })?.err ??
       'Unknown error'
     throw new Error(error)
+  }
+}
+
+export async function setTellThemCollegePrepModalSeenAt(
+  store: Store<RootState>
+) {
+  try {
+    store.dispatch('productFlags/addToProductFlags', {
+      tellThemCollegePrepModalSeenAt: new Date().toISOString(),
+    })
+    await NetworkService.setTellThemCollegePrepModalSeenAt()
+  } catch (err: unknown) {
+    LoggerService.noticeError(err)
   }
 }

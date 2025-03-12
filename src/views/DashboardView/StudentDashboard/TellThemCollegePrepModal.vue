@@ -193,7 +193,6 @@
 import { mapState } from 'vuex'
 import Modal from '@/components/Modal.vue'
 import LargeButton from '@/components/LargeButton.vue'
-import setCookie from '@/utils/set-cookie'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import moment from 'moment'
@@ -201,6 +200,7 @@ import UpdogCollege from '@/assets/updog-college.svg'
 import UpdogWithFlag from '@/assets/updog-with-flag.svg'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import ArrowIcon from '@/assets/arrow.svg'
+import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 
 export default {
   name: 'CollegePrepModal',
@@ -225,7 +225,7 @@ export default {
   },
   mounted() {
     AnalyticsService.captureEvent(EVENTS.STUDENT_TELL_THEM_CP_MODAL_SHOWN)
-    setCookie('hasSeenTellThemCollegePrepModal', true)
+    UserProductFlagsService.setTellThemCollegePrepModalSeenAt(this.$store)
   },
   computed: {
     ...mapState({
