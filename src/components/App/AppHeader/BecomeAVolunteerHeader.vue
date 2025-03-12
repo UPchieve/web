@@ -1,14 +1,16 @@
 <template>
   <div class="header">
     <div
-      class="header-message uc-row"
+      class="header-message uc-row ml-auto"
       :class="{ 'mobile-header-message': mobileMode }"
     >
       <div class="emoji">🌟</div>
       Interested in becoming a volunteer tutor on UPchieve?
       <div class="emoji">📚</div>
     </div>
-    <LargeButton @click="toggleShowInfoModal"> Become a tutor! </LargeButton>
+    <LargeButton @click="toggleShowInfoModal" class="ml-auto">
+      Become a tutor!
+    </LargeButton>
     <Modal v-if="showModal" class="more-info-modal">
       <h3 class="heading">How it works</h3>
       <span class="main-message">
@@ -107,7 +109,6 @@ onMounted(() => {
     align-items: center;
     color: $upchieve-white;
     font-weight: 500;
-    margin-left: auto;
   }
 
   .mobile-header-message {
@@ -117,7 +118,6 @@ onMounted(() => {
     color: $upchieve-white;
     font-weight: 500;
     font-size: 14px;
-    margin-left: auto;
   }
 
   .main-message {
