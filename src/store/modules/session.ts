@@ -1,8 +1,8 @@
 import type { ActionContext } from 'vuex'
-import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import type { RootState } from '@/store/index'
 import errorFromHttpResponse from '@/utils/error-from-http-response'
+import SessionService from '@/services/SessionService'
 
 const SESSION_REQUEST_COOLDOWN_MS = 1000 * 60 * 5 // 5 minutes
 const ONE_MINUTE_IN_MS = 1000 * 60
@@ -106,8 +106,8 @@ export default {
       dispatch,
     }: ActionContext<SessionState, RootState>) {
       try {
-        const result = await NetworkService.latestSession()
-        commit('setLatestSession', result.data.data)
+        const result = await SessionService.getLatestSession()
+        commit('setLatestSession', result.sessionData)
         dispatch('startCooldownInterval')
       } catch (err) {
         commit('setLatestSession', {})
