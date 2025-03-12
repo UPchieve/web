@@ -21,20 +21,19 @@
         <div class="filter-controls">
           <label class="select-label"
             >Select Subject
-            <FormSelect
+            <IonicSelect
               v-if="topics.length"
               class="topics-dropdown"
               :name="'topic'"
               :placeholder="subjectPlaceholder"
               :optionTextField="'displayName'"
               :reduce="(option) => option.name"
-              :getSelectOptions="
-                () => [
-                  ...topics,
-                  { name: 'other', displayName: 'All Subjects' },
-                ]
-              "
+              :options="[
+                ...topics,
+                { name: 'other', displayName: 'All Subjects' },
+              ]"
               v-model="filters.topic.name"
+              @update:modelValue="submitFilter"
             />
           </label>
           <div class="date-input-container">
@@ -44,6 +43,7 @@
                 id="session-activity-from"
                 :placeholder="filters.sessionActivityFrom"
                 v-model="filters.sessionActivityFrom"
+                @update:modelValue="submitFilter"
               />
             </label>
             <label class="date-label"
@@ -52,13 +52,11 @@
                 id="session-activity-to"
                 :placeholder="filters.sessionActivityTo"
                 v-model="filters.sessionActivityTo"
+                @update:modelValue="submitFilter"
               />
             </label>
           </div>
         </div>
-        <button class="filter-btn" @click="submitFilter()">
-          Filter Sessions
-        </button>
       </div>
       <div></div>
       <div class="sessions-container">
@@ -95,12 +93,12 @@
 <script>
 import Loader from '@/components/Loader.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
-import FormSelect from '@/components/FormSelect.vue'
 import NetworkService from '@/services/NetworkService'
 import { mapState, mapGetters } from 'vuex'
 import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import moment from 'moment'
 import ExternalPage from '@/assets/ExternalPage.svg'
+import IonicSelect from '@/components/IonicSelect.vue'
 
 export default {
   name: 'student-details',
@@ -108,8 +106,8 @@ export default {
     Loader,
     StudentAvatar,
     FormDateInput,
-    FormSelect,
     ExternalPage,
+    IonicSelect,
   },
 
   data() {
@@ -282,6 +280,10 @@ export default {
   margin-top: 20px;
 }
 
+.sessions-container {
+  @include flex-container(column, center, center);
+}
+
 .img-container {
   @include flex-container(column, flex-end, center);
   background: $c-student;
@@ -312,16 +314,12 @@ export default {
   border-radius: 10px;
   overflow: hidden;
   background-color: white;
-  margin-top: 16px;
-
-  @include breakpoint-below('small') {
-    display: inline-block;
-  }
+  margin: 16px 0;
 }
 
 .sessions-table th {
   background-color: #e3f2fd;
-  padding: 8px;
+  padding: 8px 12px;
   font-size: 16px;
   font-weight: 500;
 
@@ -332,7 +330,7 @@ export default {
 }
 
 .sessions-table tr {
-  text-align: center;
+  text-align: left;
 }
 
 .sessions-table td {
@@ -352,16 +350,14 @@ export default {
 }
 
 .filter-container {
-  @include flex-container(column, center);
-  align-items: center;
+  @include flex-container(column, flex-start);
   margin-bottom: 16px;
-  background-color: #ffffff;
   border-radius: 8px;
   padding: 12px;
   margin-top: 12px;
 
   @include breakpoint-below('small') {
-    @include flex-container(column, center);
+    @include flex-container(row, center);
     max-width: 100%;
   }
 }
@@ -373,7 +369,7 @@ export default {
   margin: 10px 0;
   align-items: center;
 
-  @include breakpoint-below('small') {
+  @include breakpoint-below('medium') {
     @include flex-container(column, center);
   }
 }
@@ -381,30 +377,29 @@ export default {
 .select-label {
   flex: 1;
   margin-right: 10px;
+
+  @include breakpoint-below('medium') {
+    width: 100%;
+    margin: 0;
+  }
 }
 
 .date-input-container {
   @include flex-container(row, center, space-between);
 
-  @include breakpoint-below('small') {
+  @include breakpoint-below('medium') {
     @include flex-container(column, center);
-    align-items: center;
+    width: 100%;
   }
 }
 
 .date-label {
   @include flex-container(column, center, flex-start);
   margin-right: 10px;
-}
 
-.filter-btn {
-  padding: 8px 14px;
-  font-size: 14px;
-  color: #666f7d;
-  align-self: center;
-  border: 1px solid #343440;
-  border-radius: 32px;
-  font-weight: 500;
+  @include breakpoint-below('medium') {
+    width: 100%;
+  }
 }
 
 .view-session-btn {

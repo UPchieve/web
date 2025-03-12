@@ -118,8 +118,11 @@
             </td>
             <td v-if="!classInfo.cleverId">
               <div class="menu-button">
-                <button @click="openStudentMenu(student)">
-                  <MenuButtonsIcon />
+                <button
+                  @click="openStudentMenu(student)"
+                  class="student-menu-btns"
+                >
+                  <MenuButtonsIcon class="menu-btns" />
                 </button>
               </div>
               <div
@@ -375,8 +378,9 @@ export default {
     closeMenu(event) {
       if (
         !event.target.classList.contains('menu-btns') &&
-        this.toggledAssignmentMenuId
+        (this.toggledStudentMenuId || this.toggledAssignmentMenuId)
       ) {
+        this.toggledStudentMenuId = null
         this.toggledAssignmentMenuId = null
       }
     },
@@ -778,8 +782,8 @@ export default {
 }
 
 .class-details-view {
-  @include flex-container(column, center);
   padding: 0;
+  height: 100%;
 }
 
 .breadcrumbs {
@@ -890,6 +894,7 @@ export default {
 .classes-container {
   margin-top: 16px;
   flex-grow: 1;
+  @include flex-container(column, center, center);
 }
 
 .classes-table {
@@ -901,27 +906,25 @@ export default {
 
   th {
     background-color: #e3f2fd;
-    padding: 8px;
+    padding: 8px 12px;
     font-size: 16px;
     font-weight: 500;
   }
 
   tr {
-    text-align: center;
+    text-align: left;
   }
 
   td {
-    padding: 14px;
+    padding: 12px 8px;
     font-weight: 400;
     font-size: 14px;
   }
 }
 
 .view-details-btn {
-  padding: 8px 14px;
   font-size: 14px;
   color: $c-information-blue;
-  align-self: center;
   font-weight: 500;
 }
 
