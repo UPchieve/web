@@ -1124,6 +1124,12 @@ export default {
       surveyId,
     }).then(this._successHandler, this._errorHandler)
   },
+  setTellThemCollegePrepModalSeenAt() {
+    return httpPost(
+      `${API_ROOT}/product-flags/tell-them-college-prep-modal`,
+      {}
+    ).then(this._successHandler, this._axiosErrorHandler)
+  },
   getStudentClasses() {
     return httpGet(`${API_ROOT}/students/classes`).then(
       this._successHandler,

@@ -81,7 +81,6 @@ import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { EVENTS } from '@/consts'
-import getCookie from '@/utils/get-cookie'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
@@ -132,7 +131,7 @@ export default {
 
     if (
       this.hadASession &&
-      !getCookie('hasSeenTellThemCollegePrepModal') &&
+      !this.productFlags.tellThemCollegePrepModalSeenAt &&
       this.user.pastSessions.length >= 1 &&
       this.isCollegePrepAdEnabled
     )
@@ -353,7 +352,7 @@ export default {
         if (
           currentValue &&
           !prevValue &&
-          !getCookie('hasSeenTellThemCollegePrepModal') &&
+          !this.productFlags.tellThemCollegePrepModalSeenAt &&
           this.user.pastSessions.length >= 1 &&
           this.isCollegePrepAdEnabled
         ) {
