@@ -118,7 +118,8 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 function updateValue(event: CustomEvent) {
-  emit('update:modelValue', event.detail.value)
+  const selectedValue = event.detail.value
+  emit('update:modelValue', selectedValue)
 }
 </script>
 
