@@ -577,6 +577,7 @@ export default {
           {
             response: this.tutorFeedbackToTeacher,
             sessionId: this.session.id,
+            question: this.tutorFeedbackToTeacherQuestion,
           }
         )
 
