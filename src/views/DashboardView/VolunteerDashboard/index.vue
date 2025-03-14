@@ -2,11 +2,8 @@
   <div class="volunteer-dashboard">
     <dashboard-banner />
 
-    <div
-      v-if="downtimeBannerMessage"
-      class="dashboard-notice"
-      :class="'dashboard-notice--info'"
-    >
+    <!-- TODO: Make notices into a reusable component. -->
+    <div v-if="downtimeBannerMessage" class="dashboard-notice">
       <a href="https://upchieve.statuspage.io" target="_blank">{{
         downtimeBannerMessage
       }}</a>
@@ -733,25 +730,22 @@ export default {
 }
 
 .dashboard-notice {
-  padding: 15px;
   background: $c-warning-orange;
   border-radius: 8px;
-  margin: 20px 0 -20px;
-  font-weight: 500;
   font-size: 16px;
+  font-weight: 500;
+  margin: 20px 0 -20px;
+  padding: 15px;
+  text-align: center;
 
   a {
     color: #fff;
+    white-space: pre-line;
 
     &:hover {
       color: #f3f3f3;
       text-decoration: none;
     }
-  }
-
-  &--info {
-    color: #fff;
-    background-color: $c-information-blue;
   }
 }
 
