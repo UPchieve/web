@@ -32,6 +32,17 @@
         </div>
         <ClassImg class="dashboard-img" />
       </div>
+      <!-- TODO: Make notices into a reusable component. -->
+      <div class="dashboard-notices">
+        <div
+          v-if="downtimeBannerMessage"
+          class="dashboard-notice dashboard-notice--warn"
+        >
+          <a href="https://upchieve.statuspage.io" target="_blank">{{
+            downtimeBannerMessage
+          }}</a>
+        </div>
+      </div>
       <div v-if="isLoading" class="uc-row justify-center mt-5">
         <loader></loader>
       </div>
@@ -155,6 +166,7 @@ export default {
   computed: {
     ...mapGetters({
       topicIdToTopic: 'subjects/topicIdToTopic',
+      downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
     }),
     ...mapState({
       user: (state) => state.user,
@@ -578,6 +590,31 @@ export default {
     position: absolute;
     right: -4px;
     width: 22px;
+  }
+}
+
+.dashboard-notice {
+  background-color: $c-success-green;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 20px;
+  padding: 15px;
+  text-align: center;
+
+  a {
+    color: #fff;
+    white-space: pre-line;
+
+    &:hover {
+      color: #f3f3f3;
+      text-decoration: none;
+    }
+  }
+
+  &--warn {
+    background-color: $c-warning-orange;
   }
 }
 </style>

@@ -9,20 +9,20 @@
     <div v-else>
       <StudentAssignments :assignments="assignments" />
     </div>
+    <!-- TODO: Make notices into a reusable component. -->
     <div class="dashboard-notices">
       <div
         v-if="downtimeBannerMessage"
-        class="dashboard-notice"
-        :class="'dashboard-notice--downtime'"
+        class="dashboard-notice dashboard-notice--warn"
       >
         <a href="https://upchieve.statuspage.io" target="_blank">{{
           downtimeBannerMessage
         }}</a>
       </div>
       <large-button
-        v-if="isStandaloneAiTutorEnabled"
+        v-if="isStandaloneAiTutorEnabled && aiBotMessage"
         class="dashboard-notice ai-bot"
-        :class="'dashboard-notice--downtime'"
+        :class="'dashboard-notice--info'"
         routeTo="/ai-tutor-conversations"
         >{{ aiBotMessage }}<arrow-icon></arrow-icon
       ></large-button>
@@ -417,17 +417,18 @@ export default {
 }
 
 .dashboard-notice {
-  padding: 15px;
   background-color: $c-success-green;
   border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
   margin-top: 20px;
   font-weight: 500;
-  font-size: 16px;
-  color: #fff;
+  padding: 15px;
   text-align: center;
 
   a {
     color: #fff;
+    white-space: pre-line;
 
     &:hover {
       color: #f3f3f3;
@@ -452,11 +453,6 @@ export default {
     svg {
       fill: #fff;
     }
-  }
-
-  &--downtime {
-    color: #fff;
-    background-color: $c-information-blue;
   }
 
   &--summer-prep {
