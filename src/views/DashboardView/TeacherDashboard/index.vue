@@ -42,6 +42,14 @@
             downtimeBannerMessage
           }}</a>
         </div>
+        <div
+          v-if="isTeacherGuidanceExperimentActive"
+          class="dashboard-notice dashboard-notice--info"
+          @click="handleTeacherGuidanceClick"
+        >
+          <span>Not sure how to use UPchieve? Let us guide you!</span>
+          <arrow-icon class="arrow-icon ml-2" />
+        </div>
       </div>
       <div v-if="isLoading" class="uc-row justify-center mt-5">
         <loader></loader>
@@ -138,6 +146,7 @@ import Checklist from '@/assets/Checklist.svg'
 import CleverLogo from '@/assets/clever_logo.svg'
 import ExternalPage from '@/assets/ExternalPage.svg'
 import TaskBadge from '@/assets/task-badge.svg'
+import ArrowIcon from '@/assets/arrow.svg'
 import OnboardingModal from '@/components/OnboardingModal.vue'
 import TeacherOnboarding_Frame1 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame1.svg'
 import TeacherOnboarding_Frame2 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame2.svg'
@@ -161,13 +170,10 @@ export default {
     ExternalPage,
     TaskBadge,
     OnboardingModal,
+    ArrowIcon,
   },
 
   computed: {
-    ...mapGetters({
-      topicIdToTopic: 'subjects/topicIdToTopic',
-      downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
-    }),
     ...mapState({
       user: (state) => state.user,
       subjects: (state) => state.subjects.subjects,
@@ -176,6 +182,9 @@ export default {
     }),
     ...mapGetters({
       topicIdToTopic: 'subjects/topicIdToTopic',
+      downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
+      isTeacherGuidanceExperimentActive:
+        'featureFlags/isTeacherGuidanceExperimentActive',
     }),
   },
 
@@ -264,6 +273,25 @@ export default {
     }
 
     await this.getTeacherClasses()
+
+    if (
+      this.$route.query.action === 'assign-tutoring' &&
+      this.isTeacherGuidanceExperimentActive
+    ) {
+      if (!this.classes.length) {
+        this.openCreateTeacherClassModal()
+        AnalyticsService.captureEvent(
+          EVENTS.TEACHER_SHOWN_CLASS_MODAL_FROM_GUIDE_PAGE
+        )
+      } else {
+        // Always open the first class and let the teacher decide what class to assign
+        // if they'd like to assign a different class
+        this.openCreateAssignmentModal(this.classes[0])
+        AnalyticsService.captureEvent(
+          EVENTS.TEACHER_SHOWN_ASSIGNMENT_MODAL_FROM_GUIDE_PAGE
+        )
+      }
+    }
   },
 
   methods: {
@@ -392,6 +420,10 @@ export default {
       this.currentClassInfo = teacherClass
       this.currentClassName = teacherClass.name
       this.$router.push(`/dashboard/teacher/class/${teacherClass.id}`)
+    },
+    handleTeacherGuidanceClick() {
+      AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_GUIDANCE_GUIDE)
+      window.open('https://upchieve.org/teacher-guide', '_blank')
     },
   },
 }
@@ -600,8 +632,9 @@ export default {
   font-size: 16px;
   font-weight: 500;
   margin-top: 20px;
-  padding: 15px;
+  padding: 1em;
   text-align: center;
+  width: 100%;
 
   a {
     color: #fff;
@@ -613,8 +646,21 @@ export default {
     }
   }
 
+  svg {
+    fill: #fff;
+  }
+
   &--warn {
     background-color: $c-warning-orange;
+  }
+
+  &--info {
+    @include flex-container(row, center, center);
+    background-color: $c-information-blue;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 </style>

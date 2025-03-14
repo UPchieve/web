@@ -41,6 +41,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_SESSION_RECAPS]: false,
+      [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -203,6 +204,8 @@ export default {
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION
       ],
+    isTeacherGuidanceExperimentActive: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {
