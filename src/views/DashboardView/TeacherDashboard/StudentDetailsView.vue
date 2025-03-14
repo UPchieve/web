@@ -202,10 +202,23 @@ export default {
         const {
           data: { sessionDetails },
         } = await NetworkService.getStudentSessionDetails(this.studentId)
-        this.studentFirstName = sessionDetails[0].firstName
-        this.studentLastName = sessionDetails[0].lastName
+
+        let filteredSessionDetails = sessionDetails.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )
+
+        filteredSessionDetails = this.isTeacherSessionRecapsEnabled
+          ? sessionDetails.filter((session) => session.volunteerId)
+          : filteredSessionDetails
+
+        if (filteredSessionDetails.length === 0) {
+          return []
+        }
+
+        this.studentFirstName = filteredSessionDetails[0].firstName
+        this.studentLastName = filteredSessionDetails[0].lastName
         const subjects = this.subjects
-        const sessionsWithSubjects = sessionDetails.map((session) => {
+        const sessionsWithSubjects = filteredSessionDetails.map((session) => {
           const created = new Date(session.createdAt)
           const ended = new Date(session.endedAt)
           const sessionLength = (ended - created) / (1000 * 60)
