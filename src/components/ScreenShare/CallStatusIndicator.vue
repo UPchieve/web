@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import SpeakerIcon from '@/assets/voice_message_icons/speaker.svg'
+import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 
 const store = useStore()
 
@@ -21,7 +21,7 @@ function clearDisplayCallStatusImmediately() {
     <div class="call-status-indicator" v-if="displayCallStatus">
       <div class="main" v-if="displayCallStatus?.main?.length > 0">
         <div class="icon" v-if="displayCallStatus.icon">
-          <SpeakerIcon v-if="displayCallStatus.icon === 'speaker'" />
+          <SpeakerFilledIcon v-if="displayCallStatus.icon === 'speaker'" />
         </div>
         <div class="title">{{ displayCallStatus.main }}</div>
         <button class="close" @click="clearDisplayCallStatusImmediately">

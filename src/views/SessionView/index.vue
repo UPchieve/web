@@ -127,6 +127,7 @@
           :isPartnerSpeaking="isPartnerSpeaking"
           :partnerPresence="partnerPresence"
           :partnerMicStatus="partnerMicStatus"
+          :partnerCanUseMic="partnerCanUseMic"
           :unableToJoinCall="unableToJoinCall"
           :isBanned="isLiveMediaBanned"
           :isJoiningCall="isJoiningCall"
@@ -550,6 +551,12 @@ export default {
       const currentSession = this.session
       if (this.isStudent) return currentSession?.volunteerBannedFromLiveMedia
       else return currentSession?.studentBannedFromLiveMedia
+    },
+    partnerCanUseMic() {
+      return (
+        !this.isPartnerLiveMediaBanned &&
+        this.snapshot.context.hasReceivedPartnerAudio
+      )
     },
     partnerMicStatus() {
       const name = this.sessionPartner.firstname
