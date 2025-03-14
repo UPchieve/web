@@ -5,7 +5,7 @@
     :class="buttonClasses"
     :showArrow="showArrow"
     :buttonType="buttonType"
-    @click="$emit('click')"
+    @click="(event) => $emit('click', event)"
   >
     <slot />
   </button-template>

@@ -3,9 +3,16 @@ import LargeButton from '@/components/LargeButton.vue'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 
-const { variant } = defineProps<{
-  variant: 'primary' | 'secondary' | 'tertiary'
-}>()
+const props = defineProps({
+  variant: {
+    type: String,
+    default: 'tertiary',
+  },
+  icon: {
+    type: String,
+    required: false,
+  },
+})
 
 const store = useStore()
 const session = computed(() => store.state.user.session)
@@ -23,7 +30,8 @@ const reportSession = () => {
 </script>
 
 <template>
-  <large-button @click="reportSession" type="button" :variant="variant">
+  <large-button @click="reportSession" type="button" :variant="props.variant">
+    <component v-if="props.icon" :is="props.icon" />
     Report
   </large-button>
 </template>

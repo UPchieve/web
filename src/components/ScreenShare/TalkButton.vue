@@ -123,7 +123,7 @@ const onMouseEnterMicButton = () => {
   height: var(--var-speak-button-height);
   border-radius: 50%;
   border-width: 1px;
-  border-color: white;
+  border-color: $c-background-grey;
   background-color: white;
   padding: 6px;
 }
@@ -133,8 +133,10 @@ const onMouseEnterMicButton = () => {
 }
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 white;
-    transform: scale(1.05);
+    box-shadow: 0 0 0 2px #ccfff4;
+    border-width: 2px;
+    border-color: $c-information-blue;
+    transform: scale(1.025);
   }
 }
 
@@ -168,10 +170,10 @@ const onMouseEnterMicButton = () => {
 }
 
 .speak-button:hover {
-  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: brightness(0.8);
 }
 .speak-button:hover.muted {
-  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: brightness(1.2);
 }
 .speak-button.muted::after {
   content: ' ';

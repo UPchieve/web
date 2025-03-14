@@ -17,7 +17,7 @@
 
   <button
     v-else
-    @click="$emit('click')"
+    @click="(event) => $emit('click', event)"
     :type="buttonType"
     class="ButtonTemplate"
   >

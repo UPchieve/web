@@ -3,15 +3,16 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import PartnerInfo from './PartnerInfo.vue'
 import TalkButton from './TalkButton.vue'
 import { useStore } from 'vuex'
-import PartnerAvatar from './PartnerAvatar.vue'
 import {
   SessionAudioEvent,
   SessionAudioService,
 } from '@/services/LiveShareService/SessionAudioService'
-import EndSessionButton from '@/components/EndSessionButton.vue'
-import ReportSessionButton from '@/components/ReportSessionButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import SpeakerButton from './SpeakerButton.vue'
+import Menu from './Menu.vue'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 
 const emit = defineEmits<{
   (e: 'toggleMuteSelf'): void
@@ -25,6 +26,7 @@ const props = defineProps<{
   isPartnerSpeaking: boolean
   partnerPresence: string
   partnerMicStatus: string
+  partnerCanUseMic: boolean
   unableToJoinCall: boolean
   isJoiningCall: boolean
   isBanned: boolean
@@ -36,9 +38,6 @@ const props = defineProps<{
 const store = useStore()
 const userType = computed(
   () => store.getters['user/userType'] as 'student' | 'volunteer'
-)
-const sessionPartnerFirstName = computed(
-  () => store.getters['user/sessionPartner'].firstname
 )
 const isStartingAudio = computed(
   () => store.state.liveMedia.audio.isStartingAudio
@@ -136,20 +135,8 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
 <template>
   <div class="zoom">
     <audio v-if="useChimeMeetings" ref="meetingAudio" :muted="isSpeakerMuted" />
-    <PartnerAvatar
-      :isPartnerSpeaking="isPartnerSpeaking"
-      :isSpeakerMuted="isSpeakerMuted"
-      :userType="userType"
-      :sessionPartnerFirstName="sessionPartnerFirstName"
-      :partnerIsInAudioChannel="
-        useChimeMeetings ? true : partnerIsInAudioChannel
-      "
-      @toggleMuteSpeaker="toggleMuteSpeaker"
-      :unableToJoinCall="
-        useChimeMeetings && (unableToJoinCall || unableToJoinAudio)
-      "
-      :isJoiningCall="useChimeMeetings && isJoiningCall"
-    />
+    <VolunteerIcon class="avatar" v-if="userType === 'student'" />
+    <StudentIcon class="avatar" v-else />
     <PartnerInfo
       class="grow"
       :userType="userType"
@@ -160,17 +147,21 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
     <div class="session-buttons" :class="userType">
       <!--        There is no session header in mobile mode, in which case
 render the session control buttons in here-->
-      <ReportSessionButton
-        v-if="mobileMode"
-        :variant="'tertiary'"
-        class="report-button"
-      />
-      <EndSessionButton
-        v-if="mobileMode"
-        class="end-button"
-        :variant="'secondary'"
-        :end-text="'End'"
-      />
+
+      <SpeakerButton
+        :partnerMicStatus="partnerMicStatus"
+        :isPartnerSpeaking="isPartnerSpeaking"
+        :isSpeakerMuted="isSpeakerMuted"
+        :partnerCanUseMic="partnerCanUseMic"
+        :partnerIsInAudioChannel="
+          useChimeMeetings ? true : partnerIsInAudioChannel
+        "
+        @toggleMuteSpeaker="toggleMuteSpeaker"
+        :unableToJoinCall="
+          useChimeMeetings && (unableToJoinCall || unableToJoinAudio)
+        "
+        :isJoiningCall="useChimeMeetings && isJoiningCall"
+      ></SpeakerButton>
       <TalkButton
         :isMicMuted="
           useChimeMeetings
@@ -189,6 +180,7 @@ render the session control buttons in here-->
         "
         @toggleMuteMic="toggleMuteMic"
       />
+      <Menu v-if="mobileMode" />
     </div>
   </div>
 </template>
@@ -233,22 +225,10 @@ render the session control buttons in here-->
   justify-content: space-between;
 }
 
-.report-button {
-  background-color: transparent;
-  color: white;
-  border: none;
-  padding: 0px;
-  &:hover {
-    background-color: #fff3;
-  }
-}
-.end-button {
-  background-color: transparent;
-  color: white;
-  border-color: white;
-  &:hover {
-    border-color: white;
-    background-color: #fff3;
-  }
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  flex-shrink: 0;
 }
 </style>

@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { computed } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 
-const { variant, endText } = defineProps({
+const props = defineProps({
   variant: {
     type: String,
     default: 'tertiary',
@@ -14,7 +14,12 @@ const { variant, endText } = defineProps({
     type: String,
     default: 'End Session',
   },
+  icon: {
+    type: String,
+    required: false,
+  },
 })
+
 const store = useStore()
 const router = useRouter()
 const isSessionWaitingForVolunteer = computed(
@@ -69,16 +74,17 @@ const endSession = async () => {
     v-if="isSessionWaitingForVolunteer"
     @click="end"
     type="button"
-    :variant="variant"
+    :variant="props.variant"
     data-testid="cancel-session-button"
     >Cancel</large-button
   >
   <large-button v-else-if="isSessionOver" @click="finish" type="button"
     >Finish</large-button
   >
-  <large-button class="end-session-button" v-else @click="end" type="button">{{
-    endText
-  }}</large-button>
+  <large-button class="end-session-button" v-else @click="end" type="button">
+    <component v-if="props.icon" :is="props.icon" />
+    {{ props.endText }}
+  </large-button>
 </template>
 
 <style lang="scss" scoped>
