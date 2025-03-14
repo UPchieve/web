@@ -20,9 +20,6 @@ export default {
   components: {
     IonAlert,
   },
-  async created() {
-    await this.getCurrentServerVersion()
-  },
   async mounted() {
     await this.getCurrentServerVersion()
     // every 10 minutes, check the current server version
