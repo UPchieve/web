@@ -16,7 +16,7 @@
         <label for="email" class="uc-form-label">Email</label>
         <input id="email" type="text" v-model="email" />
       </div>
-      <div class="row" v-if="isStudent || isVolunteer">
+      <div class="row" v-if="hasStudentRole || hasVolunteerRole">
         <label for="partner-org" class="uc-form-label"> Partner org </label>
         <v-select
           id="partner-org"
@@ -26,7 +26,7 @@
           v-model="partnerOrg"
         />
       </div>
-      <div class="row" v-if="isStudent && partnerOrg && partnerOrg.sites">
+      <div class="row" v-if="hasStudentRole && partnerOrg && partnerOrg.sites">
         <label for="partner-site" class="uc-form-label">Partner Site</label>
         <v-select
           id="partner-sites"
@@ -36,7 +36,7 @@
         />
       </div>
 
-      <div class="row" v-if="isStudent">
+      <div class="row" v-if="hasStudentRole">
         <label for="partner-school" class="uc-form-label">
           Partner school
         </label>
@@ -102,7 +102,7 @@
           </option>
         </select>
       </div>
-      <div class="row" v-if="isVolunteer">
+      <div class="row" v-if="hasVolunteerRole">
         <label for="approved" class="uc-form-label">Approved</label>
         <select name="approved" id="approved" v-model="isApproved">
           <option
@@ -126,9 +126,10 @@ import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import {
-  isVolunteerUserType,
-  isStudentUserType,
   isTeacherUserType,
+  hasStudentRole,
+  hasVolunteerRole,
+  isStudentVolunteer,
 } from '@/utils/user-type'
 
 export default {
@@ -170,14 +171,17 @@ export default {
   },
 
   computed: {
-    isVolunteer() {
-      return isVolunteerUserType(this.user.userType)
-    },
-    isStudent() {
-      return isStudentUserType(this.user.userType)
-    },
     isTeacher() {
       return isTeacherUserType(this.user.userType)
+    },
+    hasStudentRole() {
+      return hasStudentRole(this.user?.roles ?? [])
+    },
+    hasVolunteerRole() {
+      return hasVolunteerRole(this.user?.roles ?? [])
+    },
+    isStudentVolunteer() {
+      return isStudentVolunteer(this.user?.roles ?? [])
     },
   },
 
@@ -185,7 +189,7 @@ export default {
     this.isLoading = true
     try {
       this.banOptions =
-        this.isVolunteer || this.isTeacher
+        (this.hasVolunteerRole && !this.isStudentVolunteer) || this.isTeacher
           ? [
               { text: 'False', value: null },
               { text: 'True', value: 'complete' },
@@ -198,13 +202,13 @@ export default {
 
       let activeSchoolPartnerName = ''
 
-      if (this.isVolunteer) {
+      if (this.hasVolunteerRole && !this.hasStudentRole) {
         const response = await NetworkService.adminGetVolunteerPartners()
         const {
           data: { partnerOrgs },
         } = response
         this.listedPartnerOrgs = partnerOrgs
-      } else if (this.isStudent) {
+      } else if (this.hasStudentRole) {
         const response = await NetworkService.adminGetStudentPartners()
         const {
           data: { partnerOrgs },

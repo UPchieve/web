@@ -1,5 +1,10 @@
 <template>
   <div v-if="user.id" class="user-detail">
+    <div v-if="isStudentVolunteer" class="student-volunteer-notice">
+      <InformationIcon class="info-icon" />
+      This student is part of an experiment where they can also become
+      volunteers on the same account.
+    </div>
     <admin-edit-user
       v-if="isEditMode"
       :user="user"
@@ -7,7 +12,7 @@
       :getUser="getUser"
     />
     <admin-pending-volunteer-detail
-      v-else-if="isVolunteer && !user.isApproved"
+      v-else-if="hasVolunteerRole && !user.isApproved"
       :toggleEditMode="toggleEditMode"
       :volunteer="user"
     />
@@ -63,7 +68,7 @@
           {{ user.firstName }} {{ user.lastName }}
         </div>
         <div class="user-detail__subtitle mb-0">ID: {{ user.id }}</div>
-        <div class="user-detail__subtitle">Type: {{ user.userType }}</div>
+        <div class="user-detail__subtitle">{{ userTypeLabel }}</div>
         <div class="user-detail__section">
           <div class="user-detail__section-title">Joined</div>
           <div>{{ createdAt }}</div>
@@ -92,7 +97,10 @@
           <div class="user-detail__section-title">Zip code</div>
           <div>{{ user.zipCode }}</div>
         </div>
-        <div v-if="isVolunteer" class="user-detail__section">
+        <div
+          v-if="isVolunteer || isStudentVolunteer"
+          class="user-detail__section"
+        >
           <div class="user-detail__section-title">Background Information</div>
           <div v-if="user.background.occupation">
             <div class="user-detail__subtitle">
@@ -167,7 +175,13 @@ import SessionsList from '@/components/Admin/SessionsList.vue'
 import AdminPendingVolunteerDetail from '@/views/Admin/AdminPendingVolunteerDetail.vue'
 import AdminEditUser from '@/views/Admin/AdminEditUser.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
-import { isVolunteerUserType, isStudentUserType } from '@/utils/user-type'
+import {
+  isVolunteerUserType,
+  isStudentUserType,
+  isStudentVolunteer,
+  hasVolunteerRole,
+} from '@/utils/user-type'
+import InformationIcon from '@/assets/information.svg'
 
 const getUser = async (userId, page) => {
   const { data } = await NetworkService.adminGetUser(userId, page)
@@ -182,6 +196,7 @@ export default {
     SessionsList,
     AdminEditUser,
     PageControl,
+    InformationIcon,
   },
 
   data() {
@@ -199,6 +214,19 @@ export default {
   },
 
   computed: {
+    userTypeLabel() {
+      const primaryType = this.user.userType
+      if (this.isStudentVolunteer) {
+        return `Type: ${primaryType} (primary), volunteer (experimental)`
+      }
+      return `Type: ${primaryType}`
+    },
+    isStudentVolunteer() {
+      return isStudentVolunteer(this.user?.roles ?? [])
+    },
+    hasVolunteerRole() {
+      return hasVolunteerRole(this.user?.roles ?? [])
+    },
     isVolunteer() {
       return isVolunteerUserType(this.user.userType)
     },
@@ -379,5 +407,20 @@ export default {
   &:hover {
     color: #2c3e50;
   }
+}
+
+.student-volunteer-notice {
+  background-color: lightyellow;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+}
+
+.info-icon {
+  height: 48px;
+  width: 48px;
 }
 </style>

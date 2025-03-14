@@ -38,7 +38,9 @@ describe('AdminEditUser.vue', () => {
     NetworkService.adminGetVolunteerPartners = vi
       .fn()
       .mockResolvedValueOnce({ data: { partnerOrgs: [] } })
-    const wrapper = getWrapper({ user: { userType: 'volunteer' } })
+    const wrapper = getWrapper({
+      user: { userType: 'volunteer', roles: ['volunteer'] },
+    })
 
     await flushPromises()
 
