@@ -200,6 +200,7 @@ export default {
       isQuizStudyMaterialUser: 'user/isQuizStudyMaterialUser',
       hasCertification: 'user/hasCertification',
       isAutoFlowUser: 'user/isAutoFlowUser',
+      isStudentVolunteer: 'user/isStudentVolunteer',
     }),
     tries() {
       const { user } = this.$store.state.user
@@ -266,11 +267,14 @@ export default {
                 ? EVENTS.ROLE_SWITCHING_USER_PASSED_CERTIFICATION_QUIZ
                 : EVENTS.ROLE_SWITCHING_USER_FAILED_CERTIFICATION_QUIZ,
               {
-                quiz: this.quizName,
+                quiz: this.category,
               }
             )
             AnalyticsService.captureEvent(
-              EVENTS.ROLE_SWITCHING_USER_COMPLETED_CERTIFICATION_QUIZ
+              EVENTS.ROLE_SWITCHING_USER_COMPLETED_CERTIFICATION_QUIZ,
+              {
+                quiz: this.category,
+              }
             )
           }
 
