@@ -76,12 +76,24 @@
             <td>{{ session.length }} Minutes</td>
             <td v-if="isTeacherSessionRecapsEnabled">
               <button
+                v-if="isHighlyRatedSession(session)"
                 class="view-session-btn"
                 @click="goToSessionRecap(session.id)"
               >
                 View Session
                 <external-page class="external-page-icon" />
               </button>
+              <span
+                v-else
+                class="view-session-btn-disabled"
+                v-tooltip="{
+                  text: 'Feature in beta, only some session recaps are available.',
+                  color: 'black',
+                  position: 'bottom',
+                }"
+              >
+                Not available
+              </span>
             </td>
           </tr>
         </table>
@@ -99,9 +111,13 @@ import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import moment from 'moment'
 import ExternalPage from '@/assets/ExternalPage.svg'
 import IonicSelect from '@/components/IonicSelect.vue'
+import { vTooltip } from 'maz-ui'
 
 export default {
   name: 'student-details',
+  directives: {
+    tooltip: vTooltip,
+  },
   components: {
     Loader,
     StudentAvatar,
@@ -194,6 +210,16 @@ export default {
     formatTimestamp(timestamp) {
       const date = moment(timestamp)
       return date.format('MM/DD/YYYY')
+    },
+
+    isHighlyRatedSession(session) {
+      const hasRating = session.studentRating || session.volunteerRating
+
+      const isHighlyRated =
+        (!session.studentRating || session.studentRating >= 4) &&
+        (!session.volunteerRating || session.volunteerRating >= 4)
+
+      return hasRating && isHighlyRated
     },
 
     async getStudentSessionDetails() {
@@ -419,6 +445,14 @@ export default {
   padding: 8px 14px;
   font-size: 14px;
   color: $c-information-blue;
+  align-self: center;
+  font-weight: 500;
+}
+
+.view-session-btn-disabled {
+  padding: 8px 14px;
+  font-size: 14px;
+  color: $c-default-grey;
   align-self: center;
   font-weight: 500;
 }
