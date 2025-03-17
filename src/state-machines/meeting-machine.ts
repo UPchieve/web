@@ -46,6 +46,7 @@ export type Context = {
   endScreenShareModeration: () => void
   isPartnerMicMuted: boolean
   activeSpeakerIds: string[]
+  isPartnerSpeaking: boolean
   hasReceivedPartnerAudio: boolean // We use this to determine if we know the partner's mic status or not.
   transcriptionStarted: boolean
   screenShareWidth: number | undefined
@@ -150,6 +151,7 @@ export function create() {
       endScreenShareModeration: () => {},
       isPartnerMicMuted: true,
       activeSpeakerIds: [],
+      isPartnerSpeaking: false,
       hasReceivedPartnerAudio: false,
       transcriptionStarted: false,
       screenShareWidth: undefined,
@@ -624,6 +626,11 @@ export function create() {
                 },
               },
               SpeakerUnmuted: {
+                entry: [
+                  () => {
+                    store.dispatch('liveMedia/audio/dismissDisplayCallStatus')
+                  },
+                ],
                 on: {
                   toggle_mute_partner: {
                     target: 'SpeakerMuted',
@@ -652,6 +659,10 @@ export function create() {
           active_speakers_changed: {
             actions: [
               assign({
+                isPartnerSpeaking: (input) =>
+                  input.event.speakerIds.includes(
+                    input.context.partnerAttendeeId ?? ''
+                  ),
                 activeSpeakerIds: (input) => input.event.speakerIds,
                 isPartnerMicMuted: (input) =>
                   // If the partner is speaking, they can't be muted.

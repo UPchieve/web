@@ -1,10 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import MutedMicIcon from '@/assets/muted-mic.svg'
-import { vTooltip } from 'maz-ui'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 const store = useStore()
 const props = defineProps<{
@@ -15,31 +11,12 @@ const props = defineProps<{
 }>()
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
-
-const onMouseEnterAudioStatus = () => {
-  AnalyticsService.captureEvent(
-    EVENTS.VOICE_CHAT_USER_MOUSED_OVER_PARTNER_MIC_STATUS
-  )
-}
 </script>
 
 <template>
   <div class="name-container">
     <div>
-      <div class="name">
-        {{ sessionPartner.firstname
-        }}<span
-          class="disabled-mic"
-          v-if="props.partnerMicStatus && props.audioCallSupported"
-          @mouseenter="onMouseEnterAudioStatus"
-          v-tooltip="{
-            text: props.partnerMicStatus,
-            color: 'black',
-            position: 'bottom',
-          }"
-          ><MutedMicIcon class="icon"
-        /></span>
-      </div>
+      <div class="name">{{ sessionPartner.firstname }}</div>
       <div class="status">
         {{ props.partnerPresence }}
       </div>

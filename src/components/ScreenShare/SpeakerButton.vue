@@ -4,7 +4,6 @@ import { computed } from 'vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import SpeakerMutedIcon from '@/assets/voice_message_icons/speaker-muted.svg'
-import SpeakerNoSoundIcon from '@/assets/voice_message_icons/speaker-no-sound.svg'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 
 const props = defineProps<{
@@ -33,23 +32,24 @@ const tooltipText = computed(() => {
   }
 
   if (props.isSpeakerMuted) {
-    return 'Click to unmute'
+    return 'Click to listen'
   }
 
-  return 'Click to mute'
+  return 'Click to mute speaker'
 })
 
 const onClickMute = () => {
   AnalyticsService.captureEvent(
     EVENTS.VOICE_CHAT_USER_CLICKED_PARTNER_AVATAR_BUTTON
   )
+
   emit('toggleMuteSpeaker')
 }
 </script>
 <template>
   <div class="start-call-container" :class="{ muted: props.isSpeakerMuted }">
     <button
-      :disabled="props.unableToJoinCall"
+      :disabled="props.unableToJoinCall || !props.partnerCanUseMic"
       class="speaker-button"
       :class="{
         muted: props.isSpeakerMuted,
@@ -62,8 +62,7 @@ const onClickMute = () => {
         position: 'bottom',
       }"
     >
-      <SpeakerNoSoundIcon v-if="disabled" class="disabled" />
-      <SpeakerMutedIcon v-else-if="props.isSpeakerMuted" />
+      <SpeakerMutedIcon v-if="props.isSpeakerMuted" :class="{ disabled }" />
       <SpeakerFilledIcon v-else />
     </button>
   </div>
@@ -137,6 +136,6 @@ const onClickMute = () => {
   filter: brightness(0.6);
 }
 .speaker-button:disabled:hover {
-  backdrop-filter: brightness(1);
+  backdrop-filter: unset;
 }
 </style>
