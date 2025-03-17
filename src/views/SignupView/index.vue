@@ -108,6 +108,9 @@
           Already have an account?
           <router-link class="uc-link" to="/login">Log In</router-link>
         </p>
+        <p v-if="downtimeBannerMessage" class="downtime-msg">
+          Note: {{ downtimeBannerMessage }}
+        </p>
       </div>
     </div>
   </form-page-template>
@@ -195,6 +198,7 @@ export default {
   computed: {
     ...mapGetters({
       useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
+      downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
     }),
     welcomeMessage() {
       if (this.referredBy?.firstName)
@@ -326,5 +330,14 @@ a.link {
     color: #103a90;
     text-decoration: none;
   }
+}
+
+.downtime-msg {
+  background-color: $c-warning-orange;
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  margin-top: 16px;
 }
 </style>
