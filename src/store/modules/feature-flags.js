@@ -49,8 +49,7 @@ export default {
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
-      [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]:
-        'We are doing maintenance to our infrastructure the week of March 14th to March 21st.\nWe apologize in advance for any disruptions to the platform.',
+      [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS]: [],
