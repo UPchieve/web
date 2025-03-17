@@ -91,17 +91,18 @@
           }
         "
       />
-      <div
+      <button
         class="toolbar-item"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
         tabindex="0"
         @click="usePickTool"
         @keydown.enter="usePickTool"
+        :disabled="isConnected ? undefined : true"
       >
         <PickToolIcon class="toolbar-icon--pick" />
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Brushes"
         tabindex="0"
@@ -112,6 +113,7 @@
             ? 'selected-tool'
             : ''
         "
+        :disabled="isConnected ? undefined : true"
       >
         <PenIcon class="toolbar-icon--pen" />
         <div v-if="showBrushPicker" class="options-bar">
@@ -134,8 +136,8 @@
             <ThinPenIcon class="toolbar-icon" />
           </div>
         </div>
-      </div>
-      <div
+      </button>
+      <button
         v-if="isWhiteboardEraserToolActive"
         class="toolbar-item"
         :class="selectedTool === 'eraser' ? 'selected-tool' : ''"
@@ -143,15 +145,17 @@
         tabindex="0"
         @click="useEraserTool"
         @keydown.enter="useEraserTool"
+        :disabled="isConnected ? undefined : true"
       >
         <EraserIcon class="toolbar-icon" />
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Upload photo"
         tabindex="0"
         @click="openFileDialog"
         @keydown.enter="openFileDialog"
+        :disabled="isConnected ? undefined : true"
       >
         <FileDialog
           ref="fileDialog"
@@ -160,14 +164,15 @@
           @file-selected="uploadPhoto"
         />
         <PhotoUploadIcon class="toolbar-icon--photo" />
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Shapes"
         tabindex="0"
         @click="toggleShapes"
         @keydown.enter="toggleShapes"
         :class="isShapeSelected ? 'selected-tool' : ''"
+        :disabled="isConnected ? undefined : true"
       >
         <ShapesIcon class="toolbar-icon" />
         <div v-if="showShapePicker" class="options-bar">
@@ -230,8 +235,8 @@
           <!-- <xy-graph-icon class="toolbar-icon--shape" title="Graph paper" /> -->
           <!-- </div> -->
         </div>
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Text"
         tabindex="0"
@@ -242,6 +247,7 @@
             ? 'selected-tool'
             : ''
         "
+        :disabled="isConnected ? undefined : true"
       >
         <TextIcon class="toolbar-icon" />
         <div v-if="showTextPicker" class="options-bar">
@@ -266,13 +272,14 @@
             <SmallTextIcon class="toolbar-icon" />
           </div>
         </div>
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Color picker"
         tabindex="0"
         @click="toggleColorPicker"
         @keydown.enter="toggleColorPicker"
+        :disabled="isConnected ? undefined : true"
       >
         <ColorPickerIcon class="toolbar-icon--color" />
         <div v-if="showColorPicker" class="options-bar --color">
@@ -365,34 +372,37 @@
             @keydown.enter="setColor('rgba(255, 255, 255, 0.0)')"
           ></div>
         </div>
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Undo"
         tabindex="0"
         @click="undo"
         @keydown.enter="undo"
+        :disabled="isConnected ? undefined : true"
       >
         <UndoIcon class="toolbar-icon" />
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Redo"
         tabindex="0"
         @click="redo"
         @keydown.enter="redo"
+        :disabled="isConnected ? undefined : true"
       >
         <RedoIcon class="toolbar-icon" />
-      </div>
-      <div
+      </button>
+      <button
         class="toolbar-item"
         title="Clear whiteboard"
         tabindex="0"
         @click="clearWhiteboard"
         @keydown.enter="clearWhiteboard"
+        :disabled="isConnected ? undefined : true"
       >
         <ClearIcon class="toolbar-icon" />
-      </div>
+      </button>
       <div
         class="toolbar-item"
         title="Reset whiteboard"
@@ -1035,8 +1045,8 @@ export default {
       // disable showing hints on the canvas
       this.zwibblerCtx.setConfig('showHints', false)
 
-      // read-only until connected
-      this.zwibblerCtx.setConfig('readOnly', false)
+      // Keep the canvas as read-only until connected.
+      this.zwibblerCtx.setConfig('readOnly', true)
       this.zwibblerCtx.on('connected', () => {
         this.isConnected = true
         this.zwibblerCtx.setConfig('readOnly', false)
@@ -1327,6 +1337,8 @@ export default {
   justify-content: center;
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
 
   @include breakpoint-below('tiny') {
     padding: 0;
@@ -1354,6 +1366,14 @@ export default {
 
     @include breakpoint-below('tiny') {
       padding: 1em;
+    }
+  }
+
+  &[disabled] {
+    cursor: auto;
+
+    &:hover {
+      background: transparent;
     }
   }
 }
