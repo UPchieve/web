@@ -43,8 +43,9 @@ const GLEAP_WIDGET_CONFIGS = {
 
 type User = Partial<{
   sessionStats: Record<string, any>[]
-  type: 'student' | 'volunteer'
+  userType: 'student' | 'volunteer'
   createdAt: string
+  roles?: string[]
 }>
 type SegmentProperties = {
   minSessions?: number
@@ -54,6 +55,8 @@ type SegmentProperties = {
   accountCreatedAfter?: string
   accountCreatedBefore?: string
   averageSessionRatingLessThan?: number
+  hasStudentRole?: boolean
+  hasVolunteerRole?: boolean
 }
 type CheckArgs = {
   user: User
@@ -84,7 +87,7 @@ const validationFns = {
   },
   userType: ({ user, properties }: CheckArgs) =>
     properties.userType !== undefined
-      ? properties.userType === user.type
+      ? properties.userType === user.userType
       : true,
   hasAValidFlag: ({ properties }: CheckArgs) =>
     properties.flagFilters?.some((flag) =>
@@ -99,9 +102,13 @@ const validationFns = {
     properties.accountCreatedBefore !== undefined
       ? Date.parse(properties.accountCreatedBefore) > Date.parse(user.createdAt)
       : true,
+  hasAStudentRole: ({ user, properties }: CheckArgs) =>
+    !!properties.hasStudentRole && (user.roles ?? []).includes('student'),
+  hasVolunteerRole: ({ user, properties }: CheckArgs) =>
+    !!properties.hasVolunteerRole && (user.roles ?? []).includes('volunteer'),
 }
 
-async function isValidUserForSegment(user, properties) {
+async function isValidUserForSegment(user, properties): Promise<boolean> {
   const results = []
   for (const fn of Object.values(validationFns)) {
     const result = await fn({ user, properties })
