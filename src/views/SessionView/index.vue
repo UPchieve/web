@@ -315,7 +315,8 @@ import { SessionAudioState } from '@/services/LiveShareService/SessionAudioServi
 import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
 import { useActor } from '@xstate/vue'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
-import { ref } from 'vue'
+import { ref, markRaw } from 'vue'
+import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 
 const meetingActor = ref(null)
 export default {
@@ -519,9 +520,7 @@ export default {
       )
     },
     isPartnerSpeaking() {
-      const activeSpeakerIds = this.snapshot.context.activeSpeakerIds
-      const partnerId = this.snapshot.context.partnerAttendeeId ?? ''
-      return activeSpeakerIds.includes(partnerId)
+      return this.snapshot.context.isPartnerSpeaking
     },
     isSpeaking() {
       const activeSpeakerIds = this.snapshot.context.activeSpeakerIds
@@ -535,12 +534,13 @@ export default {
       return isSpeaking
     },
     partnerPresence() {
-      const name = this.sessionPartner.firstname
-      return this.isPartnerSpeaking
-        ? `${name} is speaking`
-        : this.isPartnerOnline
-          ? 'In session'
-          : 'Away'
+      if (!this.isPartnerOnline) return 'is away'
+
+      return this.snapshot.context.isPartnerMicMuted
+        ? 'has their mic off'
+        : this.isPartnerSpeaking
+          ? `is speaking`
+          : 'is in session'
     },
     isLiveMediaBanned() {
       const currentSession = this.session
@@ -773,17 +773,13 @@ export default {
   watch: {
     isPartnerSpeaking(newVal) {
       if (newVal && !this.everShownDisplayCallStatus && this.isSpeakerMuted) {
-        this.$store.commit('liveMedia/audio/setDisplayCallStatus', {
+        this.$store.dispatch('liveMedia/audio/setDisplayCallStatus', {
           type: 'partner-speaking',
-          icon: 'speaker',
+          icon: markRaw(SpeakerFilledIcon),
           main: `${this.sessionPartner.firstName} is speaking`,
-          secondary: `Click ${this.sessionPartner.firstName}'s icon to listen`,
-          fadeOutAfterMs: 3000,
+          secondary: `Click the speaker icon to listen`,
+          fadeOutAfterMs: 6000,
         })
-        this.$store.commit(
-          'liveMedia/audio/setEverShownDisplayCallStatus',
-          true
-        )
       }
     },
     async session(session) {

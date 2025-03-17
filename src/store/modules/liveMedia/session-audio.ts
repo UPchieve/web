@@ -634,22 +634,29 @@ export default {
           type: 'partner-speaking',
           icon: 'speaker',
           main: `${rootGetters['user/sessionPartner'].firstName} is speaking`,
-          secondary: `Click ${rootGetters['user/sessionPartner'].firstName}'s icon to listen`,
+          secondary: `Click the speaker icon to listen`,
           fadeOutAfterMs: 3000,
         })
         commit('setEverShownDisplayCallStatus', true)
       }
     },
-    dismissDisplayCallStatus: (
-      { commit },
-      args = { fadeOut: true, afterMs: 1000 }
-    ) => {
+    dismissDisplayCallStatus: ({ commit }, args: { afterMs?: number } = {}) => {
       const dismiss = () => commit('setDisplayCallStatus', null)
-      if (args.fadeOut) {
+      if (args?.afterMs) {
         setTimeout(dismiss, args.afterMs)
       } else {
         dismiss()
       }
+    },
+    setDisplayCallStatus: ({ commit, dispatch }, displayCallStatus) => {
+      commit('setDisplayCallStatus', displayCallStatus)
+      if (displayCallStatus?.fadeOutAfterMs) {
+        dispatch('dismissDisplayCallStatus', {
+          afterMs: displayCallStatus.fadeOutAfterMs,
+        })
+      }
+
+      commit('setEverShownDisplayCallStatus', true)
     },
 
     // TDOO create this before volunteer joins

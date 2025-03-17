@@ -55,7 +55,7 @@ const tooltipText = computed(() => {
     return 'Click to speak'
   }
 
-  return 'Click to mute'
+  return 'Click to mute mic'
 })
 
 const onClickMute = () => {

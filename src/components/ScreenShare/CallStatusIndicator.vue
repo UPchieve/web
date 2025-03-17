@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 
 const store = useStore()
 
@@ -9,30 +8,25 @@ const displayCallStatus = computed(() => {
   return store.state.liveMedia.audio.displayCallStatus
 })
 function clearDisplayCallStatusImmediately() {
-  store.dispatch('liveMedia/audio/dismissDisplayCallStatus', {
-    fadeOut: true,
-    afterMs: 0,
-  })
+  store.dispatch('liveMedia/audio/dismissDisplayCallStatus')
 }
 </script>
 
 <template>
-  <Transition>
-    <div class="call-status-indicator" v-if="displayCallStatus">
-      <div class="main" v-if="displayCallStatus?.main?.length > 0">
-        <div class="icon" v-if="displayCallStatus.icon">
-          <SpeakerFilledIcon v-if="displayCallStatus.icon === 'speaker'" />
-        </div>
-        <div class="title">{{ displayCallStatus.main }}</div>
-        <button class="close" @click="clearDisplayCallStatusImmediately">
-          +
-        </button>
+  <div class="call-status-indicator" v-if="displayCallStatus">
+    <div class="main" v-if="displayCallStatus?.main?.length > 0">
+      <div class="icon" v-if="displayCallStatus.icon">
+        <component :is="displayCallStatus.icon" />
       </div>
-      <div class="secondary" v-if="displayCallStatus?.secondary?.length > 0">
-        {{ displayCallStatus.secondary }}
-      </div>
+      <div class="title">{{ displayCallStatus.main }}</div>
+      <button class="close" @click="clearDisplayCallStatusImmediately">
+        +
+      </button>
     </div>
-  </Transition>
+    <div class="secondary" v-if="displayCallStatus?.secondary?.length > 0">
+      {{ displayCallStatus.secondary }}
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
