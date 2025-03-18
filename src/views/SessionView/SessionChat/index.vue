@@ -171,6 +171,7 @@
           data-testid="chat-textarea"
           autofocus
           @keydown="handleOutgoingMessage"
+          @input="resizeTextarea"
           v-model="newMessage"
           placeholder="Type a message..."
           :disabled="waitingForModeration"
@@ -367,6 +368,8 @@ export default {
       this.$refs.messages.scrollTop =
         messageElements[this.chatScrolledToMessageIndex].offsetTop
     }
+    if (this.$refs.textareaRef)
+      this.resizeTextarea({ target: this.$refs.textareaRef })
   },
   methods: {
     async fetchIsSessionAudioCallEnabled(partnerUserId) {
@@ -577,6 +580,7 @@ export default {
       if (event.key === 'Enter') {
         event.preventDefault()
         await this.sendMessage()
+        this.resizeTextarea({ target: this.$refs.textareaRef })
         return
 
         // Disregard typing handler for backspace
@@ -596,6 +600,11 @@ export default {
       this.typingTimeout = setTimeout(() => {
         this.notTyping()
       }, 2000)
+    },
+    resizeTextarea(event) {
+      const textarea = event.target
+      textarea.style.height = 'auto'
+      textarea.style.height = textarea.scrollHeight + 'px'
     },
     async triggerAlert(data) {
       try {
@@ -1064,6 +1073,8 @@ export default {
   padding: 1em;
   resize: none;
   place-content: center;
+  max-height: 250px;
+  overflow-y: auto;
   &.hidden {
     display: none;
   }
