@@ -76,7 +76,7 @@
             <td>{{ session.length }} Minutes</td>
             <td v-if="isTeacherSessionRecapsEnabled">
               <button
-                v-if="isHighlyRatedSession(session)"
+                v-if="!isLowRatedSession(session)"
                 class="view-session-btn"
                 @click="goToSessionRecap(session.id)"
               >
@@ -212,14 +212,8 @@ export default {
       return date.format('MM/DD/YYYY')
     },
 
-    isHighlyRatedSession(session) {
-      const hasRating = session.studentRating || session.volunteerRating
-
-      const isHighlyRated =
-        (!session.studentRating || session.studentRating >= 4) &&
-        (!session.volunteerRating || session.volunteerRating >= 4)
-
-      return hasRating && isHighlyRated
+    isLowRatedSession(session) {
+      return session.studentRating <= 2 || session.volunteerRating <= 2
     },
 
     async getStudentSessionDetails() {
