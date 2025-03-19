@@ -1,6 +1,6 @@
 import SessionService from '@/services/SessionService'
 import Case from 'case'
-import NetworkService from '@/services/NetworkService'
+import UserService from '@/services/UserService'
 
 /**
  * Starts a new session for the specified topic and subtopic.
@@ -22,15 +22,15 @@ export const startSession = (router, topic, subtopic, queryParams) => {
  * @param {string} sessionPath
  */
 export const rejoinSession = async (
-  router,
+  context,
   sessionPath,
   userType,
   roleInCurrentSession
 ) => {
   if (sessionPath) {
     if (roleInCurrentSession !== userType)
-      await NetworkService.switchActiveRole(roleInCurrentSession)
-    router.push(sessionPath)
+      await UserService.switchActiveRole(context, roleInCurrentSession)
+    context.$router.push(sessionPath)
   }
 }
 

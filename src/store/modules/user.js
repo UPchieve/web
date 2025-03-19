@@ -13,6 +13,7 @@ import {
   isTeacherUserType,
   isVolunteerUserType,
 } from '@/utils/user-type'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   namespaced: true,
@@ -244,9 +245,9 @@ export default {
       const updatedUser = { ...user, ...data }
       commit('updateUser', updatedUser)
       // Ensure that properties are up to date with for feature flag evaluation
-      FeatureFlagService.setPersonPropertiesForFlags(
-        getters.getUserPropsForAnalytics()
-      )
+      const personProps = getters.getUserPropsForAnalytics()
+      FeatureFlagService.setPersonPropertiesForFlags(personProps)
+      AnalyticsService.identify(user.id, personProps)
     },
 
     updatePresessionSurvey: ({ commit }, surveyData) => {

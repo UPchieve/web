@@ -1248,7 +1248,7 @@ export default {
       this._errorHandler
     )
   },
-  switchActiveRole(activeRole) {
+  switchActiveRole(activeRole: 'student' | 'volunteer') {
     return httpPut(`${API_ROOT}/user/roles/active`, { activeRole }).then(
       this._successHandler,
       this._errorHandler

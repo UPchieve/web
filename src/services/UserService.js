@@ -1,6 +1,8 @@
 import moment from 'moment'
 import AuthService from './AuthService'
 import NetworkService from './NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   getUser() {
@@ -50,6 +52,21 @@ export default {
           throw new Error()
         }
       }
+    )
+  },
+
+  async switchActiveRole(context, activeRole) {
+    const response = await NetworkService.switchActiveRole(activeRole)
+    const newActiveRole = response.data.activeRole
+    const newUser = response.data.user
+    await context.$store.dispatch('user/addToUser', {
+      userType: newActiveRole,
+      ...newUser,
+    })
+    AnalyticsService.captureEvent(
+      newActiveRole === 'volunteer'
+        ? EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_VOLUNTEER_MODE
+        : EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_STUDENT_MODE
     )
   },
 }

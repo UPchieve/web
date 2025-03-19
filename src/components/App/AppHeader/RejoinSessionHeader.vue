@@ -61,7 +61,7 @@ export default {
     },
     rejoin() {
       sessionUtils.rejoinSession(
-        this.$router,
+        this,
         this.sessionPath,
         this.userType,
         this.roleInCurrentSession
