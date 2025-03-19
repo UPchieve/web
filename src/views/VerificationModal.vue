@@ -1,5 +1,5 @@
 <template>
-  <Modal :closeModal="closeModal">
+  <Modal :closeModal="() => closeModal(verificationComplete)">
     <Loader v-if="isSubmitting" :message="loadingMessage" overlay />
     <!-- Step 1 content: Need to complete verification -->
     <div v-if="!verificationComplete">
@@ -60,7 +60,7 @@
           <button
             class="uc-form-button-secondary"
             id="cancel-btn"
-            @click="closeModal"
+            @click="() => closeModal(verificationComplete)"
           >
             Cancel
           </button>
@@ -71,7 +71,7 @@
         v-if="flowIncompletable"
         class="uc-form-button-secondary"
         id="cancel-btn"
-        @click="closeModal"
+        @click="() => closeModal(verificationComplete)"
       >
         Go Back
       </button>
@@ -245,7 +245,7 @@ export default {
       this.initiateVerification()
     },
     async completeModal() {
-      this.closeModal()
+      this.closeModal(this.verificationComplete)
       const updates = {}
       if (this.verificationMethod === VERIFICATION_METHOD.EMAIL) {
         updates.emailVerified = true
