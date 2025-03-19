@@ -62,6 +62,7 @@ import NetworkService from '@/services/NetworkService'
 import { useStore } from 'vuex'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import UserService from '@/services/UserService'
 
 const router = useRouter()
 const store = useStore()
@@ -78,10 +79,7 @@ const becomeAVolunteer = async () => {
   )
   try {
     await NetworkService.addVolunteerRoleForStudent()
-    await NetworkService.switchActiveRole('volunteer')
-    AnalyticsService.captureEvent(
-      EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_VOLUNTEER_MODE
-    )
+    await UserService.switchActiveRole({ $store: store }, 'volunteer')
     if (router.currentRoute.value.path === '/dashboard') router.go(0)
     else await router.replace('/dashboard')
   } catch (err) {

@@ -11,15 +11,13 @@
 </template>
 
 <script lang="ts" setup>
-import NetworkService from '@/services/NetworkService'
 import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import LoggerService from '@/services/LoggerService'
 import Modal from '@/components/Modal.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import UserService from '@/services/UserService'
 import { useStore } from 'vuex'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   userType: 'student' | 'volunteer'
@@ -28,7 +26,6 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
-const store = useStore()
 const error = ref<string>('')
 const alternateRole = computed(() =>
   props.userType === 'student' ? 'Volunteer' : 'Student'
@@ -38,25 +35,19 @@ const message = computed(() => {
   return props.message ?? `Switch to ${alternateRole.value} View`
 })
 
+const store = useStore()
+
 const switchRole = async () => {
   try {
-    const response = await NetworkService.switchActiveRole(
+    await UserService.switchActiveRole(
+      { $store: store },
       props.userType === 'volunteer' ? 'student' : 'volunteer'
     )
-    const newRole = response.data.activeRole
-    AnalyticsService.captureEvent(
-      newRole === 'volunteer'
-        ? EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_VOLUNTEER_MODE
-        : EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_STUDENT_MODE
-    )
-    const { user } = response.data
-    store.commit('user/updateUser', user)
-
     if (router.currentRoute.value.path === '/dashboard') router.go(0)
     else await router.replace('/dashboard')
   } catch (err) {
     LoggerService.noticeError(
-      err?.response?.data?.err ?? 'Error while switching account modes',
+      err?.message ?? 'Error while switching account modes',
       { userId: props.userId }
     )
     error.value =
