@@ -1,13 +1,15 @@
 <template>
-  <ion-alert
-    v-if="shouldShow"
-    :is-open="shouldShow"
-    :header="getHeader"
-    :message="getMessage"
-    :buttons="getButtons"
-    class="refresh-alert"
-    data-testid="refresh-app-ion-alert"
-  />
+  <div data-testid="refresh-app-alert">
+    <ion-alert
+      v-if="shouldShow"
+      :is-open="shouldShow"
+      :header="getHeader"
+      :message="getMessage"
+      :buttons="getButtons"
+      class="refresh-alert"
+      data-testid="refresh-app-ion-alert"
+    />
+  </div>
 </template>
 
 <script>

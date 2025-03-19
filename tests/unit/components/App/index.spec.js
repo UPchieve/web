@@ -13,6 +13,11 @@ const getWrapper = (options = {}) => {
     showHeader: true,
     showSidebar: true,
     showModal: false,
+    mockRoute: {
+      path: '/dashboard',
+      params: {},
+      name: 'DashboardView',
+    },
     ...options,
   }
 
@@ -29,8 +34,14 @@ const getWrapper = (options = {}) => {
       },
     })
   )
+
   return mount(App, {
-    global: { plugins: [router, store] },
+    global: {
+      plugins: [router, store],
+      mocks: {
+        $route: options.mockRoute,
+      },
+    },
   })
 }
 
@@ -41,6 +52,9 @@ describe('App', () => {
     expect(wrapper.findComponent(AppHeader).exists()).toBe(true)
     expect(wrapper.findComponent(AppSidebar).exists()).toBe(true)
     expect(wrapper.findComponent(AppModal).exists()).toBe(false)
+    expect(
+      wrapper.find('[data-testid="refresh-app-alert"]').exists()
+    ).toBeTruthy()
 
     const routerViewWrapper = wrapper.find('.App-router-view-wrapper')
     expect(routerViewWrapper.exists()).toBe(true)
@@ -76,5 +90,15 @@ describe('App', () => {
   it('conditionally renders `AppModal`', () => {
     const wrapper = getWrapper({ showModal: true })
     expect(wrapper.findComponent(AppModal).exists()).toBe(true)
+  })
+
+  it('does not render the RefreshAppAlert if in SessionView', () => {
+    const mockSessionRoute = {
+      name: 'SessionView',
+      path: '/session/:topic/:subTopic/:sessionId?',
+    }
+    const wrapper = getWrapper({ mockRoute: mockSessionRoute })
+    const refreshAppAlert = wrapper.find('[data-testid="refresh-app-alert"]')
+    expect(refreshAppAlert.exists()).toBeFalsy()
   })
 })

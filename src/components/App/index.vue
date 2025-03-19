@@ -2,7 +2,7 @@
   <div id="app" class="App" :class="isIOS && 'is-ios'">
     <ion-app>
       <ion-content>
-        <refresh-app-alert />
+        <refresh-app-alert v-if="doMountRefreshAppAlert" />
         <app-header v-show="showHeader" />
         <app-sidebar v-if="showSidebar" />
         <app-modal v-if="showModal" />
@@ -233,6 +233,9 @@ export default {
       showInAppSessionNotifications:
         'featureFlags/showInAppSessionNotifications',
     }),
+    doMountRefreshAppAlert() {
+      return this.$route.name !== 'SessionView'
+    },
     isSocketReadyToGetWaitingStudents() {
       return [this.isConnected, this.isVolunteer]
     },
