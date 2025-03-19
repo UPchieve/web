@@ -431,7 +431,10 @@ export default {
       return !this.newMutedSubjectAlerts.includes(subject)
     },
 
-    toggleShowSmsVerificationModal() {
+    toggleShowSmsVerificationModal(isSuccess) {
+      if (!isSuccess) {
+        this.phone = this.user.phone
+      }
       this.showSmsVerificationModal = !this.showSmsVerificationModal
     },
 
@@ -517,7 +520,6 @@ export default {
 
             // Update user state after successful API call
             let addToUserData = {
-              phone: reqBody.phone ?? this.user.phone,
               isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
               smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
             }
