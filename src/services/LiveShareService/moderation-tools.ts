@@ -29,9 +29,9 @@ function captureFrameFromCanvas(
     imageData,
   }
 }
-// 16 seems to be the standard size of cursors in OSX and Windows
-const CURSOR_WIDTH_IN_PIXELS = 16 * window.devicePixelRatio
-const CURSOR_HEIGHT_IN_PIXELS = 16 * window.devicePixelRatio
+// 16 (4x4) seems to be the standard size of cursors in OSX and Windows
+const CURSOR_WIDTH_IN_PIXELS = 2 * window.devicePixelRatio
+const CURSOR_HEIGHT_IN_PIXELS = 2 * window.devicePixelRatio
 const MAX_PIXELS_DIFFERENCE = CURSOR_WIDTH_IN_PIXELS * CURSOR_HEIGHT_IN_PIXELS
 
 const lastModeratedFrameBuffer = ref<null | Uint8ClampedArray>(null)
