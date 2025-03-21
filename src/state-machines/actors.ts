@@ -93,9 +93,6 @@ function startScreenShareObserver({
         }
       }
     },
-    contentShareDidStart: () => {
-      sendBack({ type: 'partner_shared_screen' })
-    },
     contentShareDidStop: () => {
       sendBack({ type: 'stop_share_screen' })
     },
@@ -240,6 +237,7 @@ export const joinMeeting = fromCallback(
       await meetingSession!.audioVideo.stopContentShare()
       input.context.endScreenShareModeration()
       input.context.meetingSession!.audioVideo.stop()
+      await input.context.meetingSession!.audioVideo.stopAudioInput()
       store.commit('liveMedia/setScreenShareActor', null)
     }
 
@@ -250,11 +248,16 @@ export const joinMeeting = fromCallback(
   }
 )
 
-export const isBannedFromLiveMedia = fromPromise(async () => {
-  return {
-    isBanned: store.getters['liveMedia/isBannedFromLiveMedia'],
+export const isBannedFromLiveMedia = fromCallback(
+  ({ sendBack }: { sendBack: (event: Events) => void }) => {
+    const isBanned = store.getters['liveMedia/isBannedFromLiveMedia']
+    if (isBanned) {
+      sendBack({ type: 'banned' })
+    } else {
+      sendBack({ type: 'not_banned' })
+    }
   }
-})
+)
 
 // @ts-ignore
 const canKeepScreenFocus = typeof CaptureController !== 'undefined'
@@ -273,11 +276,11 @@ async function getStream(input: { context: Context }) {
       controller,
     })
 
-    return await input.context.meetingSession!.audioVideo.startContentShare(
+    await input.context.meetingSession!.audioVideo.startContentShare(
       contentShareStream
     )
   } else {
-    return await input.context.meetingSession!.audioVideo.startContentShareFromScreenCapture()
+    await input.context.meetingSession!.audioVideo.startContentShareFromScreenCapture()
   }
 }
 
@@ -286,15 +289,32 @@ export const startingShareMyScreen = fromPromise(
     const { beginScreenShareModeration, endScreenShareModeration } =
       moderateScreenShare()
     beginScreenShareModeration(input.context.videoOutputElement)
-    const contentShareStream = await getStream(input)
-    return { contentShareStream, endScreenShareModeration }
+    await getStream(input)
+    return { endScreenShareModeration }
   }
 )
 
-export const stopShareMyScreen = fromPromise(
-  async ({ input }: { input: { context: Context } }) => {
+const _stopMic = async ({ input }: { input: { context: Context } }) => {
+  await input.context.meetingSession!.audioVideo.stopAudioInput()
+}
+
+const _stopShareMyScreen = async ({
+  input,
+}: {
+  input: { context: Context }
+}) => {
+  if (input.context.isSharingMyScreen) {
     await input.context.meetingSession!.audioVideo.stopContentShare()
     input.context.endScreenShareModeration()
+  }
+}
+
+export const stopShareMyScreen = fromPromise(_stopShareMyScreen)
+
+export const stopShareMyScreenAndMic = fromPromise(
+  async ({ input }: { input: { context: Context } }) => {
+    await _stopShareMyScreen({ input })
+    await _stopMic({ input })
   }
 )
 

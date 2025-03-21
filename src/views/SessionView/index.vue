@@ -455,7 +455,9 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       sessionPartner: 'user/sessionPartner',
       isScreenshareEnabledFeatureFlag: 'featureFlags/isScreenshareEnabled',
-      useChimeMeetings: ['featureFlags/isChimeMeetingEnabled'],
+      useChimeMeetings: 'featureFlags/isChimeMeetingEnabled',
+      isLiveMediaBanned: 'liveMedia/isBannedFromLiveMedia',
+      isPartnerLiveMediaBanned: 'liveMedia/isPartnerBannedFromLiveMedia',
     }),
     micState() {
       if (
@@ -541,16 +543,6 @@ export default {
         : this.isPartnerSpeaking
           ? `is speaking`
           : 'is in session'
-    },
-    isLiveMediaBanned() {
-      const currentSession = this.session
-      if (this.isStudent) return currentSession?.studentBannedFromLiveMedia
-      else return currentSession?.volunteerBannedFromLiveMedia
-    },
-    isPartnerLiveMediaBanned() {
-      const currentSession = this.session
-      if (this.isStudent) return currentSession?.volunteerBannedFromLiveMedia
-      else return currentSession?.studentBannedFromLiveMedia
     },
     partnerCanUseMic() {
       return (
