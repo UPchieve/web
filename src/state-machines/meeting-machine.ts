@@ -7,6 +7,7 @@ import {
   isBannedFromLiveMedia,
   startingShareMyScreen,
   stopShareMyScreen,
+  stopShareMyScreenAndMic,
   requestMicAccess,
   requestSpeakerAccess,
 } from './actors'
@@ -41,8 +42,7 @@ export type Context = {
   isAudioEligible: boolean
   isScreenshareEligible: boolean
   showPartnerScreenShare: boolean
-  isBanned: boolean
-  contentShareStream: MediaStream | null
+  isSharingMyScreen: boolean
   endScreenShareModeration: () => void
   isPartnerMicMuted: boolean
   activeSpeakerIds: string[]
@@ -79,6 +79,8 @@ export type Events =
   | { type: 'transcription_not_started' }
   | { type: 'transcription_started' }
   | { type: 'set_screen_share_dimensions'; width: number; height: number }
+  | { type: 'banned' }
+  | { type: 'not_banned' }
 export function create() {
   return setup({
     types: {
@@ -103,6 +105,7 @@ export function create() {
       isBannedFromLiveMedia,
       startingShareMyScreen,
       stopShareMyScreen,
+      stopShareMyScreenAndMic,
       requestMicAccess,
       requestSpeakerAccess,
     },
@@ -144,10 +147,9 @@ export function create() {
       partnerAttendeeId: null,
       meetingSession: null,
       showPartnerScreenShare: false,
-      isBanned: false,
       isAudioEligible: false,
       isScreenshareEligible: false,
-      contentShareStream: null,
+      isSharingMyScreen: false,
       endScreenShareModeration: () => {},
       isPartnerMicMuted: true,
       activeSpeakerIds: [],
@@ -165,9 +167,6 @@ export function create() {
       },
       ban_user_from_live_media: {
         target: '#MeetingMachine.Banned',
-        actions: assign({
-          isBanned: () => true,
-        }),
       },
       new_partner_attendee: {
         actions: assign({
@@ -406,9 +405,23 @@ export function create() {
                 on: {
                   share_screen: {
                     target: 'StartingShareMyScreen',
-                    guard: ({ context }) =>
-                      !context.isBanned && context.isScreenshareEligible,
+                    guard: ({ context }) => context.isScreenshareEligible,
                   },
+                  partner_shared_screen: {
+                    target: 'ViewingPartnerScreenShare',
+                    actions: [
+                      assign({ showPartnerScreenShare: () => true }),
+                      () => {
+                        AnalyticsService.captureEvent(
+                          EVENTS.SCREENSHARE_USER_VIEWED_SCREENSHARE
+                        )
+                      },
+                    ],
+                  },
+                },
+              },
+              Banned: {
+                on: {
                   partner_shared_screen: {
                     target: 'ViewingPartnerScreenShare',
                     actions: [
@@ -424,15 +437,23 @@ export function create() {
               },
               CheckingEligibility: {
                 tags: ['loadingScreenShare'],
+                on: {
+                  banned: [
+                    {
+                      target: 'ViewingPartnerScreenShare',
+                      guard: ({ context }) => context.showPartnerScreenShare,
+                    },
+                    {
+                      target: 'Banned',
+                    },
+                  ],
+                  not_banned: {
+                    target: 'Idle',
+                  },
+                },
                 invoke: {
                   id: 'ScreenShareControl.CheckingEligibility:checkEligibility',
                   src: 'isBannedFromLiveMedia',
-                  onDone: {
-                    target: 'Idle',
-                    actions: assign({
-                      isBanned: ({ event }) => event.output.isBanned,
-                    }),
-                  },
                 },
               },
               StartingShareMyScreen: {
@@ -444,8 +465,7 @@ export function create() {
                     target: 'SharingMyScreen',
                     actions: [
                       assign({
-                        contentShareStream: ({ event }) =>
-                          event.output.contentShareStream,
+                        isSharingMyScreen: () => true,
                         endScreenShareModeration: ({ event }) =>
                           event.output.endScreenShareModeration,
                       }),
@@ -489,17 +509,24 @@ export function create() {
               },
               ViewingPartnerScreenShare: {
                 on: {
-                  partner_stopped_sharing_screen: {
-                    target: 'Idle',
-                    actions: [
-                      assign({ showPartnerScreenShare: () => false }),
-                      () => {
-                        AnalyticsService.captureEvent(
-                          EVENTS.SCREENSHARE_USER_STOPPED_VIEWING_SCREENSHARE
-                        )
-                      },
-                    ],
-                  },
+                  partner_stopped_sharing_screen: [
+                    {
+                      guard: () =>
+                        store.getters['liveMedia/isBannedFromLiveMedia'],
+                      target: 'Banned',
+                    },
+                    {
+                      target: 'Idle',
+                      actions: [
+                        assign({ showPartnerScreenShare: () => false }),
+                        () => {
+                          AnalyticsService.captureEvent(
+                            EVENTS.SCREENSHARE_USER_STOPPED_VIEWING_SCREENSHARE
+                          )
+                        },
+                      ],
+                    },
+                  ],
                 },
               },
             },
@@ -512,8 +539,23 @@ export function create() {
                 type: 'final',
                 tags: ['unableToJoinAudioCall'],
               },
-
+              Banned: { type: 'final' },
               CheckingEligibility: {
+                tags: ['loadingScreenShare'],
+                invoke: {
+                  id: 'MicControl.CheckingEligibility:checkEligibility',
+                  src: 'isBannedFromLiveMedia',
+                },
+                on: {
+                  banned: {
+                    target: 'Banned',
+                  },
+                  not_banned: {
+                    target: 'WaitingForTranscription',
+                  },
+                },
+              },
+              WaitingForTranscription: {
                 on: {
                   transcription_not_started: {
                     target: 'AudioCallUnavailable',
@@ -693,8 +735,8 @@ export function create() {
       },
       Banned: {
         invoke: {
-          id: 'Banned:stopShareMyScreen',
-          src: 'stopShareMyScreen',
+          id: 'Banned:stopShareMyScreenAndMic',
+          src: 'stopShareMyScreenAndMic',
           input: ({ context }) => ({ context }),
           onDone: {
             target: 'JoinedMeeting',
