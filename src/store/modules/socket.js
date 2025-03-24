@@ -232,6 +232,10 @@ export default {
       socket.on('sessions:banned-from-live-media', () => {
         this.dispatch('liveMedia/bannedFromLiveMedia')
       })
+
+      socket.on('moderation-infraction', (data) => {
+        this.dispatch('liveMedia/handleModerationInfraction', data)
+      })
     },
     connect() {
       socket.connect()

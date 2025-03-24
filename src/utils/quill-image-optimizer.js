@@ -17,7 +17,6 @@ const isSafari =
 
 const maxImagesEvent = new Event(maxImagesEventName)
 const fileSizeEvent = new Event(fileSizeTooBigEventName)
-const imageFailedModerationEvent = new Event(imageFailedModerationEventName)
 
 const getImagesFromDragEvent = (evt) => {
   return Array.from(evt?.dataTransfer?.files ?? []).filter((f) =>
@@ -168,9 +167,11 @@ class ImageDrop {
     evt.stopImmediatePropagation()
 
     const image = evt.type === 'paste' ? images[0].getAsFile() : images[0]
-    const isClean = await this.isImageClean(image, sessionId)
+    const { isClean, failures } = await this.isImageClean(image, sessionId)
     if (!isClean) {
-      this.quill.root.dispatchEvent(imageFailedModerationEvent)
+      const event = new Event(imageFailedModerationEventName)
+      event.failures = failures
+      this.quill.root.dispatchEvent(event)
     } else {
       await callback(image)
     }
@@ -180,8 +181,7 @@ class ImageDrop {
     const formData = new FormData()
     formData.append('image', imageFile)
     formData.append('sessionId', sessionId)
-    const { isClean } = await ModerationService.checkIfImageIsClean(formData)
-    return isClean
+    return await ModerationService.checkIfImageIsClean(formData)
   }
 
   async handleDropImage(imageFile, evt) {
