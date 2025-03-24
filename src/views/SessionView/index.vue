@@ -37,6 +37,16 @@
         :screenShareHeight="meetingActor.snapshot.context.screenShareHeight"
         :screenShareActive="screenShareActive"
       />
+      <ModerationInfractionToast
+        :show="showModerationInfractionToast"
+        :on-dismiss="dismissModerationInfraction"
+        :on-click-more-info="toggleModerationInfractionModal"
+      />
+      <ModerationInfractionModal
+        v-if="showModerationInfractionModal"
+        @close="toggleModerationInfractionModal"
+        :moderation-infraction="moderationInfraction"
+      />
       <div
         class="auxiliary-container"
         ref="auxiliaryContainer"
@@ -317,11 +327,15 @@ import { useActor } from '@xstate/vue'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
 import { ref, markRaw } from 'vue'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
+import ModerationInfractionModal from '@/components/Moderation/ModerationInfractionModal.vue'
+import ModerationInfractionToast from '@/components/Moderation/ModerationInfractionToast.vue'
 
 const meetingActor = ref(null)
 export default {
   name: 'session-view',
   components: {
+    ModerationInfractionToast,
+    ModerationInfractionModal,
     ScreenShare,
     Spinner,
     AiWidgetTool,
@@ -412,6 +426,8 @@ export default {
         typeof navigator.mediaDevices.getDisplayMedia !== 'undefined',
       previousSessionCountWithStudent: 0,
       meetingActor,
+      showModerationInfractionModal: false,
+      showModerationInfractionToast: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -421,6 +437,7 @@ export default {
   },
   computed: {
     ...mapState({
+      moderationInfraction: (state) => state.liveMedia.moderationInfraction,
       hasJoinedZoomCall: (state) =>
         state.liveMedia.audio.sessionAudioState === SessionAudioState.Joined,
       user: (state) => state.user.user,
@@ -440,6 +457,7 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      isMobileLandscape: 'app/isMobileLandscape',
       isAuthenticated: 'user/isAuthenticated',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
@@ -763,6 +781,11 @@ export default {
       })
   },
   watch: {
+    moderationInfraction(newVal) {
+      if (newVal) {
+        this.showModerationInfractionToast = true
+      }
+    },
     isPartnerSpeaking(newVal) {
       if (newVal && !this.everShownDisplayCallStatus && this.isSpeakerMuted) {
         this.$store.dispatch('liveMedia/audio/setDisplayCallStatus', {
@@ -941,6 +964,16 @@ export default {
     },
   },
   methods: {
+    toggleModerationInfractionModal() {
+      if (this.auxiliaryOpen && this.isMobileLandscape) {
+        // Workaround until mobile small screen landscape is fixed
+        this.toggleAuxiliary()
+      }
+      this.showModerationInfractionModal = !this.showModerationInfractionModal
+    },
+    dismissModerationInfraction() {
+      this.showModerationInfractionToast = false
+    },
     toggleMuteSelf() {
       this.meetingActor?.send({ type: 'toggle_mute_self' })
     },

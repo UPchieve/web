@@ -30,6 +30,7 @@ export default {
     retryBackoff: 100,
     isPartnerJustBannedFromLiveMedia: false,
     screenShareActor: null,
+    moderationInfraction: null,
   },
   mutations: {
     setMyZoomUser: (state, zoomUser) => (state.myZoomUser = zoomUser),
@@ -49,6 +50,9 @@ export default {
       (state.isPartnerJustBannedFromLiveMedia = val),
     setScreenShareActor(state, actor) {
       state.screenShareActor = actor
+    },
+    setModerationInfraction(state, infraction) {
+      state.moderationInfraction = infraction
     },
   },
   getters: {
@@ -75,6 +79,25 @@ export default {
           ? 'volunteerBannedFromLiveMedia'
           : 'studentBannedFromLiveMedia'
       return session && session[key]
+    },
+    moderationInfractionSource: (state): string => {
+      let source = ''
+      switch (state.moderationInfraction?.source) {
+        case 'audio_transcription':
+        case 'voice_chat':
+          source = 'microphone'
+          break
+        case 'screenshare':
+          source = 'screenshare'
+          break
+        case 'image_upload':
+          source = 'image'
+          break
+        default:
+          source = 'screenshare or microphone'
+          break
+      }
+      return source
     },
   },
   actions: {
@@ -124,6 +147,10 @@ export default {
 
     partnerBannedFromLiveMedia({ commit }) {
       commit('setIsPartnerJustBannedFromLiveMedia', true)
+    },
+
+    handleModerationInfraction({ commit }, data) {
+      commit('setModerationInfraction', data)
     },
   },
 }

@@ -87,10 +87,6 @@ export default {
       retries: 0,
       showRefreshModal: false,
       isConnecting: false,
-      inappropriateImageErrorMessage:
-        'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org.',
-      failedToModerateImageMessage:
-        'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.',
       text: '',
     }
   },
@@ -169,7 +165,7 @@ export default {
     )
     this.quillEditor.root.addEventListener(
       imageFailedModerationEventName,
-      () => this.showImageUploadError(this.inappropriateImageErrorMessage),
+      (event) => this.onImageUploadModerationFailure(event),
       false
     )
 
@@ -276,22 +272,29 @@ export default {
       formData.append('image', file)
       formData.append('sessionId', this.sessionId)
       try {
-        const { isClean } =
+        const { isClean, failures } =
           await ModerationService.checkIfImageIsClean(formData)
         if (!isClean) {
-          this.showImageUploadError(this.inappropriateImageErrorMessage)
+          this.onImageUploadModerationFailure(failures)
           return
         }
       } catch (err) {
-        this.showImageUploadError(this.failedToModerateImageMessage)
+        alert(
+          'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
+        )
       }
 
       const range = this.quillEditor.getSelection()
       const b64 = await file2b64(file)
       this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
     },
-    showImageUploadError(message) {
-      alert(message)
+    onImageUploadModerationFailure(event) {
+      this.$store.commit('liveMedia/setModerationInfraction', {
+        infraction: event.failures,
+        isBanned: false,
+        source: 'image_upload',
+        occurredAt: new Date(),
+      })
     },
   },
   watch: {

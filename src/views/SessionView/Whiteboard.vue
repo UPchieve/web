@@ -839,9 +839,9 @@ export default {
     openFileDialog(event) {
       this.$refs.fileDialog.openFileDialog(event)
     },
-    async showImageUploadError(message, timeMs) {
+    async showImageUploadError(timeMs) {
       this.uploadingPictureError = true
-      this.imageUploadErrorMessage = message ?? 'Unable to upload image'
+      this.imageUploadErrorMessage = 'Unable to upload image'
       setTimeout(() => {
         this.uploadingPictureError = false
       }, timeMs ?? 2000)
@@ -883,13 +883,15 @@ export default {
         const formData = new FormData()
         formData.append('image', file)
         formData.append('sessionId', this.sessionId)
-        const { isClean } =
+        const { isClean, failures } =
           await ModerationService.checkIfImageIsClean(formData)
         if (!isClean) {
-          this.showImageUploadError(
-            'The image is not appropriate. If you believe this to be an error, please contact us at support@upchieve.org',
-            6000
-          )
+          this.$store.commit('liveMedia/setModerationInfraction', {
+            infraction: failures,
+            source: 'image_upload',
+            isBanned: false,
+            occurredAt: new Date(),
+          })
           return
         }
 
