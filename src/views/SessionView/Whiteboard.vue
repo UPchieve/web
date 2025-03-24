@@ -1,10 +1,5 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
-    <reset-whiteboard-modal
-      v-if="showResetWhiteboardModal"
-      :setShouldResetWhiteboard="setShouldResetWhiteboard"
-      :closeModal="toggleResetWhiteboardModal"
-    />
     <transition name="whiteboard-warning">
       <loading-message
         message="Attempting to connect the whiteboard"
@@ -13,11 +8,6 @@
       />
     </transition>
     <div id="zwib-div" :class="{ 'whiteboard-open': isWhiteboardOpen }"></div>
-    <transition name="reset-whiteboard-error">
-      <p class="whiteboard-transition-error" v-show="resetWhiteboardError">
-        Unable to reset the whiteboard.
-      </p>
-    </transition>
     <transition name="uploading-picture-error">
       <p class="whiteboard-transition-error" v-show="uploadingPictureError">
         {{ imageUploadErrorMessage }}
@@ -403,15 +393,6 @@
       >
         <ClearIcon class="toolbar-icon" />
       </button>
-      <div
-        class="toolbar-item"
-        title="Reset whiteboard"
-        tabindex="0"
-        @click="toggleResetWhiteboardModal"
-        @keydown.enter="toggleResetWhiteboardModal"
-      >
-        <ResetIcon class="toolbar-icon--reset" />
-      </div>
     </div>
     <div v-if="isLoading" class="loading-overlay">
       <loader />
@@ -442,17 +423,14 @@ import CircleIcon from '@/assets/whiteboard_icons/circle.svg'
 import RectangleIcon from '@/assets/whiteboard_icons/rectangle.svg'
 import TriangleIcon from '@/assets/whiteboard_icons/triangle.svg'
 import LineIcon from '@/assets/whiteboard_icons/line.svg'
-import ResetIcon from '@/assets/whiteboard_icons/reset.svg'
 import EraserIcon from '@/assets/whiteboard_icons/eraser.svg'
 import TextIcon from '@/assets/whiteboard_icons/text_tool.svg'
 import SmallTextIcon from '@/assets/whiteboard_icons/small_text_tool.svg'
 import Loader from '@/components/Loader.vue'
-import ResetWhiteboardModal from './ResetWhiteboardModal.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import config from '../../config'
 import heic2any from 'heic2any'
 import LoggerService from '@/services/LoggerService'
-import { socket } from '@/socket'
 import { markRaw } from 'vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -486,12 +464,10 @@ export default {
     RectangleIcon,
     TriangleIcon,
     LineIcon,
-    ResetIcon,
     EraserIcon,
     TextIcon,
     SmallTextIcon,
     Loader,
-    ResetWhiteboardModal,
     LoadingMessage,
     ScreenShareIcon,
     StopScreenShareIcon,
@@ -580,10 +556,6 @@ export default {
       selectedEraserTool: false,
       selectedThinBrushTool: false,
       selectedSmallTextTool: false,
-      // Resetting the whiteboard.
-      showResetWhiteboardModal: false,
-      shouldResetWhiteboard: false,
-      resetWhiteboardError: false,
     }
   },
   emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
@@ -651,19 +623,6 @@ export default {
     }
   },
   async mounted() {
-    /*
-     * This seems like an anti-pattern.
-     * Any events sent before `created()` is called will be missed.
-     * Socket listeners should ideally be defined in the socket store.
-     */
-    socket.on('resetwhiteboard', async () => {
-      window.clearInterval(this.pingPongInterval)
-      await this.zwibblerCtx.destroy()
-      this.zwibblerCtx = markRaw(null)
-
-      this.loadZwibbler()
-    })
-
     this.loadZwibbler()
   },
   methods: {
@@ -995,22 +954,7 @@ export default {
       this.zwibblerCtx.addSelectionHandle(0.5, 1.0, 0, 0, '', 'scale')
       this.zwibblerCtx.addSelectionHandle(0.0, 0.5, 0, 0, '', 'scale')
     },
-    setShouldResetWhiteboard(value) {
-      this.shouldResetWhiteboard = value
-    },
-    toggleResetWhiteboardModal() {
-      this.showResetWhiteboardModal = !this.showResetWhiteboardModal
-    },
-    async resetWhiteboard() {
-      await NetworkService.resetWhiteboard({ sessionId: this.sessionId })
-      window.clearInterval(this.pingPongInterval)
-      await this.zwibblerCtx.destroy()
-      this.setShouldResetWhiteboard(false)
-      this.loadZwibbler()
-      socket.emit('resetWhiteboard', {
-        sessionId: this.sessionId,
-      })
-    },
+
     async loadZwibbler() {
       const zwibblerCtx = window.Zwibbler.create('zwib-div', {
         showToolbar: false,
@@ -1246,9 +1190,6 @@ export default {
       if (isSessionOver && !oldIsSessionOver)
         this.zwibblerCtx.setConfig('readOnly', true)
     },
-    shouldResetWhiteboard(currentValue) {
-      if (currentValue) this.resetWhiteboard()
-    },
   },
 }
 </script>
@@ -1403,10 +1344,6 @@ export default {
   &--color {
     height: 25px;
     width: 25px;
-  }
-
-  &--reset {
-    width: 28px;
   }
 }
 

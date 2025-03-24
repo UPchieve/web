@@ -12,7 +12,6 @@ const ELIGIBILITY_API_ROOT = `${config.serverRoot}/api-public/eligibility`
 const CONTACT_API_ROOT = `${config.serverRoot}/api-public/contact`
 const REFERENCE_API_ROOT = `${config.serverRoot}/api-public/reference`
 const REFERRAL_API_ROOT = `${config.serverRoot}/api-public/referral`
-const WHITEBOARD_ROOT = `${config.serverRoot}/whiteboard`
 const VERSION_ROOT = config.appRoot
 
 const FAULT_TOLERANT_HTTP_TIMEOUT = 10000
@@ -380,12 +379,6 @@ export default {
   },
   timedOutSession(sessionId, data) {
     return httpPost(`${API_ROOT}/session/${sessionId}/timed-out`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
-  resetWhiteboard(data) {
-    return httpPost(`${WHITEBOARD_ROOT}/reset`, data).then(
       this._successHandler,
       this._errorHandler
     )
