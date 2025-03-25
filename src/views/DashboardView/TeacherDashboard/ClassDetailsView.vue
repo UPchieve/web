@@ -431,6 +431,17 @@ export default {
             }
           })
         )
+
+        studentsAndSessions.sort((a, b) => {
+          if (a.lastSession === 'Has not completed a session') return 1
+          if (b.lastsession === 'Has not completed a session') return -1
+
+          const dateA = moment(a.lastSession, 'MM/DD/YYYY')
+          const dateB = moment(b.lastSession, 'MM/DD/YYYY')
+
+          return dateB.diff(dateA)
+        })
+
         return studentsAndSessions
       } catch (err) {
         this.error =
