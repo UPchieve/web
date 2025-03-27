@@ -199,6 +199,18 @@ export const joinMeeting = fromCallback(
     )
 
     const transcriptionObserver = (event) => {
+      if (event.type === 'started') {
+        sendBackToParent({
+          type: 'transcription_status_changed',
+          status: 'started',
+        })
+      }
+      if (event.type === 'stopped') {
+        sendBackToParent({
+          type: 'transcription_status_changed',
+          status: 'stopped',
+        })
+      }
       if (!event.results) return
       // https://docs.aws.amazon.com/chime-sdk/latest/dg/process-msgs.html
       // eventually, we can use the `entities` value (in alternatives) to identify PII for moderation
@@ -318,11 +330,25 @@ export const stopShareMyScreenAndMic = fromPromise(
   }
 )
 
+export const maybeStartTranscription = fromPromise(
+  async ({
+    input: { transcriptionStarted, sessionId },
+  }: {
+    input: { transcriptionStarted: boolean; sessionId: string }
+  }) => {
+    if (!transcriptionStarted) {
+      await NetworkService.startSessionMeetingTranscription(sessionId)
+    }
+  }
+)
+
 export const requestMicAccess = fromPromise(
   async ({
     input: { meetingSession },
   }: {
-    input: { meetingSession: DefaultMeetingSession }
+    input: {
+      meetingSession: DefaultMeetingSession
+    }
   }) => {
     meetingSession.audioVideo.setDeviceLabelTrigger(
       async () =>

@@ -1229,6 +1229,11 @@ export default {
       this._errorHandler
     )
   },
+  startSessionMeetingTranscription(sessionId) {
+    return httpPost(
+      `${API_ROOT}/sessions/${sessionId}/meeting/start-transcription`
+    ).then(this._successHandler, this._errorHandler)
+  },
   endSessionMeeting(sessionId) {
     return httpPut(`${API_ROOT}/sessions/${sessionId}/meeting}`).then(
       this._successHandler,
