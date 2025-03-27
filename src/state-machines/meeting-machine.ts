@@ -1,5 +1,5 @@
 import { DefaultMeetingSession } from 'amazon-chime-sdk-js'
-import { assign, fromCallback, setup } from 'xstate'
+import { assign, setup } from 'xstate'
 import {
   fetchChimeMeeting,
   createMeetingSession,
@@ -10,6 +10,7 @@ import {
   stopShareMyScreenAndMic,
   requestMicAccess,
   requestSpeakerAccess,
+  maybeStartTranscription,
 } from './actors'
 import store from '@/store'
 import LoggerService from '@/services/LoggerService'
@@ -81,6 +82,7 @@ export type Events =
   | { type: 'set_screen_share_dimensions'; width: number; height: number }
   | { type: 'banned' }
   | { type: 'not_banned' }
+  | { type: 'transcription_status_changed'; status: 'started' | 'stopped' }
 export function create() {
   return setup({
     types: {
@@ -108,6 +110,7 @@ export function create() {
       stopShareMyScreenAndMic,
       requestMicAccess,
       requestSpeakerAccess,
+      maybeStartTranscription,
     },
     actions: {
       entry: ({ self }) => {
@@ -185,6 +188,11 @@ export function create() {
         actions: assign({
           screenShareWidth: ({ event }) => event.width,
           screenShareHeight: ({ event }) => event.height,
+        }),
+      },
+      transcription_status_changed: {
+        actions: assign({
+          transcriptionStarted: ({ event }) => event.status === 'started',
         }),
       },
     },
@@ -317,8 +325,6 @@ export function create() {
                   partnerAttendeeId: ({ event }) =>
                     event.output.partnerAttendee?.AttendeeId ?? null,
                   retryCount: 0,
-                  transcriptionStarted: ({ event }) =>
-                    event.output.transcriptionStarted,
                 }),
               },
               onError: {
@@ -551,30 +557,8 @@ export function create() {
                     target: 'Banned',
                   },
                   not_banned: {
-                    target: 'WaitingForTranscription',
-                  },
-                },
-              },
-              WaitingForTranscription: {
-                on: {
-                  transcription_not_started: {
-                    target: 'AudioCallUnavailable',
-                  },
-                  transcription_started: {
                     target: 'Waiting',
                   },
-                },
-                invoke: {
-                  src: fromCallback(({ input, sendBack }) => {
-                    if (input.transcriptionStarted) {
-                      sendBack({ type: 'transcription_started' })
-                    } else {
-                      sendBack({ type: 'transcription_not_started' })
-                    }
-                  }),
-                  input: ({ context }) => ({
-                    transcriptionStarted: context.transcriptionStarted,
-                  }),
                 },
               },
 
@@ -597,7 +581,7 @@ export function create() {
                     meetingSession: context.meetingSession!,
                   }),
                   onDone: {
-                    target: 'MicUnmuted',
+                    target: 'WaitingForTranscription',
                   },
                   onError: {
                     target: 'MicPermissionsDenied',
@@ -624,10 +608,37 @@ export function create() {
                 ],
                 on: {
                   toggle_mute_self: {
-                    target: 'MicUnmuted',
+                    target: 'WaitingForTranscription',
                   },
                 },
               },
+
+              WaitingForTranscription: {
+                tags: ['loadingAudioCall'],
+                on: {
+                  transcription_not_started: {
+                    target: 'MicMuted',
+                  },
+                  transcription_started: {
+                    target: 'MicUnmuted',
+                  },
+                },
+                invoke: {
+                  id: 'MicControl.WaitingForTranscription:maybeStartTranscription',
+                  src: 'maybeStartTranscription',
+                  input: ({ context }) => ({
+                    transcriptionStarted: context.transcriptionStarted,
+                    sessionId: context.sessionId!,
+                  }),
+                  onDone: {
+                    target: 'MicUnmuted',
+                  },
+                  onError: {
+                    target: 'MicMuted',
+                  },
+                },
+              },
+
               MicPermissionsDenied: {
                 description: 'Failed to get mic permissions',
                 on: {
