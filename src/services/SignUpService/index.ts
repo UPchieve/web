@@ -127,22 +127,27 @@ export function continueToAccountPage(data: Object) {
   return getSubmitResponseDefault(SignUpPage.account, data)
 }
 
-export function createAccountWithGoogle(data) {
+export function createAccountWithGoogle(userType: 'student' | 'teacher', data) {
   AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
-  return createAccountWithSso(Provider.GOOGLE, data)
+  return createAccountWithSso(Provider.GOOGLE, userType, data)
 }
 
-export function createAccountWithClever(data) {
+export function createAccountWithClever(userType: 'student' | 'teacher', data) {
   AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLEVER)
-  return createAccountWithSso(Provider.CLEVER, data)
+  return createAccountWithSso(Provider.CLEVER, userType, data)
 }
 
 function createAccountWithSso(
   provider: 'google' | 'clever',
+  userType: 'student' | 'teacher',
   data: any
 ): SubmitActionResponse {
   try {
-    signInWithSso({ provider, ...data })
+    signInWithSso({
+      provider,
+      errorRedirect: `/sign-up/${userType}/account`,
+      ...data,
+    })
     return [null, null]
   } catch (err) {
     LoggerService.noticeError(err)

@@ -177,8 +177,8 @@
             </div>
           </div>
 
-          <hr v-if="isPartnerTeacher" />
-          <div v-if="isPartnerTeacher" class="uc-column">
+          <hr v-if="isPartnerTeacher || user.usesClever" />
+          <div v-if="isPartnerTeacher || user.usesClever" class="uc-column">
             <button class="sync-clever-btn" @click="syncClever">
               <clever-logo class="mr-2" />
               {{ user.lastSuccessfulCleverSync ? 'Resync' : 'Sync' }} Clever
@@ -262,6 +262,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import { toastController } from '@ionic/vue'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { Provider, signInWithSso } from '@/services/SsoService'
@@ -310,7 +311,7 @@ export default {
       newMutedSubjectAlerts: [],
     }
   },
-  created() {
+  async created() {
     this.isAllowingNotifications = getNotificationPermission() === 'granted'
     this.isAccountActive = !this.user.isDeactivated
     if (this.user.phone) {
@@ -321,6 +322,16 @@ export default {
       this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
     }
     this.setFlagsForEditingPhoneNumber()
+
+    if (this.$route?.query?.error) {
+      const toast = await toastController.create({
+        message: this.$route.query.error,
+        color: 'danger',
+        duration: 3000,
+        position: 'bottom',
+      })
+      await toast.present()
+    }
   },
   computed: {
     ...mapState({
@@ -450,6 +461,8 @@ export default {
       signInWithSso({
         provider: Provider.CLEVER,
         email: this.user.email,
+        redirect: '/profile',
+        errorRedirect: '/profile',
       })
     },
 

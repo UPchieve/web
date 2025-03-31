@@ -191,14 +191,14 @@ function createAccountWithGoogle(data) {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
     provider: 'google',
   })
-  return SignUpService.createAccountWithGoogle(data)
+  return SignUpService.createAccountWithGoogle('student', data)
 }
 
 export function createAccountWithClever(data) {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
     provider: 'clever',
   })
-  return SignUpService.createAccountWithClever(data)
+  return SignUpService.createAccountWithClever('student', data)
 }
 
 function isParentGuardianSignUp(to: RouteLocation) {
