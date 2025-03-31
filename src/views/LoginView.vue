@@ -161,6 +161,7 @@ export default {
         provider,
         isLogin: true,
         redirect: this.$route.query.redirect ?? '',
+        errorRedirect: '/login',
       })
       const url = `${config.serverRoot}/auth/sso?${params.toString()}`
       window.location.replace(url)

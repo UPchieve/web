@@ -1574,6 +1574,7 @@ export default {
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
         email: this.eligibility.studentEmail,
+        errorRedirect: '/sign-up/student/account',
         gradeLevel: this.trimCurrentGrade,
         isLogin: false,
         provider: 'google',

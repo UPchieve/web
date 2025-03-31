@@ -695,10 +695,10 @@ export default {
       return Object.keys(params).includes('error')
     },
     shouldUseGoogleSSO(params) {
-      return params['sso'] === 'google'
+      return params['sso'] === 'google' || params['provider'] === 'google'
     },
     shouldUseCleverSSO(params) {
-      return params['sso'] === 'clever'
+      return params['sso'] === 'clever' || params['provider'] === 'clever'
     },
     shouldUseParentGuardianSignUpFlow(params) {
       for (const key in params) {
@@ -839,6 +839,7 @@ export default {
 
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
+        errorRedirect: this.$route.path,
         gradeLevel: this.trimGradeLevel,
         isLogin: false,
         provider,

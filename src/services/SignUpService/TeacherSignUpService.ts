@@ -282,7 +282,7 @@ function createAccountWithClever(data) {
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT, {
     provider: 'clever',
   })
-  return SignUpService.createAccountWithClever(data)
+  return SignUpService.createAccountWithClever('teacher', data)
 }
 
 export async function beforeEnter(to, from, next) {
