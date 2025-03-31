@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 DATETIME=$(date '+%Y-%m-%d:%H-%M-%S')
 EMAIL=$(op account list --format json | jq -r '.[0].email')
