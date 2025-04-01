@@ -8,13 +8,19 @@
           v-show="moderationWarningIsShown"
         >
           <div class="moderation-body" data-testid="moderation-body">
-            <span
+            <span v-if="Object.keys(failureReasons ?? {}).length">
+              Your message cannot be shown due to the following policy
+              violations:
+            </span>
+            <span v-else
               >Messages cannot contain personal information, profanity, or links
-              to third party video services</span
+              to third party communication services.</span
             >
             <ul class="moderation-reasons">
               <li v-for="(value, key) in failureReasons" :key="key">
-                <div class="reason" :data-testid="key">{{ key }}</div>
+                <div class="reason" :data-testid="key">
+                  {{ getModerationFailureReason(key) }}
+                </div>
                 <div class="instances" :data-testid="`${key}-instances`">
                   {{ getOffendingSubstringsForReason(key) }}
                 </div>
@@ -220,6 +226,7 @@ import CallStatusIndicator from '@/components/ScreenShare/CallStatusIndicator.vu
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import TranscribedMessage from './TranscribedMessage.vue'
 import SendMessage from '@/assets/voice_message_icons/send-message.svg'
+import { startCase } from 'lodash-es'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -392,6 +399,16 @@ export default {
     onStopRecording() {
       this.notTyping()
     },
+    getModerationFailureReason(reasonKey) {
+      switch (reasonKey.toLowerCase()) {
+        case 'platform circumvention':
+          return 'Attempting to communicate off-platform'
+        case 'pii':
+          return 'Sharing personally identifiable information'
+        default:
+          return startCase(reasonKey)
+      }
+    },
     getOffendingSubstringsForReason(reasonKey) {
       if (
         !Object.hasOwn(this.failureReasons, reasonKey) ||
@@ -399,7 +416,9 @@ export default {
       ) {
         return ''
       }
-      return this.failureReasons[reasonKey].map((s) => s.trim()).join(', ')
+      return this.failureReasons[reasonKey]
+        .map((s) => `"` + s.trim() + `"`)
+        .join(', ')
     },
     formatTime(createdAt) {
       return moment(createdAt).format('h:mm a')
