@@ -191,13 +191,15 @@ export default {
       this.banOptions =
         (this.hasVolunteerRole && !this.isStudentVolunteer) || this.isTeacher
           ? [
-              { text: 'False', value: null },
-              { text: 'True', value: 'complete' },
+              { text: 'None', value: null },
+              { text: 'Complete Ban', value: 'complete' },
+              { text: 'Live Media Ban', value: 'live_media' },
             ]
           : [
               { text: 'None', value: null },
               { text: 'Complete Ban', value: 'complete' },
               { text: 'Shadow Ban', value: 'shadow' },
+              { text: 'Live Media Ban', value: 'live_media' },
             ]
 
       let activeSchoolPartnerName = ''

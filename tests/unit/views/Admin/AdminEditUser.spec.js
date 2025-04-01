@@ -49,8 +49,9 @@ describe('AdminEditUser.vue', () => {
       .findAll('option')
     const optionTexts = options.map((o) => o.text())
 
-    expect(optionTexts).toContain('False')
-    expect(optionTexts).toContain('True')
+    expect(optionTexts).toContain('None')
+    expect(optionTexts).toContain('Complete Ban')
+    expect(optionTexts).toContain('Live Media Ban')
   })
 
   it('should show NONE, COMPLETE OR SHADOW options for banned for students', async () => {
@@ -72,5 +73,6 @@ describe('AdminEditUser.vue', () => {
     expect(optionTexts).toContain('None')
     expect(optionTexts).toContain('Complete Ban')
     expect(optionTexts).toContain('Shadow Ban')
+    expect(optionTexts).toContain('Live Media Ban')
   })
 })
