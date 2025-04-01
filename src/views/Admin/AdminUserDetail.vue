@@ -46,6 +46,12 @@
             >Shadow Banned</span
           >
           <span
+            v-if="user.banType === 'live_media'"
+            class="user-detail__account-notice user-detail__account-notice--shadowban"
+            data-testid="user-detail-label-live-media-banned"
+            >Live Media Banned</span
+          >
+          <span
             v-if="user.isDeactivated"
             class="user-detail__account-notice user-detail__account-notice--deactivated"
             data-testid="user-detail-label-deactivated"
