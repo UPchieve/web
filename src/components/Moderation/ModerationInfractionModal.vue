@@ -1,5 +1,5 @@
 <template>
-  <Modal class="moderation-infraction-info-modal">
+  <Modal class="moderation-infraction-info-modal upc-modal">
     <h3>
       We detected a potential policy violation with your
       {{ moderationInfractionSource }} use
@@ -48,6 +48,7 @@ const moderationInfractionSource = computed(
 .moderation-infraction-info-modal {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 
   .infraction-modal-body {
     display: flex;
