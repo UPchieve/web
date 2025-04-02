@@ -53,7 +53,10 @@
             </div>
             <template v-if="isCollegeEducated">
               <label class="uc-form-label occupations-label" for="college"
-                >What college/university do you currently attend?</label
+                >What college/university do you currently attend?<span
+                  class="background-info__question-required"
+                  >*</span
+                ></label
               >
               <input
                 type="text"
@@ -66,7 +69,10 @@
 
             <template v-if="isWorkingFullTime">
               <label class="uc-form-label occupations-label" for="company"
-                >What company do you currently work at?</label
+                >What company do you currently work at?<span
+                  class="background-info__question-required"
+                  >*</span
+                ></label
               >
               <input
                 type="text"
@@ -108,7 +114,11 @@
               >
             </p>
 
-            <label class="uc-form-label location-label">Country</label>
+            <label class="uc-form-label location-label"
+              >Country<span class="background-info__question-required"
+                >*</span
+              ></label
+            >
             <v-select
               class="location-input"
               v-model="country"
@@ -117,7 +127,11 @@
               data-testid="location-input"
             />
             <template v-if="country === 'United States of America'">
-              <label class="uc-form-label location-label">State</label>
+              <label class="uc-form-label location-label"
+                >State<span class="background-info__question-required"
+                  >*</span
+                ></label
+              >
               <v-select
                 class="location-input"
                 id="state"
@@ -129,7 +143,9 @@
             </template>
             <template v-if="country">
               <label class="uc-form-label location-label" for="city"
-                >City</label
+                >City<span class="background-info__question-required"
+                  >*</span
+                ></label
               >
               <input
                 type="text"
@@ -298,6 +314,7 @@ import { mapState, mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { COUNTRIES, STATES, EVENTS } from '@/consts'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   name: 'background-info-view',
@@ -467,6 +484,10 @@ export default {
         }
         await this.$store.dispatch('user/addToUser', update)
       } catch (error) {
+        LoggerService.noticeError(error)
+        AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_ERROR, {
+          error: error?.message,
+        })
         this.formError = 'Sorry, we had some trouble saving your information.'
         this.wasSubmitted = false
       }
