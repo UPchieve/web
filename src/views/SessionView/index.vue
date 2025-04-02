@@ -264,11 +264,6 @@
     >
       <photo-upload-icon class="photo-upload--icon" />
     </div>
-    <ai-assisted-tutoring-modal
-      v-if="showAiAssistedTutoringModal"
-      :isVolunteer="user.isVolunteer"
-      :closeModal="() => setShowAiAssistedTutoringModal(false)"
-    />
     <web-notifications-modal
       v-if="showNotificationModal"
       :closeModal="() => setShowNotificationModal(false)"
@@ -309,7 +304,6 @@ import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
-import AiAssistedTutoringModal from './AiAssistedTutoringModal.vue'
 import AboutSessionModal from './AboutSessionModal.vue'
 import AssignmentDetailModal from './AssignmentDetailModal.vue'
 import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
@@ -342,7 +336,6 @@ export default {
     ScreenShare,
     Spinner,
     AiWidgetTool,
-    AiAssistedTutoringModal,
     SessionChatHeader,
     SessionChat,
     Whiteboard,
@@ -413,7 +406,6 @@ export default {
       aiWidgetHidden: true,
       aiWidgetEnabled: false,
       hasUnreadAiTutorMessage: false,
-      showAiAssistedTutoringModal: false,
       aiWidgetDragging: false,
       aiWidgetResizing: false,
       didAutoOpen: false,
@@ -814,9 +806,6 @@ export default {
         )
           .then((r) => {
             this.aiWidgetEnabled = r.isEnabled.includes('in-session')
-            if (!localStorage.getItem('seen-ai-assisted-modal')) {
-              this.setShowAiAssistedTutoringModal(this.aiWidgetEnabled)
-            }
           })
           .catch((err) => {
             LoggerService.noticeError(
@@ -1108,9 +1097,6 @@ export default {
     },
     setHasSeenNewMessage(value) {
       this.hasSeenNewMessage = value
-    },
-    setShowAiAssistedTutoringModal(value) {
-      this.showAiAssistedTutoringModal = value
     },
     setShowNotificationModal(value) {
       this.showNotificationModal = value
