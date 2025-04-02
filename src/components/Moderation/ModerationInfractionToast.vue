@@ -5,8 +5,8 @@
     :header="heading"
     icon="alert-circle-outline"
     :animated="true"
-    position="top"
-    :duration="1000 * 5"
+    position="middle"
+    :duration="props.requireClickMoreInfoToDismiss ? 0 : 5000"
     :buttons="moderationInfractionToastButtons"
     @didDismiss="props.onDismiss"
     :layout="mobileMode ? 'stacked' : 'baseline'"
@@ -22,6 +22,7 @@ const props = defineProps<{
   show: false
   onDismiss: Function
   onClickMoreInfo: Function
+  requireClickMoreInfoToDismiss: false
 }>()
 
 const store = useStore()
@@ -47,13 +48,15 @@ const moderationInfractionSource = computed(
 )
 
 const moderationInfractionToastButtons = computed(() => {
-  const buttons = [
-    {
-      text: 'Dismiss',
-      role: 'cancel',
-      handler: props.onDismiss,
-    },
-  ]
+  const dismissButton = {
+    text: 'Dismiss',
+    role: 'cancel',
+    handler: props.onDismiss,
+  }
+  const buttons = []
+  if (!props.requireClickMoreInfoToDismiss) {
+    buttons.push(dismissButton)
+  }
   // Image uploads don't actually cause strikes against the user if they're censored,
   // so don't show them the modal about manual review.
   if (moderationInfraction.value?.source !== 'image_upload') {

@@ -41,6 +41,9 @@
         :show="showModerationInfractionToast"
         :on-dismiss="dismissModerationInfraction"
         :on-click-more-info="toggleModerationInfractionModal"
+        :require-click-more-info-to-dismiss="
+          moderationInfraction?.isBanned ?? false
+        "
       />
       <ModerationInfractionModal
         v-if="showModerationInfractionModal"
