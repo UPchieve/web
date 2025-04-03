@@ -1,176 +1,170 @@
 <template>
   <div v-if="user.id" class="user-detail">
-    <div v-if="isStudentVolunteer" class="student-volunteer-notice">
-      <InformationIcon class="info-icon" />
-      This student is part of an experiment where they can also become
-      volunteers on the same account.
-    </div>
-    <admin-edit-user
-      v-if="isEditMode"
-      :user="user"
-      :toggleEditMode="toggleEditMode"
-      :getUser="getUser"
-    />
-    <admin-pending-volunteer-detail
-      v-else-if="hasVolunteerRole && !user.isApproved"
-      :toggleEditMode="toggleEditMode"
-      :volunteer="user"
-    />
-    <template v-else>
-      <div class="user-detail__body">
-        <div class="user-detail__buttons-section">
-          <button class="back-button" @click="goBack()" type="button">
-            ← Back
-          </button>
-          <button type="button" class="edit-btn btn" @click="toggleEditMode()">
-            Edit
-          </button>
-        </div>
-        <div>
-          <span
-            v-if="user.isAdmin"
-            class="user-detail__account-notice user-detail__account-notice--admin"
-            data-testid="user-detail-label-admin"
-            >Admin</span
-          >
-          <span
-            v-if="user.banType === 'complete'"
-            class="user-detail__account-notice user-detail__account-notice--ban"
-            data-testid="user-detail-label-banned"
-            >Banned</span
-          >
-          <span
-            v-if="user.banType === 'shadow'"
-            class="user-detail__account-notice user-detail__account-notice--shadowban"
-            data-testid="user-detail-label-shadowbanned"
-            >Shadow Banned</span
-          >
-          <span
-            v-if="user.banType === 'live_media'"
-            class="user-detail__account-notice user-detail__account-notice--shadowban"
-            data-testid="user-detail-label-live-media-banned"
-            >Live Media Banned</span
-          >
-          <span
-            v-if="user.isDeactivated"
-            class="user-detail__account-notice user-detail__account-notice--deactivated"
-            data-testid="user-detail-label-deactivated"
-            >Deactivated</span
-          >
-          <span
-            v-if="user.isTestUser"
-            class="user-detail__account-notice user-detail__account-notice--test"
-            data-testid="user-detail-label-test"
-            >Test account</span
-          >
-          <span
-            v-if="user.isFakeUser"
-            class="user-detail__account-notice user-detail__account-notice--fake"
-            data-testid="user-detail-label-fake"
-            >Fake account</span
-          >
-        </div>
-        <div class="user-detail__title">
-          {{ user.firstName }} {{ user.lastName }}
-        </div>
-        <div class="user-detail__subtitle mb-0">ID: {{ user.id }}</div>
-        <div class="user-detail__subtitle">{{ userTypeLabel }}</div>
-        <div class="user-detail__section">
-          <div class="user-detail__section-title">Joined</div>
-          <div>{{ createdAt }}</div>
-        </div>
-        <div class="user-detail__section">
-          <div class="user-detail__section-title">Email</div>
-          <div>{{ user.email }}</div>
-        </div>
-        <div v-if="partnerOrg" class="user-detail__section">
-          <div class="user-detail__section-title">Partner organization</div>
-          <div>{{ partnerOrg }}</div>
-        </div>
-        <div v-if="user.partnerSite" class="user-detail__section">
-          <div class="user-detail__section-title">Partner site</div>
-          <div>{{ user.partnerSite }}</div>
-        </div>
-        <div v-if="user.schoolName" class="user-detail__section">
-          <div class="user-detail__section-title">School</div>
-          <div>{{ user.schoolName }}</div>
-        </div>
-        <div v-if="user.currentGrade" class="user-detail__section">
-          <div class="user-detail__section-title">Grade level</div>
-          <div>{{ user.currentGrade }}</div>
-        </div>
-        <div v-if="user.zipCode" class="user-detail__section">
-          <div class="user-detail__section-title">Zip code</div>
-          <div>{{ user.zipCode }}</div>
-        </div>
-        <div
-          v-if="isVolunteer || isStudentVolunteer"
-          class="user-detail__section"
+    <div class="user-detail__body">
+      <div class="user-detail__buttons-section">
+        <button class="back-button" @click="goBack()" type="button">
+          ← Back
+        </button>
+        <button type="button" class="edit-btn btn" @click="toggleEditMode()">
+          Edit
+        </button>
+      </div>
+      <div v-if="isStudentVolunteer" class="student-volunteer-notice">
+        <InformationIcon class="info-icon" />
+        This student is part of an experiment where they can also become
+        volunteers on the same account.
+      </div>
+      <admin-edit-user
+        v-if="isEditMode"
+        :user="user"
+        :toggleEditMode="toggleEditMode"
+        :getUser="getUser"
+      />
+      <admin-pending-volunteer-detail
+        v-else-if="readyToReviewId"
+        :volunteer="user"
+      />
+      <div>
+        <span
+          v-if="user.isAdmin"
+          class="user-detail__account-notice user-detail__account-notice--admin"
+          data-testid="user-detail-label-admin"
+          >Admin</span
         >
-          <div class="user-detail__section-title">Background Information</div>
-          <div v-if="user.background.occupation">
-            <div class="user-detail__subtitle">
-              Occupation: {{ user.background.occupation.toString() }}
-            </div>
+        <span
+          v-if="user.banType === 'complete'"
+          class="user-detail__account-notice user-detail__account-notice--ban"
+          data-testid="user-detail-label-banned"
+          >Banned</span
+        >
+        <span
+          v-if="user.banType === 'shadow'"
+          class="user-detail__account-notice user-detail__account-notice--shadowban"
+          data-testid="user-detail-label-shadowbanned"
+          >Shadow Banned</span
+        >
+        <span
+          v-if="user.banType === 'live_media'"
+          class="user-detail__account-notice user-detail__account-notice--shadowban"
+          data-testid="user-detail-label-live-media-banned"
+          >Live Media Banned</span
+        >
+        <span
+          v-if="user.isDeactivated"
+          class="user-detail__account-notice user-detail__account-notice--deactivated"
+          data-testid="user-detail-label-deactivated"
+          >Deactivated</span
+        >
+        <span
+          v-if="user.isTestUser"
+          class="user-detail__account-notice user-detail__account-notice--test"
+          data-testid="user-detail-label-test"
+          >Test account</span
+        >
+        <span
+          v-if="user.isFakeUser"
+          class="user-detail__account-notice user-detail__account-notice--fake"
+          data-testid="user-detail-label-fake"
+          >Fake account</span
+        >
+      </div>
+      <div class="user-detail__title">
+        {{ user.firstName }} {{ user.lastName }}
+      </div>
+      <div class="user-detail__subtitle mb-0">ID: {{ user.id }}</div>
+      <div class="user-detail__subtitle">{{ userTypeLabel }}</div>
+      <div class="user-detail__section">
+        <div class="user-detail__section-title">Joined</div>
+        <div>{{ createdAt }}</div>
+      </div>
+      <div class="user-detail__section">
+        <div class="user-detail__section-title">Email</div>
+        <div>{{ user.email }}</div>
+      </div>
+      <div v-if="partnerOrg" class="user-detail__section">
+        <div class="user-detail__section-title">Partner organization</div>
+        <div>{{ partnerOrg }}</div>
+      </div>
+      <div v-if="user.partnerSite" class="user-detail__section">
+        <div class="user-detail__section-title">Partner site</div>
+        <div>{{ user.partnerSite }}</div>
+      </div>
+      <div v-if="user.schoolName" class="user-detail__section">
+        <div class="user-detail__section-title">School</div>
+        <div>{{ user.schoolName }}</div>
+      </div>
+      <div v-if="user.currentGrade" class="user-detail__section">
+        <div class="user-detail__section-title">Grade level</div>
+        <div>{{ user.currentGrade }}</div>
+      </div>
+      <div v-if="user.zipCode" class="user-detail__section">
+        <div class="user-detail__section-title">Zip code</div>
+        <div>{{ user.zipCode }}</div>
+      </div>
+      <div v-if="hasVolunteerRole" class="user-detail__section">
+        <div class="user-detail__section-title">Background Information</div>
+        <div v-if="user.background.occupation">
+          <div class="user-detail__subtitle">
+            Occupation: {{ user.background.occupation.toString() }}
           </div>
-          <div v-if="user.background.college">
-            <div class="user-detail__subtitle">
-              College/University: {{ user.background.college }}
-            </div>
+        </div>
+        <div v-if="user.background.college">
+          <div class="user-detail__subtitle">
+            College/University: {{ user.background.college }}
           </div>
-          <div v-if="user.background.company">
-            <div class="user-detail__subtitle">
-              Company: {{ user.background.company }}
-            </div>
+        </div>
+        <div v-if="user.background.company">
+          <div class="user-detail__subtitle">
+            Company: {{ user.background.company }}
           </div>
-          <div v-if="user.background.linkedInUrl">
-            <div class="user-detail__subtitle">
-              LinkedIn Url: {{ user.background.linkedInUrl }}
-            </div>
+        </div>
+        <div v-if="user.background.linkedInUrl">
+          <div class="user-detail__subtitle">
+            LinkedIn Url: {{ user.background.linkedInUrl }}
           </div>
-          <div v-if="user.background.country">
-            <div class="user-detail__subtitle">
-              Country: {{ user.background.country }}
-            </div>
+        </div>
+        <div v-if="user.background.country">
+          <div class="user-detail__subtitle">
+            Country: {{ user.background.country }}
           </div>
-          <div v-if="user.background.state">
-            <div class="user-detail__subtitle">
-              State: {{ user.background.state }}
-            </div>
+        </div>
+        <div v-if="user.background.state">
+          <div class="user-detail__subtitle">
+            State: {{ user.background.state }}
           </div>
-          <div v-if="user.background.city">
-            <div class="user-detail__subtitle">
-              City: {{ user.background.city }}
-            </div>
+        </div>
+        <div v-if="user.background.city">
+          <div class="user-detail__subtitle">
+            City: {{ user.background.city }}
           </div>
-          <div v-if="user.background.experience">
-            <div class="user-detail__subtitle">
-              Experience: Tutoring: {{ user.background.experience.tutoring }},
-              College Counseling:
-              {{ user.background.experience.collegeCounseling }}, Mentoring:
-              {{ user.background.experience.mentoring }}
-            </div>
+        </div>
+        <div v-if="user.background.experience">
+          <div class="user-detail__subtitle">
+            Experience: Tutoring: {{ user.background.experience.tutoring }},
+            College Counseling:
+            {{ user.background.experience.collegeCounseling }}, Mentoring:
+            {{ user.background.experience.mentoring }}
           </div>
-          <div v-if="user.background.languages">
-            <div class="user-detail__subtitle">
-              Languages: {{ user.background.languages.toString() }}
-            </div>
+        </div>
+        <div v-if="user.background.languages">
+          <div class="user-detail__subtitle">
+            Languages: {{ user.background.languages.toString() }}
           </div>
         </div>
       </div>
-      <page-control
-        :page="page"
-        :isFirstPage="isFirstPage"
-        :isLastPage="isLastPage"
-        @nextPage="nextPage"
-        @previousPage="previousPage"
-        :showPageNumber="user.pastSessions.length > 0"
-      />
-      <sessions-list
-        v-if="user.pastSessions.length"
-        :sessions="sortedPastSessions"
-      />
-    </template>
+    </div>
+    <page-control
+      :page="page"
+      :isFirstPage="isFirstPage"
+      :isLastPage="isLastPage"
+      @nextPage="nextPage"
+      @previousPage="previousPage"
+      :showPageNumber="user.pastSessions.length > 0"
+    />
+    <sessions-list
+      v-if="user.pastSessions.length"
+      :sessions="sortedPastSessions"
+    />
   </div>
 </template>
 
@@ -220,6 +214,13 @@ export default {
   },
 
   computed: {
+    readyToReviewId() {
+      return (
+        hasVolunteerRole &&
+        !this.user.isApproved &&
+        Object.keys(this.user.background ?? {}).length
+      )
+    },
     userTypeLabel() {
       const primaryType = this.user.userType
       if (this.isStudentVolunteer) {
