@@ -58,7 +58,7 @@
             v-if="isScreenSharing"
             class="toolbar-item__svg"
           />
-          <ScreenShareIcon v-else class="toolbar-item__svg" />
+          <StartScreenShareButton v-else class="toolbar-item__svg" />
         </button>
       </div>
       <WhiteboardAiTutorButton
@@ -437,10 +437,10 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
 import { WhiteboardNullTool } from './WhiteboardNullTool'
 import WhiteboardAiTutorButton from './WhiteboardAiTutorButton.vue'
-import ScreenShareIcon from '@/assets/screen-share.svg'
 import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
 import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
+import StartScreenShareButton from './StartScreenShareButton.vue'
 
 const TOOLS = {
   BRUSH: 'brush',
@@ -476,10 +476,10 @@ export default {
     SmallTextIcon,
     Loader,
     LoadingMessage,
-    ScreenShareIcon,
     StopScreenShareIcon,
     Spinner,
     ErrorIcon,
+    StartScreenShareButton,
   },
   props: {
     sessionId: {
