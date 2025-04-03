@@ -4,8 +4,8 @@ import LoggerService from '@/services/LoggerService'
 import store from '@/store'
 import pixelmatch from 'pixelmatch'
 
-// This is the size of the image that we want to send to subway for moderation
-const TARGET_LARGEST_IMAGE_DIMENSION_IN_PIXELS = 3000
+// This is the max file size we can send to rekognition for moderation
+const MAX_BYTE_SIZE_FOR_FRAME = 5242880
 
 function captureFrameFromCanvas(
   canvas: HTMLCanvasElement,
@@ -35,9 +35,9 @@ const CURSOR_HEIGHT_IN_PIXELS = 2 * window.devicePixelRatio
 const MAX_PIXELS_DIFFERENCE = CURSOR_WIDTH_IN_PIXELS * CURSOR_HEIGHT_IN_PIXELS
 
 const lastModeratedFrameBuffer = ref<null | Uint8ClampedArray>(null)
-async function shouldModerateFrame(
+function shouldModerateFrame(
   frame: ReturnType<typeof captureFrameFromCanvas>
-): Promise<boolean> {
+): boolean {
   const lastFrame = lastModeratedFrameBuffer.value
   lastModeratedFrameBuffer.value = frame.imageData.data
 
@@ -45,15 +45,25 @@ async function shouldModerateFrame(
     return true
   }
 
-  const numDifferingPixels = pixelmatch(
-    lastFrame,
-    frame.imageData.data,
-    null,
-    frame.imageData.width,
-    frame.imageData.height
-  )
+  try {
+    const numDifferingPixels = pixelmatch(
+      lastFrame,
+      frame.imageData.data,
+      null,
+      frame.imageData.width,
+      frame.imageData.height
+    )
 
-  return numDifferingPixels > MAX_PIXELS_DIFFERENCE
+    return numDifferingPixels > MAX_PIXELS_DIFFERENCE
+  } catch (err) {
+    if (err instanceof Error && err.message !== 'Image sizes do not match.') {
+      LoggerService.noticeError(
+        err,
+        'Error comparing previous frame and current frame'
+      )
+    }
+    return true
+  }
 }
 
 async function moderateFrame(
@@ -61,7 +71,7 @@ async function moderateFrame(
 ): Promise<void> {
   try {
     // Basic check to prevent tons of duplicate moderation requests
-    if (await shouldModerateFrame(frameToModerate)) {
+    if (shouldModerateFrame(frameToModerate)) {
       const formData = new FormData()
       formData.append('frame', frameToModerate.binary)
       formData.append('sessionId', store.state.user.session.id)
@@ -73,31 +83,14 @@ async function moderateFrame(
   }
 }
 
-function getScaledDimensions(dimensions: { width: number; height: number }): {
-  width: number
-  height: number
-} {
-  const largerDimension =
-    dimensions.width > dimensions.height ? 'width' : 'height'
-  const scaleFactor =
-    TARGET_LARGEST_IMAGE_DIMENSION_IN_PIXELS / dimensions[largerDimension]
-  const width =
-    scaleFactor > 1 ? dimensions.width : dimensions.width * scaleFactor
-  const height =
-    scaleFactor > 1 ? dimensions.height : dimensions.height * scaleFactor
-  return { width, height }
-}
-
 function drawImage(
   canvas: HTMLCanvasElement,
   targetElement: HTMLVideoElement | HTMLCanvasElement
 ): ImageData {
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Could not get 2d context')
-  const { width, height } = getScaledDimensions({
-    width: canvas.width,
-    height: canvas.height,
-  })
+  const width = canvas.width
+  const height = canvas.height
   ctx.drawImage(targetElement, 0, 0, width, height)
   return ctx.getImageData(0, 0, width, height)
 }
@@ -121,20 +114,52 @@ function startModeration({
   sampleInterval: number
 }): ReturnType<typeof setInterval> {
   const captureCanvas = document.createElement('canvas')
-  const { width, height } = targetElement.getBoundingClientRect()
-  captureCanvas.width = width
-  captureCanvas.height = height
-  moderateFrame(
-    processFrameForModeration({ canvas: captureCanvas, targetElement })
-  )
+  if (targetElement instanceof HTMLVideoElement) {
+    captureCanvas.width = targetElement.videoWidth
+    captureCanvas.height = targetElement.videoHeight
+  } else {
+    captureCanvas.width = targetElement.width
+    captureCanvas.height = targetElement.height
+  }
+
+  function scaleDownFrame(frame: ReturnType<typeof captureFrameFromCanvas>) {
+    // if the frame is too large, let's scale it down to 70% of the max byte size for frame and try again
+    const targetSize = MAX_BYTE_SIZE_FOR_FRAME * 0.7
+    const scaleFactor = Math.round(Math.sqrt(targetSize / frame.binary.size))
+    captureCanvas.width = captureCanvas.width * scaleFactor
+    captureCanvas.height = captureCanvas.height * scaleFactor
+    return processFrameForModeration({
+      canvas: captureCanvas,
+      targetElement,
+    })
+  }
+
+  let frame = processFrameForModeration({
+    canvas: captureCanvas,
+    targetElement,
+  })
+
+  if (frame.binary.size >= MAX_BYTE_SIZE_FOR_FRAME) {
+    frame = scaleDownFrame(frame)
+  }
+
+  moderateFrame(frame)
+
   return setInterval(() => {
     if (targetElement && captureCanvas) {
-      moderateFrame(
-        processFrameForModeration({ canvas: captureCanvas, targetElement })
-      )
+      let frame = processFrameForModeration({
+        canvas: captureCanvas,
+        targetElement,
+      })
+
+      if (frame.binary.size >= MAX_BYTE_SIZE_FOR_FRAME) {
+        frame = scaleDownFrame(frame)
+      }
+      moderateFrame(frame)
     }
   }, sampleInterval)
 }
+
 export function moderateScreenShare(
   options: { sampleInterval: number } = {
     sampleInterval: store.getters['featureFlags/videoModerationSampleInterval'],
