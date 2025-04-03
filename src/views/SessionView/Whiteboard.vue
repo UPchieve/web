@@ -230,7 +230,7 @@
         class="toolbar-item"
         title="Text"
         tabindex="0"
-        @click="toggleTextPicker"
+        @click="clickTextPicker"
         @keydown.enter="toggleTextPicker"
         :class="
           selectedTool === 'small-text' || selectedTool === 'text'
@@ -445,6 +445,8 @@ import { vTooltip } from 'maz-ui'
 const TOOLS = {
   BRUSH: 'brush',
   THIN_BRUSH: 'thin-brush',
+  TEXT: 'text',
+  SMALL_TEXT: 'small-text',
 }
 
 export default {
@@ -562,6 +564,7 @@ export default {
       selectedThinBrushTool: false,
       selectedSmallTextTool: false,
       lastSelectedBrushType: TOOLS.BRUSH,
+      lastSelectedTextSize: TOOLS.TEXT,
     }
   },
   emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
@@ -593,6 +596,8 @@ export default {
       if (
         this.selectedTool === TOOLS.BRUSH ||
         this.selectedTool === TOOLS.THIN_BRUSH ||
+        this.selectedTool === TOOLS.BRUSH ||
+        this.selectedTool === TOOLS.THIN_BRUSH ||
         this.selectedTool === 'line' ||
         this.selectedTool === 'arrow' ||
         this.selectedTool === 'circle' ||
@@ -603,7 +608,10 @@ export default {
         return 'zwib-wrapper--crosshair-curor'
       }
 
-      if (this.selectedTool === 'text' || this.selectedTool === 'small-text') {
+      if (
+        this.selectedTool === TOOLS.TEXT ||
+        this.selectedTool === TOOLS.SMALL_TEXT
+      ) {
         return 'zwib-wrapper--text-cursor'
       }
 
@@ -707,6 +715,48 @@ export default {
         }
       })
     },
+    clickTextPicker() {
+      this.toggleTextPicker()
+
+      if (
+        this.showTextPicker &&
+        this.selectedTool !== TOOLS.SMALL_TEXT &&
+        this.selectedTool !== TOOLS.TEXT
+      ) {
+        if (this.lastSelectedTextSize === TOOLS.TEXT) {
+          this.useTextTool()
+        } else {
+          this.useSmallTextTool()
+        }
+      }
+
+      this.zwibblerCtx.on('edit-text-shown', () => {
+        if (this.showTextPicker) {
+          this.showTextPicker = false
+        }
+      })
+    },
+    clickBrushOnce(event) {
+      this.toggleBrushes(event)
+
+      if (
+        this.showBrushPicker &&
+        this.selectedTool !== TOOLS.BRUSH &&
+        this.selectedTool !== TOOLS.THIN_BRUSH
+      ) {
+        if (this.lastSelectedBrushType === TOOLS.BRUSH) {
+          this.useBrushTool(event)
+        } else {
+          this.useThinBrushTool(event)
+        }
+      }
+
+      this.zwibblerCtx.on('draw', () => {
+        if (this.showBrushPicker) {
+          this.showBrushPicker = false
+        }
+      })
+    },
     usePickTool(event) {
       this.zwibblerCtx.usePickTool()
       this.maybeFocusZwibbler(event)
@@ -715,11 +765,13 @@ export default {
       this.zwibblerCtx.useBrushTool()
       this.maybeFocusZwibbler(event)
       this.lastSelectedBrushType = TOOLS.BRUSH
+      this.lastSelectedBrushType = TOOLS.BRUSH
     },
     useThinBrushTool(event) {
       this.selectedThinBrushTool = true
       this.zwibblerCtx.useBrushTool({ lineWidth: 3 })
       this.maybeFocusZwibbler(event)
+      this.lastSelectedBrushType = TOOLS.THIN_BRUSH
       this.lastSelectedBrushType = TOOLS.THIN_BRUSH
     },
     useEraserTool(event) {
@@ -771,10 +823,13 @@ export default {
       this.maybeFocusZwibbler(event)
     },
     useTextTool(event) {
+      this.lastSelectedTextSize = TOOLS.TEXT
+      this.selectedSmallTextTool = false
       this.zwibblerCtx.useTextTool()
       this.maybeFocusZwibbler(event)
     },
     useSmallTextTool(event) {
+      this.lastSelectedTextSize = TOOLS.SMALL_TEXT
       this.selectedSmallTextTool = true
       this.zwibblerCtx.useTextTool({ fontSize: 26, fontName: 'Arial' })
       this.maybeFocusZwibbler(event)
@@ -1075,12 +1130,15 @@ export default {
             this.selectedEraserTool = false
             this.selectedTool = 'eraser'
             this.hideHoveredToolbars()
+            this.hideHoveredToolbars()
           } else if (this.selectedThinBrushTool) {
             this.selectedThinBrushTool = false
+            this.selectedTool = TOOLS.THIN_BRUSH
             this.selectedTool = TOOLS.THIN_BRUSH
           } else if (this.selectedSmallTextTool) {
             this.selectedSmallTextTool = false
             this.selectedTool = 'small-text'
+            this.hideHoveredToolbars()
             this.hideHoveredToolbars()
           } else {
             this.selectedTool = toolname
@@ -1199,10 +1257,10 @@ export default {
           case 'stamp':
             this.useXyGraphStampTool()
             break
-          case 'text':
+          case TOOLS.TEXT:
             this.useTextTool()
             break
-          case 'small-text':
+          case TOOLS.SMALL_TEXT:
             this.useSmallTextTool()
             break
           default:
