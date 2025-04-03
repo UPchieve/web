@@ -61,7 +61,7 @@
       <div class="line-break"></div>
       <div class="instructions">
         <p><strong class="bold-text">Instructions:</strong></p>
-        <p data-testid="description-text">
+        <p data-testid="description-text" class="instructions-text">
           {{ assignmentInfo.description || `No instructions provided.` }}
         </p>
       </div>
@@ -194,6 +194,10 @@ export default {
 .instructions,
 .line-break {
   margin-left: 5em;
+}
+
+.instructions-text {
+  white-space: pre-wrap;
 }
 
 .breadcrumbs-container {
