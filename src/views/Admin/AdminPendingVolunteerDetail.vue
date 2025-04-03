@@ -133,10 +133,6 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     padding: 20px 15px;
-
-    @include breakpoint-above('medium') {
-      padding: 40px;
-    }
   }
 
   &__title {
@@ -208,7 +204,6 @@ export default {
 }
 
 .save-btn {
-  margin-top: 3em;
   color: #fff;
   background-color: $c-success-green;
   border: none;

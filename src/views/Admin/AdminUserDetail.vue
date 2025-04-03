@@ -20,10 +20,6 @@
         :toggleEditMode="toggleEditMode"
         :getUser="getUser"
       />
-      <admin-pending-volunteer-detail
-        v-else-if="readyToReviewId"
-        :volunteer="user"
-      />
       <div>
         <span
           v-if="user.isAdmin"
@@ -73,6 +69,10 @@
       </div>
       <div class="user-detail__subtitle mb-0">ID: {{ user.id }}</div>
       <div class="user-detail__subtitle">{{ userTypeLabel }}</div>
+      <admin-pending-volunteer-detail
+        v-if="readyToReviewId && !isEditMode"
+        :volunteer="user"
+      />
       <div class="user-detail__section">
         <div class="user-detail__section-title">Joined</div>
         <div>{{ createdAt }}</div>
@@ -215,11 +215,7 @@ export default {
 
   computed: {
     readyToReviewId() {
-      return (
-        hasVolunteerRole &&
-        !this.user.isApproved &&
-        Object.keys(this.user.background ?? {}).length
-      )
+      return hasVolunteerRole && !this.user.isApproved
     },
     userTypeLabel() {
       const primaryType = this.user.userType
