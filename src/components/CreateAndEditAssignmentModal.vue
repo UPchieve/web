@@ -355,8 +355,8 @@ export default {
         title: this.assignmentName,
         numberOfSessions: this.numSessions,
         minDurationInMinutes: this.numMinutes,
-        dueDate: moment(this.dueDate).startOf('day').toDate(),
-        startDate: moment(this.startDate).endOf('day').toDate(),
+        dueDate: moment(this.dueDate).endOf('day').toDate(),
+        startDate: moment(this.startDate).startOf('day').toDate(),
         isRequired: false,
         subjectId: this.selectedSessionToComplete.id,
       }
