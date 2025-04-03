@@ -96,7 +96,7 @@
         class="toolbar-item"
         title="Brushes"
         tabindex="0"
-        @click="toggleBrushes"
+        @click="clickBrushTool"
         @keydown.enter="toggleBrushes"
         :class="
           selectedTool === 'brush' || selectedTool === 'thin-brush'
@@ -442,6 +442,11 @@ import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
 import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
 
+const TOOLS = {
+  BRUSH: 'brush',
+  THIN_BRUSH: 'thin-brush',
+}
+
 export default {
   directives: {
     tooltip: vTooltip,
@@ -556,6 +561,7 @@ export default {
       selectedEraserTool: false,
       selectedThinBrushTool: false,
       selectedSmallTextTool: false,
+      lastSelectedBrushType: TOOLS.BRUSH,
     }
   },
   emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
@@ -585,8 +591,8 @@ export default {
     },
     toolClass() {
       if (
-        this.selectedTool === 'brush' ||
-        this.selectedTool === 'thin-brush' ||
+        this.selectedTool === TOOLS.BRUSH ||
+        this.selectedTool === TOOLS.THIN_BRUSH ||
         this.selectedTool === 'line' ||
         this.selectedTool === 'arrow' ||
         this.selectedTool === 'circle' ||
@@ -680,6 +686,27 @@ export default {
         this.zwibblerCtx.focus(true, this)
       }
     },
+    clickBrushTool(event) {
+      this.toggleBrushes(event)
+
+      if (
+        this.showBrushPicker &&
+        this.selectedTool !== TOOLS.BRUSH &&
+        this.selectedTool !== TOOLS.THIN_BRUSH
+      ) {
+        if (this.lastSelectedBrushType === TOOLS.BRUSH) {
+          this.useBrushTool(event)
+        } else {
+          this.useThinBrushTool(event)
+        }
+      }
+
+      this.zwibblerCtx.on('draw', () => {
+        if (this.showBrushPicker) {
+          this.showBrushPicker = false
+        }
+      })
+    },
     usePickTool(event) {
       this.zwibblerCtx.usePickTool()
       this.maybeFocusZwibbler(event)
@@ -687,11 +714,13 @@ export default {
     useBrushTool(event) {
       this.zwibblerCtx.useBrushTool()
       this.maybeFocusZwibbler(event)
+      this.lastSelectedBrushType = TOOLS.BRUSH
     },
     useThinBrushTool(event) {
       this.selectedThinBrushTool = true
       this.zwibblerCtx.useBrushTool({ lineWidth: 3 })
       this.maybeFocusZwibbler(event)
+      this.lastSelectedBrushType = TOOLS.THIN_BRUSH
     },
     useEraserTool(event) {
       const layer = this.zwibblerCtx.getActiveLayer()
@@ -1045,16 +1074,17 @@ export default {
           if (this.selectedEraserTool) {
             this.selectedEraserTool = false
             this.selectedTool = 'eraser'
+            this.hideHoveredToolbars()
           } else if (this.selectedThinBrushTool) {
             this.selectedThinBrushTool = false
-            this.selectedTool = 'thin-brush'
+            this.selectedTool = TOOLS.THIN_BRUSH
           } else if (this.selectedSmallTextTool) {
             this.selectedSmallTextTool = false
             this.selectedTool = 'small-text'
+            this.hideHoveredToolbars()
           } else {
             this.selectedTool = toolname
           }
-          this.hideHoveredToolbars()
         })
       })
 
@@ -1142,10 +1172,10 @@ export default {
           case 'pick':
             this.usePickTool()
             break
-          case 'brush':
+          case TOOLS.BRUSH:
             this.useBrushTool()
             break
-          case 'thin-brush':
+          case TOOLS.THIN_BRUSH:
             this.userThinBrushTool()
             break
           case 'eraser':
