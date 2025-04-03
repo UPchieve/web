@@ -1,21 +1,6 @@
 <template>
   <div v-if="volunteer.id" class="user-detail">
     <div class="user-detail__body">
-      <button class="edit-btn btn" type="button" @click="toggleEditMode()">
-        Edit
-      </button>
-      <div class="user-detail__title">
-        {{ volunteer.firstName }} {{ volunteer.lastName }}
-      </div>
-      <div class="user-detail__subtitle">ID: {{ volunteer.id }}</div>
-      <div class="user-detail__section">
-        <div class="user-detail__section-title">Joined</div>
-        <div>{{ createdAt }}</div>
-      </div>
-      <div class="user-detail__section">
-        <div class="user-detail__section-title">Email</div>
-        <div>{{ volunteer.email }}</div>
-      </div>
       <div class="user-detail__section">
         <div class="user-detail__section-title">
           Photo Id
@@ -79,7 +64,6 @@ export default {
   components: { LargeButton, BackgroundInfo },
   props: {
     volunteer: { type: Object, required: true },
-    toggleEditMode: { type: Function, required: true },
   },
   data() {
     return {
