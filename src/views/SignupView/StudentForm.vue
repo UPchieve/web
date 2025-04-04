@@ -1384,6 +1384,9 @@ export default {
               })
                 .then(() => {
                   this.step = 'parentGuardianConfirmation'
+                  AnalyticsService.captureGoogleAnalyticsEvent(
+                    'student_sign_up'
+                  )
                 })
                 .catch((err) => {
                   this.errors.push(
@@ -1555,6 +1558,7 @@ export default {
           zipCode: this.eligibility.zipCode ? this.eligibility.zipCode : null,
         }
         await AuthService.registerStudent(data)
+        AnalyticsService.captureGoogleAnalyticsEvent('student_sign_up')
         window.localStorage.removeItem('upcReferredByCode')
         this.$router.replace('/verify')
       } catch (e) {
