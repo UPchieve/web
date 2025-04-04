@@ -787,7 +787,9 @@ export default {
     },
     messageData: {
       handler(data) {
-        const { userId } = data
+        const { userId, sessionId } = data
+        if (sessionId !== this.currentSession.id) return
+
         // If the chat is hidden show visual indicator that a new message has arrived
         if (this.shouldHideChatSection) {
           this.setHasSeenNewMessage(false)
@@ -809,8 +811,14 @@ export default {
       deep: true,
     },
 
-    isTyping(currentVal) {
-      this.typingIndicatorShown = currentVal
+    isTyping({ sessionId, isTyping }) {
+      if (sessionId !== this.currentSession.id) return
+      if (!isTyping) this.typingIndicatorShown = false
+      else
+        this.typingIndicatorShown = this.isInRecap
+          ? true
+          : // TODO: Are these checks still needed? Could we just read off `isTyping` instead?
+            this.isSessionAlive && this.isSessionConnectionAlive
     },
     'currentSession.messages': {
       handler(currentVal, prevVal) {
