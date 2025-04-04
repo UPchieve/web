@@ -143,6 +143,7 @@
 </template>
 
 <script>
+import { EVENTS } from '@/consts'
 import NetworkService from '@/services/NetworkService'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Calendar from '@/assets/calendar.svg'
@@ -151,6 +152,7 @@ import Loader from '@/components/Loader.vue'
 import { useClipboard } from '@vueuse/core'
 import { toastController } from '@ionic/vue'
 import CopyIcon from '@/assets/copy-icon.svg'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   name: 'Assignment',
@@ -192,6 +194,10 @@ export default {
       (student) => student.submitted_at !== null
     ).length
     this.isGettingStarted = this.assignmentInfo.isGettingStartedAssignment
+
+    AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_EDIT_ASSIGNMENT, {
+      isGettingStartedAssignment: this.isGettingStarted,
+    })
   },
 
   methods: {
@@ -206,10 +212,22 @@ export default {
         position: 'top',
       })
       await toast.present()
+      AnalyticsService.captureEvent(
+        EVENTS.TEACHER_CLICKED_GETTING_STARTED_ASSIGNMENT_CLASS_LINK,
+        {
+          isGettingStartedAssignment: true,
+        }
+      )
     },
 
     goToYoutubeVideo() {
       window.open('https://www.youtube.com/watch?v=qtsY7wJxlko', '_blank')
+      AnalyticsService.captureEvent(
+        EVENTS.TEACHER_CLICKED_GETTING_STARTED_ASSIGNMENT_VIDEO,
+        {
+          isGettingStartedAssignment: true,
+        }
+      )
     },
 
     async getAssignmentDetails(assignmentId) {

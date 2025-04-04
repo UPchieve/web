@@ -488,6 +488,9 @@ export default {
     },
 
     openEditAssignmentModal(assignment) {
+      AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_EDIT_ASSIGNMENT, {
+        isGettingStartedAssignment: assignment.isGettingStartedAssignment,
+      })
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAndEditAssignmentModal',
         data: {
