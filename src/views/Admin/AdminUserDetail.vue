@@ -215,7 +215,7 @@ export default {
 
   computed: {
     readyToReviewId() {
-      return hasVolunteerRole && !this.user.isApproved
+      return this.hasVolunteerRole && !this.user.isApproved
     },
     userTypeLabel() {
       const primaryType = this.user.userType
