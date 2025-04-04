@@ -274,7 +274,7 @@ export const isBannedFromLiveMedia = fromCallback(
 // @ts-ignore
 const canKeepScreenFocus = typeof CaptureController !== 'undefined'
 
-async function getStream(input: { context: Context }) {
+async function getStream(input: { meetingSession: DefaultMeetingSession }) {
   /*
     Chrome and Edge browsers support the CaptureController API, which allows us to keep the screen
     in focus (rather than jumping to the shared window) when starting a screen share.
@@ -288,20 +288,34 @@ async function getStream(input: { context: Context }) {
       controller,
     })
 
-    await input.context.meetingSession!.audioVideo.startContentShare(
-      contentShareStream
-    )
+    await input.meetingSession.audioVideo.startContentShare(contentShareStream)
   } else {
-    await input.context.meetingSession!.audioVideo.startContentShareFromScreenCapture()
+    await input.meetingSession.audioVideo.startContentShareFromScreenCapture()
   }
 }
 
+async function startSessionRecording(sessionId: string) {
+  await NetworkService.startSessionRecording(sessionId)
+}
+
 export const startingShareMyScreen = fromPromise(
-  async ({ input }: { input: { context: Context } }) => {
+  async ({
+    input,
+  }: {
+    input: {
+      sessionId: string
+      videoOutputElement: HTMLVideoElement
+      sessionRecordingStarted: boolean
+      meetingSession: DefaultMeetingSession
+    }
+  }) => {
+    if (!input.sessionRecordingStarted) {
+      await startSessionRecording(input.sessionId)
+    }
     const { beginScreenShareModeration, endScreenShareModeration } =
       moderateScreenShare()
-    beginScreenShareModeration(input.context.videoOutputElement)
-    await getStream(input)
+    beginScreenShareModeration(input.videoOutputElement)
+    await getStream({ meetingSession: input.meetingSession })
     return { endScreenShareModeration }
   }
 )
@@ -332,10 +346,17 @@ export const stopShareMyScreenAndMic = fromPromise(
 
 export const maybeStartTranscription = fromPromise(
   async ({
-    input: { transcriptionStarted, sessionId },
+    input: { transcriptionStarted, sessionId, sessionRecordingStarted },
   }: {
-    input: { transcriptionStarted: boolean; sessionId: string }
+    input: {
+      transcriptionStarted: boolean
+      sessionId: string
+      sessionRecordingStarted: boolean
+    }
   }) => {
+    if (!sessionRecordingStarted) {
+      await startSessionRecording(sessionId)
+    }
     if (!transcriptionStarted) {
       await NetworkService.startSessionMeetingTranscription(sessionId)
     }

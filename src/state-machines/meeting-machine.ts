@@ -52,6 +52,7 @@ export type Context = {
   transcriptionStarted: boolean
   screenShareWidth: number | undefined
   screenShareHeight: number | undefined
+  sessionRecordingStarted: boolean
 }
 
 export type Events =
@@ -161,6 +162,7 @@ export function create() {
       transcriptionStarted: false,
       screenShareWidth: undefined,
       screenShareHeight: undefined,
+      sessionRecordingStarted: false,
     }),
     initial: 'FetchingState',
     entry: { type: 'entry' },
@@ -466,7 +468,12 @@ export function create() {
                 invoke: {
                   id: 'ScreenShareControl.StartingShareMyScreen:startingShareMyScreen',
                   src: 'startingShareMyScreen',
-                  input: ({ context }) => ({ context }),
+                  input: ({ context }) => ({
+                    sessionId: context.sessionId!,
+                    sessionRecordingStarted: context.sessionRecordingStarted,
+                    videoOutputElement: context.videoOutputElement!,
+                    meetingSession: context.meetingSession!,
+                  }),
                   onDone: {
                     target: 'SharingMyScreen',
                     actions: [
@@ -474,6 +481,7 @@ export function create() {
                         isSharingMyScreen: () => true,
                         endScreenShareModeration: ({ event }) =>
                           event.output.endScreenShareModeration,
+                        sessionRecordingStarted: () => true,
                       }),
                       () =>
                         AnalyticsService.captureEvent(
@@ -629,9 +637,13 @@ export function create() {
                   input: ({ context }) => ({
                     transcriptionStarted: context.transcriptionStarted,
                     sessionId: context.sessionId!,
+                    sessionRecordingStarted: context.sessionRecordingStarted,
                   }),
                   onDone: {
                     target: 'MicUnmuted',
+                    actions: assign({
+                      sessionRecordingStarted: () => true,
+                    }),
                   },
                   onError: {
                     target: 'MicMuted',
