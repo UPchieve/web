@@ -17,7 +17,7 @@ const HANDLE_SIZE = 10
 const emit = defineEmits(['dragging', 'resizing'])
 const props = defineProps<{
   firstName: string
-  isVolunteer: boolean
+  isViewingPartnerScreenShare: boolean
   meetingActor: ReturnType<typeof useActor<ReturnType<typeof create>>>
   screenShareWidth?: number
   screenShareHeight?: number
@@ -107,7 +107,7 @@ const windowContent = ref()
 
 const options = {
   input: {
-    isVolunteer: props.isVolunteer,
+    isViewingPartnerScreenShare: props.isViewingPartnerScreenShare,
     width: width.value,
     height: height.value,
     x: x.value,
@@ -225,7 +225,7 @@ watch(
       // We toggle twice for volunteers as a small hack to ensure the video content is correctly containted
       nextTick(() => {
         windowMachine.send({ type: 'toggleMaximize' })
-        if (props.isVolunteer) {
+        if (!props.isViewingPartnerScreenShare) {
           nextTick(() => {
             windowMachine.send({ type: 'toggleMaximize' })
           })

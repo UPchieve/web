@@ -15,7 +15,12 @@
     </transition>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
-      <div v-if="showScreenShareTool" class="toolbar-item" tabindex="0">
+      <div
+        v-if="screenShareAvailable"
+        class="toolbar-item"
+        tabindex="0"
+        :disabled="isViewingPartnerScreenShare ? true : false"
+      >
         <Spinner
           v-if="isJoiningCall"
           :height="24"
@@ -49,10 +54,30 @@
           <ErrorIcon class="screenshare-error" />
         </span>
         <button
+          v-else-if="isViewingPartnerScreenShare"
           class="toolbar-item"
-          v-else
-          @click="toggleScreenShareWindow"
           :class="selectedTool === 'screen-share' ? 'selected-tool' : ''"
+          :disabled="isViewingPartnerScreenShare"
+          v-tooltip="{
+            text: `You can't share your screen while your partner is sharing.`,
+            position: 'top',
+            color: 'black',
+          }"
+        >
+          <EyeIcon class="toolbar-item__svg eye-icon" />
+        </button>
+        <button
+          v-else
+          class="toolbar-item"
+          @click="
+            () => {
+              if (!isViewingPartnerScreenShare) {
+                toggleScreenShareWindow()
+              }
+            }
+          "
+          :class="selectedTool === 'screen-share' ? 'selected-tool' : ''"
+          :disabled="isViewingPartnerScreenShare"
         >
           <StopScreenShareIcon
             v-if="isScreenSharing"
@@ -424,6 +449,7 @@ import RectangleIcon from '@/assets/whiteboard_icons/rectangle.svg'
 import TriangleIcon from '@/assets/whiteboard_icons/triangle.svg'
 import LineIcon from '@/assets/whiteboard_icons/line.svg'
 import EraserIcon from '@/assets/whiteboard_icons/eraser.svg'
+import EyeIcon from '@/assets/eye.svg'
 import TextIcon from '@/assets/whiteboard_icons/text_tool.svg'
 import SmallTextIcon from '@/assets/whiteboard_icons/small_text_tool.svg'
 import Loader from '@/components/Loader.vue'
@@ -480,6 +506,7 @@ export default {
     Spinner,
     ErrorIcon,
     StartScreenShareButton,
+    EyeIcon,
   },
   props: {
     sessionId: {
@@ -523,6 +550,10 @@ export default {
       required: true,
     },
     isScreenSharing: {
+      type: Boolean,
+      required: true,
+    },
+    isViewingPartnerScreenShare: {
       type: Boolean,
       required: true,
     },
@@ -580,14 +611,6 @@ export default {
     }),
     isLiveMediaBanned() {
       return this.isBanned
-    },
-    showScreenShareTool() {
-      // Show to students once a volunteer is sharing their screen
-      // and show to volunteers right away
-      return (
-        (this.isVolunteer && this.screenShareAvailable) ||
-        (this.isStudent && this.unableToJoinCall)
-      )
     },
     isAiWidgetHidden() {
       return this.aiWidgetHidden
@@ -1402,8 +1425,7 @@ export default {
 
   &[disabled] {
     cursor: auto;
-
-    &:hover {
+    &:not(.selected-tool):hover {
       background: transparent;
     }
   }
@@ -1555,5 +1577,9 @@ export default {
   fill: $c-error-red;
   height: 26px;
   width: 26px;
+}
+
+.eye-icon {
+  color: $c-error-red;
 }
 </style>

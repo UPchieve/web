@@ -26,9 +26,11 @@
             : this.$refs.auxiliaryContainer
         "
         :class="{ 'display-none': !screenShareActive }"
-        :isVolunteer="isVolunteer"
+        :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
         :firstName="
-          isVolunteer ? user?.firstName : session?.volunteer?.firstName ?? ''
+          isViewingPartnerScreenShare
+            ? sessionPartner.firstName
+            : user?.firstName
         "
         :meetingActor="meetingActor"
         @dragging="(value) => (draggingScreenShare = value)"
@@ -84,11 +86,11 @@
             isSessionInProgress &&
             isScreenshareEnabled &&
             getDisplayMediaSupported &&
-            meetingHasNotEnded &&
-            !unableToJoinCall
+            meetingHasNotEnded
           "
           @toggleScreenShareWindow="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
+          :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
           :unableToJoinCall="unableToJoinCall"
         />
@@ -107,6 +109,7 @@
           "
           @toggleScreenShareWindow="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
+          :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
           :unableToJoinCall="unableToJoinCall"
         />
@@ -497,6 +500,11 @@ export default {
         'JoinedMeeting.ScreenShareControl.SharingMyScreen'
       )
     },
+    isViewingPartnerScreenShare() {
+      return this.meetingActor.snapshot.matches(
+        'JoinedMeeting.ScreenShareControl.ViewingPartnerScreenShare'
+      )
+    },
     isJoiningCall() {
       return (
         this.meetingActor?.snapshot?.hasTag('loadingScreenShare') ||
@@ -705,13 +713,11 @@ export default {
         this.sessionId = sessionId
         this.meetingActor.actorRef.start()
         this.meetingActor.actorRef.send({ type: 'set_session_id', sessionId })
-        if (this.session.volunteerId) {
-          this.meetingActor.actorRef.send({
-            type: 'session_started',
-            isAudioEligible: this.isSessionAudioCallEnabled,
-            isScreenshareEligible: this.isScreenshareEnabled,
-          })
-        }
+        this.meetingActor.actorRef.send({
+          type: 'session_started',
+          isAudioEligible: this.isSessionAudioCallEnabled,
+          isScreenshareEligible: this.isScreenshareEnabled,
+        })
 
         const transferringFromTutorBot = Object.prototype.hasOwnProperty.call(
           this.$route.query,
@@ -979,13 +985,11 @@ export default {
       })
     },
     toggleScreenShareWindow() {
-      if (this.isVolunteer) {
-        if (this.screenShareActive) {
-          // TODO could makea toggle_screen_share event to get rid of this conditional
-          this.meetingActor.send({ type: 'stop_share_screen' })
-        } else {
-          this.meetingActor.send({ type: 'share_screen' })
-        }
+      if (this.screenShareActive) {
+        // TODO could makea toggle_screen_share event to get rid of this conditional
+        this.meetingActor.send({ type: 'stop_share_screen' })
+      } else {
+        this.meetingActor.send({ type: 'share_screen' })
       }
     },
     async fetchSessionAudioFlag() {

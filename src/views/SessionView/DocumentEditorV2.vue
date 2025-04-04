@@ -32,7 +32,7 @@
           @click="toggleScreenShareErrorTooltipOpen"
           v-tooltip="{
             text: 'Could not load the Screen Share tool. Please refresh and try again.',
-            position: 'bottom',
+            position: 'right',
             color: 'black',
             open: showScreenShareErrorTooltip,
           }"
@@ -46,6 +46,19 @@
           :container-height="20"
           :container-width="20"
         />
+
+        <button
+          v-else-if="isViewingPartnerScreenShare"
+          @click="toggleScreenShare"
+          v-tooltip="{
+            text: `You can't share your screen while your partner is sharing.`,
+            position: 'bottom',
+            color: 'black',
+          }"
+        >
+          <EyeIcon class="toolbar-item__svg eye-icon" />
+        </button>
+
         <button v-else @click="toggleScreenShare">
           <StopScreenShareIcon v-if="isScreenSharing" />
           <ScreenShareIcon v-else />
@@ -109,7 +122,7 @@ import ActivityDot from '@/components/ActivityDot.vue'
 import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
 import WordCount from '@/components/WordCount.vue'
-
+import EyeIcon from '@/assets/eye.svg'
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageCompressor)
 
@@ -131,6 +144,7 @@ export default {
     ActivityDot,
     Spinner,
     WordCount,
+    EyeIcon,
   },
   props: {
     sessionId: {
@@ -161,6 +175,10 @@ export default {
       default: false,
     },
     isScreenSharing: {
+      type: Boolean,
+      default: false,
+    },
+    isViewingPartnerScreenShare: {
       type: Boolean,
       default: false,
     },
@@ -204,10 +222,7 @@ export default {
     showScreenShareTool() {
       // Show to students once a volunteer is sharing their screen
       // and show to volunteers right away
-      return (
-        this.isScreenShareEnabled &&
-        (this.isVolunteer || (this.isStudent && this.unableToJoinCall))
-      )
+      return this.isScreenShareEnabled
     },
     isSocketReadyToRequestForDoc() {
       return [this.isConnected, this.currentSession?.id]
@@ -507,5 +522,9 @@ export default {
 
 select svg {
   pointer-events: none;
+}
+
+.eye-icon {
+  color: $c-error-red;
 }
 </style>
