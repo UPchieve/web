@@ -176,6 +176,7 @@ async function createAccount(data) {
       [InputName.ZIP_CODE]: data[InputName.ZIP_CODE],
     })
     window.localStorage.removeItem('upcReferredByCode')
+    AnalyticsService.captureGoogleAnalyticsEvent('student_sign_up')
 
     return getSubmitResponse(
       data.parent ? SignUpPage.parentGuardianConfirmation : SignUpPage.verify,

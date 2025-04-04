@@ -113,9 +113,12 @@ export default {
     )
       this.triggerIncentiveEnrollmentModal()
 
+    // TODO: Do this better.
+    // Dashboard page view ends up coming before account created/verified.
     if (localStorage.getItem('isSSOSignUpRedirect')) {
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+      AnalyticsService.captureGoogleAnalyticsEvent('student_sign_up')
       localStorage.removeItem('isSSOSignUpRedirect')
       this.$store.dispatch('user/firstDashboardVisit', true)
     }

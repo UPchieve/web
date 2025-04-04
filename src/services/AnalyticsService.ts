@@ -10,6 +10,8 @@ const GLEAP_TRACK_EVENTS = new Set([
   EVENTS.VOICE_MESSAGE_PLAYED_PARTNER_MESSAGE_IN_CHAT,
 ])
 
+type GA4_EVENTS = 'student_sign_up'
+
 type UserProperties = {
   userType: string
   partner?: string
@@ -63,6 +65,12 @@ class AnalyticsService {
     }
   }
 
+  static captureGoogleAnalyticsEvent(eventName: GA4_EVENTS, properties = {}) {
+    if (window.gtag) {
+      window.gtag('event', eventName, properties)
+    }
+  }
+
   // unset any of the user's distinctive ids
   static reset() {
     posthog.reset()
@@ -105,6 +113,15 @@ class DevAnalyticsService {
       name,
       properties,
       GLEAP_TRACK_EVENTS.has(name)
+    )
+  }
+
+  static captureGoogleAnalyticsEvent(eventName: GA4_EVENTS, properties = {}) {
+    // eslint-disable-next-line no-console
+    console.info(
+      'AnalyticsService.captureGoogleAnalyticsEvent',
+      eventName,
+      properties
     )
   }
 
