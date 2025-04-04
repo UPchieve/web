@@ -1,13 +1,13 @@
 <template>
   <div class="student-dashboard">
     <dashboard-banner
-      v-if="!assignments.length"
+      v-if="!user.studentAssignments.length"
       :subheader="
         showDashboardRedesign ? `What can we help you with today?` : ``
       "
     />
     <div v-else>
-      <StudentAssignments :assignments="assignments" />
+      <StudentAssignments :assignments="user.studentAssignments" />
     </div>
     <!-- TODO: Make notices into a reusable component. -->
     <div class="dashboard-notices">
@@ -85,7 +85,6 @@ import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import StudentAssignments from '@/components/StudentAssignments.vue'
-import * as StudentAssignmentUtils from '@/utils/student-assignments-utils'
 import OnboardingModal from '@/components/OnboardingModal.vue'
 import Student_Onboarding_Frame1 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame1.svg'
 import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.svg'
@@ -142,9 +141,6 @@ export default {
       this.joinedClassCode = classCode
       localStorage.removeItem('joinedClassCode')
     }
-    this.assignments = this.filterStudentAssignments(
-      this.user.studentAssignments
-    )
     this.onboardingFrames = [
       {
         step: 1,
@@ -277,13 +273,6 @@ export default {
         this.fallIncentiveProgramModalViewCount + 1
       )
       this.showFallIncentiveEnrollmentModal = true
-    },
-    filterStudentAssignments(assignments) {
-      //Only show the first 3 incomplete assignments
-      return StudentAssignmentUtils.getIncompleteAssignments(assignments).slice(
-        0,
-        3
-      )
     },
     async processImpactStudySurvey() {
       let didResetForNewSurvey = false

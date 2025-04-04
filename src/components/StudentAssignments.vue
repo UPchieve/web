@@ -5,7 +5,10 @@
       <button @click="goToClasses">See all</button>
     </div>
     <div class="student-assignments--assignments">
-      <div v-for="assignment in assignments" v-bind:key="assignment.id">
+      <div
+        v-for="assignment in filterStudentAssignments"
+        v-bind:key="assignment.id"
+      >
         <button
           class="assignment-card"
           @click="goToAssignment(assignment.classId, assignment.id)"
@@ -45,6 +48,7 @@
 import { mapState } from 'vuex'
 import moment from 'moment'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
+import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 
 export default {
   name: 'StudentAssignments',
@@ -64,6 +68,9 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
     }),
+    filterStudentAssignments() {
+      return getIncompleteAssignments(this.assignments).slice(0, 3)
+    },
   },
 
   methods: {
