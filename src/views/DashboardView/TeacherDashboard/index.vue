@@ -13,7 +13,10 @@
       :className="currentClassInfo.name"
       :topics="topics"
     />
-    <Assignment v-else-if="this.view === 'assignment'" />
+    <Assignment
+      v-else-if="this.view === 'assignment'"
+      :currentClassCode="currentClassInfo.code"
+    />
     <div v-else>
       <div class="dashboard-banner">
         <div>
@@ -249,24 +252,22 @@ export default {
       },
     ]
     // TODO: Clean-up routing.
-    if (
-      this.$route.params.classId &&
-      !this.$route.params.studentId &&
-      !this.$route.params.assignmentId
-    ) {
-      this.classId = this.$route.params.classId
+    const { classId, studentId, assignmentId } = this.$route.params
+
+    if (classId) {
+      this.classId = classId
+
       if (_.isEmpty(this.currentClassInfo)) {
         this.currentClassInfo = await this.getClassInfo(this.classId)
       }
+    }
+
+    if (classId && !studentId && !assignmentId) {
       this.view = 'classDetails'
-    } else if (this.$route.params.studentId) {
-      this.studentId = this.$route.params.studentId
-      this.classId = this.$route.params.classId
-      if (_.isEmpty(this.currentClassInfo)) {
-        this.currentClassInfo = await this.getClassInfo(this.classId)
-      }
+    } else if (studentId) {
+      this.studentId = studentId
       this.view = 'studentDetails'
-    } else if (this.$route.params.assignmentId) {
+    } else if (assignmentId) {
       this.view = 'assignment'
     } else {
       this.view = ''
@@ -433,6 +434,7 @@ export default {
 .teacher-dashboard {
   padding: 30px;
   height: 100%;
+  overflow: auto;
   background-color: #fbfbfc;
 }
 
