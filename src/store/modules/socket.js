@@ -158,34 +158,15 @@ export default {
       })
 
       socket.on('is-typing', (data) => {
-        const isRecap = data.sessionId === rootState.user.recapSession.id
-        if (data.sessionId === rootState.user.session.id || isRecap) {
-          commit(
-            'setIsTyping',
-            isRecap
-              ? true
-              : rootGetters['user/isSessionAlive'] &&
-                  rootState.user.isSessionConnectionAlive
-          )
-        }
+        commit('setIsTyping', { sessionId: data.sessionId, isTyping: true })
       })
 
       socket.on('not-typing', (data) => {
-        if (
-          data.sessionId === rootState.user.session.id ||
-          data.sessionId === rootState.user.recapSession.id
-        ) {
-          commit('setIsTyping', false)
-        }
+        commit('setIsTyping', { sessionId: data.sessionId, isTyping: false })
       })
 
       socket.on('messageSend', (data) => {
-        if (
-          data.sessionId === rootState.user.session.id ||
-          data.sessionId === rootState.user.recapSession.id
-        ) {
-          commit('setMessageData', data)
-        }
+        commit('setMessageData', data)
       })
 
       socket.on('tutorBotConversationMessage', (data) => {
