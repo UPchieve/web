@@ -39,6 +39,9 @@ class LoggerService {
   static noticeError(err, customData) {
     if (window && window.newrelic) {
       window.newrelic.noticeError(err, customData)
+      // Also log to console.error so it shows up in NR logs.
+      // eslint-disable-next-line no-console
+      console.error(err, customData)
     }
   }
 
