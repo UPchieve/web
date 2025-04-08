@@ -3,6 +3,7 @@ import AuthService from './AuthService'
 import NetworkService from './NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import Gleap from 'gleap'
 
 export default {
   getUser() {
@@ -68,5 +69,6 @@ export default {
         ? EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_VOLUNTEER_MODE
         : EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_STUDENT_MODE
     )
+    Gleap.getInstance().softReInitialize()
   },
 }

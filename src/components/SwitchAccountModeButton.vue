@@ -18,6 +18,7 @@ import Modal from '@/components/Modal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import UserService from '@/services/UserService'
 import { useStore } from 'vuex'
+import Gleap from 'gleap'
 
 const props = defineProps<{
   userType: 'student' | 'volunteer'
@@ -39,12 +40,18 @@ const store = useStore()
 
 const switchRole = async () => {
   try {
+    const isGleapOpen = Gleap.isOpened()
     await UserService.switchActiveRole(
       { $store: store },
       props.userType === 'volunteer' ? 'student' : 'volunteer'
     )
     if (router.currentRoute.value.path === '/dashboard') router.go(0)
-    else await router.replace('/dashboard')
+    else {
+      await router.replace('/dashboard')
+      if (isGleapOpen) {
+        Gleap.open()
+      }
+    }
   } catch (err) {
     LoggerService.noticeError(
       err?.message ?? 'Error while switching account modes',
