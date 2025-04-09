@@ -250,7 +250,7 @@ export const joinMeeting = fromCallback(
       input.context.endScreenShareModeration()
       input.context.meetingSession!.audioVideo.stop()
       await input.context.meetingSession!.audioVideo.stopAudioInput()
-      store.commit('liveMedia/setScreenShareActor', null)
+      store.dispatch('liveMedia/reset')
     }
 
     sendBack({ type: 'set_unsubscribe_all', unsubscribeAll })

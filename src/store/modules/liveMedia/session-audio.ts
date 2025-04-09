@@ -225,6 +225,12 @@ export default {
   },
 
   actions: {
+    resetSessionMessages: ({ commit }) => {
+      commit('setMyInProgressCaptionMessage', null)
+      commit('setPartnerInProgressCaptionMessage', null)
+      commit('setCaptionsCurrentMessageId', null)
+      commit('setPartnerCaptionsCurrentMessageId', null)
+    },
     setMicState: async ({ state, rootState, commit, dispatch }, micState) => {
       commit('setMicState', micState)
 
