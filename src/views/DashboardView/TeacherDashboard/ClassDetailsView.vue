@@ -362,8 +362,6 @@ export default {
   computed: {
     ...mapGetters({
       topicIdToTopic: 'subjects/topicIdToTopic',
-      isTeacherSessionRecapsEnabled:
-        'featureFlags/isTeacherSessionRecapsEnabled',
     }),
   },
 
@@ -400,11 +398,7 @@ export default {
             let minTutored = 0
             let lastSession = ''
 
-            const filteredSessionDetails = this.isTeacherSessionRecapsEnabled
-              ? sessionDetails.filter((session) => session.volunteerId)
-              : sessionDetails
-
-            filteredSessionDetails.forEach((session) => {
+            sessionDetails.forEach((session) => {
               const endedAt = new Date(session.endedAt)
               const startedAt = new Date(session.createdAt)
               const sessionLength = (endedAt - startedAt) / (1000 * 60)
@@ -423,7 +417,7 @@ export default {
                 : `${Math.round(minTutored)} minutes`
             return {
               ...student,
-              numSessions: filteredSessionDetails.length,
+              numSessions: sessionDetails.length,
               timeTutored,
               lastSession: lastSession
                 ? this.formatTimestamp(lastSession)
