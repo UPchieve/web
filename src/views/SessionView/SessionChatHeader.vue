@@ -261,7 +261,7 @@ export default {
 .session-header {
   position: relative;
   background-color: $c-information-blue;
-  padding: 8px 20px;
+  padding: 12px 12px;
   text-align: left;
   display: flex;
   flex-direction: row;
@@ -297,20 +297,18 @@ h1 {
 }
 
 .info {
-  padding-left: 15px;
+  padding-left: 12px;
   color: white;
   font-weight: 600;
   font-size: 16px;
   max-width: 600px;
-
-  @include breakpoint-below('large') {
-    line-height: 1;
-  }
+  line-height: 18px;
 }
 
 .volunteer-info {
-  display: inline-block;
-  line-height: 1.25;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .volunteer-name {
@@ -362,6 +360,7 @@ h1 {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  padding: 0.5px 0;
 }
 .report-button {
   background-color: transparent;
