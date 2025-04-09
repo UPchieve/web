@@ -226,6 +226,16 @@ export default {
     },
     addPendingMessage: ({ commit }, message) => {
       commit('addPendingMessage', message)
+      // We've seen some cases where the message fails to be emitted back to the client
+      // when that happens, the message will be stuck in the pending messages array
+      // and just float at the bottom of the chat.
+      // to get around that, we clear the pending messages after 7 seconds.
+      // This can be reproduced by stopping redis while transcription is happening.
+      // In practice, I'm not sure where the break down is but this should at latest
+      // let the chat make sense.
+      setTimeout(() => {
+        commit('removePendingMessage', message)
+      }, 7000)
     },
     addMessage: ({ commit }, message) => {
       commit('removePendingMessage', message)

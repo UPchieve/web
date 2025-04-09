@@ -101,6 +101,10 @@ export default {
     },
   },
   actions: {
+    reset({ commit, dispatch }) {
+      commit('setScreenShareActor', null)
+      dispatch('liveMedia/audio/resetSessionMessages', null, { root: true })
+    },
     async updateMyZoomUser({ commit }, zoomUser) {
       commit('updateMyZoomUser', zoomUser)
     },
