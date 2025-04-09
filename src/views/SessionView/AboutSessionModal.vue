@@ -2,9 +2,17 @@
   <modal :closeModal="closeModal" class="about-session-modal-wrapper">
     <div class="about-session-modal">
       <div class="header-info">
-        <cross-icon class="cross-icon" @click="closeModal" />
-        <div class="header">About the session</div>
-        <div v-if="isNewStudent" class="alert-container">
+        <div class="header">
+          About the session
+          <large-button
+            class="cross-icon"
+            variant="tertiary"
+            @click="closeModal"
+          >
+            <cross-icon />
+          </large-button>
+        </div>
+        <div v-if="true" class="alert-container">
           <div class="alert">
             <alert-icon class="alert-icon" />
             <div class="subheading">{{ totalSessionsTextTitle }}</div>
@@ -70,12 +78,20 @@ import AlertIcon from '@/assets/blue-alert.svg'
 import CrossIcon from '@/assets/cross.svg'
 import { mapGetters, mapState } from 'vuex'
 import AboutThisSessionSurvey from '@/components/AboutThisSessionSurvey.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 const LOW_CONFIDENCE_THRESHOLD = 2
 
 export default {
   name: 'about-session-modal',
-  components: { AboutThisSessionSurvey, Modal, Stepper, AlertIcon, CrossIcon },
+  components: {
+    AboutThisSessionSurvey,
+    Modal,
+    Stepper,
+    AlertIcon,
+    CrossIcon,
+    LargeButton,
+  },
   props: {
     closeModal: { type: Function, required: true },
     responses: { type: Array, required: true },
@@ -175,6 +191,9 @@ export default {
 
 .header {
   @include font-category('display-small');
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .subheading {
@@ -230,13 +249,20 @@ export default {
 }
 
 .cross-icon {
-  height: 10px;
-  width: 10px;
-  margin-left: 100%;
-  vertical-align: top;
+  width: 48px;
+  height: 48px;
+  &:deep(svg) {
+    height: 16px;
+    width: 16px;
+  }
 
   &:hover {
+    background-color: transparent;
     cursor: pointer;
+    &:deep(path) {
+      stroke: $c-soft-black;
+      stroke-width: 1px;
+    }
   }
 }
 
