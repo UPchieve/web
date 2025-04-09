@@ -195,7 +195,7 @@ export default {
     ).length
     this.isGettingStarted = this.assignmentInfo.isGettingStartedAssignment
 
-    AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_EDIT_ASSIGNMENT, {
+    AnalyticsService.captureEvent(EVENTS.TEACHER_VIEWED_ASSIGNMENT, {
       isGettingStartedAssignment: this.isGettingStarted,
     })
   },
