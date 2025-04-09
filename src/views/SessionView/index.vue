@@ -120,23 +120,16 @@
       </div>
 
       <div class="session-header-container">
-        <Spinner
-          v-if="isFetchingSessionAudioCallFlag"
-          :container-height="48"
-          :container-width="48"
-          :width="36"
-          :height="36"
-          :thickness="3"
-        />
         <session-chat-header
-          v-else-if="
+          v-if="
             !isSessionAudioCallEnabled ||
             (isSessionAudioCallEnabled && !isSessionInProgress)
           "
           @try-clicked="tryClicked"
         />
+
         <ZoomSessionChatHeader
-          v-if="isSessionInProgress && isSessionAudioCallEnabled"
+          v-else-if="isSessionInProgress && isSessionAudioCallEnabled"
           class="zoom-container"
           :isMyMicMuted="isMyMicMuted"
           :isSpeakerMuted="isSpeakerMuted"
@@ -320,7 +313,6 @@ import { socket } from '@/socket'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import ZoomSessionChatHeader from '@/components/ScreenShare/ZoomSessionChatHeader.vue'
-import Spinner from '@/components/Spinner.vue'
 import { SessionAudioState } from '@/services/LiveShareService/SessionAudioService'
 import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
 import { useActor } from '@xstate/vue'
@@ -337,7 +329,6 @@ export default {
     ModerationInfractionToast,
     ModerationInfractionModal,
     ScreenShare,
-    Spinner,
     AiWidgetTool,
     SessionChatHeader,
     SessionChat,

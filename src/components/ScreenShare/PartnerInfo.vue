@@ -57,9 +57,10 @@ const sessionPartner = computed(() => store.getters['user/sessionPartner'])
   flex-direction: row;
   align-items: center;
   gap: 8px;
+  line-height: 18px;
 }
 .status {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
 }
 </style>
