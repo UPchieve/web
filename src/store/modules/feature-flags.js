@@ -40,7 +40,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
-      [POSTHOG_FEATURE_FLAGS.TEACHER_SESSION_RECAPS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
     },
     multivariantFlags: {
@@ -197,8 +196,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME],
     isStudentsBecomeVolunteersEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
-    isTeacherSessionRecapsEnabled: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_SESSION_RECAPS],
     tutorFeedbackToTeacherQuestion: (state) =>
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION

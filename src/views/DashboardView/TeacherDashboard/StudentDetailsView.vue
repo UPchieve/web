@@ -67,34 +67,12 @@
             <th># of Messages</th>
             <th>Session Date</th>
             <th>Session Length</th>
-            <th v-if="isTeacherSessionRecapsEnabled">Session Recap</th>
           </tr>
           <tr v-for="session in sessions" :key="session.id">
             <td>{{ session.sessionSubject }}</td>
             <td>{{ session.messageCount }}</td>
             <td>{{ formatTimestamp(session.createdAt) }}</td>
             <td>{{ session.length }} Minutes</td>
-            <td v-if="isTeacherSessionRecapsEnabled">
-              <button
-                v-if="!isLowRatedSession(session)"
-                class="view-session-btn"
-                @click="goToSessionRecap(session.id)"
-              >
-                View Session
-                <external-page class="external-page-icon" />
-              </button>
-              <span
-                v-else
-                class="view-session-btn-disabled"
-                v-tooltip="{
-                  text: 'Feature in beta, only some session recaps are available.',
-                  color: 'black',
-                  position: 'bottom',
-                }"
-              >
-                Not available
-              </span>
-            </td>
           </tr>
         </table>
       </div>
@@ -106,10 +84,9 @@
 import Loader from '@/components/Loader.vue'
 import FormDateInput from '@/components/FormDateInput.vue'
 import NetworkService from '@/services/NetworkService'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import moment from 'moment'
-import ExternalPage from '@/assets/ExternalPage.svg'
 import IonicSelect from '@/components/IonicSelect.vue'
 import { vTooltip } from 'maz-ui'
 
@@ -122,7 +99,6 @@ export default {
     Loader,
     StudentAvatar,
     FormDateInput,
-    ExternalPage,
     IonicSelect,
   },
 
@@ -155,10 +131,6 @@ export default {
     ...mapState({
       topics: (state) => state.subjects.topics,
       subjects: (state) => state.subjects.subjects,
-    }),
-    ...mapGetters({
-      isTeacherSessionRecapsEnabled:
-        'featureFlags/isTeacherSessionRecapsEnabled',
     }),
   },
 
@@ -203,17 +175,10 @@ export default {
     backToClassDetails() {
       this.$router.push(`/dashboard/teacher/class/${this.classId}`)
     },
-    goToSessionRecap(sessionId) {
-      window.open(`/sessions/${sessionId}/recap`, '_blank')
-    },
 
     formatTimestamp(timestamp) {
       const date = moment(timestamp)
       return date.format('MM/DD/YYYY')
-    },
-
-    isLowRatedSession(session) {
-      return session.studentRating <= 2 || session.volunteerRating <= 2
     },
 
     async getStudentSessionDetails() {
@@ -226,10 +191,6 @@ export default {
         let filteredSessionDetails = sessionDetails.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )
-
-        filteredSessionDetails = this.isTeacherSessionRecapsEnabled
-          ? sessionDetails.filter((session) => session.volunteerId)
-          : filteredSessionDetails
 
         if (filteredSessionDetails.length === 0) {
           return []
@@ -433,26 +394,5 @@ export default {
   @include breakpoint-below('medium') {
     width: 100%;
   }
-}
-
-.view-session-btn {
-  padding: 8px 14px;
-  font-size: 14px;
-  color: $c-information-blue;
-  align-self: center;
-  font-weight: 500;
-}
-
-.view-session-btn-disabled {
-  padding: 8px 14px;
-  font-size: 14px;
-  color: $c-default-grey;
-  align-self: center;
-  font-weight: 500;
-}
-
-.external-page-icon {
-  width: 16px;
-  height: 16px;
 }
 </style>
