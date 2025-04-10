@@ -73,9 +73,6 @@ export default {
         'featureFlags/isStudentsBecomeVolunteersEnabled',
       isStudentVolunteer: 'user/isStudentVolunteer',
     }),
-    completed101Training() {
-      return this.user.trainingCourses.upchieve101.progress === 100
-    },
   },
 
   methods: {
@@ -100,14 +97,6 @@ export default {
           subtitle: 'Choose a subject to take a short quiz in.',
         },
       })
-    },
-    handle101Redirect() {
-      this.completed101Training
-        ? this.$router.push('/training/upchieve101/quiz')
-        : this.$router.push('/training/course/upchieve101')
-    },
-    handleAvailabilityPageRedirect() {
-      this.$router.push('/calendar')
     },
   },
 }

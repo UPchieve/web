@@ -787,6 +787,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   STUDENTS_BECOME_VOLUNTEERS: 'students-become-volunteers',
   TUTOR_FEEDBACK_TO_TEACHER_QUESTION: 'tutor-feedback-to-teacher-question',
   TEACHER_GUIDANCE_EXPERIMENT: 'teacher-guidance-experiment',
+  COMBINED_ONBOARDING_QUIZ: 'combined-onboarding-quiz',
 }
 
 export const ANALYTICS_REPORT_ROW = {

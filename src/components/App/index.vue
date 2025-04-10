@@ -228,7 +228,6 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
-      isAutoFlowUser: 'user/isAutoFlowUser',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       showInAppSessionNotifications:
         'featureFlags/showInAppSessionNotifications',
@@ -300,9 +299,6 @@ export default {
           this.$store.dispatch('user/fetchSession', this)
         }
       }
-    },
-    isAutoFlowUser(currentValue, prevValue) {
-      if (currentValue && !prevValue) this.$router.push('/welcome')
     },
     session(currentValue, prevValue) {
       const hadASession = !currentValue.id && prevValue.id

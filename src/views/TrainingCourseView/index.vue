@@ -15,28 +15,40 @@
           v-on:material-completed="trackMaterialProgress"
         />
         <quiz-link
+          v-if="!isCombinedOnboardingQuizEnabled"
           :isDisabled="!course.isComplete"
           :quizKey="course.quizKey"
           :quizName="course.quizName"
           :certification="quizCertification"
         />
       </div>
+      <LargeButton
+        v-if="isCombinedOnboardingQuizEnabled"
+        variant="primary"
+        class="back-to-quiz-button"
+        :showArrow="false"
+        @click="goToSubjectSelection"
+      >
+        Back To Quiz
+      </LargeButton>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import Module from './Module.vue'
 import QuizLink from './QuizLink.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'TrainingCourseView',
   components: {
+    LargeButton,
     Module,
     QuizLink,
   },
@@ -56,11 +68,18 @@ export default {
     ...mapState({
       certifications: (state) => state.user.user.certifications,
     }),
+    ...mapGetters({
+      isCombinedOnboardingQuizEnabled:
+        'featureFlags/isCombinedOnboardingQuizEnabled',
+    }),
     quizCertification() {
       return this.certifications[this.course.quizKey]
     },
   },
   methods: {
+    goToSubjectSelection() {
+      this.$router.push('/welcome')
+    },
     async trackMaterialProgress(materialKey) {
       let materialName = ''
       this.course.modules.forEach((mod) => {
@@ -139,5 +158,9 @@ export default {
       font-weight: 600;
     }
   }
+}
+
+.back-to-quiz-button {
+  margin-top: 2em;
 }
 </style>
