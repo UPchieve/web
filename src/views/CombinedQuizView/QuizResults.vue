@@ -40,7 +40,7 @@
           <LargeButton
             class="uc-form-button-secondary half-width"
             variant="secondary"
-            @click="() => emit('clickedReviewUPchieve101')"
+            @click="onClickedReviewUpchieve101"
           >
             Review UPchieve 101
           </LargeButton>
@@ -64,7 +64,7 @@
           <LargeButton
             class="uc-form-button-secondary half-width"
             variant="secondary"
-            @click="() => emit('clickedReviewSubject')"
+            @click="onClickedReviewSubject"
           >
             Review {{ props.subjectDisplayName }}
           </LargeButton>
@@ -80,7 +80,7 @@
         <LargeButton
           class="uc-form-button"
           variant="primary"
-          @click="() => emit('clickedRetakeQuiz')"
+          @click="retakeQuiz"
           :showArrow="false"
           >Retake quiz</LargeButton
         >
@@ -97,6 +97,8 @@ import { onBeforeMount } from 'vue'
 import type { AnswerMap } from '@/services/TrainingService'
 import NetworkService from '@/services/NetworkService'
 import { useStore } from 'vuex'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const UPCHIEVE_101_CATEGORY = 'upchieve101'
 
@@ -126,7 +128,42 @@ const goToDashboard = () => {
   router.push('/dashboard')
 }
 
+const onClickedReviewUpchieve101 = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.COMBINED_QUIZ_CLICKED_STUDY_AFTER_FAILED_QUIZ,
+    {
+      category: UPCHIEVE_101_CATEGORY,
+    }
+  )
+  emit('clickedReviewUPchieve101')
+}
+
+const onClickedReviewSubject = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.COMBINED_QUIZ_CLICKED_STUDY_AFTER_FAILED_QUIZ,
+    {
+      category: props.subjectCategory,
+    }
+  )
+  emit('clickedReviewSubject')
+}
+
 onBeforeMount(async () => {
+  if (props.hadUpchieve101Questions) {
+    const event = props.passedUPchieve101
+      ? EVENTS.COMBINED_QUIZ_PASSED_QUIZ
+      : EVENTS.COMBINED_QUIZ_FAILED_QUIZ
+    const eventData = { category: UPCHIEVE_101_CATEGORY }
+    AnalyticsService.captureEvent(event, eventData)
+  }
+  if (props.hadSubjectQuestions) {
+    const event = props.passedSubject
+      ? EVENTS.COMBINED_QUIZ_PASSED_QUIZ
+      : EVENTS.COMBINED_QUIZ_FAILED_QUIZ
+    const eventData = { category: props.subjectCategory }
+    AnalyticsService.captureEvent(event, eventData)
+  }
+
   const newCertifications = {
     ...store.state.user.user.certifications,
   }
@@ -159,6 +196,11 @@ onBeforeMount(async () => {
     certifications: newCertifications,
   })
 })
+
+const retakeQuiz = () => {
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_CLICKED_RETAKE_QUIZ)
+  emit('clickedRetakeQuiz')
+}
 </script>
 
 <style lang="scss" scoped>

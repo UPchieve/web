@@ -61,7 +61,7 @@
       <LargeButton
         class="uc-form-button-secondary study-btn"
         variant="secondary"
-        @click="() => emit('clickedOpenReviewMaterials')"
+        @click="onClickedStudy"
         >Study</LargeButton
       >
       <LargeButton
@@ -83,6 +83,8 @@ import { ref, computed, onUpdated, onMounted } from 'vue'
 import ImageExpandIcon from '@/assets/image-expand.svg'
 import ImageCollapseIcon from '@/assets/image-collapse.svg'
 import LoggerService from '@/services/LoggerService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const emit = defineEmits<{
   (e: 'submittedAnswer', answerChoice: string): void
@@ -130,6 +132,16 @@ const handleImageExpansion = (event: any) => {
   ) {
     return
   } else isImageExpanded.value = !isImageExpanded.value
+}
+
+const onClickedStudy = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.COMBINED_QUIZ_CLICKED_STUDY_AFTER_WRONG_ANSWER,
+    {
+      category: props.currentQuestion?.category,
+    }
+  )
+  emit('clickedOpenReviewMaterials')
 }
 
 onUpdated(() => {
