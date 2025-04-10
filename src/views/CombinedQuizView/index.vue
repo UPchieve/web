@@ -31,20 +31,20 @@
           <LargeButton
             class="uc-form-button"
             variant="secondary"
-            @click="() => openReviewMaterials('upchieve101')"
+            @click="() => openReviewMaterialsAtStart('upchieve101')"
             >Study UPchieve 101</LargeButton
           >
           <LargeButton
             class="uc-form-button"
             variant="secondary"
-            @click="() => openReviewMaterials('subject')"
+            @click="() => openReviewMaterialsAtStart('subject')"
             >Study {{ subjectDisplayName }}</LargeButton
           >
           <LargeButton
             variant="primary"
             class="uc-form-button"
             :showArrow="false"
-            @click="() => (startedQuiz = true)"
+            @click="startQuiz"
             >Start Quiz</LargeButton
           >
         </div>
@@ -106,6 +106,8 @@ import LargeButton from '@/components/LargeButton.vue'
 import Case from 'case'
 import { camelCase } from 'lodash-es'
 import { isEmpty } from 'lodash'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const router = useRouter()
 const store = useStore()
@@ -122,6 +124,7 @@ const isAutoFlowUser = computed(() => store.getters['user/isAutoFlowUser'])
 const goToSubjectsPage = () => {
   isAutoFlowUser.value ? router.push('/welcome') : router.push('/training')
 }
+
 const upchieve101Questions = ref<QuizQuestion[]>([])
 const subjectQuestions = ref<QuizQuestion[]>([])
 const quizQuestions = ref<QuizQuestion[]>([])
@@ -133,13 +136,25 @@ const startedQuiz = ref<boolean>(false)
 const upchieve101AnswerMap = ref<AnswerMap>({})
 const subjectAnswerMap = ref<AnswerMap>({})
 
-const openReviewMaterials = (quiz?: 'upchieve101' | 'subject') => {
+const startQuiz = () => {
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_BEGAN_QUIZ)
+  startedQuiz.value = true
+}
+
+const openReviewMaterials = (quiz: 'upchieve101' | 'subject') => {
   const upchieve101ReviewUrl = '/training/course/upchieve101'
   const subjectReviewUrl = `/training/review/${Case.kebab(subjectCategory.value as string)}`
   window.open(
     quiz === 'upchieve101' ? upchieve101ReviewUrl : subjectReviewUrl,
     '_blank'
   )
+}
+
+const openReviewMaterialsAtStart = (quiz: 'upchieve101' | 'subject') => {
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_CLICKED_STUDY_AT_START, {
+    category: quiz === 'upchieve101' ? quiz : subjectCategory.value,
+  })
+  openReviewMaterials(quiz)
 }
 
 const currentQuestion = computed(() => {
@@ -180,6 +195,7 @@ const goToNextQuestion = () => {
 
 const answerChoice = ref<string | null>(null)
 const submitAnswer = async (selectedAnswer: string) => {
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_SUBMITTED_ANSWER)
   answerChoice.value = selectedAnswer
   if (answerChoice.value === currentQuestion.value?.correctAnswer)
     handleCorrectAnswer()
@@ -187,6 +203,7 @@ const submitAnswer = async (selectedAnswer: string) => {
 }
 
 const handleCorrectAnswer = () => {
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_ANSWER_CORRECT)
   answerResult.value = 'correct'
   if (currentQuestion.value?.category === UPCHIEVE_101_CATEGORY) {
     numCorrectUpchieve101.value = numCorrectUpchieve101.value + 1
@@ -201,6 +218,7 @@ const handleCorrectAnswer = () => {
 }
 
 const handleIncorrectAnswer = () => {
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_ANSWER_INCORRECT)
   answerResult.value = 'incorrect'
 }
 
@@ -236,6 +254,7 @@ const loadQuizQuestions = async (): Promise<void> => {
 
 onMounted(() => {
   loadQuizQuestions()
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_USER_SAW_QUIZ)
 })
 </script>
 
