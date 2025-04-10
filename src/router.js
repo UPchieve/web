@@ -17,7 +17,6 @@ import AdminUsers from './views/Admin/AdminUsers.vue'
 import AdminVolunteerReports from './views/Admin/AdminVolunteerReports.vue'
 import AdminZipCodes from './views/Admin/AdminZipCodes.vue'
 import AdminRosterStudents from './views/Admin/AdminRosterStudents.vue'
-import BotConversationsView from './views/BotConversationsView/index.vue'
 import VolunteerCoverage from './views/Admin/VolunteerCoverage.vue'
 import BackgroundInfoView from './views/BackgroundInfoView.vue'
 import CalendarView from './views/CalendarView.vue'
@@ -59,10 +58,15 @@ import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/Stud
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
-import BotChatView from './views/BotConversationsView/BotChatView.vue'
-import NewBotChat from './views/BotConversationsView/NewBotChat.vue'
 import RewardsView from './views/RewardsView.vue'
 import SurveysView from './views/SurveysView.vue'
+import CombinedQuizView from '@/views/CombinedQuizView/index.vue'
+import { camelCase } from 'lodash-es'
+
+const autoflowRedirect = (to, from, next) => {
+  if (store.getters['user/isAutoFlowUser']) next('/welcome')
+  else next()
+}
 
 const getUser = () => {
   if (store.getters['user/isAuthenticated']) {
@@ -83,8 +87,10 @@ const routes = [
       getUser()
         .then(() => {
           if (store.getters['user/isAuthenticated']) {
-            if (store.getters['user/isAutoFlowUser']) next('/welcome')
-            else next('/dashboard')
+            if (store.getters['user/isAutoFlowUser']) {
+              return next('/welcome')
+            }
+            next('/dashboard')
           } else {
             next('/login')
           }
@@ -216,8 +222,9 @@ const routes = [
     component: DashboardView,
     meta: { protected: true },
     beforeEnter: async (to, from, next) => {
-      if (store.getters['user/isAutoFlowUser']) next('/welcome')
-
+      if (store.getters['user/isAutoFlowUser']) {
+        next('/welcome')
+      }
       if (to.query.classCode) {
         localStorage.setItem('joinedClassCode', to.query.classCode)
         delete to.query.classCode
@@ -253,26 +260,6 @@ const routes = [
     name: 'SessionView',
     component: SessionView,
     meta: { protected: true, hideNavigation: true },
-  },
-  {
-    path: '/ai-tutor-conversations',
-    name: 'BotConversationsView',
-    component: BotConversationsView,
-    meta: { protected: true },
-    children: [
-      {
-        path: '',
-        name: 'NewBotChat',
-        component: NewBotChat,
-        meta: { protected: true },
-      },
-      {
-        path: ':conversationId',
-        name: 'BotChat',
-        component: BotChatView,
-        meta: { protected: true },
-      },
-    ],
   },
   {
     path: '/resources',
@@ -321,6 +308,7 @@ const routes = [
     name: 'TrainingView',
     component: TrainingView,
     meta: { protected: true },
+    beforeEnter: autoflowRedirect,
   },
   {
     path: '/training/review/:category',
@@ -335,6 +323,18 @@ const routes = [
     meta: { protected: true },
   },
   {
+    path: '/training/:category/quiz/combined',
+    name: 'CombinedQuizView',
+    component: CombinedQuizView,
+    meta: { protected: true },
+    props: (route) => {
+      const category = camelCase(route.params.category ?? '')
+      return {
+        subjectDisplayName: store.state.subjects.subjects[category].displayName,
+      }
+    },
+  },
+  {
     path: '/training/course/:courseKey',
     name: 'TrainingCourseView',
     component: TrainingCourseView,
@@ -345,10 +345,7 @@ const routes = [
     name: 'ProfileView',
     component: ProfileView,
     meta: { protected: true },
-    beforeEnter: (to, from, next) => {
-      if (store.getters['user/isAutoFlowUser']) next('/welcome')
-      else next()
-    },
+    beforeEnter: autoflowRedirect,
   },
   {
     path: '/favorite-coaches',
@@ -361,10 +358,7 @@ const routes = [
     name: 'CalendarView',
     component: CalendarView,
     meta: { protected: true },
-    beforeEnter: (to, from, next) => {
-      if (store.getters['user/isAutoFlowUser']) next('/welcome')
-      else next()
-    },
+    beforeEnter: autoflowRedirect,
   },
   {
     path: '/admin',

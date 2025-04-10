@@ -83,7 +83,7 @@
           >
             CONTACT US
           </router-link>
-          <div v-if="showQuizStart" class="quiz-start">
+          <div v-if="showQuizStart">
             <div>
               <div class="instructions">
                 <h2 class="instructions-header">Get ready, set...</h2>
@@ -302,15 +302,14 @@ export default {
     reloadQuiz() {
       this.loadQuiz()
     },
-    loadQuiz() {
-      TrainingService.loadQuiz(this.category).then((quizLength) => {
-        this.quizLoading = false
-        this.showQuizResults = false
-        this.showQuizReview = false
-        this.quizResults = {}
-        this.quizLength = quizLength
-        this.showQuizStart = !!quizLength
-      })
+    async loadQuiz() {
+      const quizLength = await TrainingService.loadQuiz(this.category)
+      this.quizLoading = false
+      this.showQuizResults = false
+      this.showQuizReview = false
+      this.quizResults = {}
+      this.quizLength = quizLength
+      this.showQuizStart = !!quizLength
     },
     goToStudyMaterials() {
       this.$router.push(`/training/review/${Case.kebab(this.category)}`)

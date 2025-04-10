@@ -112,7 +112,9 @@ import ImageCollapseIcon from '@/assets/image-collapse.svg'
 import LoggerService from '@/services/LoggerService'
 
 export default {
-  props: ['quizLength'],
+  props: {
+    quizLength: { type: Number, required: true },
+  },
   data() {
     return {
       picked: '',

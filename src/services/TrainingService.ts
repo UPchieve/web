@@ -1,15 +1,33 @@
 import { isEmpty } from 'lodash-es'
 import NetworkService from './NetworkService'
 
+export type QuizQuestion = {
+  id: number
+  questionText: string
+  possibleAnswers: {
+    txt: string
+    val: string
+  }[]
+  correctAnswer: string
+  userAnswer?: string
+  category: string
+  subcategory: string
+  imageSrc?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type AnswerMap = { [k: number]: string }
+
 export default {
-  idAnswerMap: {},
-  questions: [],
+  idAnswerMap: {} as AnswerMap,
+  questions: [] as QuizQuestion[],
   index: 0,
   numAnswers: 0,
-  idCorrectAnswerMap: {},
-  category: null,
+  idCorrectAnswerMap: {} as AnswerMap,
+  category: '',
 
-  loadQuiz(category) {
+  async loadQuiz(category: string): Promise<number> {
     this.index = 0
     this.numAnswers = 0
     this.idAnswerMap = {}
@@ -20,9 +38,8 @@ export default {
       return this.questions.length
     })
   },
-  getFirstQuestion() {
-    const question = this.questions[this.index]
-    return question
+  getFirstQuestion(): QuizQuestion {
+    return this.questions[this.index]
   },
   getIndex() {
     return this.index
@@ -40,7 +57,7 @@ export default {
     if (this.index < this.questions.length) {
       this.index = this.index + 1
       const question = this.questions[this.index]
-      const picked = this.idAnswerMap[question._id]
+      const picked = this.idAnswerMap[question.id]
       return {
         question,
         picked,
@@ -52,7 +69,7 @@ export default {
     if (this.index > 0) {
       this.index = this.index - 1
       const question = this.questions[this.index]
-      const picked = this.idAnswerMap[question._id]
+      const picked = this.idAnswerMap[question.id]
       return {
         question,
         picked,
@@ -60,16 +77,16 @@ export default {
     }
     return null
   },
-  saveAnswer(picked) {
+  saveAnswer(picked: string) {
     const question = this.questions[this.index]
     const isNewAnswer =
-      isEmpty(this.idAnswerMap[question._id]) && !isEmpty(picked)
+      isEmpty(this.idAnswerMap[question.id]) && !isEmpty(picked)
     if (isNewAnswer) {
       this.numAnswers += 1
     }
-    this.idAnswerMap[question._id] = picked
+    this.idAnswerMap[question.id] = picked
   },
-  submitQuiz() {
+  async submitQuiz() {
     return NetworkService.getQuizScore({
       idAnswerMap: this.idAnswerMap,
       category: this.category,
@@ -89,8 +106,8 @@ export default {
     const idCorrectAnswerMap = { ...this.idCorrectAnswerMap }
     const idAnswerMap = { ...this.idAnswerMap }
     questionsReview.forEach((question) => {
-      question.userAnswer = idAnswerMap[question._id]
-      question.correctAnswer = idCorrectAnswerMap[question._id]
+      question.userAnswer = idAnswerMap[question.id]
+      question.correctAnswer = idCorrectAnswerMap[question.id]
     })
     return questionsReview
   },
