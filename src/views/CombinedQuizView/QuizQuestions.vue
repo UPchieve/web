@@ -237,6 +237,11 @@ const rerenderMathJaxElements = () => {
   gap: 8px;
 }
 
+ion-radio::part(label) {
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
 .incorrect-answer {
   padding: 16px;
   color: $c-error-red;

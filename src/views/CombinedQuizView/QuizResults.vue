@@ -38,7 +38,7 @@
             UPchieve 101 questions correct.
           </div>
           <LargeButton
-            class="uc-form-button-secondary half-width"
+            class="uc-form-button-secondary half-width ml-2"
             variant="secondary"
             @click="onClickedReviewUpchieve101"
           >
@@ -62,7 +62,7 @@
             questions correct
           </div>
           <LargeButton
-            class="uc-form-button-secondary half-width"
+            class="uc-form-button-secondary half-width ml-2"
             variant="secondary"
             @click="onClickedReviewSubject"
           >
