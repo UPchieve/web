@@ -4,7 +4,7 @@
       <arrow-icon class="subjects-link--arrow-icon" />
       <span class="subjects-link--text">Back to subjects page</span>
     </div>
-    <div class="quiz-container">
+    <div class="quiz-overall-container">
       <h1 class="title">
         {{ props.subjectDisplayName }} Tutoring Certification Quiz
       </h1>
@@ -51,22 +51,45 @@
       </div>
 
       <!--    Quiz questions-->
-      <QuizQuestions
-        v-else-if="currentQuestion"
-        :currentQuestion="currentQuestion"
-        :overallQuestionIndex="overallQuestionIndex"
-        :answerResult="answerResult"
-        @clicked-go-to-next-question="goToNextQuestion"
-        @clicked-open-review-materials="
-          () =>
-            openReviewMaterials(
-              currentQuestion?.category === UPCHIEVE_101_CATEGORY
-                ? 'upchieve101'
-                : 'subject'
-            )
-        "
-        @submitted-answer="submitAnswer"
-      />
+      <div v-else-if="currentQuestion" class="quiz-container">
+        <div class="progress-container">
+          <div class="progress-category">
+            UPchieve 101
+            <ProgressBar
+              v-if="!completedQuizCategory('upchieve101')"
+              :questionNumber="numCorrectUpchieve101 + 1"
+              :barWidth="progress('upchieve101')"
+              :quizLength="numRequiredToPass('upchieve101')"
+            />
+            <CheckCircledIcon v-else />
+          </div>
+          <div class="progress-category">
+            {{ props.subjectDisplayName }}
+            <ProgressBar
+              v-if="!completedQuizCategory('subject')"
+              :questionNumber="numCorrectSubject + 1"
+              :barWidth="progress('subject')"
+              :quizLength="numRequiredToPass('subject')"
+            />
+            <CheckCircledIcon v-else />
+          </div>
+        </div>
+        <QuizQuestions
+          :currentQuestion="currentQuestion"
+          :overallQuestionIndex="overallQuestionIndex"
+          :answerResult="answerResult"
+          @clicked-go-to-next-question="goToNextQuestion"
+          @clicked-open-review-materials="
+            () =>
+              openReviewMaterials(
+                currentQuestion?.category === UPCHIEVE_101_CATEGORY
+                  ? 'upchieve101'
+                  : 'subject'
+              )
+          "
+          @submitted-answer="submitAnswer"
+        />
+      </div>
       <QuizResults
         v-else
         :passedUPchieve101="
@@ -93,6 +116,7 @@
 
 <script lang="ts" setup>
 import QuizResults from './QuizResults.vue'
+import CheckCircledIcon from '@/assets/check-circled.svg'
 import QuizQuestions from './QuizQuestions.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -108,6 +132,7 @@ import { camelCase } from 'lodash-es'
 import { isEmpty } from 'lodash'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import ProgressBar from '@/views/QuizView/ProgressBar.vue'
 
 const router = useRouter()
 const store = useStore()
@@ -163,15 +188,28 @@ const currentQuestion = computed(() => {
   return undefined
 })
 
+const DEFAULT_NUM_CORRECT_TO_PASS = 10
+
+const numRequiredToPass = computed(() => (quiz: 'upchieve101' | 'subject') => {
+  const quizQuestions =
+    quiz === 'upchieve101' ? upchieve101Questions.value : subjectQuestions.value
+  return Math.min(DEFAULT_NUM_CORRECT_TO_PASS, quizQuestions.length)
+})
+
+const progress = computed(() => (quiz: 'upchieve101' | 'subject') => {
+  const numCorrect =
+    quiz === 'upchieve101'
+      ? numCorrectUpchieve101.value
+      : numCorrectSubject.value
+  return (100 / (numRequiredToPass.value(quiz) - 1)) * numCorrect
+})
+
 const quizResults = computed(() => {
-  const DEFAULT_NUM_CORRECT_TO_PASS = 10
   return {
     passedUpchieve101:
-      numCorrectUpchieve101.value >=
-      Math.min(DEFAULT_NUM_CORRECT_TO_PASS, upchieve101Questions.value.length),
+      numCorrectUpchieve101.value >= numRequiredToPass.value('upchieve101'),
     passedSubject:
-      numCorrectSubject.value >=
-      Math.min(DEFAULT_NUM_CORRECT_TO_PASS, subjectQuestions.value.length),
+      numCorrectSubject.value >= numRequiredToPass.value('subject'),
   }
 })
 
@@ -201,6 +239,17 @@ const submitAnswer = async (selectedAnswer: string) => {
     handleCorrectAnswer()
   else handleIncorrectAnswer()
 }
+
+const completedQuizCategory = computed(
+  () => (quiz: 'upchieve101' | 'subject') => {
+    const numCorrect =
+      quiz === 'upchieve101'
+        ? numCorrectUpchieve101.value
+        : numCorrectSubject.value
+    const numRequired = numRequiredToPass.value(quiz)
+    return numCorrect >= numRequired
+  }
+)
 
 const handleCorrectAnswer = () => {
   AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_ANSWER_CORRECT)
@@ -279,7 +328,7 @@ onMounted(() => {
   }
 }
 
-.quiz-container {
+.quiz-overall-container {
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -338,5 +387,21 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  margin: 2em auto;
+  gap: 14px;
+
+  .progress-category {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    font-size: 16px;
+    line-height: normal;
+    gap: 8px;
+  }
 }
 </style>

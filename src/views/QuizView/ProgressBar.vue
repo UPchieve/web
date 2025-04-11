@@ -8,7 +8,10 @@
         v-for="n in quizLength"
         :key="`circle-${n}`"
         :id="'circle-' + n"
-        class="circle"
+        :class="{
+          circle: true,
+          'filled-in': n <= questionNumber,
+        }"
       >
         {{ n }}
       </div>
@@ -55,6 +58,10 @@ export default {
 }
 
 #circle-1 {
+  background-color: $c-success-green;
+}
+
+.filled-in {
   background-color: $c-success-green;
 }
 
