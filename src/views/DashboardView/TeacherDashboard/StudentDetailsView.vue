@@ -95,7 +95,7 @@
                     accurate.
                   </div>
                 </div>
-                {{ session.summary }}
+                {{ session.summary.summary }}
               </div>
             </div>
           </div>
