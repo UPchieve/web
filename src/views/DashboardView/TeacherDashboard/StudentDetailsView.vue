@@ -72,9 +72,12 @@
           v-for="session in sessions"
           :key="session.id"
           class="session-group"
-          :class="session.summary ? 'has-summary' : ''"
+          :class="hasSessionSummary ? 'has-summary' : ''"
         >
-          <div class="session-row">
+          <div
+            class="session-row"
+            :class="hasSessionSummary && !session.summary ? 'summary-row' : ''"
+          >
             <div class="session-item">
               <b v-if="session.summary">{{ session.sessionSubject }}</b
               ><span v-else>{{ session.sessionSubject }}</span>
@@ -148,6 +151,7 @@ export default {
         sessionActivityTo: moment().format('YYYY-MM-DD'),
       },
       subjectPlaceholder: '',
+      hasSessionSummary: false,
     }
   },
   computed: {
@@ -226,6 +230,7 @@ export default {
           const created = new Date(session.createdAt)
           const ended = new Date(session.endedAt)
           const sessionLength = (ended - created) / (1000 * 60)
+          if (session.summary) this.hasSessionSummary = true
           return {
             ...session,
             sessionSubject: subjects[session.name].displayName,
