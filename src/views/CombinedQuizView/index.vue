@@ -51,7 +51,10 @@
       </div>
 
       <!--    Quiz questions-->
-      <div v-else-if="currentQuestion" class="quiz-container">
+      <div
+        v-else-if="!quizResults.passedUpchieve101 || !quizResults.passedSubject"
+        class="quiz-container"
+      >
         <div class="progress-container">
           <div class="progress-category">
             UPchieve 101
@@ -92,23 +95,10 @@
       </div>
       <QuizResults
         v-else
-        :passedUPchieve101="
-          !isEmpty(upchieve101AnswerMap) && quizResults?.passedUpchieve101
-        "
-        :passedSubject="
-          !isEmpty(subjectAnswerMap) && quizResults?.passedSubject
-        "
-        :hadUpchieve101Questions="upchieve101Questions.length > 0"
-        :hadSubjectQuestions="subjectQuestions.length > 0"
-        :numCorrectUPchieve101="numCorrectUpchieve101"
-        :numCorrectSubject="numCorrectSubject"
         :subjectDisplayName="props.subjectDisplayName"
         :subjectCategory="subjectCategory as string"
         :upchieveAnswerMap="upchieve101AnswerMap"
         :subjectAnswerMap="subjectAnswerMap"
-        @clicked-retake-quiz="() => router.go(0)"
-        @clicked-review-subject="() => openReviewMaterials('subject')"
-        @clicked-review-u-pchieve101="() => openReviewMaterials('upchieve101')"
       />
     </div>
   </div>
@@ -129,7 +119,6 @@ import { interleave } from '@/utils/array-utils'
 import LargeButton from '@/components/LargeButton.vue'
 import Case from 'case'
 import { camelCase } from 'lodash-es'
-import { isEmpty } from 'lodash'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import ProgressBar from '@/views/QuizView/ProgressBar.vue'
@@ -213,10 +202,17 @@ const quizResults = computed(() => {
   }
 })
 
+const numUpchieve101Incorrect = ref<number>(0)
+const numSubjectIncorrect = ref<number>(0)
+
 const goToNextQuestion = () => {
+  // If incorrect, push the last question to the end
+  if (answerResult.value === 'incorrect') {
+    quizQuestions.value.push(currentQuestion.value!)
+  }
+  overallQuestionIndex.value = overallQuestionIndex.value + 1
   answerResult.value = null
   answerChoice.value = null
-  overallQuestionIndex.value = overallQuestionIndex.value + 1
 
   // Filter out remaining questions if you already passed
   if (quizResults.value?.passedSubject) {
@@ -267,7 +263,20 @@ const handleCorrectAnswer = () => {
 }
 
 const handleIncorrectAnswer = () => {
-  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_ANSWER_INCORRECT)
+  const category = currentQuestion?.value?.category
+  let numIncorrect
+  if (category === UPCHIEVE_101_CATEGORY) {
+    numIncorrect = numUpchieve101Incorrect.value + 1
+    numUpchieve101Incorrect.value = numIncorrect
+  } else {
+    numIncorrect = numSubjectIncorrect.value + 1
+    numSubjectIncorrect.value = numIncorrect
+  }
+
+  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_ANSWER_INCORRECT, {
+    category,
+    numIncorrect,
+  })
   answerResult.value = 'incorrect'
 }
 
