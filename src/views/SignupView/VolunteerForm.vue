@@ -6,14 +6,16 @@
     @submit.prevent="nextPage()"
   >
     <div
-      v-if="errors.length"
+      v-if="validationErrors.length"
       class="step-errors"
       role="alert"
       aria-labelledby="errorsHeading"
     >
       <h5 id="errorsHeading">Please correct the following problems:</h5>
       <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+        <li v-for="error in validationErrors" v-bind:key="error">
+          {{ error }}
+        </li>
       </ul>
     </div>
 
@@ -62,7 +64,9 @@
 
     <button class="uc-form-button" type="submit">Continue</button>
 
-    <div v-if="msg !== ''" role="alert">{{ msg }}</div>
+    <div v-if="submitError !== ''" role="alert" class="submission-error">
+      {{ submitError }}
+    </div>
   </form>
 
   <form
@@ -72,7 +76,7 @@
     @submit.prevent="checkInputs($event)"
   >
     <div
-      v-if="errors.length"
+      v-if="validationErrors.length"
       class="step-errors"
       role="alert"
       aria-labelledby="volunteerInformationErrorsHeading"
@@ -81,7 +85,9 @@
         Please correct the following problems:
       </h5>
       <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+        <li v-for="error in validationErrors" v-bind:key="error">
+          {{ error }}
+        </li>
       </ul>
     </div>
 
@@ -210,7 +216,7 @@
       Sign Up
     </button>
     <loader class="register-loader" v-if="isRegistering" />
-    <div v-if="msg" role="alert">{{ msg }}</div>
+    <div v-if="submitError" role="alert">{{ submitError }}</div>
   </form>
 
   <div v-else class="uc-form-body">Unexpected Error</div>
@@ -232,8 +238,8 @@ export default {
   },
   data() {
     return {
-      msg: '',
-      errors: [],
+      submitError: '',
+      validationErrors: [],
       invalidInputs: [],
       credentials: {
         email: '',
@@ -260,25 +266,25 @@ export default {
   methods: {
     nextPage() {
       // validate input
-      this.errors = []
+      this.validationErrors = []
       this.invalidInputs = []
-      this.msg = ''
+      this.submitError = ''
       if (!this.credentials.email) {
-        this.errors.push('An email address is required.')
+        this.validationErrors.push('An email address is required.')
         this.invalidInputs.push('inputEmail')
       } else if (!validator.isEmail(this.credentials.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
         // user actually tries to submit the form, which does not occur until step 2
-        this.errors.push(
+        this.validationErrors.push(
           this.credentials.email + ' is not a valid email address.'
         )
         this.invalidInputs.push('inputEmail')
       }
       if (!this.credentials.password) {
-        this.errors.push('A password is required.')
+        this.validationErrors.push('A password is required.')
         this.invalidInputs.push('inputPassword')
       }
-      if (this.errors.length) {
+      if (this.validationErrors.length) {
         return
       }
 
@@ -293,19 +299,20 @@ export default {
           this.getSignupSources()
         })
         .catch((err) => {
-          this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
+          this.submitError =
+            err?.response?.data?.err ?? 'Failed: Please try again.'
           if (err?.response?.status !== 409 && err?.response?.status !== 422) {
             LoggerService.noticeError(err)
           }
         })
     },
     checkInputs() {
-      this.errors = []
+      this.validationErrors = []
       this.invalidInputs = []
 
       // validate input
       if (!this.profile.firstName || !this.profile.lastName) {
-        this.errors.push('You must enter your first and last name.')
+        this.validationErrors.push('You must enter your first and last name.')
       }
       if (!this.profile.firstName) {
         this.invalidInputs.push('firstName')
@@ -314,27 +321,31 @@ export default {
         this.invalidInputs.push('lastName')
       }
       if (!this.profile.phone) {
-        this.errors.push('You must enter a phone number.')
+        this.validationErrors.push('You must enter a phone number.')
         this.invalidInputs.push('phone')
       } else if (!this.phoneInputInfo.isValid || !this.phoneInputInfo.e164) {
-        this.errors.push(this.profile.phone + ' is not a valid phone number.')
+        this.validationErrors.push(
+          this.profile.phone + ' is not a valid phone number.'
+        )
         this.invalidInputs.push('phone')
       }
       if (!this.credentials.terms) {
-        this.errors.push('You must read and accept the user agreement.')
+        this.validationErrors.push(
+          'You must read and accept the user agreement.'
+        )
       }
       if (this.shouldShowOtherSignupInput() && !this.otherSignupSource) {
-        this.errors.push(
+        this.validationErrors.push(
           'Please enter signup source in the text box if "Other" is selected'
         )
         this.invalidInputs.push('otherSignupSource')
       }
-      if (!this.errors.length) {
+      if (!this.validationErrors.length) {
         this.submit()
       }
     },
     submit() {
-      this.msg = ''
+      this.submitError = ''
       if (this.isRegistering) return
       this.isRegistering = true
       AuthService.registerOpenVolunteer({
@@ -355,7 +366,8 @@ export default {
         })
         .catch((err) => {
           this.isRegistering = false
-          this.msg = err?.response?.data?.err ?? 'Failed: Please try again.'
+          this.submitError =
+            err?.response?.data?.err ?? 'Failed: Please try again.'
           if (err?.response.status !== 409 && err?.response.status !== 422) {
             LoggerService.noticeError(err)
           }
@@ -429,5 +441,9 @@ export default {
   top: 50%;
   transform: translate(-50%, -50%);
   margin: 0;
+}
+
+.submission-error {
+  color: $c-error-red;
 }
 </style>
