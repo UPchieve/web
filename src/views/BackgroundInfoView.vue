@@ -7,13 +7,17 @@
       >
         Background Information
       </h1>
-      <div v-if="hasCompletedBackgroundInfo">
-        <p
-          class="background-info__completed-message"
-          data-testid="bg-info-complete"
-        >
-          Thank you for submitting your background information!
+      <div v-if="hasCompletedBackgroundInfo" class="complete">
+        <p data-testid="bg-info-complete">
+          Thank you for submitting your background information!<br />
         </p>
+        <LargeButton
+          variant="primary"
+          class="continue-onboarding-btn"
+          :showArrow="false"
+          @click="goToDashboard"
+          >Continue Onboarding</LargeButton
+        >
       </div>
       <form class="background-info__form" @submit="submitForm" v-else>
         <p data-testid="background-information-explainer">
@@ -315,9 +319,11 @@ import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { COUNTRIES, STATES, EVENTS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'background-info-view',
+  components: { LargeButton },
   data() {
     return {
       options: {
@@ -420,6 +426,9 @@ export default {
     },
   },
   methods: {
+    goToDashboard() {
+      this.$router.push('/dashboard')
+    },
     async submitForm(event) {
       event.preventDefault()
 
@@ -483,6 +492,7 @@ export default {
           country: data.country,
         }
         await this.$store.dispatch('user/addToUser', update)
+        this.justSubmittedBackgroundForm = true
       } catch (error) {
         LoggerService.noticeError(error)
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_ERROR, {
@@ -581,10 +591,6 @@ textarea {
     @include breakpoint-above('medium') {
       padding: 20px;
     }
-  }
-
-  &__completed-message {
-    padding: 1em;
   }
 
   &__form {
@@ -750,6 +756,17 @@ textarea {
     @include breakpoint-above('medium') {
       box-shadow: none;
     }
+  }
+}
+
+.complete {
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  align-items: center;
+
+  .continue-onboarding-btn {
+    width: fit-content;
   }
 }
 </style>
