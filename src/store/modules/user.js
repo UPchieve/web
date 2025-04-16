@@ -494,7 +494,7 @@ export default {
     // preventing any caching issues that might interfere
     // with the dynamic loading of feature flags
     getUserPropsForAnalytics: (state, getters, rootState) => () => {
-      const userProps = {
+      let userProps = {
         ucId: state.user.id,
         userType: state.user.userType,
         createdAt: state.user.createdAt,
@@ -506,6 +506,16 @@ export default {
         hasTeacherRole: getters.hasTeacherRole,
         occupation: state.user.occupation?.join(', '),
       }
+      userProps.partner =
+        state.user.volunteerPartnerOrg ?? state.user.studentPartnerOrg
+      if (!userProps.partner) delete userProps.partner
+
+      if (state.user.isSchoolPartner) {
+        userProps.schoolPartner = state.user.schoolName
+      }
+
+      userProps.usesClever = state.user.usesClever
+      if (!userProps.usesClever) delete userProps.usesClever
 
       if (state.user?.ratings) {
         // Old schema for accounts w/ only one role (student or volunteer)
@@ -537,10 +547,10 @@ export default {
           state.user.ratings?.partnerReportedVolunteerRating?.total ?? 0
       }
 
-      if (getters.isVolunteer) {
+      // Add role-specific props
+      if (getters.hasVolunteerRole) {
         userProps.onboarded = state.user.isOnboarded
         userProps.approved = state.user.isApproved
-        userProps.partner = state.user.volunteerPartnerOrg
 
         const certificationInfo = Object.entries(
           state.user.certifications
@@ -548,28 +558,23 @@ export default {
           acc[subject] = quizInfo.passed
           return acc
         }, {})
-        return {
+
+        const hasSubjectCertification = getters.hasCertification
+        userProps = {
           ...userProps,
           ...certificationInfo,
         }
-      } else if (getters.isStudent) {
-        userProps.partner = state.user.studentPartnerOrg
+        userProps.hasSubjectCertification = hasSubjectCertification
+      }
+      if (getters.hasStudentRole) {
         userProps.gradeLevel = state.user.gradeLevel
         userProps.usesClever = state.user.usesClever
         userProps.usesGoogle = state.user.usesGoogle
-        if (state.user.isSchoolPartner) {
-          userProps.schoolPartner = state.user.schoolName
-        }
 
         if (rootState.featureFlags.eligibleForChooseTutorType) {
           userProps.eligibleForChooseTutorType =
             rootState.featureFlags.eligibleForChooseTutorType
         }
-      } else if (getters.isTeacher) {
-        if (state.user.isSchoolPartner) {
-          userProps.schoolPartner = state.user.schoolName
-        }
-        userProps.usesClever = state.user.usesClever
       }
 
       // Although 'fallIncentiveEnrollmentAt' is only relevant to student users,
