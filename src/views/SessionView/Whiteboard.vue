@@ -153,7 +153,6 @@
         </div>
       </button>
       <button
-        v-if="isWhiteboardEraserToolActive"
         class="toolbar-item"
         :class="selectedTool === 'eraser' ? 'selected-tool' : ''"
         title="Eraser"
@@ -602,7 +601,6 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isWhiteboardEraserToolActive: 'featureFlags/isWhiteboardEraserToolActive',
       userType: 'user/userType',
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
