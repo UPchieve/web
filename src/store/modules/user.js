@@ -553,7 +553,7 @@ export default {
         userProps.approved = state.user.isApproved
 
         const certificationInfo = Object.entries(
-          state.user.certifications
+          state.user.certifications ?? {}
         ).reduce((acc, [subject, quizInfo]) => {
           acc[subject] = quizInfo.passed
           return acc
