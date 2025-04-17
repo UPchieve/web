@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import CheckMark from '@/components/CheckMark.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -100,6 +100,10 @@ export default {
       user: (state) => state.user.user,
       windowWidth: (state) => state.app.windowWidth,
     }),
+    ...mapGetters({
+      isCombinedOnboardingQuizEnabled:
+        'featureFlags/isCombinedOnboardingQuizEnabled',
+    }),
     isLargeDevice() {
       const largeScreenBreakpoint = 992
 
@@ -111,21 +115,44 @@ export default {
     isComplete(cert) {
       return this.user.certifications[cert].passed
     },
+    isCompleteForCombinedQuizUser(cert) {
+      // For users going through the combined quiz experiment, we'll consider their tranining course
+      // complete as long as they passed the quiz.
+      return (
+        cert.trainingCourse === 'upchieve101' &&
+        this.isComplete(cert) &&
+        this.isCombinedOnboardingQuizEnabled
+      )
+    },
     progressStatus(cert) {
-      const { progress } = this.user.trainingCourses[cert]
+      const certificationInfo = this.user.trainingCourses[cert]
+      if (this.isCompleteForCombinedQuizUser) {
+        return 'Completed'
+      }
+
+      const progress = certificationInfo.progress
       if (progress === 0) return 'Not started'
       if (this.isComplete(cert)) return 'Completed'
       return 'In progress'
     },
     progressBarNumber(cert) {
-      const { progress, isComplete } = this.user.trainingCourses[cert]
+      const certificationInfo = this.user.trainingCourses[cert]
+      if (this.isCompleteForCombinedQuizUser) {
+        return 100
+      }
+
+      const { progress, isComplete } = certificationInfo
       // If user has not completed the course quiz show 99% in the progress bar
       if (isComplete && !this.isComplete(cert)) return 99
       else return progress
     },
     actionButtonText(cert) {
-      const { progress } = this.user.trainingCourses[cert]
-      if (progress === 0) return 'Start course'
+      const certificationInfo = this.user.trainingCourses[cert]
+      if (this.isCompleteForCombinedQuizUser) {
+        return 'Completed'
+      }
+
+      if (certificationInfo.progress === 0) return 'Start course'
       if (this.isComplete(cert)) return 'Completed'
       return 'Resume course'
     },

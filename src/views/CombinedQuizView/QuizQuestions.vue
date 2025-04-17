@@ -4,7 +4,9 @@
       <div class="question-number">
         Question {{ props.overallQuestionIndex + 1 }}
       </div>
-      <div id="question-text">{{ props.currentQuestion?.questionText }}</div>
+      <div id="question-text" class="question-text">
+        {{ props.currentQuestion?.questionText }}
+      </div>
       <div class="image-container" v-if="props.currentQuestion?.imageSrc">
         <image-expand-icon
           class="image-sizer-icon"
@@ -178,6 +180,10 @@ const rerenderMathJaxElements = () => {
   .question-number {
     font-weight: 600;
     margin-bottom: 1.4em;
+  }
+
+  .question-text {
+    white-space: pre-wrap;
   }
 }
 

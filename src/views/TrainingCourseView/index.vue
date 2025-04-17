@@ -23,7 +23,7 @@
         />
       </div>
       <LargeButton
-        v-if="isCombinedOnboardingQuizEnabled"
+        v-if="isCombinedOnboardingQuizEnabled && this.isAutoFlowUser"
         variant="primary"
         class="back-to-quiz-button"
         :showArrow="false"
@@ -71,6 +71,7 @@ export default {
     ...mapGetters({
       isCombinedOnboardingQuizEnabled:
         'featureFlags/isCombinedOnboardingQuizEnabled',
+      isAutoFlowUser: 'user/isAutoFlowUser',
     }),
     quizCertification() {
       return this.certifications[this.course.quizKey]
