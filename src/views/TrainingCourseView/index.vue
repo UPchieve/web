@@ -31,6 +31,15 @@
       >
         Back To Quiz
       </LargeButton>
+      <LargeButton
+        v-else-if="isCombinedOnboardingQuizEnabled && !this.passedUpchieve101"
+        variant="primary"
+        class="back-to-quiz-button"
+        :showArrow="false"
+        @click="goToUpchieve101Quiz"
+      >
+        Back To Quiz
+      </LargeButton>
     </div>
   </div>
 </template>
@@ -72,12 +81,16 @@ export default {
       isCombinedOnboardingQuizEnabled:
         'featureFlags/isCombinedOnboardingQuizEnabled',
       isAutoFlowUser: 'user/isAutoFlowUser',
+      passedUpchieve101: 'user/passedUpchieve101',
     }),
     quizCertification() {
       return this.certifications[this.course.quizKey]
     },
   },
   methods: {
+    goToUpchieve101Quiz() {
+      this.$router.push('/training/upchieve101/quiz')
+    },
     goToSubjectSelection() {
       this.$router.push('/welcome')
     },

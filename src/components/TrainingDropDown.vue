@@ -126,7 +126,7 @@ export default {
     },
     progressStatus(cert) {
       const certificationInfo = this.user.trainingCourses[cert]
-      if (this.isCompleteForCombinedQuizUser) {
+      if (this.isCompleteForCombinedQuizUser(cert)) {
         return 'Completed'
       }
 
@@ -137,7 +137,7 @@ export default {
     },
     progressBarNumber(cert) {
       const certificationInfo = this.user.trainingCourses[cert]
-      if (this.isCompleteForCombinedQuizUser) {
+      if (this.isCompleteForCombinedQuizUser(cert)) {
         return 100
       }
 
@@ -148,7 +148,7 @@ export default {
     },
     actionButtonText(cert) {
       const certificationInfo = this.user.trainingCourses[cert]
-      if (this.isCompleteForCombinedQuizUser) {
+      if (this.isCompleteForCombinedQuizUser(cert)) {
         return 'Completed'
       }
 
