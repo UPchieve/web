@@ -113,7 +113,7 @@
         tabindex="0"
         @click="usePickTool"
         @keydown.enter="usePickTool"
-        :disabled="isConnected ? undefined : true"
+        :disabled="!isConnected"
       >
         <PickToolIcon class="toolbar-icon--pick" />
       </button>
@@ -122,13 +122,13 @@
         title="Brushes"
         tabindex="0"
         @click="clickBrushTool"
-        @keydown.enter="toggleBrushes"
+        @keydown.enter="clickBrushTool"
         :class="
           selectedTool === 'brush' || selectedTool === 'thin-brush'
             ? 'selected-tool'
             : ''
         "
-        :disabled="isConnected ? undefined : true"
+        :disabled="!isConnected"
       >
         <PenIcon class="toolbar-icon--pen" />
         <div v-if="showBrushPicker" class="options-bar">
@@ -159,7 +159,7 @@
         tabindex="0"
         @click="useEraserTool"
         @keydown.enter="useEraserTool"
-        :disabled="isConnected ? undefined : true"
+        :disabled="!isConnected"
       >
         <EraserIcon class="toolbar-icon" />
       </button>
@@ -169,7 +169,7 @@
         tabindex="0"
         @click="openFileDialog"
         @keydown.enter="openFileDialog"
-        :disabled="isConnected ? undefined : true"
+        :disabled="!isConnected"
       >
         <FileDialog
           ref="fileDialog"
@@ -186,7 +186,7 @@
         @click="toggleShapes"
         @keydown.enter="toggleShapes"
         :class="isShapeSelected ? 'selected-tool' : ''"
-        :disabled="isConnected ? undefined : true"
+        :disabled="!isConnected"
       >
         <ShapesIcon class="toolbar-icon" />
         <div v-if="showShapePicker" class="options-bar">
@@ -261,7 +261,7 @@
             ? 'selected-tool'
             : ''
         "
-        :disabled="isConnected ? undefined : true"
+        :disabled="!isConnected"
       >
         <TextIcon class="toolbar-icon" />
         <div v-if="showTextPicker" class="options-bar">
@@ -293,7 +293,7 @@
         tabindex="0"
         @click="toggleColorPicker"
         @keydown.enter="toggleColorPicker"
-        :disabled="isConnected ? undefined : true"
+        :disabled="!isConnected"
       >
         <ColorPickerIcon class="toolbar-icon--color" />
         <div v-if="showColorPicker" class="options-bar --color">
@@ -389,33 +389,42 @@
       </button>
       <button
         class="toolbar-item"
-        title="Undo"
+        title="More"
         tabindex="0"
-        @click="undo"
-        @keydown.enter="undo"
-        :disabled="isConnected ? undefined : true"
+        @click="toggleMoreMenu"
+        @keydown.enter="toggleMoreMenu"
+        :disabled="!isConnected"
       >
-        <UndoIcon class="toolbar-icon" />
-      </button>
-      <button
-        class="toolbar-item"
-        title="Redo"
-        tabindex="0"
-        @click="redo"
-        @keydown.enter="redo"
-        :disabled="isConnected ? undefined : true"
-      >
-        <RedoIcon class="toolbar-icon" />
-      </button>
-      <button
-        class="toolbar-item"
-        title="Clear whiteboard"
-        tabindex="0"
-        @click="clearWhiteboard"
-        @keydown.enter="clearWhiteboard"
-        :disabled="isConnected ? undefined : true"
-      >
-        <ClearIcon class="toolbar-icon" />
+        <MoreIcon class="toolbar-icon" />
+        <div v-if="showMoreMenu" class="options-bar --more-menu">
+          <div
+            class="toolbar-item option-item"
+            title="Undo"
+            tabindex="0"
+            @click="undo"
+            @keydown.enter="undo"
+          >
+            <UndoIcon class="toolbar-icon" />
+          </div>
+          <div
+            class="toolbar-item option-item"
+            title="Redo"
+            tabindex="0"
+            @click="redo"
+            @keydown.enter="redo"
+          >
+            <RedoIcon class="toolbar-icon" />
+          </div>
+          <div
+            class="toolbar-item option-item"
+            title="Clear whiteboard"
+            tabindex="0"
+            @click="clearWhiteboard"
+            @keydown.enter="clearWhiteboard"
+          >
+            <ClearIcon class="toolbar-icon" />
+          </div>
+        </div>
       </button>
     </div>
     <div v-if="isLoading" class="loading-overlay">
@@ -429,6 +438,7 @@ import { mapGetters } from 'vuex'
 import axios from 'axios'
 import NetworkService from '@/services/NetworkService'
 import PickToolIcon from '@/assets/whiteboard_icons/selection.svg'
+import MoreIcon from '@/assets/VerticalMenuButtons.svg'
 import ClearIcon from '@/assets/whiteboard_icons/clear.svg'
 import ColorPickerIcon from '@/assets/whiteboard_icons/color_picker.svg'
 import PenIcon from '@/assets/whiteboard_icons/pen.svg'
@@ -481,6 +491,7 @@ export default {
   components: {
     WhiteboardAiTutorButton,
     PickToolIcon,
+    MoreIcon,
     ClearIcon,
     ColorPickerIcon,
     PenIcon,
@@ -589,6 +600,7 @@ export default {
       showShapePicker: false,
       showTextPicker: false,
       showColorPicker: false,
+      showMoreMenu: false,
       // The tools that alter the default Zwibbler tool state.
       selectedEraserTool: false,
       selectedThinBrushTool: false,
@@ -855,29 +867,34 @@ export default {
       this.zwibblerCtx.useTextTool({ fontSize: 26, fontName: 'Arial' })
       this.maybeFocusZwibbler(event)
     },
+    // TODO: Use a generic "toggle" method.
     toggleBrushes() {
       this.showBrushPicker = !this.showBrushPicker
       this.showShapePicker = false
       this.showTextPicker = false
       this.showColorPicker = false
+      this.showMoreMenu = false
     },
     toggleShapes() {
       this.showShapePicker = !this.showShapePicker
       this.showBrushPicker = false
       this.showTextPicker = false
       this.showColorPicker = false
+      this.showMoreMenu = false
     },
     toggleTextPicker() {
       this.showTextPicker = !this.showTextPicker
       this.showBrushPicker = false
       this.showShapePicker = false
       this.showColorPicker = false
+      this.showMoreMenu = false
     },
     toggleColorPicker() {
       this.showColorPicker = !this.showColorPicker
       this.showBrushPicker = false
       this.showTextPicker = false
       this.showShapePicker = false
+      this.showMoreMenu = false
       /* Since the eraser is also a `brush`, let's assume the user
        * doesn't want to erase in the color they just chose and
        * automatically switch to the brush.
@@ -885,6 +902,13 @@ export default {
       if (this.selectedTool === 'eraser' && !this.showColorPicker) {
         this.useBrushTool()
       }
+    },
+    toggleMoreMenu() {
+      this.showMoreMenu = !this.showMoreMenu
+      this.showColorPicker = false
+      this.showBrushPicker = false
+      this.showTextPicker = false
+      this.showShapePicker = false
     },
     undo() {
       this.zwibblerCtx.undo()
@@ -894,11 +918,16 @@ export default {
       this.zwibblerCtx.redo()
       this.hideHoveredToolbars()
     },
+    clearWhiteboard() {
+      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes())
+      this.hideHoveredToolbars()
+    },
     hideHoveredToolbars() {
       this.showBrushPicker = false
       this.showShapePicker = false
       this.showTextPicker = false
       this.showColorPicker = false
+      this.showMoreMenu = false
     },
     openFileDialog(event) {
       this.$refs.fileDialog.openFileDialog(event)
@@ -1010,9 +1039,6 @@ export default {
         this.zwibblerCtx.setNodeProperty(nodeId, 'opacity', 1)
         this.isLoading = false
       })
-    },
-    clearWhiteboard() {
-      this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes())
     },
     setColor(color) {
       // Second parameter indicates whether the colour should affect the fill or outline colour.
@@ -1352,33 +1378,22 @@ export default {
 }
 
 .toolbar {
-  max-width: 550px;
-  height: 70px;
-  position: absolute;
-  bottom: 50px;
-  left: 0;
-  right: 20px;
-  margin: auto;
-  display: flex;
   align-items: center;
-  justify-content: space-around;
-  border-radius: 8px;
   background-color: rgb(238, 238, 238);
+  border-radius: 8px;
+  bottom: 20px;
+  display: flex;
+  height: 50px;
+  justify-content: space-around;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  width: 100%;
 
-  @include breakpoint-above('medium') {
-    position: absolute;
-    bottom: 40px;
-  }
-
-  @include breakpoint-latest-iphones {
-    max-width: 100%;
-    height: 100px;
-    bottom: 0;
-    border-radius: 0;
-  }
-
-  @media only screen and (orientation: landscape) and (max-height: 500px) {
-    bottom: 0;
+  @include breakpoint-above('small') {
+    height: 70px;
+    max-width: 550px;
   }
 }
 
@@ -1387,6 +1402,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  max-width: 70px;
   width: 100%;
   height: 100%;
   margin: 0;
@@ -1414,11 +1430,8 @@ export default {
 
   .option-item {
     border-radius: initial;
+    height: 40px;
     padding: 0.5em;
-
-    @include breakpoint-below('tiny') {
-      padding: 1em;
-    }
   }
 
   &[disabled] {
@@ -1489,7 +1502,7 @@ export default {
   background-color: #fff;
   border: 1px solid #d8d8d8;
   border-radius: 5px;
-  bottom: 58px;
+  bottom: 45px;
   margin: 0;
   position: absolute;
 
@@ -1497,8 +1510,12 @@ export default {
     padding: 10px 8px;
   }
 
-  @include breakpoint-latest-iphones {
-    bottom: 88px;
+  &.--more-menu {
+    right: 2px;
+  }
+
+  @include breakpoint-above('small') {
+    bottom: 58px;
   }
 }
 
