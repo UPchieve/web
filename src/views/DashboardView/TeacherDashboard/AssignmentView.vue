@@ -221,7 +221,7 @@ export default {
     },
 
     goToYoutubeVideo() {
-      window.open('https://www.youtube.com/watch?v=qtsY7wJxlko', '_blank')
+      window.open('https://www.youtube.com/watch?v=IjK1SjHAtlc', '_blank')
       AnalyticsService.captureEvent(
         EVENTS.TEACHER_CLICKED_GETTING_STARTED_ASSIGNMENT_VIDEO,
         {
