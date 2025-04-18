@@ -10,6 +10,7 @@
     :buttons="moderationInfractionToastButtons"
     @didDismiss="props.onDismiss"
     :layout="mobileMode ? 'stacked' : 'baseline'"
+    swipeGesture="vertical"
   />
 </template>
 

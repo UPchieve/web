@@ -12,11 +12,7 @@
           :class="{ 'switch-account-mode-mobile': mobileMode }"
         >
           Want to set this up later?&nbsp;
-          <SwitchAccountModeButton
-            :user-type="userType"
-            :user-id="user.id"
-            :message="`Switch back to Student View.`"
-          />
+          <SwitchAccountModeButton />
         </div>
       </div>
       <verification-method-selector
