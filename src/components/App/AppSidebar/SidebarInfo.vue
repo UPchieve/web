@@ -8,8 +8,6 @@
       <div v-if="!mobileMode" class="SidebarInfo-type">{{ type }}</div>
       <SwitchAccountModeButton
         v-if="isStudentVolunteer"
-        :user-id="user.id"
-        :user-type="userType"
         class="switch-account-mode-button"
       />
       <div v-if="!isTeacher && !mobileMode" class="SidebarInfo-status">

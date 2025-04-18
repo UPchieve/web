@@ -13,6 +13,7 @@
       <hamburger-button
         :class="{ white: headerComponent !== 'default-header' }"
         data-testid="mobile-header-hamburger"
+        id="mobile-hamburger-btn"
       />
     </div>
     <component :is="headerComponent" />

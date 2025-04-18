@@ -70,5 +70,6 @@ export default {
         : EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_STUDENT_MODE
     )
     Gleap.getInstance().softReInitialize()
+    return newActiveRole
   },
 }
