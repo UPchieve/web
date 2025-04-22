@@ -6,7 +6,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { useStore } from 'vuex'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 const store = useStore()
 const props = defineProps<{
@@ -28,22 +28,28 @@ const emit = defineEmits([
   'finishedOnboarding',
 ])
 
+onMounted(() => {
+  AnalyticsService.captureEvent(
+    EVENTS.ROLE_SWITCHING_SAW_ONBOARDING_REMINDER_POPOVER
+  )
+})
+
 const temporarilyDismiss = () => {
   AnalyticsService.captureEvent(
-    EVENTS.COMBINED_QUIZ_DISMISSED_ONBOARDING_REMINDER_TOAST
+    EVENTS.ROLE_SWITCHING_DISMISSED_ONBOARDING_REMINDER_POPOVER
   )
   emit('dismissed')
 }
 
 const permanentlyDismiss = () => {
   AnalyticsService.captureEvent(
-    EVENTS.COMBINED_QUIZ_PERMANENTLY_DISMISSED_ONBOARDING_REMINDER_TOAST
+    EVENTS.ROLE_SWITCHING_PERMANENTLY_DISMISSED_ONBOARDING_REMINDER_POPOVER
   )
   emit('permanentlyDismissed')
 }
 
 const finishOnboarding = () => {
-  AnalyticsService.captureEvent(EVENTS.COMBINED_QUIZ_CLICKED_FINISH_ONBOARDING)
+  AnalyticsService.captureEvent(EVENTS.ROLE_SWITCHING_CLICKED_FINISH_ONBOARDING)
   emit('finishedOnboarding')
 }
 </script>
