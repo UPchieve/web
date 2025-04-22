@@ -7,11 +7,21 @@
         v-if="isStudent && isStandaloneAiEnabled"
       ></ai-tutor-button>
 
-      <sidebar-link v-if="!isTeacher" to="/dashboard" text="Dashboard">
+      <sidebar-link
+        v-if="!isTeacher"
+        to="/dashboard"
+        text="Dashboard"
+        id="dashboard-sidebar-link"
+      >
         <house-icon class="icon" />
       </sidebar-link>
 
-      <sidebar-link v-else to="/dashboard" text="My Classes">
+      <sidebar-link
+        v-else
+        to="/dashboard"
+        text="My Classes"
+        id="my-classes-sidebar-link"
+      >
         <book-icon class="icon" />
       </sidebar-link>
 
@@ -20,6 +30,7 @@
         text="My Progress"
         class="SidebarLinks__container"
         to="/sessions/progress"
+        id="my-progress-sidebar-link"
       >
         <your-progress-icon class="icon" />
         <activity-dot
@@ -32,6 +43,7 @@
         v-if="isStudent"
         to="/sessions/history"
         text="Session History"
+        id="session-history-sidebar-link"
       >
         <archive-icon class="icon" />
       </sidebar-link>
@@ -40,6 +52,7 @@
         v-if="isStudent"
         to="/favorite-coaches"
         text="Favorite Coaches"
+        id="favorite-coaches-sidebar-link"
       >
         <heart-icon class="icon" />
       </sidebar-link>
@@ -48,6 +61,7 @@
         v-if="showStudentMyClassesLink"
         to="/classes"
         text="My Classes"
+        id="student-my-classes-sidebar-link"
       >
         <book-icon class="icon" />
         <activity-dot
@@ -61,11 +75,17 @@
         to="/training"
         text="Training"
         data-testid="training-link"
+        id="training-sidebar-link"
       >
         <graduation-cap-icon class="icon" />
       </sidebar-link>
 
-      <sidebar-link v-if="isVolunteer" to="/calendar" text="Schedule">
+      <sidebar-link
+        v-if="isVolunteer"
+        to="/calendar"
+        text="Schedule"
+        id="calendar-sidebar-link"
+      >
         <calendar-icon class="icon" />
       </sidebar-link>
 
@@ -73,15 +93,21 @@
         v-if="isVolunteer"
         to="/sessions/history"
         text="Session History"
+        id="session-history-sidebar-link"
       >
         <archive-icon class="icon" />
       </sidebar-link>
 
-      <sidebar-link v-if="isAdmin" to="/admin" text="Admin">
+      <sidebar-link
+        v-if="isAdmin"
+        to="/admin"
+        text="Admin"
+        id="admin-sidebar-link"
+      >
         <folder-icon class="icon" />
       </sidebar-link>
 
-      <sidebar-link to="/profile" text="Profile">
+      <sidebar-link to="/profile" text="Profile" id="profile-sidebar-link">
         <portrait-icon class="icon" />
       </sidebar-link>
 
@@ -89,6 +115,7 @@
         v-if="isVolunteer"
         :onClick="openReferFriendModal"
         text="Invite a Friend"
+        id="volunteer-referral-sidebar-link"
       >
         <refer-friend-icon class="icon" />
       </sidebar-link>
@@ -97,6 +124,7 @@
         v-if="showDashboardRedesign"
         text="Refer a Friend"
         :onClick="openReferFriendModal"
+        id="refer-a-friend-sidebar-link"
       >
         <refer-friend-icon class="icon" />
       </sidebar-link>
@@ -105,12 +133,17 @@
         v-if="isStudent && productFlags.impactStudyEnrollmentAt"
         to="/rewards"
         text="Rewards"
+        id="rewards-sidebar-link"
       >
         <rewards-sidebar-icon class="icon icon--rewards" />
       </sidebar-link>
 
       <div v-if="!mobileMode" class="SidebarLinks-about">About UPchieve</div>
-      <sidebar-link to="/contact" text="Contact us">
+      <sidebar-link
+        to="/contact"
+        text="Contact us"
+        id="contact-us-sidebar-link"
+      >
         <envelope-icon class="icon" />
       </sidebar-link>
       <sidebar-link
@@ -118,6 +151,7 @@
         to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-315owtp5i-TuwFrOlKvBEC9UzZrTob6g"
         text="Community"
         :openNewTab="true"
+        id="community-sidebar-link"
       >
         <slack-logo-icon class="icon" />
       </sidebar-link>
