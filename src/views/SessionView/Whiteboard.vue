@@ -930,6 +930,12 @@ export default {
       this.showMoreMenu = false
     },
     openFileDialog(event) {
+      AnalyticsService.captureEvent(
+        EVENTS.IMAGE_UPLOAD_USER_CLICKED_UPLOAD_IMAGE,
+        {
+          tool: 'whiteboard',
+        }
+      )
       this.$refs.fileDialog.openFileDialog(event)
     },
     async showImageUploadError(timeMs) {
@@ -979,6 +985,9 @@ export default {
         const { isClean, failures } =
           await ModerationService.checkIfImageIsClean(formData)
         if (!isClean) {
+          AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_IMAGE_CENSORED, {
+            tool: 'whiteboard',
+          })
           this.$store.commit('liveMedia/setModerationInfraction', {
             infraction: failures,
             source: 'image_upload',
@@ -1002,8 +1011,17 @@ export default {
             },
           })
           this.insertPhoto(imageUrl)
+          AnalyticsService.captureEvent(
+            EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE,
+            {
+              tool: 'whiteboard',
+            }
+          )
         }
       } catch (error) {
+        AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_FAILED, {
+          tool: 'whiteboard',
+        })
         this.showImageUploadError()
         LoggerService.noticeError(error)
         return

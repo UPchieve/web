@@ -264,6 +264,12 @@ export default {
     )
 
     this.quillEditor.getModule('toolbar').addHandler('image', async () => {
+      AnalyticsService.captureEvent(
+        EVENTS.IMAGE_UPLOAD_USER_CLICKED_UPLOAD_IMAGE,
+        {
+          tool: 'document-editor-v2',
+        }
+      )
       this.$refs.fileDialog.openFileDialog()
     })
 
@@ -387,6 +393,9 @@ export default {
           return
         }
       } catch (err) {
+        AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_FAILED, {
+          tool: 'document-editor-v2',
+        })
         alert(
           'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
         )
@@ -394,8 +403,14 @@ export default {
       const range = this.quillEditor.getSelection()
       const b64 = await file2b64(file)
       this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
+      AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
+        tool: 'document-editor-v2',
+      })
     },
     onImageFailedModeration(failures) {
+      AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_IMAGE_CENSORED, {
+        tool: 'document-editor-v2',
+      })
       this.$store.commit('liveMedia/setModerationInfraction', {
         // @TODO This is mixing liveMedia with non-live media concerns, ugh...
         infraction: failures,
