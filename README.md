@@ -4,7 +4,7 @@
 
 [Contributing Guide](https://gitlab.com/groups/upchieve/-/wikis/1-Community-Development)
 
-## IMPORTANT: THE FRONTEND IS IN A SEPARATE REPOSITORY
+## IMPORTANT: THE BACKEND IS IN A SEPARATE REPOSITORY
 
 This repository is the frontend SPA only. It relies on the API server and worker. To set that up follow [the readme for the backend repo](https://gitlab.com/upchieve/subway).
 
