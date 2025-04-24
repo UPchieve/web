@@ -60,6 +60,8 @@ export default {
     isSessionRecapBot: { type: Boolean, default: false },
     isInRecap: { type: Boolean, default: false },
     currentSession: { type: Object },
+    isDisplayingLanguagesSpoken: { type: Boolean, default: false },
+    languages: { type: Array },
   },
 
   computed: {
@@ -87,6 +89,29 @@ export default {
         hasHtml: true,
       })
       this.showBotMessage()
+    } else if (this.isDisplayingLanguagesSpoken) {
+      const formattedLanguages = this.formatLanguagesListWithEnglish(
+        this.languages
+      )
+      const languageSupportMessage =
+        this.languages.length > 1
+          ? "Feel free to use the language you're most comfortable with — if it helps!"
+          : "We'll let you know if future tutors speak other languages!"
+      const botMessages = [
+        {
+          msg: `Your tutor speaks ${formattedLanguages}. ${languageSupportMessage}`,
+        },
+      ]
+      this.unsentBotMessages = botMessages
+      this.showBotMessage()
+      AnalyticsService.captureEvent(
+        EVENTS.CHAT_BOT_SENT_STUDENT_VOLUNTEER_LANGUAGES,
+        {
+          sessionId: this.currentSession.id,
+          languages: this.languages,
+          languageCount: this.languages.length,
+        }
+      )
     } else if (!this.isSessionRecapBot) {
       const botMessages = [
         {
@@ -188,6 +213,14 @@ export default {
           this.showBotMessage()
         }
       }, 2000)
+    },
+
+    formatLanguagesListWithEnglish(languages = []) {
+      const allLanguages = ['English', ...languages]
+      if (allLanguages.length === 1) return allLanguages[0]
+      if (allLanguages.length === 2)
+        return `${allLanguages[0]} and ${allLanguages[1]}`
+      return `${allLanguages.slice(0, -1).join(', ')}, and ${allLanguages[allLanguages.length - 1]}`
     },
   },
   watch: {
