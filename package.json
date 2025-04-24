@@ -39,7 +39,6 @@
     "@vuelidate/validators": "^2.0.2",
     "@vueuse/core": "^10.11.0",
     "@xstate/vue": "^4.0.2",
-    "@zoom/videosdk": "^1.12.12",
     "amazon-chime-sdk-js": "^3.26.0",
     "awesome-phonenumber": "^2.20.0",
     "axios": "^1.5.0",

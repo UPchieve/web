@@ -59,7 +59,7 @@ export type Events =
   | { type: 'audio_ui_loaded'; audioOutputElement: HTMLAudioElement }
   | { type: 'video_ui_loaded'; videoOutputElement: HTMLVideoElement }
   | { type: 'meeting_started' }
-  | { type: 'new_partner_attendee'; attendeeId: string }
+  | { type: 'new_partner_attendee'; partnerAttendeeId: string }
   | { type: 'set_unsubscribe_all'; unsubscribeAll: () => Promise<void> }
   | { type: 'set_session_id'; sessionId: string }
   | { type: 'partner_shared_screen' }
@@ -175,7 +175,7 @@ export function create() {
       },
       new_partner_attendee: {
         actions: assign({
-          partnerAttendeeId: ({ event }) => event.attendeeId,
+          partnerAttendeeId: ({ event }) => event.partnerAttendeeId,
         }),
       },
       set_unsubscribe_all: {

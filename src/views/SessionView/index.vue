@@ -313,7 +313,6 @@ import { socket } from '@/socket'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import ZoomSessionChatHeader from '@/components/ScreenShare/ZoomSessionChatHeader.vue'
-import { SessionAudioState } from '@/services/LiveShareService/SessionAudioService'
 import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
 import { useActor } from '@xstate/vue'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
@@ -427,8 +426,6 @@ export default {
   computed: {
     ...mapState({
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
-      hasJoinedZoomCall: (state) =>
-        state.liveMedia.audio.sessionAudioState === SessionAudioState.Joined,
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
@@ -462,7 +459,6 @@ export default {
       isSessionInProgress: 'user/isSessionInProgress',
       sessionPartner: 'user/sessionPartner',
       isScreenshareEnabledFeatureFlag: 'featureFlags/isScreenshareEnabled',
-      useChimeMeetings: 'featureFlags/isChimeMeetingEnabled',
       isLiveMediaBanned: 'liveMedia/isBannedFromLiveMedia',
       isPartnerLiveMediaBanned: 'liveMedia/isPartnerBannedFromLiveMedia',
     }),

@@ -4,10 +4,7 @@ import { useStore } from 'vuex'
 
 const store = useStore()
 const props = defineProps<{
-  userType: 'student' | 'volunteer'
   partnerPresence: string | null
-  audioCallSupported: boolean
-  partnerMicStatus: string
 }>()
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])

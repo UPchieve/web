@@ -13,8 +13,6 @@ const props = defineProps<{
   hasSpeakingPrivileges: boolean
   audioCallSupported: boolean
   isJoiningCall: boolean
-  isActiveInAnotherTab: boolean
-  isStartingAudio: boolean
   unableToJoinCall: boolean
 }>()
 const emit = defineEmits<{
@@ -26,17 +24,12 @@ const isDisabled = computed(() => {
     !props.hasSpeakingPrivileges ||
     !props.audioCallSupported ||
     props.isJoiningCall ||
-    props.isActiveInAnotherTab ||
     props.unableToJoinCall
   )
 })
 const tooltipText = computed(() => {
   if (props.unableToJoinCall) {
     return 'Unable to join call'
-  }
-
-  if (props.isActiveInAnotherTab) {
-    return 'Audio controls are enabled in another tab'
   }
 
   if (props.micState === 'denied') {
@@ -74,7 +67,7 @@ const onMouseEnterMicButton = () => {
 <template>
   <div class="start-call-container" :class="{ muted: props.isMicMuted }">
     <Spinner
-      v-if="props.isJoiningCall || props.isStartingAudio"
+      v-if="props.isJoiningCall"
       class="spinner"
       :container-height="48"
       :container-width="48"

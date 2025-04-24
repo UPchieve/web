@@ -142,15 +142,18 @@ export const joinMeeting = fromCallback(
       )
     }
 
-    const partnerAddedObserver = (attendeeId: string) => {
-      if (
-        (partnerAttendeeId && partnerAttendeeId === attendeeId) ||
-        attendee?.AttendeeId === attendeeId
-      ) {
-        return
+    const partnerAddedObserver = (
+      attendeeId: string,
+      _present: boolean,
+      externalUserId?: string
+    ) => {
+      if (externalUserId === store.getters['user/sessionPartner'].id) {
+        subscribeToPartnerVolumeChanges(attendeeId)
+        sendBackToParent({
+          type: 'new_partner_attendee',
+          partnerAttendeeId: attendeeId,
+        })
       }
-      subscribeToPartnerVolumeChanges(attendeeId)
-      sendBackToParent({ type: 'new_partner_attendee', attendeeId })
     }
 
     meetingSession!.audioVideo.realtimeSubscribeToAttendeeIdPresence(
