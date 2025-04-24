@@ -10,7 +10,6 @@ const props = defineProps<{
   isPartnerSpeaking: boolean
   isSpeakerMuted: boolean
   unableToJoinCall: boolean
-  isJoiningCall: boolean
   partnerMicStatus: string
   partnerCanUseMic: boolean
 }>()

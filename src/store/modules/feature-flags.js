@@ -37,7 +37,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SCREENSHARE]: false,
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
-      [POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ]: false,
@@ -191,8 +190,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED],
     isImpactStudySurveyEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
-    isChimeMeetingEnabled: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.USE_AWS_CHIME],
     isStudentsBecomeVolunteersEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
     tutorFeedbackToTeacherQuestion: (state) =>

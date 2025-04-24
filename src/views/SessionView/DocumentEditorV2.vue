@@ -215,7 +215,6 @@ export default {
       isStudent: 'user/isStudent',
       userType: 'user/userType',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
-      isJoiningCall: 'liveMedia/isJoiningCall',
       sessionPartner: 'user/sessionPartner',
       mobileMode: 'app/mobileMode',
     }),

@@ -333,7 +333,6 @@ describe('MeetingMachine', () => {
 
     mockMachine.start()
     await joinMeetingWithLiveMediaAccess(mockMachine)
-
     expect(
       mockMachine
         .getSnapshot()

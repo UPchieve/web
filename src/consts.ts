@@ -806,7 +806,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   VIDEO_MODERATION_SAMPLE_INTERVAL: 'video-moderation-sample-interval',
   VIDEO_MODERATION_ENABLED: 'video-moderation-enabled',
   IMPACT_STUDY_SURVEY: 'impact-study-survey',
-  USE_AWS_CHIME: 'use-aws-chime',
   STUDENTS_BECOME_VOLUNTEERS: 'students-become-volunteers',
   TUTOR_FEEDBACK_TO_TEACHER_QUESTION: 'tutor-feedback-to-teacher-question',
   TEACHER_GUIDANCE_EXPERIMENT: 'teacher-guidance-experiment',
