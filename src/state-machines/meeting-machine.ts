@@ -663,8 +663,9 @@ export function create() {
           },
           SpeakerControl: {
             description: `State machine that manages the user's speaker controls (muting/unmuting the other person)`,
-            initial: 'Waiting',
+            initial: 'PreviousState',
             states: {
+              PreviousState: { type: 'history', target: 'Waiting' },
               Waiting: {
                 description: `Waiting for the user to attempt to interact with the speaker.`,
                 on: {
