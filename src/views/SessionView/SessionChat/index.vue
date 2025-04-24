@@ -55,6 +55,17 @@
           v-if="isStudent && isSessionWaitingForVolunteer && !aiWidgetPresent"
           @new-bot-message="handleIncomingMessage"
         />
+        <chat-bot
+          v-if="
+            isStudent &&
+            isDisplayVolunteerLanguagesEnabled &&
+            isTutorJoiningForFirstTime
+          "
+          :isDisplayingLanguagesSpoken="true"
+          :currentSession="currentSession"
+          :languages="currentSession.volunteerLanguages ?? []"
+          @new-bot-message="handleIncomingMessage"
+        />
         <div
           v-for="(message, index) in withPendingMessages"
           :key="`message-${index}`"
@@ -284,6 +295,7 @@ export default {
       textMessageHidden: false,
       hasStartedTyping: false,
       isSessionAudioCallEnabled: false,
+      isTutorJoiningForFirstTime: false,
     }
   },
   computed: {
@@ -307,6 +319,8 @@ export default {
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
+      isDisplayVolunteerLanguagesEnabled:
+        'featureFlags/isDisplayVolunteerLanguagesEnabled',
       sessionPartner: 'user/sessionPartner',
     }),
     showMyInProgressCaptionMessage() {
@@ -758,6 +772,7 @@ export default {
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
         await this.fetchIsSessionAudioCallEnabled(current?.id)
+        if (this.isStudent) this.isTutorJoiningForFirstTime = true
       }
     },
     myInProgressCaptionMessage: {
