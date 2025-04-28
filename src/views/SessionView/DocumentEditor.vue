@@ -1,12 +1,7 @@
 <template>
   <div class="document-editor">
     <div id="ql-toolbar">
-      <select class="ql-header">
-        <option value="small"></option>
-        <option selected></option>
-        <option value="large"></option>
-        <option value="huge"></option>
-      </select>
+      <select class="ql-size" />
       <button class="ql-bold" />
       <button class="ql-italic" />
       <button class="ql-underline" />
@@ -113,7 +108,7 @@ export default {
         placeholder: 'Type or paste something...',
         theme: 'snow',
         formats: [
-          'header',
+          'size',
           'bold',
           'italic',
           'underline',
