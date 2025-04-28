@@ -46,7 +46,7 @@ export default {
       commit('setEverShownDisplayCallStatus', false)
     },
 
-    inProgressCaptionMessageChime: (
+    inProgressCaptionMessage: (
       { commit, rootState, rootGetters },
       payload: {
         resultId: string
@@ -66,7 +66,6 @@ export default {
       if (isPartnerMessage) {
         commit('setPartnerInProgressCaptionMessage', {
           text: transcript,
-          zoomMessageId: payload.resultId, // can we get rid of zoomMessageId and just use msgId?
           msgId: payload.resultId,
           userType:
             rootGetters['user/userType'] === 'student'
@@ -78,7 +77,6 @@ export default {
       } else {
         commit('setMyInProgressCaptionMessage', {
           text: transcript,
-          zoomMessageId: payload.resultId, // can we get rid of zoomMessageId and just use msgId?
           msgId: payload.resultId,
           userType: rootGetters['user/userType'],
           user: userId,
@@ -87,7 +85,7 @@ export default {
       }
     },
 
-    setCaptionMessageChime: async (
+    setCaptionMessage: async (
       { commit, dispatch, rootState },
       payload: {
         resultId: string
@@ -115,7 +113,7 @@ export default {
             user: userId,
             userType:
               rootState.user.user.type === 'student' ? 'volunteer' : 'student',
-            zoomMessageId: payload.resultId,
+            msgId: payload.resultId,
           },
           { root: true }
         )
@@ -129,7 +127,7 @@ export default {
             type: 'audio-transcription',
             user: userId,
             userType: rootState.user.user.userType,
-            zoomMessageId: payload.resultId,
+            msgId: payload.resultId,
           },
           { root: true }
         )
@@ -142,7 +140,7 @@ export default {
           source: '',
           type: 'audio-transcription',
           saidAt: new Date(payload.endTimeMs).toISOString(),
-          zoomMessageId: payload.resultId,
+          msgId: payload.resultId,
         })
         commit('setMyInProgressCaptionMessage', null)
       }
