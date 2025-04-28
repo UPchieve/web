@@ -358,7 +358,7 @@ onUnmounted(() => {
   background-color: #fff;
   border-radius: 11px;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  overflow-y: hidden;
+  overflow-y: auto;
   padding-top: var(--header-height);
   max-height: 80vh;
   max-width: 80vw;
