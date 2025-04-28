@@ -717,6 +717,12 @@ export default {
     referredByCode,
     schoolId,
     zipCode,
+  }: {
+    email: string
+    gradeLevel?: string
+    referredByCode: string | null
+    schoolId?: string
+    zipCode: string
   }) {
     return httpPost(`${ELIGIBILITY_API_ROOT}/check`, {
       email,
@@ -726,7 +732,7 @@ export default {
       zipCode,
     }).then(this._successHandler, this._errorHandler)
   },
-  checkTeacherEligibility({ schoolId }) {
+  checkTeacherEligibility({ schoolId }: { schoolId: string }) {
     const queryParams = new URLSearchParams({ schoolId }).toString()
     return httpGet(`${ELIGIBILITY_API_ROOT}/check/teacher?${queryParams}`).then(
       this._successHandler,

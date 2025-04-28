@@ -1,6 +1,6 @@
 import config from '@/config'
 
-export enum Provider {
+export enum SsoProvider {
   GOOGLE = 'google',
   CLEVER = 'clever',
 }

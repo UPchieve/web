@@ -1,3 +1,8 @@
+import type {
+  RouteLocation,
+  RouteLocationNormalized,
+  NavigationGuardNext,
+} from 'vue-router'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
@@ -10,11 +15,17 @@ import {
   getInputElement,
   getButtonElement,
   getAlreadyHaveAccountElements,
-  getSubmitResponseDefault as getSubmitResponse,
+  getSubmitResponse,
   getSsoButton,
+  UserType,
+  getLinkElement,
+  getRouterLinkElement,
 } from '@/services/SignUpService'
-import { getLinkElement, getRouterLinkElement } from '.'
-import router from '@/router'
+import type {
+  PageDetail,
+  PageDetailsUnion,
+  SubmitActionResponse,
+} from '@/services/SignUpService'
 
 const RoutePath = {
   account: `/sign-up/teacher/${SignUpPage.account}`,
@@ -23,37 +34,69 @@ const RoutePath = {
   verify: `/${SignUpPage.verify}`,
 }
 
-export const InputName = {
-  EMAIL: 'email',
-  FIRST_NAME: 'firstName',
-  LAST_NAME: 'lastName',
-  PASSWORD: 'password',
-  SCHOOL_ID: 'schoolId',
-  SIGNUP_SOURCE: 'signupSource',
-  WORKS_WITH_ELIGIBLE_STUDENTS: 'worksWithEligibleStudents',
+// The following values are used as the `name` attribute on form elements,
+// and should match the keys in server requests.
+export enum InputName {
+  EMAIL = 'email',
+  FIRST_NAME = 'firstName',
+  LAST_NAME = 'lastName',
+  PASSWORD = 'password',
+  SCHOOL_ID = 'schoolId',
+  SIGNUP_SOURCE = 'signupSource',
+  WORKS_WITH_ELIGIBLE_STUDENTS = 'worksWithEligibleStudents',
 }
 
-export function getPageDetails(to, from) {
-  if (isIneligibleRoute(to, from)) {
+export type TeacherSignUpFormData =
+  | TeacherEligibilityFormData
+  | TeacherAccountFormData
+
+export type TeacherEligibilityFormData = {
+  [InputName.SCHOOL_ID]?: string
+  [InputName.SIGNUP_SOURCE]?: string
+  [InputName.WORKS_WITH_ELIGIBLE_STUDENTS]?: boolean
+}
+
+export type TeacherAccountFormData = {
+  [InputName.EMAIL]?: string
+  [InputName.FIRST_NAME]?: string
+  [InputName.LAST_NAME]?: string
+  [InputName.PASSWORD]?: string
+  [InputName.SCHOOL_ID]?: string
+  [InputName.SIGNUP_SOURCE]?: string
+}
+
+export function getPageDetails(
+  to: RouteLocation & { path: typeof RoutePath.ineligible }
+): PageDetail<{}>
+export function getPageDetails(
+  to: RouteLocation & { path: typeof RoutePath.account }
+): PageDetail<TeacherAccountFormData>
+export function getPageDetails(
+  to: RouteLocation & { path: typeof RoutePath.eligibility }
+): PageDetail<TeacherEligibilityFormData>
+export function getPageDetails(
+  to: RouteLocation
+): PageDetailsUnion<TeacherSignUpFormData> {
+  if (isIneligibleRoute(to)) {
     return getIneligiblePageDetails()
   }
 
-  if (isAccountRoute(to, from)) {
+  if (isAccountRoute(to)) {
     return getAccountPageDetails()
   }
 
-  return getEligibilityPageDetails(to, from)
+  return getEligibilityPageDetails()
 }
 
-function isIneligibleRoute(to) {
+function isIneligibleRoute(to: RouteLocation) {
   return to.path === RoutePath.ineligible
 }
 
-function isAccountRoute(to) {
+function isAccountRoute(to: RouteLocation) {
   return to.path === RoutePath.account
 }
 
-function getEligibilityPageDetails() {
+function getEligibilityPageDetails(): PageDetail<TeacherEligibilityFormData> {
   return {
     backgroundLayout: 'panel-right-50p',
     submitAction: checkEligibility,
@@ -105,13 +148,20 @@ function getEligibilityPageDetails() {
   }
 }
 
-async function checkEligibility(data) {
+async function checkEligibility(
+  data: TeacherEligibilityFormData
+): Promise<SubmitActionResponse> {
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CHECK_ELIGIBILITY)
+
+  if (!data.schoolId) {
+    return getSubmitResponse(null, null, 'Must select a school.')
+  }
+
   try {
     const {
       data: { isEligible },
     } = await NetworkService.checkTeacherEligibility({
-      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
+      [InputName.SCHOOL_ID]: data.schoolId,
     })
     AnalyticsService.captureEvent(
       isEligible
@@ -130,9 +180,10 @@ async function checkEligibility(data) {
   }
 }
 
-function getIneligiblePageDetails() {
+function getIneligiblePageDetails(): PageDetail<{}> {
   return {
     backgroundLayout: 'full',
+    submitAction: ineligibleContinue,
     rows: [
       getRow(
         'justify-center center mt-3',
@@ -191,7 +242,12 @@ function getIneligiblePageDetails() {
   }
 }
 
-function getAccountPageDetails() {
+function ineligibleContinue(): SubmitActionResponse {
+  window.location.replace('https://upchieve.org/cant-find-school')
+  return [null, null]
+}
+
+function getAccountPageDetails(): PageDetail<TeacherAccountFormData> {
   return {
     backgroundLayout: 'panel-right-75p',
     submitAction: createAccount,
@@ -240,52 +296,46 @@ function getAccountPageDetails() {
           blurEvent: EVENTS.TEACHER_ENTERED_PASSWORD,
         },
       }),
-      getRow('mt-4', getButtonElement(createAccount, 'Confirm')),
+      getRow(
+        'mt-4',
+        getButtonElement<TeacherAccountFormData>(createAccount, 'Confirm')
+      ),
     ],
   }
 }
 
-async function createAccount(data) {
+async function createAccount(data: TeacherAccountFormData) {
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT)
   try {
     await NetworkService.registerTeacher({
-      [InputName.EMAIL]: data[InputName.EMAIL],
-      [InputName.FIRST_NAME]: data[InputName.FIRST_NAME],
-      [InputName.LAST_NAME]: data[InputName.LAST_NAME],
-      [InputName.PASSWORD]: data[InputName.PASSWORD],
-      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
-      [InputName.SIGNUP_SOURCE]: data[InputName.SIGNUP_SOURCE],
+      [InputName.EMAIL]: data.email,
+      [InputName.FIRST_NAME]: data.firstName,
+      [InputName.LAST_NAME]: data.lastName,
+      [InputName.PASSWORD]: data.password,
+      [InputName.SCHOOL_ID]: data.schoolId,
+      [InputName.SIGNUP_SOURCE]: data.signupSource,
     })
 
     return getSubmitResponse(SignUpPage.verify)
   } catch (err) {
-    const submitResponse = getSubmitResponse(null, null, err)
-    if (
-      submitResponse &&
-      submitResponse[1] === 'The email address you entered is already in use'
-    ) {
-      const redirectUriParams = new URLSearchParams({
-        message:
-          'Looks like you already have an UPchieve account, please sign in!',
-        email: data[InputName.EMAIL],
-      })
-      router.push('/login?' + redirectUriParams.toString())
-      return
-    } else {
-      LoggerService.noticeError(err)
-      return submitResponse
-    }
+    return getSubmitResponse(null, null, err)
   }
 }
 
-function createAccountWithClever(data) {
+function createAccountWithClever(
+  data: TeacherAccountFormData
+): SubmitActionResponse {
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT, {
     provider: 'clever',
   })
-  return SignUpService.createAccountWithClever('teacher', data)
+  return SignUpService.createAccountWithClever(UserType.teacher, data)
 }
 
-export async function beforeEnter(to, from, next) {
+export async function beforeEnter(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+): Promise<void> {
   if (
     // Teachers must start from the eligibility page,
     // unless it is an error redirect.
