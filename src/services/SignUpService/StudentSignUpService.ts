@@ -1,14 +1,17 @@
+import type {
+  NavigationGuardNext,
+  RouteLocation,
+  RouteLocationNormalized,
+  RouteLocationRaw,
+} from 'vue-router'
 import store from '@/store'
 import { GRADES, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
 import * as SignUpService from '@/services/SignUpService'
 import {
-  UserType,
   SignUpPage,
   getFilteredPageDetails,
-  getSubmitResponseDefault,
-  continueToAccountPage,
   getRow,
   getTextElement,
   getButtonElement,
@@ -17,17 +20,20 @@ import {
   getAlreadyHaveAccountElements,
   getSignUpSourceElement,
   getInputElement,
+  getSubmitResponse,
+  UserType,
 } from '@/services/SignUpService'
 import type {
   PageDetail,
   FormElement,
   FormRow,
   SubmitActionResponse,
+  PageDetailsUnion,
 } from '@/services/SignUpService'
-import NetworkService from '@/services/NetworkService'
+import NetworkService, { type NetworkError } from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
+import { SsoProvider } from '@/services/SsoService'
 import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
-import type { RouteLocation } from 'vue-router'
 
 const RoutePath = {
   account: `/sign-up/student/${SignUpPage.account}`,
@@ -37,6 +43,7 @@ const RoutePath = {
   partnerInfo: `sign-up/student/${SignUpPage.partnerInfo}`,
   verify: `/${SignUpPage.verify}`,
 }
+
 // The following values are used as the `name` attribute on form elements,
 // and should match the keys in server requests.
 export enum InputName {
@@ -45,21 +52,87 @@ export enum InputName {
   FIRST_NAME = 'firstName',
   GRADE_LEVEL = 'gradeLevel',
   LAST_NAME = 'lastName',
+  PARENT = 'parent',
   PARENT_GUARDIAN_EMAIL = 'parentGuardianEmail',
   PASSWORD = 'password',
-  REFERRED_BY_CODE = 'upcReferredByCode',
+  REFERRED_BY_CODE = 'referredByCode',
   SCHOOL_ID = 'schoolId',
   SIGNUP_SOURCE_ID = 'signupSourceId',
   STUDENT_PARTNER_ORG_KEY = 'studentPartnerOrgKey',
   STUDENT_PARTNER_ORG_SITE_NAME = 'studentPartnerOrgSiteName',
   TERMS = 'terms',
+  VALIDATOR = 'validator',
   ZIP_CODE = 'zipCode',
 }
 
+export type StudentSignUpFormData =
+  | StudentEligibilityFormData
+  | StudentAccountFormData
+  | ParentGuardianReset
+  | CleverStudentRedirectFormData
+
+export type StudentEligibilityFormData = {
+  [InputName.CLASS_CODE]?: string
+  [InputName.GRADE_LEVEL]?: string
+  [InputName.PARENT]?: string // 'true' if defined.
+  [InputName.STUDENT_PARTNER_ORG_KEY]?: string
+  [InputName.STUDENT_PARTNER_ORG_SITE_NAME]?: string
+  [InputName.SCHOOL_ID]?: string
+  [InputName.SIGNUP_SOURCE_ID]?: number
+  [InputName.ZIP_CODE]?: string
+}
+
+export type StudentAccountFormData = {
+  [InputName.CLASS_CODE]?: string
+  [InputName.EMAIL]?: string
+  [InputName.GRADE_LEVEL]?: string
+  [InputName.FIRST_NAME]?: string
+  [InputName.LAST_NAME]?: string
+  [InputName.PASSWORD]?: string
+  [InputName.PARENT_GUARDIAN_EMAIL]?: string
+  [InputName.PARENT]?: string // 'true' if defined.
+  [InputName.PASSWORD]?: string
+  [InputName.SCHOOL_ID]?: string
+  [InputName.SIGNUP_SOURCE_ID]?: string
+  [InputName.STUDENT_PARTNER_ORG_KEY]?: string
+  [InputName.STUDENT_PARTNER_ORG_SITE_NAME]?: string
+  [InputName.ZIP_CODE]?: string
+}
+
+type ParentGuardianReset = {
+  [InputName.PARENT]: string
+  [InputName.STUDENT_PARTNER_ORG_KEY]?: string
+}
+
+type CleverStudentRedirectFormData = {
+  [InputName.EMAIL]: string
+  [InputName.VALIDATOR]: string
+}
+
+export function getPageDetails(
+  to: RouteLocation & { path: typeof RoutePath.ineligible },
+  from: RouteLocation
+): PageDetail<{}>
+export function getPageDetails(
+  to: RouteLocation & { query: { isCleverStudentEmailRedirect: 'true' } },
+  from: RouteLocation
+): PageDetail<CleverStudentRedirectFormData>
+export function getPageDetails(
+  to: RouteLocation & { path: typeof RoutePath.account },
+  from: RouteLocation
+): PageDetail<StudentAccountFormData>
+export function getPageDetails(
+  to: RouteLocation & { params: { parent: 'true' } },
+  from: RouteLocation
+): PageDetail<ParentGuardianReset>
+export function getPageDetails(
+  to: RouteLocation & { path: typeof RoutePath.eligibility },
+  from: RouteLocation
+): PageDetail<StudentEligibilityFormData>
 export function getPageDetails(
   to: RouteLocation,
   from: RouteLocation
-): PageDetail {
+): PageDetailsUnion<StudentSignUpFormData> {
   return getFilteredPageDetails(() => {
     if (isIneligibleRoute(to)) {
       return getIneligiblePageDetails()
@@ -77,134 +150,8 @@ export function getPageDetails(
       return getParentGuardianConfirmationDetails(to)
     }
 
-    return getFirstPageDetails(to)
+    return getEligibilityPageDetails(to)
   })
-}
-
-function getSubmitResponse(
-  nextPage?: SignUpPage,
-  data?: any,
-  err?: Error
-): SubmitActionResponse {
-  switch (nextPage) {
-    case SignUpPage.eligibility:
-      return [
-        {
-          params: {
-            userType: UserType.student,
-            step: SignUpPage.eligibility,
-          },
-          query: {
-            parent: data.parent,
-            partner: data.partner?.key,
-          },
-        },
-        null,
-      ]
-    case SignUpPage.parentGuardianConfirmation:
-      return [
-        {
-          params: {
-            ...data,
-            step: SignUpPage.parentGuardianConfirmation,
-          },
-        },
-        null,
-      ]
-    default:
-      return getSubmitResponseDefault(nextPage, data, err)
-  }
-}
-
-async function checkEligibility(data): Promise<SubmitActionResponse> {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY, {
-    partnerKey: data.partner?.key,
-  })
-  try {
-    const {
-      data: { isEligible },
-    } = await NetworkService.checkStudentEligibility({
-      [InputName.EMAIL]: '',
-      [InputName.GRADE_LEVEL]: data[InputName.GRADE_LEVEL],
-      [InputName.REFERRED_BY_CODE]:
-        window.localStorage.getItem('upcReferredByCode'),
-      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
-      [InputName.ZIP_CODE]: data[InputName.ZIP_CODE],
-    })
-    AnalyticsService.captureEvent(
-      isEligible ? EVENTS.ELIGIBILITY_ELIGIBLE : EVENTS.ELIGIBILITY_INELIGIBLE,
-      { partnerKey: data.partner?.key }
-    )
-
-    return getSubmitResponse(
-      isEligible ? SignUpPage.account : SignUpPage.ineligible,
-      data
-    )
-  } catch (err) {
-    LoggerService.noticeError(err)
-    return getSubmitResponse(null, null, err)
-  }
-}
-
-function ineligibleContinue(): SubmitActionResponse {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
-  // @ts-ignore
-  window.location = 'https://upchieve.org/request-access'
-  return [null, null]
-}
-
-async function createAccount(data) {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT)
-  try {
-    await AuthService.registerStudent({
-      [InputName.CLASS_CODE]: data[InputName.CLASS_CODE],
-      [InputName.EMAIL]: data[InputName.EMAIL],
-      [InputName.FIRST_NAME]: data[InputName.FIRST_NAME],
-      [InputName.GRADE_LEVEL]: data[InputName.GRADE_LEVEL],
-      [InputName.LAST_NAME]: data[InputName.LAST_NAME],
-      [InputName.PARENT_GUARDIAN_EMAIL]: data[InputName.PARENT_GUARDIAN_EMAIL],
-      [InputName.PASSWORD]: data[InputName.PASSWORD],
-      [InputName.REFERRED_BY_CODE]:
-        window.localStorage.getItem('upcReferredByCode'),
-      [InputName.SCHOOL_ID]: data[InputName.SCHOOL_ID],
-      [InputName.SIGNUP_SOURCE_ID]: data[InputName.SIGNUP_SOURCE_ID],
-      [InputName.STUDENT_PARTNER_ORG_KEY]:
-        data[InputName.STUDENT_PARTNER_ORG_KEY],
-      [InputName.STUDENT_PARTNER_ORG_SITE_NAME]:
-        data[InputName.STUDENT_PARTNER_ORG_SITE_NAME],
-      validator: data.validator,
-      [InputName.ZIP_CODE]: data[InputName.ZIP_CODE],
-    })
-    window.localStorage.removeItem('upcReferredByCode')
-    AnalyticsService.captureGoogleAnalyticsEvent('student_sign_up')
-
-    return getSubmitResponse(
-      data.parent ? SignUpPage.parentGuardianConfirmation : SignUpPage.verify,
-      data
-    )
-  } catch (err) {
-    LoggerService.noticeError(err)
-    return getSubmitResponse(null, null, err)
-  }
-}
-
-function createAccountWithGoogle(data) {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
-    provider: 'google',
-  })
-  return SignUpService.createAccountWithGoogle('student', data)
-}
-
-export function createAccountWithClever(data) {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
-    provider: 'clever',
-  })
-  return SignUpService.createAccountWithClever('student', data)
-}
-
-function isParentGuardianSignUp(to: RouteLocation) {
-  // @ts-ignore
-  return to.params.parent === true || to.params.parent === 'true'
 }
 
 function isIneligibleRoute(to: RouteLocation) {
@@ -219,150 +166,34 @@ function isAccountRoute(to: RouteLocation) {
   return to.path === RoutePath.account
 }
 
+function isParentGuardianSignUp(to: RouteLocation) {
+  return to.params.parent === 'true'
+}
+
 function isParentGuardianConfirmationRoute(
   to: RouteLocation,
   from: RouteLocation
 ) {
   return (
     to.path === SignUpPage.parentGuardianConfirmation &&
-    from?.path === SignUpPage.account
+    from.path === SignUpPage.account
   )
 }
 
-function getStudentEmailElement(
-  isParentGuardian: boolean = false
-): FormElement {
-  return {
-    element: 'FormEmail',
-    props: {
-      name: InputName.EMAIL,
-      label: getLabelPrefix(isParentGuardian) + 'Email',
-      placeholder: getLabelPrefix(isParentGuardian) + 'Email',
-      blurEvent: EVENTS.STUDENT_ENTERED_EMAIL,
-    },
-  }
-}
-
-function getParentGuardianEmailElement(): FormElement {
-  return {
-    element: 'FormEmail',
-    props: {
-      name: InputName.PARENT_GUARDIAN_EMAIL,
-      label: 'Your Email',
-      placeholder: 'Your Email',
-    },
-  }
-}
-
-export function getZipCodeElement(): FormElement {
-  return {
-    element: 'FormInput',
-    props: {
-      name: InputName.ZIP_CODE,
-      label: 'Zip Code',
-      placeholder: 'Zip Code',
-      minLength: 5,
-      maxLength: 5,
-      blurEvent: EVENTS.STUDENT_ENTERED_ZIP_CODE,
-    },
-  }
-}
-
-export function getGradeSelectionElement(
-  isParentGuardian: boolean
-): FormElement {
-  return {
-    element: 'FormSelect',
-    props: {
-      blurEvent: EVENTS.STUDENT_SELECTED_GRADE,
-      getSelectOptions: () => GRADES,
-      name: InputName.GRADE_LEVEL,
-      label: getLabelPrefix(isParentGuardian) + 'Grade in 2023-2024',
-      placeholder: getLabelPrefix(isParentGuardian) + 'Grade in 2023-2024',
-      reduce: (option) => option.split(' ')[0],
-    },
-  }
-}
-
-function getSsoSectionElements(): FormRow[] {
-  return [
-    getRow('mt-4', getSsoButton(createAccountWithGoogle, 'Google')),
-    getRow('mt-3', getSsoButton(createAccountWithClever, 'Clever', 'clever')),
-    getRow(
-      'justify-center italic mt-3',
-      getTextElement(
-        'p',
-        'By clicking the button above, you agree to our User Agreement'
-      )
-    ),
-    getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } }),
-  ]
-}
-
-export function getPartnerSitesElement(to: RouteLocation): FormElement {
-  // @ts-ignore
-  const sites = to.params.partner?.sites
-  if (!sites) {
-    return
-  }
-
-  return {
-    element: 'FormSelect',
-    props: {
-      blurEvent: EVENTS.STUDENT_SELECTED_PARTNER_SITE,
-      getSelectOptions: () => sites,
-      name: InputName.STUDENT_PARTNER_ORG_SITE_NAME,
-      label: 'Site',
-      placeholder: 'Site',
-    },
-  }
-}
-
-export function getTermsCheckboxElements() {
-  return [
-    getRow(
-      'justify-start mt-4 el-gap-sm',
-      {
-        element: 'FormCheckBox',
-        props: {
-          label: 'I have read and accept the',
-          name: InputName.TERMS,
-        },
-      },
-      {
-        element: 'a',
-        classes: 'uc-link',
-        content: 'User Agreement.',
-        props: {
-          href: 'https://upchieve.org/legal',
-          target: '_blank',
-        },
-      }
-    ),
-  ]
-}
-
-function getFirstPageDetails(to: RouteLocation): PageDetail {
-  function isEligibilitySignUp() {
-    return to.params.step === 'eligibility'
-  }
-  function isEligibilityAppealSignUp() {
-    // @ts-ignore
-    return to.params.partner?.isManuallyApproved
-  }
+function getEligibilityPageDetails(
+  to: RouteLocation
+): PageDetail<StudentEligibilityFormData> {
   function isOrganicStudentSignUp() {
-    return !to.params.partner
+    return !isPartnerStudentSignUp()
   }
   function isPartnerStudentSignUp() {
-    return to.params.partner
+    return !!to.params.studentPartnerOrgKey
   }
   function isCodeDotOrgStudent() {
-    // @ts-ignore
-    return to.params.partner?.key === 'code-org'
+    return to.params.studentPartnerOrgKey === 'code-org'
   }
   function isBigFutureStudent() {
-    // @ts-ignore
-    return to.params.partner?.key === 'bigfuture'
+    return to.params.studentPartnerOrgKey === 'bigfuture'
   }
   function isCollegeConfidentialStudent() {
     return to.params['utm_source'] === 'collegeconfidential'
@@ -378,10 +209,9 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
     if (isCollegeConfidentialStudent()) {
       return `Get that A you deserve!`
     }
-    // @ts-ignore
-    const partnerName = to.params.partner?.name
-    if (partnerName) {
-      return `Welcome ${partnerName} ${getFormAddressee(isParentGuardianSignUp(to))}!`
+
+    if (to.params.studentPartnerName) {
+      return `Welcome ${to.params.studentPartnerName} ${getFormAddressee(isParentGuardianSignUp(to))}!`
     }
 
     return 'Check if you are eligible for UPchieve'
@@ -402,16 +232,14 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
 
   function includeSchoolElement() {
     if (isPartnerStudentSignUp()) {
-      // @ts-ignore
-      return !to.params.partner.isSchool
+      return to.params.studentPartnerIsSchool === 'true'
     }
     return true
   }
 
   function isSchoolRequired() {
     if (isPartnerStudentSignUp()) {
-      // @ts-ignore
-      return to.params.partner.schoolSignupRequired
+      return to.params.schoolSignupRequired === 'true'
     }
     return true
   }
@@ -433,8 +261,7 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
         ? getRow(
             'justify-start mt-1',
             getRouterLinkElement(
-              // @ts-ignore
-              `Not with ${to.params.partner?.name}?`,
+              `Not with ${to.params.studentPartnerName}?`,
               '/sign-up/student/eligibility'
             )
           )
@@ -448,7 +275,7 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
       getRow(
         'mt-2',
         getGradeSelectionElement(isParentGuardian),
-        isEligibilitySignUp() ? getZipCodeElement() : null
+        getZipCodeElement()
       ),
       includeSchoolElement()
         ? getRow('mt-2', {
@@ -468,11 +295,11 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
                 '10th',
                 '11th',
                 '12th',
-              ].includes(form[InputName.GRADE_LEVEL])
+              ].includes(form.gradeLevel)
             },
           })
         : null,
-      isOrganicStudentSignUp() || isEligibilityAppealSignUp()
+      isOrganicStudentSignUp()
         ? getRow(
             'mt-2',
             getSignUpSourceElement(
@@ -481,17 +308,44 @@ function getFirstPageDetails(to: RouteLocation): PageDetail {
             )
           )
         : null,
-      getRow(
-        'mt-4',
-        isEligibilitySignUp()
-          ? getButtonElement(checkEligibility, 'Check eligibility')
-          : getButtonElement(continueToAccountPage, 'Continue')
-      ),
+      getRow('mt-4', getButtonElement(checkEligibility, 'Check eligibility')),
     ],
   }
 }
 
-function getIneligiblePageDetails(): PageDetail {
+async function checkEligibility(
+  data: StudentEligibilityFormData
+): Promise<SubmitActionResponse> {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY, {
+    partnerKey: data.studentPartnerOrgKey,
+  })
+  try {
+    const {
+      data: { isEligible },
+    } = await NetworkService.checkStudentEligibility({
+      [InputName.EMAIL]: '',
+      [InputName.GRADE_LEVEL]: data.gradeLevel,
+      [InputName.REFERRED_BY_CODE]:
+        window.localStorage.getItem('upcReferredByCode'),
+      [InputName.SCHOOL_ID]: data.schoolId,
+      [InputName.ZIP_CODE]: data.zipCode ?? '',
+    })
+    AnalyticsService.captureEvent(
+      isEligible ? EVENTS.ELIGIBILITY_ELIGIBLE : EVENTS.ELIGIBILITY_INELIGIBLE,
+      { partnerKey: data.studentPartnerOrgKey }
+    )
+
+    return getSubmitResponse(
+      isEligible ? SignUpPage.account : SignUpPage.ineligible,
+      data
+    )
+  } catch (err) {
+    LoggerService.noticeError(err)
+    return getSubmitResponse(null, null, err)
+  }
+}
+
+function getIneligiblePageDetails(): PageDetail<{}> {
   return {
     backgroundLayout: 'full',
     submitAction: ineligibleContinue,
@@ -520,10 +374,20 @@ function getIneligiblePageDetails(): PageDetail {
   }
 }
 
-function getCleverStudentRedirectPageDetails(): PageDetail {
+function ineligibleContinue(): SubmitActionResponse {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_STUDENT_ACCESS_PAGE)
+  window.location.replace('https://upchieve.org/request-access')
+  return [null, null]
+}
+
+/*
+ * When a student profile coming from Clever SSO doesn't have an email, we redirect to this
+ * form to get the student's email before registering them.
+ */
+function getCleverStudentRedirectPageDetails(): PageDetail<CleverStudentRedirectFormData> {
   return {
     backgroundLayout: 'card',
-    submitAction: createAccount,
+    submitAction: createAccountWithMissingEmail,
     rows: [
       getRow(
         'justify-center center mt-4',
@@ -539,13 +403,32 @@ function getCleverStudentRedirectPageDetails(): PageDetail {
       getRow('mt-2', getStudentEmailElement()),
       getRow(
         'justify-center mt-3',
-        getButtonElement(createAccount, 'Continue')
+        getButtonElement(createAccountWithMissingEmail, 'Continue')
       ),
     ],
   }
 }
 
-function getAccountPageDetails(to: RouteLocation): PageDetail {
+async function createAccountWithMissingEmail(
+  data: CleverStudentRedirectFormData
+) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT)
+  try {
+    await AuthService.registerStudent({
+      [InputName.EMAIL]: data.email,
+      [InputName.VALIDATOR]: data.validator,
+    })
+
+    return getSubmitResponse(SignUpPage.verify, data)
+  } catch (err) {
+    LoggerService.noticeError(err)
+    return getSubmitResponse(null, null, err)
+  }
+}
+
+function getAccountPageDetails(
+  to: RouteLocation
+): PageDetail<StudentAccountFormData> {
   const isParentGuardian = isParentGuardianSignUp(to)
   const isClassCodeSignUp = !!to.params.classCode
 
@@ -566,7 +449,7 @@ function getAccountPageDetails(to: RouteLocation): PageDetail {
     backgroundLayout: 'panel-right-75p',
     submitAction: createAccount,
     rows: [
-      getRow('justify-start mt-4', {
+      getRow('justify-start', {
         element: 'header-logo-teal',
       }),
       getRow('mt-4', getTextElement('h1', getH1Text())),
@@ -577,13 +460,11 @@ function getAccountPageDetails(to: RouteLocation): PageDetail {
         'mt-2 uc-column-sm',
         getInputElement(
           InputName.FIRST_NAME,
-          'First Name',
           getLabelPrefix(isParentGuardian) + 'First Name',
           EVENTS.STUDENT_ENTERED_FIRST_NAME
         ),
         getInputElement(
           InputName.LAST_NAME,
-          'Last Name',
           getLabelPrefix(isParentGuardian) + 'Last Name',
           EVENTS.STUDENT_ENTERED_LAST_NAME
         )
@@ -605,14 +486,66 @@ function getAccountPageDetails(to: RouteLocation): PageDetail {
       ...getTermsCheckboxElements(),
       getRow(
         'justify-end mt-4',
-        getButtonElement(createAccount, 'Confirm', 'button-narrow')
+        getButtonElement<StudentAccountFormData>(
+          createAccount,
+          'Confirm',
+          'button-narrow'
+        )
       ),
     ],
   }
 }
 
-function getParentGuardianConfirmationDetails(to: RouteLocation): PageDetail {
-  function resetSignUp(data) {
+async function createAccount(data: StudentAccountFormData) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT)
+  try {
+    await AuthService.registerStudent({
+      [InputName.CLASS_CODE]: data.classCode,
+      [InputName.EMAIL]: data.email,
+      [InputName.FIRST_NAME]: data.firstName,
+      [InputName.GRADE_LEVEL]: data.gradeLevel,
+      [InputName.LAST_NAME]: data.lastName,
+      [InputName.PARENT_GUARDIAN_EMAIL]: data.parentGuardianEmail,
+      [InputName.PASSWORD]: data.password,
+      [InputName.REFERRED_BY_CODE]:
+        window.localStorage.getItem('upcReferredByCode'),
+      [InputName.SCHOOL_ID]: data.schoolId,
+      [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
+      [InputName.STUDENT_PARTNER_ORG_KEY]: data.studentPartnerOrgKey,
+      [InputName.STUDENT_PARTNER_ORG_SITE_NAME]: data.studentPartnerOrgSiteName,
+      [InputName.ZIP_CODE]: data.zipCode,
+    })
+    window.localStorage.removeItem('upcReferredByCode')
+    AnalyticsService.captureGoogleAnalyticsEvent('student_sign_up')
+
+    return getSubmitResponse(
+      data.parent ? SignUpPage.parentGuardianConfirmation : SignUpPage.verify,
+      data
+    )
+  } catch (err) {
+    LoggerService.noticeError(err)
+    return getSubmitResponse(null, null, err)
+  }
+}
+
+function createAccountWithGoogle(data: StudentAccountFormData) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
+    provider: SsoProvider.GOOGLE,
+  })
+  return SignUpService.createAccountWithGoogle(UserType.student, data)
+}
+
+export function createAccountWithClever(data: StudentAccountFormData) {
+  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
+    provider: SsoProvider.CLEVER,
+  })
+  return SignUpService.createAccountWithClever(UserType.student, data)
+}
+
+function getParentGuardianConfirmationDetails(
+  to: RouteLocation
+): PageDetail<ParentGuardianReset> {
+  function resetSignUp(data: ParentGuardianReset) {
     return getSubmitResponse(SignUpPage.eligibility, data)
   }
 
@@ -646,7 +579,7 @@ function getParentGuardianConfirmationDetails(to: RouteLocation): PageDetail {
       getRow(
         'justify-center bold',
         getTextElement('p', "My child didn't receive a sign up email."),
-        getRouterLinkElement('Resend email', '') // TODO: Need a new endpoint.
+        getRouterLinkElement('Contact Us', '/contact')
       ),
       getRow(
         'justify-center',
@@ -656,11 +589,125 @@ function getParentGuardianConfirmationDetails(to: RouteLocation): PageDetail {
   }
 }
 
-export async function beforeEnter(to, from, next) {
+function getStudentEmailElement(
+  isParentGuardian: boolean = false
+): FormElement {
+  return {
+    element: 'FormEmail',
+    props: {
+      name: InputName.EMAIL,
+      label: getLabelPrefix(isParentGuardian) + 'Email',
+      placeholder: getLabelPrefix(isParentGuardian) + 'Email',
+      blurEvent: EVENTS.STUDENT_ENTERED_EMAIL,
+    },
+  }
+}
+
+function getParentGuardianEmailElement(): FormElement {
+  return {
+    element: 'FormEmail',
+    props: {
+      name: InputName.PARENT_GUARDIAN_EMAIL,
+      label: 'Your Email',
+      placeholder: 'Your Email',
+    },
+  }
+}
+
+function getZipCodeElement(): FormElement {
+  return {
+    element: 'FormInput',
+    props: {
+      name: InputName.ZIP_CODE,
+      label: 'Zip Code',
+      placeholder: 'Zip Code',
+      minLength: 5,
+      maxLength: 5,
+      blurEvent: EVENTS.STUDENT_ENTERED_ZIP_CODE,
+    },
+  }
+}
+
+function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
+  return {
+    element: 'FormSelect',
+    props: {
+      blurEvent: EVENTS.STUDENT_SELECTED_GRADE,
+      getSelectOptions: () => GRADES,
+      name: InputName.GRADE_LEVEL,
+      label: getLabelPrefix(isParentGuardian) + 'Grade in 2023-2024',
+      placeholder: getLabelPrefix(isParentGuardian) + 'Grade in 2023-2024',
+      reduce: (option: string) => option.split(' ')[0],
+    },
+  }
+}
+
+function getSsoSectionElements(): FormRow[] {
+  return [
+    getRow('mt-4', getSsoButton(createAccountWithGoogle, 'Google')),
+    getRow('mt-3', getSsoButton(createAccountWithClever, 'Clever', 'clever')),
+    getRow(
+      'justify-center italic mt-3',
+      getTextElement(
+        'p',
+        'By clicking the button above, you agree to our User Agreement'
+      )
+    ),
+    getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } }),
+  ]
+}
+
+function getPartnerSitesElement(to: RouteLocation): FormElement | undefined {
+  const sites = to.params.studentPartnerSites
+  if (!sites || !sites.length) {
+    return
+  }
+
+  return {
+    element: 'FormSelect',
+    props: {
+      blurEvent: EVENTS.STUDENT_SELECTED_PARTNER_SITE,
+      getSelectOptions: () => sites,
+      name: InputName.STUDENT_PARTNER_ORG_SITE_NAME,
+      label: 'Site',
+      placeholder: 'Site',
+    },
+  }
+}
+
+function getTermsCheckboxElements() {
+  return [
+    getRow(
+      'justify-start mt-4 el-gap-sm',
+      {
+        element: 'FormCheckBox',
+        props: {
+          label: 'I have read and accept the',
+          name: InputName.TERMS,
+        },
+      },
+      {
+        element: 'a',
+        classes: 'uc-link',
+        content: 'User Agreement.',
+        props: {
+          href: 'https://upchieve.org/legal',
+          target: '_blank',
+        },
+      }
+    ),
+  ]
+}
+
+export async function beforeEnter(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+) {
   if (
     // Students must start from one of the form first pages,
     // unless it is an error redirect.
-    !['eligibility', 'info'].includes(to.params.step) &&
+    to.params.step !== 'eligibility' &&
     !from.name &&
     !to.query.error
   ) {
@@ -672,9 +719,9 @@ export async function beforeEnter(to, from, next) {
   }
 
   if (to.query.classCode) {
-    to.params.classCode = to.query.classCode
-    to.params.email = to.query.email
-    to.params.gradeLevel = to.query.gradeLevel
+    to.params.classCode = to.query.classCode as string
+    to.params.email = to.query.email as string
+    to.params.gradeLevel = to.query.gradeLevel as string
     delete to.query.classCode
     delete to.query.email
     delete to.query.gradeLevel
@@ -683,9 +730,11 @@ export async function beforeEnter(to, from, next) {
   const isParent = Object.keys(to.query ?? {}).some(
     (key) => key.trim() === 'parent'
   )
-  to.params.parent = isParent
+  if (isParent) {
+    to.params.parent = 'true'
+  }
 
-  const partnerKey = to.query?.partner
+  const partnerKey = to.query?.partner as string
   if (partnerKey) {
     try {
       const {
@@ -697,10 +746,19 @@ export async function beforeEnter(to, from, next) {
           { partner: to.query.partner }
         )
         delete to.query.partner
-        return next({ path: to.path, query: to.query, params: to.params })
+        return next({
+          path: to.path,
+          query: to.query,
+          params: to.params,
+        } as RouteLocationRaw)
       } else {
         to.params.partner = studentPartner
-        to.params[InputName.STUDENT_PARTNER_ORG_KEY] = studentPartner.key
+        to.params.studentPartnerOrgKey = studentPartner.key
+        to.params.studentParterName = studentPartner.name
+        to.params.studentPartnerSites = studentPartner.sites
+        to.params.studentPartnerIsSchool = studentPartner.isSchool.toString()
+        to.params.schoolSignupRequired =
+          studentPartner.schoolSignupRequired.toString()
       }
     } catch (err) {
       // TODO: Don't throw an error if a partner with the key does not exist.
@@ -708,7 +766,11 @@ export async function beforeEnter(to, from, next) {
         LoggerService.noticeError(err)
       }
       delete to.query.partner
-      return next({ path: to.path, query: to.query, params: to.params })
+      return next({
+        path: to.path,
+        query: to.query,
+        params: to.params,
+      } as RouteLocationRaw)
     }
   }
 

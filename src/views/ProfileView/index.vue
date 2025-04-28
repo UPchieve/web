@@ -265,7 +265,7 @@ import { mapGetters, mapState } from 'vuex'
 import { toastController } from '@ionic/vue'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
-import { Provider, signInWithSso } from '@/services/SsoService'
+import { SsoProvider, signInWithSso } from '@/services/SsoService'
 import DeactivateAccountModal from '../DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
@@ -459,7 +459,7 @@ export default {
 
     syncClever() {
       signInWithSso({
-        provider: Provider.CLEVER,
+        provider: SsoProvider.CLEVER,
         email: this.user.email,
         redirect: '/profile',
         errorRedirect: '/profile',
