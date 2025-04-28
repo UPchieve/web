@@ -219,12 +219,9 @@ export const joinMeeting = fromCallback(
       // eventually, we can use the `entities` value (in alternatives) to identify PII for moderation
       for (const result of event.results) {
         if (result.isPartial) {
-          store.dispatch(
-            'liveMedia/audio/inProgressCaptionMessageChime',
-            result
-          )
+          store.dispatch('liveMedia/audio/inProgressCaptionMessage', result)
         } else {
-          store.dispatch('liveMedia/audio/setCaptionMessageChime', result)
+          store.dispatch('liveMedia/audio/setCaptionMessage', result)
         }
       }
     }

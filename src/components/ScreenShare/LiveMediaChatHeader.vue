@@ -55,7 +55,7 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
 </script>
 
 <template>
-  <div class="zoom">
+  <div class="live-media-header">
     <audio ref="meetingAudio" :muted="props.isSpeakerMuted" />
     <VolunteerIcon class="avatar" v-if="userType === 'student'" />
     <StudentIcon class="avatar" v-else />
@@ -94,7 +94,7 @@ render the session control buttons in here-->
 </template>
 
 <style scoped lang="scss">
-.zoom {
+.live-media-header {
   background-color: $c-information-blue;
   display: flex;
   justify-content: start;

@@ -46,9 +46,7 @@ export default {
     addPendingMessage: (state, message) => {
       if (
         message &&
-        !state.session.messages.some(
-          (m) => m.zoomMessageId === message.zoomMessageId
-        )
+        !state.session.messages.some((m) => m.msgId === message.msgId)
       ) {
         if (!state.session.pendingMessages) {
           state.session.pendingMessages = []
@@ -60,7 +58,7 @@ export default {
       if (message)
         state.session.pendingMessages =
           state.session.pendingMessages?.filter(
-            (m) => m?.zoomMessageId !== message.zoomMessageId
+            (m) => m?.msgId !== message.msgId
           ) ?? []
     },
     addMessage: (state, message) => {

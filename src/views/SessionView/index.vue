@@ -128,9 +128,9 @@
           @try-clicked="tryClicked"
         />
 
-        <ZoomSessionChatHeader
+        <LiveMediaChatHeader
           v-else-if="isSessionInProgress && isSessionAudioCallEnabled"
-          class="zoom-container"
+          class="live-media-header-container"
           :isMyMicMuted="isMyMicMuted"
           :isSpeakerMuted="isSpeakerMuted"
           :isPartnerSpeaking="isPartnerSpeaking"
@@ -312,7 +312,7 @@ import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
-import ZoomSessionChatHeader from '@/components/ScreenShare/ZoomSessionChatHeader.vue'
+import LiveMediaChatHeader from '@/components/ScreenShare/LiveMediaChatHeader.vue'
 import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
 import { useActor } from '@xstate/vue'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
@@ -342,7 +342,7 @@ export default {
     QuestionMarkIcon,
     FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
-    ZoomSessionChatHeader,
+    LiveMediaChatHeader,
   },
   setup() {
     /*
@@ -407,7 +407,7 @@ export default {
       isScreenshareEnabled: false,
       draggingScreenShare: false,
       resizingScreenShare: false,
-      // zoom uses getDisplayMedia for screen sharing and iOS safari does not support it
+      // chime uses getDisplayMedia for screen sharing and iOS safari does not support it
       // so we hide the screen share button on iOS.
       // NOTE: users can still view a shared screen in iOS safari, they just can't share their own screen
       getDisplayMediaSupported:
@@ -1370,7 +1370,7 @@ export default {
   }
 }
 
-.zoom-container {
+.live-media-header-container {
   width: 100%;
 }
 
