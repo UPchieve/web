@@ -14,7 +14,7 @@ This repository is the frontend SPA only. It relies on the API server and worker
   - [Local Development](#local-development)
     - [Local Dependencies](#local-dependencies)
     - [App Dependencies](#app-dependencies)
-    - [Run the Dev Server](#run-the-dev-server)
+    - [Run the Local Server](#run-the-local-server)
     - [Quality Checks](#quality-checks)
   - [Production Builds](#production-builds)
     - [Production Server](#production-server)
@@ -25,34 +25,41 @@ This repository is the frontend SPA only. It relies on the API server and worker
 
 ### Local Dependencies
 
-The recommended tool for runtime version management is [`nvm`][nvm]. To use `nvm` on Windows, first install the appropriate Linux shell distribution using [`WSL`][wsl] (Windows Subsystem for Linux). We currently run on Node v20.10.0, you can switch to this using
+1. The recommended tool for runtime version management is [`nvm`][nvm].
 
-```shell
-$ nvm install v20.10.0 && nvm use v20.10.0
-```
+   ```shell
+      nvm install v20.10.0 && nvm use v20.10.0
+   ```
 
-After switching npm versions using nvm, you will need to run `$ npm install`.
+2. Install dependencies
+
+   ```shell
+   npm install
+   ```
+
+3. Set local environment variables
+
+   ```shell
+     cp .env.template .env.local
+   ```
 
 ### App Dependencies
 
 As noted above you will also need the backend running on `localhost` on port `3000`
 
-### Run the Dev Server
+### Run the Local Server
 
-The development server (which supports hot reloading) can be started using
+The local server (which supports hot reloading) can be started using:
 
 ```shell
-$ npm run serve
+     npm run serve
 ```
 
-If your terminal or editor support .env files, there is one in this repo that contains local development values,
-otherwise you will need to set them in the environment yourself, as the dev server relies on those environment values.
-
-The development server does not support one frontend feature, which is notifying when
+The local server does not support one frontend feature, which is notifying when
 the version has changed and prompting a reload. To test that, you need to run the production server,
 instructions for which are below.
 
-Once the both the backend and frontend dev servers are running, you can open the app at `http://localhost:8080`.
+Once the both the backend and frontend local servers are running, you can open the app at `http://localhost:8080`.
 
 ### Quality Checks
 
@@ -69,9 +76,9 @@ Tests can be run using `$ npm run test`
 
 A production build of the frontend resources (index.html/js/css/images) can be done by running
 
-```
-$ npm run build
-```
+    ```shell
+    npm run build
+    ```
 
 which puts the output in the directory `dist/`
 
