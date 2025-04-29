@@ -203,7 +203,7 @@
               </div>
             </li>
           </div>
-          <li v-if="tutorFeedbackToTeacherQuestion">
+          <li v-if="tutorFeedbackToTeacherQuestion && isSessionVolunteer">
             <div class="question__section-header">Notes For Their Teacher</div>
             <div class="question__title">
               {{ tutorFeedbackToTeacherQuestion }}
@@ -284,7 +284,11 @@ export default {
     }),
     ...mapState({
       subjects: (state) => state.subjects.subjects,
+      userId: (state) => state.user.user.id,
     }),
+    isSessionVolunteer() {
+      return this.session.volunteerId === this.userId
+    },
     sessionPartnerFirstName() {
       return this.isVolunteer
         ? this.session.student.firstName
