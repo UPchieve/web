@@ -319,6 +319,15 @@ async function checkEligibility(
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CHECK_MY_ELIGIBILITY, {
     partnerKey: data.studentPartnerOrgKey,
   })
+
+  if (
+    SignUpService.ensureHasNoRecentIneligibility(UserType.student, {
+      partnerKey: data.studentPartnerOrgKey,
+    })
+  ) {
+    return getSubmitResponse(SignUpPage.ineligible, data)
+  }
+
   try {
     const {
       data: { isEligible },
@@ -330,14 +339,16 @@ async function checkEligibility(
       [InputName.SCHOOL_ID]: data.schoolId,
       [InputName.ZIP_CODE]: data.zipCode ?? '',
     })
-    AnalyticsService.captureEvent(
-      isEligible ? EVENTS.ELIGIBILITY_ELIGIBLE : EVENTS.ELIGIBILITY_INELIGIBLE,
-      { partnerKey: data.studentPartnerOrgKey }
-    )
 
-    return getSubmitResponse(
-      isEligible ? SignUpPage.account : SignUpPage.ineligible,
-      data
+    return SignUpService.handleEligibilityResult(
+      isEligible,
+      UserType.student,
+      data,
+      {
+        partnerKey: data.studentPartnerOrgKey,
+        schoolId: data.schoolId,
+        zipCode: data.zipCode,
+      }
     )
   } catch (err) {
     LoggerService.noticeError(err)
@@ -644,8 +655,14 @@ function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
 
 function getSsoSectionElements(): FormRow[] {
   return [
-    getRow('mt-4', getSsoButton(createAccountWithGoogle, 'Google')),
-    getRow('mt-3', getSsoButton(createAccountWithClever, 'Clever', 'clever')),
+    getRow(
+      'mt-4',
+      getSsoButton(createAccountWithGoogle, 'Google', SsoProvider.GOOGLE)
+    ),
+    getRow(
+      'mt-3',
+      getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER)
+    ),
     getRow(
       'justify-center italic mt-3',
       getTextElement(
@@ -775,4 +792,10 @@ export async function beforeEnter(
   }
 
   return next()
+}
+
+// Exported for testing.
+export const __test__ = {
+  getEligibilityPageDetails,
+  checkEligibility,
 }

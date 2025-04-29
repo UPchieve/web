@@ -157,22 +157,24 @@ async function checkEligibility(
     return getSubmitResponse(null, null, 'Must select a school.')
   }
 
+  if (SignUpService.ensureHasNoRecentIneligibility(UserType.teacher)) {
+    return getSubmitResponse(SignUpPage.ineligible, data)
+  }
+
   try {
     const {
       data: { isEligible },
     } = await NetworkService.checkTeacherEligibility({
       [InputName.SCHOOL_ID]: data.schoolId,
     })
-    AnalyticsService.captureEvent(
-      isEligible
-        ? EVENTS.TEACHER_ELIGIBILITY_ELIGIBLE
-        : EVENTS.TEACHER_ELIGIBILITY_INELIGIBLE,
-      { schoolId: data[InputName.SCHOOL_ID] }
-    )
 
-    return getSubmitResponse(
-      isEligible ? SignUpPage.account : SignUpPage.ineligible,
-      data
+    return SignUpService.handleEligibilityResult(
+      isEligible,
+      UserType.teacher,
+      data,
+      {
+        schoolId: data.schoolId,
+      }
     )
   } catch (err) {
     LoggerService.noticeError(err)

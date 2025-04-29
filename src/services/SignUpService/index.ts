@@ -6,10 +6,12 @@ import NetworkService from '@/services/NetworkService'
 import { SsoProvider, signInWithSso } from '@/services/SsoService'
 import type {
   StudentAccountFormData,
+  StudentEligibilityFormData,
   StudentSignUpFormData,
 } from './StudentSignUpService'
 import type {
   TeacherAccountFormData,
+  TeacherEligibilityFormData,
   TeacherSignUpFormData,
 } from './TeacherSignUpService'
 
@@ -29,6 +31,9 @@ export enum UserType {
 }
 
 export type SignUpFormData = StudentSignUpFormData | TeacherSignUpFormData
+export type EligibilityFormData =
+  | StudentEligibilityFormData
+  | TeacherEligibilityFormData
 type AccountFormData = StudentAccountFormData | TeacherAccountFormData
 
 /**
@@ -321,4 +326,75 @@ export function getAlreadyHaveAccountElements() {
     getTextElement('p', 'Already have an account?'),
     getRouterLinkElement('Log in', '/login'),
   ]
+}
+
+const ELIGIBILITY_CHECK_TIMEOUT_MS = 10 * 60 * 1000
+const ELIGIBILITY_CHECK_KEY_BASE = 'lastIneligible_'
+
+export function ensureHasNoRecentIneligibility(
+  userType: UserType,
+  opts?: Record<string, string | undefined>
+) {
+  if (hasRecentIneligibilityCheck(userType)) {
+    AnalyticsService.captureEvent(EVENTS.ELIGIBILITY_INELIGIBLE, {
+      userType,
+      source: 'cache',
+      ...opts,
+    })
+    return true
+  }
+  return false
+}
+
+export function handleEligibilityResult(
+  isEligible: boolean,
+  userType: UserType,
+  data: EligibilityFormData,
+  opts: Record<string, string | undefined>
+) {
+  if (!isEligible) {
+    storeIneligibilityCheck(userType)
+  }
+
+  AnalyticsService.captureEvent(
+    isEligible ? EVENTS.ELIGIBILITY_ELIGIBLE : EVENTS.ELIGIBILITY_INELIGIBLE,
+    {
+      userType,
+      ...opts,
+    }
+  )
+
+  return getSubmitResponse(
+    isEligible ? SignUpPage.account : SignUpPage.ineligible,
+    data
+  )
+}
+
+function hasRecentIneligibilityCheck(userType: UserType): boolean {
+  const key = createEligibilityCheckKey(userType)
+  const value = window.localStorage.getItem(key)
+  if (!value) return false
+
+  try {
+    const lastCheck = parseInt(value)
+    const now = Date.now()
+    return now - lastCheck < ELIGIBILITY_CHECK_TIMEOUT_MS
+  } catch (e) {
+    window.localStorage.removeItem(key)
+    return false
+  }
+}
+
+function storeIneligibilityCheck(userType: UserType): void {
+  const key = createEligibilityCheckKey(userType)
+  window.localStorage.setItem(key, Date.now().toString())
+}
+
+function createEligibilityCheckKey(userType: string) {
+  return btoa(ELIGIBILITY_CHECK_KEY_BASE + userType)
+}
+
+// Exported for testing.
+export const __test__ = {
+  createEligibilityCheckKey,
 }
