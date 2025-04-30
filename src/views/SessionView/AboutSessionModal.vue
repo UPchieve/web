@@ -17,6 +17,9 @@
             <alert-icon class="alert-icon" />
             <div class="subheading">{{ totalSessionsTextTitle }}</div>
           </div>
+          <div>
+            {{ this.studentsFirstName }} is in {{ this.studentsGrade }} grade.
+          </div>
           <div class="subtitle">
             Be sure to be welcoming and extra patient as they get used to our
             platform.
@@ -118,6 +121,9 @@ export default {
     },
     studentsFirstName() {
       return this.session.student.firstname
+    },
+    studentsGrade() {
+      return this.session.student.gradeLevel
     },
     /**
      * Return the first presession survey response where the student indicated low confidence
