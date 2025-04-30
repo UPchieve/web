@@ -1,8 +1,15 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import type { RouteLocation } from 'vue-router'
+import type {
+  RouteLocation,
+  NavigationGuardNext,
+  RouteLocationNormalized,
+} from 'vue-router'
 import store from '@/store'
 import router from '@/router'
-import { __test__ } from '@/services/SignUpService/StudentSignUpService'
+import {
+  __test__,
+  beforeEnter,
+} from '@/services/SignUpService/StudentSignUpService'
 import * as SignUpService from '@/services/SignUpService'
 import NetworkService from '@/services/NetworkService'
 import AuthService from '@/services/AuthService'
@@ -459,7 +466,7 @@ describe('StudentSignUpService', () => {
     })
   })
 
-  describe('ineligibility', () => {
+  describe('Ineligibility step', () => {
     test('getIneligiblePageDetails returns the correct rows', () => {
       const pageDetails = __test__.getIneligiblePageDetails()
 
@@ -869,6 +876,214 @@ describe('StudentSignUpService', () => {
         )
 
         routerPushSpy.mockRestore()
+      })
+    })
+  })
+
+  describe('beforeEnter navigation guard', () => {
+    const next = vi.fn() as unknown as NavigationGuardNext
+
+    beforeEach(() => {
+      vi.resetAllMocks()
+    })
+
+    test('redirects to eligibility page if starting from a different step and no error/international', async () => {
+      const to = {
+        name: 'SignupView',
+        params: { step: 'account', userType: 'student' },
+        query: {},
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(next).toHaveBeenCalledWith({
+        name: 'SignupView',
+        params: { step: 'eligibility', userType: 'student' },
+        query: {},
+      })
+    })
+
+    test('allows access to eligibility page', async () => {
+      const to = {
+        name: 'SignupView',
+        params: { step: 'eligibility', userType: 'student' },
+        query: {},
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(next).toHaveBeenCalledWith()
+    })
+
+    test('allows access to international page if redirected', async () => {
+      const to = {
+        name: 'SignupView',
+        params: { step: 'international', userType: 'student' },
+        redirectedFrom: { params: { step: 'eligibility' } },
+        query: {},
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(next).toHaveBeenCalledWith()
+    })
+
+    test('allows access to account page if error', async () => {
+      const to = {
+        name: 'SignupView',
+        params: { step: 'account', userType: 'student' },
+        query: { error: 'some-error' },
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(next).toHaveBeenCalledWith()
+    })
+
+    test('processes query parameters from join-class', async () => {
+      const to = {
+        name: 'SignupView',
+        params: { step: 'account', userType: 'student' },
+        query: {
+          classCode: 'ABC123',
+          email: 'student@join-class.com',
+          gradeLevel: '10th',
+        },
+      } as unknown as RouteLocationNormalized
+      const from = {
+        name: 'JoinClassView',
+        path: '/join-class',
+      } as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(to.params.classCode).toBe('ABC123')
+      expect(to.params.email).toBe('student@join-class.com')
+      expect(to.params.gradeLevel).toBe('10th')
+      expect(to.query.classCode).toBeUndefined()
+      expect(to.query.email).toBeUndefined()
+      expect(to.query.gradeLevel).toBeUndefined()
+      expect(next).toHaveBeenCalledWith()
+    })
+
+    test('processes/sanitizes query parameter for parent/guardian flow', async () => {
+      const to = {
+        name: 'SignupView',
+        params: { step: 'eligibility', userType: 'student' },
+        query: { parent: 'true' },
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to as any, from as any, next)
+
+      expect(to.params.parent).toBe('true')
+      expect(next).toHaveBeenCalledWith()
+    })
+
+    test('processes partner query parameter and gets partner data', async () => {
+      mockedNetworkService.getStudentPartner = vi.fn().mockResolvedValue({
+        data: {
+          studentPartner: {
+            key: 'test-partner',
+            name: 'Test Partner',
+            sites: ['Site 1', 'Site 2'],
+            isSchool: false,
+            schoolSignupRequired: true,
+            deactivated: false,
+          },
+        },
+      })
+
+      const to = {
+        name: 'SignupView',
+        params: { step: 'eligibility', userType: 'student' },
+        query: { partner: 'test-partner' },
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(mockedNetworkService.getStudentPartner).toHaveBeenCalledWith(
+        'test-partner'
+      )
+      expect(to.params.studentPartnerOrgKey).toBe('test-partner')
+      expect(to.params.studentPartnerSites).toEqual(['Site 1', 'Site 2'])
+      expect(to.params.studentPartnerIsSchool).toBe('false')
+      expect(to.params.schoolSignupRequired).toBe('true')
+      expect(next).toHaveBeenCalledWith()
+    })
+
+    test('handles deactivated partner', async () => {
+      mockedNetworkService.getStudentPartner.mockResolvedValue({
+        data: {
+          studentPartner: {
+            key: 'deactivated-partner',
+            deactivated: true,
+          },
+        },
+      })
+
+      const to = {
+        name: 'SignupView',
+        params: { step: 'eligibility', userType: 'student' },
+        query: { partner: 'deactivated-partner' },
+        path: '/sign-up/student/eligibility',
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(to.query.partner).toBeUndefined()
+      expect(next).toHaveBeenCalledWith({
+        path: '/sign-up/student/eligibility',
+        query: {},
+        params: { step: 'eligibility', userType: 'student' },
+      })
+    })
+
+    test('handles non-existent partner', async () => {
+      const networkError = { status: 422 }
+      mockedNetworkService.getStudentPartner.mockRejectedValue(networkError)
+
+      const to = {
+        name: 'SignupView',
+        params: { step: 'eligibility', userType: 'student' },
+        query: { partner: 'non-existent' },
+        path: '/sign-up/student/eligibility',
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(to.query.partner).toBeUndefined()
+      expect(next).toHaveBeenCalledWith({
+        path: '/sign-up/student/eligibility',
+        query: {},
+        params: { step: 'eligibility', userType: 'student' },
+      })
+    })
+
+    test('redirects to international page if IP check fails', async () => {
+      mockedNetworkService.checkIpAddress.mockRejectedValue(
+        new Error('Not in US')
+      )
+
+      const to = {
+        name: 'SignupView',
+        params: { step: 'eligibility', userType: 'student' },
+        query: {},
+      } as unknown as RouteLocationNormalized
+      const from = {} as unknown as RouteLocationNormalized
+
+      await beforeEnter(to, from, next)
+
+      expect(next).toHaveBeenCalledWith({
+        name: 'SignupView',
+        params: { step: 'international', userType: 'student' },
       })
     })
   })

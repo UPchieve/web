@@ -39,6 +39,7 @@ const RoutePath = {
   account: `/sign-up/student/${SignUpPage.account}`,
   eligibility: `/sign-up/student/${SignUpPage.eligibility}`,
   ineligible: `/sign-up/student/${SignUpPage.ineligible}`,
+  international: `/sign-up/student/${SignUpPage.international}`,
   parentGuardianConfirmation: `/sign-up/student/${SignUpPage.parentGuardianConfirmation}`,
   partnerInfo: `sign-up/student/${SignUpPage.partnerInfo}`,
   verify: `/${SignUpPage.verify}`,
@@ -110,6 +111,10 @@ type CleverStudentRedirectFormData = {
 }
 
 export function getPageDetails(
+  to: RouteLocation & { path: typeof RoutePath.international },
+  from: RouteLocation
+): PageDetail<{}>
+export function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.ineligible },
   from: RouteLocation
 ): PageDetail<{}>
@@ -134,6 +139,9 @@ export function getPageDetails(
   from: RouteLocation
 ): PageDetailsUnion<StudentSignUpFormData> {
   return getFilteredPageDetails(() => {
+    if (isInternationalRoute(to)) {
+      return getInternationalPageDetails()
+    }
     if (isIneligibleRoute(to)) {
       return getIneligiblePageDetails()
     }
@@ -152,6 +160,10 @@ export function getPageDetails(
 
     return getEligibilityPageDetails(to)
   })
+}
+
+function isInternationalRoute(to: RouteLocation) {
+  return to.path === RoutePath.international
 }
 
 function isIneligibleRoute(to: RouteLocation) {
@@ -353,6 +365,45 @@ async function checkEligibility(
   } catch (err) {
     LoggerService.noticeError(err)
     return getSubmitResponse(null, null, err)
+  }
+}
+
+function getInternationalPageDetails(): PageDetail<{}> {
+  return {
+    backgroundLayout: 'full',
+    submitAction: () => {
+      return [{ path: '/contact' }, null]
+    },
+    classes: 'text-center screen-narrow',
+    rows: [
+      getRow('uc-row, justify-center', {
+        element: 'error-badge',
+        classes: 'error-badge',
+      }),
+      getRow(
+        'justify-center center mt-4 pre-wrap',
+        getTextElement('h1', "Looks like you're not in\nthe US!")
+      ),
+      getRow(
+        'justify-center center mt-3 pre-wrap',
+        getTextElement(
+          'p',
+          "UPchieve is currently only available to students in the US.\nWe're sorry for the inconvenience! 😔"
+        )
+      ),
+      getRow(
+        'justify-center center mt-3 italic pre-wrap',
+        getTextElement(
+          'p',
+          "Live in the US and still seeing this message?\nMake sure you're not using a VPN."
+        )
+      ),
+      getRow(
+        'justify-center mt-3 el-gap-sm',
+        getRouterLinkElement('Contact us', '/contact'),
+        getTextElement('p', 'if you still need help!')
+      ),
+    ],
   }
 }
 
@@ -723,9 +774,11 @@ export async function beforeEnter(
   next: NavigationGuardNext
 ) {
   if (
-    // Students must start from one of the form first pages,
-    // unless it is an error redirect.
+    // Students must start from the eligibility page,
+    // unless it is an error redirect or we have been redirected to
+    // the international page (after checking IP).
     to.params.step !== 'eligibility' &&
+    !(to.params.step === 'international' && to.redirectedFrom?.params.step) &&
     !from.name &&
     !to.query.error
   ) {
@@ -749,6 +802,7 @@ export async function beforeEnter(
     (key) => key.trim() === 'parent'
   )
   if (isParent) {
+    // Needed for legacy data sanitation.
     to.params.parent = 'true'
   }
 
@@ -789,6 +843,16 @@ export async function beforeEnter(
         query: to.query,
         params: to.params,
       } as RouteLocationRaw)
+    }
+  } else if (to.params.step !== 'international') {
+    try {
+      await NetworkService.checkIpAddress()
+    } catch (err) {
+      // TODO: Don't throw an error if the student is not in the US.
+      return next({
+        name: 'SignupView',
+        params: { step: 'international', userType: to.params.userType },
+      })
     }
   }
 

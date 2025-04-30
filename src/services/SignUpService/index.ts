@@ -19,6 +19,7 @@ export enum SignUpPage {
   account = 'account',
   eligibility = 'eligibility',
   ineligible = 'ineligible',
+  international = 'international',
   parentGuardianConfirmation = 'confirmation',
   partnerInfo = 'info',
   verify = 'verify',
@@ -110,6 +111,7 @@ type FormElementType =
   | 'header-logo-teal'
   | 'updog-crying'
   | 'updog-smiling'
+  | 'error-badge'
 
 export function getFilteredPageDetails(
   cb: () => PageDetailsUnion<SignUpFormData>
