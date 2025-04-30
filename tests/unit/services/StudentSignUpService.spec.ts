@@ -1,14 +1,349 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
+import type { RouteLocation } from 'vue-router'
+import store from '@/store'
+import router from '@/router'
 import { __test__ } from '@/services/SignUpService/StudentSignUpService'
 import * as SignUpService from '@/services/SignUpService'
 import NetworkService from '@/services/NetworkService'
+import AuthService from '@/services/AuthService'
+import type {
+  FormElement,
+  FormRow,
+  SubmitButtonFormElement,
+  SubmitFormRow,
+} from '@/services/SignUpService'
 
-vi.mock('@/services/NetworkService')
 vi.mock('@/services/AnalyticsService')
+vi.mock('@/services/AuthService')
+vi.mock('@/services/NetworkService')
+const mockedAuthService = vi.mocked(AuthService)
 const mockedNetworkService = vi.mocked(NetworkService)
 
+window.location = {
+  ...window.location,
+  // Can't use spyOn `replace` because, based on how spyOn
+  // works, end up getting a TypeError that cannot redefine
+  // the property replace.
+  replace: vi.fn(),
+}
+
+function findElementAndRow(
+  rows: (FormRow | SubmitFormRow<any> | null)[],
+  search: (element: FormElement) => boolean
+):
+  | { formElement: FormElement | SubmitButtonFormElement<any>; row: FormRow }
+  | undefined {
+  for (const row of rows) {
+    if (!row) continue
+
+    for (const formElement of row.elements) {
+      if (search(formElement)) {
+        return { formElement, row }
+      }
+    }
+  }
+}
+
 describe('StudentSignUpService', () => {
-  describe('Eligibility', () => {
+  describe('Check eligibility step', () => {
+    describe('getEligibilityPageDetails', () => {
+      test('returns correct page details for organic student', () => {
+        const route = {
+          path: '/sign-up/student/eligibility',
+          params: {},
+          query: {},
+        } as RouteLocation
+
+        const pageDetails = __test__.getEligibilityPageDetails(route)
+        const expectedRows = [
+          'logo',
+          'header',
+          'existingAccountLink',
+          'gradeLevel/zipCode',
+          'school',
+          'signupSource',
+          'submitButton',
+        ]
+        expect(pageDetails.rows.filter((r) => !!r).length).toBe(
+          expectedRows.length
+        )
+
+        const header = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h1'
+        )
+        expect(header?.formElement.content).toBe(
+          'Check if you are eligible for UPchieve'
+        )
+
+        const existingAccountLink = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'router-link'
+        )
+        expect(existingAccountLink?.row.elements[0].content).toBe(
+          'Already have an account?'
+        )
+        expect(existingAccountLink?.row.elements[1].content).toBe('Log in')
+
+        const grade = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'gradeLevel'
+        )
+        expect(grade).toBeDefined()
+        expect(grade?.formElement.props.label).toBe('Grade in 2023-2024')
+
+        const zipCode = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'zipCode'
+        )
+        expect(zipCode).toBeDefined()
+        expect(zipCode?.formElement.props.label).toBe('Zip Code')
+
+        const school = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'FormSchoolSearch'
+        )
+        expect(school).toBeDefined()
+        expect(school?.formElement.props.label).toBe('School Name')
+
+        const signupSource = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'signupSourceId'
+        )
+        expect(signupSource).toBeDefined()
+        expect(signupSource?.formElement.props.label).toBe(
+          'How did you hear about us?'
+        )
+
+        const submitButton = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'button' && e.content === 'Check eligibility'
+        )
+        // @ts-ignore
+        expect(submitButton?.formElement.submitAction).toBe(
+          __test__.checkEligibility
+        )
+      })
+
+      test('returns correct page details for parent/guardian', () => {
+        const route = {
+          path: '/sign-up/student/eligibility',
+          params: { parent: 'true' },
+          query: {},
+        } as unknown as RouteLocation
+
+        const pageDetails = __test__.getEligibilityPageDetails(route)
+        const expectedRows = [
+          'logo',
+          'header',
+          'existingAccountLink',
+          'gradeLevel/zipCode',
+          'school',
+          'signupSource',
+          'submitAction',
+        ]
+        expect(pageDetails.rows.filter((r) => !!r).length).toBe(
+          expectedRows.length
+        )
+
+        const header = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h1'
+        )
+        expect(header?.formElement.content).toBe(
+          'Check if your child is eligible for free tutoring with UPchieve'
+        )
+
+        const grade = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'gradeLevel'
+        )
+        expect(grade).toBeDefined()
+        expect(grade?.formElement.props.label).toBe(
+          "Child's Grade in 2023-2024"
+        )
+
+        const school = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'FormSchoolSearch'
+        )
+        expect(school).toBeDefined()
+        expect(school?.formElement.props.label).toBe("Child's School Name")
+
+        const zipCode = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'zipCode'
+        )
+        expect(zipCode).toBeDefined()
+      })
+
+      test('returns correct page details for school partner student', () => {
+        const route = {
+          path: '/sign-up/student/eligibility',
+          params: {
+            studentPartnerOrgKey: 'meow',
+            studentPartnerName: 'Meow School',
+            studentPartnerIsSchool: 'true',
+          },
+          query: {},
+        } as unknown as RouteLocation
+
+        const pageDetails = __test__.getEligibilityPageDetails(route)
+        const expectedRows = [
+          'logo',
+          'header',
+          'notWithPartnerLink',
+          'gradeLevel/zipCode',
+          'submitButton',
+        ]
+        expect(pageDetails.rows.filter((r) => !!r).length).toBe(
+          expectedRows.length
+        )
+        const header = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h1'
+        )
+        expect(header?.formElement.content).toBe('Welcome Meow School Student!')
+
+        const notWithPartnerLink = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'router-link'
+        )
+        expect(notWithPartnerLink?.formElement.content).toBe(
+          'Not with Meow School?'
+        )
+
+        const school = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'FormSchoolSearch'
+        )
+        expect(school).toBeUndefined()
+
+        const signupSource = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'signupSourceId'
+        )
+        expect(signupSource).toBeUndefined()
+      })
+
+      test('has school element if partner org is not a school', () => {
+        const route = {
+          path: '/sign-up/student/eligibility',
+          params: {
+            studentPartnerOrgKey: 'woof',
+            studentPartnerName: 'Woof Org',
+            studentPartnerIsSchool: 'false',
+          },
+          query: {},
+        } as unknown as RouteLocation
+
+        const pageDetails = __test__.getEligibilityPageDetails(route)
+        const expectedRows = [
+          'logo',
+          'header',
+          'notWithPartnerLink',
+          'gradeLevel/zipCode',
+          'school',
+          'submitButton',
+        ]
+        expect(pageDetails.rows.filter((r) => !!r).length).toBe(
+          expectedRows.length
+        )
+
+        const school = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'FormSchoolSearch'
+        )
+        expect(school).toBeDefined()
+      })
+
+      describe('returns correct title and subtitle for specific partner orgs', () => {
+        test('code.org', () => {
+          const route = {
+            path: '/sign-up/student/eligibility',
+            params: {
+              studentPartnerOrgKey: 'code-org',
+            },
+            query: {},
+          } as unknown as RouteLocation
+
+          const pageDetails = __test__.getEligibilityPageDetails(route)
+
+          const header = findElementAndRow(
+            pageDetails.rows,
+            (e) => e.element === 'h1'
+          )
+          expect(header?.formElement.content).toBe('Welcome to UPchieve!')
+
+          const subheader = findElementAndRow(
+            pageDetails.rows,
+            (e) => e.element === 'p'
+          )
+          expect(
+            subheader?.formElement.content?.endsWith(
+              'including AP Computer Science.'
+            )
+          ).toBe(true)
+        })
+
+        test('College Confidential', () => {
+          const route = {
+            path: '/sign-up/student/eligibility',
+            params: {
+              utm_source: 'collegeconfidential',
+            },
+            query: {},
+          } as unknown as RouteLocation
+
+          const pageDetails = __test__.getEligibilityPageDetails(route)
+          const header = findElementAndRow(
+            pageDetails.rows,
+            (e) => e.element === 'h1'
+          )
+          expect(header?.formElement.content).toBe('Get that A you deserve!')
+          const subheader = findElementAndRow(
+            pageDetails.rows,
+            (e) => e.element === 'p'
+          )
+          expect(
+            subheader?.formElement.content?.includes(
+              'are more competitive during college admission'
+            )
+          ).toBe(true)
+        })
+
+        test('BigFuture', () => {
+          const bfIntroCopy = 'Something for BF here.'
+          const storeSpy = vi.spyOn(store, 'getters', 'get').mockReturnValue({
+            'featureFlags/bfIntroCopy': bfIntroCopy,
+          })
+
+          const route = {
+            path: '/sign-up/student/eligibility',
+            params: {
+              studentPartnerOrgKey: 'bigfuture',
+              studentPartnerName: 'BigFuture',
+            },
+            query: {},
+          } as unknown as RouteLocation
+
+          const pageDetails = __test__.getEligibilityPageDetails(route)
+          const header = findElementAndRow(
+            pageDetails.rows,
+            (e) => e.element === 'h1'
+          )
+          expect(header?.formElement.content).toBe('Welcome BigFuture Student!')
+          const subheader = findElementAndRow(
+            pageDetails.rows,
+            (e) => e.element === 'p'
+          )
+          expect(subheader?.formElement.content).toBe(bfIntroCopy)
+
+          storeSpy.mockRestore()
+        })
+      })
+    })
+
     describe('checkEligibility', () => {
       const INELIGIBILITY_KEY =
         SignUpService.__test__.createEligibilityCheckKey(
@@ -27,6 +362,7 @@ describe('StudentSignUpService', () => {
           zipCode: '97878',
         }
         await __test__.checkEligibility(data)
+
         expect(
           mockedNetworkService.checkStudentEligibility
         ).toHaveBeenCalledWith({
@@ -86,7 +422,7 @@ describe('StudentSignUpService', () => {
       })
 
       test('returns account page as next page when eligible', async () => {
-        const data = { gradeLevel: '12th', schoolId: 'school-789' }
+        const data = { gradeLevel: '12th', schoolId: 'school-id-abc' }
 
         mockedNetworkService.checkStudentEligibility.mockResolvedValue({
           data: { isEligible: true },
@@ -104,7 +440,7 @@ describe('StudentSignUpService', () => {
       })
 
       test('returns ineligible page as next page when ineligible', async () => {
-        const data = { gradeLevel: 'College', schoolId: 'school-101' }
+        const data = { gradeLevel: 'College', schoolId: 'school-id-def' }
 
         mockedNetworkService.checkStudentEligibility.mockResolvedValue({
           data: { isEligible: false },
@@ -119,6 +455,420 @@ describe('StudentSignUpService', () => {
           },
         })
         expect(result[1]).toBeNull()
+      })
+    })
+  })
+
+  describe('ineligibility', () => {
+    test('getIneligiblePageDetails returns the correct rows', () => {
+      const pageDetails = __test__.getIneligiblePageDetails()
+
+      expect(pageDetails.backgroundLayout).toBe('full')
+      expect(pageDetails.submitAction).toBe(__test__.ineligibleContinue)
+      expect(pageDetails.classes).toBe('text-center screen-narrow')
+
+      const expectedRows = ['updog-crying', 'header', 'body', 'continueButton']
+      expect(pageDetails.rows.length).toBe(expectedRows.length)
+
+      const updogElement = findElementAndRow(
+        pageDetails.rows,
+        (e) => e.element === 'updog-crying'
+      )
+      expect(updogElement).toBeDefined()
+
+      const header = findElementAndRow(
+        pageDetails.rows,
+        (e) => e.element === 'h1'
+      )
+      expect(header).toBeDefined()
+
+      const body = findElementAndRow(pageDetails.rows, (e) => e.element === 'p')
+      expect(body).toBeDefined()
+
+      const continueButton = findElementAndRow(
+        pageDetails.rows,
+        (e) => e.element === 'button'
+      )
+      expect(continueButton?.formElement.content).toBe('Continue')
+      // @ts-ignore
+      expect(continueButton?.formElement.submitAction).toBe(
+        __test__.ineligibleContinue
+      )
+    })
+
+    test('ineligibleContinue redirects to request access page', () => {
+      const result = __test__.ineligibleContinue()
+
+      expect(window.location.replace).toHaveBeenCalledWith(
+        'https://upchieve.org/request-access'
+      )
+      expect(result[0]).toBeNull()
+      expect(result[1]).toBeNull()
+    })
+  })
+
+  describe('Create account step', () => {
+    describe('getAccountPageDetails', () => {
+      test('returns correct page details for organic student', () => {
+        const route = {
+          path: '/sign-up/student/account',
+          params: {
+            gradeLevel: '10th',
+            schoolId: 'school-123',
+            zipCode: '12345',
+          },
+          query: {},
+        } as unknown as RouteLocation
+
+        const pageDetails = __test__.getAccountPageDetails(route)
+        const expectedRows = [
+          'logo',
+          'header',
+          'subheader',
+          'cleverButton',
+          'googleButton',
+          'orLineBreak',
+          'firstName',
+          'lastName',
+          'email',
+          'password',
+          'terms',
+          'submitButton',
+        ]
+        expect(pageDetails.rows.filter((r) => !!r).length).toBe(
+          expectedRows.length
+        )
+        expect(pageDetails.backgroundLayout).toBe('panel-right-75p')
+        expect(pageDetails.submitAction).toBe(__test__.createAccount)
+
+        const header = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h1'
+        )
+        expect(header?.formElement.content).toContain(
+          "You're eligible for UPchieve!"
+        )
+
+        const subheader = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h2'
+        )
+        expect(subheader?.formElement.content).toBe(
+          'Finish creating your account'
+        )
+
+        const googleSsoButton = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'SsoButton' && e.props?.ssoMethod === 'google'
+        )
+        expect(googleSsoButton).toBeDefined()
+
+        const cleverSsoButton = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'SsoButton' && e.props?.ssoMethod === 'clever'
+        )
+        expect(cleverSsoButton).toBeDefined()
+
+        const firstName = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'firstName'
+        )
+        expect(firstName).toBeDefined()
+        expect(firstName?.formElement.props.label).toBe('First Name')
+
+        const lastName = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'lastName'
+        )
+        expect(lastName).toBeDefined()
+        expect(lastName?.formElement.props.label).toBe('Last Name')
+
+        const email = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'email'
+        )
+        expect(email).toBeDefined()
+        expect(email?.formElement.props.label).toBe('Email')
+
+        const password = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'FormPassword'
+        )
+        expect(password).toBeDefined()
+        expect(password?.formElement.props.label).toBe('Password')
+
+        const terms = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'terms'
+        )
+        expect(terms).toBeDefined()
+
+        const submitButton = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'button' && e.content === 'Confirm'
+        )
+        expect(submitButton).toBeDefined()
+        // @ts-ignore
+        expect(submitButton?.formElement.submitAction).toBe(
+          __test__.createAccount
+        )
+      })
+
+      test('returns correct page details for parent/guardian', () => {
+        const route = {
+          path: '/sign-up/student/account',
+          params: {
+            parent: 'true',
+            gradeLevel: '8th',
+            schoolId: 'school-id-456',
+            zipCode: '54321',
+          },
+          query: {},
+        } as unknown as RouteLocation
+
+        const pageDetails = __test__.getAccountPageDetails(route)
+        const expectedRows = [
+          'logo',
+          'header',
+          'subheader',
+          'pgEmail',
+          'childFirstName/childLastName',
+          'childEmail',
+          'terms',
+          'submitButton',
+        ]
+        expect(pageDetails.rows.filter((r) => !!r).length).toBe(
+          expectedRows.length
+        )
+
+        const header = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h1'
+        )
+        expect(header?.formElement.content).toContain(
+          'Your child is eligible for UPchieve!'
+        )
+
+        const parentEmail = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'parentGuardianEmail'
+        )
+        expect(parentEmail).toBeDefined()
+        expect(parentEmail?.formElement.props.label).toBe('Your Email')
+
+        const firstName = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'firstName'
+        )
+        expect(firstName).toBeDefined()
+        expect(firstName?.formElement.props.label).toBe("Child's First Name")
+
+        const lastName = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'lastName'
+        )
+        expect(lastName).toBeDefined()
+        expect(lastName?.formElement.props.label).toBe("Child's Last Name")
+
+        const googleSsoButton = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'SsoButton' && e.props?.ssoMethod === 'google'
+        )
+        expect(googleSsoButton).toBeUndefined()
+
+        const cleverSsoButton = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'SsoButton' && e.props?.ssoMethod === 'clever'
+        )
+        expect(cleverSsoButton).toBeUndefined()
+      })
+
+      test('returns correct page details for class code signup', () => {
+        const route = {
+          path: '/sign-up/student/account',
+          params: {
+            classCode: 'ABC123',
+            gradeLevel: '11th',
+            email: 'joinclass@student.org',
+          },
+          query: {},
+        } as unknown as RouteLocation
+
+        const pageDetails = __test__.getAccountPageDetails(route)
+        const expectedRows = [
+          'logo',
+          'header',
+          'subheader',
+          'cleverButton',
+          'googleButton',
+          'orLineBreak',
+          'firstName',
+          'lastName',
+          'password',
+          'terms',
+          'submitButton',
+        ]
+        expect(pageDetails.rows.filter((r) => !!r).length).toBe(
+          expectedRows.length
+        )
+
+        const header = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h1'
+        )
+        expect(header?.formElement.content).toContain("You're almost done!")
+
+        const subheader = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.element === 'h2'
+        )
+        expect(subheader?.formElement.content).toBe(
+          `Finish creating your account to join class ${route.params.classCode}`
+        )
+
+        const email = findElementAndRow(
+          pageDetails.rows,
+          (e) => e.props?.name === 'email'
+        )
+        expect(email).toBeUndefined()
+      })
+    })
+
+    describe('createAccount', () => {
+      beforeEach(() => {
+        vi.resetAllMocks()
+        localStorage.clear()
+        mockedAuthService.registerStudent.mockResolvedValue()
+      })
+
+      test('registers student with correct data', async () => {
+        const data = {
+          firstName: 'MeowFirst',
+          lastName: 'MeowLast',
+          email: 'student@student.org',
+          password: 'Password123',
+          gradeLevel: '10th',
+          schoolId: 'school-id-000',
+          zipCode: '00000',
+        }
+        const result = await __test__.createAccount(data)
+
+        expect(mockedAuthService.registerStudent).toHaveBeenCalledWith({
+          email: data.email,
+          firstName: data.firstName,
+          gradeLevel: data.gradeLevel,
+          lastName: data.lastName,
+          password: data.password,
+          referredByCode: null,
+          schoolId: data.schoolId,
+          zipCode: data.zipCode,
+        })
+
+        expect(result[0]).toEqual({
+          path: '/verify',
+        })
+        expect(result[1]).toBeNull()
+      })
+
+      test('registers parent/guardian student with correct data', async () => {
+        const data = {
+          firstName: 'BarkFirst',
+          lastName: 'BarkLast',
+          parentGuardianEmail: 'pg@gpg.com',
+          email: 'student@pg.com',
+          parent: 'true',
+          gradeLevel: '8th',
+          schoolId: 'school-id-999',
+        }
+
+        const result = await __test__.createAccount(data)
+
+        expect(mockedAuthService.registerStudent).toHaveBeenCalledWith({
+          firstName: data.firstName,
+          gradeLevel: data.gradeLevel,
+          lastName: data.lastName,
+          parentGuardianEmail: data.parentGuardianEmail,
+          email: data.email,
+          referredByCode: null,
+          schoolId: data.schoolId,
+        })
+
+        expect(result[0]).toEqual({
+          params: {
+            ...data,
+            step: 'confirmation',
+          },
+        })
+      })
+
+      test('handles referral code', async () => {
+        const referralCode = 'this-is-my-referral-code'
+        localStorage.setItem('upcReferredByCode', referralCode)
+
+        const data = {
+          firstName: 'FriendsFirst',
+          lastName: 'FriendsLast',
+          email: 'referral@referral.com',
+          password: 'Password123',
+        }
+
+        await __test__.createAccount(data)
+
+        expect(mockedAuthService.registerStudent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            referredByCode: referralCode,
+          })
+        )
+        expect(localStorage.getItem('upcReferredByCode')).toBeNull()
+      })
+
+      test('handles registration error', async () => {
+        const error = { response: { data: { err: 'Registration failed' } } }
+        mockedAuthService.registerStudent.mockRejectedValue(error)
+
+        const data = {
+          firstName: 'ErrorFirst',
+          lastName: 'ErrorLast',
+          email: 'test@example.com',
+          password: 'Password123',
+        }
+
+        const result = await __test__.createAccount(data)
+
+        expect(result[0]).toBeNull()
+        expect(result[1]).toBe('Registration failed')
+      })
+
+      test('redirects to login if email already in use', async () => {
+        const error = {
+          response: {
+            data: {
+              err: 'The email address you entered is already in use',
+            },
+          },
+        }
+        mockedAuthService.registerStudent.mockRejectedValue(error)
+        const routerPushSpy = vi
+          .spyOn(router, 'push')
+          .mockImplementation(() => Promise.resolve())
+
+        const data = {
+          firstName: 'Existing',
+          lastName: 'Account',
+          email: 'existing@account.com',
+          password: 'Password123',
+        }
+        const result = await __test__.createAccount(data)
+
+        expect(routerPushSpy).toHaveBeenCalledWith(
+          expect.stringContaining('/login?message=')
+        )
+        expect(result[0]).toBeNull()
+        expect(result[1]).toBe(
+          'The email address you entered is already in use'
+        )
+
+        routerPushSpy.mockRestore()
       })
     })
   })

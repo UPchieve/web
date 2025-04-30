@@ -232,7 +232,7 @@ function getEligibilityPageDetails(
 
   function includeSchoolElement() {
     if (isPartnerStudentSignUp()) {
-      return to.params.studentPartnerIsSchool === 'true'
+      return to.params.studentPartnerIsSchool !== 'true'
     }
     return true
   }
@@ -269,7 +269,7 @@ function getEligibilityPageDetails(
             'justify-start mt-1 el-gap-sm',
             ...getAlreadyHaveAccountElements()
           ),
-      isPartnerStudentSignUp()
+      isPartnerStudentSignUp() && to.params.studentPartnerSites?.length
         ? getRow('mt-2', getPartnerSitesElement(to))
         : null,
       getRow(
@@ -487,6 +487,7 @@ function getAccountPageDetails(
         ? getRow('mt-2', {
             element: 'FormPassword',
             props: {
+              label: 'Password',
               name: InputName.PASSWORD,
               metadata:
                 'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
@@ -797,5 +798,9 @@ export async function beforeEnter(
 // Exported for testing.
 export const __test__ = {
   getEligibilityPageDetails,
+  getIneligiblePageDetails,
+  getAccountPageDetails,
   checkEligibility,
+  ineligibleContinue,
+  createAccount,
 }
