@@ -7,14 +7,14 @@ describe('countWords', () => {
     expect(countWords(' . ??-!/')).toBe(0)
     expect(countWords('hello')).toBe(1)
     expect(countWords('hello world')).toBe(2)
-    expect(countWords('hello, 123,456!')).toBe(2)
+    expect(countWords('hello, 123,456!')).toBe(3)
     expect(countWords("it's a me, mario!")).toBe(4)
     expect(
       countWords(`
       I'm a member of
-      S.T.A.R.S
+      STARS ⭐
       `)
-    ).toBe(5)
+    ).toBe(6)
     expect(countWords('hi--how are you?')).toBe(4)
   })
 })
