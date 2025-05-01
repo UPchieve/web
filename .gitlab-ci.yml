@@ -13,11 +13,11 @@ cache:
 
 variables:
   # TODO: Is this variable actually ?
-  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  npm_config_cache: '$CI_PROJECT_DIR/.npm'
 
 .build_artifact:
   stage: build
-  image: "node:20.10.0-bullseye"
+  image: 'node:20.10.0-bullseye'
   cache: []
   environment:
     action: prepare
@@ -100,6 +100,21 @@ tag_commit_production:
   release:
     tag_name: 'deployed-$(date +%Y-%m-%d_%H-%M-%S)'
     description: 'Deployed from GitLab CI.'
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+
+new_relic_deploy_tracker:
+  stage: post-deploy
+  needs:
+    - job: deploy_production
+  variables:
+    NEW_RELIC_DEPLOYMENT_USER_KEY: $NEW_RELIC_DEPLOYMENT_USER_KEY
+    NEW_RELIC_BROWSER_GUID_PRODUCTION: $NEW_RELIC_BROWSER_GUID_PRODUCTION
+  script: >
+    curl -v https://api.newrelic.com/graphql
+    -H 'content-type: application/json; charset=utf-8'
+    -H "API-Key: $NEW_RELIC_DEPLOYMENT_USER_KEY"
+    --data-raw '{"query":"mutation { changeTrackingCreateDeployment(deployment: {version: \"'$CI_COMMIT_SHA'\", entityGuid: \"'$NEW_RELIC_BROWSER_GUID_PRODUCTION'\"}) { deploymentId timestamp } }"}'
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
