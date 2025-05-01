@@ -855,8 +855,8 @@ describe('StudentSignUpService', () => {
           },
         }
         mockedAuthService.registerStudent.mockRejectedValue(error)
-        const routerPushSpy = vi
-          .spyOn(router, 'push')
+        const routerReplaceSpy = vi
+          .spyOn(router, 'replace')
           .mockImplementation(() => Promise.resolve())
 
         const data = {
@@ -867,7 +867,7 @@ describe('StudentSignUpService', () => {
         }
         const result = await __test__.createAccount(data)
 
-        expect(routerPushSpy).toHaveBeenCalledWith(
+        expect(routerReplaceSpy).toHaveBeenCalledWith(
           expect.stringContaining('/login?message=')
         )
         expect(result[0]).toBeNull()
@@ -875,7 +875,7 @@ describe('StudentSignUpService', () => {
           'The email address you entered is already in use'
         )
 
-        routerPushSpy.mockRestore()
+        routerReplaceSpy.mockRestore()
       })
     })
   })

@@ -121,6 +121,14 @@ export default {
 
   watch: {
     $route(to, from) {
+      if (to.params?.reset) {
+        for (const r of to.params.reset) {
+          delete this.form[r]
+          delete to.params[r]
+          delete to.query[r]
+        }
+        delete to.params.reset
+      }
       this.loadPageDetails(to, from)
     },
   },

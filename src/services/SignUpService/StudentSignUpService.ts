@@ -142,6 +142,7 @@ export function getPageDetails(
     if (isInternationalRoute(to)) {
       return getInternationalPageDetails()
     }
+
     if (isIneligibleRoute(to)) {
       return getIneligiblePageDetails()
     }
@@ -182,13 +183,17 @@ function isParentGuardianSignUp(to: RouteLocation) {
   return to.params.parent === 'true'
 }
 
+function isGreatSchoolsStudent(to: RouteLocation) {
+  return to.params.studentPartnerOrgKey === 'great-schools'
+}
+
 function isParentGuardianConfirmationRoute(
   to: RouteLocation,
-  from: RouteLocation
+  from?: RouteLocation
 ) {
   return (
-    to.path === SignUpPage.parentGuardianConfirmation &&
-    from.path === SignUpPage.account
+    to.path === RoutePath.parentGuardianConfirmation &&
+    from?.path === RoutePath.account
   )
 }
 
@@ -210,8 +215,10 @@ function getEligibilityPageDetails(
   function isCollegeConfidentialStudent() {
     return to.params['utm_source'] === 'collegeconfidential'
   }
-
   function getHeaderText() {
+    if (isGreatSchoolsStudent(to)) {
+      return "Hey! 👋 We're UPchieve, a non-profit on a mission to help all children get the academic support they deserve."
+    }
     if (isParentGuardianSignUp(to)) {
       return 'Check if your child is eligible for free tutoring with UPchieve'
     }
@@ -240,6 +247,9 @@ function getEligibilityPageDetails(
     if (isCodeDotOrgStudent()) {
       return 'Create an account now to access FREE, 24/7 tutoring in all your classes, including AP Computer Science.'
     }
+    if (isGreatSchoolsStudent(to)) {
+      return 'Check if your child is eligible for FREE 1:1 tutoring!'
+    }
   }
 
   function includeSchoolElement() {
@@ -261,14 +271,16 @@ function getEligibilityPageDetails(
   return {
     backgroundLayout: 'panel-right-50p',
     submitAction: checkEligibility,
-    panelImage: 'chat-one-on-one',
+    panelImage: isGreatSchoolsStudent(to)
+      ? 'we-can-help-subjects'
+      : 'chat-one-on-one',
     classes: 'uc-column justify-center justify-start-md',
     rows: [
       getRow('justify-center', {
         element: 'header-logo-teal',
       }),
       getRow('mt-4', getTextElement('h1', getHeaderText())),
-      subheaderText ? getRow('mt-3', getTextElement('p', subheaderText)) : null,
+      subheaderText ? getRow('mt-2', getTextElement('p', subheaderText)) : null,
       isPartnerStudentSignUp()
         ? getRow(
             'justify-start mt-1',
@@ -504,11 +516,17 @@ function getAccountPageDetails(
   }
   function getH2Text() {
     const suffix = ` to join class ${to.params.classCode}`
-    return 'Finish creating your account' + (isClassCodeSignUp ? suffix : '')
+    return (
+      `Finish creating ${isParentGuardian ? "your child's" : 'your'} account` +
+      (isClassCodeSignUp ? suffix : '')
+    )
   }
 
   return {
-    backgroundLayout: 'panel-right-75p',
+    backgroundLayout: isGreatSchoolsStudent(to)
+      ? 'panel-right-50p'
+      : 'panel-right-75p',
+    panelImage: isGreatSchoolsStudent(to) ? 'trusted-by-students' : undefined,
     submitAction: createAccount,
     rows: [
       getRow('justify-start', {
@@ -609,10 +627,24 @@ function getParentGuardianConfirmationDetails(
   to: RouteLocation
 ): PageDetail<ParentGuardianReset> {
   function resetSignUp(data: ParentGuardianReset) {
-    return getSubmitResponse(SignUpPage.eligibility, data)
+    return getSubmitResponse(SignUpPage.eligibility, {
+      ...data,
+      // If a parent/guardian wants to add another child,
+      // reset only the parts of the form specific
+      // to that child they just added.
+      // @ts-ignore
+      reset: [
+        'email',
+        'firstName',
+        'lastName',
+        'schoolId',
+        'gradeLevel',
+        'signupSourceId',
+      ],
+    })
   }
 
-  const studentEmail = to.params.studentEmail
+  const studentEmail = to.params.email
   return {
     backgroundLayout: 'full',
     classes: 'text-center screen-narrow',
@@ -625,22 +657,22 @@ function getParentGuardianConfirmationDetails(
           'Your child should have received an email from us!'
         )
       ),
-      getRow('justify-center', {
+      getRow('justify-center mt-3', {
         element: 'updog-smiling',
         classes: 'updog',
       }),
-      getRow('justify-center', {
+      getRow('justify-center mt-3', {
         element: 'check-circled',
       }),
       getRow(
-        'justify-center',
+        'justify-center mt-3 pre-wrap',
         getTextElement(
           'p',
-          `Please confirm with your child that they in fact did receive an email from us. Email was sent to ${studentEmail}.`
+          `Please confirm with your child that they in fact did receive an email from us.\nEmail was sent to ${studentEmail}.`
         )
       ),
       getRow(
-        'justify-center bold',
+        'justify-center bold mt-3',
         getTextElement('p', "My child didn't receive a sign up email."),
         getRouterLinkElement('Contact Us', '/contact')
       ),
@@ -826,7 +858,7 @@ export async function beforeEnter(
       } else {
         to.params.partner = studentPartner
         to.params.studentPartnerOrgKey = studentPartner.key
-        to.params.studentParterName = studentPartner.name
+        to.params.studentPartnerName = studentPartner.name
         to.params.studentPartnerSites = studentPartner.sites
         to.params.studentPartnerIsSchool = studentPartner.isSchool.toString()
         to.params.schoolSignupRequired =

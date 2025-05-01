@@ -133,7 +133,7 @@ export function getSubmitResponse(
         ? err
         : err.response?.data?.err ?? 'Failed: Please try again.'
     if (error === EMAIL_ALREADY_IN_USE) {
-      router.push(
+      router.replace(
         '/login?' +
           new URLSearchParams({
             message:

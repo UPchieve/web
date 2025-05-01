@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="useNewSignUpFlow && this.userSelection === UserType.student"
+    v-if="(useNewSignUpFlow || $route.query.partner === 'great-schools') && this.userSelection === UserType.student"
     class="h-full"
   >
     <sign-up-forms :getPageDetails="getStudentPageDetails" />

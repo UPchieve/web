@@ -14,7 +14,12 @@
       }"
     >
       <div v-if="layout.includes('panel')" class="img-content">
-        <component v-if="panelImg" :is="panelImg" class="img" />
+        <component
+          v-if="panelImg"
+          :is="panelImg"
+          class="img"
+          :style="customPanelImgStyle"
+        />
       </div>
       <div class="form-content">
         <img
@@ -43,14 +48,18 @@
 </template>
 
 <script>
-import ChatOneOnOne from '@/assets/chat-1-on-1.svg'
-import ConnectYourStudents from '@/assets/connect-your-students.svg'
+import ChatOneOnOne from '@/assets/marketing_images/chat-1-on-1.svg'
+import ConnectYourStudents from '@/assets/marketing_images/connect-your-students.svg'
+import TrustedByStudents from '@/assets/marketing_images/trusted_by_students.svg'
 import UpdogSubjects from '@/assets/updog-subjects.svg'
+import WeCanHelpSubjects from '@/assets/marketing_images/we_can_help_in_any_core_subject.svg'
 export default {
   components: {
     ChatOneOnOne,
     ConnectYourStudents,
+    TrustedByStudents,
     UpdogSubjects,
+    WeCanHelpSubjects,
   },
   props: {
     layout: {
@@ -66,6 +75,23 @@ export default {
     formCardMaxWidth: {
       type: String,
       default: null,
+    },
+  },
+  computed: {
+    customPanelImgStyle() {
+      if (this.panelImg === 'chat-one-on-one') {
+        return {
+          'padding-left': '0px',
+        }
+      }
+
+      if (this.panelImg === 'we-can-help-subjects') {
+        return {
+          padding: '45px',
+        }
+      }
+
+      return {}
     },
   },
 }
@@ -225,7 +251,7 @@ $footer-height-tiny: 100px;
 .img {
   height: calc(100vh - $footer-height);
   max-width: 1000px;
-  padding-top: 25px;
+  padding: 25px 25px 0 25px;
   width: 100%;
 }
 
