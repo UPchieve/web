@@ -305,27 +305,32 @@ export default {
         )
 
         try {
-          await this.zwibblerCtx.joinSharedSession(this.session._id, false)
+          await this.zwibblerCtx.joinSharedSession(this.session.id, false)
         } catch (error) {
           this.loadingWhiteboardError = 'Failed to load the whiteboard.'
         }
 
         this.zwibblerCtx.on('connected', () => {
-          this.zwibblerCtx.usePanTool()
-          try {
-            this.zwibblerCtx.setViewRectangle(
-              this.zwibblerCtx.getBoundingRectangle(
-                this.zwibblerCtx.getAllNodes()
+          if (this.zwibblerCtx.getDocumentProperty('useInfiniteWhiteboard')) {
+            this.zwibblerCtx.setZoom('page')
+            this.zwibblerCtx.setConfig('allowZoom', true)
+          } else {
+            try {
+              this.zwibblerCtx.setViewRectangle(
+                this.zwibblerCtx.getBoundingRectangle(
+                  this.zwibblerCtx.getAllNodes()
+                )
               )
-            )
-          } catch (error) {
-            this.zwibblerCtx.setViewRectangle({
-              x: 0,
-              y: 0,
-              width: 1,
-              height: 1,
-            })
+            } catch (error) {
+              this.zwibblerCtx.setViewRectangle({
+                x: 0,
+                y: 0,
+                width: 1,
+                height: 1,
+              })
+            }
           }
+          this.zwibblerCtx.usePanTool()
         })
       }
     })
@@ -349,6 +354,12 @@ export default {
 
     goBack() {
       this.$router.go(-1)
+    },
+    async beforeUnmount() {
+      if (this.zwibblerCtx?.leaveSharedSession) {
+        await this.zwibblerCtx.leaveSharedSession()
+      }
+      this.zwibblerCtx?.destroy()
     },
   },
 }

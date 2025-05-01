@@ -301,7 +301,6 @@ export default {
             showColourPanel: false,
             collaborationServer: `${config.websocketRoot}/whiteboard/recap/${this.session.id}`,
             readOnly: true,
-            allowZoom: false,
           })
         )
 
@@ -324,18 +323,27 @@ export default {
         }
 
         this.zwibblerCtx.on('connected', () => {
-          this.zwibblerCtx.setPaperSize(
-            this.whiteboardDimensions.width,
-            this.whiteboardDimensions.height
-          )
-          this.resizeViewRectangle()
+          if (this.zwibblerCtx.getDocumentProperty('useInfiniteWhiteboard')) {
+            this.zwibblerCtx.setZoom('page')
+            this.zwibblerCtx.setConfig('allowZoom', true)
+          } else {
+            this.zwibblerCtx.setPaperSize(
+              this.whiteboardDimensions.width,
+              this.whiteboardDimensions.height
+            )
+            this.resizeViewRectangle()
+          }
+          this.zwibblerCtx.usePanTool()
           this.isConnectedToWhiteboard = true
         })
       }
     })
   },
-  beforeUnmount() {
+  async beforeUnmount() {
     socket.emit('sessions/recap:leave', { sessionId: this.session.id })
+    if (this.zwibblerCtx?.leaveSharedSession) {
+      await this.zwibblerCtx.leaveSharedSession()
+    }
     this.zwibblerCtx?.destroy()
   },
   methods: {

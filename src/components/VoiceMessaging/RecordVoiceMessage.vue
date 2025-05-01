@@ -8,7 +8,7 @@ import LoggerService from '@/services/LoggerService'
 import { vTooltip } from 'maz-ui'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '../../consts'
-import Announcement from './Announcement.vue'
+import Announcement from '@/components/Announcement.vue'
 import { VoiceRecognition } from './voice-recognition'
 import Spinner from '../../components/Spinner.vue'
 import LargeButton from '../../components/LargeButton.vue'
@@ -204,7 +204,19 @@ function destroy() {
 
 <template>
   <div v-if="recording.state === STATES.idle">
-    <Announcement />
+    <Announcement
+      localStorageKey="showVmAnnouncement"
+      title="Audio Recording!"
+      body="Exciting news! We're experimenting with audio messages and speech-to-text in the chat, available to a select group. Try it out today!"
+      :position="{
+        bottom: '60px',
+        right: '8px',
+        top: 'initial',
+        left: 'initial',
+      }"
+      :showEvent="EVENTS.VOICE_MESSAGE_ANNOUNCEMENT_SEEN"
+      :closeEvent="EVENTS.VOICE_MESSAGE_ANNOUNCEMENT_CLOSED"
+    />
 
     <button
       v-tooltip="{

@@ -1280,7 +1280,7 @@ export default {
   // TODO: research performance implications of position: absolute
   // vs alternatives and how they impact DOM reflow triggers
   &--hidden {
-    display: none;
+    visibility: hidden;
   }
 }
 
