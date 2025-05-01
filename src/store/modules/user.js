@@ -211,8 +211,12 @@ export default {
       commit('setIsSessionConnectionAlive', true)
     },
 
-    updateSession: ({ commit }, sessionData) => {
+    updateSession: ({ commit, dispatch }, sessionData) => {
       commit('setSession', sessionData)
+
+      if (sessionData.endedAt) {
+        dispatch('federalWorkStudyVolunteer/startCooldown', { root: true })
+      }
     },
 
     updateAvailability: ({ commit }, availability, date = Date.now()) => {

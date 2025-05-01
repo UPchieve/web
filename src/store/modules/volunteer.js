@@ -1,6 +1,7 @@
 import sendWebNotification from '@/utils/send-web-notification'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
+import * as FederalWorkStudyVolunteerService from '@/services/FederalWorkStudyVolunteerService'
 
 export default {
   namespaced: true,
@@ -180,6 +181,8 @@ export default {
       for (const removedSessionId of removedSessionIds) {
         this.dispatch('notifications/remove', removedSessionId)
       }
+
+      FederalWorkStudyVolunteerService.maybeAutoJoinOldestSession(results)
     },
   },
 

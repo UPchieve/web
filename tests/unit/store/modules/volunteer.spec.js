@@ -3,6 +3,12 @@ import userModule from '@/store/modules/user'
 import { it, vi } from 'vitest'
 import { createStore } from 'vuex'
 
+vi.mock('@/services/FederalWorkStudyVolunteerService', () => {
+  return {
+    maybeAutoJoinOldestSession: vi.fn(),
+  }
+})
+
 describe('Volunteer store module', () => {
   const mockUserModule = {
     namespaced: true,

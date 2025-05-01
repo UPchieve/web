@@ -32,6 +32,7 @@ export default {
       await NetworkService.endSession({ sessionId })
       // TODO: Just return the mutated session in `NetworkService.endSession`.
       store?.dispatch('session/fetchLatestSession')
+      store?.dispatch('federalWorkStudyVolunteer/startCooldown')
     } catch (err) {
       if (err?.response?.data?.err !== 'Session has already ended') {
         throw err
