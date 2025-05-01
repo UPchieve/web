@@ -97,7 +97,7 @@ describe('StudentSignUpService', () => {
           (e) => e.props?.name === 'gradeLevel'
         )
         expect(grade).toBeDefined()
-        expect(grade?.formElement.props.label).toBe('Grade in 2023-2024')
+        expect(grade?.formElement.props.label).toBe('Grade in 2024-2025')
 
         const zipCode = findElementAndRow(
           pageDetails.rows,
@@ -167,7 +167,7 @@ describe('StudentSignUpService', () => {
         )
         expect(grade).toBeDefined()
         expect(grade?.formElement.props.label).toBe(
-          "Child's Grade in 2023-2024"
+          "Child's Grade in 2024-2025"
         )
 
         const school = findElementAndRow(
