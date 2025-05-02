@@ -1346,7 +1346,6 @@ export default {
         showColourPanel: false,
         showToolbar: false,
         showHints: false,
-        scrollbars: true,
         zoomOnResize: true,
       })
 
@@ -1432,11 +1431,13 @@ export default {
           this.zwibblerCtx.setDocumentProperty('useInfiniteWhiteboard', true)
           this.useInfiniteWhiteboard = true
           this.zwibblerCtx.setConfig('allowZoom', true)
+          this.zwibblerCtx.setConfig('scrollbars', false)
           this.zoomToFit()
           this.addInfiniteSizeListeners()
         } else {
           this.useInfiniteWhiteboard = false
           this.zwibblerCtx.setConfig('allowZoom', false)
+          this.zwibblerCtx.setConfig('scrollbars', true)
           this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight)
           this.resizeViewRectangle()
           this.addFixedSizeListeners()
@@ -1610,13 +1611,12 @@ export default {
     calculateArrowPosition(x, y, whiteboardWidth, whiteboardHeight) {
       // Boundaries of the whiteboard (within which we can place the arrow).
       // Leave additional space so as the arrow rotates, it doesn't get hidden off-screen.
-      // Extra space on right and bottom is to account for the scrollbars.
-      const margins = { left: 5, top: 5, right: 15, bottom: 15 }
+      const margin = 5
       const bounds = {
-        left: margins.left,
-        right: whiteboardWidth - margins.right,
-        top: margins.top,
-        bottom: whiteboardHeight - margins.bottom,
+        left: margin,
+        right: whiteboardWidth - margin,
+        top: margin,
+        bottom: whiteboardHeight - margin
       }
 
       // Determine the distance (and direction) from the center to the cursor.
@@ -1801,7 +1801,7 @@ export default {
   display: flex;
   flex-direction: column;
   position: absolute;
-  right: 20px;
+  right: 10px;
   top: 10px;
   width: 50px;
 }
