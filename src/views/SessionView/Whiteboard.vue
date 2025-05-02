@@ -1228,6 +1228,7 @@ export default {
       if (!this.recentNodesOutsideView.length) return
 
       this.zoomToFit(null, this.recentNodesOutsideView)
+      this.recentNodesOutsideView = []
       this.showGoToRecentNodesButton = false
       AnalyticsService.captureEvent(
         EVENTS.USER_CLICKED_WHITEBOARD_GO_TO_LATEST,
