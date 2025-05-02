@@ -279,7 +279,10 @@ export default {
     },
     async processImpactStudySurvey() {
       let didResetForNewSurvey = false
-      if (this.productFlags.impactStudyEnrollmentAt) {
+      if (
+        this.productFlags.impactStudyEnrollmentAt &&
+        this.isImpactStudySurveyEnabled
+      ) {
         try {
           const [{ data: currentSurveyData }, { data: surveyResponseData }] =
             await Promise.all([
@@ -287,11 +290,12 @@ export default {
               NetworkService.getImpactStudySurveyResponses(),
             ])
           // User has already filled out the survey
-          if (currentSurveyData.surveyId === surveyResponseData.surveyId) return
+          if (currentSurveyData.surveyId === surveyResponseData?.surveyId)
+            return
 
           const isNewImpactStudySurveyForUser =
             currentSurveyData.surveyId !== surveyResponseData.surveyId
-          if (surveyResponseData && isNewImpactStudySurveyForUser) {
+          if (isNewImpactStudySurveyForUser) {
             const currentSurveyId = currentSurveyData.surveyId
             const lastResetSurveyId =
               Number(localStorage.getItem('lastImpactStudySurveyId')) || 0
