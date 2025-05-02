@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { MESSAGE_ALIGNMENT } from '../BotConversationsView/BotChatMessages.vue'
-import GenerationFeedback from '../BotConversationsView/GenerationFeedback.vue'
+import GenerationFeedback from '@/components/GenerationFeedback.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import SystemMessage from '../BotConversationsView/SystemMessage.vue'
+import { EVENTS } from '@/consts'
 
 const { alignment, message } = defineProps<{
   alignment: MESSAGE_ALIGNMENT
@@ -22,6 +23,10 @@ function messageClassFor(
     return 'partner'
   }
 }
+
+const thumbsUpEvent = EVENTS.AI_TUTOR_THUMBS_UP
+const thumbsDownEvent = EVENTS.AI_TUTOR_THUMBS_DOWN
+const followupFeedbackEvent = EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK
 </script>
 
 <template>
@@ -60,6 +65,10 @@ function messageClassFor(
         v-if="message.traceId"
         :traceId="message.traceId"
         :observationId="message?.observationId ?? ''"
+        name="tutor-bot-feedback"
+        :analyticsServiceThumbsUp="{ eventName: thumbsUpEvent }"
+        :analyticsServiceThumbsDown="{ eventName: thumbsDownEvent }"
+        :analyticsServiceFollowup="{ eventName: followupFeedbackEvent }"
       />
     </div>
   </div>

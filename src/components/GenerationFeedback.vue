@@ -6,14 +6,32 @@ import { computed, ref } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 enum MODAL_STATE {
   'can-open',
   'negative-follow-up',
   'positive-follow-up',
 }
-const props = defineProps<{ traceId: string; observationId: string }>()
+
+export type FeedbackOptions = {
+  title: string
+  options?: string[]
+  moreFeedbackTitle?: string
+}
+
+type AnalyticsServiceType = {
+  eventName: string
+  eventData?: Object
+}
+
+const props = defineProps<{
+  traceId?: string
+  observationId?: string
+  name: string
+  analyticsServiceThumbsUp: AnalyticsServiceType
+  analyticsServiceThumbsDown: AnalyticsServiceType
+  analyticsServiceFollowup?: AnalyticsServiceType
+}>()
 const modalState = ref(MODAL_STATE['can-open'])
 
 // TODO move this to a service
@@ -25,35 +43,10 @@ const langfuse = new LangfuseWeb({
 let selectedOption = ref()
 let additionalFeedback = ref('')
 
-const negativeArgs = {
-  title: 'What was the problem?',
-  options: [
-    'Needs whiteboard or visual support',
-    'Message was confusing or too long',
-    'Asked too many questions',
-    'Technical issue',
-    'Message was incorrect or inaccurate',
-    'Other',
-  ],
-  moreFeedbackTitle: 'Tell us more about the issue or how we can improve.',
-}
-
-const positiveArgs = {
-  title: 'What was helpful?',
-  options: [
-    'Message was clear and easy to understand',
-    'Asked a helpful question',
-    'Provided a helpful explanation',
-    'Fast and efficient response',
-    'Other',
-  ],
-  moreFeedbackTitle: 'Tell us more about the issue or how we can improve.',
-}
-
 let feedbackArgs = computed(() =>
   modalState.value === MODAL_STATE['negative-follow-up']
-    ? negativeArgs
-    : positiveArgs
+    ? negativeArgs(props.name)
+    : positiveArgs(props.name)
 )
 
 const reset = () => {
@@ -62,15 +55,69 @@ const reset = () => {
   modalState.value = MODAL_STATE['can-open']
 }
 
+const positiveArgs = (type: string): FeedbackOptions | undefined => {
+  switch (type) {
+    case 'session-review-feedback':
+      return undefined
+    case 'tutor-bot-feedback':
+      return {
+        title: 'What was helpful?',
+        options: [
+          'Message was clear and easy to understand',
+          'Asked a helpful question',
+          'Provided a helpful explanation',
+          'Fast and efficient response',
+          'Other',
+        ],
+        moreFeedbackTitle:
+          'Tell us more about the issue or how we can improve.',
+      }
+    default:
+      return undefined
+  }
+}
+
+const negativeArgs = (type: string): FeedbackOptions | undefined => {
+  switch (type) {
+    case 'session-review-feedback':
+      return {
+        title: 'What can we improve?',
+        moreFeedbackTitle: 'Tell us how we can make this summary better.',
+      }
+    case 'tutor-bot-feedback':
+      return {
+        title: 'What was the problem?',
+        options: [
+          'Needs whiteboard or visual support',
+          'Message was confusing or too long',
+          'Asked too many questions',
+          'Technical issue',
+          'Message was incorrect or inaccurate',
+          'Other',
+        ],
+        moreFeedbackTitle:
+          'Tell us more about the issue or how we can improve.',
+      }
+    default:
+      return undefined
+  }
+}
+
 const thumbsUp = () => {
-  AnalyticsService.captureEvent(EVENTS.AI_TUTOR_THUMBS_UP)
-  langfuse.score({
-    name: 'tutor-bot-feedback',
-    traceId: props.traceId,
-    observationId: props.observationId,
-    value: 1,
-  })
-  if (modalState.value === MODAL_STATE['can-open']) {
+  const { eventName, eventData } = props.analyticsServiceThumbsUp
+  AnalyticsService.captureEvent(eventName, eventData)
+  if (props.traceId) {
+    langfuse.score({
+      name: props.name,
+      traceId: props.traceId,
+      observationId: props.observationId,
+      value: 1,
+    })
+  }
+  if (
+    positiveArgs(props.name) &&
+    modalState.value === MODAL_STATE['can-open']
+  ) {
     modalState.value = MODAL_STATE['positive-follow-up']
   }
 }
@@ -80,29 +127,43 @@ const closeModal = () => {
 }
 
 const thumbsDown = () => {
-  AnalyticsService.captureEvent(EVENTS.AI_TUTOR_THUMBS_DOWN)
-  langfuse.score({
-    name: 'tutor-bot-feedback',
-    traceId: props.traceId,
-    observationId: props.observationId,
-    value: 0,
-  })
-  if (modalState.value === MODAL_STATE['can-open']) {
+  const { eventName, eventData } = props.analyticsServiceThumbsDown
+  AnalyticsService.captureEvent(eventName, eventData)
+  if (props.traceId) {
+    langfuse.score({
+      name: props.name,
+      traceId: props.traceId,
+      observationId: props.observationId,
+      value: 0,
+    })
+  }
+  if (
+    negativeArgs(props.name) &&
+    modalState.value === MODAL_STATE['can-open']
+  ) {
     modalState.value = MODAL_STATE['negative-follow-up']
   }
 }
 
 const giveFeedback = (event: Event) => {
   event.preventDefault()
-  AnalyticsService.captureEvent(EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK)
-  langfuse.score({
-    name: 'tutor-bot-feedback:followup',
-    traceId: props.traceId,
-    observationId: props.observationId,
-    dataType: 'CATEGORICAL',
-    value: selectedOption.value,
-    comment: additionalFeedback.value,
-  })
+  if (props.analyticsServiceFollowup) {
+    const { eventName, eventData } = props.analyticsServiceFollowup
+    AnalyticsService.captureEvent(eventName, {
+      ...eventData,
+      comment: additionalFeedback.value,
+    })
+  }
+  if (props.traceId) {
+    langfuse.score({
+      name: props.name + ':followup',
+      traceId: props.traceId,
+      observationId: props.observationId,
+      dataType: 'CATEGORICAL',
+      value: selectedOption.value,
+      comment: additionalFeedback.value,
+    })
+  }
   closeModal()
 }
 </script>
@@ -116,7 +177,7 @@ const giveFeedback = (event: Event) => {
     />
     <Modal
       :closeModal="closeModal"
-      v-if="modalState !== MODAL_STATE['can-open']"
+      v-if="modalState !== MODAL_STATE['can-open'] && feedbackArgs"
     >
       <div class="title">{{ feedbackArgs.title }}</div>
       <form class="options" @submit="giveFeedback">
@@ -128,8 +189,11 @@ const giveFeedback = (event: Event) => {
           >{{ option }}</LargeButton
         >
         <div class="footer">
-          <label>{{ feedbackArgs.moreFeedbackTitle }}</label>
+          <label v-if="feedbackArgs.moreFeedbackTitle">{{
+            feedbackArgs.moreFeedbackTitle
+          }}</label>
           <textarea
+            v-if="feedbackArgs.moreFeedbackTitle"
             class="more-feedback"
             v-model="additionalFeedback"
             @keydown="
@@ -145,7 +209,9 @@ const giveFeedback = (event: Event) => {
             class="submit-button"
             type="submit"
             primary
-            :disabled="!selectedOption"
+            :disabled="
+              feedbackArgs.options ? !selectedOption : !additionalFeedback
+            "
             >Submit</LargeButton
           >
         </div>

@@ -100,6 +100,20 @@
                 </div>
                 {{ session.summary.summary }}
               </div>
+              <div class="summary-feedback">
+                <span>Was this summary helpful?</span>
+                <GenerationFeedback
+                  name="session-review-feedback"
+                  :analyticsServiceThumbsUp="{
+                    eventName: EVENTS.SESSION_SUMMARY_THUMBS_UP,
+                    eventData: { sessionId: session.id },
+                  }"
+                  :analyticsServiceThumbsDown="{
+                    eventName: EVENTS.SESSION_SUMMARY_THUMBS_DOWN,
+                    eventData: { sessionId: session.id },
+                  }"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -117,6 +131,8 @@ import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import moment from 'moment'
 import IonicSelect from '@/components/IonicSelect.vue'
 import BlueAlert from '@/assets/blue-alert.svg'
+import GenerationFeedback from '@/components/GenerationFeedback.vue'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'student-details',
@@ -126,6 +142,7 @@ export default {
     FormDateInput,
     IonicSelect,
     BlueAlert,
+    GenerationFeedback,
   },
 
   data() {
@@ -152,6 +169,7 @@ export default {
       },
       subjectPlaceholder: '',
       hasSessionSummary: false,
+      EVENTS,
     }
   },
   computed: {
@@ -405,6 +423,13 @@ export default {
 
 .session-summary {
   @include flex-container(row, flex-start, center);
+}
+
+.summary-feedback {
+  margin-top: 16px;
+  span {
+    font-weight: 500;
+  }
 }
 
 .icon-and-tooltip:hover .summary-tooltip {
