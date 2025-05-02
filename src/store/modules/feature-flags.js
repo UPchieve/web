@@ -42,6 +42,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ]: false,
       [POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES]: false,
       [POSTHOG_FEATURE_FLAGS.INFINITE_WHITEBOARD]: false,
+      [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -205,6 +206,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES],
     isInfiniteWhiteboardEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.INFINITE_WHITEBOARD],
+    isSecondaryEmailOnProfilePageEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {

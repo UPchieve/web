@@ -8,6 +8,10 @@
       :closeModal="toggleShowSmsVerificationModal"
       :onCloseSuccess="updateVerifiedPhoneInfo"
     />
+    <SecondaryEmailModal
+      v-if="showSecondaryEmailModal"
+      @dismissed="() => toggleSecondaryEmailModal(false)"
+    />
     <deactivate-account-modal
       v-if="showDeactivateAccountModal"
       :closeModal="toggleDeactivatedAccountModal"
@@ -45,6 +49,30 @@
             <div class="prompt">Your Email</div>
             <div id="ph-no-capture" class="answer">{{ user.email }}</div>
           </div>
+          <div
+            v-if="isSecondaryEmailOnProfilePageEnabled"
+            id="secondary-email"
+            class="container-section"
+          >
+            <div class="prompt">Secondary Email</div>
+            <div v-if="user.proxyEmail" id="ph-no-capture" class="answer">
+              {{ user.proxyEmail }}
+            </div>
+            <div
+              v-else
+              class="alert alert-warning w-full inline-block"
+              id="secondary-email-profile-cta"
+            >
+              Add a secondary email to make sure you don't lose access to your
+              account if something happens to your primary email.<br />
+              <span
+                @click="() => toggleSecondaryEmailModal(true)"
+                class="secondary-btn uc-link bold"
+              >
+                Add email
+              </span>
+            </div>
+          </div>
           <div>
             <div id="phone" class="container-section">
               <div id="phone-heading">
@@ -77,11 +105,11 @@
                 <!-- Unverified phone number: Show alert with CTA to verify phone number -->
                 <div
                   v-if="!this.user.phoneVerified"
-                  class="alert alert-warning unverified"
+                  class="alert alert-warning unverified w-full"
                 >
-                  Your phone number has not been verified.
+                  Your phone number has not been verified.<br />
                   <span
-                    class="uc-link secondary-btn"
+                    class="uc-link secondary-btn bold"
                     @click.prevent="toggleShowSmsVerificationModal"
                     >Verify now
                   </span>
@@ -278,10 +306,12 @@ import CleverLogo from '@/assets/clever_logo.svg'
 import TrashIcon from '@/assets/trash.svg'
 import ToggleButton from '@/components/ToggleButton.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
+import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 
 export default {
   name: 'profile-view',
   components: {
+    SecondaryEmailModal,
     RemovePhoneConfirmationModal,
     Checkbox,
     DeactivateAccountModal,
@@ -309,6 +339,7 @@ export default {
       showSmsVerificationModal: false,
       smsConsent: false,
       newMutedSubjectAlerts: [],
+      showSecondaryEmailModal: false,
     }
   },
   async created() {
@@ -347,6 +378,9 @@ export default {
       showNationalPhoneNumbersOnly: 'user/showNationalPhoneNumbersOnly',
       allSubtopics: 'subjects/allSubtopics',
       isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
+      hasStudentOccupation: 'user/hasStudentOccupation',
+      isSecondaryEmailOnProfilePageEnabled:
+        'featureFlags/isSecondaryEmailOnProfilePageEnabled',
     }),
     isPartnerTeacher() {
       return this.isTeacher && this.user.isSchoolPartner
@@ -384,12 +418,24 @@ export default {
     },
     userNeedsToVerifyPhone() {
       return (
-        this.user.phone !== this.phoneInputInfo.e164 ||
-        (this.user.phone && !this.user.phoneVerified)
+        this.user.phone !== this.phoneInputInfo.e164 &&
+        this.user.phone &&
+        !this.user.phoneVerified
       )
     },
   },
   methods: {
+    toggleSecondaryEmailModal(maybeValue) {
+      if (maybeValue === undefined) {
+        this.showSecondaryEmailModal = !this.showSecondaryEmailModal
+      } else {
+        this.showSecondaryEmailModal = maybeValue
+        if (maybeValue)
+          AnalyticsService.captureEvent(
+            EVENTS.SECONDARY_EMAIL_CLICKED_ADD_EMAIL
+          )
+      }
+    },
     onPhoneInputUpdate(phoneInputInfo) {
       this.phoneInputInfo = phoneInputInfo
     },
@@ -626,6 +672,9 @@ export default {
 }
 
 .container-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   padding: 20px;
   text-align: left;
 
@@ -682,6 +731,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
+  gap: 4px;
 }
 
 ul {
@@ -890,13 +940,9 @@ button:hover {
 }
 
 .unverified {
-  display: flex;
-  flex-direction: row;
+  display: inline-block;
   gap: 4px;
   font-weight: normal;
-  g {
-    fill: $c-warning-orange;
-  }
 }
 
 .secondary-btn {
