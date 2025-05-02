@@ -2068,14 +2068,14 @@ export default {
 #partner-cursor {
   background-color: $c-information-blue;
   border-radius: 50%;
-  height: 15px;
+  height: 10px;
   position: absolute;
-  width: 15px;
+  width: 10px;
 
   &:before {
     content: attr(data-content);
     position: absolute;
-    top: -20px;
+    top: -25px;
   }
 }
 
