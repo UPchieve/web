@@ -355,12 +355,13 @@ export default {
     goBack() {
       this.$router.go(-1)
     },
-    async beforeUnmount() {
-      if (this.zwibblerCtx?.leaveSharedSession) {
-        await this.zwibblerCtx.leaveSharedSession()
-      }
-      this.zwibblerCtx?.destroy()
-    },
+  },
+
+  async beforeUnmount() {
+    if (this.zwibblerCtx?.leaveSharedSession) {
+      await this.zwibblerCtx.leaveSharedSession()
+    }
+    this.zwibblerCtx?.destroy()
   },
 }
 </script>
