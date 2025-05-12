@@ -53,9 +53,9 @@
       v-if="showTroubleMatchingModal"
       :closeModal="toggleTroubleMatchingModal"
       :endSession="endAndExitSession"
-      :sessionId="session._id"
+      :sessionId="session.id"
     />
-    <unmatched-modal v-if="showUnmatchedModal" :sessionId="session._id" />
+    <unmatched-modal v-if="showUnmatchedModal" :sessionId="session.id" />
   </div>
 </template>
 
