@@ -58,7 +58,7 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="showStudentMyClassesLink"
+        v-if="isStudent"
         to="/classes"
         text="My Classes"
         id="student-my-classes-sidebar-link"
@@ -226,9 +226,6 @@ export default {
       return (
         this.isAiTutorActive && this.isAiTutorActive.includes('stand-alone')
       )
-    },
-    showStudentMyClassesLink() {
-      return this.isStudent && this.numberOfStudentClasses > 0
     },
     hasIncompleteAssignments() {
       return !!getIncompleteAssignments(this.user.studentAssignments).length

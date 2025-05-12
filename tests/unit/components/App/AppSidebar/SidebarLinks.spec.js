@@ -55,13 +55,6 @@ const links = {
       DASHBOARD_LINK,
       SESSION_HISTORY_LINK,
       FAVORITE_COACHES_LINK,
-      PROFILE_LINK,
-      CONTACT_LINK,
-    ],
-    studentWithClasses: [
-      DASHBOARD_LINK,
-      SESSION_HISTORY_LINK,
-      FAVORITE_COACHES_LINK,
       MY_CLASSES_LINK,
       PROFILE_LINK,
       CONTACT_LINK,
@@ -219,26 +212,6 @@ describe('SidebarLinks', () => {
         testLinks(wrapper, links.default.admin)
       })
 
-      it('renders "My Classes" link if the student has classes and feature flag is enabled', () => {
-        const wrapper = getWrapper({
-          authenticated: true,
-          mobileMode: true,
-          isStudent: true,
-          numberOfStudentClasses: 1,
-        })
-        testLinks(wrapper, links.default.studentWithClasses)
-      })
-
-      it('does not render "My Classes" link if the student does not have any classes', () => {
-        const wrapper = getWrapper({
-          authenticated: true,
-          mobileMode: true,
-          isStudent: true,
-          numberOfStudentClasses: 0,
-        })
-        testLinks(wrapper, links.default.student)
-      })
-
       it('renders default links for teacher', () => {
         const wrapper = getWrapper({
           authenticated: true,
@@ -295,24 +268,6 @@ describe('SidebarLinks', () => {
           authenticated: true,
         })
         testLinks(wrapper, links.default.admin)
-      })
-
-      it('renders "My Classes" link if the student has classes and feature flag is enabled', () => {
-        const wrapper = getWrapper({
-          authenticated: true,
-          isStudent: true,
-          numberOfStudentClasses: 1,
-        })
-        testLinks(wrapper, links.default.studentWithClasses)
-      })
-
-      it('does not render "My Classes" link if the student does not have any classes', () => {
-        const wrapper = getWrapper({
-          authenticated: true,
-          isStudent: true,
-          numberOfStudentClasses: 0,
-        })
-        testLinks(wrapper, links.default.student)
       })
     })
   })

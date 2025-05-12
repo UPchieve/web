@@ -14,6 +14,7 @@ import UpdogCrying from '@/assets/updog-crying.svg'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import ActivityDot from '@/components/ActivityDot.vue'
+import JoinClassModal from '@/views/JoinClassModal.vue'
 
 const $store = useStore()
 const $route = useRoute()
@@ -56,6 +57,8 @@ const errorMessage = ref<string | undefined>()
 const allStudentClasses = ref<TeacherClass[]>([])
 const currentClass = ref<TeacherClass | undefined>()
 const selectedAssignment = ref<Assignment | undefined>()
+
+const showJoinClassModal = ref<boolean>(false)
 
 const showStudentClassesView = computed(() => !props.assignmentId)
 const subjects = computed(() => $store.state.subjects.subjects)
@@ -207,10 +210,18 @@ function goToClassesFromAssignmentDetail() {
   const backRoute = $route.path.split('/assignments')[CLASSES_PATH_INDEX]
   $router.replace(backRoute)
 }
+
+function joinClass() {
+  showJoinClassModal.value = true
+}
 </script>
 
 <template>
   <div class="h-full">
+    <join-class-modal
+      :closeModal="() => (showJoinClassModal = false)"
+      v-if="showJoinClassModal"
+    />
     <router-view
       class="assignment-detail-container"
       :assignment="selectedAssignment"
@@ -220,6 +231,13 @@ function goToClassesFromAssignmentDetail() {
     <div class="uc-column h-full" v-if="showStudentClassesView">
       <div class="header">
         <h1>My Classes</h1>
+        <button
+          v-if="allStudentClasses.length"
+          class="uc-form-button join-class-btn"
+          @click="joinClass()"
+        >
+          Join a class
+        </button>
       </div>
 
       <div v-if="isLoading" class="uc-row justify-center mt-5">
@@ -241,10 +259,14 @@ function goToClassesFromAssignmentDetail() {
       <div
         v-else-if="!allStudentClasses.length"
         data-testid="no-classes-container"
+        class="no-classes-container"
       >
-        You don't have any classes yet!
+        <p>You don't have any classes yet!</p>
+        <p>Join a class with a class code from your teacher below.</p>
+        <button class="uc-form-button join-class-btn" @click="joinClass()">
+          Join a class
+        </button>
       </div>
-
       <div v-else class="uc-column h-full">
         <div class="uc-row tabs-container">
           <div
@@ -386,9 +408,26 @@ h1 {
 }
 
 .header {
+  @include flex-container(row, space-between, center);
   padding: 30px $padding-horizontal;
 }
 
+.no-classes-container {
+  @include flex-container(column, center, center);
+  padding: 0 45px;
+  text-align: center;
+}
+
+.join-class-btn {
+  background-color: $c-success-green;
+  width: auto;
+  padding: 0 16px;
+  font-weight: 500;
+
+  &:hover {
+    background-color: darken($c-success-green, 10%);
+  }
+}
 h2 {
   font-size: 20px;
   font-weight: 400;

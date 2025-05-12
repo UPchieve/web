@@ -1582,14 +1582,14 @@ export default {
 
       const nodeBounds = this.zwibblerCtx.getBoundingRectangle(newNodes)
       if (!nodeBounds) return
-      
+
       // Skip small nodes to prevent going to nodes that were unintentionally
       // added while navigating the whiteboard.
       // 50x50 just seemed like a reasonable size to prevent navigating to
       // accidental dots or small dashes, but we might need to play around with
       // these measurements.
       if (nodeBounds.width < 50 && nodeBounds.height < 50) return
-      
+
       // This is unfortunately a bit of a hack until we update our Zwibbler version,
       // because `remote` isn't an arg in the `nodes-added` callback. Instead, we
       // check if the nodes added are outside of the view. If they are, we know
