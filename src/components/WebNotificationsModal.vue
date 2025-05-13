@@ -1,12 +1,13 @@
 <template>
   <modal :closeModal="closeModal">
     <div class="web-notifications-modal">
+      <updog-notification class="web-notifications-modal__image" />
       <header>
         <h1 class="web-notifications-modal__title" v-if="isVolunteer">
-          Do you want to turn on browser notifications?
+          Turn on browser notifications?
         </h1>
         <h1 v-else class="web-notifications-modal__title">
-          Do you want to be notified when a coach joins?
+          Want us to let you know when your tutor joins?
         </h1>
       </header>
 
@@ -14,13 +15,20 @@
         {{ description }}
       </h2>
 
-      <separator />
-
       <footer class="web-notifications-modal__footer">
         <div class="web-notifications-modal__buttons">
-          <large-button @click="closeModal">No thanks.</large-button>
-          <large-button primary @click="requestNotificationPermission"
-            >Yes, notify me!</large-button
+          <large-button
+            class="web-notifications-modal__yes_button"
+            variant="primary-blue"
+            @click="requestNotificationPermission"
+          >
+            <notification-bell-icon class="icon" />
+            Yes, notify me!
+          </large-button>
+          <hyperlink-button
+            class="web-notifications-modal__no_button"
+            @click="closeModal"
+            >No, thanks</hyperlink-button
           >
         </div>
       </footer>
@@ -31,13 +39,21 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import Modal from '@/components/Modal.vue'
-import Separator from '@/components/Separator.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
+import NotificationBellIcon from '@/assets/notification-bell.svg'
+import UpdogNotification from '@/assets/updog-notification.svg'
 
 export default {
   name: 'WebNotificationsModal',
-  components: { LargeButton, Modal, Separator },
+  components: {
+    LargeButton,
+    HyperlinkButton,
+    Modal,
+    NotificationBellIcon,
+    UpdogNotification,
+  },
   props: {
     closeModal: { type: Function, required: true },
     handleNotificationButton: { type: Function },
@@ -51,17 +67,11 @@ export default {
       user: (state) => state.user.user,
     }),
     description() {
-      if (this.isVolunteerDashboardView)
-        return 'Turning on browser notifications will help ensure you never miss a student request while the dashboard is open. We’ll also notify you during the session if the student sends a message while you’re not looking. You can change this setting any time via your profile.'
       if (this.isVolunteer)
-        return 'Turning on browser notifications will help ensure you never miss a message from a student during your session. We’ll also notify you if a new student request comes in while you have the dashboard open. You can change this setting any time via your profile.'
-      if (this.isStudent)
-        return 'Turning on notifications will help you get support faster by making sure you don’t miss when your coach joins the session. We’ll also notify you during the session if they send you a message while you’re not looking.'
+        return "Turn on browser notifications so we can let you know when a student requests help or sends a message during a session — even if you're on another tab. You can update this anytime in your profile."
+      if (this.isStudent) return 'Turn on notifications to get notified!'
 
       return ''
-    },
-    isVolunteerDashboardView() {
-      return this.$route.name === 'DashboardView' && this.isVolunteer
     },
   },
   methods: {
@@ -82,23 +92,41 @@ export default {
 
 <style lang="scss" scoped>
 .web-notifications-modal {
-  @include flex-container(column);
+  @include flex-container(column, center, center);
+
+  &__image {
+    margin: 0 0 32px;
+  }
 
   &__title {
     @include font-category('display-small');
+    padding-left: 48px;
+    padding-right: 48px;
   }
 
   &__subtitle {
     @include font-category('body');
-    margin: 0 0 35px;
+    margin: 8px 0 16px;
     color: $c-secondary-grey;
     font-size: 15px;
+    padding-left: 48px;
+    padding-right: 48px;
   }
 
   &__buttons {
     margin-top: 16px;
-    @include flex-container(row, flex-end);
-    @include child-spacing(left, 16px);
+    margin-bottom: 16px;
+    @include flex-container(column, center, center);
+    @include child-spacing(top, 16px);
+  }
+  &__yes_button {
+    padding-left: 64px;
+    padding-right: 64px;
+  }
+  &__no_button {
+    padding-left: 64px;
+    padding-right: 64px;
+    color: $c-soft-black;
   }
 }
 </style>
