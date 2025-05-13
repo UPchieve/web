@@ -182,7 +182,12 @@ export default {
         this.dispatch('notifications/remove', removedSessionId)
       }
 
-      FederalWorkStudyVolunteerService.maybeAutoJoinOldestSession(results)
+      if (
+        this.getters['federalWorkStudyVolunteer/isFederalWorkStudyVolunteer'] &&
+        !this.state.user.session?.id
+      ) {
+        FederalWorkStudyVolunteerService.maybeAutoJoinOldestSession(results)
+      }
     },
   },
 

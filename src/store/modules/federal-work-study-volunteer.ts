@@ -26,7 +26,7 @@ export default {
 
   getters: {
     isFederalWorkStudyVolunteer(_state, _getters, rootState) {
-      return rootState.user.user.sponsorships.some(
+      return rootState.user.user?.sponsorships?.some(
         (sponsorship) => sponsorship.key === 'fws'
       )
     },

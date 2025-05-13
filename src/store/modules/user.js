@@ -211,11 +211,13 @@ export default {
       commit('setIsSessionConnectionAlive', true)
     },
 
-    updateSession: ({ commit, dispatch }, sessionData) => {
+    updateSession: ({ commit, dispatch, getters }, sessionData) => {
       commit('setSession', sessionData)
 
-      if (sessionData.endedAt) {
-        dispatch('federalWorkStudyVolunteer/startCooldown', { root: true })
+      if (sessionData.endedAt && getters.isVolunteer) {
+        dispatch('federalWorkStudyVolunteer/startCooldown', null, {
+          root: true,
+        })
       }
     },
 
