@@ -56,7 +56,7 @@ export default {
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['/tests/setup.js'],
+    setupFiles: ['tests/setup.js'],
     exclude: ['**/tests/e2e/**', '**/node_modules/**'],
     server: {
       deps: {
