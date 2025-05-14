@@ -125,7 +125,6 @@
             !isSessionAudioCallEnabled ||
             (isSessionAudioCallEnabled && !isSessionInProgress)
           "
-          @try-clicked="tryClicked"
         />
 
         <LiveMediaChatHeader
@@ -886,15 +885,6 @@ export default {
         this.hasUnreadAiTutorMessage = false
       }
     },
-    reconnectAttempts(prev, current) {
-      if (current > prev) {
-        this.$store.dispatch('user/sessionDisconnected')
-        if (!this.session || !this.session._id) {
-          const abort = () => this.$router.push('/')
-          this.showTroubleStartingModal(abort)
-        }
-      }
-    },
     isConnectionReady(currentValue, prevValue) {
       const [isConnected, sessionId] = currentValue
       const [prevIsConnected] = prevValue
@@ -1079,9 +1069,6 @@ export default {
           abortFunction: abort,
         },
       })
-    },
-    tryClicked() {
-      this.sessionReconnecting = true
     },
     openFileDialog(event) {
       this.$refs.whiteboard.openFileDialog(event)

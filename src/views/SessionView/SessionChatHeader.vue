@@ -172,21 +172,12 @@ export default {
       return ''
     },
   },
-  emits: ['try-clicked'],
   methods: {
     endAndExitSession() {
       SessionService.endAndExitSession({
         store: this.$store,
         router: this.$router,
       })
-    },
-    tryReconnect() {
-      // socket must be closed before reopening for automatic reconnections
-      // to resume
-      socket.close()
-      socket.open()
-      this.reconnectAttemptMsg = 'Waiting for server response.'
-      this.$emit('try-clicked')
     },
     connectionSuccess() {
       this.connectionMsg = ''
