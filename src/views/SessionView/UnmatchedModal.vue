@@ -27,6 +27,7 @@
 import { mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import SessionService from '@/services/SessionService'
 import { EVENTS } from '@/consts'
 import Modal from '@/components/Modal.vue'
 import Separator from '@/components/Separator.vue'
@@ -62,7 +63,10 @@ export default {
       AnalyticsService.captureEvent(EVENTS.SESSION_TIMED_OUT_45_MINS, {
         event: EVENTS.SESSION_TIMED_OUT_45_MINS,
       })
-      this.$router.push('/dashboard')
+      await SessionService.endAndExitSession({
+        store: this.$store,
+        router: this.$router
+      })
     },
   },
 }
