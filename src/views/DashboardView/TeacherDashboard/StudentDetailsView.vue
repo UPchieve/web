@@ -37,24 +37,20 @@
             />
           </label>
           <div class="date-input-container">
-            <label class="date-label"
-              >from
-              <FormDateInput
-                id="session-activity-from"
-                :placeholder="filters.sessionActivityFrom"
-                v-model="filters.sessionActivityFrom"
-                @update:modelValue="submitFilter"
-              />
-            </label>
-            <label class="date-label"
-              >to
-              <FormDateInput
-                id="session-activity-to"
-                :placeholder="filters.sessionActivityTo"
-                v-model="filters.sessionActivityTo"
-                @update:modelValue="submitFilter"
-              />
-            </label>
+            <FormDateInput
+              label="from"
+              id="session-activity-from"
+              :placeholder="filters.sessionActivityFrom"
+              v-model="filters.sessionActivityFrom"
+              @update:modelValue="submitFilter"
+            />
+            <FormDateInput
+              label="to"
+              id="session-activity-to"
+              :placeholder="filters.sessionActivityTo"
+              v-model="filters.sessionActivityTo"
+              @update:modelValue="submitFilter"
+            />
           </div>
         </div>
       </div>
@@ -124,7 +120,7 @@
 
 <script>
 import Loader from '@/components/Loader.vue'
-import FormDateInput from '@/components/FormDateInput.vue'
+import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 import NetworkService from '@/services/NetworkService'
 import { mapState } from 'vuex'
 import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
@@ -483,7 +479,7 @@ export default {
 
 .date-input-container {
   @include flex-container(row, center, space-between);
-
+  gap: 10px;
   @include breakpoint-below('medium') {
     @include flex-container(column, center);
     width: 100%;

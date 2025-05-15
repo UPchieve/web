@@ -3,15 +3,18 @@
     <div class="filter-panel">
       <div class="col">
         <div class="filter-panel__row">
-          <label class="col">
-            From
-            <input id="volunteer-report-from" type="date" v-model="startDate" />
-          </label>
-
-          <label class="col">
-            To
-            <input id="volunteer-report-to" type="date" v-model="endDate" />
-          </label>
+          <FormDateInput
+            label="From"
+            id="volunteer-report-from"
+            v-model="startDate"
+            placeholder="mm/dd/yyyy"
+          />
+          <FormDateInput
+            label="To"
+            id="volunteer-reports-to"
+            v-model="endDate"
+            placeholder="mm/dd/yyyy"
+          />
         </div>
       </div>
 
@@ -61,10 +64,11 @@ import moment from 'moment'
 import exportToCsv from '@/utils/export-to-csv'
 import { ANALYTICS_REPORT_ROW, ANALYTICS_REPORT_SUMMARY } from '@/consts'
 import fileDownload from '@/utils/file-download'
+import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 
 export default {
   name: 'AdminReports',
-  components: { Loader },
+  components: { Loader, FormDateInput },
 
   data() {
     return {
@@ -307,6 +311,7 @@ input {
 
   &__row {
     @include flex-container(row);
+    gap: 16px;
   }
 
   &__session-range {

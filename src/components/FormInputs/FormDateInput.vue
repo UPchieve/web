@@ -25,6 +25,7 @@
       :css-class="'datetime-modal-container'"
     >
       <ion-datetime
+        aria-label="Date picker"
         id="date-time-picker"
         :presentation="props.hasTime ? 'date-time' : 'date'"
         v-bind="dateTimeProps"
@@ -121,6 +122,13 @@ function openCalendar() {
 </script>
 
 <style lang="scss" scoped>
+:global(.datetime-modal-container) {
+  --width: auto;
+  --height: auto;
+  --max-width: 320px;
+  --max-height: 420px;
+}
+
 ion-button {
   --background: transparent;
   --box-shadow: 0;

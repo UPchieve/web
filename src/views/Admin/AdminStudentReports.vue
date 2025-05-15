@@ -3,33 +3,33 @@
     <div class="filter-panel">
       <div class="col">
         <div class="filter-panel__row">
-          <label class="col">
-            Joined after
-            <input id="joined-after" type="date" v-model="joinedAfter" />
-          </label>
-
-          <label class="col">
-            Joined before
-            <input id="joined-before" type="date" v-model="joinedBefore" />
-          </label>
+          <FormDateInput
+            label="Joined after"
+            v-model="joinedAfter"
+            placeholder="mm/dd/yyyy"
+          />
+          <FormDateInput
+            label="Joined before"
+            v-model="joinedBefore"
+            placeholder="mm/dd/yyyy"
+          />
         </div>
       </div>
 
       <div class="col">
         <div class="filter-panel__row">
-          <label class="col">
-            Session from
-            <input
-              id="session-range-from"
-              type="date"
-              v-model="sessionRangeFrom"
-            />
-          </label>
-
-          <label class="col">
-            Session to
-            <input id="session-range-to" type="date" v-model="sessionRangeTo" />
-          </label>
+          <FormDateInput
+            id="session-range-from"
+            label="Session From"
+            v-model="sessionRangeFrom"
+            placeholder="mm/dd/yyyy"
+          />
+          <FormDateInput
+            id="session-range-to"
+            label="Session to"
+            v-model="sessionRangeTo"
+            placeholder="mm/dd/yyyy"
+          />
         </div>
       </div>
 
@@ -112,10 +112,11 @@ import SchoolList from '@/components/SchoolList.vue'
 import Loader from '@/components/Loader.vue'
 import moment from 'moment'
 import exportToCsv from '@/utils/export-to-csv'
+import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 
 export default {
   name: 'AdminReports',
-  components: { SchoolList, Loader },
+  components: { SchoolList, Loader, FormDateInput },
 
   data() {
     return {
@@ -327,6 +328,7 @@ input {
 
   &__row {
     @include flex-container(row);
+    gap: 16px;
   }
 
   &__session-range {

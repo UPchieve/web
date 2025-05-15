@@ -46,25 +46,14 @@
           <section class="tell-them-cp-modal__section">
             <p>UPchieve College Prep</p>
             <div class="tell-them-cp-modal__reminder-container">
-              <label class="tell-them-cp-modal__reminder-label">
-                Date
-                <input
-                  id="reminder-date"
-                  class="tell-them-cp-modal__reminder-input"
-                  type="date"
-                  v-model="reminderDate"
-                  :min="todaysDate"
-                />
-              </label>
-              <label class="tell-them-cp-modal__reminder-label">
-                Time
-                <input
-                  id="reminder-time"
-                  type="time"
-                  v-model="reminderTime"
-                  class="tell-them-cp-modal__reminder-input"
-                />
-              </label>
+              <FormDateInput
+                id="reminder-date"
+                class="tell-them-cp-modal__reminder-input"
+                label="Date"
+                placeholder="mm/dd/yyyy hh/mm"
+                v-model="reminderDate"
+                :hasTime="true"
+              />
             </div>
           </section>
           <footer class="tell-them-cp-modal__footer">
@@ -81,7 +70,7 @@
                 primary
                 :showArrow="false"
                 @click="handleReminderDate"
-                :disabled="!(reminderDate && reminderTime) ? true : null"
+                :disabled="!reminderDate ? true : null"
                 >Continue</large-button
               >
             </div>
@@ -201,6 +190,7 @@ import UpdogWithFlag from '@/assets/updog-with-flag.svg'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import ArrowIcon from '@/assets/arrow.svg'
 import * as UserProductFlagsService from '@/services/UserProductFlagsService'
+import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 
 export default {
   name: 'CollegePrepModal',
@@ -211,13 +201,13 @@ export default {
     UpdogWithFlag,
     MazPhoneNumberInput,
     ArrowIcon,
+    FormDateInput,
   },
   data() {
     return {
       step: 1,
       showModal: true,
-      reminderDate: '',
-      reminderTime: '',
+      reminderDate: moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'),
       phone: '',
       isPhoneError: false,
       phoneInput: {},
@@ -243,7 +233,7 @@ export default {
       return new Date().toISOString().split('T')[0]
     },
     dateTime() {
-      return `${this.reminderDate} ${this.reminderTime}`
+      return `${this.reminderDate}`
     },
   },
   methods: {

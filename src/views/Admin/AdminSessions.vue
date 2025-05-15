@@ -55,23 +55,16 @@
 
       <div class="col">
         <div class="session-activity-container">
-          <label class="col"
-            >from
-            <input
-              id="session-activity-from"
-              type="date"
-              v-model="filters.sessionActivityFrom"
-            />
-          </label>
-
-          <label class="col"
-            >to
-            <input
-              id="session-activity-to"
-              type="date"
-              v-model="filters.sessionActivityTo"
-            />
-          </label>
+          <FormDateInput
+            label="from"
+            id="session-activity-from"
+            v-model="filters.sessionActivityFrom"
+          />
+          <FormDateInput
+            label="to"
+            id="session-activity-to"
+            v-model="filters.sessionActivityTo"
+          />
         </div>
       </div>
 
@@ -164,6 +157,7 @@
 import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
+import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 import moment from 'moment'
 
 const getSessions = async (filters) => {
@@ -177,7 +171,7 @@ const getSessions = async (filters) => {
 export default {
   name: 'AdminSessions',
 
-  components: { SessionsList, PageControl },
+  components: { SessionsList, PageControl, FormDateInput },
 
   data() {
     return {
@@ -303,10 +297,6 @@ export default {
 input[type='number'],
 .small-input {
   width: 60px;
-  border: 1px solid $c-border-grey;
-}
-
-input[type='date'] {
   border: 1px solid $c-border-grey;
 }
 

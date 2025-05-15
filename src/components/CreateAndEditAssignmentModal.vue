@@ -22,7 +22,7 @@
             class="date-input assignment-name"
             v-model="dueDate"
             :placeholder="dueDate"
-            :minDate="minDueDate"
+            :minDate="new Date(minDueDate)"
           />
         </div>
         <div class="assignment-details-row">
@@ -156,7 +156,7 @@ import moment from 'moment'
 import { mapGetters, mapState } from 'vuex'
 import { EVENTS } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
-import FormDateInput from '@/components/FormDateInput.vue'
+import FormDateInput from './FormInputs/FormDateInput.vue'
 import IonicSelect from '@/components/IonicSelect.vue'
 import Modal from '@/components/Modal.vue'
 import FileDialog from '@/components/FileDialog.vue'
