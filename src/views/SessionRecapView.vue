@@ -449,7 +449,6 @@ export default {
   @include breakpoint-above('large') {
     display: flex;
     flex-flow: row wrap;
-    height: 1300px;
   }
 }
 
