@@ -1616,7 +1616,7 @@ export default {
         left: margin,
         right: whiteboardWidth - margin,
         top: margin,
-        bottom: whiteboardHeight - margin
+        bottom: whiteboardHeight - margin,
       }
 
       // Determine the distance (and direction) from the center to the cursor.

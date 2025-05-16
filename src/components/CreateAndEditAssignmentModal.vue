@@ -391,6 +391,11 @@ export default {
         })
         AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
         this.$store.dispatch('app/modal/hide')
+        if (!this.$route.path.includes('assignments')) {
+          this.$router.push(
+            `/dashboard/teacher/class/${this.modalData.currentClass.id}/assignments`
+          )
+        }
       }
     },
   },

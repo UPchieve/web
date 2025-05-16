@@ -2,10 +2,9 @@
   <div class="teacher-dashboard">
     <ClassDetails
       v-if="this.view === 'classDetails'"
-      :classInfo="currentClassInfo"
       :classId="classId"
       :classes="classes"
-      :topics="topics"
+      :initialClassData="currentClassInfo"
     />
     <StudentDetails
       v-else-if="this.view === 'studentDetails'"

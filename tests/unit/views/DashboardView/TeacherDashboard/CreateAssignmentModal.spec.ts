@@ -4,6 +4,7 @@ import subjectsModule from '@/store/modules/subjects'
 import { mount } from '@vue/test-utils'
 import CreateAndEditAssignmentModal from '@/components/CreateAndEditAssignmentModal.vue'
 import { describe, expect, test, vi } from 'vitest'
+import router from '@/router'
 
 const classes = [
   {
@@ -112,7 +113,7 @@ const getWrapper = async (data: {}) => {
 
   const wrapper = mount(CreateAndEditAssignmentModal, {
     global: {
-      plugins: [store],
+      plugins: [store, router],
     },
     props: {
       modalData: {
@@ -186,6 +187,7 @@ describe('Create Assignment Modal', () => {
       },
     }
 
+    await router.push(`/dashboard/teacher`)
     const wrapper = await getWrapper(data)
     const assignButton = wrapper.find('[data-testid="create-assignment-btn"]')
 

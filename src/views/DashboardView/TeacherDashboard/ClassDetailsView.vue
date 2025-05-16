@@ -11,21 +11,21 @@
         <div class="class-info">
           <div class="start-col">
             <img
-              v-if="classInfo.topicId"
-              :src="topicIdToTopic[classInfo.topicId]?.iconLink"
+              v-if="classData.topicId"
+              :src="topicIdToTopic[classData.topicId]?.iconLink"
               :alt="altImageText"
               class="subject-icon"
               aria-hidden
             />
             <task-badge v-else class="subject-icon" aria-hidden />
-            <clever-logo v-if="classInfo.cleverId" class="clever-logo" />
-            <h1>{{ className }}</h1>
+            <clever-logo v-if="classData.cleverId" class="clever-logo" />
+            <h1>{{ classData.name }}</h1>
             <span class="students-text"
-              >{{ classInfo.totalStudents || '0' }}
-              {{ classInfo.totalStudents == 1 ? 'student' : 'students' }}</span
+              >{{ classData.totalStudents || '0' }}
+              {{ classData.totalStudents == 1 ? 'student' : 'students' }}</span
             >
             <button
-              v-if="!classInfo.cleverId"
+              v-if="!classData.cleverId"
               class="open-teacher-code-modal"
               @click="openTeacherCodeModal"
             >
@@ -66,7 +66,7 @@
       <div v-if="isSelected === 'classDetails'" class="classes-container">
         <loader v-if="isLoading" />
         <div v-else-if="!students.length">
-          <div v-if="classInfo.cleverId" class="empty-sessions-container">
+          <div v-if="classData.cleverId" class="empty-sessions-container">
             <p>We can't seem to find any students in your Clever class</p>
             <p class="sub-text">
               If this is a mistake, try Clever Resync or reach out to your
@@ -80,7 +80,7 @@
               share the code with your students!
             </p>
             <button
-              v-if="!classInfo.cleverId"
+              v-if="!classData.cleverId"
               class="uc-form-button"
               @click="openTeacherCodeModal"
             >
@@ -96,7 +96,7 @@
             <th>Last Session</th>
             <th>Details</th>
             <th></th>
-            <th v-if="!classInfo.cleverId"></th>
+            <th v-if="!classData.cleverId"></th>
           </tr>
           <tr
             v-for="student in students"
@@ -116,7 +116,7 @@
                 View Details
               </button>
             </td>
-            <td v-if="!classInfo.cleverId">
+            <td v-if="!classData.cleverId">
               <div class="menu-button">
                 <button
                   @click="openStudentMenu(student)"
@@ -264,7 +264,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -280,6 +280,8 @@ import MenuButtonsIcon from '@/assets/Menu.svg'
 import VerticalMenuButtonsIcon from '@/assets/VerticalMenuButtons.svg'
 import TrashIcon from '@/assets/trash.svg'
 import RemoveIcon from '@/assets/Remove.svg'
+import { toastController } from '@ionic/vue'
+import _ from 'lodash'
 
 export default {
   name: 'ClassDetails',
@@ -308,27 +310,24 @@ export default {
       assignments: [],
       toggledAssignmentId: '',
       assignmentsCompletion: {},
-      className: this.classInfo.name,
-      topicId: this.classInfo.topicId,
+      className: '',
+      topicId: '',
       toggledStudentMenuId: '',
       toggledAssignmentMenuId: '',
+      classData: {},
     }
   },
   props: {
+    initialClassData: {
+      type: Object,
+      required: true,
+    },
     classes: {
       type: Array,
       required: true,
     },
     classId: {
       type: String,
-      required: true,
-    },
-    classInfo: {
-      type: Object,
-      required: true,
-    },
-    topics: {
-      type: Array,
       required: true,
     },
   },
@@ -347,7 +346,8 @@ export default {
       !this.$route.path.includes('assignments') &&
       !this.$route.params.studentId
     ) {
-      this.students = await this.getStudents(this.classId)
+      this.students = await this.getStudents(this.$route.params.classId)
+      this.isLoading = false
     } else if (
       this.$route.params.classId &&
       this.$route.path.includes('assignments')
@@ -357,15 +357,33 @@ export default {
     } else if (!this.$route.params.classId) {
       this.$router.push('/dashboard')
     }
+    this.classData = _.isEmpty(this.initialClassData)
+      ? await this.getClassInfo(this.$route.params.classId)
+      : this.initialClassData
+    this.className = this.classData.name
+    this.topicId = this.classData.topicId
   },
 
   computed: {
+    ...mapState({
+      topics: (state) => state.subjects.topics,
+    }),
     ...mapGetters({
       topicIdToTopic: 'subjects/topicIdToTopic',
     }),
   },
 
   methods: {
+    async showToast(message, isError) {
+      const toast = await toastController.create({
+        message,
+        color: isError ? 'danger' : 'dark',
+        duration: 2000,
+        position: 'bottom',
+      })
+      await toast.present()
+    },
+
     backToClasses() {
       this.$router.push('/dashboard')
     },
@@ -382,6 +400,20 @@ export default {
       ) {
         this.toggledStudentMenuId = null
         this.toggledAssignmentMenuId = null
+      }
+    },
+
+    async getClassInfo(classId) {
+      try {
+        const {
+          data: { teacherClass },
+        } = await NetworkService.getTeacherClassById(classId)
+        return teacherClass
+      } catch (err) {
+        const error =
+          err?.response?.data?.err ??
+          'Unable to get class information. Please refresh the page and try again.'
+        this.showToast(error, true)
       }
     },
 
@@ -441,13 +473,11 @@ export default {
         this.error =
           err.response.data.err ??
           'Unable to load students. Please refresh the page and try again.'
-      } finally {
-        this.isLoading = false
       }
     },
 
     openTeacherCodeModal() {
-      const code = this.classInfo.code
+      const code = this.classData.code
       this.$store.dispatch('app/modal/show', {
         component: 'TeacherClassCodeModal',
         data: {
@@ -460,7 +490,7 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'EditTeacherClassModal',
         data: {
-          classInfo: this.classInfo,
+          classInfo: this.classData,
           topics: this.topics,
           updateTeacherClass: this.updateTeacherClass,
           deactivateTeacherClass: this.deactivateTeacherClass,
@@ -475,7 +505,7 @@ export default {
         data: {
           onAssignmentCreated: this.handleAssignmentCreated,
           classes: this.classes,
-          currentClass: this.classInfo,
+          currentClass: this.classData,
           topics: this.topics,
         },
       })
@@ -490,7 +520,7 @@ export default {
         data: {
           onAssignmentEdited: this.handleEditAssignment,
           classes: this.classes,
-          currentClass: this.classInfo,
+          currentClass: this.classData,
           topics: this.topics,
           assignment: assignment,
         },
@@ -551,6 +581,8 @@ export default {
             await NetworkService.uploadFiles({ assignmentId, files })
           })
         }
+
+        this.isSelected = 'assignments'
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to create assignment.'
       }
@@ -615,7 +647,7 @@ export default {
     viewStudentDetails(student) {
       this.studentId = student.id
       this.$router.push(
-        `/dashboard/teacher/class/${this.classInfo.id}/student/${student.id}`
+        `/dashboard/teacher/class/${this.classData.id}/student/${student.id}`
       )
     },
 
@@ -646,13 +678,14 @@ export default {
       ) {
         this.isSelected = 'assignments'
         this.$router.push(
-          `/dashboard/teacher/class/${this.classInfo.id}/assignments`
+          `/dashboard/teacher/class/${this.classData.id}/assignments`
         )
         await this.showAssignments()
       } else {
         this.isSelected = 'classDetails'
-        this.$router.push(`/dashboard/teacher/class/${this.classInfo.id}`)
+        this.$router.push(`/dashboard/teacher/class/${this.classData.id}`)
         this.students = await this.getStudents(this.classId)
+        this.isLoading = false
       }
     },
 
@@ -665,7 +698,7 @@ export default {
 
     viewAssignment(assignmentId) {
       this.$router.push(
-        `/dashboard/teacher/class/${this.classInfo.id}/assignment/${assignmentId}`
+        `/dashboard/teacher/class/${this.classData.id}/assignment/${assignmentId}`
       )
     },
 
@@ -737,8 +770,7 @@ export default {
         const {
           data: { updatedClass },
         } = await NetworkService.updateTeacherClass(classData)
-        this.className = updatedClass.name
-        this.topicId = updatedClass.topicId
+        this.classData = updatedClass
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to edit class.'
       }
@@ -759,7 +791,7 @@ export default {
           data: { removedId },
         } = await NetworkService.removeStudentFromClass({
           studentId,
-          classId: this.classInfo.id,
+          classId: this.classData.id,
         })
         if (!removedId) {
           alert('This student was unable to be removed from class.')

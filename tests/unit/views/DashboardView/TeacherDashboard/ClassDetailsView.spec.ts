@@ -31,15 +31,7 @@ const getWrapper = async (overrides: Overrides = {}) => {
       plugins: [store, router],
     },
     props: {
-      classInfo: {
-        id: 'class-id',
-        userId: 'user-id',
-        name: 'Algebra 1',
-        code: '4BNK46',
-        active: true,
-        topicId: 1,
-        totalStudents: '2',
-      },
+      classes: [],
       classId: 'class-id',
     },
   })
@@ -106,6 +98,20 @@ describe('Class Details View', () => {
         ],
       },
     })
+
+    NetworkService.getTeacherClassById = vi.fn().mockResolvedValue({
+      data: {
+        teacherClass: {
+          id: 'class-id',
+          userId: 'user-id',
+          name: 'Algebra 1',
+          code: '4BNK46',
+          active: true,
+          topicId: 1,
+          totalStudents: '2',
+        },
+      },
+    })
     await router.push(`/dashboard/teacher/class/class-id`)
   })
 
@@ -169,6 +175,15 @@ describe('Class Details View', () => {
               lastSession: '07/26/2024',
             },
           ],
+          classData: {
+            id: 'class-id',
+            userId: 'user-id',
+            name: 'Algebra 1',
+            code: '4BNK46',
+            active: true,
+            topicId: 1,
+            totalStudents: '2',
+          },
         },
       })
 
@@ -259,6 +274,20 @@ describe('Assignments View', () => {
           },
         })
       })
+
+    NetworkService.getTeacherClassById = vi.fn().mockResolvedValue({
+      data: {
+        teacherClass: {
+          id: 'class-id',
+          userId: 'user-id',
+          name: 'Algebra 1',
+          code: '4BNK46',
+          active: true,
+          topicId: 1,
+          totalStudents: '2',
+        },
+      },
+    })
   })
 
   test('Show no assignments', async () => {
