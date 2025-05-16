@@ -160,7 +160,7 @@ const giveFeedback = (event: Event) => {
       traceId: props.traceId,
       observationId: props.observationId,
       dataType: 'CATEGORICAL',
-      value: selectedOption.value,
+      value: selectedOption.value ?? '', //empty string in case we don't have multiple choice options for feedback
       comment: additionalFeedback.value,
     })
   }

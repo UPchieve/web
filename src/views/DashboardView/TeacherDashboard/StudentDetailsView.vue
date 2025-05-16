@@ -108,6 +108,10 @@
                     eventName: EVENTS.SESSION_SUMMARY_THUMBS_DOWN,
                     eventData: { sessionId: session.id },
                   }"
+                  :analyticsServiceFollowup="{
+                    eventName: EVENTS.SESSION_SUMMARY_FEEDBACK,
+                  }"
+                  :traceId="session.summary.traceId"
                 />
               </div>
             </div>
