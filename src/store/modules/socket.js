@@ -165,6 +165,10 @@ export default {
         commit('setIsTyping', { sessionId: data.sessionId, isTyping: false })
       })
 
+      socket.on('celebrate', (data) => {
+        this.dispatch('celebrations/celebrate', data.duration)
+      })
+
       socket.on('messageSend', (data) => {
         commit('setMessageData', data)
       })

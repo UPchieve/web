@@ -11,9 +11,11 @@ import sessionModule from './modules/session'
 import botConversationsModule from './modules/bot-conversations'
 import liveMediaModule from './modules/liveMedia'
 import federalWorkStudyVolunteerModule from './modules/federal-work-study-volunteer'
+import celebrationsModule from './modules/celebrations'
 
 // TODO: Update with the type of all the modules once convert to TS.
 export type RootState = any
+export type RootGetters = any
 
 export const storeOptions = {
   modules: {
@@ -29,6 +31,7 @@ export const storeOptions = {
     liveMedia: liveMediaModule,
     botConversations: botConversationsModule,
     federalWorkStudyVolunteer: federalWorkStudyVolunteerModule,
+    celebrations: celebrationsModule,
   },
 }
 

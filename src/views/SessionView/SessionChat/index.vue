@@ -194,6 +194,7 @@
           :disabled="waitingForModeration"
           ref="textareaRef"
         />
+        <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
         <record-voice-message
           @idle="showTextMessage"
           @not-idle="hideTextMessage"
@@ -238,6 +239,10 @@ import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import TranscribedMessage from './TranscribedMessage.vue'
 import SendMessage from '@/assets/voice_message_icons/send-message.svg'
 import { startCase } from 'lodash-es'
+import CelebrationButton from './CelebrationButton.vue'
+import { DEFAULT_CELEBRATION_DURATION } from '@/store/modules/celebrations'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -264,6 +269,7 @@ export default {
     SpeakerFilledIcon,
     TranscribedMessage,
     SendMessage,
+    CelebrationButton,
   },
   props: {
     setHasSeenNewMessage: { type: Function, required: true },
@@ -322,6 +328,7 @@ export default {
       isDisplayVolunteerLanguagesEnabled:
         'featureFlags/isDisplayVolunteerLanguagesEnabled',
       sessionPartner: 'user/sessionPartner',
+      isConfettiCelebrationEnabled: 'featureFlags/isConfettiCelebrationEnabled',
     }),
     showMyInProgressCaptionMessage() {
       return this.myInProgressCaptionMessage?.text?.length > 0
@@ -380,6 +387,14 @@ export default {
         this.isSessionAlive
         ? `${this.sessionPartnerName || 'Chatbot'} is typing...`
         : 'UPchieve'
+    },
+    showCelebrateButton() {
+      return (
+        this.isConfettiCelebrationEnabled &&
+        this.isVolunteer &&
+        !this.isInRecap &&
+        this.currentSession?.messages?.length > 20
+      )
     },
   },
   mounted() {
@@ -766,6 +781,16 @@ export default {
         : false
       if (!isStudentMessage && !isVolunteerMessage) return 'contents--chat-bot'
       return ''
+    },
+    celebrate() {
+      this.$store.dispatch('celebrations/celebrate')
+      socket.emit('celebrate', {
+        sessionId: this.currentSession.id,
+        userId: this.user.id,
+        duration: DEFAULT_CELEBRATION_DURATION,
+      })
+
+      AnalyticsService.captureEvent(EVENTS.USER_SENT_CELEBRATION)
     },
   },
   watch: {

@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="App" :class="isIOS && 'is-ios'">
+    <Celebration />
     <ion-app>
       <ion-content>
         <refresh-app-alert v-if="doMountRefreshAppAlert" />
@@ -42,6 +43,7 @@ import AttentionBoxes from '../AttentionBoxes.vue'
 import { socket } from '@/socket'
 import sound from '@/assets/audio/alert.mp3'
 import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
+import Celebration from '@/components/Celebration.vue'
 
 export default {
   name: 'App',
@@ -54,6 +56,7 @@ export default {
     AttentionBoxes,
     IonApp,
     IonContent,
+    Celebration,
   },
   data() {
     return {
