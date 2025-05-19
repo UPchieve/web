@@ -450,6 +450,7 @@ export default {
         hoursTutoredThisWeek: this.user.hoursTutoredThisWeek,
         elapsedAvailability: this.user.elapsedAvailability,
         totalQuizzesPassed: this.user.totalQuizzesPassed,
+        totalStudentsHelped: this.user.uniqueStudentsHelpedCount,
       })
     },
   },
@@ -509,6 +510,7 @@ export default {
       hoursTutoredThisWeek,
       totalQuizzesPassed,
       elapsedAvailability,
+      totalStudentsHelped,
     }) {
       let numHoursSelected = 0
 
@@ -567,17 +569,21 @@ export default {
           value: `${numRequestsFilled} requests filled`,
         },
         {
-          label: 'Total hours of tutoring completed',
+          label: 'Hours of tutoring completed (all time)',
           value: `${numHoursTutored}`,
         },
         {
-          label: 'Hours tutored this week',
+          label: 'Hours of tutoring completed (this week)',
           value: `${timeTutoredThisWeek}`,
           tooltip: 'Monday to Sunday UTC time',
         },
         {
           label: 'Hours of elapsed availability',
           value: `${numElapsedAvailabilityHours} hours elapsed`,
+        },
+        {
+          label: 'Total students helped',
+          value: `${totalStudentsHelped} students helped`,
         },
       ]
     },
