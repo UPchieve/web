@@ -45,7 +45,18 @@
                 class="volunteer-impact__stat"
               >
                 <div class="volunteer-impact__stat-label">
-                  {{ stat.label }}:
+                  {{ stat.label }}
+                  <span
+                    class="stat-tooltip"
+                    v-if="stat.tooltip"
+                    v-tooltip="{
+                      text: stat.tooltip,
+                      color: 'black',
+                      position: 'top',
+                    }"
+                  >
+                    <InformationIcon />
+                  </span>
                 </div>
                 <div class="volunteer-impact__stat-value">{{ stat.value }}</div>
               </div>
@@ -160,6 +171,9 @@ import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
 import Loader from '@/components/Loader.vue'
+import { hoursToHoursAndMinutes } from '@/utils/time-utils'
+import InformationIcon from '@/assets/information.svg'
+import { vTooltip } from 'maz-ui'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -177,6 +191,10 @@ export default {
     WebNotificationsButton,
     ArrowIcon,
     Loader,
+    InformationIcon,
+  },
+  directives: {
+    tooltip: vTooltip,
   },
 
   watch: {
@@ -199,7 +217,6 @@ export default {
       showPhotoUploadModal: false,
       showWelcomeModal: false,
       lastUpdated: '',
-      impactStats: {},
       isLoadingImpactSummary: true,
     }
   },
@@ -416,6 +433,25 @@ export default {
         return 'https://cdn.upchieve.org/docs/Verizon-Volunteer-Hour-Tracking-Resource.pdf'
       return 'https://cdn.upchieve.org/docs/volunteer-hour-tracking-guide.pdf'
     },
+
+    impactStats() {
+      if (this.isCustomVolunteerPartner) {
+        return this.getCustomImpactStats({
+          availability: this.user.availability,
+          totalVolunteerHours: this.user.totalVolunteerHours,
+          pastSessions: this.user.pastSessions,
+          totalQuizzesPassed: this.user.totalQuizzesPassed,
+        })
+      }
+      return this.getImpactStats({
+        availability: this.user.availability,
+        pastSessions: this.user.pastSessions,
+        hoursTutored: this.user.hoursTutored,
+        hoursTutoredThisWeek: this.user.hoursTutoredThisWeek,
+        elapsedAvailability: this.user.elapsedAvailability,
+        totalQuizzesPassed: this.user.totalQuizzesPassed,
+      })
+    },
   },
   methods: {
     rejoinHelpSession() {
@@ -466,14 +502,19 @@ export default {
       const lastUpdated = res.data.lastUpdated
       return `Last updated on ${lastUpdated}`
     },
-    getImpactStats() {
-      const user = this.$store.state.user.user
-
+    getImpactStats({
+      availability,
+      pastSessions,
+      hoursTutored,
+      hoursTutoredThisWeek,
+      totalQuizzesPassed,
+      elapsedAvailability,
+    }) {
       let numHoursSelected = 0
 
-      if (userHasSchedule(user, 'availability.Thursday.5p')) {
+      if (userHasSchedule(availability, 'Thursday.5p')) {
         numHoursSelected = reduce(
-          user.availability,
+          availability,
           (weeklyHourCount, dayHours) => {
             // Tally up num hours for each day
             const hoursSelectedForDay = reduce(
@@ -492,13 +533,25 @@ export default {
       }
 
       // (3) Requests filled
-      const numRequestsFilled = get(user, 'pastSessions.length', '--')
+      const numRequestsFilled = get(pastSessions, 'length', 0)
+
+      const formatFn = ({ hours, minutes }) =>
+        `${hours} ${hours === 1 ? 'hour' : 'hours'}, ${minutes}m`
 
       // (4) Hours tutored
-      const numHoursTutored = Number(this.user.hoursTutored) || '0'
+      const numHoursTutored = hoursToHoursAndMinutes(
+        Number(hoursTutored) ?? 0,
+        formatFn
+      )
 
-      // (5) Elapsed availability
-      const numElapsedAvailabilityHours = user.elapsedAvailability
+      // (5) Hours tutored this week
+      const timeTutoredThisWeek = hoursToHoursAndMinutes(
+        hoursTutoredThisWeek ? Number(hoursTutoredThisWeek) : 0,
+        formatFn
+      )
+
+      // (6) Elapsed availability
+      const numElapsedAvailabilityHours = elapsedAvailability
 
       return [
         {
@@ -507,15 +560,20 @@ export default {
         },
         {
           label: 'Number of quizzes passed',
-          value: `${this.user.totalQuizzesPassed} quizzes passed`,
+          value: `${totalQuizzesPassed} quizzes passed`,
         },
         {
           label: 'Number of requests filled',
           value: `${numRequestsFilled} requests filled`,
         },
         {
-          label: 'Hours of tutoring completed',
-          value: `${numHoursTutored} hours tutored`,
+          label: 'Total hours of tutoring completed',
+          value: `${numHoursTutored}`,
+        },
+        {
+          label: 'Hours tutored this week',
+          value: `${timeTutoredThisWeek}`,
+          tooltip: 'Monday to Sunday UTC time',
         },
         {
           label: 'Hours of elapsed availability',
@@ -523,13 +581,17 @@ export default {
         },
       ]
     },
-    getCustomImpactStats() {
-      const user = this.$store.state.user.user
+    getCustomImpactStats({
+      availability,
+      totalVolunteerHours,
+      pastSessions,
+      totalQuizzesPassed,
+    }) {
       let numHoursSelected = 0
 
       if (userHasSchedule(user, 'availability.Thursday.5p')) {
         numHoursSelected = reduce(
-          user.availability,
+          availability,
           (weeklyHourCount, dayHours) => {
             // Tally up num hours for each day
             const hoursSelectedForDay = reduce(
@@ -548,10 +610,10 @@ export default {
       }
 
       // (3) Requests filled
-      const numRequestsFilled = get(user, 'pastSessions.length', '--')
+      const numRequestsFilled = get(pastSessions, 'length', '--')
 
       // (4) Hours volunteered
-      const numHoursVolunteered = Number(user.totalVolunteerHours) || '--'
+      const numHoursVolunteered = Number(totalVolunteerHours) || '--'
 
       return [
         {
@@ -560,7 +622,7 @@ export default {
         },
         {
           label: 'Number of quizzes passed',
-          value: `${this.user.totalQuizzesPassed} quizzes passed`,
+          value: `${totalQuizzesPassed} quizzes passed`,
         },
         {
           label: 'Number of requests filled',
@@ -575,9 +637,8 @@ export default {
     async initImpactSummary() {
       try {
         if (this.isCustomVolunteerPartner) {
-          this.impactStats = await this.getCustomImpactStats()
           this.lastUpdated = await this.getLastUpdated()
-        } else this.impactStats = await this.getImpactStats()
+        }
       } finally {
         this.isLoadingImpactSummary = false
       }
@@ -789,5 +850,9 @@ export default {
 
 .loader--center {
   text-align: center;
+}
+
+.stat-tooltip:before {
+  transition-duration: 0ms;
 }
 </style>
