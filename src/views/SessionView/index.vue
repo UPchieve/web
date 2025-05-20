@@ -251,14 +251,6 @@
         />
       </div>
     </div>
-    <div
-      v-if="showPhotoUpload"
-      class="toggleButton toggleButton__photo-upload"
-      :class="shouldHideChatSection ? 'photo-upload--hidden' : ''"
-      @click="openFileDialog"
-    >
-      <photo-upload-icon class="photo-upload--icon" />
-    </div>
     <web-notifications-modal
       v-if="showNotificationModal"
       :closeModal="() => setShowNotificationModal(false)"
@@ -294,8 +286,6 @@ import Whiteboard from './Whiteboard.vue'
 import DocumentEditor from './DocumentEditor.vue'
 import DocumentEditorV2 from './DocumentEditorV2.vue'
 import ConnectionTroubleModal from './ConnectionTroubleModal.vue'
-import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
-import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
@@ -331,7 +321,6 @@ export default {
     SessionChatHeader,
     SessionChat,
     Whiteboard,
-    PhotoUploadIcon,
     DocumentEditor,
     DocumentEditorV2,
     WebNotificationsModal,
@@ -594,16 +583,6 @@ export default {
       }
 
       return this.auxiliaryOpen
-    },
-    showPhotoUpload() {
-      if (this.auxiliaryType !== 'WHITEBOARD') return false
-
-      if (this.isStudent && this.mobileMode) {
-        if (this.isMobileApp && isOutdatedMobileAppVersion()) return false
-        return true
-      }
-
-      return false
     },
     isConnectionReady() {
       return [this.isConnected, this.sessionId]
@@ -1070,9 +1049,6 @@ export default {
         },
       })
     },
-    openFileDialog(event) {
-      this.$refs.whiteboard.openFileDialog(event)
-    },
     setHasSeenNewMessage(value) {
       this.hasSeenNewMessage = value
     },
@@ -1287,8 +1263,7 @@ export default {
   }
 }
 
-.toggleButton,
-.toggleButton__photo-upload {
+.toggleButton {
   position: fixed;
   z-index: 3;
   bottom: 10px;
@@ -1302,12 +1277,6 @@ export default {
 
   @include breakpoint-below('medium') {
     bottom: 40px;
-  }
-
-  &__photo-upload {
-    background-color: white;
-    border: 1px solid $c-border-grey;
-    right: 80px;
   }
 
   img,
