@@ -814,7 +814,6 @@ export const POSTHOG_FEATURE_FLAGS = {
   SMS_VERIFICATION: 'sms-verification',
   ELIGIBILITY_EMAIL: 'eligibility-email',
   PROGRESS_REPORTS: 'progress-reports',
-  QUILL_V2: 'quill-v2',
   PROGRESS_REPORT_SURVEY: 'progress-report-survey',
   USE_NEW_SIGN_UP_FLOW: 'use-new-sign-up-flow',
   SHOW_IN_APP_SESSION_NOTIFICATIONS: 'show-in-app-session-notifications',

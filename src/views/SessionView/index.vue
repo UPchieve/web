@@ -97,8 +97,7 @@
 
         <document-editor-v2
           v-else-if="
-            auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR &&
-            docEditorVersion === 2
+            auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR
           "
           :sessionId="this.sessionId"
           :isAiWidgetEnabled="aiWidgetEnabled"
@@ -112,10 +111,6 @@
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
           :unableToJoinCall="unableToJoinCall"
-        />
-        <document-editor
-          v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
-          :sessionId="this.sessionId"
         />
       </div>
 
@@ -283,7 +278,6 @@ import SessionChatHeader from './SessionChatHeader.vue'
 import SessionChat from './SessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
 import Whiteboard from './Whiteboard.vue'
-import DocumentEditor from './DocumentEditor.vue'
 import DocumentEditorV2 from './DocumentEditorV2.vue'
 import ConnectionTroubleModal from './ConnectionTroubleModal.vue'
 import CaretIcon from '@/assets/caret.svg'
@@ -321,7 +315,6 @@ export default {
     SessionChatHeader,
     SessionChat,
     Whiteboard,
-    DocumentEditor,
     DocumentEditorV2,
     WebNotificationsModal,
     CaretIcon,
@@ -419,7 +412,6 @@ export default {
       isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
       isMobileApp: (state) => state.app.isMobileApp,
       presessionSurvey: (state) => state.user.presessionSurvey,
-      docEditorVersion: (state) => state.user.session.docEditorVersion,
       auxiliaryType: (state) => state.user.session.toolType,
       isConnected: (state) => state.socket.isConnected,
       productFlags: (state) => state.productFlags.flags,
@@ -439,7 +431,6 @@ export default {
       isSessionOver: 'user/isSessionOver',
       isSessionAlive: 'user/isSessionAlive',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
-      shouldUseQuillV2: 'featureFlags/shouldUseQuillV2',
       isTutorBotChatEnabled: 'featureFlags/isTutorBotChatEnabled',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
@@ -649,10 +640,7 @@ export default {
         onRetry: (res, abort) => {
           this.showTroubleStartingModal(abort)
         },
-      }
-
-      if (this.shouldUseQuillV2) {
-        options.docEditorVersion = 2
+        docEditorVersion: 2
       }
 
       if (assignmentId) {
