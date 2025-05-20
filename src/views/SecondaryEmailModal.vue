@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import FormEmail from '@/components/FormEmail.vue'
 import Modal from '@/components/Modal.vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
 import CrossIcon from '@/assets/cross.svg'
 import NetworkService from '@/services/NetworkService'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
@@ -12,11 +12,20 @@ import FormInput from '@/components/FormInput.vue'
 import isEmail from 'validator/lib/isEmail'
 import AnalyticsService from '@/services/AnalyticsService'
 
+const props = defineProps<{
+  showGrade12Messaging: false
+  showPermanentDismissOption: false
+}>()
+
 const store = useStore()
 const secondaryEmail = ref<string>('')
 const verificationCode = ref<string>('')
 const isLoading = ref<boolean>(false)
-const emit = defineEmits('dismissed')
+const emit = defineEmits<{
+  (e: 'dismissed', complete: { isComplete: boolean; email?: string }): void
+  (e: 'completed', secondaryEmail: string): void
+  (e: 'permanentlyDismissed'): void
+}>()
 type FormStep = 'enter_email' | 'enter_code' | 'complete'
 const formStep = ref<FormStep>('enter_email')
 const errorMessage = ref<string>('')
@@ -34,6 +43,10 @@ const handleError = (error: any) => {
     errorMessage.value = `Something went wrong sending a verification code to ${secondaryEmail.value}. Please try again. If the problem persists, please reach out to support@upchieve.org for help!`
   }
 }
+
+onBeforeUnmount(() => {
+  if (formStep.value === 'complete') emit('completed', secondaryEmail.value)
+})
 
 const sendVerificationCode = async (event: Event) => {
   errorMessage.value = ''
@@ -77,9 +90,6 @@ const confirmVerificationCode = async (event: Event) => {
     if (response.data.success) {
       formStep.value = 'complete'
       AnalyticsService.captureEvent(EVENTS.SECONDARY_EMAIL_VERIFIED)
-      await store.dispatch('user/addToUser', {
-        proxyEmail: secondaryEmail.value,
-      })
     } else {
       handleError(
         'Invalid verification code. Please double check the code, or request a new code.'
@@ -113,18 +123,47 @@ onMounted(() => {
 onUnmounted(() => {
   AnalyticsService.captureEvent(EVENTS.SECONDARY_EMAIL_CLOSED_MODAL)
 })
+
+const messageForSeniors = {
+  main: `📣 Hey Senior! Add your personal email now so that you don't lose access to UPchieve when you graduate! This is a great way to stay in the loop about internships, volunteer opportunities, and the UPchieve community.`,
+  sub: 'Please be sure to add a secondary email ASAP if you are using a school email!',
+}
+const message = computed((): { main: string; sub?: string } => {
+  return props.showGrade12Messaging ? messageForSeniors : null
+})
+
+const onPermanentlyDismissed = () => {
+  AnalyticsService.captureEvent(
+    EVENTS.SECONDARY_EMAIL_PERMANENTLY_DISMISSED_MODAL
+  )
+  emit('permanentlyDismissed')
+  emit('dismissed', { isComplete: false })
+}
 </script>
 
 <template>
   <Modal>
     <div class="header">
       <div class="uc-form-header header-text">{{ headingText }}</div>
-      <CrossIcon class="dismiss-button" @click="emit('dismissed')" />
+      <CrossIcon
+        class="dismiss-button"
+        @click="
+          emit('dismissed', {
+            isComplete: formStep === 'complete',
+            email: secondaryEmail,
+          })
+        "
+      />
     </div>
     <div class="content flex-col">
       <div v-if="errorMessage" class="alert alert-danger">
         {{ errorMessage }}
       </div>
+      <div class="message" v-if="formStep === 'enter_email'">
+        <span v-if="message?.main">{{ message.main }}</span>
+        <span class="sub-message" v-if="message?.sub">{{ message?.sub }}</span>
+      </div>
+
       <form v-if="formStep === 'enter_email'" @submit="sendVerificationCode">
         <Spinner v-if="isLoading" />
         <FormEmail
@@ -160,7 +199,9 @@ onUnmounted(() => {
         v-else-if="formStep === 'enter_code'"
         @submit="confirmVerificationCode"
       >
-        We have sent a verification code to <strong>{{ secondaryEmail }}</strong
+        We have sent a verification code to
+        <strong
+          ><span id="ph-no-capture">{{ secondaryEmail }}</span></strong
         >.<br />
         Please enter the code below:
         <FormInput
@@ -200,11 +241,27 @@ onUnmounted(() => {
         </div>
         <Spinner v-else />
       </form>
-      <button v-else class="uc-form-button" @click="emit('dismissed')">
+      <button
+        v-else
+        class="uc-form-button"
+        @click="
+          emit('dismissed', {
+            isComplete: formStep === 'complete',
+            email: secondaryEmail,
+          })
+        "
+      >
         Close
       </button>
     </div>
     <RecaptchaCaption v-if="formStep !== 'complete'" />
+    <button
+      class="permanent-dismiss-button"
+      v-if="props.showPermanentDismissOption"
+      @click="onPermanentlyDismissed"
+    >
+      Don't show this again
+    </button>
   </Modal>
 </template>
 
@@ -242,5 +299,18 @@ onUnmounted(() => {
     padding-top: 0px;
     margin-top: 0px;
   }
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  .sub-message {
+    font-weight: $font-weight-medium;
+  }
+}
+
+.permanent-dismiss-button {
+  color: $c-information-blue;
 }
 </style>

@@ -55,6 +55,15 @@
       v-if="showImpactStudySurvey"
       :closeModal="toggleImpactStudySurvey"
     />
+    <secondary-email-modal
+      v-if="showSecondaryEmailModal"
+      :showGrade12Messaging="this.user.gradeLevel === '12th'"
+      :showPermanentDismissOption="true"
+      @dismissed="onSecondaryEmailDismissed"
+      @completed="updateSecondaryEmail"
+      @permanentlyDismissed="onPermanentlyDismissedSecondaryEmailModal"
+    />
+
     <subject-selection />
 
     <onboarding-modal
@@ -91,10 +100,12 @@ import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Studen
 import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.svg'
 import Student_Onboarding_Frame4 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.svg'
 import { getImpactStudyCacheKey } from '@/utils/cache-keys'
+import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 
 export default {
   name: 'student-dashboard',
   components: {
+    SecondaryEmailModal,
     DashboardBanner,
     SubjectSelection,
     TellThemCollegePrepModal,
@@ -179,6 +190,7 @@ export default {
       assignments: [],
       onboardingFrames: [],
       showImpactStudySurvey: false,
+      dismissedSecondaryEmailModal: false,
     }
   },
   computed: {
@@ -206,7 +218,30 @@ export default {
         'featureFlags/isFallIncentiveProgramEnabled',
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
       isMobileMode: 'app/mobileMode',
+      isSecondaryEmailOnProfilePageEnabled:
+        'featureFlags/isSecondaryEmailOnProfilePageEnabled',
     }),
+    permanentlyDismissedSecondaryEmailModalKey() {
+      return `${this.user.id}-permanently-dismissed-secondary-email-modal`
+    },
+    permanentlyDismissedSecondaryEmailModal() {
+      return (
+        localStorage.getItem(
+          this.permanentlyDismissedSecondaryEmailModalKey
+        ) !== null
+      )
+    },
+
+    showSecondaryEmailModal() {
+      return (
+        this.isSecondaryEmailOnProfilePageEnabled &&
+        // always show for 12th graders while they do not have a proxy email, or until they permanently dismiss this
+        this.user?.gradeLevel === '12th' &&
+        !this.dismissedSecondaryEmailModal &&
+        !this.permanentlyDismissedSecondaryEmailModal &&
+        !this.user.proxyEmail
+      )
+    },
 
     aiBotMessage() {
       return this.isStandaloneAiTutorEnabled && this.isMobileMode
@@ -254,13 +289,25 @@ export default {
     },
   },
   methods: {
+    onPermanentlyDismissedSecondaryEmailModal() {
+      localStorage.setItem(
+        this.permanentlyDismissedSecondaryEmailModalKey,
+        'true'
+      )
+    },
+    onSecondaryEmailDismissed() {
+      this.toggleSecondaryEmailModal()
+    },
+    async updateSecondaryEmail(email) {
+      await this.$store.dispatch('user/addToUser', {
+        proxyEmail: email,
+      })
+    },
+    toggleSecondaryEmailModal() {
+      this.dismissedSecondaryEmailModal = true
+    },
     toggleTellThemCollegePrepModal() {
       this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
-    },
-    showGleapBot() {
-      AnalyticsService.captureEvent(EVENTS.GLEAP_BOT_SHOWN)
-      Gleap.startBot('64b555f1e8dd226df869b2e7')
-      AnalyticsService.updateUser({ hasMessages: false })
     },
     toggleFallIncentiveEnrollmentModal() {
       this.showFallIncentiveEnrollmentModal =

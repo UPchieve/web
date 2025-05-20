@@ -11,6 +11,7 @@
     <SecondaryEmailModal
       v-if="showSecondaryEmailModal"
       @dismissed="() => toggleSecondaryEmailModal(false)"
+      @completed="updateSecondaryEmail"
     />
     <deactivate-account-modal
       v-if="showDeactivateAccountModal"
@@ -425,6 +426,11 @@ export default {
     },
   },
   methods: {
+    async updateSecondaryEmail(email) {
+      await this.$store.dispatch('user/addToUser', {
+        proxyEmail: email,
+      })
+    },
     toggleSecondaryEmailModal(maybeValue) {
       if (maybeValue === undefined) {
         this.showSecondaryEmailModal = !this.showSecondaryEmailModal
