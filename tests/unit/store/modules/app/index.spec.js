@@ -23,6 +23,7 @@ describe('`app` store module', () => {
       version: '',
       csrfToken: '',
       showCsrfRefreshAlert: false,
+      prefersReducedMotion: false,
     })
   })
 

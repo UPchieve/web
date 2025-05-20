@@ -20,6 +20,7 @@ export default {
     version: '',
     csrfToken: '',
     showCsrfRefreshAlert: false,
+    prefersReducedMotion: false,
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
@@ -31,6 +32,7 @@ export default {
     isWebPageHidden: (state, isVisible) => (state.isWebPageHidden = isVisible),
     setCsrfToken: (state, csrfToken) => (state.csrfToken = csrfToken),
     setShowCsrfRefreshAlert: (state, val) => (state.showCsrfRefreshAlert = val),
+    setPrefersReducedMotion: (state, val) => (state.prefersReducedMotion = val),
   },
   actions: {
     showNavigation: ({ commit, dispatch }) => {

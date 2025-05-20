@@ -62,6 +62,7 @@ onMounted(() => {
   margin-bottom: 0;
   transition: all 100ms ease-in;
 }
+
 .celebrate-button:hover {
   left: 0;
   bottom: 0;
@@ -70,6 +71,13 @@ onMounted(() => {
 }
 .celebrate-button.wiggle {
   animation: wiggle 0.5s infinite ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebrate-button:hover,
+  .celebrate-button.wiggle {
+    animation: none;
+  }
 }
 
 .celebrate-button-enter-active {

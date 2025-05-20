@@ -14,30 +14,38 @@ const showConfetti = computed(
 const confettiCelebrations = computed(
   () => store.state.celebrations.confettiCelebrations
 )
+
+const prefersReducedMotion = computed(() => {
+  return store.state.app.prefersReducedMotion
+})
 </script>
 
 <template>
-  <div v-if="showConfetti" class="confetti">
-    <div
-      v-for="celebration in confettiCelebrations"
-      :key="celebration.id"
-      v-confetti="{
-        colors: [
-          '#16d2aa',
-          '#FF8c5f',
-          '#F44747',
-          '#1855d1',
-          '#fed766',
-          '#f7aef8',
-          '#76e5fd',
-        ],
-        force: 0.9,
-        duration: celebration.duration,
-        stageWidth,
-        stageHeight,
-      }"
-    ></div>
-  </div>
+  <Transition name="fade">
+    <div v-if="showConfetti" class="confetti">
+      <div v-if="prefersReducedMotion" class="reduced-motion-confetti">🎉</div>
+      <div
+        v-else
+        v-for="celebration in confettiCelebrations"
+        :key="celebration.id"
+        v-confetti="{
+          colors: [
+            '#16d2aa',
+            '#FF8c5f',
+            '#F44747',
+            '#1855d1',
+            '#fed766',
+            '#f7aef8',
+            '#76e5fd',
+          ],
+          force: 0.9,
+          duration: celebration.duration,
+          stageWidth,
+          stageHeight,
+        }"
+      ></div>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
@@ -52,5 +60,22 @@ const confettiCelebrations = computed(
   overflow: hidden;
   pointer-events: none;
   z-index: 1000;
+}
+
+.reduced-motion-confetti {
+  margin-top: 1em;
+  font-size: 100px;
+}
+</style>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

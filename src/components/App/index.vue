@@ -45,6 +45,8 @@ import sound from '@/assets/audio/alert.mp3'
 import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
 import Celebration from '@/components/Celebration.vue'
 
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+
 export default {
   name: 'App',
   components: {
@@ -95,6 +97,12 @@ export default {
         document.addEventListener('click', this.iOSFocusElements, false)
       }
     }
+    if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
+      this.$store.commit('app/setPrefersReducedMotion', true)
+    }
+    window
+      .matchMedia(REDUCED_MOTION_QUERY)
+      .addEventListener('change', this.updateMotionPreference)
   },
   mounted() {
     if (this.mobileMode) {
@@ -116,8 +124,14 @@ export default {
         document.addEventListener('click', this.iOSFocusElements, false)
       }
     }
+    window
+      .matchMedia(REDUCED_MOTION_QUERY)
+      .removeEventListener('change', this.updateMotionPreference)
   },
   methods: {
+    updateMotionPreference(e) {
+      this.$store.commit('app/setPrefersReducedMotion', e.matches)
+    },
     iOSFocusElements(e) {
       if (!e) {
         return
