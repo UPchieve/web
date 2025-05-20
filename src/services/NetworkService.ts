@@ -77,7 +77,7 @@ export default {
   _axiosErrorHandler(res: AxiosError): Promise<NetworkError> {
     return Promise.reject({
       status: res.response?.status,
-      msg: (res.response?.data as { err?: string })?.err,
+      message: (res.response?.data as { err?: string })?.err,
     })
   },
   _faultTolerantHttp(method, onRetry, url, data) {
@@ -730,7 +730,7 @@ export default {
       referredByCode,
       schoolId,
       zipCode,
-    }).then(this._successHandler, this._errorHandler)
+    }).then(this._successHandler, this._axiosErrorHandler)
   },
   checkTeacherEligibility({ schoolId }: { schoolId: string }) {
     const queryParams = new URLSearchParams({ schoolId }).toString()

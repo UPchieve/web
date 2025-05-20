@@ -1284,17 +1284,6 @@ export default {
         this.errors.push('You must select a school.')
       }
 
-      // Skip the zipcode check for the BF two question eligibility flow
-      if (!this.isBigFutureTwoQuestionEligiblityFlowActive) {
-        const zipCode = this.eligibility.zipCode
-        const {
-          data: { isValidZipCode },
-        } = await NetworkService.checkZipCode({ zipCode })
-        if (!isValidZipCode) {
-          this.errors.push('You must enter a valid United States zip code.')
-        }
-      }
-
       if (!this.eligibility.studentEmail && !this.skipEligibilityEmail) {
         this.errors.push('An email address is required.')
       }
@@ -1425,9 +1414,7 @@ export default {
           if (!isDomesticIpAddress) return this.internationalPage()
         })
         .catch((res) => {
-          const error =
-            (res.body && (res.body.err || res.body.message)) ||
-            'Unknown server error'
+          const error = res.message ?? 'Unknown server error'
           this.errors.push(error)
         })
     },
