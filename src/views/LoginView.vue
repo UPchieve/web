@@ -72,6 +72,7 @@
 import { mapGetters } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
+import LoggerService from '@/services/LoggerService'
 import FormEmail from '@/components/FormEmail.vue'
 import FormPassword from '@/components/FormPassword.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
@@ -123,6 +124,7 @@ export default {
       error = provider
         ? `Your ${provider} account is not associated with this account.`
         : `Something went wrong. Please verify your login method and try again.`
+      LoggerService.noticeError(`${provider} error: ${error}`)
     }
     return {
       credentials: {

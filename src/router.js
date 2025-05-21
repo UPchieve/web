@@ -51,6 +51,7 @@ import WelcomePage from './views/WelcomePage.vue'
 import ProgressReportsOverviewView from './views/ProgressReportsOverviewView.vue'
 import ProgressReportsOverviewSubjectView from './views/ProgressReportsOverviewSubjectView.vue'
 import TeacherDashboardView from './views/DashboardView/TeacherDashboard/index.vue'
+import CleverSigninInstructions from './views/SignupView/CleverSigninInstructions.vue'
 import Gleap from 'gleap'
 import NetworkService, { axiosInstance } from './services/NetworkService'
 import { UserType } from '@/services/SignUpService'
@@ -549,6 +550,12 @@ const routes = [
     name: 'SurveysView',
     component: SurveysView,
     meta: { protected: true },
+  },
+  {
+    path: '/clever-signin-instructions',
+    name: 'CleverSigninInstructions',
+    component: CleverSigninInstructions,
+    meta: { loggedOutOnly: true, hideNavigation: true },
   },
   {
     path: '/:pathMatch(.*)*',

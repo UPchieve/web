@@ -20,6 +20,9 @@
           class="img"
           :style="customPanelImgStyle"
         />
+        <div v-if="imageText" class="img-text">
+          <h1>{{ imageText }}</h1>
+        </div>
       </div>
       <div class="form-content">
         <img
@@ -53,6 +56,8 @@ import ConnectYourStudents from '@/assets/marketing_images/connect-your-students
 import TrustedByStudents from '@/assets/marketing_images/trusted_by_students.svg'
 import UpdogSubjects from '@/assets/updog-subjects.svg'
 import WeCanHelpSubjects from '@/assets/marketing_images/we_can_help_in_any_core_subject.svg'
+import UpdogCrying from '@/assets/updog-crying.svg'
+
 export default {
   components: {
     ChatOneOnOne,
@@ -60,6 +65,7 @@ export default {
     TrustedByStudents,
     UpdogSubjects,
     WeCanHelpSubjects,
+    UpdogCrying
   },
   props: {
     layout: {
@@ -76,6 +82,10 @@ export default {
       type: String,
       default: null,
     },
+    imageText: {
+      type: String,
+      default: null,
+    },
   },
   computed: {
     customPanelImgStyle() {
@@ -87,6 +97,14 @@ export default {
 
       if (this.panelImg === 'we-can-help-subjects') {
         return {
+          padding: '45px',
+        }
+      }
+
+      if(this.panelImg === 'updog-crying') {
+        return {
+          'height': 'auto',
+          'max-width': '80%',
           padding: '45px',
         }
       }
@@ -253,6 +271,15 @@ $footer-height-tiny: 100px;
   max-width: 1000px;
   padding: 25px 25px 0 25px;
   width: 100%;
+}
+
+.img-text {
+  text-align: center;
+  padding: 25px 25px 0 25px;
+
+  h1{ 
+    font-size: 32px;
+  }
 }
 
 .footer {

@@ -192,12 +192,15 @@ function createAccountWithSso(
     }
     signInWithSso({
       provider,
-      errorRedirect: `/sign-up/${userType}/account`,
+      errorRedirect:
+        provider === 'google'
+          ? `/sign-up/${userType}/account`
+          : '/clever-signin-instructions',
       ...data,
     })
     return [null, null]
   } catch (err) {
-    LoggerService.noticeError(err)
+    LoggerService.noticeError(`${provider} error: ${err}`)
     return getSubmitResponse(null, null, err)
   }
 }

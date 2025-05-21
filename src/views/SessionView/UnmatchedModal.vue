@@ -65,7 +65,7 @@ export default {
       })
       await SessionService.endAndExitSession({
         store: this.$store,
-        router: this.$router
+        router: this.$router,
       })
     },
   },
