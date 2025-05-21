@@ -106,6 +106,7 @@ const getWrapper = async (overrides = {}) => {
           path: '/dashboard',
         },
       },
+      query: {},
     },
   }
   store.dispatch('volunteer/handleIncomingSessions', {

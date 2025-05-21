@@ -28,6 +28,7 @@ describe('AboutThisSessionSurvey', () => {
         mocks: {
           $route: {
             params: { sessionId },
+            query: {},
           },
         },
       },

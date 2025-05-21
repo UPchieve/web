@@ -124,7 +124,7 @@ const getWrapper = (options = {}) => {
   return shallowMount(SidebarLinks, {
     global: {
       plugins: [store],
-      mocks: { $route: { path: options.path } },
+      mocks: { $route: { path: options.path, query: {} } },
     },
     props: {
       authenticated: options.authenticated,

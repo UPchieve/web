@@ -16,6 +16,7 @@ const getWrapper = (options = {}) => {
     mockRoute: {
       path: '/dashboard',
       params: {},
+      query: {},
       name: 'DashboardView',
     },
     ...options,

@@ -27,6 +27,7 @@ describe('VolunteerPartnerSignupView', () => {
               partnerId: PARTNER.key,
               uid: '123',
             },
+            query: {},
           },
         },
       },

@@ -52,6 +52,7 @@ describe('AboutSessionModal', () => {
         mocks: {
           $route: {
             params: { sessionId: '12345' },
+            query: {},
           },
         },
       },
