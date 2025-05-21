@@ -246,7 +246,9 @@ export default {
             data.tutorBotConversationId ===
             rootState.botConversations.currentConversation.conversationId
           ) {
-            commit('botConversations/addToCurrentConversation', data, { root: true })
+            commit('botConversations/addToCurrentConversation', data, {
+              root: true,
+            })
           }
         }
       )

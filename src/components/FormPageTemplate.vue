@@ -109,6 +109,12 @@ export default {
         }
       }
 
+      if (this.panelImg === 'trusted-by-students') {
+        return {
+          'padding-top': '25px',
+        }
+      }
+
       return {}
     },
   },
