@@ -6,7 +6,7 @@
     class="ButtonTemplate"
     @click="$emit('click')"
   >
-    <div>
+    <div class="ButtonTemplate-content">
       <slot />
     </div>
     <arrow-icon
@@ -21,7 +21,7 @@
     :type="buttonType"
     class="ButtonTemplate"
   >
-    <span>
+    <span class="ButtonTemplate-content">
       <slot />
     </span>
     <arrow-icon
@@ -62,7 +62,13 @@ export default {
   background: none;
   border: none;
   margin: 0;
-  padding: 0;
+  padding: 8px 16px; 
+}
+
+.ButtonTemplate-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ButtonTemplate-icon {
