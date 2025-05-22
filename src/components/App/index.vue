@@ -44,6 +44,8 @@ import { socket } from '@/socket'
 import sound from '@/assets/audio/alert.mp3'
 import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
 import Celebration from '@/components/Celebration.vue'
+import getNotificationPermission from '@/utils/get-notification-permission'
+import { EVENTS } from '@/consts'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
@@ -288,6 +290,13 @@ export default {
         }
 
         this.$store.dispatch('user/getProgressReportOverviewSubjectStats')
+
+        // We're gathering initial data for PostHog since we cannot backfill and know who previously
+        // granted web notification permissions. We'll be removing this after a couple of weeks
+        if (getNotificationPermission() === 'granted')
+          AnalyticsService.captureEvent(
+            EVENTS.USER_HAS_GRANTED_WEB_NOTIFICATION_PERMISSION
+          )
       } else if (currentUserValue.id) {
         const userProps = this.getUserPropsForAnalytics()
         AnalyticsService.updateUser(userProps)
