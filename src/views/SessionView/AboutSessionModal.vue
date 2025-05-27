@@ -116,7 +116,11 @@ export default {
       let display = ''
       if (this.totalStudentSessions === 1) display = 'first'
       if (this.totalStudentSessions === 2) display = 'second'
+      if (this.totalStudentSessions === 3) display = 'third'
 
+      if (!display) {
+        display = this.totalStudentSessions + 'th'
+      }
       return `This is ${this.studentsFirstName}'s ${display} session!`
     },
     studentsFirstName() {
