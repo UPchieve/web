@@ -17,7 +17,7 @@
             <alert-icon class="alert-icon" />
             <div class="subheading">{{ totalSessionsTextTitle }}</div>
           </div>
-          <div>
+          <div v-if="this.studentsGrade">
             {{ this.studentsFirstName }} is in {{ this.studentsGrade }} grade.
           </div>
           <div class="subtitle">
