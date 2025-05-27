@@ -45,7 +45,7 @@ export default {
     openVerificationModal() {
       this.showVerificationModal = true
       AnalyticsService.captureEvent(EVENTS.VERIFICATION_HEADER_CLICKED, {
-        verificationMethod: this.headerData.verificationMethod,
+        verificationMethod: this.verificationMethod,
         userId: this.user.id,
       })
     },
