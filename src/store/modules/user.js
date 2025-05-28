@@ -3,6 +3,7 @@ import { some } from 'lodash-es'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import TeacherIcon from '@/assets/user_avatars/teacher-icon.svg'
 import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
+import AmbassadorIcon from '@/assets/user_avatars/ambassador-icon.svg'
 import SessionService from '@/services/SessionService'
 import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
@@ -334,12 +335,14 @@ export default {
   },
   getters: {
     avatar(_state, getters) {
-      if (getters.isVolunteer) {
-        return VolunteerIcon
+      if (getters.showAmbassadorTitle) {
+        return { component: AmbassadorIcon, id: 'ambassador-avatar' }
+      } else if (getters.isVolunteer) {
+        return { component: VolunteerIcon, id: 'volunteer-avatar' }
       } else if (getters.isStudent) {
-        return StudentIcon
+        return { component: StudentIcon, id: 'student-avatar' }
       } else if (getters.isTeacher) {
-        return TeacherIcon
+        return { component: TeacherIcon, id: 'teacher-avatar' }
       }
       return ''
     },
@@ -360,13 +363,25 @@ export default {
     isStudentVolunteer: (_state, getters) =>
       getters.userRoles.includes('student') &&
       getters.userRoles.includes('volunteer'),
-
     hasStudentRole: (_state, getters) => getters.userRoles.includes('student'),
-
     hasVolunteerRole: (_state, getters) =>
       getters.userRoles.includes('volunteer'),
-
     hasTeacherRole: (_state, getters) => getters.userRoles.includes('teacher'),
+    hasAmbassadorRole: (_state, getters) =>
+      getters.userRoles.includes('ambassador'),
+    isVolunteerProgramAmbassador: (_state, getters) =>
+      getters.hasAmbassadorRole && getters.hasVolunteerRole,
+    isVolunteerReferralAmbassador: (state) =>
+      state.user?.numReferredVolunteers &&
+      state.user?.numReferredVolunteers >= 5,
+    showAmbassadorTitle: (state, getters, _rootState, rootGetters) => {
+      return (
+        rootGetters['featureFlags/isShowAmbassadorTitleEnabled'] &&
+        getters.hasVolunteerRole &&
+        (getters.isVolunteerProgramAmbassador ||
+          getters.isVolunteerReferralAmbassador)
+      )
+    },
 
     isAuthenticated: (state) => !!(state.user && state.user.id),
 

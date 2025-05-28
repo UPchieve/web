@@ -43,6 +43,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.INFINITE_WHITEBOARD]: false,
       [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -208,6 +209,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE],
     isConfettiCelebrationEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION],
+    isShowAmbassadorTitleEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {

@@ -38,7 +38,7 @@ test('shows correct layout when logged in and in mobileMode', () => {
   const loggedIn = getWrapper({ isAuthenticated: true, mobileMode: true })
 
   expect(loggedIn.find('.SidebarInfo-name').exists()).toBe(true)
-  expect(loggedIn.find('.SidebarInfo-type').exists()).toBe(false)
+  expect(loggedIn.find('.SidebarInfo-type').exists()).toBe(true)
   expect(loggedIn.find('.SidebarInfo-status').exists()).toBe(false)
 })
 
