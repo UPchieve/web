@@ -9,6 +9,9 @@ import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { vi } from 'vitest'
 import productFlagsModule from '@/store/modules/product-flags'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
+import { nextTick } from 'vue'
+import flushPromises from 'flush-promises'
 
 describe('ProfileView', () => {
   let DEFAULT_FLAGS_GETTERS, DEFAULT_USER
@@ -74,8 +77,28 @@ describe('ProfileView', () => {
     // Many tests rely on accessing the wrapper for the nested VuePhoneNumberInput component.
     // Thus we must use mount() instead of shallowMount()
     return mount(ProfileView, {
-      global: { plugins: [store] },
+      global: {
+        plugins: [store],
+        components: {
+          MazPhoneNumberInput,
+        },
+      },
     })
+  }
+
+  const getPhoneInputs = (wrapper) => {
+    const mazInputs = wrapper.findAll('.m-input-wrapper-input')
+    const countryCodeInput = mazInputs
+      .find((input) => input.text() === 'Country code')
+      .find('.m-input-input')
+    const phoneNumberInput = mazInputs
+      .find(
+        (input) =>
+          input.text() === 'Phone number' ||
+          input.text() === 'Example: (201) 555-0123'
+      )
+      .find('.m-input-input')
+    return { countryCodeInput, phoneNumberInput }
   }
 
   describe('Render differences between students and volunteers', () => {
@@ -129,7 +152,8 @@ describe('ProfileView', () => {
      */
     const clickEditSaveButton = async (wrapper) => {
       wrapper.find('[data-testid="edit-profile-btn"]').trigger('click')
-      await wrapper.vm.$nextTick()
+      await nextTick()
+      await flushPromises()
     }
 
     test.each([
@@ -173,6 +197,50 @@ describe('ProfileView', () => {
       expect(
         wrapper.find('[data-testid="sms-verification-modal"]').exists()
       ).toBeFalsy()
+    })
+
+    it('Should open the verification modal if the user changes their phone number', async () => {
+      const wrapper = getWrapper({
+        user: {
+          phone: '+18602124444',
+          phoneVerified: true,
+        },
+      })
+      // Enter edit mode and save changes
+      await clickEditSaveButton(wrapper)
+      await nextTick()
+
+      const { countryCodeInput, phoneNumberInput } = getPhoneInputs(wrapper)
+      await countryCodeInput.setValue('+1')
+      await phoneNumberInput.setValue('(212) 998-1123')
+      await clickEditSaveButton(wrapper)
+      await nextTick()
+
+      // Expect modal to open
+      expect(
+        wrapper.find('[data-testid="sms-verification-modal"]').exists()
+      ).toBeTruthy()
+    })
+
+    it('Should open the verification modal if the user adds a phone number for the first time', async () => {
+      const wrapper = getWrapper({
+        user: {
+          phone: null,
+        },
+      })
+      // Enter edit mode and save changes
+      await clickEditSaveButton(wrapper)
+
+      const { countryCodeInput, phoneNumberInput } = getPhoneInputs(wrapper)
+      await countryCodeInput.setValue('+1')
+      await phoneNumberInput.setValue('(212) 998-1123')
+      await clickEditSaveButton(wrapper)
+      await nextTick()
+
+      // Expect modal to open
+      expect(
+        wrapper.find('[data-testid="sms-verification-modal"]').exists()
+      ).toBeTruthy()
     })
 
     it('Should open the corresponding modal if a student clicks the Remove Phone button', async () => {

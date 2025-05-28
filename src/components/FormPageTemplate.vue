@@ -65,7 +65,7 @@ export default {
     TrustedByStudents,
     UpdogSubjects,
     WeCanHelpSubjects,
-    UpdogCrying
+    UpdogCrying,
   },
   props: {
     layout: {
@@ -101,9 +101,9 @@ export default {
         }
       }
 
-      if(this.panelImg === 'updog-crying') {
+      if (this.panelImg === 'updog-crying') {
         return {
-          'height': 'auto',
+          height: 'auto',
           'max-width': '80%',
           padding: '45px',
         }
@@ -283,7 +283,7 @@ $footer-height-tiny: 100px;
   text-align: center;
   padding: 25px 25px 0 25px;
 
-  h1{ 
+  h1 {
     font-size: 32px;
   }
 }

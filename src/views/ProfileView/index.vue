@@ -418,11 +418,10 @@ export default {
       return 'Notification' in window && Notification.permission === 'granted'
     },
     userNeedsToVerifyPhone() {
-      return (
-        this.user.phone !== this.phoneInputInfo.e164 &&
-        this.user.phone &&
-        !this.user.phoneVerified
-      )
+      const isAddingForFirstTime = !this.user.phone && this.phoneInputInfo.e164
+      const isUpdating =
+        this.user.phone && this.user.phone !== this.phoneInputInfo.e164
+      return isAddingForFirstTime || isUpdating
     },
   },
   methods: {
