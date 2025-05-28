@@ -12,15 +12,17 @@
             <cross-icon />
           </large-button>
         </div>
-        <div v-if="true" class="alert-container">
+        <div class="alert-container">
           <div class="alert">
             <alert-icon class="alert-icon" />
-            <div class="subheading">{{ totalSessionsTextTitle }}</div>
+            <div class="subheading" data-testid="total-sessions">
+              {{ totalSessionsTextTitle }}
+            </div>
           </div>
           <div v-if="this.studentsGrade">
             {{ this.studentsFirstName }} is in {{ this.studentsGrade }} grade.
           </div>
-          <div class="subtitle">
+          <div v-if="totalStudentSessions <= 3" class="subtitle">
             Be sure to be welcoming and extra patient as they get used to our
             platform.
           </div>
@@ -82,6 +84,7 @@ import CrossIcon from '@/assets/cross.svg'
 import { mapGetters, mapState } from 'vuex'
 import AboutThisSessionSurvey from '@/components/AboutThisSessionSurvey.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import { ordinalizeNumber } from '@/utils/ordinalize-number'
 
 const LOW_CONFIDENCE_THRESHOLD = 2
 
@@ -118,10 +121,7 @@ export default {
       if (this.totalStudentSessions === 2) display = 'second'
       if (this.totalStudentSessions === 3) display = 'third'
 
-      if (!display) {
-        display = this.totalStudentSessions + 'th'
-      }
-      return `This is ${this.studentsFirstName}'s ${display} session!`
+      return `This is ${this.studentsFirstName}'s ${display || ordinalizeNumber(this.totalStudentSessions)} session!`
     },
     studentsFirstName() {
       return this.session.student.firstname

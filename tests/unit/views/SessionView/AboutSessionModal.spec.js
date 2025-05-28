@@ -160,4 +160,71 @@ describe('AboutSessionModal', () => {
       }
     )
   })
+
+  describe('About This Session student session count', () => {
+    it('Should render "first" for the first session', () => {
+      const wrapper = getWrapper({
+        props: {
+          totalStudentSessions: 1,
+        },
+      })
+      expect(wrapper.find('[data-testid="total-sessions"]').text()).toContain(
+        'first'
+      )
+    })
+
+    it('Should render "second" for the second session', () => {
+      const wrapper = getWrapper({
+        props: {
+          totalStudentSessions: 2,
+        },
+      })
+      expect(wrapper.find('[data-testid="total-sessions"]').text()).toContain(
+        'second'
+      )
+    })
+
+    it('Should render "third" for the third session', () => {
+      const wrapper = getWrapper({
+        props: {
+          totalStudentSessions: 3,
+        },
+      })
+      expect(wrapper.find('[data-testid="total-sessions"]').text()).toContain(
+        'third'
+      )
+    })
+
+    it.each([
+      [4, 'th'],
+      [101, 'st'],
+      [22, 'nd'],
+      [73, 'rd'],
+      [561, 'st'],
+      [872, 'nd'],
+      [1093, 'rd'],
+      // Special cases when ending in 11-13.
+      [11, 'th'],
+      [12, 'th'],
+      [13, 'th'],
+      [111, 'th'],
+      [112, 'th'],
+      [113, 'th'],
+      [211, 'th'],
+      [212, 'th'],
+      [213, 'th'],
+    ])(
+      'Should render the number with the appropriate suffix for the %s%s session',
+      (sessionCount, suffix) => {
+        const wrapper = getWrapper({
+          props: {
+            totalStudentSessions: sessionCount,
+          },
+        })
+        expect(wrapper.find('[data-testid="total-sessions"]').text()).toContain(
+          sessionCount + suffix
+        )
+      }
+    )
+  })
 })
