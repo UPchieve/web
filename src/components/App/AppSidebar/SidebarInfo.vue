@@ -73,7 +73,7 @@ export default {
     ambassadorTooltipText() {
       return this.isInAmbassadorProgram
         ? 'You are a member of our UPchieve Ambassadors program!'
-        : `You've become an UPchieve Ambassador by referring ${this.user?.numReferredVolunteers ?? '5+'} friends to volunteer. Nice work!`
+        : `You've earned UPchieve ambassador status by referring ${this.user?.numReferredVolunteers ?? '5+'} friends. Nice work!`
     },
     type() {
       if (this.showAmbassadorTitle) {
