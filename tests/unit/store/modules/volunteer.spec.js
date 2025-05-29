@@ -1,7 +1,6 @@
-import volunteerModule from '@/store/modules/volunteer'
-import userModule from '@/store/modules/user'
-import { it, vi } from 'vitest'
+import { it, vi, describe, expect } from 'vitest'
 import { createStore } from 'vuex'
+import { storeOptions } from '@/store'
 
 vi.mock('@/services/FederalWorkStudyVolunteerService', () => {
   return {
@@ -10,36 +9,29 @@ vi.mock('@/services/FederalWorkStudyVolunteerService', () => {
 })
 
 describe('Volunteer store module', () => {
-  const mockUserModule = {
-    namespaced: true,
-    getters: {},
-    state: {},
-    actions: {},
-    mutations: {},
-  }
-
   const getStore = (args = {}) => {
     return createStore({
       modules: {
+        ...storeOptions.modules,
         volunteer: {
-          ...volunteerModule,
+          ...storeOptions.modules.volunteer,
           state: {
-            ...volunteerModule.state,
+            ...storeOptions.modules.volunteer.state,
             ...(args.volunteer?.state ?? {}),
           },
           mutations: {
-            ...volunteerModule.mutations,
+            ...storeOptions.modules.volunteer.mutations,
             ...(args.volunteer?.mutations ?? {}),
           },
         },
         user: {
-          ...mockUserModule,
+          ...storeOptions.modules.user,
           state: {
-            ...userModule.state,
+            ...storeOptions.modules.user.state,
             ...(args.user?.state ?? {}),
           },
           getters: {
-            ...userModule.getters,
+            ...storeOptions.modules.user.getters,
             ...(args.user?.getters ?? {}),
           },
         },

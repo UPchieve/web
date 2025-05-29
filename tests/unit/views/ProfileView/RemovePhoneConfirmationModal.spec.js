@@ -3,8 +3,7 @@ import { createStore } from 'vuex'
 import { vi } from 'vitest'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import NetworkService from '@/services/NetworkService'
-import userModule from '@/store/modules/user'
-import appModule from '@/store/modules/app/index'
+import { storeOptions } from '@/store'
 import flushPromises from 'flush-promises'
 
 vi.mock('../../../../src/services/NetworkService')
@@ -16,14 +15,16 @@ describe('RemovePhoneConfirmationModal', () => {
   const getWrapper = (mobileMode = false, userType = 'student') => {
     const store = createStore({
       modules: {
+        ...storeOptions.modules,
         user: {
-          ...userModule,
+          ...storeOptions.modules.user,
           state: {
             user: {
               ...defaultUserState,
             },
           },
           getters: {
+            ...storeOptions.modules.user.getters,
             userType: () => userType,
             isVolunteer: () => userType === 'volunteer',
             isStudent: () => userType === 'student',
@@ -31,8 +32,9 @@ describe('RemovePhoneConfirmationModal', () => {
           },
         },
         app: {
-          ...appModule,
+          ...storeOptions.modules.app,
           getters: {
+            ...storeOptions.modules.app.getters,
             mobileMode: () => mobileMode,
           },
         },

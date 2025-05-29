@@ -1,7 +1,6 @@
-import userModule from '@/store/modules/user'
-import featureFlagsModule from '@/store/modules/feature-flags'
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
+import { storeOptions } from '@/store'
 import VerificationView from '@/views/VerificationView/index.vue'
 import { vi } from 'vitest'
 
@@ -13,8 +12,9 @@ describe('VerificationView', () => {
   const getWrapper = (smsVerificationEnabled = true) => {
     const store = createStore({
       modules: {
+        ...storeOptions.modules,
         user: {
-          ...userModule,
+          ...storeOptions.modules.user,
           state: {
             user: {
               email: 'testEmail@gmail.com',
@@ -26,8 +26,9 @@ describe('VerificationView', () => {
           },
         },
         featureFlags: {
-          ...featureFlagsModule,
+          ...storeOptions.modules.featureFlags,
           getters: {
+            ...storeOptions.modules.featureFlags.getters,
             isSmsVerificationEnabled: () => smsVerificationEnabled,
           },
         },

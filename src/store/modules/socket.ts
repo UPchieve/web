@@ -64,9 +64,6 @@ export default {
     }: ActionContext<SocketState, RootState>) {
       socket.on('connect', async () => {
         commit('setIsConnected', true)
-        // TODO: Refactor references to isSessionConnectionAlive
-        // to use the isConnected state in this store.
-        dispatch('user/sessionConnected', null, { root: true })
         socket.emit('client_connect', {
           metadata: {
             pageVisibility: document.visibilityState,
@@ -79,9 +76,6 @@ export default {
       // https://socket.io/docs/v2/client-api/#event-disconnect
       socket.on('disconnect', async (reason: string) => {
         commit('setIsConnected', false)
-        // TODO: Refactor references to isSessionConnectionAlive
-        // to use the isConnected state in this store.
-        dispatch('user/sessionDisconnected', null, { root: true })
         socket.emit('client_disconnect', {
           reason,
           metadata: {
@@ -108,9 +102,6 @@ export default {
 
       socket.on('connect_error', (error: any) => {
         commit('setIsConnected', false)
-        // TODO: Refactor references to isSessionConnectionAlive
-        // to use the isConnected state in this store.
-        dispatch('user/sessionDisconnected', null, { root: true })
         socket.emit('client_connect_error', {
           error,
           metadata: {
@@ -124,9 +115,6 @@ export default {
 
       socket.io.on('error', (error: any) => {
         commit('setIsConnected', false)
-        // TODO: Refactor references to isSessionConnectionAlive
-        // to use the isConnected state in this store.
-        dispatch('user/sessionDisconnected', null, { root: true })
         socket.emit('client_error', {
           error,
           metadata: {
@@ -140,9 +128,6 @@ export default {
 
       socket.io.on('reconnect_error', (error: any) => {
         commit('setIsConnected', false)
-        // TODO: Refactor references to isSessionConnectionAlive
-        // to use the isConnected state in this store.
-        dispatch('user/sessionDisconnected', null, { root: true })
         socket.emit('client_reconnect_error', {
           error,
           metadata: {
@@ -157,9 +142,6 @@ export default {
       socket.io.on('reconnect', () => {
         socket.emit('client_reconnect')
         commit('setIsConnected', false)
-        // TODO: Refactor references to isSessionConnectionAlive
-        // to use the isConnected state in this store.
-        dispatch('user/sessionConnected', null, { root: true })
       })
 
       socket.io.on('reconnect_failed', () => {
@@ -168,9 +150,6 @@ export default {
 
       socket.io.on('reconnect_attempt', () => {
         commit('setIsConnected', false)
-        // TODO: Refactor references to isSessionConnectionAlive
-        // to use the isConnected state in this store.
-        dispatch('user/sessionDisconnected', null, { root: true })
         commit('incrementReconnectAttempts')
         socket.emit('client_reconnect_attempt')
       })

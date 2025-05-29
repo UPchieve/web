@@ -2,9 +2,7 @@ import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
-import userModule from '@/store/modules/user'
-import featureFlagsModule from '@/store/modules/feature-flags'
-import productFlagsModule from '@/store/modules/product-flags'
+import { storeOptions } from '@/store'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -104,19 +102,21 @@ const getWrapper = (options = {}) => {
 
   const store = createStore({
     modules: {
+      ...storeOptions.modules,
       user: {
-        ...userModule,
+        ...storeOptions.modules.user,
         getters: {
+          ...storeOptions.modules.user.getters,
           isVolunteer: () => options.isVolunteer,
           isStudent: () => options.isStudent,
           isTeacher: () => options.isTeacher,
         },
       },
       featureFlags: {
-        ...featureFlagsModule,
+        ...storeOptions.modules.featureFlags,
       },
       productFlags: {
-        ...productFlagsModule,
+        ...storeOptions.modules.productFlags,
       },
     },
   })

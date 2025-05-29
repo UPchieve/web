@@ -67,7 +67,7 @@ const getWrapper = (params) => {
       mocks: {
         $route: {
           name: options.routeName,
-          query: {}
+          query: {},
         },
       },
     },

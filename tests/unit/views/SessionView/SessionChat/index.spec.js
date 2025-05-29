@@ -1,18 +1,19 @@
-import { test, vi } from 'vitest'
+import { test, vi, describe, expect } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
-import userModule from '@/store/modules/user'
+import { storeOptions } from '@/store'
 import ModerationService from '@/services/ModerationService'
 import flushPromises from 'flush-promises'
 
 vi.mock('../../../../../services/ModerationService')
 describe('SessionChat', () => {
   const getWrapper = (overrides = {}) => {
-    const store = new Vuex.Store({
+    const store = createStore({
       modules: {
+        ...storeOptions.modules,
         user: {
-          ...userModule,
+          ...storeOptions.modules.user,
           state: {
             user: {
               ...(overrides?.user?.state ?? {}),
@@ -21,6 +22,7 @@ describe('SessionChat', () => {
             chatScrolledToMessageIndex: null,
           },
           getters: {
+            ...storeOptions.modules.user.getters,
             isVolunteer: () => overrides?.user?.isVolunteer,
             isStudent: () => overrides?.user?.isStudent,
             isSessionWaitingForVolunteer: () => true,
@@ -28,12 +30,15 @@ describe('SessionChat', () => {
           },
         },
         app: {
+          ...storeOptions.modules.app,
           state: {
             isWebPageHidden: false,
           },
         },
         featureFlags: {
+          ...storeOptions.modules.featureFlags,
           getters: {
+            ...storeOptions.modules.featureFlags.getters,
             isSessionRecapDmsActive: () => true,
           },
         },

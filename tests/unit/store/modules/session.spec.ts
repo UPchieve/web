@@ -1,6 +1,6 @@
-import sessionModule from '@/store/modules/session'
-import { beforeEach, it, vi, describe } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi, describe } from 'vitest'
 import { createStore } from 'vuex'
+import { storeOptions } from '@/store'
 
 vi.mock('../../../../src/services/NetworkService')
 
@@ -20,10 +20,11 @@ describe('Session store', () => {
   const getStore = (args: { state?: any } = {}) => {
     return createStore({
       modules: {
+        ...storeOptions.modules,
         session: {
-          ...sessionModule,
+          ...storeOptions.modules.session,
           state: {
-            ...sessionModule.state,
+            ...storeOptions.modules.session.state,
             ...(args?.state || {}),
           },
         },

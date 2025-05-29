@@ -272,11 +272,12 @@ export default {
     CelebrationButton,
   },
   props: {
+    // TODO: Some of the following don't need to be props.
     setHasSeenNewMessage: { type: Function, required: true },
     shouldHideChatSection: { type: Boolean, required: true },
     currentSession: { type: Object, required: true },
     isInRecap: { type: Boolean, default: false },
-    isSessionConnectionAlive: { type: Boolean, required: true },
+    isSocketConnected: { type: Boolean, required: true },
     isSessionAlive: { type: Boolean, required: true },
     isFetchingIsSessionRecapEligible: { type: Boolean, default: false },
     isSessionRecapEligible: { type: Boolean, default: false },
@@ -360,7 +361,7 @@ export default {
     // when logging out expected errors
     isSessionConnectionFailure: function () {
       const isConnectionFailure =
-        !this.isSessionConnectionAlive && this.isSessionAlive && !this.isInRecap
+        !this.isSocketConnected && this.isSessionAlive && !this.isInRecap
       if (isConnectionFailure)
         LoggerService.noticeError(new Error('Attempting to connect the chat'), {
           tags: {
@@ -383,7 +384,7 @@ export default {
     },
     documentTitle() {
       return this.typingIndicatorShown &&
-        this.isSessionConnectionAlive &&
+        this.isSocketConnected &&
         this.isSessionAlive
         ? `${this.sessionPartnerName || 'Chatbot'} is typing...`
         : 'UPchieve'
@@ -858,7 +859,7 @@ export default {
         this.typingIndicatorShown = this.isInRecap
           ? true
           : // TODO: Are these checks still needed? Could we just read off `isTyping` instead?
-            this.isSessionAlive && this.isSessionConnectionAlive
+            this.isSessionAlive && this.isSocketConnected
     },
     'currentSession.messages': {
       handler(currentVal, prevVal) {

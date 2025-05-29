@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
+import { storeOptions } from '@/store'
 import userModule from '@/store/modules/user'
-import appModule from '@/store/modules/app'
 import ContactView from '@/views/ContactView.vue'
 
 const getWrapper = (
@@ -11,9 +11,7 @@ const getWrapper = (
 ) => {
   const store = createStore({
     modules: {
-      app: {
-        ...appModule,
-      },
+      ...storeOptions.modules,
       user: {
         ...userModule,
         getters: {

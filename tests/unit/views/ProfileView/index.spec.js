@@ -1,6 +1,4 @@
-import userModule from '@/store/modules/user'
-import featureFlagsModule from '@/store/modules/feature-flags'
-import subjectsModule from '@/store/modules/subjects'
+import { storeOptions } from '@/store'
 import ProfileView from '@/views/ProfileView/index.vue'
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
@@ -8,7 +6,6 @@ import UserService from '@/services/UserService'
 import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { vi } from 'vitest'
-import productFlagsModule from '@/store/modules/product-flags'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
@@ -20,8 +17,8 @@ describe('ProfileView', () => {
     vi.resetAllMocks()
     UserService.setProfile = vi.fn().mockResolvedValue()
     AuthService.initiateVerification = vi.fn().mockResolvedValue()
-    userModule.actions.addToUser = vi.fn().mockResolvedValue()
     AnalyticsService.captureEvent = vi.fn().mockReturnValue()
+    storeOptions.modules.user.actions.addToUser = vi.fn().mockResolvedValue()
 
     DEFAULT_FLAGS_GETTERS = {
       isFilterActiveSubjectsActive: () => true,
@@ -42,8 +39,9 @@ describe('ProfileView', () => {
   const getWrapper = (overrides = {}) => {
     const store = createStore({
       modules: {
+        ...storeOptions.modules,
         user: {
-          ...userModule,
+          ...storeOptions.modules.user,
           state: {
             user: {
               ...DEFAULT_USER,
@@ -52,17 +50,15 @@ describe('ProfileView', () => {
           },
         },
         featureFlags: {
-          ...featureFlagsModule,
+          ...storeOptions.modules.featureFlags,
           getters: {
+            ...storeOptions.modules.featureFlags.getters,
             ...DEFAULT_FLAGS_GETTERS,
             ...(overrides.featureFlags?.getters ?? {}),
           },
         },
-        productFlags: {
-          ...productFlagsModule,
-        },
         subjects: {
-          ...subjectsModule,
+          ...storeOptions.modules.subjects,
           state: {
             subjects: {
               ...(overrides.subjects ?? {}),

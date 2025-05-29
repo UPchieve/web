@@ -1,7 +1,6 @@
-import userModule from '@/store/modules/user'
-import productFlagsModule from '@/store/modules/product-flags'
 import { it, vi } from 'vitest'
 import { createStore } from 'vuex'
+import { storeOptions } from '@/store'
 
 describe('User store module', () => {
   const baseUser = {
@@ -24,31 +23,26 @@ describe('User store module', () => {
     usesClever: false,
     usesGoogle: true,
   }
-  const mockFeatureFlagsModule = {
-    namespaced: true,
-    getters: {
-      showDashboardRedesign: vi.fn().mockReturnValue(false),
-      eligibleForChooseTutorType: vi.fn().mockReturnValue(false),
-    },
-    state: {},
-    actions: {},
-    mutations: {},
-  }
 
   const getStore = (args = {}) => {
     return createStore({
       modules: {
+        ...storeOptions.modules,
         productFlags: {
-          ...productFlagsModule,
+          ...storeOptions.modules.productFlags,
           flags: {
             fallIncentiveEnrollmentAt: new Date(),
           },
         },
         featureFlags: {
-          ...mockFeatureFlagsModule,
+          ...storeOptions.modules.featureFlags,
+          getters: {
+            showDashboardRedesign: vi.fn().mockReturnValue(false),
+            eligibleForChooseTutorType: vi.fn().mockReturnValue(false),
+          },
         },
         user: {
-          ...userModule,
+          ...storeOptions.modules.user,
           state: {
             user: {
               ...baseUser,
@@ -56,7 +50,7 @@ describe('User store module', () => {
             },
           },
           getters: {
-            ...userModule.getters,
+            ...storeOptions.modules.user.getters,
             ...(args.user?.getters ?? {}),
           },
         },

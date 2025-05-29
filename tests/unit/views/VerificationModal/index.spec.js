@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
-import userModule from '@/store/modules/user'
+import { storeOptions } from '@/store'
 import VerificationModal from '@/views/VerificationModal.vue'
 import AuthService from '@/services/AuthService'
 import { VERIFICATION_METHOD } from '@/consts'
@@ -21,8 +21,9 @@ describe('VerificationModal', () => {
   const getWrapper = (user = {}, props = DEFAULT_PROPS) => {
     const store = createStore({
       modules: {
+        ...storeOptions.modules,
         user: {
-          ...userModule,
+          ...storeOptions.modules.user,
           state: {
             user,
           },

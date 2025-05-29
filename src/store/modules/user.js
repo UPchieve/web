@@ -23,7 +23,6 @@ export default {
     session: {},
     recapSession: {},
     isFirstDashboardVisit: false,
-    isSessionConnectionAlive: false,
     presessionSurvey: {},
     unreadChatMessageIndices: [],
     chatScrolledToMessageIndex: null,
@@ -86,10 +85,6 @@ export default {
 
     setIsFirstDashboardVisit: (state, isFirstDashboardVisit) => {
       state.isFirstDashboardVisit = isFirstDashboardVisit
-    },
-
-    setIsSessionConnectionAlive: (state, isSessionConnectionAlive) => {
-      state.isSessionConnectionAlive = isSessionConnectionAlive
     },
 
     setPresessionSurvey: (state, presessionSurvey = {}) =>
@@ -200,16 +195,8 @@ export default {
 
     clearSession: ({ commit }) => {
       commit('setSession', {})
-    },
-
-    sessionDisconnected: ({ commit }) => {
-      commit('setIsSessionConnectionAlive', false)
       commit('clearUnreadChatMessages')
       commit('clearChatScrolledToMessageIndex')
-    },
-
-    sessionConnected: ({ commit }) => {
-      commit('setIsSessionConnectionAlive', true)
     },
 
     updateSession: ({ commit, dispatch, getters }, sessionData) => {

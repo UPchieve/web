@@ -1,14 +1,16 @@
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
-import userModule from '@/store/modules/user'
+import { storeOptions } from '@/store'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 
 const getWrapper = (firstName = 'Tester', subheader) => {
   const store = createStore({
     modules: {
+      ...storeOptions.modules,
       user: {
-        ...userModule,
+        ...storeOptions.modules.user,
         getters: {
+          ...storeOptions.modules.user.getters,
           firstName: () => firstName,
         },
       },

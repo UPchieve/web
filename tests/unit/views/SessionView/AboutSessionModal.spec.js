@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
-import userModule from '@/store/modules/user'
-import featureFlagsModule from '@/store/modules/feature-flags'
+import { storeOptions } from '@/store'
 import AboutSessionModal from '@/views/SessionView/AboutSessionModal.vue'
 import { vi } from 'vitest'
 
@@ -28,8 +27,9 @@ describe('AboutSessionModal', () => {
   const getWrapper = (overrides = {}) => {
     const store = createStore({
       modules: {
+        ...storeOptions.modules,
         user: {
-          ...userModule,
+          ...storeOptions.modules.user,
           state: {
             session: {
               ...DEFAULT_SESSION,
@@ -37,8 +37,9 @@ describe('AboutSessionModal', () => {
           },
         },
         featureFlags: {
-          ...featureFlagsModule,
+          ...storeOptions.modules.featureFlags,
           getters: {
+            ...storeOptions.modules.featureFlags.getters,
             isAboutThisSessionSurveyActive: () =>
               overrides.featureFlags?.isAboutThisSessionSurveyActive ?? false,
           },

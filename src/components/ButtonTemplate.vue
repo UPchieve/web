@@ -62,7 +62,7 @@ export default {
   background: none;
   border: none;
   margin: 0;
-  padding: 8px 16px; 
+  padding: 8px 16px;
 }
 
 .ButtonTemplate-content {

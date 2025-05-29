@@ -1,22 +1,23 @@
 import { createStore } from 'vuex'
 import { shallowMount } from '@vue/test-utils'
-import appModule from '@/store/modules/app'
-import userModule from '@/store/modules/user'
+import { storeOptions } from '@/store'
 import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo.vue'
 
 const getWrapper = (options) => {
   const store = createStore({
     modules: {
+      ...storeOptions.modules,
       app: {
-        ...appModule,
+        ...storeOptions.modules.app,
         getters: {
+          ...storeOptions.modules.app.getters,
           mobileMode: () => options.mobileMode,
         },
       },
       user: {
-        ...userModule,
+        ...storeOptions.modules.user,
         getters: {
-          ...userModule.getters,
+          ...storeOptions.modules.user.getters,
           isAuthenticated: () => options.isAuthenticated,
         },
       },

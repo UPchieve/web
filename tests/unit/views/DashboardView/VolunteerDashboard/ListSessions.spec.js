@@ -1,8 +1,4 @@
-import userModule from '@/store/modules/user'
-import volunteerModule from '@/store/modules/volunteer'
-import featureFlagsModule from '@/store/modules/feature-flags'
-import subjectsModule from '@/store/modules/subjects'
-import notificationsModule from '@/store/modules/notifications'
+import { storeOptions } from '@/store'
 import { createStore } from 'vuex'
 import { shallowMount } from '@vue/test-utils'
 import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions.vue'
@@ -53,10 +49,11 @@ const sessions = [
 const getWrapper = async (overrides = {}) => {
   const store = createStore({
     modules: {
+      ...storeOptions.modules,
       user: {
         state: {
           user: {
-            ...userModule.state,
+            ...storeOptions.modules.state,
             userType: 'volunteer',
             subjects: ['algebraOne', 'algebraTwo', 'biology'],
             activeSubjects: ['algebraOne', 'algebraTwo', 'biology'],
@@ -67,33 +64,16 @@ const getWrapper = async (overrides = {}) => {
             ...(overrides.user ?? {}),
           },
         },
-        getters: {
-          ...userModule.getters,
-        },
       },
       volunteer: {
-        ...volunteerModule,
-        state: {
-          ...volunteerModule.state,
-        },
-        mutations: {
-          ...volunteerModule.mutations,
-        },
+        ...storeOptions.modules.volunteer,
         getters: {
           isReadyToTutor: () => true,
         },
       },
-      featureFlags: {
-        ...featureFlagsModule,
-      },
-      notifications: {
-        state: {
-          ...notificationsModule.state,
-        },
-      },
       subjects: {
+        ...storeOptions.modules.subjects,
         state: {
-          ...subjectsModule,
           subjects: ['algebraOne', 'algebraTwo', 'biology'],
         },
       },

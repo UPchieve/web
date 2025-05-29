@@ -1,4 +1,5 @@
 import { EVENTS } from '../consts'
+import store from '@/store'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
 import AnalyticsService from './AnalyticsService'
 import NetworkService from './NetworkService'
@@ -27,12 +28,13 @@ function getMessagesAfterVolunteerJoined(session) {
 }
 
 export default {
-  async endSession(sessionId: string, subTopic: string, store) {
+  async endSession(sessionId: string, subTopic: string) {
     try {
       await NetworkService.endSession({ sessionId })
       // TODO: Just return the mutated session in `NetworkService.endSession`.
-      store?.dispatch('session/fetchLatestSession')
-      store?.dispatch('federalWorkStudyVolunteer/startCooldown')
+      store.dispatch('user/clearSession')
+      store.dispatch('session/fetchLatestSession')
+      store.dispatch('federalWorkStudyVolunteer/startCooldown')
     } catch (err) {
       if (err?.response?.data?.err !== 'Session has already ended') {
         throw err
@@ -61,7 +63,6 @@ export default {
       store.state.user.session.subTopic,
       store
     )
-    store.dispatch('user/sessionDisconnected')
     // Do not send the user directly to the feedback page if they can leave DMs
     if (!isSessionRecapDmsActive)
       this.postSessionRedirect(router, store.state.user.session)

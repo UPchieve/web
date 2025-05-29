@@ -96,9 +96,7 @@
         />
 
         <document-editor-v2
-          v-else-if="
-            auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR
-          "
+          v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
           :sessionId="this.sessionId"
           :isAiWidgetEnabled="aiWidgetEnabled"
           :onWidgetClicked="toggleAiWidget"
@@ -209,7 +207,7 @@
           :currentSession="session"
           :shouldHideChatSection="shouldHideChatSection"
           :setHasSeenNewMessage="setHasSeenNewMessage"
-          :isSessionConnectionAlive="isSessionConnectionAlive"
+          :isSocketConnected="isSocketConnected"
           :isSessionAlive="isSessionAlive"
           :sessionHasEnded="sessionHasEnded"
         />
@@ -409,11 +407,10 @@ export default {
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
       user: (state) => state.user.user,
       session: (state) => state.user.session,
-      isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
       isMobileApp: (state) => state.app.isMobileApp,
       presessionSurvey: (state) => state.user.presessionSurvey,
       auxiliaryType: (state) => state.user.session.toolType,
-      isConnected: (state) => state.socket.isConnected,
+      isSocketConnected: (state) => state.socket.isConnected,
       productFlags: (state) => state.productFlags.flags,
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
@@ -575,8 +572,8 @@ export default {
 
       return this.auxiliaryOpen
     },
-    isConnectionReady() {
-      return [this.isConnected, this.sessionId]
+    isSocketConnectionReady() {
+      return [this.isSocketConnected, this.sessionId]
     },
     showAiWidget() {
       return (
@@ -640,7 +637,7 @@ export default {
         onRetry: (res, abort) => {
           this.showTroubleStartingModal(abort)
         },
-        docEditorVersion: 2
+        docEditorVersion: 2,
       }
 
       if (assignmentId) {
@@ -711,7 +708,9 @@ export default {
           this.$store.dispatch('user/fetchUser')
         }
 
-        if (!socket.connected) await socket.connect()
+        if (!socket.connected) {
+          await socket.connect()
+        }
         Gleap.setCustomData('sessionId', sessionId)
 
         await this.getSessionContext(sessionId)
@@ -723,8 +722,9 @@ export default {
         )
           this.showNotificationModal = false
 
-        if (getNotificationPermission() === 'default')
+        if (getNotificationPermission() === 'default') {
           this.showNotificationModal = true
+        }
       })
       .catch((err) => {
         if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
@@ -852,15 +852,14 @@ export default {
         this.hasUnreadAiTutorMessage = false
       }
     },
-    isConnectionReady(currentValue, prevValue) {
-      const [isConnected, sessionId] = currentValue
+    isSocketConnectionReady(currentValue, prevValue) {
+      const [isSocketConnected, sessionId] = currentValue
       const [prevIsConnected] = prevValue
-      if (isConnected && sessionId) {
+      if (isSocketConnected && sessionId) {
         this.joinSession(this.sessionId)
-        this.$store.dispatch('user/sessionConnected')
       }
 
-      if (isConnected && !prevIsConnected)
+      if (isSocketConnected && !prevIsConnected)
         AnalyticsService.captureEvent(
           EVENTS.USER_SOCKET_IS_CONNECTED_IN_SESSION,
           {
@@ -868,7 +867,7 @@ export default {
             sessionId: this.sessionId,
           }
         )
-      if (!isConnected && prevIsConnected)
+      if (!isSocketConnected && prevIsConnected)
         AnalyticsService.captureEvent(
           EVENTS.USER_SOCKET_IS_DISCONNECTED_IN_SESSION,
           {
@@ -876,11 +875,6 @@ export default {
             sessionId: this.sessionId,
           }
         )
-    },
-    isSessionConnectionAlive(newValue, oldValue) {
-      if (newValue && !oldValue) {
-        this.$store.dispatch('app/modal/hide')
-      }
     },
     mobileMode(isMobileMode) {
       Gleap.showFeedbackButton(!isMobileMode)
