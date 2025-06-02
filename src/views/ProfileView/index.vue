@@ -18,17 +18,7 @@
       :closeModal="toggleDeactivatedAccountModal"
       :setIsAccountActive="setIsAccountActive"
     />
-    <div class="header">
-      Your profile
-      <button
-        type="button"
-        class="editBtn btn"
-        data-testid="edit-profile-btn"
-        @click="editProfile()"
-      >
-        {{ editBtnMsg }}
-      </button>
-    </div>
+    <div class="header">Your Profile</div>
     <div class="wrap-container">
       <div class="personal-info contain">
         <div v-if="errors.length" class="errors">
@@ -44,7 +34,18 @@
         <div v-if="saveFailed" class="errors">
           <h4 class="errors-heading">Could not save data</h4>
         </div>
-        <div class="subheader">Personal Information</div>
+        <div class="subheader">
+          Personal Information
+
+          <button
+            type="button"
+            class="editBtn btn"
+            data-testid="edit-profile-btn"
+            @click="editProfile()"
+          >
+            {{ editBtnMsg }}
+          </button>
+        </div>
         <div class="container-content">
           <div id="email" class="container-section">
             <div class="prompt">Your Email</div>
@@ -263,7 +264,6 @@
               <div class="subjects-right" data-testid="toggle-buttons">
                 <toggle-button
                   :data-testid="`toggle-button-${subject.name}`"
-                  :disabled="!activeEdit ? true : null"
                   :value="subjectIsNotMuted(subject.name)"
                   :width="75"
                   :labels="{ checked: 'On', unchecked: 'Off' }"
@@ -479,7 +479,7 @@ export default {
       setNotificationPermission(permission)
     },
 
-    togglemutedSubjectAlerts(subject, isNotMuted) {
+    async togglemutedSubjectAlerts(subject, isNotMuted) {
       if (isNotMuted) {
         this.newMutedSubjectAlerts.push(subject)
       } else {
@@ -487,6 +487,12 @@ export default {
           (s) => s != subject
         )
       }
+
+      // TODO handle failures (i.e. unset non-saved values)
+      // maybe dont' reuse createUpdateProfileRequestBody.
+      // how about a new endpoint?
+      const reqBody = this.createUpdateProfileRequestBody()
+      await UserService.setProfile(reqBody)
     },
 
     subjectIsNotMuted(subject) {
@@ -691,7 +697,7 @@ export default {
 .subheader {
   font-weight: 600;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: 30px 15px 0;
   font-size: 20px;
