@@ -48,6 +48,7 @@ export default {
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
       [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE]: '', // tutor-count-shown | tutor-count-hidden
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
@@ -211,6 +212,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION],
     isShowAmbassadorTitleEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE],
+    volunteerSubjectPresenceVariant: (state) =>
+      state.multivariantFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {

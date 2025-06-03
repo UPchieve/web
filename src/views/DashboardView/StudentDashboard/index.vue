@@ -89,7 +89,7 @@ import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FeatureFlagService from '@/services/FeatureFlagService'
-import { EVENTS } from '@/consts'
+import { EVENTS, POSTHOG_FEATURE_FLAGS } from '@/consts'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
@@ -101,6 +101,9 @@ import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Studen
 import Student_Onboarding_Frame4 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.svg'
 import { getImpactStudyCacheKey } from '@/utils/cache-keys'
 import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
+import { isEmpty } from 'lodash-es'
+import getNotificationPermission from '@/utils/get-notification-permission'
+import sendWebNotification from '@/utils/send-web-notification'
 
 export default {
   name: 'student-dashboard',
@@ -181,6 +184,9 @@ export default {
         image: Student_Onboarding_Frame4,
       },
     ]
+
+    if (this.volunteerSubjectPresenceVariant)
+      this.scheduleVolunteerPresenceNotification()
   },
   data() {
     return {
@@ -201,6 +207,8 @@ export default {
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
       latestSession: (state) => state.session.latestSession,
       productFlags: (state) => state.productFlags.flags,
+      currentSession: (state) => state.user.session,
+      subjects: (state) => state.subjects.subjects,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -220,6 +228,8 @@ export default {
       isMobileMode: 'app/mobileMode',
       isSecondaryEmailOnProfilePageEnabled:
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
+      volunteerSubjectPresenceVariant:
+        'featureFlags/volunteerSubjectPresenceVariant',
     }),
     permanentlyDismissedSecondaryEmailModalKey() {
       return `${this.user.id}-permanently-dismissed-secondary-email-modal`
@@ -323,6 +333,74 @@ export default {
         this.fallIncentiveProgramModalViewCount + 1
       )
       this.showFallIncentiveEnrollmentModal = true
+    },
+    async maybeTriggerVolunteerPresenceNotification() {
+      const now = Date.now()
+      const presenceKey = 'lastVolunteerPresenceNotificationAt'
+      const lastNotifiedAt = localStorage.getItem(presenceKey)
+      const oneDayInMs = 1000 * 60 * 60 * 24
+      const tenMinutesInMs = 1000 * 60 * 10
+      const hasRecentNotification =
+        lastNotifiedAt && now - new Date(lastNotifiedAt).getTime() < oneDayInMs
+
+      const hasNoCurrentOrRecentSession =
+        isEmpty(this.currentSession) &&
+        this.latestSession?.createdAt &&
+        new Date(this.latestSession.createdAt).getTime() < now - tenMinutesInMs
+
+      const hasRequestedSubjects = this.user?.latestRequestedSubjects.length > 0
+      const hasPermissionGranted = getNotificationPermission() === 'granted'
+
+      if (
+        hasNoCurrentOrRecentSession &&
+        hasRequestedSubjects &&
+        hasPermissionGranted &&
+        !hasRecentNotification
+      ) {
+        try {
+          const {
+            data: { presenceBySubject },
+          } = await NetworkService.getVolunteerPresence()
+          const mostRecentSubject = this.user.latestRequestedSubjects[0]
+          const subject = this.subjects[mostRecentSubject]
+          const totalOnlineForSubject = presenceBySubject[mostRecentSubject]
+          if (!subject)
+            throw new Error(
+              `No subject ${mostRecentSubject} found in subjects store`
+            )
+          if (!totalOnlineForSubject) return
+
+          const body =
+            this.volunteerSubjectPresenceVariant === 'tutor-count-shown'
+              ? `There ${totalOnlineForSubject === 1 ? 'is' : 'are'} ${totalOnlineForSubject} tutor${totalOnlineForSubject === 1 ? '' : 's'} online for ${subject.displayName} right now!`
+              : `There are tutors online ready to help in ${subject.displayName}!`
+
+          sendWebNotification(
+            `Get help in ${subject.displayName}!`,
+            {
+              body,
+            },
+            {
+              totalVolunteersAvailable: totalOnlineForSubject,
+              pageVisibility: document.visibilityState,
+              subject: subject.name,
+              experiment: POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE,
+              type: POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE,
+              variant: this.volunteerSubjectPresenceVariant,
+            }
+          )
+          localStorage.setItem(presenceKey, new Date().toISOString())
+        } catch (error) {
+          LoggerService.noticeError(error)
+        }
+      }
+    },
+    scheduleVolunteerPresenceNotification() {
+      // Trigger notification after student has spent some time on the dashboard
+      const fiveMinutesInMS = 1000 * 60 * 5
+      setTimeout(() => {
+        this.maybeTriggerVolunteerPresenceNotification()
+      }, fiveMinutesInMS)
     },
     async processImpactStudySurvey() {
       let didResetForNewSurvey = false
@@ -442,6 +520,10 @@ export default {
     },
     shouldSeeIncentiveModalForSecondTime(currentValue, prevValue) {
       if (currentValue && !prevValue) this.triggerIncentiveEnrollmentModal()
+    },
+    volunteerSubjectPresenceVariant(currentValue, prevValue) {
+      if (currentValue && !prevValue)
+        this.scheduleVolunteerPresenceNotification()
     },
   },
 }

@@ -848,6 +848,7 @@ export const POSTHOG_FEATURE_FLAGS = {
   SECONDARY_EMAIL_ON_PROFILE_PAGE: 'secondary-email-on-profile-page',
   CONFETTI_CELEBRATION: 'confetti-celebration',
   SHOW_AMBASSADOR_TITLE: 'show-ambassador-title',
+  VOLUNTEER_SUBJECT_PRESENCE: 'volunteer-subject-presence',
 }
 
 export const ANALYTICS_REPORT_ROW = {

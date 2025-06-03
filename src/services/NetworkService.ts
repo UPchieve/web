@@ -1245,4 +1245,9 @@ export default {
       this._errorHandler
     )
   },
+  getVolunteerPresence() {
+    return httpGet(`${API_ROOT}/volunteers/presence`, {}).catch(
+      this._axiosErrorHandler
+    )
+  },
 }
