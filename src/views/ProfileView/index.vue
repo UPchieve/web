@@ -219,6 +219,15 @@
             </div>
           </div>
 
+          <div v-if="isSelectingPreferredLanguageEnabled">
+            <div class="prompt">Select your preferred language</div>
+            <preferred-language-select
+              ref="preferredLanguageSelectRef"
+              :userPreferredLanguage="user.preferredLanguage"
+              :disabled="!activeEdit ? true : null"
+            />
+          </div>
+
           <hr />
 
           <div class="uc-column">
@@ -306,6 +315,7 @@ import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirm
 import CleverLogo from '@/assets/clever_logo.svg'
 import TrashIcon from '@/assets/trash.svg'
 import ToggleButton from '@/components/ToggleButton.vue'
+import PreferredLanguageSelect from '@/components/PreferredLanguageSelect.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 
@@ -322,6 +332,7 @@ export default {
     TrashIcon,
     CleverLogo,
     ToggleButton,
+    PreferredLanguageSelect,
   },
   data() {
     return {
@@ -382,6 +393,8 @@ export default {
       hasStudentOccupation: 'user/hasStudentOccupation',
       isSecondaryEmailOnProfilePageEnabled:
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
+      isSelectingPreferredLanguageEnabled:
+        'featureFlags/isSelectingPreferredLanguageEnabled',
     }),
     isPartnerTeacher() {
       return this.isTeacher && this.user.isSchoolPartner
@@ -422,6 +435,9 @@ export default {
       const isUpdating =
         this.user.phone && this.user.phone !== this.phoneInputInfo.e164
       return isAddingForFirstTime || isUpdating
+    },
+    userPreferredLanguage() {
+      return this.$refs.preferredLanguageSelectRef?.selectedLanguage
     },
   },
   methods: {
@@ -556,6 +572,14 @@ export default {
         }
       }
 
+      if (
+        this.isSelectingPreferredLanguageEnabled &&
+        !this.$refs.preferredLanguageSelectRef.isLanguageValid
+      ) {
+        this.errors.push('Please enter a language name.')
+        this.invalidInputs.push('preferredLanguage')
+      }
+
       if (!this.errors.length) {
         const isDeactivatedBeforeUpdate = this.user.isDeactivated
         const reqBody = this.createUpdateProfileRequestBody()
@@ -592,6 +616,8 @@ export default {
             let addToUserData = {
               isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
               smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
+              preferredLanguage:
+                this.userPreferredLanguage?.name ?? this.user.preferredLanguage,
             }
             if (this.isVolunteer) {
               addToUserData.mutedSubjectAlerts =
@@ -614,6 +640,10 @@ export default {
     createUpdateProfileRequestBody() {
       const reqBody = {}
       reqBody.isDeactivated = !this.isAccountActive
+
+      if (this.userPreferredLanguage?.name) {
+        reqBody.preferredLanguage = this.userPreferredLanguage.name
+      }
 
       // Students get a checkbox to opt in/out of SMS
       if (this.isStudent && this.smsConsent !== this.user.smsConsent) {
@@ -988,5 +1018,9 @@ button:hover {
 .last-clever-sync {
   color: $c-secondary-grey;
   font-size: 14px;
+}
+
+.preferred-language-select {
+  margin-top: 1em;
 }
 </style>

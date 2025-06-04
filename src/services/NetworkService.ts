@@ -2,7 +2,7 @@ import errcode from 'err-code'
 import promiseRetry from 'promise-retry'
 import config from '../config'
 import axios from 'axios'
-import type { AxiosError } from 'axios'
+import type { AxiosError, AxiosRequestConfig } from 'axios'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -46,25 +46,37 @@ async function getAdditionalConfig(action: string) {
   return { headers: { 'g-recaptcha-response': token } }
 }
 
-export async function httpGet(path: string, config?) {
-  return axiosInstance.get(path, config)
+export async function httpGet<T>(path: string, config?: Object) {
+  return axiosInstance.get<T>(path, config)
 }
 
 // TODO: Use generics instead of Object.
-export async function httpPost(path: string, data: Object, config?) {
-  return axiosInstance.post(path, data, config)
+export async function httpPost<T>(
+  path: string,
+  data: Object,
+  config?: AxiosRequestConfig
+) {
+  return axiosInstance.post<T>(path, data, config)
 }
 
-export async function httpPut(path: string, data: Object, config?) {
-  return axiosInstance.put(path, data, config)
+export async function httpPut<T>(
+  path: string,
+  data: Object,
+  config?: AxiosRequestConfig
+) {
+  return axiosInstance.put<T>(path, data, config)
 }
 
-export async function httpPatch(path: string, data: Object, config?) {
-  return axiosInstance.patch(path, data, config)
+export async function httpPatch<T>(
+  path: string,
+  data: Object,
+  config?: AxiosRequestConfig
+) {
+  return axiosInstance.patch<T>(path, data, config)
 }
 
-export async function httpDelete(path: string, config?) {
-  return axiosInstance.delete(path, config)
+export async function httpDelete<T>(path: string, config?: AxiosRequestConfig) {
+  return axiosInstance.delete<T>(path, config)
 }
 
 export default {
@@ -1249,5 +1261,10 @@ export default {
     return httpGet(`${API_ROOT}/volunteers/presence`, {}).catch(
       this._axiosErrorHandler
     )
+  },
+  updateUserPreferredLanguage(preferredLanguage: string) {
+    return httpPost<void>(`${API_ROOT}/user/preferred-language`, {
+      preferredLanguage,
+    }).catch(this._axiosErrorHandler)
   },
 }

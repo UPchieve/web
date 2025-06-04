@@ -169,4 +169,21 @@ export default {
     background: $c-background-grey;
   }
 }
+
+.LargeButton-link-style {
+  @extend %LargeButton;
+
+  border: none;
+  color: $c-soft-black;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    color: $c-disabled-grey;
+    cursor: default;
+  }
+}
 </style>

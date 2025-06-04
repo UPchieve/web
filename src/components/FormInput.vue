@@ -4,12 +4,12 @@
       <label
         :for="name"
         :class="{
-          error: hasValidationError(),
+          error: hasValidationError(customError),
         }"
         >{{ label }}</label
       >
-      <div v-if="hasValidationError()" class="error-caption">
-        {{ getValidationErrors() }}
+      <div v-if="hasValidationError(customError)" class="error-caption">
+        {{ getValidationErrors(customError) }}
       </div>
     </div>
     <input
@@ -18,7 +18,7 @@
       :data-testid="testid"
       class="uc-form-text-input"
       :class="{
-        'uc-form-text-input-invalid': hasValidationError(),
+        'uc-form-text-input-invalid': hasValidationError(customError),
       }"
       :type="type"
       :placeholder="placeholder"
@@ -90,6 +90,10 @@ export default {
     readOnly: {
       type: Boolean,
       default: false,
+    },
+    customError: {
+      type: String,
+      default: '',
     },
   },
   emits: ['update:modelValue'],

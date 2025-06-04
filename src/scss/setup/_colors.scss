@@ -88,3 +88,12 @@ $button-secondary-border-hover: $c-information-blue;
 $c-student: #f9bef9;
 $c-volunteer: #fedf85;
 $c-teacher: #76e5fd;
+
+// Override Ionic colors
+:root {
+  --ion-color-success: #{lighten($c-success-green, 50%)};
+}
+
+.ion-color-sucess {
+  --ion-color-base: var(--ion-color-success);
+}

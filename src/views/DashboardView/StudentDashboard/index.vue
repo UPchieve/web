@@ -64,6 +64,11 @@
       @permanentlyDismissed="onPermanentlyDismissedSecondaryEmailModal"
     />
 
+    <select-preferred-language-modal
+      v-if="showSelectPreferredLanguageModal"
+      :closeModal="toggleSelectPreferredLanguageModal"
+    />
+
     <subject-selection />
 
     <onboarding-modal
@@ -84,6 +89,7 @@ import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import ImpactStudySurveyModal from './ImpactStudySurveyModal.vue'
+import SelectPreferredLanguageModal from './SelectPreferredLanguageModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import LoggerService from '@/services/LoggerService'
@@ -119,6 +125,7 @@ export default {
     LargeButton,
     StudentAssignments,
     OnboardingModal,
+    SelectPreferredLanguageModal,
   },
   async created() {
     if (
@@ -187,6 +194,12 @@ export default {
 
     if (this.volunteerSubjectPresenceVariant)
       this.scheduleVolunteerPresenceNotification()
+
+    if (
+      !localStorage.getItem('seenSelectPreferredLanguageModal') &&
+      this.isSelectingPreferredLanguageEnabled
+    )
+      this.showSelectPreferredLanguageModal = true
   },
   data() {
     return {
@@ -197,6 +210,7 @@ export default {
       onboardingFrames: [],
       showImpactStudySurvey: false,
       dismissedSecondaryEmailModal: false,
+      showSelectPreferredLanguageModal: false,
     }
   },
   computed: {
@@ -225,6 +239,8 @@ export default {
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
+      isSelectingPreferredLanguageEnabled:
+        'featureFlags/isSelectingPreferredLanguageEnabled',
       isMobileMode: 'app/mobileMode',
       isSecondaryEmailOnProfilePageEnabled:
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
@@ -325,6 +341,10 @@ export default {
     },
     toggleImpactStudySurvey() {
       this.showImpactStudySurvey = !this.showImpactStudySurvey
+    },
+    toggleSelectPreferredLanguageModal() {
+      this.showSelectPreferredLanguageModal =
+        !this.showSelectPreferredLanguageModal
     },
     triggerIncentiveEnrollmentModal() {
       if (this.showFallIncentiveEnrollmentModal) return
