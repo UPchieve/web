@@ -268,6 +268,7 @@
 </template>
 
 <script>
+import { ref, markRaw, onBeforeUnmount } from 'vue'
 import { mapState, mapGetters } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import SessionService from '@/services/SessionService'
@@ -297,7 +298,6 @@ import LiveMediaChatHeader from '@/components/ScreenShare/LiveMediaChatHeader.vu
 import ScreenShare from '@/components/ScreenShare/ScreenShare.vue'
 import { useActor } from '@xstate/vue'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
-import { ref, markRaw } from 'vue'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import ModerationInfractionModal from '@/components/Moderation/ModerationInfractionModal.vue'
 import ModerationInfractionToast from '@/components/Moderation/ModerationInfractionToast.vue'
@@ -324,7 +324,19 @@ export default {
     LiveMediaChatHeader,
   },
   setup() {
-    /*
+    /**
+     * We use the useActor hook from xstate/vue to attach the actor to the component lifecycle.
+     * Before we lose the actor, we want to make sure it sends a final meeting_ended event which will
+     * trigger any cleanup we need to do (i.e. ending ongoing moderation processes).
+     *
+     * The problem is useActor() is registered before beforeUnmount, and will therefore drop the actor before
+     * we can use it to send that final event.
+     * As a workaround, we use onBeforeUnmount which happens to get registered and run before useActor.
+     */
+    onBeforeUnmount(() => {
+      meetingActor.value.actorRef.send({ type: 'meeting_ended' })
+    }),
+      /*
       NOTE: to use xstate live machine inspector:
 
       // import the inspector
@@ -334,7 +346,7 @@ export default {
       const options = { inspect: createBrowserInspector().inspect }
       meetingActor.value = useActor(MeetingMachine.create(), options)
     */
-    meetingActor.value = useActor(MeetingMachine.create())
+      (meetingActor.value = useActor(MeetingMachine.create()))
   },
   created() {
     if (this.mobileMode) {
@@ -353,7 +365,6 @@ export default {
     Gleap.removeCustomData('sessionId')
     Gleap.showFeedbackButton(true)
     window.removeEventListener('resize', this.handleResize)
-    this.meetingActor.actorRef.send({ type: 'meeting_ended' })
   },
   /*
    * @notes

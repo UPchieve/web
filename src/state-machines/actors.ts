@@ -230,30 +230,19 @@ export const joinMeeting = fromCallback(
       transcriptionObserver
     )
 
-    const unsubscribeAll = async () => {
-      meetingSession!.audioVideo.transcriptionController?.unsubscribeFromTranscriptEvent(
-        transcriptionObserver
-      )
-      meetingSession!.audioVideo.realtimeUnsubscribeToAttendeeIdPresence(
-        partnerAddedObserver
-      )
-      meetingSession!.eventController!.removeObserver(meetingStartedObserver)
-      meetingSession!.audioVideo.unbindAudioElement()
-      meetingSession!.audioVideo.realtimeUnsubscribeFromVolumeIndicator(
-        partnerAttendeeId ?? ''
-      )
-      meetingSession!.audioVideo.unsubscribeFromActiveSpeakerDetector(
-        activeSpeakerCallback
-      )
-      unsubscribeScreenShareHandler()
-      await meetingSession!.audioVideo.stopContentShare()
-      input.context.endScreenShareModeration()
-      input.context.meetingSession!.audioVideo.stop()
-      await input.context.meetingSession!.audioVideo.stopAudioInput()
-      store.dispatch('liveMedia/reset')
+    const observers = {
+      transcriptionObserver,
+      partnerAddedObserver,
+      meetingStartedObserver,
+      activeSpeakerCallback,
+      unsubscribeScreenShareHandler,
     }
-
-    sendBack({ type: 'set_unsubscribe_all', unsubscribeAll })
+    sendBack({
+      type: 'set_unsubscribe_all',
+      unsubscribeAllFn: unsubscribeAll,
+      observers,
+      partnerAttendeeId,
+    })
 
     meetingSession!.audioVideo.start()
     meetingSession!.audioVideo.realtimeMuteLocalAudio()
@@ -296,6 +285,46 @@ async function getStream(input: { meetingSession: DefaultMeetingSession }) {
 
 async function startSessionRecording(sessionId: string) {
   await NetworkService.startSessionRecording(sessionId)
+}
+
+async function unsubscribeAll(
+  context: Partial<Context>,
+  observers: {
+    transcriptionObserver: (event: any) => void
+    partnerAddedObserver: (
+      attendeeId: string,
+      _present: boolean,
+      externalUserId?: string
+    ) => void
+    meetingStartedObserver: { eventDidReceive(name: EventName): void }
+    activeSpeakerCallback: (speakerIds: string[]) => void
+    unsubscribeScreenShareHandler: () => void
+  },
+  partnerAttendeeId: string | null
+): Promise<void> {
+  // A function that takes context as input and does all the unsubscribe work.
+  context.meetingSession!.audioVideo.transcriptionController?.unsubscribeFromTranscriptEvent(
+    observers.transcriptionObserver
+  )
+  context.meetingSession!.audioVideo.realtimeUnsubscribeToAttendeeIdPresence(
+    observers.partnerAddedObserver
+  )
+  context.meetingSession!.eventController!.removeObserver(
+    observers.meetingStartedObserver
+  )
+  context.meetingSession!.audioVideo.unbindAudioElement()
+  context.meetingSession!.audioVideo.realtimeUnsubscribeFromVolumeIndicator(
+    partnerAttendeeId ?? ''
+  )
+  context.meetingSession!.audioVideo.unsubscribeFromActiveSpeakerDetector(
+    observers.activeSpeakerCallback
+  )
+  observers.unsubscribeScreenShareHandler()
+  context.endScreenShareModeration!()
+  context.meetingSession!.audioVideo.stop()
+  await context.meetingSession!.audioVideo.stopContentShare()
+  await context.meetingSession!.audioVideo.stopAudioInput()
+  store.dispatch('liveMedia/reset')
 }
 
 export const startingShareMyScreen = fromPromise(

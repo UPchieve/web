@@ -60,7 +60,16 @@ export type Events =
   | { type: 'video_ui_loaded'; videoOutputElement: HTMLVideoElement }
   | { type: 'meeting_started' }
   | { type: 'new_partner_attendee'; partnerAttendeeId: string }
-  | { type: 'set_unsubscribe_all'; unsubscribeAll: () => Promise<void> }
+  | {
+      type: 'set_unsubscribe_all'
+      unsubscribeAllFn: (
+        context: Partial<Context>,
+        observers: any,
+        partnerAttendeeId: string | null
+      ) => Promise<void>
+      observers: any
+      partnerAttendeeId: string | null
+    }
   | { type: 'set_session_id'; sessionId: string }
   | { type: 'partner_shared_screen' }
   | { type: 'partner_stopped_sharing_screen' }
@@ -122,12 +131,35 @@ export function create() {
       }),
       setupOnStop: (
         { self },
-        params: { unsubscribeAll: () => Promise<void> }
+        params: {
+          unsubscribeAllFn: (
+            context: Partial<Context>,
+            observers: any,
+            partnerAttendeeId: string | null
+          ) => Promise<void>
+          observers: any
+          partnerAttendeeId: string | null
+        }
       ) => {
         // this is the only way to clean up when a machine is stopped
         const sub = self.subscribe({
           complete: async () => {
-            await params.unsubscribeAll()
+            await params.unsubscribeAllFn(
+              // Reference context this way instead of passing it as a param along with { self }
+              // Passing it along as { self, context } appears to serve a stale version of context
+              // whereas pulling context from the snapshot serves the most recent context available.
+              self.getSnapshot().context,
+              params.observers,
+              params.partnerAttendeeId
+            )
+            sub.unsubscribe()
+          },
+          error: async () => {
+            await params.unsubscribeAllFn(
+              self.getSnapshot().context,
+              params.observers,
+              params.partnerAttendeeId
+            )
             sub.unsubscribe()
           },
         })
@@ -182,7 +214,9 @@ export function create() {
         actions: {
           type: 'setupOnStop',
           params: ({ event }) => ({
-            unsubscribeAll: event.unsubscribeAll,
+            unsubscribeAllFn: event.unsubscribeAllFn,
+            observers: event.observers,
+            partnerAttendeeId: event.partnerAttendeeId,
           }),
         },
       },
@@ -479,14 +513,25 @@ export function create() {
                     actions: [
                       assign({
                         isSharingMyScreen: () => true,
-                        endScreenShareModeration: ({ event }) =>
-                          event.output.endScreenShareModeration,
+                        endScreenShareModeration: ({ event }) => {
+                          return event.output.endScreenShareModeration
+                        },
                         sessionRecordingStarted: () => true,
                       }),
                       () =>
                         AnalyticsService.captureEvent(
                           EVENTS.SCREENSHARE_USER_SHARED_SCREEN
                         ),
+                      ({ self, event }) => {
+                        self.subscribe({
+                          complete: () => {
+                            event.output.endScreenShareModeration()
+                          },
+                          error: () => {
+                            event.output.endScreenShareModeration()
+                          },
+                        })
+                      },
                     ],
                   },
                   onError: {

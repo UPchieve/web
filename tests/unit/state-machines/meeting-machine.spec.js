@@ -33,7 +33,7 @@ const isBannedFromLiveMedia = fromCallback(({ sendBack }) => {
 })
 const joinMeeting = fromCallback(noop)
 const startingShareMyScreen = fromPromise(() => ({
-  endScreenshareModeration: noop,
+  endScreenShareModeration: noop,
 }))
 export const stopShareMyScreen = fromPromise(noop)
 export const stopShareMyScreenAndMic = fromPromise(noop)
@@ -442,5 +442,94 @@ describe('MeetingMachine', () => {
         .matches('JoinedMeeting.ScreenShareControl.Banned'),
       'Transitions to screensharing should be ignored when banned'
     ).toBe(true)
+  })
+
+  it('Ends continuous screenshare moderation when screenshare ends', async () => {
+    const mockEndScreenShareModeration = vi.fn()
+    const machine = MeetingMachine.create()
+    const startingShareMyScreen = fromPromise(() => ({
+      endScreenShareModeration: mockEndScreenShareModeration,
+    }))
+    const stopShareMyScreen = fromPromise(async (input) => {
+      await input.context.endScreenShareModeration()
+    })
+    const mockMachine = createActor(
+      machine.provide({
+        actors: {
+          ...defaultActors,
+          startingShareMyScreen,
+          stopShareMyScreen,
+        },
+      })
+    )
+    expect(mockMachine).toBeDefined()
+
+    mockMachine.start()
+    await joinMeetingWithLiveMediaAccess(mockMachine)
+    expect(
+      mockMachine.getSnapshot().context.endScreenShareModeration()
+    ).toEqual(undefined) // default value for endScreenShareModeration is () => void
+
+    // Start sharing screen
+    mockMachine.send({
+      type: 'share_screen',
+    })
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.StartingShareMyScreen'),
+      'We should be in the screen share control starting share my screen state'
+    ).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.SharingMyScreen'),
+      'We should be in the screen share control sharing my screen state'
+    ).toBe(true)
+    // Confirm the updated value for endScreenShareModeration stored in context
+    expect(mockMachine.getSnapshot().context.endScreenShareModeration).toEqual(
+      mockEndScreenShareModeration
+    )
+
+    // Stop sharing screen
+    mockMachine.send({ type: 'stop_share_screen' })
+
+    // Confirm the new value of endScreenShareModeration is called.
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.StoppingShareMyScreen')
+    )
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(
+      mockMachine.getSnapshot().matches('JoinedMeeting.ScreenShareControl.Idle')
+    )
+
+    // Ensure that endScreenShareModeration was called after the screenshare stops
+    expect(mockEndScreenShareModeration).toHaveBeenCalled()
+  })
+
+  it('Calls unsubscribeAll when the machine is stopped', async () => {
+    const machine = MeetingMachine.create()
+    const mockMachine = createActor(
+      machine.provide({
+        actors: defaultActors,
+      })
+    )
+    expect(mockMachine).toBeDefined()
+
+    mockMachine.start()
+    await joinMeetingWithLiveMediaAccess(mockMachine)
+    const mockUnsubscribeAll = vi.fn()
+    mockMachine.send({
+      type: 'set_unsubscribe_all',
+      unsubscribeAllFn: mockUnsubscribeAll,
+      observers: {},
+      partnerAttendeeId: '123',
+    })
+    expect(mockUnsubscribeAll).not.toHaveBeenCalled()
+    mockMachine.send({ type: 'meeting_ended' })
+    expect(mockUnsubscribeAll).toHaveBeenCalled()
   })
 })
