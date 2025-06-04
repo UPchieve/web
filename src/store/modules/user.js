@@ -199,14 +199,8 @@ export default {
       commit('clearChatScrolledToMessageIndex')
     },
 
-    updateSession: ({ commit, dispatch, getters }, sessionData) => {
+    updateSession: ({ commit }, sessionData) => {
       commit('setSession', sessionData)
-
-      if (sessionData.endedAt && getters.isVolunteer) {
-        dispatch('federalWorkStudyVolunteer/startCooldown', null, {
-          root: true,
-        })
-      }
     },
 
     updateAvailability: ({ commit }, availability, date = Date.now()) => {

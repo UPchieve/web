@@ -3,12 +3,6 @@ import { createStore } from 'vuex'
 import { shallowMount } from '@vue/test-utils'
 import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions.vue'
 
-vi.mock('@/services/FederalWorkStudyVolunteerService', () => {
-  return {
-    maybeAutoJoinOldestSession: vi.fn(),
-  }
-})
-
 const sessions = [
   {
     id: 'session-1',

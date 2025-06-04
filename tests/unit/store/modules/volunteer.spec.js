@@ -2,12 +2,6 @@ import { it, vi, describe, expect } from 'vitest'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 
-vi.mock('@/services/FederalWorkStudyVolunteerService', () => {
-  return {
-    maybeAutoJoinOldestSession: vi.fn(),
-  }
-})
-
 describe('Volunteer store module', () => {
   const getStore = (args = {}) => {
     return createStore({
