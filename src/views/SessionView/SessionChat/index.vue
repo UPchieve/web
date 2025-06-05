@@ -404,7 +404,6 @@ export default {
       const messageElements = this.getUserMessageElements()
       this.$refs.messages.scrollTop =
         messageElements[this.chatScrolledToMessageIndex].offsetTop
-      messageElements[this.chatScrolledToMessageIndex]?.offsetTop
     }
     if (this.$refs.textareaRef)
       this.resizeTextarea({ target: this.$refs.textareaRef })

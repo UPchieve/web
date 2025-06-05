@@ -1,11 +1,8 @@
 import { EVENTS } from '../consts'
-import router from '@/router'
 import store from '@/store'
+import errorFromHttpResponse from '../utils/error-from-http-response.js'
 import AnalyticsService from './AnalyticsService'
 import NetworkService from './NetworkService'
-import errorFromHttpResponse from '../utils/error-from-http-response.js'
-
-type Session = any
 
 function isAbsentUser(session: Record<string, any>) {
   const { student, volunteer } = session
@@ -22,7 +19,7 @@ function isAbsentUser(session: Record<string, any>) {
   return isAbsentStudent || isAbsentVolunteer
 }
 
-function getMessagesAfterVolunteerJoined(session: Session) {
+function getMessagesAfterVolunteerJoined(session) {
   return session.messages.filter(
     (message: Record<string, any> & { createdAt: string }) =>
       new Date(message.createdAt).getTime() >=
@@ -31,59 +28,6 @@ function getMessagesAfterVolunteerJoined(session: Session) {
 }
 
 export default {
-  async createOrJoinSession(
-    topic: string,
-    subTopic: string,
-    sessionId?: string,
-    assignmentId?: string,
-    joinedFrom?: string
-  ) {
-    const {
-      data: { isValid },
-    } = await NetworkService.getIsSubjectValid(subTopic, topic)
-    if (!isValid) {
-      throw new Error('Invalid subject and topic.')
-    }
-
-    if (sessionId) {
-      const {
-        data: { session },
-      } = await NetworkService.joinSession({ sessionId, joinedFrom })
-      await store.dispatch('user/updateSession', {
-        ...session,
-        type: topic,
-        subTopic,
-        _id: session.id,
-      })
-      return session
-    }
-
-    const presessionSurvey = Object.keys(store.state.user.presessionSurvey)
-      .length
-      ? store.state.user.presessionSurvey
-      : undefined
-    const {
-      data: { session },
-    } = await NetworkService.newSession({
-      sessionType: topic,
-      sessionSubTopic: subTopic,
-      docEditorVersion: 2,
-      assignmentId,
-      presessionSurvey,
-    })
-    await Promise.all([
-      store.dispatch('user/updateSession', {
-        ...session,
-        type: topic,
-        subTopic,
-        _id: session.id,
-      }),
-      store.dispatch('user/clearPresessionSurvey'),
-    ])
-    await router.replace(store.getters['user/sessionPath'])
-    return session
-  },
-
   async endSession(sessionId: string, subTopic: string) {
     try {
       await NetworkService.endSession({ sessionId })
@@ -124,6 +68,55 @@ export default {
     // Send students directly to feedback page whether or not volunteers can send DMs.
     if (isStudent) this.postSessionRedirect(router, store.state.user.session)
     store.commit('user/setSessionIsEnding', false)
+  },
+
+  async newSession(context, sessionType, sessionSubTopic, options) {
+    const onRetry = options && options.onRetry
+    const docEditorVersion = options?.docEditorVersion
+    const assignmentId = options?.assignmentId
+    const data = {
+      sessionType,
+      sessionSubTopic,
+      docEditorVersion,
+      assignmentId,
+    }
+
+    const {
+      data: { sessionId },
+    } = await NetworkService.newSession(data, onRetry)
+    if (sessionId) {
+      const sessionData = {
+        type: sessionType,
+        subTopic: sessionSubTopic,
+        _id: sessionId,
+        id: sessionId,
+      }
+      await context.$store.dispatch('user/updateSession', sessionData)
+      context.$router.replace(context.$store.getters['user/sessionPath'])
+    } else {
+      context.$router.replace('/')
+    }
+
+    return sessionId
+  },
+
+  useExistingSession(context, sessionId, options) {
+    const onRetry = options && options.onRetry
+
+    return NetworkService.checkSession({ sessionId }, onRetry)
+      .then((res) => {
+        const data = res.data || {}
+        const { sessionId } = data
+
+        return sessionId
+      })
+      .catch((res) => {
+        if (res.status === 404) {
+          context.$router.replace('/')
+        } else {
+          throw res
+        }
+      })
   },
 
   getCurrentSession() {
