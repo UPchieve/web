@@ -514,6 +514,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import axios from 'axios'
+import { backOff } from 'exponential-backoff'
 import NetworkService from '@/services/NetworkService'
 import PickToolIcon from '@/assets/whiteboard_icons/selection.svg'
 import MoreIcon from '@/assets/VerticalMenuButtons.svg'
@@ -1419,8 +1420,6 @@ export default {
       // Keep the canvas as read-only until connected.
       this.zwibblerCtx.setConfig('readOnly', true)
       this.zwibblerCtx.on('connected', () => {
-        this.isConnected = true
-
         if (
           (this.isInfiniteWhiteboardEnabled && this.isStudent) ||
           this.zwibblerCtx.getDocumentProperty('useInfiniteWhiteboard')
@@ -1443,7 +1442,15 @@ export default {
           this.addFixedSizeListeners()
         }
 
+        LoggerService.log('Zwibbler: Connected', {
+          sessionId: this.sessionId,
+        })
+        AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECTED, {
+          sessionId: this.sessionId,
+        })
+        this.isConnected = true
         this.zwibblerCtx.setConfig('readOnly', false)
+
         // @todo access the connection in a less sketchy way
         // If you're using public/static/zwibbler-demo.js as your VUE_APP_ZWIBBLER_URL value,
         // then get the `zc.Pb.Pb` else assume you're using zwibbler2.js from the cdn
@@ -1460,18 +1467,19 @@ export default {
 
         // Intercept Zwibbler's websocket close handler to throw custom error
         zwibblerWsConnection.onclose = (closeEvent) => {
-          // Access Zwibbler's internal WebSocket stream name
-          // Note: the properties to access will change with every new Zwibbler update
-          const err = new Error(
-            `WebSocket for the ${this.userType} in session ${this.sessionId} closed with code ${closeEvent.code} for reason: "${closeEvent.reason}" in room: ${
-              // If you're using public/static/zwibbler-demo.js as your VUE_APP_ZWIBBLER_URL value,
-              // then get the `zc.zc.Hx` else assume you're using zwibbler2.js from the cdn
-              this.zwibblerCtx?.zc?.Hx
-                ? this.zwibblerCtx.zc.Hx
-                : this.zwibblerCtx.Ec.cC
-            }`
-          )
-          LoggerService.noticeError(err)
+          // The onclose callback is called _after_ calling `onDestroy`,
+          // which we do before unmount of the component. If there is
+          // no Zwibbler ctx, it means we are simply leaving the component.
+          if (this.zwibblerCtx) {
+            LoggerService.noticeError(
+              'Zwibbler: Unexpectedly closing WS connection',
+              {
+                sessionId: this.sessionId,
+                userType: this.userType,
+              }
+            )
+          }
+
           zwibblerOnClose(closeEvent)
         }
 
@@ -1563,6 +1571,12 @@ export default {
         this.hadConnectionIssue = true
         window.clearInterval(this.pingPongInterval)
         this.zwibblerCtx.setConfig('readOnly', true)
+        LoggerService.noticeError('Zwibbler: Received connect-error.', {
+          sessionId: this.sessionId,
+        })
+        AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECT_ERROR, {
+          sessionId: this.sessionId,
+        })
       })
 
       // disallow dragging and pasting to the whiteboard
@@ -1571,9 +1585,83 @@ export default {
       })
 
       try {
-        await this.zwibblerCtx.joinSharedSession(this.sessionId, true)
+        await this.joinSharedSessionWithRetry()
       } catch (err) {
         LoggerService.noticeError(err)
+      }
+    },
+
+    async joinSharedSessionWithRetry() {
+      const MAX_RETRIES = 5
+      const TIMEOUT_MS = 5000
+      let currentAttempt = 1
+
+      try {
+        await backOff(
+          () => {
+            return new Promise((resolve, reject) => {
+              const timeoutId = setTimeout(() => {
+                this.zwibblerCtx.leaveSharedSession(this.sessionId)
+                reject(new Error())
+              }, TIMEOUT_MS)
+
+              this.zwibblerCtx
+                .joinSharedSession(this.sessionId, true)
+                .then(() => {
+                  LoggerService.log(
+                    `Zwibbler: Successfully connected to collaboration server on attempt ${currentAttempt}.`,
+                    {
+                      sessionId: this.sessionId,
+                      attemptNumber: currentAttempt,
+                    }
+                  )
+                  AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECTED, {
+                    sessionId: this.sessionId,
+                    attemptNumber: currentAttempt,
+                  })
+                  clearTimeout(timeoutId)
+                  resolve()
+                })
+                .catch((error) => {
+                  clearTimeout(timeoutId)
+                  reject(error)
+                })
+            })
+          },
+          {
+            numOfAttempts: MAX_RETRIES,
+            retry: (_error, attemptNumber) => {
+              currentAttempt = attemptNumber + 1
+              LoggerService.log(
+                `Zwibbler: Failed to connect to collaboration server on attempt ${attemptNumber}`,
+                {
+                  sessionId: this.sessionId,
+                  attemptNumber,
+                }
+              )
+              AnalyticsService.captureEvent(EVENTS.ZWIBBLER_FAILED_TO_CONNECT, {
+                sessionId: this.sessionId,
+                attemptNumber,
+              })
+              return true
+            },
+          }
+        )
+      } catch {
+        // TODO: If we have failed here, show a message to the user to try refreshing the page.
+        LoggerService.noticeError(
+          `Zwibbler: Failed to connect to collaboration server after ${MAX_RETRIES} retries.`,
+          {
+            sessionId: this.sessionId,
+            retries: MAX_RETRIES,
+            timeout: TIMEOUT_MS,
+          }
+        )
+        AnalyticsService.captureEvent(EVENTS.ZWIBBLER_FAILED_TO_CONNECT, {
+          sessionId: this.sessionId,
+          attemptNumber: MAX_RETRIES,
+          isFinal: true,
+        })
       }
     },
 
@@ -1668,12 +1756,13 @@ export default {
     this.removeFixedSizeListeners()
     this.removeInfiniteSizeListeners()
     window.clearInterval(this.pingPongInterval)
-    // zwibbler cleanup
+    // Zwibbler cleanup.
     // This method doesn't exist in zwibbler-demo.js
     if (this.zwibblerCtx?.leaveSharedSession) {
-      await this.zwibblerCtx.leaveSharedSession()
+      this.zwibblerCtx.leaveSharedSession()
     }
     this.zwibblerCtx.destroy()
+    this.zwibblerCtx = null
   },
   watch: {
     aiWidgetMoving(current) {
