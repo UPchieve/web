@@ -226,7 +226,12 @@ export default {
     // Close possibly open modals that are triggered by a long waiting period
     // and clear the isWaiting interval when a volunteer joins the session
     async isSessionWaitingForVolunteer(value, prevValue) {
-      if (!value && prevValue && !this.session.endedAt) {
+      if (
+        !value &&
+        prevValue &&
+        Object.keys(this.session).length &&
+        !this.session.endedAt
+      ) {
         this.showTroubleMatchingModal = false
         this.showUnmatchedModal = false
         clearInterval(this.isWaitingIntervalId)
