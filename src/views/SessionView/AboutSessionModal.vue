@@ -19,8 +19,8 @@
               {{ totalSessionsTextTitle }}
             </div>
           </div>
-          <div v-if="this.studentsGrade">
-            {{ this.studentsFirstName }} is in {{ this.studentsGrade }} grade.
+          <div v-if="studentsGrade">
+            {{ studentsFirstName }} is in {{ studentsGrade }} grade.
           </div>
           <div v-if="totalStudentSessions <= 3" class="subtitle">
             Be sure to be welcoming and extra patient as they get used to our
@@ -28,7 +28,7 @@
           </div>
         </div>
       </div>
-      <div class="session-info">
+      <div v-if="responses && responses.length" class="session-info">
         <div class="session-info-stepper-container">
           <stepper :totalSteps="3" class="session-info-stepper" />
           <div class="session-info-responses">
@@ -72,6 +72,7 @@
         data-testid="about-this-session-survey"
         v-if="isAboutThisSessionSurveyEnabled"
       />
+      <div v-else class="session-info">No goal found for this session</div>
     </div>
   </modal>
 </template>

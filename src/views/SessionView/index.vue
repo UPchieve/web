@@ -176,7 +176,12 @@
               <caret-icon class="caret" />
             </div>
             <div
-              v-else-if="isVolunteer && studentPresessionResponses.length > 0"
+              v-else-if="
+                isVolunteer &&
+                (studentPresessionResponses.length ||
+                  totalStudentSessions ||
+                  session.student.gradeLevel)
+              "
               class="about-session-button"
               @click="handleAboutSessionClick"
             >
