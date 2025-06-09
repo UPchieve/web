@@ -43,6 +43,8 @@ describe('SessionChat', () => {
           getters: {
             ...storeOptions.modules.featureFlags.getters,
             isSessionRecapDmsActive: () => true,
+            isPendingMessagesEnabled: () =>
+              overrides.isPendingMessagesEnabled ?? false,
           },
         },
         socket: {
@@ -94,22 +96,22 @@ describe('SessionChat', () => {
 
   describe('moderateMessage', () => {
     test.each([{ failures: {} }, { failures: { profanity: ['butt'] } }])(
-      'It clears the textarea only when the message is clean and can be sent (isClean=%s)',
+      'It clears the textarea if pending messages is enabled',
       async (isClean) => {
         ModerationService.checkIfMessageIsClean = vi
           .fn()
           .mockResolvedValue(isClean)
-        const wrapper = getWrapper()
+        const wrapper = getWrapper({ isPendingMessagesEnabled: true })
         const textArea = wrapper.get('[data-testid="chat-textarea"]')
         const message = await sendMessage(wrapper)
+        await flushPromises()
 
         expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
           message,
           sessionId: currentSession.id,
         })
         await flushPromises()
-        const hasFailures = Boolean(isClean.failures.profanity)
-        expect(textArea.element.value).toEqual(hasFailures ? message : '')
+        expect(textArea.element.value).toEqual('')
       }
     )
 
@@ -143,6 +145,8 @@ describe('SessionChat', () => {
           },
         })
         const message = await sendMessage(wrapper)
+        await flushPromises()
+
         expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
           message,
           sessionId: currentSession.id,
@@ -181,6 +185,7 @@ describe('SessionChat', () => {
         },
       })
       const message = await sendMessage(wrapper)
+      await flushPromises()
 
       expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
         message,
@@ -389,6 +394,7 @@ describe('SessionChat', () => {
   it('Disables sending chat message if not connected to the socket session room', async () => {
     const wrapper = getWrapper({ isSocketSessionRoomConnected: false })
     const message = await sendMessage(wrapper)
+    await flushPromises()
 
     expect(ModerationService.checkIfMessageIsClean).not.toHaveBeenCalled()
     expect(wrapper.get('[data-testid="chat-textarea"]').element.value).toBe(

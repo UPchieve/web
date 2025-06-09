@@ -881,6 +881,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   SHOW_NEW_INTERNATIONAL_MESSAGE = 'show-new-international-message',
   UPCHIEVE_101_LMS_FORMAT = 'upchieve-101-lms-format',
   TEXT_REFERRAL_LINKS = 'text-referral-links',
+  PENDING_MESSAGES = 'pending-messages',
 }
 
 export const ANALYTICS_REPORT_ROW = {

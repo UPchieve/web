@@ -45,7 +45,7 @@
       <div class="messages" ref="messages" @scroll="handleScroll" tabindex="0">
         <chat-bot
           v-if="isStudent && isSessionWaitingForVolunteer && !aiWidgetPresent"
-          @new-bot-message="handleIncomingMessage"
+          @new-bot-message="handleNewMessageScrollPosition"
         />
         <chat-bot
           v-if="
@@ -56,10 +56,10 @@
           :isDisplayingLanguagesSpoken="true"
           :currentSession="currentSession"
           :languages="currentSession.volunteerLanguages ?? []"
-          @new-bot-message="handleIncomingMessage"
+          @new-bot-message="handleNewMessageScrollPosition"
         />
         <div
-          v-for="(message, index) in withPendingMessages"
+          v-for="(message, index) in withPendingVoiceMessages"
           :key="`message-${index}`"
           :class="[messageAlignment(message), { 'mt-2': index === 0 }]"
           class="message"
@@ -88,7 +88,6 @@
                 <span v-if="message.hasHtml" v-html="message.contents"></span>
                 <transcribed-message
                   v-else-if="message.type === 'audio-transcription'"
-                  :message="message"
                 />
                 <span v-else-if="message.type === 'voice'">
                   <voice-message
@@ -102,12 +101,13 @@
                   >{{ message.contents }}</span
                 >
               </div>
-              <div v-if="shouldShowTimestamp(message, index)" class="time">
+              <div v-if="shouldShowTimestamp(message, index)" class="metadata">
                 {{ formatTime(message.createdAt) }}
               </div>
             </div>
           </template>
         </div>
+
         <div v-if="showMyInProgressCaptionMessage" class="message right">
           <transcribed-message
             class="contents"
@@ -125,6 +125,52 @@
             }"
           />
         </div>
+
+        <div
+          v-for="(message, index) in pendingTextMessages"
+          :key="`pending-text-${index}`"
+          class="message right"
+          :class="{
+            editing: isEditingMessage(index),
+            flagged: isFlaggedMessage(message),
+          }"
+        >
+          <div class="contents">
+            <div class="bubble">
+              <span v-if="!isEditingMessage(index)">
+                {{ message.contents }}
+              </span>
+              <textarea
+                v-else
+                v-model="message.contents"
+                @keydown="onEditKeydown($event, index)"
+                class="edit-textarea"
+                ref="editTextarea"
+              />
+            </div>
+            <div class="metadata">
+              <span v-if="isFlaggedMessage(message)">Flagged!</span>
+            </div>
+          </div>
+          <div v-if="isFlaggedMessage(message)" class="flagged-actions mr-1">
+            <button
+              @click="deleteFlaggedMessage(index)"
+              class="action-button delete"
+              title="Delete this flagged message and continue sending remaining messages."
+            >
+              <TrashIcon />
+            </button>
+            <button
+              v-if="!isEditingMessage(index)"
+              @click="editingMessageIndex = index"
+              class="action-button edit"
+              title="Edit this message to fix policy violations."
+            >
+              <PencilIcon />
+            </button>
+          </div>
+        </div>
+
         <chat-bot
           v-if="sessionHasEnded && isSessionRecapDmsActive && isVolunteer"
           :isSessionRecapBot="true"
@@ -165,12 +211,15 @@
 
     <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
       <loading-message
-        message="Sending"
+        v-if="!this.isPendingMessagesEnabled && this.waitingForModeration"
         class="waiting-for-moderation"
-        v-show="waitingForModeration"
+        message="Sending"
       />
       <transition name="fade">
-        <div class="typing-indicator" v-show="typingIndicatorShown">
+        <div v-if="hasFlaggedMessage" class="flagged-indicator">
+          Fix flagged message to send
+        </div>
+        <div class="typing-indicator" v-else-if="typingIndicatorShown">
           {{ sessionPartnerName || 'Chatbot' }} is typing...
         </div>
       </transition>
@@ -180,11 +229,10 @@
           :class="{ hidden: textMessageHidden }"
           data-testid="chat-textarea"
           autofocus
-          @keydown="handleOutgoingMessage"
+          @keydown="onTypingInChat"
           @input="resizeTextarea"
           v-model="newMessage"
           placeholder="Type a message..."
-          :disabled="waitingForModeration"
           ref="textareaRef"
         />
         <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
@@ -198,11 +246,7 @@
           :sendTextMessage="sendTranscriptMessage"
         />
         <button
-          :disabled="
-            waitingForModeration ||
-            newMessage.length === 0 ||
-            !isSocketSessionRoomConnected
-          "
+          :disabled="isSendMessageDisabled"
           class="send-button"
           :class="{ hidden: textMessageHidden }"
           @click="sendMessage"
@@ -215,31 +259,35 @@
 </template>
 
 <script>
-import { isEmpty } from 'lodash-es'
+import { isEmpty, startCase } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
+import moment from 'moment'
+import { socket } from '@/socket'
+
+import { EVENTS } from '@/consts'
+import sound from '@/assets/audio/receive-message.mp3'
+import PencilIcon from '@/assets/pencil.svg'
+import SendMessage from '@/assets/voice_message_icons/send-message.svg'
+import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
+import TrashIcon from '@/assets/trash.svg'
 
 import ChatBot from './ChatBot.vue'
 import RecordVoiceMessage from '@/components/VoiceMessaging/RecordVoiceMessage.vue'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
+import CallStatusIndicator from '@/components/ScreenShare/CallStatusIndicator.vue'
+import TranscribedMessage from './TranscribedMessage.vue'
+import CelebrationButton from './CelebrationButton.vue'
+
+import AnalyticsService from '@/services/AnalyticsService'
+import LoggerService from '@/services/LoggerService'
 import ModerationService from '@/services/ModerationService'
 import VoiceMessageService from '@/services/VoiceMessageService'
-import sendWebNotification from '@/utils/send-web-notification'
-import getChatAvatar from '@/utils/get-chat-avatar'
-import LoggerService from '@/services/LoggerService'
-import moment from 'moment'
-import { socket } from '@/socket'
-import sound from '@/assets/audio/receive-message.mp3'
-import CallStatusIndicator from '@/components/ScreenShare/CallStatusIndicator.vue'
-import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
-import TranscribedMessage from './TranscribedMessage.vue'
-import SendMessage from '@/assets/voice_message_icons/send-message.svg'
-import { startCase } from 'lodash-es'
-import CelebrationButton from './CelebrationButton.vue'
+
 import { DEFAULT_CELEBRATION_DURATION } from '@/store/modules/celebrations'
-import { EVENTS } from '@/consts'
-import AnalyticsService from '@/services/AnalyticsService'
+import getChatAvatar from '@/utils/get-chat-avatar'
+import sendWebNotification from '@/utils/send-web-notification'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -249,25 +297,26 @@ const MESSAGE_ALIGNMENT = {
 function wasCensoredByChrome(transcript) {
   return transcript.includes('*')
 }
-/**
- * @todo {1} Use more descriptive names that comply with the coding standards.
- *           Keep in mind that it also requires a small backend update in
- *           router/sockets.js
- */
+
 export default {
   name: 'session-chat',
   components: {
+    // Assets:
+    PencilIcon,
+    SendMessage,
+    TrashIcon,
+    SpeakerFilledIcon,
+    // Components:
     ChatBot,
     LoadingMessage,
     DocumentTitle,
     RecordVoiceMessage,
     VoiceMessage,
     CallStatusIndicator,
-    SpeakerFilledIcon,
     TranscribedMessage,
-    SendMessage,
     CelebrationButton,
   },
+
   props: {
     // TODO: Some of the following don't need to be props.
     setHasSeenNewMessage: { type: Function, required: true },
@@ -281,13 +330,13 @@ export default {
     sessionHasEnded: { type: Boolean, default: false },
     aiWidgetPresent: { type: Boolean, default: false },
   },
+
   data() {
     return {
       newMessage: '',
       moderationWarningIsShown: false,
       typingTimeout: null,
       typingIndicatorShown: false,
-      isMessageError: false,
       isAutoscrolling: false,
       showChatBot: false,
       eligibleForSessionRecapChat: false,
@@ -300,8 +349,11 @@ export default {
       hasStartedTyping: false,
       isSessionAudioCallEnabled: false,
       isTutorJoiningForFirstTime: false,
+      pendingTextMessages: [],
+      editingMessageIndex: -1,
     }
   },
+
   computed: {
     ...mapState({
       user: (state) => state.user.user,
@@ -327,6 +379,7 @@ export default {
         'featureFlags/isDisplayVolunteerLanguagesEnabled',
       sessionPartner: 'user/sessionPartner',
       isConfettiCelebrationEnabled: 'featureFlags/isConfettiCelebrationEnabled',
+      isPendingMessagesEnabled: 'featureFlags/isPendingMessagesEnabled',
     }),
     showMyInProgressCaptionMessage() {
       return this.myInProgressCaptionMessage?.text?.length > 0
@@ -334,10 +387,11 @@ export default {
     showPartnerInProgressCaptionMessage() {
       return this.partnerInProgressCaptionMessage?.text?.length > 0
     },
-    withPendingMessages() {
+    withPendingVoiceMessages() {
       const currentMessages = this.currentSession?.messages ?? []
+      const pendingVoiceMessages = this.currentSession?.pendingMessages ?? []
 
-      return currentMessages.concat(this.currentSession?.pendingMessages ?? [])
+      return currentMessages.concat(pendingVoiceMessages)
     },
     showVoiceMessaging() {
       return this.voiceMessagingAvailable && this.eligibleForVoiceMessaging
@@ -383,17 +437,30 @@ export default {
         this.currentSession?.messages?.length > 20
       )
     },
+    hasFlaggedMessage() {
+      return this.pendingTextMessages.some((message) => {
+        return message.flagged
+      })
+    },
+    isSendMessageDisabled() {
+      return (
+        this.newMessage.length === 0 ||
+        !this.isSocketSessionRoomConnected ||
+        this.hasFlaggedMessage ||
+        (!this.isPendingMessagesEnabled && this.waitingForModeration)
+      )
+    },
   },
-  mounted() {
-    this.fetchIsSessionAudioCallEnabled(this.sessionPartner?.id)
-    if (this.chatScrolledToMessageIndex !== null) {
+
+  async created() {
+    await this.fetchIsSessionAudioCallEnabled(this.sessionPartner?.id)
+    if (this.chatScrolledToMessageIndex) {
       const messageElements = this.getUserMessageElements()
       this.$refs.messages.scrollTop =
         messageElements[this.chatScrolledToMessageIndex]?.offsetTop
     }
-    if (this.$refs.textareaRef)
-      this.resizeTextarea({ target: this.$refs.textareaRef })
   },
+
   methods: {
     async fetchIsSessionAudioCallEnabled(partnerUserId) {
       if (!partnerUserId) return
@@ -402,6 +469,7 @@ export default {
         partnerUserId
       )
     },
+
     showTextMessage() {
       this.textMessageHidden = false
       this.hideModerationWarning()
@@ -415,6 +483,7 @@ export default {
     onStopRecording() {
       this.notTyping()
     },
+
     getModerationFailureReason(reasonKey) {
       switch (reasonKey.toLowerCase()) {
         case 'platform circumvention':
@@ -436,9 +505,6 @@ export default {
         .map((s) => `"` + s.trim() + `"`)
         .join(', ')
     },
-    formatTime(createdAt) {
-      return moment(createdAt).format('h:mm a')
-    },
     showModerationWarning() {
       this.moderationWarningIsShown = true
     },
@@ -446,74 +512,240 @@ export default {
       this.moderationWarningIsShown = false
       this.failureReasons = null
     },
+
+    formatTime(createdAt) {
+      return moment(createdAt).format('h:mm a')
+    },
+    isPendingMessage(message) {
+      return !message.createdAt
+    },
+    isFlaggedMessage(message) {
+      return message.flagged
+    },
+
     toggleEligibleForSessionRecapChat() {
       this.eligibleForSessionRecapChat = true
     },
-    showNewMessage(message) {
-      socket.emit('message', {
-        sessionId: this.currentSession.id,
-        user: this.user,
-        message,
-        source:
-          this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
-      })
-    },
-    isEventFromSameSession(sessionId) {
-      return this.currentSession.id === sessionId
-    },
-    clearMessageInput() {
-      this.newMessage = ''
-    },
+
     notTyping() {
       this.hasStartedTyping = false
-      // Tell the server that the user is no longer typing
+      // Tell the server that the user is no longer typing.
       socket.emit('notTyping', {
         sessionId: this.currentSession.id,
       })
     },
+
+    async onTypingInChat(event) {
+      if (event.key == 'Enter' && event.shiftKey) {
+        // Allow-multi-line messages.
+        return
+      }
+
+      // If key pressed is Enter, send the message.
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        await this.sendMessage()
+        return
+      }
+
+      if (!this.hasStartedTyping) {
+        this.hasStartedTyping = true
+        socket.emit('typing', {
+          sessionId: this.currentSession.id,
+        })
+      }
+
+      // Every time a key is pressed, set an inactive timer.
+      // If another key is pressed within 2 seconds, reset timer.
+      clearTimeout(this.typingTimeout)
+      this.typingTimeout = setTimeout(() => {
+        this.notTyping()
+      }, 2000)
+    },
+
+    async sendMessage() {
+      const message = this.newMessage.trim()
+      // Early exit if message is blank.
+      if (isEmpty(message) || this.isSendMessageDisabled) return
+
+      if (this.isPendingMessagesEnabled) {
+        const pendingMessage = {
+          contents: message,
+          user: this.user.id,
+          emitted: false,
+          moderated: false,
+          flagged: false,
+        }
+        this.pendingTextMessages.push(pendingMessage)
+      }
+
+      this.newMessage = ''
+      await this.$nextTick()
+      this.resizeTextarea({ target: this.$refs.textareaRef })
+      this.$refs.textareaRef.focus()
+      this.scrollToBottom()
+
+      clearTimeout(this.typingTimeout)
+      this.notTyping()
+
+      const isClean = await this.moderateMessage(message)
+
+      if (this.isPendingMessagesEnabled) {
+        const messageToUpdate = this.pendingTextMessages.find(
+          (m) => m.contents === message && !m.moderated
+        )
+        if (!messageToUpdate) {
+          LoggerService.noticeError(
+            'Did not find message to update in pending messages.'
+          )
+          return
+        }
+        messageToUpdate.moderated = true
+        messageToUpdate.flagged = !isClean
+        this.processPendingMessageQueue()
+      } else if (isClean) {
+        this.handleOutgoingMessage({ contents: message })
+      } else if (!isClean) {
+        this.newMessage = message
+      }
+
+      // This is temporary for `sendTranscriptMessage`,
+      // which will be removed shortly, theoretically.
+      return isClean
+    },
+
     async moderateMessage(message) {
-      // Reset the chat warning
       this.hideModerationWarning()
       this.waitingForModeration = true
+
       try {
-        // Check for personal info/profanity in message
         const { failures } = await ModerationService.checkIfMessageIsClean({
           message,
           sessionId: this.currentSession.id,
         })
         const isClean = Object.keys(failures).length === 0
-        if (isClean) {
-          this.showNewMessage(message)
-          this.clearMessageInput()
-        } else {
-          // do not show the offending profanity to students
-          // in the event it was a typo
+        if (!isClean) {
+          // Do not show the offending profanity to students
+          // in the event it was a typo.
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { profanity, ...rest } = failures
           this.failureReasons = this.isVolunteer ? failures : rest
           this.showModerationWarning()
         }
+        return isClean
       } catch (e) {
-        this.showNewMessage(message)
-        this.clearMessageInput()
         LoggerService.noticeError(`ModerationService failed with`, e)
+        return true
       } finally {
         this.waitingForModeration = false
       }
     },
+
+    async processPendingMessageQueue() {
+      for (const message of [...this.pendingTextMessages]) {
+        // If a message has already been emitted,
+        // continue to messages that haven't been emitted yet.
+        if (message.emitted) continue
+        // If a message has not received back a moderation result,
+        // or it's been flagged, end now until we have more information
+        // to continue with the rest of the queue.
+        if (!message.moderated || message.flagged) return
+
+        this.handleOutgoingMessage(message)
+        // Add a slight delay before processing the next message.
+        // This delay is basically imperceptible to the user (if anything,
+        // it adds a nicer UX feel), but it helps prevent a race condition
+        // on the server of emitting the message back to clients out of order.
+        await new Promise((resolve) => setTimeout(resolve, 500))
+      }
+    },
+
+    handleOutgoingMessage(message) {
+      message.emitted = true
+      socket.emit('message', {
+        sessionId: this.currentSession.id,
+        user: this.user,
+        message: message.contents,
+        source:
+          this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
+      })
+    },
+
+    removePendingMessage(message) {
+      const index = this.pendingTextMessages.findIndex((m) => {
+        return m.contents === message && m.emitted
+      })
+      if (index > -1) {
+        this.pendingTextMessages.splice(index, 1)
+      }
+    },
+
+    deleteFlaggedMessage(index) {
+      this.editingMessageIndex = -1
+      this.moderationWarningIsShown = false
+      this.pendingTextMessages.splice(index, 1)
+      this.processPendingMessageQueue()
+    },
+
+    isEditingMessage(index) {
+      return this.editingMessageIndex === index
+    },
+    async onEditKeydown(event, index) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        this.editingMessageIndex = -1
+        return
+      }
+
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault()
+        this.sendEdittedMessage(this.pendingTextMessages[index])
+      }
+    },
+    async sendEdittedMessage(edittedMessage) {
+      const newContent = edittedMessage?.contents.trim()
+      if (newContent) {
+        this.editingMessageIndex = -1
+        edittedMessage.contents = newContent
+        edittedMessage.moderated = false
+        edittedMessage.flagged = false
+
+        const isClean = await this.moderateMessage(newContent)
+        edittedMessage.moderated = true
+        edittedMessage.flagged = !isClean
+        this.processPendingMessageQueue()
+      }
+    },
+
+    async sendTranscriptMessage(transcript) {
+      this.hideModerationWarning()
+
+      if (wasCensoredByChrome(transcript)) {
+        this.showModerationWarning()
+        return false
+      }
+
+      try {
+        const isClean = await this.sendMessage(transcript)
+        return isClean
+      } catch {
+        return true
+      }
+    },
+
     async sendVoiceMessage({ audio, transcript, userEditedTranscript }) {
       try {
         this.hideModerationWarning()
         this.waitingForModeration = true
 
         if (wasCensoredByChrome(transcript)) {
-          this.waitingForModeration = false
           this.showModerationWarning()
+          this.waitingForModeration = false
           return false
         }
 
         const { failures } = await ModerationService.checkIfMessageIsClean({
-          // Moderate both original audio transcript and user edited
+          // Moderate both original audio transcript and user edited.
           message: `${transcript} ${userEditedTranscript}`,
           sessionId: this.currentSession.id,
         })
@@ -530,6 +762,8 @@ export default {
           const voiceMessageId =
             await VoiceMessageService.saveVoiceMessage(form)
 
+          // Not worrying about voice pending messages because
+          // voice messaging is going to be removed.
           socket.emit('message', {
             type: 'voice',
             sessionId: this.currentSession.id,
@@ -557,129 +791,10 @@ export default {
         this.waitingForModeration = false
       }
     },
-    async sendTranscriptMessage(transcript) {
-      try {
-        this.hideModerationWarning()
-        this.waitingForModeration = true
 
-        if (wasCensoredByChrome(transcript)) {
-          this.waitingForModeration = false
-          this.showModerationWarning()
-          return false
-        }
-
-        const { failures } = await ModerationService.checkIfMessageIsClean({
-          message: transcript,
-          sessionId: this.currentSession.id,
-        })
-
-        const isClean = Object.keys(failures).length === 0
-        if (isClean) {
-          this.showNewMessage(transcript)
-          return true
-        } else {
-          // do not show the offending profanity to students
-          // in the event it was a typo
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { profanity, ...rest } = failures
-          this.failureReasons = this.isVolunteer ? failures : rest
-          this.showModerationWarning()
-          return false
-        }
-      } catch (e) {
-        this.showNewMessage(transcript)
-        LoggerService.noticeError(`ModerationService failed with`, e)
-        return true
-      } finally {
-        this.waitingForModeration = false
-      }
-    },
-
-    async sendMessage() {
-      const message = this.newMessage.trim()
-      // Early exit if message is blank
-      if (isEmpty(message) || !this.isSocketSessionRoomConnected) return
-
-      await this.moderateMessage(message)
-      this.notTyping()
-      this.$nextTick(() => this.$refs.textareaRef.focus())
-    },
-
-    async handleOutgoingMessage(event) {
-      if (event.key == 'Enter' && event.shiftKey) {
-        // Allow multi-line messages.
-        return
-      }
-
-      // If key pressed is Enter, send the message
-      if (event.key === 'Enter') {
-        event.preventDefault()
-        await this.sendMessage()
-        this.resizeTextarea({ target: this.$refs.textareaRef })
-        return
-
-        // Disregard typing handler for backspace
-      } else if (event.key == 'Backspace') return
-
-      // Typing handler for when non-Enter/Backspace keys are pressed
-      if (!this.hasStartedTyping) {
-        this.hasStartedTyping = true
-        socket.emit('typing', {
-          sessionId: this.currentSession.id,
-        })
-      }
-
-      /** Every time a key is pressed, set an inactive timer
-          If another key is pressed within 2 seconds, reset timer**/
-      clearTimeout(this.typingTimeout)
-      this.typingTimeout = setTimeout(() => {
-        this.notTyping()
-      }, 2000)
-    },
-    resizeTextarea(event) {
-      const textarea = event.target
-      textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + 'px'
-    },
-    async triggerAlert(data) {
-      try {
-        await this.receiveMessageAudio.play()
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.log('Unable to play audio', error)
-      }
-
-      sendWebNotification(`${this.sessionPartnerName} has sent a message`, {
-        body: data.contents,
-      })
-      return
-    },
-    handleScroll() {
-      const messageElements = this.getUserMessageElements()
-
-      if (this.unreadChatMessageIndices.length > 0) {
-        const readMessageIndices = this.unreadChatMessageIndices.filter(
-          (index) => this.isMessageElementInView(messageElements[index])
-        )
-        this.$store.dispatch('user/markChatMessagesAsRead', readMessageIndices)
-      }
-
-      const topVisibleMessageElementIndex = messageElements.findIndex(
-        this.isMessageElementInView
-      )
-      this.$store.dispatch(
-        'user/scrollChatToMessage',
-        topVisibleMessageElementIndex
-      )
-
-      this.updateAutoscrolling()
-    },
-    async handleIncomingMessage() {
-      // called whenever a new message enters the chat, either from
-      // a user or from the chatbot
+    async handleNewMessageScrollPosition() {
       await this.$nextTick()
       if (this.isAutoscrolling) {
-        // autoscroll chat if at bottom
         this.scrollToBottom()
       } else if (
         this.currentSession.messages.length > 0 &&
@@ -702,12 +817,25 @@ export default {
 
       this.updateAutoscrolling()
     },
-    getUserMessageElements() {
-      // the DOM elements corresponding to messages sent by users
-      // (as opposed to the chatbot)
-      return Array.from(this.$refs.messages.children).filter((element) =>
-        element.classList.contains('message')
+    handleScroll() {
+      const messageElements = this.getUserMessageElements()
+
+      if (this.unreadChatMessageIndices.length > 0) {
+        const readMessageIndices = this.unreadChatMessageIndices.filter(
+          (index) => this.isMessageElementInView(messageElements[index])
+        )
+        this.$store.dispatch('user/markChatMessagesAsRead', readMessageIndices)
+      }
+
+      const topVisibleMessageElementIndex = messageElements.findIndex(
+        this.isMessageElementInView
       )
+      this.$store.dispatch(
+        'user/scrollChatToMessage',
+        topVisibleMessageElementIndex
+      )
+
+      this.updateAutoscrolling()
     },
     isMessageElementInView(messageElement) {
       const messagesBox = this.$refs.messages
@@ -743,14 +871,39 @@ export default {
         (messagesBox.lastElementChild?.offsetTop ?? 0) +
         (messagesBox.lastElementChild?.offsetHeight ?? 0)
     },
+
+    resizeTextarea(event) {
+      const textarea = event.target
+      textarea.style.height = 'auto'
+      textarea.style.height = textarea.scrollHeight + 'px'
+    },
+
+    async triggerAlert(data) {
+      try {
+        await this.receiveMessageAudio.play()
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log('Unable to play audio', error)
+      }
+
+      sendWebNotification(`${this.sessionPartnerName} has sent a message`, {
+        body: data.contents,
+      })
+      return
+    },
+    getUserMessageElements() {
+      // the DOM elements corresponding to messages sent by users
+      // (as opposed to the chatbot)
+      return Array.from(this.$refs.messages.children).filter((element) =>
+        element.classList.contains('message')
+      )
+    },
+
     messageAlignment(message) {
       if (message.isSystemMessage) return MESSAGE_ALIGNMENT.CENTER
       return message.user === this.user.id
         ? MESSAGE_ALIGNMENT.RIGHT
         : MESSAGE_ALIGNMENT.LEFT
-    },
-    showAvatar(message) {
-      return this.messageAlignment(message) === MESSAGE_ALIGNMENT.LEFT
     },
     avatar(message) {
       const volunteerId =
@@ -771,20 +924,20 @@ export default {
     },
     shouldShowPartnerAvatar(message, index) {
       // Show the partner avatar if it's the last message.
-      if (index === this.withPendingMessages.length - 1) return true
+      if (index === this.withPendingVoiceMessages.length - 1) return true
 
       // Show the partner avatar if the next message isn't from the partner.
-      const nextMessage = this.withPendingMessages[index + 1]
+      const nextMessage = this.withPendingVoiceMessages[index + 1]
       if (nextMessage.user !== message.user) return true
 
       return false
     },
     shouldShowTimestamp(message, index) {
       // Show the timestamp on the last message.
-      if (index === this.withPendingMessages.length - 1) return true
+      if (index === this.withPendingVoiceMessages.length - 1) return true
 
       // Show the timestamp if the next message isn't from the same person.
-      const nextMessage = this.withPendingMessages[index + 1]
+      const nextMessage = this.withPendingVoiceMessages[index + 1]
       if (nextMessage.user !== message.user) return true
 
       // Show the timestamp if the times between this message
@@ -792,6 +945,11 @@ export default {
       const currentFormatted = this.formatTime(message.createdAt)
       const nextFormatted = this.formatTime(nextMessage.createdAt)
       return currentFormatted !== nextFormatted
+    },
+    shouldShowPendingMessage(index) {
+      if (index === this.pendingTextMessages.length - 1) return true
+      const nextMessage = this.pendingTextMessages[index + 1]
+      if (nextMessage.flagged) return true
     },
     celebrate() {
       this.$store.dispatch('celebrations/celebrate')
@@ -804,6 +962,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.USER_SENT_CELEBRATION)
     },
   },
+
   watch: {
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
@@ -829,45 +988,30 @@ export default {
       },
       deep: true,
     },
-    messageData: {
-      handler(data) {
-        const { userId, sessionId } = data
-        if (sessionId !== this.currentSession.id) return
-
-        // If the chat is hidden show visual indicator that a new message has arrived
-        if (this.shouldHideChatSection) {
-          this.setHasSeenNewMessage(false)
-          this.triggerAlert(data)
-        }
-
-        // Only allow audio when a user does not have the web page in view
-        if (userId !== this.user.id && this.isWebPageHidden)
-          this.triggerAlert(data)
-
-        if (this.isInRecap) {
-          this.$store.dispatch('user/addRecapMessage', data)
-        } else {
-          this.$store.dispatch('user/addMessage', data)
-        }
-
-        this.handleIncomingMessage()
-      },
-      deep: true,
-    },
-
     isTyping({ sessionId, isTyping }) {
       if (sessionId !== this.currentSession.id) return
       this.typingIndicatorShown = isTyping
     },
-    'currentSession.messages': {
-      handler(currentVal, prevVal) {
-        if ((this.isInRecap && currentVal, !prevVal))
-          // Wait for the DOM to update
-          this.$nextTick(() => {
-            this.scrollToBottom()
-          })
-      },
-      deep: true,
+    messageData(data) {
+      const { userId, sessionId } = data
+      if (sessionId !== this.currentSession.id) return
+
+      // If the chat is hidden show visual indicator that a new message has arrived.
+      if (this.shouldHideChatSection) {
+        this.setHasSeenNewMessage(false)
+        this.triggerAlert(data)
+      }
+
+      // Only allow audio when a user does not have the web page in view.
+      if (userId !== this.user.id && this.isWebPageHidden) {
+        this.triggerAlert(data)
+      }
+
+      if (this.isPendingMessagesEnabled && data.user === this.user.id) {
+        this.removePendingMessage(data.contents)
+      }
+
+      this.handleNewMessageScrollPosition()
     },
     currentSession(newValue, oldValue) {
       if (
@@ -882,7 +1026,7 @@ export default {
           isSystemMessage: true,
           createdAt: new Date().toISOString(),
         })
-        // Wait for the DOM to update
+        // Wait for the DOM to update.
         this.$nextTick(() => {
           this.scrollToBottom()
         })
@@ -1027,7 +1171,7 @@ export default {
         background-color: $c-background-blue;
       }
 
-      .time {
+      .metadata {
         text-align: right;
       }
     }
@@ -1070,13 +1214,14 @@ export default {
       background-color: $c-background-grey;
       border-radius: 20px;
       white-space: pre-line;
+      word-break: break-word;
 
       &--chat-bot {
         background-color: $upchieve-chat-bot-green;
       }
     }
 
-    .time {
+    .metadata {
       color: #73737a;
       font-size: 14px;
       font-weight: 500;
@@ -1088,6 +1233,89 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.message.pending {
+  opacity: 0.7;
+  .contents {
+    .bubble {
+      background-color: $c-background-grey;
+    }
+  }
+
+  .metadata {
+    color: #73737a;
+    font-style: italic;
+    font-weight: normal;
+  }
+}
+
+.message.flagged {
+  .contents {
+    .bubble {
+      border: $c-error-red solid 1px;
+      background-color: lighten($c-error-red, 25%);
+    }
+  }
+
+  .metadata {
+    color: $c-error-red;
+    font-weight: 600;
+    font-style: normal;
+  }
+}
+
+.message.editing {
+  .contents {
+    .bubble {
+      background: white;
+      border: none;
+      padding: 0;
+    }
+  }
+}
+
+.flagged-actions {
+  align-items: flex-start;
+  display: flex;
+  gap: 4px;
+  padding-top: 8px;
+
+  .action-button {
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    padding: 6px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      border-color: black;
+    }
+  }
+}
+
+.edit-textarea {
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: inherit;
+  resize: vertical;
+  min-height: 20px;
+
+  &:focus {
+    outline: none;
+    border-color: #007cff;
+    box-shadow: 0 0 0 2px rgba(0, 124, 255, 0.3);
+  }
 }
 
 .chat-footer {
@@ -1129,6 +1357,16 @@ export default {
   padding-left: 1em;
   font-size: 13px;
   font-weight: 300;
+  transition: 0.25s;
+}
+
+.flagged-indicator {
+  color: $c-error-red;
+  font-size: 13px;
+  font-weight: 500;
+  padding-left: 1em;
+  position: absolute;
+  top: -20px;
   transition: 0.25s;
 }
 
@@ -1187,6 +1425,8 @@ export default {
   filter: brightness(0.9);
 }
 .send-button:disabled {
-  filter: grayscale(0.75);
+  :deep(circle) {
+    fill: $c-disabled-grey;
+  }
 }
 </style>

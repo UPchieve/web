@@ -19,13 +19,11 @@ export type SocketState = {
   reconnectAttempts: number
   isTyping: boolean
   messageData: MessageData
-  messageError: MessageError
   socketJoinedRoom: boolean
 }
 
 // TODO: Replace any's with proper types.
 type MessageData = any
-type MessageError = any
 
 export default {
   namespaced: true,
@@ -35,23 +33,24 @@ export default {
     reconnectAttempts: 0,
     isTyping: false,
     messageData: {},
-    messageError: {},
     socketJoinedRoom: false,
   },
   mutations: {
-    setIsConnected: (state: SocketState, isConnected: boolean) =>
-      (state.isConnected = isConnected),
-    incrementReconnectAttempts: (state: SocketState) =>
-      (state.reconnectAttempts += 1),
+    setIsConnected: (state: SocketState, isConnected: boolean) => {
+      state.isConnected = isConnected
+    },
+    incrementReconnectAttempts: (state: SocketState) => {
+      state.reconnectAttempts += 1
+    },
     setIsTyping: (state: SocketState, isTyping: boolean) => {
       state.isTyping = isTyping
     },
-    setMessageData: (state: SocketState, data: MessageData) =>
-      (state.messageData = data),
-    setMessageError: (state: SocketState, data: MessageError) =>
-      (state.messageError = data),
-    setSocketJoinedRoom: (state: SocketState, bool: boolean) =>
-      (state.socketJoinedRoom = bool),
+    setMessageData: (state: SocketState, data: MessageData) => {
+      state.messageData = data
+    },
+    setSocketJoinedRoom: (state: SocketState, bool: boolean) => {
+      state.socketJoinedRoom = bool
+    },
   },
 
   actions: {
@@ -192,6 +191,9 @@ export default {
 
       socket.on('messageSend', (data: MessageData) => {
         commit('setMessageData', data)
+        commit('user/addMessage', data, {
+          root: true,
+        })
       })
 
       socket.on(
@@ -207,15 +209,6 @@ export default {
           }
         }
       )
-
-      socket.on('messageError', (data: MessageError) => {
-        if (
-          data.sessionId === rootState.user.session.id ||
-          data.sessionId === rootState.user.recapSession.id
-        ) {
-          commit('setMessageError', data)
-        }
-      })
 
       socket.on('sessions/recap:joined', () => {
         commit('setSocketJoinedRoom', true)

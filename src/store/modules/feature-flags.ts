@@ -57,6 +57,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_NEW_INTERNATIONAL_MESSAGE]: false,
       [POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_LMS_FORMAT]: false,
       [POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS]: false,
+      [POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -244,6 +245,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_LMS_FORMAT],
     isTextReferralLinksEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS],
+    isPendingMessagesEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES],
   },
   actions: {
     isSessionAudioCallEnabled: async (

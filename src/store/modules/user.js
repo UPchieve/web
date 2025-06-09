@@ -39,10 +39,11 @@ export default {
       state.user = user
     },
 
+    // TODO: Move session related stuff to session store.
     setSession: (state, session = {}) => (state.session = session),
-
     setRecapSession: (state, session = {}) => (state.recapSession = session),
-
+    // For live voice chat message.
+    // TODO: Make that more clear.
     addPendingMessage: (state, message) => {
       if (
         message &&
@@ -54,6 +55,8 @@ export default {
         state.session.pendingMessages.push(message)
       }
     },
+    // For live voice chat message.
+    // TODO: Make that more clear.
     removePendingMessage: (state, message) => {
       if (message)
         state.session.pendingMessages =
@@ -62,9 +65,16 @@ export default {
           ) ?? []
     },
     addMessage: (state, message) => {
-      if (message) state.session.messages.push(message)
+      if (message.sessionId === state.session.id) {
+        state.session.messages.push(message)
+      } else if (message.sessionId === state.recapSession.id) {
+        state.recapSession.messages.push(message)
+      } else {
+        LoggerService.noticeError(
+          'Received message for unknown session: ' + message.sessionId
+        )
+      }
     },
-
     addRecapMessage: (state, message) => {
       if (message) state.recapSession.messages.push(message)
     },
