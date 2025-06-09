@@ -28,7 +28,7 @@ import RejoinSessionModal from './RejoinSessionModal.vue'
 import UpgradeAppModal from './UpgradeAppModal.vue'
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal.vue'
-import ReferralModal from '@/views/DashboardView/StudentDashboard/ReferralModal.vue'
+import ReferralModal from '@/views/DashboardView/ReferralModal.vue'
 import SessionFulfilledModal from '@/views/SessionView/SessionFulfilledModal.vue'
 import VolunteerOnboardingModal from '@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue'
 import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
@@ -39,6 +39,7 @@ import CreateAndEditAssignmentModal from '@/components/CreateAndEditAssignmentMo
 import StudentCompletionModal from '@/components/StudentCompletionModal.vue'
 import EditTeacherClassModal from '@/components/EditTeacherClassModal.vue'
 import RemoveAssignmentConfirmationModal from '@/components/RemoveAssignmentConfirmationModal.vue'
+import AmbassadorReferralModal from '@/views/AmbassadorReferralModal.vue'
 
 export default {
   components: {
@@ -47,6 +48,7 @@ export default {
     SubjectSelectionModal,
     NotificationsModal,
     ReferralModal,
+    AmbassadorReferralModal,
     SessionFulfilledModal,
     VolunteerOnboardingModal,
     UpgradeAppModal,

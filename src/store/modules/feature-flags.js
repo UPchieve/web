@@ -45,6 +45,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_PREFERRED_LANGUAGE]: false,
+      [POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -217,6 +218,8 @@ export default {
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE],
     isSelectingPreferredLanguageEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENT_PREFERRED_LANGUAGE],
+    isBecomeAnAmbassadorCtaEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA],
   },
   actions: {
     isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {

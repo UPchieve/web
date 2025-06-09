@@ -25,7 +25,10 @@
               </button>
             </div>
             <div v-else>
-              <div class="dashboard-card__subtitle">
+              <div
+                class="dashboard-card__subtitle"
+                v-if="openSessions?.length || !isBecomeAnAmbassadorCtaEnabled"
+              >
                 Students waiting for help will show up below.
               </div>
               <list-sessions />
@@ -224,6 +227,7 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
+      openSessions: (state) => state.volunteer.openSessions,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -231,6 +235,8 @@ export default {
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       allSubjectNames: 'subjects/allSubtopicNames',
+      isBecomeAnAmbassadorCtaEnabled:
+        'featureFlags/isBecomeAnAmbassadorCtaEnabled',
     }),
 
     isCustomVolunteerPartner() {

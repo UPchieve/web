@@ -355,12 +355,14 @@ export default {
     isVolunteerReferralAmbassador: (state) =>
       state.user?.numReferredVolunteers &&
       state.user?.numReferredVolunteers >= 5,
+    isAmbassador: (_state, getters) =>
+      getters.isVolunteerReferralAmbassador ||
+      getters.isVolunteerProgramAmbassador,
     showAmbassadorTitle: (state, getters, _rootState, rootGetters) => {
       return (
         rootGetters['featureFlags/isShowAmbassadorTitleEnabled'] &&
         getters.hasVolunteerRole &&
-        (getters.isVolunteerProgramAmbassador ||
-          getters.isVolunteerReferralAmbassador)
+        getters.isAmbassador
       )
     },
 

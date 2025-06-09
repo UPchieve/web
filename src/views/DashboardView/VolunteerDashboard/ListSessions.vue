@@ -3,7 +3,10 @@
     <div v-if="hasError" class="session-list__error">
       <p>Failed to load a list of students. Please try refreshing</p>
     </div>
-    <table v-else class="table table-striped table-hover">
+    <table
+      v-else-if="sortedOpenSessions?.length || !isBecomeAnAmbassadorCtaEnabled"
+      class="table table-striped table-hover"
+    >
       <thead>
         <tr>
           <th scope="col">Student</th>
@@ -37,12 +40,26 @@
         </tr>
       </tbody>
     </table>
+    <div
+      v-else-if="isBecomeAnAmbassadorCtaEnabled && isVolunteer && !isAmbassador"
+      class="become-an-ambassador-container"
+    >
+      Currently there are no students waiting for help.
+      <div id="no-students-ambassador-message">
+        <button class="ambassador-button" @click="openAmbassadorReferralModal">
+          Still want to earn volunteer hours?<br />
+          <strong>Become an UPchieve Ambassador!</strong>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
   name: 'ListSessions',
@@ -50,24 +67,31 @@ export default {
     return {
       emitListIntervalId: null,
       hasError: false,
-      unsubscribeFromTick: () => undefined,
     }
   },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
       isWebPageHidden: (state) => state.app.isWebPageHidden,
-      sortedOpenSessions(state) {
-        return state.volunteer.openSessions.slice().sort((first, second) => {
-          if (first.createdAt < second.createdAt) return -1
-          if (first.createdAt > second.createdAt) return 1
-          return 0
-        })
-      },
       newWaitingStudentAudioElement: (state) =>
         state.volunteer.newWaitingStudentAudioElement,
       ticks: (state) => state.volunteer.ticks,
       openSessions: (state) => state.volunteer.openSessions,
+      sortedOpenSessions(state) {
+        return (state.volunteer.openSessions ?? [])
+          .slice()
+          .sort((first, second) => {
+            if (first.createdAt < second.createdAt) return -1
+            if (first.createdAt > second.createdAt) return 1
+            return 0
+          })
+      },
+    }),
+    ...mapGetters({
+      isBecomeAnAmbassadorCtaEnabled:
+        'featureFlags/isBecomeAnAmbassadorCtaEnabled',
+      isVolunteer: 'user/isVolunteer',
+      isAmbassador: 'user/isAmbassador',
     }),
   },
   watch: {
@@ -76,6 +100,17 @@ export default {
     },
   },
   methods: {
+    openAmbassadorReferralModal() {
+      AnalyticsService.captureEvent(
+        EVENTS.AMBASSADOR_NO_STUDENTS_EARN_VOLUNTEER_HOURS_CTA_CLICKED
+      )
+      this.$store.dispatch('app/modal/show', {
+        component: 'AmbassadorReferralModal',
+        data: {
+          showTemplateButtons: false,
+        },
+      })
+    },
     gotoSession(session) {
       const { type, subTopic, _id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${_id}`
@@ -138,5 +173,23 @@ thead {
   padding: 5px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+.become-an-ambassador-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+
+  .ambassador-button {
+    color: $c-information-blue;
+  }
+}
+
+#no-students-ambassador-message {
+  button {
+    line-height: 1.5;
+  }
 }
 </style>

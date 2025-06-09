@@ -52,6 +52,7 @@ export default {
           userType: this.userType,
         })
         this.copyMessage = 'Copied'
+        this.$emit('copied')
         setTimeout(() => {
           this.copyMessage = 'Copy'
         }, 3000)
