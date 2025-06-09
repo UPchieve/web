@@ -191,15 +191,13 @@ export default {
       }
     }
 
-    if (this.$route.params) {
-      if (this.$route.params.userType === this.UserType.student)
-        this.userSelection = this.UserType.student
-      else if (this.$route.params.userType === this.UserType.volunteer)
-        this.userSelection = this.UserType.volunteer
-      else if (this.$route.params.userType === this.UserType.teacher)
-        this.userSelection = this.UserType.teacher
-    }
+    this.userSelectionFrom(this.$route.params)
   },
+  beforeRouteUpdate(to, _from, next) {
+    this.userSelectionFrom(to.params)
+    next()
+  },
+
   computed: {
     ...mapGetters({
       useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
@@ -220,6 +218,15 @@ export default {
   },
 
   methods: {
+    userSelectionFrom(routeParams) {
+      if (routeParams.userType === this.UserType.student)
+        this.userSelection = this.UserType.student
+      else if (routeParams.userType === this.UserType.volunteer)
+        this.userSelection = this.UserType.volunteer
+      else if (routeParams.userType === this.UserType.teacher)
+        this.userSelection = this.UserType.teacher
+      else this.userSelection = null
+    },
     selectVolunteer() {
       this.$router.push('/sign-up/volunteer')
       this.userSelection = 'volunteer'
