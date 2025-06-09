@@ -196,9 +196,13 @@
             </div>
           </div>
           <router-link
+            v-if="
+              isVolunteer &&
+              previousSessionCountWithStudent > 0 &&
+              session.student?.firstName
+            "
             class="session-history-link"
-            v-if="isVolunteer && previousSessionCountWithStudent > 0"
-            :to="`/sessions/history?studentId=${session.student.id}&volunteerId=${session.volunteer.id}`"
+            :to="`/sessions/history?studentId=${session.studentId}&volunteerId=${session.volunteerId}`"
             >History with {{ session.student.firstName }}</router-link
           >
           <question-mark-icon
@@ -283,7 +287,6 @@ import SessionChat from './SessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
 import Whiteboard from './Whiteboard.vue'
 import DocumentEditorV2 from './DocumentEditorV2.vue'
-import ConnectionTroubleModal from './ConnectionTroubleModal.vue'
 import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
@@ -328,6 +331,7 @@ export default {
     AssignmentDetailModal,
     LiveMediaChatHeader,
   },
+
   setup() {
     /**
      * We use the useActor hook from xstate/vue to attach the actor to the component lifecycle.
@@ -353,7 +357,100 @@ export default {
     */
       (meetingActor.value = useActor(MeetingMachine.create()))
   },
-  created() {
+
+  beforeRouteEnter(_, from, next) {
+    next((vm) => {
+      vm.prevRoute = from
+    })
+  },
+
+  async created() {
+    try {
+      const session = await SessionService.createOrJoinSession(
+        this.$route.params.topic,
+        this.$route.params.subTopic,
+        this.$route.params.sessionId,
+        this.$route.query?.assignmentId,
+        this.prevRoute?.name ?? ''
+      )
+      this.session = session
+      this.sessionId = session.id
+
+      // Consider putting analytics into service.
+      if (!this.$route.params.sessionId && this.isStudent) {
+        AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
+          event: EVENTS.SESSION_REQUESTED,
+          sessionId: this.session.id,
+          subject: this.$route.params.subTopic,
+        })
+      }
+      if (this.isStudentVolunteer) {
+        if (this.isVolunteer) {
+          AnalyticsService.captureEvent(
+            EVENTS.ROLE_SWITCHING_USER_JOINED_SESSION_AS_VOLUNTEER
+          )
+        } else if (this.isStudent) {
+          AnalyticsService.captureEvent(
+            EVENTS.ROLE_SWITCHING_USER_JOINED_SESSION_AS_STUDENT
+          )
+        }
+      }
+
+      this.joinSocketSession()
+      Gleap.setCustomData('sessionId', this.session.id)
+
+      await this.getSessionContext()
+
+      if (getNotificationPermission() === 'default') {
+        this.showNotificationModal = true
+      }
+
+      await Promise.all([
+        this.fetchSessionAudioFlag(),
+        this.fetchScreenshareFlag(),
+      ])
+      this.meetingActor.actorRef.start()
+      this.meetingActor.actorRef.send({
+        type: 'set_session_id',
+        sessionId: this.session.id,
+      })
+      this.meetingActor.actorRef.send({
+        type: 'session_started',
+        isAudioEligible: this.isSessionAudioCallEnabled,
+        isScreenshareEligible: this.isScreenshareEnabled,
+      })
+
+      /*
+       * Since this is only rolled out to students,
+       * we have to check to see if the student involved in this
+       * session is eligible, if they are, we can also enable it for
+       * the volunteer.
+       */
+      FeatureFlagService.isFeatureEnabledForUser(
+        POSTHOG_FEATURE_FLAGS.AI_TUTOR,
+        this.session.studentId
+      )
+        .then((r) => {
+          this.aiWidgetEnabled = r.isEnabled.includes('in-session')
+        })
+        .catch((err) => {
+          LoggerService.noticeError(
+            `Failed to check if AI tutor is enabled for user=${student?.id}`,
+            err
+          )
+        })
+    } catch (err) {
+      window.alert('Could not join session: ' + err.message)
+      LoggerService.noticeError(err)
+      this.$router.replace('/')
+    }
+  },
+
+  async mounted() {
+    if (!this.isSocketConnected) {
+      socket.connect()
+    }
+
     if (this.mobileMode) {
       try {
         Gleap.showFeedbackButton(false)
@@ -363,6 +460,7 @@ export default {
     }
     window.addEventListener('resize', this.handleResize)
   },
+
   beforeUnmount() {
     socket.emit('sessions:leave', {
       sessionId: this.sessionId,
@@ -371,11 +469,7 @@ export default {
     Gleap.showFeedbackButton(true)
     window.removeEventListener('resize', this.handleResize)
   },
-  /*
-   * @notes
-   * [1] Refactoring candidate: it'd be awesome if Dashboard could pass
-   *     the topic directly
-   */
+
   data() {
     return {
       auxiliaryOpen: false,
@@ -413,18 +507,11 @@ export default {
       showModerationInfractionToast: false,
     }
   },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.prevRoute = from
-    })
-  },
   computed: {
     ...mapState({
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
       user: (state) => state.user.user,
       session: (state) => state.user.session,
-      isMobileApp: (state) => state.app.isMobileApp,
-      presessionSurvey: (state) => state.user.presessionSurvey,
       auxiliaryType: (state) => state.user.session.toolType,
       isSocketConnected: (state) => state.socket.isConnected,
       productFlags: (state) => state.productFlags.flags,
@@ -588,9 +675,6 @@ export default {
 
       return this.auxiliaryOpen
     },
-    isSocketConnectionReady() {
-      return [this.isSocketConnected, this.sessionId]
-    },
     showAiWidget() {
       return (
         this.currentTutorBotConversation.conversationId &&
@@ -620,136 +704,6 @@ export default {
       }
     },
   },
-  async mounted() {
-    await this.fetchSessionAudioFlag()
-    await this.fetchScreenshareFlag()
-    const {
-      data: { isValid },
-    } = await NetworkService.getIsSubjectValid(
-      this.$route.params.subTopic,
-      this.$route.params.topic
-    )
-    if (!isValid) return this.$router.push('/dashboard')
-
-    if (this.isStudentVolunteer) {
-      if (this.isVolunteer)
-        AnalyticsService.captureEvent(
-          EVENTS.ROLE_SWITCHING_USER_JOINED_SESSION_AS_VOLUNTEER
-        )
-      else if (this.isStudent)
-        AnalyticsService.captureEvent(
-          EVENTS.ROLE_SWITCHING_USER_JOINED_SESSION_AS_STUDENT
-        )
-    }
-
-    const id = this.$route.params.sessionId
-    const assignmentId = this.$route.query.assignmentId
-
-    let promise
-
-    if (!id) {
-      let type = this.$route.params.topic
-      const options = {
-        onRetry: (res, abort) => {
-          this.showTroubleStartingModal(abort)
-        },
-        docEditorVersion: 2,
-      }
-
-      if (assignmentId) {
-        options.assignmentId = assignmentId
-      }
-
-      promise = SessionService.newSession(
-        this,
-        type,
-        this.$route.params.subTopic,
-        options
-      )
-    } else {
-      promise = SessionService.useExistingSession(this, id, {
-        onRetry: (res, abort) => {
-          this.showTroubleJoiningModal(abort)
-        },
-      })
-    }
-
-    promise
-      .then(async (sessionId) => {
-        this.sessionId = sessionId
-        this.meetingActor.actorRef.start()
-        this.meetingActor.actorRef.send({ type: 'set_session_id', sessionId })
-        this.meetingActor.actorRef.send({
-          type: 'session_started',
-          isAudioEligible: this.isSessionAudioCallEnabled,
-          isScreenshareEligible: this.isScreenshareEnabled,
-        })
-
-        const transferringFromTutorBot = Object.prototype.hasOwnProperty.call(
-          this.$route.query,
-          'tutorBotConversationId'
-        )
-        if (transferringFromTutorBot) {
-          const tutorBotConversationId =
-            this.$route.query.tutorBotConversationId
-          await NetworkService.updateTutorBotConversationWithSessionId(
-            tutorBotConversationId,
-            { conversationId: tutorBotConversationId, sessionId }
-          )
-        }
-
-        if (!id && this.isStudent)
-          AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
-            event: EVENTS.SESSION_REQUESTED,
-            sessionId,
-            subject: this.$route.params.subTopic,
-          })
-
-        // If we have a pre-session survey, submit it now
-        if (Object.keys(this.presessionSurvey).length) {
-          try {
-            await backOff(() =>
-              NetworkService.submitSurvey(
-                Object.assign({}, this.presessionSurvey, { sessionId })
-              )
-            )
-          } catch (err) {
-            LoggerService.noticeError(err)
-          }
-          this.$store.dispatch('user/clearPresessionSurvey')
-        }
-
-        // ensure we restore user when we get a successful response
-        if (!this.isAuthenticated) {
-          this.$store.dispatch('user/fetchUser')
-        }
-
-        if (!socket.connected) {
-          await socket.connect()
-        }
-        Gleap.setCustomData('sessionId', sessionId)
-
-        await this.getSessionContext(sessionId)
-
-        if (
-          (this.isVolunteer &&
-            (!this.user.isOnboarded || !this.user.isApproved)) ||
-          this.isMobileApp
-        )
-          this.showNotificationModal = false
-
-        if (getNotificationPermission() === 'default') {
-          this.showNotificationModal = true
-        }
-      })
-      .catch((err) => {
-        if (err?.response?.status !== 0 && err.code !== 'EUSERABORTED') {
-          window.alert('Could not start new help session')
-          LoggerService.noticeError(err)
-        }
-        this.$router.replace('/')
-      })
-  },
   watch: {
     moderationInfraction(newVal) {
       if (newVal) {
@@ -765,37 +719,6 @@ export default {
           secondary: `Click the speaker icon to listen`,
           fadeOutAfterMs: 6000,
         })
-      }
-    },
-    async session(session) {
-      /*
-       * Since this is only rolled out to students,
-       * we have to check to see if the student involved in this
-       * session is elgible, if they are, we can also enable it for
-       * the volunteer
-       */
-      if (session.student?.id) {
-        FeatureFlagService.isFeatureEnabledForUser(
-          POSTHOG_FEATURE_FLAGS.AI_TUTOR,
-          session.student.id
-        )
-          .then((r) => {
-            this.aiWidgetEnabled = r.isEnabled.includes('in-session')
-          })
-          .catch((err) => {
-            LoggerService.noticeError(
-              `Failed to check if AI tutor is enabled for user=${student?.id}`,
-              err
-            )
-          })
-      }
-
-      if (this.isVolunteer && session.volunteerId) {
-        this.previousSessionCountWithStudent =
-          await SessionService.getTotalSessionsForPair({
-            volunteerId: this.session.volunteerId,
-            studentId: this.session.studentId,
-          })
       }
     },
 
@@ -868,14 +791,11 @@ export default {
         this.hasUnreadAiTutorMessage = false
       }
     },
-    isSocketConnectionReady(currentValue, prevValue) {
-      const [isSocketConnected, sessionId] = currentValue
-      const [prevIsConnected] = prevValue
-      if (isSocketConnected && sessionId) {
-        this.joinSession(this.sessionId)
-      }
-
-      if (isSocketConnected && !prevIsConnected)
+    isSocketConnected(curr, prev) {
+      if (curr && !prev) {
+        if (this.sessionId) {
+          this.joinSocketSession()
+        }
         AnalyticsService.captureEvent(
           EVENTS.USER_SOCKET_IS_CONNECTED_IN_SESSION,
           {
@@ -883,7 +803,9 @@ export default {
             sessionId: this.sessionId,
           }
         )
-      if (!isSocketConnected && prevIsConnected)
+      }
+
+      if (!curr && prev) {
         AnalyticsService.captureEvent(
           EVENTS.USER_SOCKET_IS_DISCONNECTED_IN_SESSION,
           {
@@ -891,6 +813,7 @@ export default {
             sessionId: this.sessionId,
           }
         )
+      }
     },
     mobileMode(isMobileMode) {
       Gleap.showFeedbackButton(!isMobileMode)
@@ -1004,48 +927,22 @@ export default {
 
       if (this.shouldHideAuxiliarySection) this.hasSeenNewMessage = true
     },
-    async joinSession(sessionId) {
-      // await nextTick to get access to this.prevRoute and avoid a race condition
-      await this.$nextTick()
-      socket.emit(
-        'join',
-        {
-          sessionId,
-          user: this.user,
-          // helps track where volunteers are joining a session from
-          // if a volunteer joins using a URL from a text notification, resolve to an empty string
-          joinedFrom:
-            this.prevRoute && this.prevRoute.name ? this.prevRoute.name : '',
-        },
-        1
-      )
-    },
-    showTroubleStartingModal(abort) {
-      const TROUBLE_STARTING_MESSAGE = `
-        The system seems to be having a problem starting your new session.
-        Please check your Internet connection.
-      `
-
-      this.showConnectionTroubleModal(abort, TROUBLE_STARTING_MESSAGE)
-    },
-    showTroubleJoiningModal(abort) {
-      const TROUBLE_JOINING_MESSAGE = `
-        The system seems to be having a problem joining your session.
-        Please check your Internet connection.
-      `
-
-      this.showConnectionTroubleModal(abort, TROUBLE_JOINING_MESSAGE)
-    },
-    showConnectionTroubleModal(abort, message) {
-      this.$store.dispatch('app/modal/show', {
-        component: ConnectionTroubleModal,
-        data: {
-          message,
-          acceptText: 'Abort Session',
-          alertModal: true,
-          abortFunction: abort,
-        },
-      })
+    async joinSocketSession() {
+      try {
+        await backOff(() =>
+          socket.timeout(2000).emitWithAck('sessions:join', {
+            sessionId: this.sessionId,
+          })
+        )
+      } catch (err) {
+        window.alert(
+          'Unable to join session chat. Please refresh and try again.'
+        )
+        AnalyticsService.captureEvent(EVENTS.SOCKET_SESSION_JOIN_FAILED, {
+          sessionId: this.session.id,
+        })
+        LoggerService.noticeError(err)
+      }
     },
     setHasSeenNewMessage(value) {
       this.hasSeenNewMessage = value
@@ -1082,13 +979,18 @@ export default {
       this.showFallIncentiveReviewWarningModal =
         !this.showFallIncentiveReviewWarningModal
     },
-    async getSessionContext(sessionId) {
+    async getSessionContext() {
       try {
         this.isLoadingSessionMetadata = true
 
         if (this.isVolunteer) {
+          this.previousSessionCountWithStudent =
+            await SessionService.getTotalSessionsForPair({
+              volunteerId: this.session.volunteerId,
+              studentId: this.session.studentId,
+            })
           const presessionSurveyResponse =
-            await NetworkService.getPresessionSurveyResponse(sessionId)
+            await NetworkService.getPresessionSurveyResponse(this.session.id)
           this.totalStudentSessions =
             presessionSurveyResponse.data.totalStudentSessions
           this.studentPresessionResponses =
@@ -1097,7 +999,7 @@ export default {
 
         const {
           data: { assignment },
-        } = await NetworkService.getAssignmentForSession(sessionId)
+        } = await NetworkService.getAssignmentForSession(this.session.id)
         if (assignment) {
           const {
             data: { assignmentDocuments },

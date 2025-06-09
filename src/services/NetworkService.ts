@@ -92,7 +92,12 @@ export default {
       message: (res.response?.data as { err?: string })?.err,
     })
   },
-  _faultTolerantHttp(method, onRetry, url, data) {
+  _faultTolerantHttp<T>(
+    method: 'get' | 'post',
+    onRetry: Function,
+    url: string,
+    data?: T & AxiosRequestConfig<T>
+  ) {
     const promiseToRetry = () => {
       return (
         ['get', 'delete', 'head', 'jsonp'].indexOf(method) !== -1
@@ -109,12 +114,15 @@ export default {
     const requestState = { isAborted: false }
 
     return promiseRetry(
-      (retry) => {
+      async (retry: Function) => {
         if (requestState.isAborted) {
           // early exit
           throw errcode(new Error('Aborted by user'), 'EUSERABORTED')
         }
 
+        // TODO: This method isn't actually fault tolerant.
+        // afaik, we don't ever send status of 0 (not that we should),
+        // so the retry never runs, instead we immediately throw the error.
         return promiseToRetry().catch((res) => {
           if (res.status === 0) {
             if (onRetry) {
@@ -298,12 +306,30 @@ export default {
       this._errorHandler
     )
   },
-  newSession(data, onRetry) {
-    return this._faultTolerantHttp(
-      'post',
-      onRetry,
-      `${API_ROOT}/session/new`,
-      data
+  newSession(data: {
+    sessionType: string // topic
+    sessionSubTopic: string // subject
+    docEditorVersion: number
+    assignmentId?: string
+    presessionSurvey?: {
+      surveyId: number
+      surveyTypeId: number
+      submissions: Array<{
+        questionId: number
+        responseChoiceId: number
+        openResponse: string
+      }>
+    }
+  }) {
+    return httpPost(`${API_ROOT}/session/new`, data).then(
+      this._successHandler,
+      this._axiosErrorHandler
+    )
+  },
+  joinSession(data: { sessionId: string; joinedFrom?: string }) {
+    return httpPost(`${API_ROOT}/session/join`, data).then(
+      this._successHandler,
+      this._axiosErrorHandler
     )
   },
   endSession(data) {
