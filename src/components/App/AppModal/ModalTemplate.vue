@@ -26,8 +26,9 @@
           <large-button v-if="!alertModal" @click="handleCancel"
             >Cancel</large-button
           >
+          <!-- TODO: Also add an accept button on mobile. -->
           <large-button
-            primary
+            variant="primary-blue"
             @click="$emit('accept')"
             :disabled="!enableAccept ? true : null"
             v-if="showAccept"
@@ -81,7 +82,7 @@ export default {
     hasNoEscape() {
       // TODO: Have this as a prop instead.
       return [
-        'SessionFulfilledModal',
+        'SessionErrorModal',
         'StudentOnboardingModal',
         'CreateAndEditAssignmentModal',
       ].includes(this.modalComponentName)

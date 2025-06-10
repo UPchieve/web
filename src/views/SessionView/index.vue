@@ -285,9 +285,10 @@
 <script>
 import { ref, markRaw, onBeforeUnmount } from 'vue'
 import { mapState, mapGetters } from 'vuex'
+import AnalyticsService from '@/services/AnalyticsService'
+import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
 import SessionService from '@/services/SessionService'
-import AnalyticsService from '@/services/AnalyticsService'
 import SessionChatHeader from './SessionChatHeader.vue'
 import SessionChat from './SessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
@@ -316,6 +317,7 @@ import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import ModerationInfractionModal from '@/components/Moderation/ModerationInfractionModal.vue'
 import ModerationInfractionToast from '@/components/Moderation/ModerationInfractionToast.vue'
 import ModerationDisclaimerModal from '@/views/SessionView/ModerationDisclaimerModal.vue'
+import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
 import {
   hasSeenScreenShareDisclaimerThisSession,
   setHasSeenScreenShareDisclaimerThisSession,
@@ -452,9 +454,8 @@ export default {
           )
         })
     } catch (err) {
-      window.alert('Could not join session: ' + err.message)
+      ModalService.showSessionError(err.message)
       LoggerService.noticeError(err)
-      this.$router.replace('/')
     }
   },
 
@@ -978,9 +979,8 @@ export default {
         if (this.joinSocketSessionAbortController.signal.aborted) {
           return
         }
-
-        window.alert(
-          'Unable to join session chat. Please refresh and try again.'
+        ModalService.showSessionError(SessionErrorType.SESSION_CHAT_ERROR, () =>
+          this.$router.go(0)
         )
         AnalyticsService.captureEvent(EVENTS.SOCKET_SESSION_JOIN_FAILED, {
           sessionId: this.session.id,

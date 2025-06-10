@@ -3,7 +3,6 @@ import router from '@/router'
 import { socket } from '@/socket'
 import type { RootState } from '@/store/index'
 import LoggerService from '@/services/LoggerService'
-import SessionFulfilledModal from '@/views/SessionView/SessionFulfilledModal.vue'
 
 /**
  * These errors handled internally and shouldn't be forwarded to our logger.
@@ -160,29 +159,6 @@ export default {
           error ?? `Redirected from ${router.currentRoute} to the dashboard`
         )
         router.push('/')
-      })
-
-      // Emitted as error when joining a session.
-      socket.on('bump', async (data: any, err: any) => {
-        const endedAt = rootState.user.session.endedAt
-        // Do not show the session fulfilled modal if a user is already
-        // present on the page after a session has ended
-        if (!endedAt) {
-          dispatch(
-            'app/modal/show',
-            {
-              component: SessionFulfilledModal,
-              data: {
-                acceptText: 'Return to Dashboard',
-                alertModal: true,
-                error: err,
-                sessionStudentId: data.student,
-                sessionVolunteerId: data.volunteer,
-              },
-            },
-            { root: true }
-          )
-        }
       })
 
       socket.on('session-change', (sessionData: any) => {

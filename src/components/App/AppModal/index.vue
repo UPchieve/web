@@ -1,4 +1,5 @@
 <template>
+  <!-- To simplify, we could just bring the ModalTemplate into this component. -->
   <modal-template
     v-on:cancel="onCancel"
     v-on:accept="onAccept"
@@ -29,7 +30,6 @@ import UpgradeAppModal from './UpgradeAppModal.vue'
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal.vue'
 import ReferralModal from '@/views/DashboardView/ReferralModal.vue'
-import SessionFulfilledModal from '@/views/SessionView/SessionFulfilledModal.vue'
 import VolunteerOnboardingModal from '@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue'
 import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
 import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
@@ -49,7 +49,6 @@ export default {
     NotificationsModal,
     ReferralModal,
     AmbassadorReferralModal,
-    SessionFulfilledModal,
     VolunteerOnboardingModal,
     UpgradeAppModal,
     ReportSessionModal,

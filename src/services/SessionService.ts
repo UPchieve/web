@@ -3,6 +3,7 @@ import router from '@/router'
 import store from '@/store'
 import AnalyticsService from './AnalyticsService'
 import NetworkService from './NetworkService'
+import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
 
 export type Session = any
@@ -42,7 +43,7 @@ export default {
       data: { isValid },
     } = await NetworkService.getIsSubjectValid(subTopic, topic)
     if (!isValid) {
-      throw new Error('Invalid subject and topic.')
+      throw new Error(SessionErrorType.INVALID_SUBJECT_TOPIC)
     }
 
     if (sessionId) {
