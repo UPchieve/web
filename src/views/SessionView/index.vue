@@ -88,7 +88,7 @@
             getDisplayMediaSupported &&
             meetingHasNotEnded
           "
-          @toggleScreenShareWindow="toggleScreenShareWindow"
+          @clickedShareScreen="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
@@ -104,7 +104,7 @@
           :isScreenShareEnabled="
             isSessionInProgress && isScreenshareEnabled && meetingHasNotEnded
           "
-          @toggleScreenShareWindow="toggleScreenShareWindow"
+          @clickedShareScreen="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
@@ -253,6 +253,12 @@
         />
       </div>
     </div>
+    <ModerationDisclaimerModal
+      v-if="showScreenShareDisclaimer"
+      :isOpen="showScreenShareDisclaimer"
+      @accept="onAcceptScreenShareTerms"
+      @cancel="onDeclineScreenShareTerms"
+    />
     <web-notifications-modal
       v-if="showNotificationModal"
       :closeModal="() => setShowNotificationModal(false)"
@@ -309,11 +315,17 @@ import * as MeetingMachine from '@/state-machines/meeting-machine'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import ModerationInfractionModal from '@/components/Moderation/ModerationInfractionModal.vue'
 import ModerationInfractionToast from '@/components/Moderation/ModerationInfractionToast.vue'
+import ModerationDisclaimerModal from '@/views/SessionView/ModerationDisclaimerModal.vue'
+import {
+  hasSeenScreenShareDisclaimerThisSession,
+  setHasSeenScreenShareDisclaimerThisSession,
+} from '@/utils/session'
 
 const meetingActor = ref(null)
 export default {
   name: 'session-view',
   components: {
+    ModerationDisclaimerModal,
     ModerationInfractionToast,
     ModerationInfractionModal,
     ScreenShare,
@@ -505,6 +517,7 @@ export default {
       meetingActor,
       showModerationInfractionModal: false,
       showModerationInfractionToast: false,
+      showScreenShareDisclaimer: false,
     }
   },
   computed: {
@@ -839,6 +852,20 @@ export default {
     },
   },
   methods: {
+    startScreenShare() {
+      this.meetingActor.send({ type: 'share_screen' })
+    },
+    stopScreenShare() {
+      this.meetingActor.send({ type: 'stop_share_screen' })
+    },
+    onAcceptScreenShareTerms() {
+      this.showScreenShareDisclaimer = false
+      setHasSeenScreenShareDisclaimerThisSession()
+      this.startScreenShare()
+    },
+    onDeclineScreenShareTerms() {
+      this.showScreenShareDisclaimer = false
+    },
     toggleModerationInfractionModal() {
       if (this.auxiliaryOpen && this.isMobileLandscape) {
         // Workaround until mobile small screen landscape is fixed
@@ -863,10 +890,13 @@ export default {
     },
     toggleScreenShareWindow() {
       if (this.screenShareActive) {
-        // TODO could makea toggle_screen_share event to get rid of this conditional
-        this.meetingActor.send({ type: 'stop_share_screen' })
+        this.stopScreenShare()
       } else {
-        this.meetingActor.send({ type: 'share_screen' })
+        if (!hasSeenScreenShareDisclaimerThisSession()) {
+          this.showScreenShareDisclaimer = true
+        } else {
+          this.startScreenShare()
+        }
       }
     },
     async fetchSessionAudioFlag() {

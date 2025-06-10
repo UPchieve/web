@@ -348,7 +348,7 @@ export default {
           userType: this.userType,
         }
       )
-      this.$emit('toggleScreenShareWindow')
+      this.$emit('clickedShareScreen')
     },
     quillTextChange(update, origin, doc) {
       // Only emit changes that are made in this component

@@ -52,3 +52,18 @@ export const endSession = (context) => {
     })
     .catch(() => window.alert('Could not end session'))
 }
+
+function getScreenShareDisclaimerLocalStorageKey() {
+  return `ACCEPTED_SCREENSHARE_TERMS`
+}
+
+export function hasSeenScreenShareDisclaimerThisSession() {
+  return !!sessionStorage.getItem(getScreenShareDisclaimerLocalStorageKey())
+}
+
+export function setHasSeenScreenShareDisclaimerThisSession() {
+  return sessionStorage.setItem(
+    getScreenShareDisclaimerLocalStorageKey(),
+    'true'
+  )
+}

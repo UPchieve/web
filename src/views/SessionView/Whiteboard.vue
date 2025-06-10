@@ -711,7 +711,7 @@ export default {
       initialNodesLoaded: false,
     }
   },
-  emits: ['toggleAiWidget', 'toggleScreenShareWindow'],
+  emits: ['toggleAiWidget', 'clickedShareScreen'],
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -785,7 +785,7 @@ export default {
         }
       )
       this.usePickTool()
-      this.$emit('toggleScreenShareWindow')
+      this.$emit('clickedShareScreen')
     },
     toggleScreenShareErrorTooltip() {
       this.screenShareErrorTooltipOpen = !this.screenShareErrorTooltipOpen

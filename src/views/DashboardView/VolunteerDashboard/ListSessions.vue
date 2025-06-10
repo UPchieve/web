@@ -37,7 +37,10 @@
         </tr>
       </tbody>
     </table>
-    <div class="no-students-message-container" v-if="!sortedOpenSessions?.length">
+    <div
+      class="no-students-message-container"
+      v-if="!sortedOpenSessions?.length"
+    >
       Currently there are no students waiting for help.
       <div
         v-if="isBecomeAnAmbassadorCtaEnabled && isVolunteer && !isAmbassador"
