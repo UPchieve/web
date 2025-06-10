@@ -112,7 +112,16 @@
       </sidebar-link>
 
       <sidebar-link
-        v-if="isVolunteer"
+        v-if="isVolunteer && isBecomeAnAmbassadorCtaEnabled"
+        :onClick="openAmbassadorReferralModal"
+        text="Level Up Impact"
+        id="volunteer-referral-sidebar-link"
+      >
+        <refer-friend-icon class="icon" />
+      </sidebar-link>
+
+      <sidebar-link
+        v-if="isVolunteer && !isBecomeAnAmbassadorCtaEnabled"
         :onClick="openReferFriendModal"
         text="Invite a Friend"
         id="volunteer-referral-sidebar-link"
@@ -221,6 +230,8 @@ export default {
       isTeacher: 'user/isTeacher',
       isAiTutorActive: 'featureFlags/aiTutor',
       userType: 'user/userType',
+      isBecomeAnAmbassadorCtaEnabled:
+        'featureFlags/isBecomeAnAmbassadorCtaEnabled',
     }),
     isStandaloneAiEnabled() {
       return (
@@ -241,6 +252,18 @@ export default {
       )
       this.$store.dispatch('app/modal/show', {
         component: 'ReferralModal',
+        data: {
+          showAccept: false,
+        },
+      })
+    },
+    openAmbassadorReferralModal() {
+      AnalyticsService.captureEvent(
+        EVENTS.USER_CLICKED_LEVEL_UP_IMPACT_SIDEBAR_LINK,
+        { userType: this.userType }
+      )
+      this.$store.dispatch('app/modal/show', {
+        component: 'AmbassadorReferralModal',
         data: {
           showAccept: false,
         },
