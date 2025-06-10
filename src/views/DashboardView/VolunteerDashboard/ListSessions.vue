@@ -3,10 +3,7 @@
     <div v-if="hasError" class="session-list__error">
       <p>Failed to load a list of students. Please try refreshing</p>
     </div>
-    <table
-      v-else-if="sortedOpenSessions?.length || !isBecomeAnAmbassadorCtaEnabled"
-      class="table table-striped table-hover"
-    >
+    <table class="table table-striped table-hover">
       <thead>
         <tr>
           <th scope="col">Student</th>
@@ -40,16 +37,21 @@
         </tr>
       </tbody>
     </table>
-    <div
-      v-else-if="isBecomeAnAmbassadorCtaEnabled && isVolunteer && !isAmbassador"
-      class="become-an-ambassador-container"
-    >
+    <div class="no-students-message-container" v-if="!sortedOpenSessions?.length">
       Currently there are no students waiting for help.
-      <div id="no-students-ambassador-message">
-        <button class="ambassador-button" @click="openAmbassadorReferralModal">
-          Still want to earn volunteer hours?<br />
-          <strong>Become an UPchieve Ambassador!</strong>
-        </button>
+      <div
+        v-if="isBecomeAnAmbassadorCtaEnabled && isVolunteer && !isAmbassador"
+      >
+        <div id="no-students-ambassador-message">
+          While you wait, you can still earn volunteer hours by
+          <button
+            class="ambassador-button"
+            @click="openAmbassadorReferralModal"
+          >
+            <strong>becoming an UPchieve Ambassador!</strong>
+            <ArrowIcon class="arrow-icon" />
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -60,6 +62,7 @@ import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import ArrowIcon from '@/assets/arrow.svg'
 
 export default {
   name: 'ListSessions',
@@ -69,6 +72,7 @@ export default {
       hasError: false,
     }
   },
+  components: { ArrowIcon },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
@@ -175,7 +179,7 @@ thead {
   white-space: nowrap;
 }
 
-.become-an-ambassador-container {
+.no-students-message-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -184,12 +188,23 @@ thead {
 
   .ambassador-button {
     color: $c-information-blue;
+    display: inline-flex;
+    align-items: center;
   }
 }
 
 #no-students-ambassador-message {
   button {
-    line-height: 1.5;
+    line-height: 2;
+    color: $c-success-green;
   }
+}
+
+.arrow-icon {
+  fill: $c-success-green;
+  height: 16px;
+  width: 16px;
+  margin-top: 2px;
+  margin-left: 8px;
 }
 </style>
