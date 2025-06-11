@@ -4,6 +4,7 @@ import config from '../config'
 import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
+import type { Session } from '@/services/SessionService'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -322,16 +323,16 @@ export default {
       }>
     }
   }) {
-    return httpPost(`${API_ROOT}/session/new`, data).then(
+    return httpPost<{ session: Session }>(`${API_ROOT}/session/new`, data).then(
       this._successHandler,
       this._axiosErrorHandler
     )
   },
   joinSession(data: { sessionId: string; joinedFrom?: string }) {
-    return httpPost(`${API_ROOT}/session/join`, data).then(
-      this._successHandler,
-      this._axiosErrorHandler
-    )
+    return httpPost<{ session: Session }>(
+      `${API_ROOT}/session/join`,
+      data
+    ).then(this._successHandler, this._axiosErrorHandler)
   },
   endSession(data) {
     return httpPost(`${API_ROOT}/session/end`, data).then(
@@ -972,7 +973,7 @@ export default {
     )
   },
   getIsSubjectValid(subject, topic) {
-    return httpGet(
+    return httpGet<{ isValid: boolean }>(
       `${API_ROOT}/subjects/is-valid?subject=${subject}&topic=${topic}`
     ).then(this._successHandler, this._errorHandler)
   },

@@ -5,7 +5,7 @@ import AnalyticsService from './AnalyticsService'
 import NetworkService from './NetworkService'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
 
-type Session = any
+export type Session = any
 
 function isAbsentUser(session: Record<string, any>) {
   const { student, volunteer } = session
