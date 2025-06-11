@@ -358,15 +358,16 @@ export default {
       const now = Date.now()
       const presenceKey = 'lastVolunteerPresenceNotificationAt'
       const lastNotifiedAt = localStorage.getItem(presenceKey)
-      const oneDayInMs = 1000 * 60 * 60 * 24
-      const tenMinutesInMs = 1000 * 60 * 10
+      const sixHoursInMs = 1000 * 60 * 60 * 6
+      const fiveMinutesInMs = 1000 * 60 * 5
       const hasRecentNotification =
-        lastNotifiedAt && now - new Date(lastNotifiedAt).getTime() < oneDayInMs
+        lastNotifiedAt &&
+        now - new Date(lastNotifiedAt).getTime() < sixHoursInMs
 
       const hasNoCurrentOrRecentSession =
         isEmpty(this.currentSession) &&
         this.latestSession?.createdAt &&
-        new Date(this.latestSession.createdAt).getTime() < now - tenMinutesInMs
+        new Date(this.latestSession.createdAt).getTime() < now - fiveMinutesInMs
 
       const hasRequestedSubjects = this.user?.latestRequestedSubjects.length > 0
       const hasPermissionGranted = getNotificationPermission() === 'granted'
@@ -417,10 +418,10 @@ export default {
     },
     scheduleVolunteerPresenceNotification() {
       // Trigger notification after student has spent some time on the dashboard
-      const fiveMinutesInMS = 1000 * 60 * 5
+      const twoMinutesInMS = 1000 * 60 * 2
       setTimeout(() => {
         this.maybeTriggerVolunteerPresenceNotification()
-      }, fiveMinutesInMS)
+      }, twoMinutesInMS)
     },
     async processImpactStudySurvey() {
       let didResetForNewSurvey = false
