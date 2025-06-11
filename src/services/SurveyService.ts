@@ -27,7 +27,6 @@ export type SurveyDefinition = {
   surveyId: number
   surveyTypeId: number
   survey: SurveyQuestionDefinition[]
-  rewardAmount?: number
 }
 
 export type SurveyUserQuestionResponse = {
@@ -81,7 +80,6 @@ function extractSurveyFromResponse(
       survey: data.survey,
       surveyId: data.surveyId,
       surveyTypeId: data.surveyTypeId,
-      rewardAmount: data.rewardAmount,
     }
 
   const nestedSurvey = data.survey
@@ -95,11 +93,17 @@ function extractSurveyFromResponse(
       survey: nestedSurvey.survey,
       surveyId: nestedSurvey.surveyId,
       surveyTypeId: nestedSurvey.surveyTypeId,
-      rewardAmount: nestedSurvey.rewardAmount,
     }
   }
 
   throw new Error('Invalid survey response structure')
+}
+
+export async function getSurveyById(
+  surveyId: number
+): Promise<SurveyDefinition> {
+  const response = await NetworkService.getSurveyById(surveyId)
+  return extractSurveyFromResponse(response)
 }
 
 export async function getPresessionSurvey(

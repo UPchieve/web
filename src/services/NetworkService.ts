@@ -3,6 +3,7 @@ import promiseRetry from 'promise-retry'
 import config from '../config'
 import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
+import type { ImpactStudyCampaign } from '@/types'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -22,7 +23,7 @@ const grecaptcha = window.grecaptcha
 
 export type NetworkError = {
   status: number
-  msg: string
+  message: string
 }
 
 export const axiosInstance = axios.create({
@@ -867,6 +868,12 @@ export default {
       this._errorHandler
     )
   },
+  getSurveyById(surveyId: number) {
+    return httpGet(`${API_ROOT}/surveys/${surveyId}`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   getPresessionSurvey(subjectName) {
     return httpGet(`${API_ROOT}/survey/presession?subject=${subjectName}`).then(
       this._successHandler,
@@ -1156,11 +1163,6 @@ export default {
       `${API_ROOT}/product-flags/fall-incentive-enrollment/denied`
     ).then(this._successHandler, this._errorHandler)
   },
-  impactStudyEnrollment(surveyId) {
-    return httpPost(`${API_ROOT}/product-flags/impact-study`, {
-      surveyId,
-    }).then(this._successHandler, this._errorHandler)
-  },
   setTellThemCollegePrepModalSeenAt() {
     return httpPost(
       `${API_ROOT}/product-flags/tell-them-college-prep-modal`,
@@ -1292,5 +1294,16 @@ export default {
     return httpPost<void>(`${API_ROOT}/user/preferred-language`, {
       preferredLanguage,
     }).catch(this._axiosErrorHandler)
+  },
+  async upsertImpactStudyCampaign(campaign: ImpactStudyCampaign) {
+    try {
+      return await httpPost<{ impactStudyEnrollmentAt?: Date }>(
+        `${API_ROOT}/product-flags/impact-study-campaigns`,
+        { campaign }
+      )
+    } catch (err) {
+      //  TODO: Error handling and throwing will probably need to be centralized in the `http*` methods (httpGet, httpPost, etc.)
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
 }

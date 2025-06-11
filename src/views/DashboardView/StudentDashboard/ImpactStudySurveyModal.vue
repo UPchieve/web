@@ -11,12 +11,11 @@ import Modal from '@/components/Modal.vue'
 import FormEmail from '@/components/FormEmail.vue'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 import Loader from '@/components/Loader.vue'
-import { useSurvey } from '@/composables/useSurvey'
 import { useVerification } from '@/composables/useVerification'
 import { useStepper } from '@/composables/useStepper'
 import AnalyticsService from '@/services/AnalyticsService'
 import FeatureFlagService from '@/services/FeatureFlagService'
-import { SURVEY_TYPES } from '@/services/SurveyService'
+import NetworkService from '@/services/NetworkService'
 
 type ModalView = 'intro' | 'email-verify' | ''
 type EmailVerifyModalView = 'proxy' | 'email' | ''
@@ -26,14 +25,15 @@ const props = defineProps({
     type: Function,
     required: true,
   },
+  impactStudyCampaignId: {
+    type: String,
+    required: true,
+  },
 })
 
 const store = useStore()
 const $router = useRouter()
 const v$ = useVuelidate()
-const { surveyRewardAmount, initializeSurvey } = useSurvey({
-  surveyType: SURVEY_TYPES.IMPACT_STUDY,
-})
 const {
   proxyEmail,
   email,
@@ -47,7 +47,7 @@ const {
   updateVerificationType,
 } = useVerification()
 
-const totalSteps = 2
+const totalSteps = ref<number>(2)
 const { currentStep, nextStep, goToStep } = useStepper(totalSteps)
 
 const modalView = ref<ModalView>('')
@@ -58,18 +58,19 @@ const isSubmitting = ref(false)
 const loadingMessage = ref('')
 
 const user = computed(() => store.state.user.user)
+const productFlags = computed(() => store.state.productFlags.flags)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
+const impactStudyCampaign = computed(
+  () =>
+    productFlags.value.impactStudyCampaigns[props.impactStudyCampaignId] ??
+    undefined
+)
+const surveyRewardAmount = computed(() =>
+  impactStudyCampaign.value ? impactStudyCampaign.value.rewardAmount : 0
+)
 const isValidInput = computed(
   () => !v$.value.$error && !v$.value.$silentErrors?.length
 )
-
-const impactStudySurveyModalViewCount = computed(() => {
-  const viewCount = parseInt(
-    localStorage.getItem('impactStudySurveyModalViewCount') ?? ''
-  )
-  if (!isNaN(viewCount)) return viewCount
-  else return 0
-})
 
 const isEmailNeeded = computed(() => {
   return (
@@ -137,29 +138,51 @@ function handleViewFromIntroView() {
 
 function goToSurveyPage() {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_VIEW_IMPACT_STUDY_SURVEY)
-  $router.push('/surveys/impact-study')
+  const surveyId = impactStudyCampaign.value?.surveyId
+  if (!surveyId) {
+    props.closeModal()
+    return
+  }
+
+  $router.push(`/surveys/impact-study/${surveyId}`)
 }
 
-function handleModalViewCount() {
-  const updatedModalViewCount = impactStudySurveyModalViewCount.value + 1
-  localStorage.setItem(
-    'impactStudySurveyModalViewCount',
-    String(updatedModalViewCount)
-  )
-  AnalyticsService.captureEvent(
-    EVENTS.STUDENT_IMPACT_STUDY_SURVEY_MODAL_SHOWN,
-    {
-      $set: { impactStudySurveyModalViewCount: updatedModalViewCount },
+async function handleModalViewCount() {
+  const campaignId = props.impactStudyCampaignId
+  const campaigns = productFlags.value.impactStudyCampaigns
+  const campaign = campaigns[campaignId]
+  if (!campaign) return
+
+  try {
+    const updatedCampaign = {
+      ...campaign,
+      viewCount: campaign.viewCount + 1,
     }
-  )
-  FeatureFlagService.setPersonPropertiesForFlags({
-    impactStudySurveyModalViewCount: updatedModalViewCount,
-  })
+    await NetworkService.upsertImpactStudyCampaign(updatedCampaign)
+
+    const updatedCampaigns = {
+      ...campaigns,
+      [campaignId]: updatedCampaign,
+    }
+    store.commit('productFlags/setImpactStudyCampaigns', updatedCampaigns)
+    FeatureFlagService.setPersonPropertiesForFlags({
+      [`impactStudySurveyModalViewCount--${campaignId}`]:
+        updatedCampaign.viewCount,
+    })
+    AnalyticsService.captureEvent(
+      EVENTS.STUDENT_IMPACT_STUDY_SURVEY_MODAL_SHOWN,
+      {
+        campaignId,
+        viewCount: updatedCampaign.viewCount,
+      }
+    )
+  } catch (err) {
+    error.value = (err as Error).message
+  }
 }
 
 onMounted(async () => {
   try {
-    await initializeSurvey()
     handleModalViewCount()
     modalView.value = 'intro'
   } catch (err) {
@@ -200,12 +223,19 @@ watch(modalView, () => {
         <section>
           <updog-star-icon class="updog" />
           <h1 class="impact-study-modal__title">
-            Take our 5 min survey and earn ${{ surveyRewardAmount }}
+            Take our 5 min survey
+            {{ surveyRewardAmount ? ` and earn $${surveyRewardAmount}` : '' }}
           </h1>
 
           <p class="impact-study-modal__subtitle">
             Help UPchieve learn how we can help students like you improve their
-            grades. We'll send you a ${{ surveyRewardAmount }} visa gift card!
+            grades.
+            {{
+              surveyRewardAmount
+                ? ` We'll send you a $${surveyRewardAmount}
+            visa gift card!`
+                : ''
+            }}
           </p>
         </section>
 
@@ -240,10 +270,14 @@ watch(modalView, () => {
       <div v-if="currentStep === 1" class="impact-study-verification">
         <header>
           <h1 class="impact-study-modal__title">
-            Verify your personal email before earning ${{ surveyRewardAmount }}!
+            Verify your personal email
+            {{
+              surveyRewardAmount ? ` before earning $${surveyRewardAmount}` : ''
+            }}
           </h1>
-          <p class="impact-study-modal__subtitle">
-            We'll send your $10 gift card to your personal email
+          <p v-if="surveyRewardAmount" class="impact-study-modal__subtitle">
+            We'll send your ${{ surveyRewardAmount }} gift card to your personal
+            email
           </p>
         </header>
 

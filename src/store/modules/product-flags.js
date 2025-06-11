@@ -7,6 +7,8 @@ export default {
   },
   mutations: {
     setUserProductFlags: (state, flags) => (state.flags = flags),
+    setImpactStudyCampaigns: (state, campaigns) =>
+      (state.flags.impactStudyCampaigns = campaigns),
   },
   actions: {
     async getUserProductFlags({ commit }) {

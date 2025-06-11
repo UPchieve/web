@@ -47,46 +47,6 @@ function isSelected(response: SurveyResponseDefinition) {
       userResponse.value.openResponse === response.responseText
     )
 }
-
-function isGpaQuestion(question: string) {
-  return question === `What is your current high school GPA?`
-}
-
-function isLowestGradeQuestion(question: string) {
-  return question === `What's your lowest grade this semester?`
-}
-
-function isHowManyCoursesTakenQuestion(question: string) {
-  return (
-    question === `How many AP courses are you taking this year?` ||
-    question === `How many IB courses are you taking this year?` ||
-    question === `How many Dual enrollment courses are you taking this year?` ||
-    question === `How many Honors courses are you taking this year?`
-  )
-}
-
-function isNumberedResponseQuestion(question: string) {
-  return (
-    isGpaQuestion(question) ||
-    isLowestGradeQuestion(question) ||
-    isHowManyCoursesTakenQuestion(question)
-  )
-}
-
-function calculateMaxValue(question: string) {
-  if (isGpaQuestion(question)) return 5
-  if (isLowestGradeQuestion(question)) return 100
-  if (isHowManyCoursesTakenQuestion(question)) return 10
-}
-
-function calculateMinValue(question: string) {
-  if (
-    isGpaQuestion(question) ||
-    isLowestGradeQuestion(question) ||
-    isHowManyCoursesTakenQuestion(question)
-  )
-    return 0
-}
 </script>
 
 <template>
@@ -151,18 +111,13 @@ function calculateMinValue(question: string) {
       </template>
 
       <FormInput
-        v-if="
-          question.questionType === QUESTION_TYPES.freeResponse &&
-          isNumberedResponseQuestion(question.questionText)
-        "
+        v-if="question.questionType === QUESTION_TYPES.number"
         :modelValue="userResponse.openResponse"
         @update:modelValue="
           (response) =>
             updateUserResponse(question.questionId, undefined, response)
         "
         type="number"
-        :maxValue="calculateMaxValue(question.questionText)"
-        :minValue="calculateMinValue(question.questionText)"
         :name="'response-' + question.questionId"
         :testid="'response-' + question.questionId"
         :isRequired="true"

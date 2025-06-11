@@ -5,6 +5,7 @@ import { EVENTS, QUESTION_TYPES } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import {
+  getSurveyById,
   getPostsessionSurvey,
   getPresessionSurvey,
   getImpactStudySurvey,
@@ -17,11 +18,13 @@ import type {
   SurveyQuestionDefinition,
   SurveyUserResponsesMap,
 } from '@/services/SurveyService'
-import { impactStudyEnrollment } from '@/services/UserProductFlagsService'
+import { processImpactStudySurveySubmission } from '@/services/UserProductFlagsService'
 import { getImpactStudyCacheKey } from '@/utils/cache-keys'
+import FeatureFlagService from '@/services/FeatureFlagService'
 
 type UseSurveyPayload = {
   surveyType: SURVEY_TYPES
+  surveyId?: number
   subject?: string
   sessionId?: string
   role?: string
@@ -35,11 +38,22 @@ export function useSurvey(data: UseSurveyPayload) {
   const survey = ref<SurveyQuestionDefinition[]>([])
   const surveyId = ref<number | undefined>(undefined)
   const surveyTypeId = ref<number | undefined>(undefined)
-  const surveyRewardAmount = ref(0)
   const userResponses = ref<SurveyUserResponsesMap>({})
   const initialUserResponses = ref<SurveyUserResponsesMap>({})
   const store = useStore()
   const user = computed(() => store.state.user.user)
+  const productFlags = computed(() => store.state.productFlags.flags)
+  const getImpactStudySurveyPayload = computed(
+    () => store.getters['featureFlags/getImpactStudySurveyPayload']
+  )
+  const impactStudyCampaign = computed(() => {
+    const flags = productFlags.value?.impactStudyCampaigns ?? {}
+    const campaignId = getImpactStudySurveyPayload?.value?.campaignId
+    return flags[campaignId]
+  })
+  const impactStudySurveyRewardAmount = computed(() => {
+    return impactStudyCampaign.value?.rewardAmount ?? 0
+  })
   const impactStudyCacheKey = computed(() =>
     getImpactStudyCacheKey(user.value.id)
   )
@@ -85,8 +99,9 @@ export function useSurvey(data: UseSurveyPayload) {
     localStorage.setItem(
       impactStudyCacheKey.value,
       JSON.stringify({
-        rewardAmount: surveyRewardAmount.value,
         responses: userResponses,
+        rewardAmount: impactStudySurveyRewardAmount.value,
+        surveyId: impactStudyCampaign.value.surveyId,
       })
     )
   }
@@ -184,6 +199,8 @@ export function useSurvey(data: UseSurveyPayload) {
   }
 
   function getSurveyDefinition() {
+    if (data.surveyId) return getSurveyById(data.surveyId)
+
     switch (data.surveyType) {
       case SURVEY_TYPES.PRESESSION:
         if (!data.subject)
@@ -211,13 +228,11 @@ export function useSurvey(data: UseSurveyPayload) {
         survey.value = data.initialSurvey.survey
         surveyId.value = data.initialSurvey.surveyId
         surveyTypeId.value = data.initialSurvey.surveyTypeId
-        surveyRewardAmount.value = data.initialSurvey.rewardAmount ?? 0
       } else {
         const surveyDefinition = await getSurveyDefinition()
         survey.value = surveyDefinition.survey
         surveyId.value = surveyDefinition.surveyId
         surveyTypeId.value = surveyDefinition.surveyTypeId
-        surveyRewardAmount.value = surveyDefinition.rewardAmount ?? 0
       }
       buildUserResponse()
     } catch (err) {
@@ -250,7 +265,24 @@ export function useSurvey(data: UseSurveyPayload) {
         surveyType: data.surveyType,
       })
       if (isImpactStudySurvey.value) {
-        await impactStudyEnrollment(store, surveyId.value)
+        const campaign = impactStudyCampaign.value
+        const campaignId = campaign.id
+        const campaigns = productFlags.value.campaigns
+        const updatedCampaign = {
+          ...campaign,
+          submittedAt: new Date(),
+        }
+        await processImpactStudySurveySubmission(store, updatedCampaign)
+
+        const updatedCampaigns = {
+          ...campaigns,
+          [campaignId]: updatedCampaign,
+        }
+        store.commit('productFlags/setImpactStudyCampaigns', updatedCampaigns)
+
+        FeatureFlagService.setPersonPropertiesForFlags({
+          [`impactStudySurveySubmitted--${campaignId}`]: true,
+        })
         localStorage.removeItem(impactStudyCacheKey.value)
       }
     } catch (err) {
@@ -267,7 +299,7 @@ export function useSurvey(data: UseSurveyPayload) {
     survey,
     surveyId,
     surveyTypeId,
-    surveyRewardAmount,
+    impactStudySurveyRewardAmount,
     isSubmitting,
     error,
     loadingMessage,

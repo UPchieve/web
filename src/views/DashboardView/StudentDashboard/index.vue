@@ -31,10 +31,14 @@
         v-if="impactStudySurveyCache"
         class="dashboard-notice"
         :class="'dashboard-notice--info'"
-        routeTo="/surveys/impact-study"
-        >You almost earned ${{ impactStudySurveyCache.rewardAmount }}! Finish up
-        your survey <arrow-icon></arrow-icon
-      ></large-button>
+        :routeTo="`/surveys/impact-study/${impactStudySurveyCache.surveyId}`"
+        >{{
+          impactStudySurveyCache.rewardAmount
+            ? `You almost earned $${impactStudySurveyCache.rewardAmount}!`
+            : ''
+        }}
+        Finish up your survey <arrow-icon
+      /></large-button>
     </div>
 
     <tell-them-college-prep-modal
@@ -52,8 +56,9 @@
       :isFirstModalView="fallIncentiveProgramModalViewCount === 0"
     />
     <impact-study-survey-modal
-      v-if="showImpactStudySurvey"
-      :closeModal="toggleImpactStudySurvey"
+      v-if="showImpactStudySurveyModal"
+      :closeModal="toggleImpactStudySurveyModal"
+      :impactStudyCampaignId="impactStudySurveyCampaignId"
     />
     <secondary-email-modal
       v-if="showSecondaryEmailModal"
@@ -94,7 +99,6 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
-import FeatureFlagService from '@/services/FeatureFlagService'
 import { EVENTS, POSTHOG_FEATURE_FLAGS } from '@/consts'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -200,6 +204,15 @@ export default {
       this.isSelectingPreferredLanguageEnabled
     )
       this.showSelectPreferredLanguageModal = true
+
+    if (this.hadASession) {
+      await this.processImpactStudySurvey()
+      // TODO: Replace `hadASession` with a more reliable session check (e.g. comparing session IDs),
+      // since it's currently used more like `justHadASession` to trigger side effects when the user
+      // finishes a session and returns to the dashboard
+      // We have to reset here so that this isn't triggered on every dashboard view
+      this.$store.dispatch('user/updateHadASession', false)
+    }
   },
   data() {
     return {
@@ -208,9 +221,10 @@ export default {
       showFallIncentiveEnrollmentModal: false,
       assignments: [],
       onboardingFrames: [],
-      showImpactStudySurvey: false,
+      showImpactStudySurveyModal: false,
       dismissedSecondaryEmailModal: false,
       showSelectPreferredLanguageModal: false,
+      impactStudySurveyCampaignId: '',
     }
   },
   computed: {
@@ -241,6 +255,7 @@ export default {
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
       isSelectingPreferredLanguageEnabled:
         'featureFlags/isSelectingPreferredLanguageEnabled',
+      getImpactStudySurveyPayload: 'featureFlags/getImpactStudySurveyPayload',
       isMobileMode: 'app/mobileMode',
       isSecondaryEmailOnProfilePageEnabled:
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
@@ -339,8 +354,8 @@ export default {
       this.showFallIncentiveEnrollmentModal =
         !this.showFallIncentiveEnrollmentModal
     },
-    toggleImpactStudySurvey() {
-      this.showImpactStudySurvey = !this.showImpactStudySurvey
+    toggleImpactStudySurveyModal() {
+      this.showImpactStudySurveyModal = !this.showImpactStudySurveyModal
     },
     toggleSelectPreferredLanguageModal() {
       this.showSelectPreferredLanguageModal =
@@ -424,51 +439,38 @@ export default {
       }, twoMinutesInMS)
     },
     async processImpactStudySurvey() {
-      let didResetForNewSurvey = false
-      if (
-        this.productFlags.impactStudyEnrollmentAt &&
-        this.isImpactStudySurveyEnabled
-      ) {
-        try {
-          const [{ data: currentSurveyData }, { data: surveyResponseData }] =
-            await Promise.all([
-              NetworkService.getImpactStudySurvey(),
-              NetworkService.getImpactStudySurveyResponses(),
-            ])
-          // User has already filled out the survey
-          if (currentSurveyData.surveyId === surveyResponseData?.surveyId)
-            return
+      try {
+        const payload = this.getImpactStudySurveyPayload
+        if (!payload || !Object.keys(payload).length) return
 
-          const isNewImpactStudySurveyForUser =
-            currentSurveyData.surveyId !== surveyResponseData.surveyId
-          if (isNewImpactStudySurveyForUser) {
-            const currentSurveyId = currentSurveyData.surveyId
-            const lastResetSurveyId =
-              Number(localStorage.getItem('lastImpactStudySurveyId')) || 0
-
-            // If this is the first time seeing the new survey, reset view count
-            if (currentSurveyId !== lastResetSurveyId) {
-              localStorage.setItem('lastImpactStudySurveyId', currentSurveyId)
-              localStorage.removeItem('impactStudySurveyModalViewCount')
-              AnalyticsService.captureEvent(
-                EVENTS.STUDENT_IMPACT_STUDY_NEW_SURVEY_RECEIVED,
-                {
-                  $set: { impactStudySurveyModalViewCount: 0 },
-                }
-              )
-              FeatureFlagService.setPersonPropertiesForFlags({
-                impactStudySurveyModalViewCount: 0,
-              })
-              didResetForNewSurvey = true
-            }
+        const { campaignId, surveyId, maxViewCount, rewardAmount, launchedAt } =
+          payload
+        if (!campaignId) return
+        const campaigns = this.productFlags.impactStudyCampaigns
+        let campaign = campaigns[campaignId]
+        if (!campaign) {
+          localStorage.removeItem(getImpactStudyCacheKey(this.user.id))
+          campaign = {
+            id: campaignId,
+            surveyId,
+            viewCount: 0,
+            maxViewCount,
+            rewardAmount,
+            createdAt: new Date(),
+            launchedAt,
           }
-        } catch (error) {
-          LoggerService.noticeError(error)
-        }
-      }
 
-      if (this.isImpactStudySurveyEnabled || didResetForNewSurvey)
-        this.showImpactStudySurvey = true
+          await NetworkService.upsertImpactStudyCampaign(campaign)
+          campaigns[campaignId] = campaign
+          this.$store.commit('productFlags/setImpactStudyCampaigns', campaigns)
+        }
+
+        if (campaign.submittedAt || campaign.viewCount >= maxViewCount) return
+        this.impactStudySurveyCampaignId = campaignId
+        this.showImpactStudySurveyModal = true
+      } catch (error) {
+        LoggerService.noticeError(error)
+      }
     },
   },
   watch: {
@@ -501,9 +503,11 @@ export default {
           this.showTellThemCollegePrepModal = true
         }
 
-        if (currentValue && !prevValue) await this.processImpactStudySurvey()
+        if (currentValue && !prevValue) {
+          await this.processImpactStudySurvey()
+          this.$store.dispatch('user/updateHadASession', false)
+        }
       },
-      deep: true,
     },
     userAndOrbitalSegment: {
       handler: function (currentValue, prevValue) {

@@ -64,6 +64,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
       [POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION]: '',
+      [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: {},
     },
     eligibleForChooseTutorType: false,
   },
@@ -194,6 +195,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED],
     isImpactStudySurveyEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
+    getImpactStudySurveyPayload: (state) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
     isStudentsBecomeVolunteersEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
     tutorFeedbackToTeacherQuestion: (state) =>

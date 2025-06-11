@@ -552,6 +552,12 @@ const routes = [
     meta: { protected: true },
   },
   {
+    path: '/surveys/:surveyType/:surveyId',
+    name: 'SurveysView',
+    component: SurveysView,
+    meta: { protected: true },
+  },
+  {
     path: '/clever-signin-instructions',
     name: 'CleverSigninInstructions',
     component: CleverSigninInstructions,

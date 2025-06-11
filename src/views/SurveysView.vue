@@ -8,9 +8,13 @@ import LargeButton from '@/components/LargeButton.vue'
 import { useRoute } from 'vue-router'
 import UpdogOpenArms from '@/assets/updog-open-arms.svg'
 import UpdogStarIcon from '@/assets/updog-star.svg'
+import type { SURVEY_TYPES } from '@/services/SurveyService'
 
 const route = useRoute()
-const surveyType = route.params.surveyType
+const surveyType = route.params.surveyType as SURVEY_TYPES
+const surveyId = route.params.surveyId
+  ? Number(route.params.surveyId)
+  : undefined
 const {
   survey,
   userResponses,
@@ -20,9 +24,10 @@ const {
   updateUserResponse,
   updateUserResponseMultiselect,
   isImpactStudySurvey,
-  surveyRewardAmount,
+  impactStudySurveyRewardAmount,
 } = useSurvey({
   surveyType,
+  surveyId,
 })
 const v$ = useVuelidate()
 
@@ -83,9 +88,9 @@ onBeforeMount(async () => {
 
       <div
         class="survey__submitted"
-        v-if="isImpactStudySurvey && surveyRewardAmount"
+        v-if="isImpactStudySurvey && impactStudySurveyRewardAmount"
       >
-        <h2>You have earned ${{ surveyRewardAmount }}</h2>
+        <h2>You have earned ${{ impactStudySurveyRewardAmount }}</h2>
         <div class="impact-study-modal__separator" />
 
         <large-button
@@ -114,9 +119,14 @@ onBeforeMount(async () => {
       <header v-if="isImpactStudySurvey" class="survey__header">
         <div class="survey__title">UPchieve Impact Survey</div>
         <p>
-          Thank you for participating in our 5 minute survey! Once you complete
+          Thank you for participating in our 5 minute survey!
+          {{
+            impactStudySurveyRewardAmount
+              ? `Once you complete
           the survey, we'll thank you for your time with a digital visa gift
-          card for $10 sent to your email.
+          card for $${impactStudySurveyRewardAmount} sent to your email.`
+              : ''
+          }}
         </p>
         <p>
           We really appreciate your help! We'll use this info to share

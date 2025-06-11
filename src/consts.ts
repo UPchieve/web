@@ -916,6 +916,7 @@ export const QUESTION_TYPES = {
   multipleChoice: 'multiple choice',
   checkBox: 'check box',
   freeResponse: 'free response',
+  number: 'number',
 }
 
 export const SESSION_TOOL_TYPES = {
