@@ -67,6 +67,7 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import LineDivider from '@/components/LineDivider.vue'
 import Loader from '@/components/Loader.vue'
 import SsoButton from '@/components/SsoButton.vue'
+import InternationalMessage from './InternationalMessage.vue'
 
 export default {
   name: 'sign-up-forms',
@@ -87,6 +88,7 @@ export default {
     Loader,
     LineDivider,
     SsoButton,
+    InternationalMessage,
   },
 
   props: {

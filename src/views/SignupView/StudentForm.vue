@@ -855,26 +855,32 @@
     </form>
   </div>
 
-  <div
-    v-else-if="step === 'international'"
-    class="uc-column justify-center items-center"
-  >
-    <error-badge />
-    <h1 class="uc-form-header center">
-      Looks like you're not in <br />the U.S.!
-    </h1>
+  <div v-else-if="step === 'international'">
+    <InternationalMessage v-if="showNewInternationalMessage" />
+    <div v-else class="uc-column justify-center items-center">
+      <error-badge />
+      <h1 class="uc-form-header center">
+        Looks like you're not in <br />the U.S.!
+      </h1>
 
-    <p class="international-availability-info">
-      UPchieve is currently only available to students in the U.S. We're sorry
-      for the inconvenience! 😔
-    </p>
+      <p class="international-availability-info">
+        UPchieve is currently only available to students in the U.S. We're sorry
+        for the inconvenience! 😔
+      </p>
 
-    <p class="international-contact-us">
-      Live in the U.S. and still seeing this message? Make sure you're not using
-      a VPN.
-      <router-link to="/contact" class="uc-link">Contact Us</router-link> if you
-      still need help!
-    </p>
+      <p>
+        Applying for college?
+        <a href="/sign-up/volunteer/account">Becoming a volunteer</a> is a great
+        way to improve your application!
+      </p>
+
+      <p class="international-contact-us">
+        Live in the U.S. and still seeing this message? Make sure you're not
+        using a VPN.
+        <router-link to="/contact" class="uc-link">Contact Us</router-link> if
+        you still need help!
+      </p>
+    </div>
   </div>
   <div v-else class="uc-form-body">Unexpected Error</div>
 </template>
@@ -903,6 +909,7 @@ import FormErrors from '@/components/FormErrors.vue'
 import config from '../../config'
 import * as signupUtils from '@/utils/signup-utils'
 import FormEmail from '@/components/FormEmail.vue'
+import InternationalMessage from './InternationalMessage.vue'
 
 export default {
   components: {
@@ -912,6 +919,7 @@ export default {
     GoogleLogo,
     FormErrors,
     FormEmail,
+    InternationalMessage,
   },
   setup() {
     return { v$: useVuelidate() }
@@ -1133,6 +1141,7 @@ export default {
         'featureFlags/isBigFutureEmailFirstFlowActive',
       isBigFutureTwoQuestionEligiblityFlowActive:
         'featureFlags/isBigFutureTwoQuestionEligiblityFlowActive',
+      showNewInternationalMessage: 'featureFlags/showNewInternationalMessage',
     }),
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels

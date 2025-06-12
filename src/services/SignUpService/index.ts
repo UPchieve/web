@@ -112,6 +112,7 @@ type FormElementType =
   | 'updog-crying'
   | 'updog-smiling'
   | 'error-badge'
+  | 'InternationalMessage'
 
 export function getFilteredPageDetails(
   cb: () => PageDetailsUnion<SignUpFormData>

@@ -34,6 +34,7 @@ import NetworkService, { type NetworkError } from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import { SsoProvider } from '@/services/SsoService'
 import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
+import featureFlags from '@/store/modules/feature-flags'
 
 const RoutePath = {
   account: `/sign-up/student/${SignUpPage.account}`,
@@ -140,7 +141,9 @@ export function getPageDetails(
 ): PageDetailsUnion<StudentSignUpFormData> {
   return getFilteredPageDetails(() => {
     if (isInternationalRoute(to)) {
-      return getInternationalPageDetails()
+      return featureFlags.getters['showNewInternationalMessage']
+        ? getExperimentalIntlDetails()
+        : getInternationalPageDetails()
     }
 
     if (isIneligibleRoute(to)) {
@@ -380,6 +383,21 @@ async function checkEligibility(
   }
 }
 
+function getExperimentalIntlDetails(): PageDetail<{}> {
+  return {
+    backgroundLayout: 'full',
+    submitAction: () => {
+      return [{ path: '/contact' }, null]
+    },
+    classes: 'text-center screen-narrow',
+    rows: [
+      getRow('uc-row justify-center', {
+        element: 'InternationalMessage',
+      }),
+    ],
+  }
+}
+
 function getInternationalPageDetails(): PageDetail<{}> {
   return {
     backgroundLayout: 'full',
@@ -388,7 +406,7 @@ function getInternationalPageDetails(): PageDetail<{}> {
     },
     classes: 'text-center screen-narrow',
     rows: [
-      getRow('uc-row, justify-center', {
+      getRow('uc-row justify-center', {
         element: 'error-badge',
         classes: 'error-badge',
       }),
