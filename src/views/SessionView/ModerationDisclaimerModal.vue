@@ -34,7 +34,10 @@ const isMobileLandscape = computed(() => store.getters['app/isMobileLandscape'])
       numbers and email addresses.
     </div>
     <div class="buttons-container" :class="{ mobile: mobileMode }">
-      <LargeButton class="modal-button" variant="secondary" @click="emit('cancel')"
+      <LargeButton
+        class="modal-button"
+        variant="secondary"
+        @click="emit('cancel')"
         >Go back</LargeButton
       >
       <LargeButton

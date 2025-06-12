@@ -37,12 +37,6 @@ describe('SidebarLink', () => {
     expect(text.text()).toBe('Home')
   })
 
-  it('conditionally renders icon', () => {
-    // const wrapper = getWrapper({ to: "/", text: "Home" });
-    // const icon = wrapper.find(UpchieveIcon);
-    // expect(icon.exists()).toBe(false);
-  })
-
   it('collapses sidebar when clicked', () => {
     const collapse = vi.fn()
     const wrapper = getWrapper(

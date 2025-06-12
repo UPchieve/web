@@ -153,7 +153,7 @@
         text="Contact us"
         id="contact-us-sidebar-link"
       >
-        <envelope-icon class="icon" />
+        <hand-wave-icon class="icon" />
       </sidebar-link>
       <sidebar-link
         v-if="isVolunteer"
@@ -174,9 +174,9 @@ import SidebarLink from './SidebarLink.vue'
 import ArchiveIcon from '@/assets/archive.svg'
 import BookIcon from '@/assets/book-icon.svg'
 import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'
-import EnvelopeIcon from '@/assets/sidebar_icons/envelope.svg'
 import FolderIcon from '@/assets/sidebar_icons/folder.svg'
 import GraduationCapIcon from '@/assets/sidebar_icons/graduation-cap.svg'
+import HandWaveIcon from '@/assets/sidebar_icons/hand-wave.svg'
 import HeartIcon from '@/assets/heart.svg'
 import HouseIcon from '@/assets/sidebar_icons/house.svg'
 import PortraitIcon from '@/assets/sidebar_icons/portrait.svg'
@@ -196,9 +196,9 @@ export default {
     ArchiveIcon,
     BookIcon,
     CalendarIcon,
-    EnvelopeIcon,
     FolderIcon,
     GraduationCapIcon,
+    HandWaveIcon,
     HeartIcon,
     AiTutorButton,
     HouseIcon,
