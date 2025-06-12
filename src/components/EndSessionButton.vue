@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useStore } from 'vuex'
 import SessionService from '@/services/SessionService'
-import { useRouter } from 'vue-router'
 import { computed } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 
@@ -21,7 +20,6 @@ const props = defineProps({
 })
 
 const store = useStore()
-const router = useRouter()
 const isSessionWaitingForVolunteer = computed(
   () => store.getters['user/isSessionWaitingForVolunteer']
 )
@@ -30,11 +28,11 @@ const isSessionAlive = computed(() => store.getters['user/isSessionAlive'])
 const isSessionEnding = computed(() => store.state.user.sessionIsEnding)
 const session = computed(() => store.state.user.session)
 
-const finish = () => {
-  SessionService.postSessionRedirect(router, session.value)
+function finish() {
+  SessionService.postSessionRedirect(session.value)
 }
 
-const end = () => {
+function end() {
   if (isSessionEnding.value) {
     return
   }
@@ -62,11 +60,7 @@ const end = () => {
     }
   }
 
-  endSession()
-}
-
-const endSession = async () => {
-  await SessionService.endAndExitSession({ store, router })
+  SessionService.endAndExitSession()
 }
 </script>
 <template>

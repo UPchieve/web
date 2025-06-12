@@ -63,10 +63,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.SESSION_TIMED_OUT_45_MINS, {
         event: EVENTS.SESSION_TIMED_OUT_45_MINS,
       })
-      await SessionService.endAndExitSession({
-        store: this.$store,
-        router: this.$router,
-      })
+      await SessionService.endAndExitSession()
     },
   },
 }

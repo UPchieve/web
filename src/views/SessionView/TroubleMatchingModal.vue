@@ -27,19 +27,19 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import NetworkService from '@/services/NetworkService'
+import { EVENTS } from '@/consts'
 import Modal from '@/components/Modal.vue'
 import Separator from '@/components/Separator.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
+import NetworkService from '@/services/NetworkService'
+import SessionService from '@/services/SessionService'
 
 export default {
   name: 'TroubleMatchingModal',
   components: { LargeButton, Modal, Separator },
   props: {
     sessionId: { type: String, required: true },
-    endSession: { type: Function, required: true },
     closeModal: { type: Function, required: true },
   },
   computed: {
@@ -70,7 +70,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.SESSION_TIMED_OUT_15_MINS, {
         event: EVENTS.SESSION_TIMED_OUT_15_MINS,
       })
-      this.endSession()
+      await SessionService.endAndExitSession()
     },
   },
 }

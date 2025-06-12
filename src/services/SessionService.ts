@@ -7,27 +7,27 @@ import errorFromHttpResponse from '../utils/error-from-http-response.js'
 
 export type Session = any
 
-function isAbsentUser(session: Record<string, any>) {
+function isAbsentUser(session: Session) {
   const { student, volunteer } = session
   if (!volunteer) return true
 
-  const messages = getMessagesAfterVolunteerJoined(session)
   let isAbsentStudent = true
   let isAbsentVolunteer = true
-  for (const message of messages) {
+
+  for (const message of session.messages) {
+    if (
+      new Date(message.createdAt).getTime() <
+      new Date(session.volunteerJoinedAt).getTime()
+    ) {
+      // Skip messages that were sent before the volunteer joined.
+      continue
+    }
     if (message.user === student.id) isAbsentStudent = false
     if (message.user === volunteer.id) isAbsentVolunteer = false
-    if (!isAbsentStudent && !isAbsentVolunteer) break
+    if (!isAbsentStudent && !isAbsentVolunteer) return false
   }
-  return isAbsentStudent || isAbsentVolunteer
-}
 
-function getMessagesAfterVolunteerJoined(session: Session) {
-  return session.messages.filter(
-    (message: Record<string, any> & { createdAt: string }) =>
-      new Date(message.createdAt).getTime() >=
-      new Date(session.volunteerJoinedAt).getTime()
-  )
+  return isAbsentStudent || isAbsentVolunteer
 }
 
 export default {
@@ -84,6 +84,7 @@ export default {
     return session
   },
 
+  // TODO: Make all paths use `endAndExitSession` instead.
   async endSession(sessionId: string, subTopic: string) {
     try {
       await NetworkService.endSession({ sessionId })
@@ -102,28 +103,31 @@ export default {
     })
   },
 
-  postSessionRedirect(router, session) {
-    // redirect to the home page if there is an absent user
-    // or if the student was not paired with a tutor
-    if (isAbsentUser(session)) return router.push('/')
-    router.push(`/feedback/${session.id}`)
-  },
+  async endAndExitSession() {
+    const endedSession = { ...store.state.user.session }
 
-  async endAndExitSession({ store, router }) {
+    await this.endSession(
+      store.state.user.session.id,
+      store.state.user.session.subTopic
+    )
+
     const isSessionRecapDmsActive =
       store.getters['featureFlags/isSessionRecapDmsActive']
     const isStudent = store.getters['user/isStudent']
-    await this.endSession(
-      store.state.user.session.id,
-      store.state.user.session.subTopic,
-      store
-    )
-    // Do not send the user directly to the feedback page if they can leave DMs
-    if (!isSessionRecapDmsActive)
-      this.postSessionRedirect(router, store.state.user.session)
-    // Send students directly to feedback page whether or not volunteers can send DMs.
-    if (isStudent) this.postSessionRedirect(router, store.state.user.session)
+    if (!isSessionRecapDmsActive || isStudent) {
+      // Do not send the coach directly to the feedback page if
+      // they can leave DMs.
+      this.postSessionRedirect(endedSession)
+    }
+
     store.commit('user/setSessionIsEnding', false)
+  },
+
+  postSessionRedirect(session: Session) {
+    // Redirect to the home page if there is an absent user
+    // or if the student was not paired with a tutor.
+    if (isAbsentUser(session)) return router.push('/')
+    router.push(`/feedback/${session.id}`)
   },
 
   getCurrentSession() {

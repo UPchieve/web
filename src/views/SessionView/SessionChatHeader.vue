@@ -51,8 +51,7 @@
     </div>
     <trouble-matching-modal
       v-if="showTroubleMatchingModal"
-      :closeModal="toggleTroubleMatchingModal"
-      :endSession="endAndExitSession"
+      :closeModal="() => (showTroubleMatchingModal = false)"
       :sessionId="session.id"
     />
     <unmatched-modal v-if="showUnmatchedModal" :sessionId="session.id" />
@@ -75,15 +74,10 @@ import ActivityDot from '@/components/ActivityDot.vue'
 import ReportSessionButton from '@/components/ReportSessionButton.vue'
 import EndSessionButton from '@/components/EndSessionButton.vue'
 import SessionService from '@/services/SessionService'
-/**
- * @todo {1} Refactoring candidate: use a modal instead.
- */
+
 export default {
   data() {
     return {
-      connectionMsg: '',
-      connectionMsgType: '',
-      reconnectAttemptMsg: '',
       showTroubleMatchingModal: false,
       showUnmatchedModal: false,
       hasSeenTroubleMatchingModal: false,
@@ -99,27 +93,6 @@ export default {
     ReportSessionButton,
     EndSessionButton,
   },
-  created() {
-    /*
-     * This seems like an anti-pattern.
-     * Any events sent before `created()` is called will be missed.
-     * Socket listeners should ideally be defined in the socket store.
-     */
-    // TODO: move this to its own store and have the socket store dispatch an event
-    socket.on('connect_error', () => {
-      this.connectionMsg =
-        'The system seems to be having a problem reaching the server.'
-      this.connectionMsgType = 'warning'
-    })
-    socket.on('connect_timeout', () => {
-      this.connectionMsg =
-        'The system seems to be having a problem reaching the server.'
-      this.connectionMsgType = 'socket/warning'
-    })
-    socket.on('reconnect_attempt', () => {
-      this.reconnectAttemptMsg = 'Trying periodically to reconnect.'
-    })
-  },
 
   mounted() {
     // Show a modal if a student has been waiting too long to get matched with a volunteer
@@ -129,6 +102,7 @@ export default {
        * If the modal is shown before this re-render occurs it will not display on
        * the screen. Set a timeout to display the modal after those initial re-renders
        **/
+      // TODO: Why are these modals in the SessionChatHeader?
       setTimeout(() => {
         this.isWaitingTooLong()
       }, 500)
@@ -145,12 +119,8 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       session: (state) => state.user.session,
-      isConnected: (state) => state.socket.isConnected,
       isPartnerOnline: (state) => state.session.isPartnerOnline,
     }),
-    canReport() {
-      return this.isVolunteer
-    },
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
@@ -164,6 +134,9 @@ export default {
       mobileMode: 'app/mobileMode',
     }),
 
+    canReport() {
+      return this.isVolunteer
+    },
     partnerAvatar() {
       if (this.isSessionWaitingForVolunteer) return ChatBotIcon
       // show the current user their partner's avatar
@@ -174,21 +147,7 @@ export default {
   },
   methods: {
     endAndExitSession() {
-      SessionService.endAndExitSession({
-        store: this.$store,
-        router: this.$router,
-      })
-    },
-    connectionSuccess() {
-      this.connectionMsg = ''
-      this.reconnectAttemptMsg = ''
-      this.connectionMsgType = ''
-    },
-    toggleTroubleMatchingModal() {
-      this.showTroubleMatchingModal = !this.showTroubleMatchingModal
-    },
-    toggleUnmatchedModal() {
-      this.showUnmatchedModal = !this.showUnmatchedModal
+      SessionService.endAndExitSession()
     },
     isWaitingTooLong() {
       if (this.session.volunteer) {
@@ -205,24 +164,19 @@ export default {
         fifteenMinsFromSessionStart + fifteenMins * 2
 
       if (Date.now() >= fortyFiveMinsFromSessionStart) {
-        // Students must end their session after 45 minutes of waiting
-        this.toggleUnmatchedModal()
+        // Students must end their session after 45 minutes of waiting.
+        this.showUnmatchedModal = true
         clearInterval(this.isWaitingIntervalId)
       } else if (
         Date.now() >= fifteenMinsFromSessionStart &&
         !this.hasSeenTroubleMatchingModal
       ) {
-        this.toggleTroubleMatchingModal()
+        this.showTroubleMatchingModal = true
         this.hasSeenTroubleMatchingModal = true
       }
     },
   },
   watch: {
-    isConnected(val) {
-      if (val) {
-        this.connectionSuccess()
-      }
-    },
     // Close possibly open modals that are triggered by a long waiting period
     // and clear the isWaiting interval when a volunteer joins the session
     async isSessionWaitingForVolunteer(value, prevValue) {
