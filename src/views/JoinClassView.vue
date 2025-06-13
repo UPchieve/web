@@ -11,7 +11,7 @@ import FormEmail from '@/components/FormEmail.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
-import FormSelect from '@/components/FormSelect.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import Loader from '@/components/Loader.vue'
 import useVuelidate from '@vuelidate/core'
 
@@ -207,7 +207,7 @@ async function addStudentToClass(_, overrideEvent?: string) {
         name="gradeLevel"
         label="Grade in 2024-2025"
         placeholder="Grade in 2024-2025"
-        :get-select-options="() => GRADES"
+        :options="GRADES"
         :reduce="(option: string) => option.split(' ')[0]"
         :blur-event="EVENTS.STUDENT_SELECTED_GRADE_ON_JOIN_CLASS"
         testid="select-grade"

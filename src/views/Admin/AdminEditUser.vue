@@ -17,34 +17,29 @@
         <input id="email" type="text" v-model="email" />
       </div>
       <div class="row" v-if="hasStudentRole || hasVolunteerRole">
-        <label for="partner-org" class="uc-form-label"> Partner org </label>
-        <v-select
+        <FormSelect
+          label="Partner org"
           id="partner-org"
-          class="option-select"
           :options="listedPartnerOrgs"
-          label="displayName"
           v-model="partnerOrg"
+          option-text-field="displayName"
         />
       </div>
       <div class="row" v-if="hasStudentRole && partnerOrg && partnerOrg.sites">
-        <label for="partner-site" class="uc-form-label">Partner Site</label>
-        <v-select
+        <FormSelect
+          label="Partner Site"
           id="partner-sites"
-          class="option-select"
           :options="partnerOrg.sites"
           v-model="partnerSite"
         />
       </div>
 
       <div class="row" v-if="hasStudentRole">
-        <label for="partner-school" class="uc-form-label">
-          Partner school
-        </label>
-        <v-select
+        <FormSelect
+          label="Partner School"
           id="partner-school"
-          class="option-select"
           :options="listedPartnerSchools"
-          label="displayName"
+          option-text-field="displayName"
           v-model="partnerSchool"
         />
       </div>
@@ -62,57 +57,49 @@
       </div>
 
       <div class="row">
-        <label for="verified" class="uc-form-label">Verified</label>
-        <select name="verified" id="verified" v-model="isVerified">
-          <option
-            v-for="option in options"
-            :value="option.value"
-            :key="option.text"
-          >
-            {{ option.text }}
-          </option>
-        </select>
+        <FormSelect
+          label="Verified"
+          id="verified"
+          name="verified"
+          :options="options"
+          option-text-field="text"
+          v-model="isVerified"
+          :reduce="(option) => option.value"
+        />
       </div>
       <div class="row">
-        <label for="banned" class="uc-form-label">Banned</label>
-        <select
-          name="banned"
+        <FormSelect
+          label="Banned"
           id="banned"
+          name="banned"
           v-model="banType"
+          :options="banOptions"
+          option-text-field="text"
           data-testid="admin-edit-user-banned"
-        >
-          <option
-            v-for="option in banOptions"
-            :value="option.value"
-            :key="option.text"
-          >
-            {{ option.text }}
-          </option>
-        </select>
+          :reduce="(option) => option.value"
+        />
       </div>
       <div class="row">
-        <label for="deactivated" class="uc-form-label">Deactivated</label>
-        <select name="deactivated" id="deactivated" v-model="isDeactivated">
-          <option
-            v-for="option in options"
-            :value="option.value"
-            :key="option.text"
-          >
-            {{ option.text }}
-          </option>
-        </select>
+        <FormSelect
+          label="Deactivated"
+          id="deactivated"
+          name="deactivated"
+          v-model="isDeactivated"
+          :options="options"
+          option-text-field="text"
+          :reduce="(option) => option.value"
+        />
       </div>
       <div class="row" v-if="hasVolunteerRole">
-        <label for="approved" class="uc-form-label">Approved</label>
-        <select name="approved" id="approved" v-model="isApproved">
-          <option
-            v-for="option in options"
-            :value="option.value"
-            :key="option.text"
-          >
-            {{ option.text }}
-          </option>
-        </select>
+        <FormSelect
+          id="approved"
+          name="approved"
+          label="Approved"
+          v-model="isApproved"
+          :options="options"
+          option-text-field="text"
+          :reduce="(option) => option.value"
+        />
       </div>
       <p class="error" v-if="error">{{ error }}</p>
       <button class="uc-form-button" type="submit">Update</button>
@@ -124,6 +111,7 @@
 import { isEmpty } from 'lodash-es'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import Loader from '@/components/Loader.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import NetworkService from '@/services/NetworkService'
 import {
   isTeacherUserType,
@@ -134,7 +122,7 @@ import {
 
 export default {
   name: 'AdminEditUser',
-  components: { FormSchoolSearch, Loader },
+  components: { FormSchoolSearch, Loader, FormSelect },
 
   props: {
     user: { type: Object, required: true },
@@ -345,11 +333,6 @@ select {
   margin-top: 2em;
   padding: 1em 1.6em;
   border: 1px solid $c-border-grey;
-}
-
-.option-select {
-  display: inline-block;
-  width: 400px;
 }
 
 .back-button {

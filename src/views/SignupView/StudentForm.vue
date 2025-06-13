@@ -113,39 +113,16 @@
       "
     >
       <div class="uc-form-element">
-        <div class="uc-row justify-between">
-          <label
-            for="grade"
-            v-bind:class="{
-              error: hasFormValidationError(v$.eligibility.currentGrade),
-            }"
-            >Grade</label
-          >
-          <div
-            v-if="hasFormValidationError(v$.eligibility.currentGrade)"
-            class="error-caption"
-          >
-            {{ getFormValidationError(v$.eligibility.currentGrade) }}
-          </div>
-        </div>
-        <v-select
+        <FormSelect
           id="grade"
-          data-testid="student-grade-select"
-          class="uc-form-select-input"
-          v-model="eligibility.currentGrade"
-          :placeholder="`Select ${getFormLabelIdentifierPossessive} grade`"
-          :aria-label="`Select ${getFormLabelIdentifierPossessive} grade`"
+          name="grade"
+          label="Grade"
           :options="gradeLevels"
-          :searchable="false"
-          :clearable="false"
-          v-bind:class="{
-            'uc-form-select-input-invalid': hasFormValidationError(
-              v$.eligibility.currentGrade
-            ),
-          }"
-          @close="onGradeClose"
-          required
-        ></v-select>
+          :placeholder="`Select ${getFormLabelIdentifierPossessive} grade`"
+          v-model="eligibility.currentGrade"
+          data-testid="student-grade-select"
+          :is-required="true"
+        />
       </div>
 
       <div class="uc-form-element">
@@ -334,39 +311,16 @@
       </div>
 
       <div class="uc-form-element">
-        <div class="uc-row justify-between">
-          <label
-            for="grade"
-            v-bind:class="{
-              error: hasFormValidationError(v$.eligibility.currentGrade),
-            }"
-            >Grade</label
-          >
-          <div
-            v-if="hasFormValidationError(v$.eligibility.currentGrade)"
-            class="error-caption"
-          >
-            {{ getFormValidationError(v$.eligibility.currentGrade) }}
-          </div>
-        </div>
-        <v-select
+        <FormSelect
           id="grade"
-          data-testid="student-grade-select"
-          class="uc-form-select-input"
-          v-model="eligibility.currentGrade"
-          :placeholder="`Select ${getFormLabelIdentifierPossessive} grade`"
-          :aria-label="`Select ${getFormLabelIdentifierPossessive} grade`"
+          name="grade"
+          label="Grade"
           :options="gradeLevels"
-          :searchable="false"
-          :clearable="false"
-          v-bind:class="{
-            'uc-form-select-input-invalid': hasFormValidationError(
-              v$.eligibility.currentGrade
-            ),
-          }"
-          @close="onGradeClose"
-          required
-        ></v-select>
+          :placeholder="`Select ${getFormLabelIdentifierPossessive} grade`"
+          v-model="eligibility.currentGrade"
+          :is-required="true"
+          data-testid="student-grade-select"
+        />
       </div>
 
       <div class="uc-form-element">
@@ -909,6 +863,7 @@ import FormErrors from '@/components/FormErrors.vue'
 import config from '../../config'
 import * as signupUtils from '@/utils/signup-utils'
 import FormEmail from '@/components/FormEmail.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import InternationalMessage from './InternationalMessage.vue'
 
 export default {
@@ -919,6 +874,7 @@ export default {
     GoogleLogo,
     FormErrors,
     FormEmail,
+    FormSelect,
     InternationalMessage,
   },
   setup() {
@@ -1243,14 +1199,6 @@ export default {
   methods: {
     isFailureRedirect() {
       return !!this.$route.query['provider']
-    },
-
-    // Necessary to explicitly call on close of the currentGrade select menu
-    // because v-select component is preventing blur event.
-    onGradeClose() {
-      if (!this.eligibility.currentGrade) {
-        this.v$.eligibility.currentGrade.$touch()
-      }
     },
 
     eligibilityPage(params) {

@@ -53,12 +53,11 @@
 
         <div class="contact-form__section">
           <div class="contact-form__label">Select reason</div>
-          <v-select
+          <FormSelect
             class="contact-form__select"
             v-model="contactFormData.topic"
             :options="contactTopics"
-            :searchable="false"
-          ></v-select>
+          />
         </div>
 
         <div class="contact-form__section">
@@ -92,6 +91,7 @@
 import { mapGetters } from 'vuex'
 import NetworkService from '../services/NetworkService'
 import LargeButton from '@/components/LargeButton.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import isEmail from 'validator/lib/isEmail'
 
 const sendStates = {
@@ -102,7 +102,7 @@ const sendStates = {
 
 export default {
   name: 'contact-view',
-  components: { LargeButton },
+  components: { LargeButton, FormSelect },
   created() {
     if (!this.isAuthenticated || !this.isVerified) {
       this.$store.dispatch('app/hideNavigation')

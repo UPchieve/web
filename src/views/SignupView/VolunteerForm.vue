@@ -163,17 +163,12 @@
       <label for="signup-source" class="uc-form-label"
         >How did you hear about us?</label
       >
-      <v-select
+      <FormSelect
         id="signup-source"
-        class="uc-form-select"
         v-model="signupSourceId"
         :options="signupSourcesOptions"
-        label="name"
-        :reduce="(option) => option.id"
-        :searchable="false"
-        :clearable="false"
-        required
-        :loading="isLoadingSignupSources"
+        option-text-field="name"
+        :is-required="true"
       />
     </div>
     <div class="uc-column" v-if="shouldShowOtherSignupInput()">
@@ -228,6 +223,7 @@ import LoggerService from '@/services/LoggerService'
 import AuthService from '@/services/AuthService'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import Loader from '@/components/Loader.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import NetworkService from '@/services/NetworkService'
 import { backOff } from 'exponential-backoff'
 
@@ -235,6 +231,7 @@ export default {
   components: {
     MazPhoneNumberInput,
     Loader,
+    FormSelect,
   },
   data() {
     return {

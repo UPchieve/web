@@ -26,7 +26,7 @@
           />
         </div>
         <div class="assignment-details-row">
-          <IonicSelect
+          <FormSelect
             label="Assign to class(es)"
             name="classes"
             class="assignment-name"
@@ -35,9 +35,8 @@
             v-model="selectedClasses"
             :multiple="true"
             :disabled="isEdit"
-            @ionChange="showClassStudents"
           />
-          <IonicSelect
+          <FormSelect
             label="Selected student(s)"
             name="students"
             class="assignment-name"
@@ -49,7 +48,7 @@
           />
         </div>
         <div class="assignment-details-row">
-          <IonicSelect
+          <FormSelect
             label="Subject"
             name="session-to-complete"
             class="session-dropdown"
@@ -157,7 +156,7 @@ import { mapGetters, mapState } from 'vuex'
 import { EVENTS } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from './FormInputs/FormDateInput.vue'
-import IonicSelect from '@/components/IonicSelect.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import Modal from '@/components/Modal.vue'
 import FileDialog from '@/components/FileDialog.vue'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
@@ -168,7 +167,7 @@ export default {
     Modal,
     FormInput,
     FormDateInput,
-    IonicSelect,
+    FormSelect,
     FileDialog,
     PhotoUploadIcon,
   },

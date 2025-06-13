@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { EVENTS } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
-import IonicSelect from '@/components/IonicSelect.vue'
+import FormSelect from './FormInputs/FormSelect.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import type { Language } from '@/types/languages'
 
@@ -114,7 +114,7 @@ defineExpose({
 
 <template>
   <div>
-    <ionic-select
+    <form-select
       @update:modelValue="onLanguageSelect"
       :modelValue="preferredLanguage?.name"
       name="preferred-language-select"

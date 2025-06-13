@@ -48,12 +48,11 @@
         <div class="subheader-calendar">Coverage Map</div>
         <div class="container-content">
           <div class="subject-selecter">
-            <v-select
+            <FormSelect
               v-model="selected"
               :options="allSubjectNames"
               @update:modelValue="getAvailability"
-            >
-            </v-select>
+            />
           </div>
           <div v-show="selected" class="table-layout">
             <div class="subtable--days">
@@ -99,10 +98,12 @@
 
 <script>
 import UserService from '@/services/UserService'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 
 import { mapGetters } from 'vuex'
 
 export default {
+  components: { FormSelect },
   data() {
     return {
       // colors for calendar heat map

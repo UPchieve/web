@@ -20,13 +20,13 @@
         </div>
       </div>
       <div class="row">
-        <label for="partner-org" class="uc-form-label">Partner org</label>
-        <v-select
+        <FormSelect
           id="partner-org"
           class="option-select"
           :options="listedPartnerOrgs"
-          label="displayName"
+          label="Partner org"
           v-model="partnerOrg"
+          option-text-field="displayName"
         />
       </div>
       <div class="row">
@@ -59,6 +59,7 @@
 import NetworkService from '@/services/NetworkService'
 import PageControl from '@/components/Admin/PageControl.vue'
 import UserListItem from '@/components/Admin/UserListItem.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { isEmpty, isEqual } from 'lodash-es'
 
 const getUsers = async (userData) => {
@@ -72,7 +73,7 @@ const getUsers = async (userData) => {
 export default {
   name: 'AdminUsers',
 
-  components: { UserListItem, PageControl },
+  components: { UserListItem, PageControl, FormSelect },
 
   data() {
     return {

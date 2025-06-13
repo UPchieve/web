@@ -14,7 +14,7 @@
       placeholder="Class Name"
       label="Class Name"
     />
-    <IonicSelect
+    <FormSelect
       v-model="currentTopic"
       label="Subject"
       name="topic"
@@ -37,11 +37,11 @@
 import { mapState } from 'vuex'
 import FormInput from '@/components/FormInput.vue'
 import Modal from '@/components/Modal.vue'
-import IonicSelect from '@/components/IonicSelect.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import ArchiveIcon from '@/assets/archive.svg'
 
 export default {
-  components: { FormInput, Modal, IonicSelect, ArchiveIcon },
+  components: { FormInput, Modal, FormSelect, ArchiveIcon },
   name: 'EditTeacherClassModal',
 
   props: {

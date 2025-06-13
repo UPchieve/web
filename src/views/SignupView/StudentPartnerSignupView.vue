@@ -31,20 +31,15 @@
         v-if="(useGoogleSSO || useCleverSSO) && !useParentGuardianSignUpFlow"
       >
         <div class="uc-form-element">
-          <div class="uc-row justify-between">
-            <label for="grade">What is your current grade?</label>
-          </div>
-          <v-select
+          <FormSelect
             id="grade"
-            class="uc-form-select-input"
+            label="What is your current grade?"
             v-model="sso.currentGrade"
             placeholder="Select your grade"
             aria-label="Select your grade"
             :options="gradeLevels"
-            :searchable="false"
-            :clearable="false"
-            required
-          ></v-select>
+            :is-required="true"
+          />
         </div>
         <SsoButton
           v-if="useGoogleSSO"
@@ -355,31 +350,15 @@
         </div>
 
         <div class="uc-form-element" v-if="requireSignupSource">
-          <label
-            for="signup-source"
-            v-bind:class="{
-              error: hasFormValidationError(v$.formData.signupSourceId),
-            }"
-            >How did you hear about us?</label
-          >
-          <v-select
+          <FormSelect
             id="signup-source"
-            class="uc-form-select-input"
-            v-bind:class="{
-              'uc-form-select-input-invalid': hasFormValidationError(
-                v$.formData.signupSourceId
-              ),
-            }"
+            label="How did you hear about us?"
             v-model="formData.signupSourceId"
             placeholder="Select how you heard about us"
-            :options="signupSourcesOptions"
-            label="name"
+            :options="isLoadingSignupSource ? [] : signupSourcesOptions"
+            option-text-field="name"
+            :is-required="true"
             :reduce="(option) => option.id"
-            :searchable="false"
-            :clearable="false"
-            required
-            :loading="isLoadingSignupSource"
-            @close="() => v$.formData.signupSourceId.$touch()"
           />
         </div>
         <div class="uc-form-element" v-if="shouldShowOtherSignupInput()">
@@ -435,6 +414,7 @@ import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import FormErrors from '@/components/FormErrors.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import SsoButton from '@/components/SsoButton.vue'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
@@ -452,6 +432,7 @@ export default {
     Autocomplete,
     VerificationBadge,
     SsoButton,
+    FormSelect,
   },
   setup() {
     return { v$: useVuelidate() }

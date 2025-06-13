@@ -15,13 +15,10 @@
 
     <div class="report-modal__section">
       <div class="report-modal__label">Reason for reporting</div>
-      <v-select
-        class="report-modal__select report-modal__select--required"
+      <FormSelect
         v-model="reportReason"
         :options="reportReasonOptionsToDisplay"
-        :searchable="false"
-        :clearable="false"
-      ></v-select>
+      />
     </div>
     <div class="report-modal__section">
       <div class="report-modal__label">Tell us what happened</div>
@@ -50,6 +47,7 @@
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { mapState, mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
 
@@ -67,7 +65,7 @@ const studentReportReasonOptions = [
 ]
 
 export default {
-  components: { LargeButton },
+  components: { LargeButton, FormSelect },
   props: {
     /*
      * @TODO: Move to Composition API and use Typescript

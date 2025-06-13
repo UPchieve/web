@@ -21,7 +21,7 @@
         <div class="filter-controls">
           <label class="select-label"
             >Select Subject
-            <IonicSelect
+            <FormSelect
               v-if="topics.length"
               class="topics-dropdown"
               :name="'topic'"
@@ -129,7 +129,7 @@ import NetworkService from '@/services/NetworkService'
 import { mapState } from 'vuex'
 import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import moment from 'moment'
-import IonicSelect from '@/components/IonicSelect.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import BlueAlert from '@/assets/blue-alert.svg'
 import GenerationFeedback from '@/components/GenerationFeedback.vue'
 import { EVENTS } from '@/consts'
@@ -140,7 +140,7 @@ export default {
     Loader,
     StudentAvatar,
     FormDateInput,
-    IonicSelect,
+    FormSelect,
     BlueAlert,
     GenerationFeedback,
   },

@@ -50,33 +50,29 @@
 
     <form @submit.prevent="submit()">
       <div class="uc-form-element">
-        <label for="partnerSchool">School</label>
-        <v-select
+        <FormSelect
           id="partnerSchool"
           class="uc-form-select-input"
+          label="School"
           placeholder="Select the partner school"
           v-model="partnerSchool"
-          label="schoolName"
           :options="partnerSchools"
-          :searchable="false"
-          :clearable="false"
-          required
-        ></v-select>
+          :is-required="true"
+          option-text-field="schoolName"
+        />
       </div>
 
       <div v-if="showPartnerSiteSelection()" class="uc-form-element">
-        <label for="partnerSite">Site</label>
-        <v-select
+        <FormSelect
           id="partnerSite"
           class="uc-form-select-input"
           placeholder="Select the partner site"
           v-model="partnerSite"
-          label="name"
+          label="Site"
           :options="getPartnerSites()"
-          :searchable="false"
-          :clearable="false"
-          required
-        ></v-select>
+          option-text-field="name"
+          :is-required="true"
+        />
       </div>
 
       <div class="uc-form-element">
@@ -106,12 +102,14 @@
 
 <script>
 import NetworkService from '@/services/NetworkService'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import Loader from '@/components/Loader.vue'
 
 export default {
   name: 'AdminRosterStudents',
   components: {
     Loader,
+    FormSelect,
   },
   data() {
     return {

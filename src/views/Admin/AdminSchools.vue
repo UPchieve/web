@@ -20,7 +20,7 @@
           placeholder="NCES Id"
           :isRequired="false"
         />
-        <IonicSelect
+        <FormSelect
           v-model="state"
           label="School State"
           name="state"
@@ -29,7 +29,7 @@
           :options="states"
           :reduce="(option) => option.value"
         />
-        <IonicSelect
+        <FormSelect
           v-model="isPartner"
           name="isPartner"
           label="Is Partner School"
@@ -81,7 +81,7 @@
 import { toastController } from '@ionic/vue'
 import NetworkService from '@/services/NetworkService'
 import FormInput from '@/components/FormInput.vue'
-import IonicSelect from '@/components/IonicSelect.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import Loader from '@/components/Loader.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
 import SchoolListItem from '@/components/Admin/SchoolListItem.vue'
@@ -91,7 +91,7 @@ export default {
   name: 'AdminSchools',
   components: {
     FormInput,
-    IonicSelect,
+    FormSelect,
     Loader,
     PageControl,
     SchoolListItem,

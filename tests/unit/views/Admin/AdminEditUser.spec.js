@@ -45,9 +45,10 @@ describe('AdminEditUser.vue', () => {
     await flushPromises()
 
     const options = wrapper
-      .find('[data-testid="admin-edit-user-banned"]')
-      .findAll('option')
-    const optionTexts = options.map((o) => o.text())
+      .findComponent('[data-testid="admin-edit-user-banned"]')
+      .props().options
+
+    const optionTexts = options.map((o) => o.text)
 
     expect(optionTexts).toContain('None')
     expect(optionTexts).toContain('Complete Ban')
@@ -66,9 +67,10 @@ describe('AdminEditUser.vue', () => {
     await flushPromises()
 
     const options = wrapper
-      .find('[data-testid="admin-edit-user-banned"]')
-      .findAll('option')
-    const optionTexts = options.map((o) => o.text())
+      .findComponent('[data-testid="admin-edit-user-banned"]')
+      .props().options
+
+    const optionTexts = options.map((o) => o.text)
 
     expect(optionTexts).toContain('None')
     expect(optionTexts).toContain('Complete Ban')

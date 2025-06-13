@@ -222,9 +222,8 @@ describe('StudentForm', () => {
         wrapper.find('[data-testid="student-last-name-label"]').text()
       ).toEqual("What is the student's last name?")
       expect(
-        wrapper
-          .find('[data-testid="student-grade-select"]')
-          .attributes('placeholder')
+        wrapper.findComponent('[data-testid="student-grade-select"]').props()
+          .placeholder
       ).toEqual("Select the student's grade")
       expect(
         wrapper

@@ -148,8 +148,8 @@
                 v-for="(subquestion, subquestionIndex) in question.options"
                 v-bind:key="subquestionIndex"
               >
-                <div class="uc-form-label">{{ subquestion }}</div>
-                <v-select
+                <form-select
+                  :label="label"
                   class="uc-reference-form__select"
                   @update:modelValue="
                     (value) =>
@@ -161,8 +161,7 @@
                   "
                   placeholder="Select your answer"
                   :options="question.tableTitle"
-                  :searchable="false"
-                ></v-select>
+                />
               </div>
             </div>
           </div>
@@ -238,11 +237,13 @@
 <script>
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import FormSelect from './FormInputs/FormSelect.vue'
 import { EVENTS } from '@/consts'
 import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'ReferenceForm',
+  components: { FormSelect },
   props: {
     isAdminReview: { type: Boolean, default: false },
     reference: { type: Object },

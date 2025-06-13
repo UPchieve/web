@@ -20,16 +20,14 @@
 
       <div class="col">
         <div>
-          <label class="col">
-            Volunteer partner org
-            <v-select
-              id="volunteer-partner-org"
-              class="filter-panel__partner-select"
-              :options="volunteerPartnerOrgs"
-              label="name"
-              v-model="volunteerPartnerOrg"
-            />
-          </label>
+          <FormSelect
+            id="volunteer-partner-org"
+            class="filter-panel__partner-select"
+            :options="volunteerPartnerOrgs"
+            label="Volunteer partner org"
+            v-model="volunteerPartnerOrg"
+            option-text-field="name"
+          />
         </div>
       </div>
     </div>
@@ -65,10 +63,11 @@ import exportToCsv from '@/utils/export-to-csv'
 import { ANALYTICS_REPORT_ROW, ANALYTICS_REPORT_SUMMARY } from '@/consts'
 import fileDownload from '@/utils/file-download'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 
 export default {
   name: 'AdminReports',
-  components: { Loader, FormDateInput },
+  components: { Loader, FormDateInput, FormSelect },
 
   data() {
     return {

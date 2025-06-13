@@ -28,7 +28,7 @@
           :placeholder="`${isVolunteer ? 'Student' : 'Coach'} First Name`"
           :is-required="false"
         />
-        <ionic-select
+        <form-select
           v-if="subjectsByTopics.length"
           v-model="filters.subjectName"
           name="subject"
@@ -249,7 +249,7 @@ import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import FormInput from '@/components/FormInput.vue'
-import IonicSelect from '@/components/IonicSelect.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
 
@@ -259,7 +259,7 @@ export default {
     CaretIcon,
     FavoritingToggle,
     FormInput,
-    IonicSelect,
+    FormSelect,
     LargeButton,
     Loader,
   },

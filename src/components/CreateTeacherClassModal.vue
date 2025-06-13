@@ -11,7 +11,7 @@
       name="class-name"
       :blurEvent="EVENTS.TEACHER_INPUT_CLASS_NAME"
     />
-    <IonicSelect
+    <FormSelect
       v-model="selectedTopic"
       placeholder="Select a subject"
       label="Subject"
@@ -35,12 +35,12 @@
 import { mapState } from 'vuex'
 import { EVENTS } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
-import IonicSelect from '@/components/IonicSelect.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import Modal from '@/components/Modal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 
 export default {
-  components: { FormInput, IonicSelect, Modal },
+  components: { FormInput, FormSelect, Modal },
   name: 'CreateTeacherClassModal',
 
   props: {

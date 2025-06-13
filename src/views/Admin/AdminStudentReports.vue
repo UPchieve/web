@@ -35,21 +35,19 @@
 
       <div class="col">
         <div>
-          <label class="col">
-            Student partner org
-            <v-select
-              id="student-partner-org"
-              class="filter-panel__partner-select"
-              :options="studentPartnerOrgs"
-              label="name"
-              v-model="studentPartnerOrg"
-            />
-          </label>
+          <FormSelect
+            id="student-partner-org"
+            class="filter-panel__partner-select"
+            :options="studentPartnerOrgs"
+            label="Student partner org"
+            v-model="studentPartnerOrg"
+            option-text-field="name"
+          />
         </div>
         <div class="col" v-if="studentPartnerOrg && studentPartnerOrg.sites">
-          <label for="partner-site">Partner Site</label>
-          <v-select
+          <FormSelect
             id="partner-sites"
+            label="Partner Site"
             class="filter-panel__partner-select"
             :options="partnerSites"
             v-model="studentPartnerSite"
@@ -58,16 +56,14 @@
       </div>
       <div class="col">
         <div>
-          <label class="col">
-            Sponsor org
-            <v-select
-              id="sponsor-org"
-              class="filter-panel__partner-select"
-              :options="sponsorOrgs"
-              label="name"
-              v-model="sponsorOrg"
-            />
-          </label>
+          <FormSelect
+            id="sponsor-org"
+            class="filter-panel__partner-select"
+            option-text-field="name"
+            :options="sponsorOrgs"
+            label="Sponsor org"
+            v-model="sponsorOrg"
+          />
         </div>
       </div>
       <div class="col">
@@ -113,10 +109,11 @@ import Loader from '@/components/Loader.vue'
 import moment from 'moment'
 import exportToCsv from '@/utils/export-to-csv'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 
 export default {
   name: 'AdminReports',
-  components: { SchoolList, Loader, FormDateInput },
+  components: { SchoolList, Loader, FormDateInput, FormSelect },
 
   data() {
     return {
@@ -228,7 +225,6 @@ export default {
         sessionRangeFrom: this.formatDate(this.sessionRangeFrom),
         sessionRangeTo: this.formatDate(this.sessionRangeTo),
         highSchoolId: this.highSchool.id ? this.highSchool.id : '',
-        // partner org or the sponsor org can be "null" from clearing the v-select, check for if org exists and then get the org
         studentPartnerOrg: this.isValidStudentPartnerOrg
           ? this.studentPartnerOrg.key
           : '',
