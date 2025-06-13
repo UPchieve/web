@@ -970,10 +970,27 @@ export default {
       try {
         await backOff(
           async () => {
-            await socket.timeout(2000).emitWithAck('sessions:join', {
-              sessionId: this.sessionId,
-            })
-            this.isSocketSessionRoomConnected = true
+            const { success, retry } = await socket
+              .timeout(2000)
+              .emitWithAck('sessions:join', {
+                sessionId: this.sessionId,
+              })
+
+            if (retry) {
+              AnalyticsService.captureEvent(EVENTS.SOCKET_SESSION_JOIN_RETRY, {
+                sessionId: this.session.id,
+              })
+              const msg =
+                'Received retry signal, try joining socket session room again.'
+              LoggerService.log(msg, {
+                sessionId: this.session.id,
+              })
+              throw new Error(msg)
+            }
+
+            if (success) {
+              this.isSocketSessionRoomConnected = true
+            }
           },
           {
             retry: () => !this.joinSocketSessionAbortController.signal.aborted,
