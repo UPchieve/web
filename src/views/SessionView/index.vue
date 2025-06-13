@@ -474,9 +474,6 @@ export default {
   },
 
   beforeUnmount() {
-    if (this.joinSocketSessionAbortController) {
-      this.joinSocketSessionAbortController.abort()
-    }
     socket.emit('sessions:leave', {
       sessionId: this.sessionId,
     })
@@ -521,7 +518,6 @@ export default {
       showModerationInfractionModal: false,
       showModerationInfractionToast: false,
       showScreenShareDisclaimer: false,
-      joinSocketSessionAbortController: null,
     }
   },
   computed: {
@@ -962,23 +958,13 @@ export default {
       if (this.shouldHideAuxiliarySection) this.hasSeenNewMessage = true
     },
     async joinSocketSession() {
-      this.joinSocketSessionAbortController = new AbortController()
-
       try {
-        await backOff(
-          () =>
-            socket.timeout(2000).emitWithAck('sessions:join', {
-              sessionId: this.sessionId,
-            }),
-          {
-            retry: () => !this.joinSocketAbortController.signal.aborted,
-          }
+        await backOff(() =>
+          socket.timeout(2000).emitWithAck('sessions:join', {
+            sessionId: this.sessionId,
+          })
         )
       } catch (err) {
-        if (this.joinSocketAbortController.signal.aborted) {
-          return
-        }
-
         window.alert(
           'Unable to join session chat. Please refresh and try again.'
         )
