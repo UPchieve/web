@@ -169,6 +169,7 @@
         :options="signupSourcesOptions"
         option-text-field="name"
         :is-required="true"
+        :reduce="(option) => option.id"
       />
     </div>
     <div class="uc-column" v-if="shouldShowOtherSignupInput()">
