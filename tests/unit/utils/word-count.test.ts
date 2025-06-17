@@ -16,5 +16,11 @@ describe('countWords', () => {
       `)
     ).toBe(6)
     expect(countWords('hi--how are you?')).toBe(4)
+
+    // U+2019 : RIGHT SINGLE QUOTATION MARK
+    expect(countWords('isn’t')).toBe(1)
+
+    // U+2014 : EM DASH
+    expect(countWords('silent—exactly')).toBe(2)
   })
 })
