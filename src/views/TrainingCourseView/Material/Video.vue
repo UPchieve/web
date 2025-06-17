@@ -1,12 +1,17 @@
 <template>
-  <div class="video">
+  <div :class="{ video: true, '`${props.cssClass}`': !!cssClass }">
     <iframe
-      class="video__iframe"
+      v-show="isLoaded"
+      :width="videoWidth"
+      :height="videoHeight"
+      class="video"
       :src="`https://player.vimeo.com/video/${resourceId}`"
       allow="autoplay; fullscreen"
       allowfullscreen
       title="external video for training"
+      @load="onLoaded"
     ></iframe>
+    <Loader v-if="!isLoaded" />
     <link-material v-if="pdf" :linkUrl="pdf" :label="'PDF Version'" />
     <resources-material :links="links" />
   </div>
@@ -15,16 +20,40 @@
 <script>
 import LinkMaterial from './Link.vue'
 import ResourcesMaterial from './Resources.vue'
+import Loader from '@/components/Loader.vue'
 
 export default {
   components: {
+    Loader,
     LinkMaterial,
     ResourcesMaterial,
+  },
+  data() {
+    return {
+      isLoaded: false,
+    }
   },
   props: {
     resourceId: String,
     pdf: String,
     links: Array,
+    cssClass: {
+      type: String,
+      default: null,
+    },
+  },
+  methods: {
+    onLoaded() {
+      this.isLoaded = true
+    },
+  },
+  computed: {
+    videoWidth() {
+      return this.$store.getters['app/mobileMode'] ? 300 : 560
+    },
+    videoHeight() {
+      return this.$store.getters['app/mobileMode'] ? 150 : 315
+    },
   },
 }
 </script>
@@ -32,10 +61,6 @@ export default {
 <style lang="scss" scoped>
 .video {
   color: black;
-
-  &__iframe {
-    width: 100%;
-    height: 400px;
-  }
+  width: 100%;
 }
 </style>

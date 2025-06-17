@@ -40,7 +40,6 @@ import SignupView from './views/SignupView/index.vue'
 import StudentAssignmentView from './views/StudentAssignmentView.vue'
 import StudentClassesView from './views/StudentClassesView.vue'
 import StudentPartnerSignupView from './views/SignupView/StudentPartnerSignupView.vue'
-import TrainingCourseView from './views/TrainingCourseView/index.vue'
 import TrainingView from './views/TrainingView.vue'
 import VerificationView from './views/VerificationView/index.vue'
 import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView.vue'
@@ -63,6 +62,7 @@ import RewardsView from './views/RewardsView.vue'
 import SurveysView from './views/SurveysView.vue'
 import CombinedQuizView from '@/views/CombinedQuizView/index.vue'
 import { camelCase } from 'lodash-es'
+import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -338,7 +338,7 @@ const routes = [
   {
     path: '/training/course/:courseKey',
     name: 'TrainingCourseView',
-    component: TrainingCourseView,
+    component: TrainingViewWrapper,
     meta: { protected: true },
   },
   {
