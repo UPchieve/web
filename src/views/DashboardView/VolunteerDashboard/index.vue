@@ -452,6 +452,7 @@ export default {
         elapsedAvailability: this.user.elapsedAvailability,
         totalQuizzesPassed: this.user.totalQuizzesPassed,
         totalStudentsHelped: this.user.uniqueStudentsHelpedCount,
+        numReferredVolunteers: this.user.numReferredVolunteers,
       })
     },
   },
@@ -512,6 +513,7 @@ export default {
       totalQuizzesPassed,
       elapsedAvailability,
       totalStudentsHelped,
+      numReferredVolunteers,
     }) {
       let numHoursSelected = 0
 
@@ -556,6 +558,11 @@ export default {
       // (6) Elapsed availability
       const numElapsedAvailabilityHours = elapsedAvailability
 
+      const numReferralHours = hoursToHoursAndMinutes(
+        (numReferredVolunteers * 12) / 60,
+        formatFn
+      )
+
       return [
         {
           label: 'Hours of availability selected',
@@ -585,6 +592,10 @@ export default {
         {
           label: 'Total students helped',
           value: `${totalStudentsHelped} students helped`,
+        },
+        {
+          label: 'Total referral hours',
+          value: `${numReferralHours}`,
         },
       ]
     },
