@@ -1347,7 +1347,7 @@ export default {
         showColourPanel: false,
         showToolbar: false,
         showHints: false,
-        zoomOnResize: true,
+        zoomOnResize: false,
       })
 
       this.zwibblerCtx = markRaw(zwibblerCtx)
@@ -1431,12 +1431,14 @@ export default {
           this.useInfiniteWhiteboard = true
           this.zwibblerCtx.setConfig('allowZoom', true)
           this.zwibblerCtx.setConfig('scrollbars', false)
+          this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'down')
           this.zoomToFit()
           this.addInfiniteSizeListeners()
         } else {
           this.useInfiniteWhiteboard = false
           this.zwibblerCtx.setConfig('allowZoom', false)
           this.zwibblerCtx.setConfig('scrollbars', true)
+          this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'none')
           this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight)
           this.resizeViewRectangle()
           this.addFixedSizeListeners()
@@ -1451,14 +1453,19 @@ export default {
         this.isConnected = true
         this.zwibblerCtx.setConfig('readOnly', false)
 
-        // @todo access the connection in a less sketchy way
-        // If you're using public/static/zwibbler-demo.js as your VUE_APP_ZWIBBLER_URL value,
-        // then get the `zc.Pb.Pb` else assume you're using zwibbler2.js from the cdn
-        const zwibblerWsConnection = this.zwibblerCtx?.zc?.Pb?.Pb
-          ? this.zwibblerCtx.zc.Pb.Pb
-          : this.zwibblerCtx.Ec.rc.rc
+        // TODO: _Is_ there a way to access the WS connection in a less sketchy way?
+        // The Zwibbler WS connection is on different properties depending on the build you are using.
+        // In order, try:
+        // - public/static/zwibbler-demo.js
+        // - (CDN) march2024/zwibbler2.js
+        // - (CDN) june2021/zwibbler2.js
+        const zwibblerWsConnection =
+          this.zwibblerCtx?.zc?.Pb?.Pb ??
+          this.zwibblerCtx?.kc?.Ac?.Ac ??
+          this.zwibblerCtx?.Ec?.rc?.rc
         const zwibblerOnMessage = zwibblerWsConnection.onmessage
         const zwibblerOnClose = zwibblerWsConnection.onclose
+
         // Intercept Zwibbler's websocket message handler
         zwibblerWsConnection.onmessage = (messageEvent) => {
           // Forward message to Zwibbler unless it's our "pong" response
@@ -1535,6 +1542,7 @@ export default {
             setTimeout(() => {
               this.zwibblerCtx.setDocumentSize(null, null)
               this.zwibblerCtx.setConfig('allowZoom', true)
+              this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'down')
               this.zoomToFit()
             }, 500)
           }
