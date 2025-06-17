@@ -69,6 +69,8 @@ describe('SessionChat', () => {
         shouldHideChatSection: false,
         setHasSeenNewMessage: true,
         currentSession: overrides.currentSession ?? currentSession,
+        isSocketSessionRoomConnected:
+          overrides.isSocketSessionRoomConnected ?? true,
       },
     })
   }
@@ -383,5 +385,15 @@ describe('SessionChat', () => {
       expect(wrapper.vm.shouldShowTimestamp(messages[0], 0)).toBe(true)
       expect(wrapper.vm.shouldShowTimestamp(messages[1], 1)).toBe(true)
     })
+  })
+
+  it('Disables sending chat message if not connected to the socket session room', async () => {
+    const wrapper = getWrapper({ isSocketSessionRoomConnected: false })
+    const message = await sendMessage(wrapper)
+
+    expect(ModerationService.checkIfMessageIsClean).not.toHaveBeenCalled()
+    expect(wrapper.get('[data-testid="chat-textarea"]').element.value).toBe(
+      message
+    )
   })
 })

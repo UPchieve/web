@@ -36,16 +36,8 @@
         <loading-message
           message="Attempting to connect the chat"
           class="chat-warning chat-warning--connection"
-          v-show="isSessionConnectionFailure"
+          v-show="showConnectingToChatMessage"
         />
-      </transition>
-      <transition name="chat-warning">
-        <p
-          class="chat-warning chat-warning--message-error"
-          v-show="isMessageError"
-        >
-          Failed to send message
-        </p>
       </transition>
     </div>
 
@@ -202,7 +194,11 @@
           :sendTextMessage="sendTranscriptMessage"
         />
         <button
-          :disabled="waitingForModeration || newMessage.length === 0"
+          :disabled="
+            waitingForModeration ||
+            newMessage.length === 0 ||
+            !isSocketSessionRoomConnected
+          "
           class="send-button"
           :class="{ hidden: textMessageHidden }"
           @click="sendMessage"
@@ -274,7 +270,7 @@ export default {
     shouldHideChatSection: { type: Boolean, required: true },
     currentSession: { type: Object, required: true },
     isInRecap: { type: Boolean, default: false },
-    isSocketConnected: { type: Boolean, required: true },
+    isSocketSessionRoomConnected: { type: Boolean, required: true },
     isSessionAlive: { type: Boolean, required: true },
     isFetchingIsSessionRecapEligible: { type: Boolean, default: false },
     isSessionRecapEligible: { type: Boolean, default: false },
@@ -356,16 +352,12 @@ export default {
     // The chat is already loaded with a connection failure in SessionRecapView
     // since it's checking if the socket joined the room. Exclude SessionRecapView
     // when logging out expected errors
-    isSessionConnectionFailure: function () {
-      const isConnectionFailure =
-        !this.isSocketConnected && this.isSessionAlive && !this.isInRecap
-      if (isConnectionFailure)
-        LoggerService.noticeError(new Error('Attempting to connect the chat'), {
-          tags: {
-            sessionId: this.currentSession.id,
-          },
-        })
-      return isConnectionFailure
+    showConnectingToChatMessage() {
+      return (
+        !this.isInRecap &&
+        this.isSessionAlive &&
+        !this.isSocketSessionRoomConnected
+      )
     },
     unreadMessageNote: function () {
       return `${this.numberOfUnreadChatMessages} unread message${
@@ -381,7 +373,7 @@ export default {
     },
     documentTitle() {
       return this.typingIndicatorShown &&
-        this.isSocketConnected &&
+        this.isConnectedToSessionRoom &&
         this.isSessionAlive
         ? `${this.sessionPartnerName || 'Chatbot'} is typing...`
         : 'UPchieve'
@@ -609,7 +601,7 @@ export default {
     async sendMessage() {
       const message = this.newMessage.trim()
       // Early exit if message is blank
-      if (isEmpty(message)) return
+      if (isEmpty(message) || !this.isSocketSessionRoomConnected) return
 
       await this.moderateMessage(message)
       this.notTyping()
@@ -840,13 +832,6 @@ export default {
       },
       deep: true,
     },
-    messageError() {
-      if (this.isMessageError) return
-      this.isMessageError = true
-      setTimeout(() => {
-        this.isMessageError = false
-      }, 1000)
-    },
     messageData: {
       handler(data) {
         const { userId, sessionId } = data
@@ -875,12 +860,7 @@ export default {
 
     isTyping({ sessionId, isTyping }) {
       if (sessionId !== this.currentSession.id) return
-      if (!isTyping) this.typingIndicatorShown = false
-      else
-        this.typingIndicatorShown = this.isInRecap
-          ? true
-          : // TODO: Are these checks still needed? Could we just read off `isTyping` instead?
-            this.isSessionAlive && this.isSocketConnected
+      this.typingIndicatorShown = isTyping
     },
     'currentSession.messages': {
       handler(currentVal, prevVal) {

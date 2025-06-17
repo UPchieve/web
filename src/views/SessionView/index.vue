@@ -216,7 +216,7 @@
           :currentSession="session"
           :shouldHideChatSection="shouldHideChatSection"
           :setHasSeenNewMessage="setHasSeenNewMessage"
-          :isSocketConnected="isSocketConnected"
+          :isSocketSessionRoomConnected="isSocketSessionRoomConnected"
           :isSessionAlive="isSessionAlive"
           :sessionHasEnded="sessionHasEnded"
         />
@@ -523,6 +523,7 @@ export default {
       showModerationInfractionToast: false,
       showScreenShareDisclaimer: false,
       joinSocketSessionAbortController: null,
+      isSocketSessionRoomConnected: false,
     }
   },
   computed: {
@@ -824,6 +825,7 @@ export default {
       }
 
       if (!curr && prev) {
+        this.isSocketSessionRoomConnected = false
         AnalyticsService.captureEvent(
           EVENTS.USER_SOCKET_IS_DISCONNECTED_IN_SESSION,
           {
@@ -967,10 +969,12 @@ export default {
 
       try {
         await backOff(
-          () =>
-            socket.timeout(2000).emitWithAck('sessions:join', {
+          async () => {
+            await socket.timeout(2000).emitWithAck('sessions:join', {
               sessionId: this.sessionId,
-            }),
+            })
+            this.isSocketSessionRoomConnected = true
+          },
           {
             retry: () => !this.joinSocketSessionAbortController.signal.aborted,
           }
