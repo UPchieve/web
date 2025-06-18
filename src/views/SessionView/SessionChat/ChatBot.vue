@@ -6,7 +6,12 @@
         v-for="(botMsg, index) in sentBotMessages"
         :key="index"
       >
-        <chat-bot-icon class="avatar" />
+        <div class="avatar-container">
+          <chat-bot-icon
+            v-if="sentBotMessages.length - 1 === index"
+            class="avatar"
+          />
+        </div>
         <p class="waiting-cards__message" v-if="!botMsg.hasHtml">
           {{ botMsg.msg }}
         </p>
@@ -22,7 +27,9 @@
       v-if="isStillMessaging || isFetchingIsSessionRecapEligible"
     >
       <div class="waiting-cards__container">
-        <chat-bot-icon class="avatar" />
+        <div class="avatar-container">
+          <chat-bot-icon class="avatar" />
+        </div>
         <div class="typing-indicator">
           <span></span>
           <span></span>
@@ -234,12 +241,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.avatar {
-  width: 32px;
+.avatar-container {
   height: 32px;
-  margin-top: 0.3125em;
-  border-radius: 16px;
-  margin-right: 0.75em;
+  margin-right: 0.5rem;
+  margin-bottom: 4px;
+  width: 32px;
+
+  .avatar {
+    border-radius: 16px;
+    height: 100%;
+    width: 100%;
+  }
 }
 
 .chat-bot {
@@ -256,20 +268,20 @@ export default {
   align-items: flex-start;
 
   &__container {
-    @include flex-container(row, initial, center);
+    @include flex-container(row, initial, end);
   }
 
   &__message {
-    text-align: left;
-    position: relative;
-    padding: 10px 14px;
-    overflow-wrap: break-word;
-    font-size: 16px;
     background: #67d3ab;
     border-radius: 20px;
-    max-width: 80%;
     color: #fff;
-    margin-bottom: 16px;
+    font-size: 16px;
+    overflow-wrap: break-word;
+    padding: 10px 14px;
+    position: relative;
+    margin-bottom: 4px;
+    max-width: 80%;
+    text-align: left;
 
     &--dark {
       color: $c-soft-black;

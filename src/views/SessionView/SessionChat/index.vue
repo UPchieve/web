@@ -69,7 +69,7 @@
         <div
           v-for="(message, index) in withPendingMessages"
           :key="`message-${index}`"
-          :class="[messageAlignment(message)]"
+          :class="[messageAlignment(message), { 'mt-2': index === 0 }]"
           class="message"
         >
           <span
@@ -78,40 +78,37 @@
           >
             {{ message.contents }}</span
           >
-          <template v-else-if="message.type === 'audio-transcription'">
-            <component
-              class="avatar"
-              :is="avatar(message)"
-              v-if="message.user !== user.id"
-            />
-            <transcribed-message :message="message" class="contents" />
-            <div class="time">
-              {{ formatTime(message.createdAt) }}
-            </div>
-          </template>
           <template v-else>
-            <component
-              class="avatar"
-              :is="avatar(message)"
-              v-if="message.user !== user.id"
-            />
-
-            <div class="contents" :class="chatBotContents(message)">
-              <span v-if="message.hasHtml" v-html="message.contents"></span>
-              <span v-else-if="message.type === 'voice'">
-                <voice-message
-                  :message="message"
-                  :isSender="message.user === user.id"
-                />
-              </span>
-              <span
-                v-else
-                :data-testid="`message-from-user-id-${message.user}`"
-                >{{ message.contents }}</span
-              >
+            <div v-if="message.user !== this.user.id" class="avatar-container">
+              <component
+                v-if="shouldShowPartnerAvatar(message, index)"
+                class="avatar"
+                :is="avatar(message)"
+              />
             </div>
-            <div class="time">
-              {{ formatTime(message.createdAt) }}
+
+            <div class="contents">
+              <div class="bubble" :class="chatBotMessageStyle(message)">
+                <span v-if="message.hasHtml" v-html="message.contents"></span>
+                <transcribed-message
+                  v-else-if="message.type === 'audio-transcription'"
+                  :message="message"
+                />
+                <span v-else-if="message.type === 'voice'">
+                  <voice-message
+                    :message="message"
+                    :isSender="message.user === user.id"
+                  />
+                </span>
+                <span
+                  v-else
+                  :data-testid="`message-from-user-id-${message.user}`"
+                  >{{ message.contents }}</span
+                >
+              </div>
+              <div v-if="shouldShowTimestamp(message, index)" class="time">
+                {{ formatTime(message.createdAt) }}
+              </div>
             </div>
           </template>
         </div>
@@ -775,13 +772,37 @@ export default {
         volunteerId
       )
     },
-    chatBotContents(message) {
+    chatBotMessageStyle(message) {
       const isStudentMessage = message.user === this.currentSession.student.id
       const isVolunteerMessage = this.currentSession.volunteer
         ? message.user === this.currentSession.volunteer.id
         : false
       if (!isStudentMessage && !isVolunteerMessage) return 'contents--chat-bot'
       return ''
+    },
+    shouldShowPartnerAvatar(message, index) {
+      // Show the partner avatar if it's the last message.
+      if (index === this.withPendingMessages.length - 1) return true
+
+      // Show the partner avatar if the next message isn't from the partner.
+      const nextMessage = this.withPendingMessages[index + 1]
+      if (nextMessage.user !== message.user) return true
+
+      return false
+    },
+    shouldShowTimestamp(message, index) {
+      // Show the timestamp on the last message.
+      if (index === this.withPendingMessages.length - 1) return true
+
+      // Show the timestamp if the next message isn't from the same person.
+      const nextMessage = this.withPendingMessages[index + 1]
+      if (nextMessage.user !== message.user) return true
+
+      // Show the timestamp if the times between this message
+      // and the next are different.
+      const currentFormatted = this.formatTime(message.createdAt)
+      const nextFormatted = this.formatTime(nextMessage.createdAt)
+      return currentFormatted !== nextFormatted
     },
     celebrate() {
       this.$store.dispatch('celebrations/celebrate')
@@ -1005,46 +1026,77 @@ export default {
 }
 
 .message {
-  position: relative;
-  padding: 1.5em;
   display: flex;
   justify-content: flex-start;
+  position: relative;
+  margin-top: 4px;
 
   /* Safari needs this specified to lay out the message divs properly. */
   flex-shrink: 0;
-}
 
-.avatar {
-  width: 32px;
-  height: 32px;
-  margin-top: 0.3125em;
-  border-radius: 16px;
-  margin-right: 0.75em;
-}
+  &.left {
+    padding-left: 20px;
+  }
 
-.name {
-  font-weight: 600;
-}
+  &.right {
+    flex-direction: row-reverse;
+    padding-right: 20px;
 
-.time {
-  font-size: 14px;
-  font-weight: 500;
-  color: #73737a;
-  position: absolute;
-  bottom: 0;
-}
+    .contents {
+      align-items: flex-end;
 
-.contents {
-  text-align: left;
-  padding: 0.625em 0.875em;
-  overflow-wrap: break-word;
-  background-color: $c-background-grey;
-  border-radius: 20px;
-  max-width: 80%;
-  white-space: pre-line;
+      .bubble {
+        background-color: $c-background-blue;
+      }
 
-  &--chat-bot {
-    background-color: $upchieve-chat-bot-green;
+      .time {
+        text-align: right;
+      }
+    }
+  }
+
+  &.center {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .avatar-container {
+    width: 32px;
+    position: relative;
+    margin-right: 4px;
+
+    .avatar {
+      border-radius: 16px;
+      bottom: 21px;
+      height: 32px;
+      position: absolute;
+      width: 100%;
+    }
+  }
+
+  .contents {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+
+    .bubble {
+      text-align: left;
+      padding: 0.625em 0.875em;
+      overflow-wrap: break-word;
+      background-color: $c-background-grey;
+      border-radius: 20px;
+      white-space: pre-line;
+
+      &--chat-bot {
+        background-color: $upchieve-chat-bot-green;
+      }
+    }
+
+    .time {
+      color: #73737a;
+      font-size: 14px;
+      font-weight: 500;
+    }
   }
 }
 
@@ -1052,25 +1104,6 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
-}
-
-.left {
-  .time {
-    margin-left: 44px;
-  }
-}
-
-.right {
-  flex-direction: row-reverse;
-
-  .contents {
-    background-color: $c-background-blue;
-  }
-}
-
-.center {
-  justify-content: center;
-  align-items: center;
 }
 
 .chat-footer {
@@ -1108,15 +1141,11 @@ export default {
 
 .typing-indicator {
   position: absolute;
-  top: -2.3em;
+  top: -20px;
   padding-left: 1em;
   font-size: 13px;
   font-weight: 300;
   transition: 0.25s;
-
-  @include breakpoint-below('medium') {
-    top: -1.5em;
-  }
 }
 
 .call-status-indicator {
