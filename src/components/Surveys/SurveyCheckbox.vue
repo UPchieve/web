@@ -28,11 +28,12 @@ export default {
       required: true,
     },
     name: {
-      type: String,
+      type: [String, Number],
       required: true,
     },
     checked: {
       type: Boolean,
+      default: false,
       required: true,
     },
     label: {

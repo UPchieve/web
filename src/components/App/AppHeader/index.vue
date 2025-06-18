@@ -62,6 +62,7 @@ export default {
       isStudentsBecomeVolunteersEnabled:
         'featureFlags/isStudentsBecomeVolunteersEnabled',
       hasVolunteerRole: 'user/hasVolunteerRole',
+      hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
     }),
 
     headerComponent() {

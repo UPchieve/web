@@ -122,21 +122,19 @@ onBeforeMount(async () => {
           Thank you for participating in our 5 minute survey!
           {{
             impactStudySurveyRewardAmount
-              ? `Once you complete
-          the survey, we'll thank you for your time with a digital visa gift
+              ? `We'll thank you for your time with a digital visa gift
           card for $${impactStudySurveyRewardAmount} sent to your email.`
               : ''
           }}
         </p>
         <p>
-          We really appreciate your help! We'll use this info to share
-          high-level anonymous insights with the people that fund us, so we can
-          provide UPchieve totally free to students. But we'll never share your
-          name and answers together with anyone.
+          Your answers help us share anonymous insights with our funders so we
+          can keep UPchieve 100% free for students. We'll never share your name
+          with your answers.
         </p>
         <p>
-          We'll reach out to you every few months with the chance to update your
-          info and earn more $!
+          For each question below, please put "N/A" if you didn't take the
+          course or don't want to share the requested info.
         </p>
 
         <div class="survey__separator" />

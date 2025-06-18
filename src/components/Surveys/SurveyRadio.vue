@@ -39,7 +39,7 @@ export default {
       required: true,
     },
     name: {
-      type: String,
+      type: [String, Number],
       required: true,
     },
     checked: {
