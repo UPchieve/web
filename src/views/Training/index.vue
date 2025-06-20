@@ -66,13 +66,55 @@ const videoHeight = computed(() =>
   store.getters['app/mobileMode'] ? 150 : 315
 )
 
+const showStepper = computed(() => currentModuleIndex.value !== 0) // Don't show stepper on the intro page.
+const stepperNumSteps = computed(
+  () => trainingCourse.value!.modules.length - 2 ?? 0
+) // Don't count intro page or quiz as steps
+const stepperStepNames = computed(() =>
+  trainingCourse.value?.modules.map((module) => module.name)
+)
+const isReadyForQuiz = computed(() => trainingCourse.value?.isComplete)
+
 onMounted(async () => {
   const course: TrainingCourse = (
     await NetworkService.getTrainingCourse(courseKey.value)
   ).data.course
+
+  const coachingOnUPchieveModule = course.modules.find(
+    (module) => module.name === 'Coaching on UPchieve'
+  )!
+  // Separate some of the modules from the BE into their own modules, just for the test.
+  const communitySafetySuccessModule = course.modules.find(
+    (module) => module.name === 'Community Safety & Success'
+  )!
+  const safetyModule: TrainingModuleType = {
+    name: 'Community Safety',
+    materials: communitySafetySuccessModule.materials.filter((material) =>
+      ['Community Safety & Success', 'Review Safety Policy'].includes(
+        material.name
+      )
+    ),
+  }
+  const academicIntegrityModule: TrainingModuleType = {
+    name: 'Academic Integrity',
+    materials: communitySafetySuccessModule.materials.filter(
+      (material) => material.name === 'Review Academic Integrity Policy'
+    ),
+  }
+  const deiPolicyModule: TrainingModuleType = {
+    name: 'Diversity, Equity, and Inclusion Policy',
+    materials: communitySafetySuccessModule.materials.filter(
+      (material) =>
+        material.name === 'Review Diversity, Equity, and Inclusion Policy'
+    ),
+  }
+
   const modifiedModules: TrainingModuleType[] = [
     welcomeModule,
-    ...course.modules,
+    coachingOnUPchieveModule,
+    safetyModule,
+    academicIntegrityModule,
+    deiPolicyModule,
   ]
   if (!hasPassedQuiz.value) {
     modifiedModules.push(quizModule)
@@ -93,28 +135,23 @@ const onClickNext = async () => {
   AnalyticsService.captureEvent(EVENTS.LMS_USER_CLICKED_NEXT_BUTTON)
 
   // Record progress
-  if (
-    currentModule.value?.materials.length &&
-    currentModule.value?.materials?.some((material) => !material.isCompleted)
-  ) {
-    try {
-      for (const material of currentModule?.value?.materials ?? []) {
-        // TODO: Update backend to accept multiple materials in a single request.
-        await NetworkService.recordTrainingCourseProgress(
-          courseKey.value,
-          material.materialKey
-        )
-      }
+  try {
+    for (const material of currentModule?.value?.materials ?? []) {
+      // TODO: Update backend to accept multiple materials in a single request.
+      await NetworkService.recordTrainingCourseProgress(
+        courseKey.value,
+        material.materialKey
+      )
       AnalyticsService.captureEvent(
         EVENTS.LMS_USER_COMPLETED_MODULE_MATERIALS,
         {
           moduleName: currentModule.value?.name,
         }
       )
-    } catch (err) {
-      error.value =
-        'Oops! Something went wrong. Please refresh the page and try again.'
     }
+  } catch (err) {
+    error.value =
+      'Oops! Something went wrong. Please refresh the page and try again.'
   }
   if (!error.value) {
     if (!viewingLastModule.value) {
@@ -158,14 +195,24 @@ watch(currentModule, (current) => {
         :disabled="viewingFirstModule"
         >Back</LargeButton
       >
-      <LargeButton
-        class="navigation-button"
-        variant="primary"
-        :showArrow="false"
-        @click="onClickNext"
-        :disabled="!!error"
-        >{{ nextButtonLabel }}</LargeButton
-      >
+      <div class="continue-buttons">
+        <LargeButton
+          class="navigation-button"
+          variant="primary"
+          :showArrow="false"
+          @click="onClickNext"
+          :disabled="!!error"
+          >{{ nextButtonLabel }}</LargeButton
+        >
+        <LargeButton
+          v-if="isReadyForQuiz"
+          class="navigation-button"
+          variant="primary"
+          :showArrow="false"
+          @click="goToQuiz"
+          >Take the Quiz</LargeButton
+        >
+      </div>
     </div>
     <div v-if="error" class="error-message-container alert alert-danger">
       {{ error }}
@@ -179,9 +226,11 @@ watch(currentModule, (current) => {
       </h2>
       <div class="training-stepper-container">
         <Stepper
+          v-if="showStepper"
           class="training-stepper"
-          :currentStep="currentModuleIndex + 1"
-          :totalSteps="trainingCourse?.modules?.length ?? 0"
+          :currentStep="currentModuleIndex"
+          :totalSteps="stepperNumSteps"
+          :stepNames="stepperStepNames"
         />
       </div>
     </div>
@@ -242,6 +291,11 @@ watch(currentModule, (current) => {
 </template>
 
 <style lang="scss" scoped>
+.continue-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
 .error-message-container {
   display: flex;
   flex-direction: column;

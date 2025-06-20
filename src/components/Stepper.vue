@@ -6,7 +6,10 @@
       :key="`step-${numStep}`"
       :class="numStep == totalSteps && 'step--last-step'"
     >
-      <div class="circle-container">
+      <div
+        class="circle-container"
+        :title="stepNames ? stepNames[numStep - 1] : ''"
+      >
         <div class="circle" :class="circleStepStatus(numStep)">
           <check-mark class="check-mark" v-if="currentStep > numStep" />
           <span v-else class="step-display" :class="checkMarkStatus(numStep)">{{
@@ -34,6 +37,7 @@ export default {
   props: {
     totalSteps: { type: Number, required: true },
     currentStep: { type: Number, required: true },
+    stepNames: { type: Array, required: false },
   },
   methods: {
     circleStepStatus(numStep) {
