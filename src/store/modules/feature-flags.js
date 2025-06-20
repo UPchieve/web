@@ -67,6 +67,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
       [POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION]: '',
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: {},
+      [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]:
+        'Interested in becoming a volunteer tutor on UPchieve?',
     },
     eligibleForChooseTutorType: false,
   },
@@ -201,6 +203,8 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
     isStudentsBecomeVolunteersEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
+    studentsBecomeVolunteersCopy: (state) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
     tutorFeedbackToTeacherQuestion: (state) =>
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION

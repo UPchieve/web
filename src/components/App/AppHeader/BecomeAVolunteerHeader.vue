@@ -5,7 +5,7 @@
       :class="{ 'mobile-header-message': mobileMode }"
     >
       <div class="emoji">🌟</div>
-      Interested in becoming a volunteer tutor on UPchieve?
+      {{ studentsBecomeVolunteersCopy }}
       <div class="emoji">📚</div>
     </div>
     <LargeButton @click="toggleShowInfoModal" class="ml-auto">
@@ -86,7 +86,9 @@ const becomeAVolunteer = async () => {
     // @TODO
   }
 }
-
+const studentsBecomeVolunteersCopy = computed(
+  () => store.getters['featureFlags/studentsBecomeVolunteersCopy']
+)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 onMounted(() => {
   AnalyticsService.captureEvent(EVENTS.ROLE_SWITCHING_USER_SAW_BANNER)
