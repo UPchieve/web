@@ -8,7 +8,11 @@ import flushPromises from 'flush-promises'
 
 vi.mock('../../../../../services/ModerationService')
 describe('SessionChat', () => {
-  const getWrapper = (overrides = {}) => {
+  const currentSession = {
+    messages: [],
+    id: '123',
+  }
+  function getWrapper(overrides = {}) {
     const store = createStore({
       modules: {
         ...storeOptions.modules,
@@ -56,18 +60,20 @@ describe('SessionChat', () => {
       },
     })
     return shallowMount(SessionChat, {
-      // localVue,
       global: {
         plugins: [store],
       },
-      // store,
       propsData: {
-        currentSession,
+        isSessionAlive: true,
+        isSocketConnected: true,
+        shouldHideChatSection: false,
+        setHasSeenNewMessage: true,
+        currentSession: overrides.currentSession ?? currentSession,
       },
     })
   }
 
-  const sendMessage = async (wrapper) => {
+  async function sendMessage(wrapper) {
     const textArea = wrapper.get('[data-testid="chat-textarea"]')
     const message = 'a message'
 
@@ -81,64 +87,100 @@ describe('SessionChat', () => {
     return message
   }
 
-  const currentSession = {
-    messages: [],
-    id: '123',
-  }
   beforeEach(() => {
     vi.resetAllMocks()
   })
 
-  test.each([{ failures: {} }, { failures: { profanity: ['butt'] } }])(
-    'It clears the textarea only when the message is clean and can be sent (isClean=%s)',
-    async (isClean) => {
-      ModerationService.checkIfMessageIsClean = vi
-        .fn()
-        .mockResolvedValue(isClean)
-      const wrapper = getWrapper()
-      const textArea = wrapper.get('[data-testid="chat-textarea"]')
-      const message = await sendMessage(wrapper)
+  describe('moderateMessage', () => {
+    test.each([{ failures: {} }, { failures: { profanity: ['butt'] } }])(
+      'It clears the textarea only when the message is clean and can be sent (isClean=%s)',
+      async (isClean) => {
+        ModerationService.checkIfMessageIsClean = vi
+          .fn()
+          .mockResolvedValue(isClean)
+        const wrapper = getWrapper()
+        const textArea = wrapper.get('[data-testid="chat-textarea"]')
+        const message = await sendMessage(wrapper)
 
-      expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
-        message,
-        sessionId: currentSession.id,
-      })
-      await flushPromises()
-      const hasFailures = Boolean(isClean.failures.profanity)
-      expect(textArea.element.value).toEqual(hasFailures ? message : '')
-    }
-  )
+        expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
+          message,
+          sessionId: currentSession.id,
+        })
+        await flushPromises()
+        const hasFailures = Boolean(isClean.failures.profanity)
+        expect(textArea.element.value).toEqual(hasFailures ? message : '')
+      }
+    )
 
-  test.each([
-    {
-      hateful_language: ['1', '2'],
-      profanity: ['5hit'],
-    },
-    {
-      hateful_language: ['1'],
-    },
-    { profanity: ['5hit'] },
-    {
-      hateful_language: ['1', '2'],
-      profanity: undefined,
-    },
-    {
-      hateful_language: ['1', '2'],
-      profanity: [],
-    },
-  ])(
-    'It renders the moderation failure reasons (failures=%s)',
-    async (moderationFailures) => {
+    test.each([
+      {
+        hateful_language: ['1', '2'],
+        profanity: ['5hit'],
+      },
+      {
+        hateful_language: ['1'],
+      },
+      { profanity: ['5hit'] },
+      {
+        hateful_language: ['1', '2'],
+        profanity: undefined,
+      },
+      {
+        hateful_language: ['1', '2'],
+        profanity: [],
+      },
+    ])(
+      'It renders the moderation failure reasons (failures=%s)',
+      async (moderationFailures) => {
+        ModerationService.checkIfMessageIsClean = vi.fn().mockResolvedValue({
+          failures: moderationFailures,
+        })
+        const wrapper = getWrapper({
+          user: {
+            isVolunteer: true,
+            isStudent: false,
+          },
+        })
+        const message = await sendMessage(wrapper)
+        expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
+          message,
+          sessionId: currentSession.id,
+        })
+        expect(
+          wrapper.find('[data-testid="moderation-body"]').isVisible()
+        ).toBeTruthy()
+        // Expect each reason to be rendered, as well as one additional div per reason
+        // that contains the offending substrings
+        const expectedDataTestIds = Object.keys(moderationFailures)
+        Object.keys(moderationFailures).forEach((reason) => {
+          expectedDataTestIds.push(`${reason}-instances`)
+        })
+        expect(expectedDataTestIds.length).toEqual(
+          Object.keys(moderationFailures).length * 2
+        )
+        expectedDataTestIds.forEach((testId) => {
+          expect(
+            wrapper.find(`[data-testid="${testId}"]`).isVisible()
+          ).toBeTruthy()
+        })
+      }
+    )
+
+    it('Does not render profanity for students', async () => {
       ModerationService.checkIfMessageIsClean = vi.fn().mockResolvedValue({
-        failures: moderationFailures,
+        failures: {
+          profanity: ['5hit'],
+          hateful_language: ['1'],
+        },
       })
       const wrapper = getWrapper({
         user: {
-          isVolunteer: true,
-          isStudent: false,
+          isStudent: true,
+          isVolunteer: false,
         },
       })
       const message = await sendMessage(wrapper)
+
       expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
         message,
         sessionId: currentSession.id,
@@ -146,54 +188,200 @@ describe('SessionChat', () => {
       expect(
         wrapper.find('[data-testid="moderation-body"]').isVisible()
       ).toBeTruthy()
-      // Expect each reason to be rendered, as well as one additional div per reason
-      // that contains the offending substrings
-      const expectedDataTestIds = Object.keys(moderationFailures)
-      Object.keys(moderationFailures).forEach((reason) => {
-        expectedDataTestIds.push(`${reason}-instances`)
-      })
-      expect(expectedDataTestIds.length).toEqual(
-        Object.keys(moderationFailures).length * 2
-      )
-      expectedDataTestIds.forEach((testId) => {
-        expect(
-          wrapper.find(`[data-testid="${testId}"]`).isVisible()
-        ).toBeTruthy()
-      })
-    }
-  )
+      expect(
+        wrapper.find('[data-testid="hateful_language"]').isVisible()
+      ).toBeTruthy()
+      expect(
+        wrapper.find('[data-testid="hateful_language-instances"]').isVisible()
+      ).toBeTruthy()
+      expect(wrapper.find('[data-testid="profanity"]').exists()).toBeFalsy()
+      expect(
+        wrapper.find('[data-testid="profanity-instances"]').exists()
+      ).toBeFalsy()
+    })
+  })
 
-  it('Does not render profanity for students', async () => {
-    ModerationService.checkIfMessageIsClean = vi.fn().mockResolvedValue({
-      failures: {
-        profanity: ['5hit'],
-        hateful_language: ['1'],
-      },
-    })
-    const wrapper = getWrapper({
-      user: {
-        isStudent: true,
-        isVolunteer: false,
-      },
-    })
-    const message = await sendMessage(wrapper)
+  describe('shouldShowPartnerAvatar', () => {
+    test('shows avatar on the last message', async () => {
+      const messages = [
+        {
+          user: 'student-id',
+          contents: 'First message',
+          createdAt: new Date(),
+        },
+        { user: 'student-id', contents: 'Last message', createdAt: new Date() },
+      ]
+      const wrapper = getWrapper({
+        user: {
+          state: { id: 'volunteer-id' },
+          isVolunteer: true,
+          isStudent: false,
+        },
+        currentSession: {
+          id: '000',
+          messages,
+          volunteer: {
+            id: 'volunteer-id',
+          },
+          student: {
+            id: 'student-id',
+          },
+        },
+      })
 
-    expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
-      message,
-      sessionId: currentSession.id,
+      expect(wrapper.vm.shouldShowPartnerAvatar(messages[0], 0)).toBe(false)
+      expect(wrapper.vm.shouldShowPartnerAvatar(messages[1], 1)).toBe(true)
     })
-    expect(
-      wrapper.find('[data-testid="moderation-body"]').isVisible()
-    ).toBeTruthy()
-    expect(
-      wrapper.find('[data-testid="hateful_language"]').isVisible()
-    ).toBeTruthy()
-    expect(
-      wrapper.find('[data-testid="hateful_language-instances"]').isVisible()
-    ).toBeTruthy()
-    expect(wrapper.find('[data-testid="profanity"]').exists()).toBeFalsy()
-    expect(
-      wrapper.find('[data-testid="profanity-instances"]').exists()
-    ).toBeFalsy()
+
+    test('shows avatar when next message is from different user', () => {
+      const messages = [
+        {
+          user: 'partner-id',
+          contents: 'Partner message',
+          createdAt: new Date(),
+        },
+        {
+          user: 'current-user-id',
+          contents: 'My message',
+          createdAt: new Date(),
+        },
+      ]
+      const wrapper = getWrapper({
+        user: {
+          state: { id: 'current-user-id' },
+          isVolunteer: true,
+          isStudent: false,
+        },
+        currentSession: {
+          id: '111',
+          messages,
+          volunteer: {
+            id: 'current-user-id',
+          },
+          student: {
+            id: 'partner-id',
+          },
+        },
+      })
+
+      expect(wrapper.vm.shouldShowPartnerAvatar(messages[0], 0)).toBe(true)
+    })
+  })
+
+  describe('shouldShowTimestamp', () => {
+    test('shows timestamp on the last message only of consecutive messages from same user', () => {
+      const messages = [
+        {
+          user: 'partner-id',
+          contents: 'First message',
+          createdAt: new Date('2025-01-01T10:00:00Z'),
+        },
+        {
+          user: 'partner-id',
+          contents: 'Middle message',
+          createdAt: new Date('2025-01-01T10:00:00Z'),
+        },
+        {
+          user: 'partner-id',
+          contents: 'Last message',
+          createdAt: new Date('2025-01-01T10:00:00Z'),
+        },
+      ]
+      const wrapper = getWrapper({
+        user: {
+          state: { id: 'current-user-id' },
+          isVolunteer: true,
+          isStudent: false,
+        },
+        currentSession: {
+          id: '222',
+          messages,
+          volunteer: {
+            id: 'current-user-id',
+          },
+          student: {
+            id: 'partner-id',
+          },
+        },
+      })
+
+      expect(wrapper.vm.shouldShowTimestamp(messages[0], 0)).toBe(false)
+      expect(wrapper.vm.shouldShowTimestamp(messages[1], 1)).toBe(false)
+      expect(wrapper.vm.shouldShowTimestamp(messages[2], 2)).toBe(true)
+    })
+
+    test('shows timestamp when next message is from different user', () => {
+      const messages = [
+        {
+          user: 'partner-id',
+          contents: 'Partner message',
+          createdAt: new Date('2025-01-01T10:00:00Z'),
+        },
+        {
+          user: 'current-user-id',
+          contents: 'My message',
+          createdAt: new Date('2025-01-01T10:00:00Z'),
+        },
+      ]
+      const wrapper = getWrapper({
+        user: {
+          state: { id: 'current-user-id' },
+          isVolunteer: true,
+          isStudent: false,
+        },
+        currentSession: {
+          id: '333',
+          messages,
+          volunteer: {
+            id: 'current-user-id',
+          },
+          student: {
+            id: 'partner-id',
+          },
+        },
+      })
+
+      wrapper.vm.withPendingMessages = messages
+
+      expect(wrapper.vm.shouldShowTimestamp(messages[0], 0)).toBe(true)
+      expect(wrapper.vm.shouldShowTimestamp(messages[1], 1)).toBe(true)
+    })
+
+    test('shows timestamp when different time between consecutive messages', () => {
+      const messages = [
+        {
+          user: 'partner-id',
+          contents: 'First message',
+          createdAt: new Date('2023-01-01T10:00:00Z'),
+        },
+        {
+          user: 'partner-id',
+          contents: 'Second message',
+          createdAt: new Date('2023-01-01T10:01:00Z'),
+        },
+      ]
+      const wrapper = getWrapper({
+        user: {
+          state: { id: 'current-user-id' },
+          isVolunteer: true,
+          isStudent: false,
+        },
+        currentSession: {
+          id: '444',
+          messages,
+          volunteer: {
+            id: 'current-user-id',
+          },
+          student: {
+            id: 'partner-id',
+          },
+        },
+      })
+
+      wrapper.vm.withPendingMessages = messages
+
+      expect(wrapper.vm.shouldShowTimestamp(messages[0], 0)).toBe(true)
+      expect(wrapper.vm.shouldShowTimestamp(messages[1], 1)).toBe(true)
+    })
   })
 })
