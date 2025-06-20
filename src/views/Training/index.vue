@@ -73,7 +73,6 @@ const stepperNumSteps = computed(
 const stepperStepNames = computed(() =>
   trainingCourse.value?.modules.map((module) => module.name)
 )
-const isReadyForQuiz = computed(() => trainingCourse.value?.isComplete)
 
 onMounted(async () => {
   const course: TrainingCourse = (
@@ -157,8 +156,10 @@ const onClickNext = async () => {
     if (!viewingLastModule.value) {
       const nextIndex = currentModuleIndex.value! + 1
       currentModule.value = trainingCourse.value?.modules[nextIndex]
-    } else {
+    } else if (!hasPassedQuiz.value) {
       goToQuiz()
+    } else {
+      goToDashboard()
     }
   }
 }
@@ -175,6 +176,9 @@ const goToQuiz = () => {
     trainingCourseKey: trainingCourse.value?.courseKey,
   })
   router.push(`/training/${courseKey.value}/quiz`)
+}
+const goToDashboard = () => {
+  router.push('/dashboard')
 }
 
 watch(currentModule, (current) => {
@@ -195,24 +199,14 @@ watch(currentModule, (current) => {
         :disabled="viewingFirstModule"
         >Back</LargeButton
       >
-      <div class="continue-buttons">
-        <LargeButton
-          class="navigation-button"
-          variant="primary"
-          :showArrow="false"
-          @click="onClickNext"
-          :disabled="!!error"
-          >{{ nextButtonLabel }}</LargeButton
-        >
-        <LargeButton
-          v-if="isReadyForQuiz"
-          class="navigation-button"
-          variant="primary"
-          :showArrow="false"
-          @click="goToQuiz"
-          >Take the Quiz</LargeButton
-        >
-      </div>
+      <LargeButton
+        class="navigation-button"
+        variant="primary"
+        :showArrow="false"
+        @click="onClickNext"
+        :disabled="!!error"
+        >{{ nextButtonLabel }}</LargeButton
+      >
     </div>
     <div v-if="error" class="error-message-container alert alert-danger">
       {{ error }}
@@ -291,11 +285,6 @@ watch(currentModule, (current) => {
 </template>
 
 <style lang="scss" scoped>
-.continue-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-}
 .error-message-container {
   display: flex;
   flex-direction: column;
