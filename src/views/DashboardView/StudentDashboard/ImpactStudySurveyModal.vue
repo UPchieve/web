@@ -233,7 +233,7 @@ watch(modalView, () => {
             {{
               surveyRewardAmount
                 ? ` We'll send you a $${surveyRewardAmount}
-            visa gift card!`
+            Amazon gift card!`
                 : ''
             }}
           </p>

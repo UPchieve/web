@@ -122,7 +122,7 @@ onBeforeMount(async () => {
           Thank you for participating in our 5 minute survey!
           {{
             impactStudySurveyRewardAmount
-              ? `We'll thank you for your time with a digital visa gift
+              ? `We'll thank you for your time with a digital Amazon gift
           card for $${impactStudySurveyRewardAmount} sent to your email.`
               : ''
           }}
