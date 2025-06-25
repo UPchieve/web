@@ -873,7 +873,8 @@ export default {
       if (
         newValue.endedBy !== this.user.id &&
         newValue.endedAt &&
-        !oldValue.endedAt
+        !oldValue.endedAt &&
+        Object.keys(oldValue).length > 0
       ) {
         this.$store.dispatch('user/addMessage', {
           contents: `${this.sessionPartnerName} has left the chat`,
