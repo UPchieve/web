@@ -66,6 +66,7 @@
         >
           <span
             v-if="message.isSystemMessage"
+            class="system-message"
             :data-testid="`message-from-system`"
           >
             {{ message.contents }}</span
@@ -79,7 +80,10 @@
               />
             </div>
 
-            <div class="contents">
+            <div
+              class="contents"
+              :class="{ 'mb-2': shouldShowTimestamp(message, index) }"
+            >
               <div class="bubble" :class="chatBotMessageStyle(message)">
                 <span v-if="message.hasHtml" v-html="message.contents"></span>
                 <transcribed-message
@@ -1040,6 +1044,12 @@ export default {
     align-items: center;
   }
 
+  .system-message {
+    color: #73737a;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+
   .avatar-container {
     width: 32px;
     position: relative;
@@ -1047,7 +1057,7 @@ export default {
 
     .avatar {
       border-radius: 16px;
-      bottom: 21px;
+      bottom: 29px;
       height: 32px;
       position: absolute;
       width: 100%;
