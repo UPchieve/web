@@ -769,7 +769,7 @@ export default {
       const isVolunteerMessage = this.currentSession.volunteer
         ? message.user === this.currentSession.volunteer.id
         : false
-      if (!isStudentMessage && !isVolunteerMessage) return 'contents--chat-bot'
+      if (!isStudentMessage && !isVolunteerMessage) return 'bubble--chat-bot'
       return ''
     },
     shouldShowPartnerAvatar(message, index) {
