@@ -168,7 +168,7 @@
             :shouldHideChatSection="false"
             :setHasSeenNewMessage="setHasSeenNewMessage"
             :isInRecap="true"
-            :isSessionConnectionAlive="isSessionConnectionAlive"
+            :isSocketSessionRoomConnected="socketJoinedRoom"
             :isSessionAlive="isSessionAlive"
           />
         </div>
@@ -235,9 +235,6 @@ export default {
     },
     volunteerAvatar() {
       return VolunteerIcon
-    },
-    isSessionConnectionAlive() {
-      return socket.connected && this.socketJoinedRoom
     },
     isJoinedSessionSocketReadyToEmit() {
       return [this.isConnected, this.session?.id]
@@ -412,7 +409,7 @@ export default {
   },
   watch: {
     socketJoinedRoom(val) {
-      if (val === false) {
+      if (!val) {
         setTimeout(() => this.joinSocketToRoom(), 3000)
       }
     },

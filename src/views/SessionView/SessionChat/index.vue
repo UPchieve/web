@@ -353,12 +353,8 @@ export default {
         ? this.currentSession.student?.firstName
         : this.currentSession.volunteer?.firstName
     },
-    // The chat is already loaded with a connection failure in SessionRecapView
-    // since it's checking if the socket joined the room. Exclude SessionRecapView
-    // when logging out expected errors
     showConnectingToChatMessage() {
       return (
-        !this.isInRecap &&
         this.isSessionAlive &&
         !this.isSocketSessionRoomConnected
       )
