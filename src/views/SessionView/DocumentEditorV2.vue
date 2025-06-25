@@ -1,14 +1,14 @@
 <template>
   <div class="document-editor" data-document-editor-version="2">
     <div id="ql-toolbar">
-      <select class="ql-size" />
+      <select class="ql-size"></select>
       <button class="ql-bold" />
       <button class="ql-italic" />
       <button class="ql-underline" />
       <button class="ql-strike" />
       <button class="ql-image" />
-      <select class="ql-color" />
-      <select class="ql-background" />
+      <select class="ql-color"></select>
+      <select class="ql-background"></select>
       <button class="ql-list" value="ordered" />
       <button class="ql-list" value="bullet" />
       <button
@@ -529,7 +529,7 @@ export default {
   }
 }
 
-select svg {
+.ql-picker-label svg {
   pointer-events: none;
 }
 
