@@ -1,10 +1,9 @@
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import { vi } from 'vitest'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import NetworkService from '@/services/NetworkService'
 import { storeOptions } from '@/store'
-import flushPromises from 'flush-promises'
 
 vi.mock('../../../../src/services/NetworkService')
 describe('RemovePhoneConfirmationModal', () => {

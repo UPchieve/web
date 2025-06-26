@@ -1,5 +1,4 @@
-import { mount } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
+import { mount, flushPromises } from '@vue/test-utils'
 import router from '@/router'
 import store from '@/store'
 import StudentPartnerSignupView from '@/views/SignupView/StudentPartnerSignupView.vue'

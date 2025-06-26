@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import StudentForm from '@/views/SignupView/StudentForm.vue'
 import featureFlagsModule from '@/store/modules/feature-flags'
@@ -9,7 +9,6 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import AuthService from '@/services/AuthService'
 import { nextTick } from 'vue'
-import flushPromises from 'flush-promises'
 
 describe('StudentForm', () => {
   const INELIGIBLE_RESPONSE = {

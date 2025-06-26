@@ -1,10 +1,9 @@
 import StudentDetailsView from '@/views/DashboardView/TeacherDashboard/StudentDetailsView.vue'
 import NetworkService from '@/services/NetworkService'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import router from '@/router'
 import { createStore } from 'vuex'
-import flushPromises from 'flush-promises'
 import subjectsModule from '@/store/modules/subjects'
 import moment from 'moment'
 

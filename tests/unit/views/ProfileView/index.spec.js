@@ -1,6 +1,6 @@
 import { storeOptions } from '@/store'
 import ProfileView from '@/views/ProfileView/index.vue'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import UserService from '@/services/UserService'
 import AuthService from '@/services/AuthService'
@@ -8,7 +8,6 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { vi } from 'vitest'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import { nextTick } from 'vue'
-import flushPromises from 'flush-promises'
 
 describe('ProfileView', () => {
   let DEFAULT_FLAGS_GETTERS, DEFAULT_USER

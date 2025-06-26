@@ -1,10 +1,9 @@
 import { test, vi, describe, expect } from 'vitest'
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import { storeOptions } from '@/store'
 import ModerationService from '@/services/ModerationService'
-import flushPromises from 'flush-promises'
 
 vi.mock('../../../../../services/ModerationService')
 describe('SessionChat', () => {

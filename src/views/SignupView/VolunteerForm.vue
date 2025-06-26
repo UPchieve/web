@@ -164,7 +164,7 @@
         >How did you hear about us?</label
       >
       <FormSelect
-        id="signup-source"
+        name="signup-source"
         v-model="signupSourceId"
         :options="signupSourcesOptions"
         option-text-field="name"
@@ -208,6 +208,7 @@
       class="uc-form-button"
       type="submit"
       :disabled="isRegistering ? true : null"
+      data-testid="signup-button"
     >
       Sign Up
     </button>

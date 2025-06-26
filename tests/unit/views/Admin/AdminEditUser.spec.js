@@ -1,6 +1,5 @@
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import flushPromises from 'flush-promises'
 import AdminEditUser from '@/views/Admin/AdminEditUser.vue'
 import NetworkService from '@/services/NetworkService'
 

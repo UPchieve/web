@@ -1,8 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import flushPromises from 'flush-promises'
 import moment from 'moment'
-import { mount, VueWrapper } from '@vue/test-utils'
+import { mount, VueWrapper, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 
 import router from '@/router'

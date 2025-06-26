@@ -1,11 +1,10 @@
 import { vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
 import * as VersionService from '@/services/VersionService'
 import appModule from '@/store/modules/app/index'
 import { nextTick } from 'vue'
-import flushPromises from 'flush-promises'
 
 const mockVersionService = vi.mocked(VersionService)
 const SERVER_VERSION = '1'
