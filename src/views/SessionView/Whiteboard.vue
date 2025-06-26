@@ -1432,6 +1432,7 @@ export default {
           this.zwibblerCtx.setConfig('allowZoom', true)
           this.zwibblerCtx.setConfig('scrollbars', false)
           this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'down')
+          this.zwibblerCtx.setConfig('rightButtonPans', true)
           this.zoomToFit()
           this.addInfiniteSizeListeners()
         } else {
@@ -1543,6 +1544,7 @@ export default {
               this.zwibblerCtx.setDocumentSize(null, null)
               this.zwibblerCtx.setConfig('allowZoom', true)
               this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'down')
+              this.zwibblerCtx.setConfig('rightButtonPans', true)
               this.zoomToFit()
             }, 500)
           }
