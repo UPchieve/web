@@ -72,7 +72,7 @@
           class="session-history-loader"
         />
         <div v-else-if="!this.sessions.length" class="info">
-          You don't haven't had any sessions matching the filters.
+          You haven't had any sessions matching the filters.
         </div>
         <ul class="session-list" v-else>
           <li v-for="(session, index) in sessions" :key="session._id">
