@@ -1,5 +1,14 @@
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import FeatureFlagService from '@/services/FeatureFlagService'
+import type { RootState } from '..'
+import type { ActionContext } from 'vuex'
+
+export type FeatureFlagState = {
+  toggleFlags: Record<POSTHOG_FEATURE_FLAGS, boolean>
+  multivariantFlags: Record<POSTHOG_FEATURE_FLAGS, boolean | string>
+  payloadFlags: Record<POSTHOG_FEATURE_FLAGS, any>
+  eligibleForChooseTutorType: boolean
+}
 
 export default {
   namespaced: true,
@@ -10,7 +19,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
-      [POSTHOG_FEATURE_FLAGS.NEW_ELIGIBILITY_FORM_DESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
@@ -74,169 +82,174 @@ export default {
     eligibleForChooseTutorType: false,
   },
   mutations: {
-    updateEligibleForChooseTutorType(state, value) {
+    updateEligibleForChooseTutorType(state: FeatureFlagState, value: boolean) {
       state.eligibleForChooseTutorType = value
     },
-    updateFlags(state) {
+    updateFlags(state: FeatureFlagState) {
       for (const flag of Object.keys(state.toggleFlags)) {
-        state.toggleFlags[flag] =
-          FeatureFlagService.isFeatureEnabled(flag) ?? state.toggleFlags[flag]
+        state.toggleFlags[flag as POSTHOG_FEATURE_FLAGS] =
+          FeatureFlagService.isFeatureEnabled(flag) ??
+          state.toggleFlags[flag as POSTHOG_FEATURE_FLAGS]
       }
 
       for (const flag of Object.keys(state.multivariantFlags)) {
-        state.multivariantFlags[flag] =
+        state.multivariantFlags[flag as POSTHOG_FEATURE_FLAGS] =
           FeatureFlagService.getFeatureFlag(flag) ??
-          state.multivariantFlags[flag]
+          state.multivariantFlags[flag as POSTHOG_FEATURE_FLAGS]
       }
 
       for (const flag of Object.keys(state.payloadFlags)) {
-        state.payloadFlags[flag] =
+        state.payloadFlags[flag as POSTHOG_FEATURE_FLAGS] =
           FeatureFlagService.getFeatureFlagPayload(flag) ??
-          state.payloadFlags[flag]
+          state.payloadFlags[flag as POSTHOG_FEATURE_FLAGS]
       }
 
       FeatureFlagService.configureFlagPolling()
     },
   },
   getters: {
-    isFilterActiveSubjectsActive: (state) =>
+    isFilterActiveSubjectsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
-    isPollingFlagsActive: (state) =>
+    isPollingFlagsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.POLL_FLAGS],
-    orbitalSegments: (state) =>
+    orbitalSegments: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
-    isOrbitalSegmentsActive: (state) =>
+    isOrbitalSegmentsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
-    downtimeBannerMessage: (state) =>
+    downtimeBannerMessage: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER],
-    subjectRequestRollout: (state) =>
+    subjectRequestRollout: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT] ?? [],
-    quizRollout: (state) =>
+    quizRollout: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
-    gleapSegmentExperiments: (state) =>
+    gleapSegmentExperiments: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS] ?? [],
-    isGleapSegmentExperimentsActive: (_state, getters) =>
+    isGleapSegmentExperimentsActive: (_state: FeatureFlagState, getters: any) =>
       getters.gleapSegmentExperiments.length > 0,
-    ccIntroCopy: (state) =>
+    ccIntroCopy: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
-    isBfIntroCopyEnabled: (state) =>
+    isBfIntroCopyEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
-    bfIntroCopy: (state) =>
+    bfIntroCopy: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
-    isSessionRecapDmsActive: (state) =>
+    isSessionRecapDmsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS],
-    showDashboardRedesign: (state) =>
+    showDashboardRedesign: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN],
-    isAutoStartCollegeSessionActive: (state) =>
+    isAutoStartCollegeSessionActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
-    autoStartCollegeSession: (state) =>
+    autoStartCollegeSession: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
-    isSmsVerificationEnabled: (state) =>
+    isSmsVerificationEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION],
-    eligibilityEmail: (state) =>
+    eligibilityEmail: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
-    isProgressReportsActive: (state) =>
+    isProgressReportsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS],
-    isProgressReportsSurveyActive: (state) =>
+    isProgressReportsSurveyActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY],
-    useNewSignUpFlow: (state) =>
+    useNewSignUpFlow: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW],
-    showInAppSessionNotifications: (state) =>
+    showInAppSessionNotifications: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS
       ],
-    isSessionPresenceActive: (state) =>
+    isSessionPresenceActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE],
-    isMostRecentSubjectsActive: (state) =>
+    isMostRecentSubjectsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS],
-    isAboutThisSessionSurveyActive: (state) =>
+    isAboutThisSessionSurveyActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY],
-    isBigFutureEmailFirstFlowActive: (state) =>
+    isBigFutureEmailFirstFlowActive: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW
       ],
-    isBigFutureTwoQuestionEligiblityFlowActive: (state) =>
+    isBigFutureTwoQuestionEligiblityFlowActive: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW
       ],
-    eligibleForVoiceMessaging: (state) =>
+    eligibleForVoiceMessaging: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VOICE_MESSAGE],
-    isCollegePrepAdEnabled: (state) =>
+    isCollegePrepAdEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD],
-    isTutorBotChatEnabled: (state) =>
+    isTutorBotChatEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
-    tutorBotChatType: (state) =>
+    tutorBotChatType: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
-    isFallIncentiveProgramEnabled: (state) =>
+    isFallIncentiveProgramEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM],
-    getFallIncentiveProgramPayload: (state) => {
+    getFallIncentiveProgramPayload: (state: FeatureFlagState) => {
       const payload =
         state.payloadFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]
       if (!payload?.maxQualifiedSessionsPerWeek)
         payload.maxQualifiedSessionsPerWeek = 1
       return payload
     },
-    isFallIncentiveParentalConsentEnabled: (state) =>
+    isFallIncentiveParentalConsentEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT
       ],
-    isNationalStudentPhoneEnabled: (state) =>
+    isNationalStudentPhoneEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE],
-    aiTutor: (state) => state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
-    showChooseTutorType: (state) =>
+    aiTutor: (state: FeatureFlagState) =>
+      state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
+    showChooseTutorType: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE] ||
       state.eligibleForChooseTutorType,
-    isSessionAudioCallEnabled: (state) =>
+    isSessionAudioCallEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL],
-    isScreenshareEnabled: (state) =>
+    isScreenshareEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SCREENSHARE],
-    videoModerationSampleInterval: (state) =>
+    videoModerationSampleInterval: (state: FeatureFlagState) =>
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL
       ],
-    isVideoModerationEnabled: (state) =>
+    isVideoModerationEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED],
-    isImpactStudySurveyEnabled: (state) =>
+    isImpactStudySurveyEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
-    getImpactStudySurveyPayload: (state) =>
+    getImpactStudySurveyPayload: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
-    isStudentsBecomeVolunteersEnabled: (state) =>
+    isStudentsBecomeVolunteersEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
-    studentsBecomeVolunteersCopy: (state) =>
+    studentsBecomeVolunteersCopy: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
-    tutorFeedbackToTeacherQuestion: (state) =>
+    tutorFeedbackToTeacherQuestion: (state: FeatureFlagState) =>
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION
       ],
-    isTeacherGuidanceExperimentActive: (state) =>
+    isTeacherGuidanceExperimentActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT],
-    isCombinedOnboardingQuizEnabled: (state) =>
+    isCombinedOnboardingQuizEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ],
-    isDisplayVolunteerLanguagesEnabled: (state) =>
+    isDisplayVolunteerLanguagesEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES],
-    isInfiniteWhiteboardEnabled: (state) =>
+    isInfiniteWhiteboardEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.INFINITE_WHITEBOARD],
-    isSecondaryEmailOnProfilePageEnabled: (state) =>
+    isSecondaryEmailOnProfilePageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE],
-    isConfettiCelebrationEnabled: (state) =>
+    isConfettiCelebrationEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION],
-    isShowAmbassadorTitleEnabled: (state) =>
+    isShowAmbassadorTitleEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE],
-    volunteerSubjectPresenceVariant: (state) =>
+    volunteerSubjectPresenceVariant: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE],
-    isSelectingPreferredLanguageEnabled: (state) =>
+    isSelectingPreferredLanguageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENT_PREFERRED_LANGUAGE],
-    isBecomeAnAmbassadorCtaEnabled: (state) =>
+    isBecomeAnAmbassadorCtaEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA],
-    showNewInternationalMessage: (state) =>
+    showNewInternationalMessage: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_NEW_INTERNATIONAL_MESSAGE],
-    isUpchieve101LMSFormatEnabled: (state) =>
+    isUpchieve101LMSFormatEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_LMS_FORMAT],
-    isTextReferralLinksEnabled: (state) =>
+    isTextReferralLinksEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS],
   },
   actions: {
-    isSessionAudioCallEnabled: async ({ getters, dispatch }, partnerUserId) => {
+    isSessionAudioCallEnabled: async (
+      { getters, dispatch }: ActionContext<FeatureFlagState, RootState>,
+      partnerUserId: string
+    ) => {
       const isEnabledForPartner =
         await FeatureFlagService.isFeatureEnabledForUser(
           POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL,
@@ -253,7 +266,10 @@ export default {
         isScreenshareEnabled
       )
     },
-    isScreenshareEnabled: async ({ getters }, partnerUserId) => {
+    isScreenshareEnabled: async (
+      { getters }: ActionContext<FeatureFlagState, RootState>,
+      partnerUserId: string
+    ) => {
       const isEnabledForPartner =
         await FeatureFlagService.isFeatureEnabledForUser(
           POSTHOG_FEATURE_FLAGS.SCREENSHARE,
