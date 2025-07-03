@@ -1307,4 +1307,10 @@ export default {
       throw this._axiosErrorHandler(err as AxiosError)
     }
   },
+  sendReferralText(phoneNumber: string) {
+    return httpPost(`${API_ROOT}/send-referral-text`, { phoneNumber }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }
