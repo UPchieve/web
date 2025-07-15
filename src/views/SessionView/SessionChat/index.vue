@@ -354,10 +354,7 @@ export default {
         : this.currentSession.volunteer?.firstName
     },
     showConnectingToChatMessage() {
-      return (
-        this.isSessionAlive &&
-        !this.isSocketSessionRoomConnected
-      )
+      return this.isSessionAlive && !this.isSocketSessionRoomConnected
     },
     unreadMessageNote: function () {
       return `${this.numberOfUnreadChatMessages} unread message${
