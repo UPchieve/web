@@ -46,6 +46,8 @@ type User = Partial<{
   userType: 'student' | 'volunteer'
   createdAt: string
   roles?: string[]
+  occupation?: string
+  signupSource?: string
 }>
 type SegmentProperties = {
   minSessions?: number
@@ -57,6 +59,8 @@ type SegmentProperties = {
   averageSessionRatingLessThan?: number
   hasStudentRole?: boolean
   hasVolunteerRole?: boolean
+  occupation?: string
+  signupSource?: string
 }
 type CheckArgs = {
   user: User
@@ -106,6 +110,14 @@ const validationFns = {
     !!properties.hasStudentRole && (user.roles ?? []).includes('student'),
   hasVolunteerRole: ({ user, properties }: CheckArgs) =>
     !!properties.hasVolunteerRole && (user.roles ?? []).includes('volunteer'),
+  occupation: ({ user, properties }: CheckArgs) =>
+    properties.occupation !== undefined
+      ? properties.occupation === user.occupation
+      : true,
+  signupSource: ({ user, properties }: CheckArgs) =>
+    properties.signupSource !== undefined
+      ? properties.signupSource === user.signupSource
+      : true,
 }
 
 async function isValidUserForSegment(user, properties): Promise<boolean> {
