@@ -131,7 +131,7 @@ onMounted(() => {
       UPchieve? Just share your <strong>unique signup link</strong> with your
       friends, family, and colleagues:
 
-      <referral-link @copied="onCopiedReferralLink" />
+      <ReferralLink @copied="onCopiedReferralLink" />
 
       Get 5 signups to earn 1 volunteer hour and become an official UPchieve
       Ambassador-- <strong>great for resumés and college apps!</strong> 🎉
@@ -230,12 +230,6 @@ onMounted(() => {
 }
 
 .phone-number-input {
-  width: 100%;
-}
-
-.referral-link {
-  margin: 0;
-  align-self: flex-start;
   width: 100%;
 }
 
