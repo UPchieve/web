@@ -200,6 +200,7 @@ export const COUNTRIES = [
   'Kiribati',
   "Korea (the Democratic People's Republic of)",
   'Korea (the Republic of)',
+  'Kosovo',
   'Kuwait',
   'Kyrgyzstan',
   "Lao People's Democratic Republic",
