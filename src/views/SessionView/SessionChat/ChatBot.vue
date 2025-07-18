@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
@@ -72,6 +72,9 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      latestSession: (state) => state.session.latestSession,
+    }),
     ...mapGetters({
       firstName: 'user/firstName',
     }),

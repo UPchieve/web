@@ -60,7 +60,8 @@ describe('Session store', () => {
         state: {
           latestSession: {
             endedAt: currentTime,
-            endedByUserRole: 'volunteer',
+            endedByUserId: 'volunteer-id',
+            volunteerId: 'volunteer-id',
           },
         },
       })
@@ -75,7 +76,7 @@ describe('Session store', () => {
         state: {
           latestSession: {
             endedAt: currentTime,
-            endedByUserRole: 'student',
+            endedByUserId: 'student-id',
             createdAt,
           },
         },
@@ -91,7 +92,7 @@ describe('Session store', () => {
         state: {
           latestSession: {
             endedAt: currentTime,
-            endedByUserRole: 'student',
+            endedByUserId: 'student',
             createdAt,
           },
         },
@@ -107,7 +108,7 @@ describe('Session store', () => {
         state: {
           latestSession: {
             endedAt: currentTime,
-            endedByUserRole: 'student',
+            endedByUserId: 'student-id',
             createdAt,
           },
         },
@@ -126,7 +127,7 @@ describe('Session store', () => {
         state: {
           latestSession: {
             endedAt: currentTime,
-            endedByUserRole: 'student',
+            endedByUserId: 'student-id',
             createdAt,
           },
         },

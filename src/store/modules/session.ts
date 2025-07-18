@@ -10,9 +10,12 @@ const ONE_MINUTE_IN_MS = 1000 * 60
 type Session = {
   id: string
   createdAt: Date
-  endedByUserRole?: 'student' | 'volunteer'
   subject: string
   timeTutored: number
+  studentId: string
+  endedAt?: Date
+  endedByUserId?: string
+  volunteerId?: string
 }
 
 export type SessionState = {
@@ -55,12 +58,16 @@ export default {
     calculateCooldown({
       state,
     }: ActionContext<SessionState, RootState>): number {
+      const hasNoLatestSession = !state.latestSession
+      const isSessionOngoing = !state.latestSession?.endedAt
+      const wasSessionEndedByVolunteer =
+        !!state.latestSession?.volunteerId &&
+        !!state.latestSession?.endedByUserId &&
+        state.latestSession?.volunteerId === state.latestSession?.endedByUserId
       if (
-        !state.latestSession ||
-        // Session is still ongoing.
-        !state.latestSession.endedByUserRole ||
-        // Only apply a cooldown if the student ended a session.
-        state.latestSession.endedByUserRole === 'volunteer'
+        hasNoLatestSession ||
+        isSessionOngoing ||
+        wasSessionEndedByVolunteer
       ) {
         return 0
       }

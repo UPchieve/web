@@ -88,10 +88,15 @@ export default {
   // TODO: Make all paths use `endAndExitSession` instead.
   async endSession(sessionId: string, subTopic: string) {
     try {
-      await NetworkService.endSession({ sessionId })
-      // TODO: Just return the mutated session in `NetworkService.endSession`.
-      store.dispatch('user/clearSession')
-      store.dispatch('session/fetchLatestSession')
+      const currentSession = store.state.user.session
+      const endSessionResponse = await NetworkService.endSession({ sessionId })
+      const updatedSession = {
+        ...currentSession,
+        ...endSessionResponse.data.session,
+      }
+      store.commit('session/setLatestSession', updatedSession) // @TODO - Eventually remove duplicate state in latestSession
+      store.commit('user/setSession', updatedSession)
+      store.dispatch('session/startCooldownInterval')
     } catch (err) {
       if (err?.response?.data?.err !== 'Session has already ended') {
         throw err
