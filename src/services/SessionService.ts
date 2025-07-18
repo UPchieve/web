@@ -96,7 +96,11 @@ export default {
       }
       store.commit('session/setLatestSession', updatedSession) // @TODO - Eventually remove duplicate state in latestSession
       store.commit('user/setSession', updatedSession)
-      store.dispatch('session/startCooldownInterval')
+      const isSessionStudent =
+        store.state.user.user.id === currentSession.student.id
+      if (isSessionStudent) {
+        store.dispatch('session/startCooldownInterval')
+      }
     } catch (err) {
       if (err?.response?.data?.err !== 'Session has already ended') {
         throw err
