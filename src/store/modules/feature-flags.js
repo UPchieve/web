@@ -183,8 +183,6 @@ export default {
     isNationalStudentPhoneEnabled: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE],
     aiTutor: (state) => state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
-    showAiOtherSubjectSurvey: (state) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY],
     showChooseTutorType: (state) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE] ||
       state.eligibleForChooseTutorType,

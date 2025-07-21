@@ -445,11 +445,12 @@ export default {
         this.session.studentId
       )
         .then((r) => {
-          this.aiWidgetEnabled = r.isEnabled.includes('in-session')
+          this.aiWidgetEnabled =
+            r.isEnabled && r.isEnabled.includes('in-session')
         })
         .catch((err) => {
           LoggerService.noticeError(
-            `Failed to check if AI tutor is enabled for user=${student?.id}`,
+            `Failed to check if AI tutor is enabled for user=${this.session.studentId}`,
             err
           )
         })
