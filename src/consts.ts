@@ -33,6 +33,7 @@ export const STATES = [
   'California',
   'Colorado',
   'Connecticut',
+  'District of Columbia',
   'Delaware',
   'Florida',
   'Georgia',
