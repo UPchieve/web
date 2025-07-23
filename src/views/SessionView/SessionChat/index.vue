@@ -188,7 +188,7 @@
       <loading-message
         v-if="this.waitingForModeration"
         class="waiting-for-moderation"
-        message="Sending"
+        message="Moderating"
       />
       <transition name="fade">
         <div class="typing-indicator" v-if="typingIndicatorShown">
