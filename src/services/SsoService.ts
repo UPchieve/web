@@ -3,6 +3,7 @@ import config from '@/config'
 export enum SsoProvider {
   GOOGLE = 'google',
   CLEVER = 'clever',
+  CLASSLINK = 'classlink',
 }
 
 export function signInWithSso(paramsData: { [key: string]: unknown }) {

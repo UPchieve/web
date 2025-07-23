@@ -1,7 +1,12 @@
 <template>
   <button class="uc-form-button sso" @click.prevent="$emit('click')">
-    <google-logo v-if="useGoogle" />
-    <clever-logo v-if="useClever" />
+    <google-logo v-if="useGoogle" class="logo" />
+    <clever-logo v-if="useClever" class="logo" />
+    <img
+      v-if="useClassLink"
+      src="@/assets/classlink_logo.png"
+      class="logo logo--img"
+    />
     {{ buttonText }}
   </button>
 </template>
@@ -31,6 +36,20 @@ export default {
     useClever() {
       return this.ssoMethod === 'clever'
     },
+    useClassLink() {
+      return this.ssoMethod === 'classlink'
+    },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.logo {
+  margin-right: 0.4em;
+
+  &--img {
+    height: 30px;
+    width: 30px;
+  }
+}
+</style>

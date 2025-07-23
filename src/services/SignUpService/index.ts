@@ -182,6 +182,14 @@ export function createAccountWithClever(
   return createAccountWithSso(SsoProvider.CLEVER, userType, data)
 }
 
+export function createAccountWithClassLink(
+  userType: UserType,
+  data: AccountFormData
+) {
+  AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLASSLINK)
+  return createAccountWithSso(SsoProvider.CLASSLINK, userType, data)
+}
+
 function createAccountWithSso(
   provider: SsoProvider,
   userType: UserType,
@@ -194,7 +202,7 @@ function createAccountWithSso(
     signInWithSso({
       provider,
       errorRedirect:
-        provider === 'google'
+        provider === SsoProvider.GOOGLE || provider === SsoProvider.CLASSLINK
           ? `/sign-up/${userType}/account`
           : '/clever-signin-instructions',
       ...data,

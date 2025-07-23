@@ -627,18 +627,41 @@ async function createAccount(data: StudentAccountFormData) {
   }
 }
 
-function createAccountWithGoogle(data: StudentAccountFormData) {
+const signUpMethodByProvider: Record<
+  SsoProvider,
+  (
+    userType: UserType,
+    data: StudentAccountFormData
+  ) => SignUpService.SubmitActionResponse
+> = {
+  [SsoProvider.GOOGLE]: SignUpService.createAccountWithGoogle,
+  [SsoProvider.CLEVER]: SignUpService.createAccountWithClever,
+  [SsoProvider.CLASSLINK]: SignUpService.createAccountWithClassLink,
+}
+
+function createAccountWithProvider(
+  provider: SsoProvider,
+  data: StudentAccountFormData
+) {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
-    provider: SsoProvider.GOOGLE,
+    provider,
   })
-  return SignUpService.createAccountWithGoogle(UserType.student, data)
+  const method = signUpMethodByProvider[provider]
+  if (!method)
+    throw new Error(`No sign-up method found for provider: ${provider}`)
+  return method(UserType.student, data)
+}
+
+function createAccountWithGoogle(data: StudentAccountFormData) {
+  return createAccountWithProvider(SsoProvider.GOOGLE, data)
 }
 
 export function createAccountWithClever(data: StudentAccountFormData) {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
-    provider: SsoProvider.CLEVER,
-  })
-  return SignUpService.createAccountWithClever(UserType.student, data)
+  return createAccountWithProvider(SsoProvider.CLEVER, data)
+}
+
+export function createAccountWithClassLink(data: StudentAccountFormData) {
+  return createAccountWithProvider(SsoProvider.CLASSLINK, data)
 }
 
 function getParentGuardianConfirmationDetails(
@@ -756,6 +779,8 @@ function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
 }
 
 function getSsoSectionElements(): FormRow[] {
+  const isClassLinkSsoEnabled =
+    store.getters['featureFlags/isClassLinkSsoEnabled']
   return [
     getRow(
       'mt-4',
@@ -765,6 +790,18 @@ function getSsoSectionElements(): FormRow[] {
       'mt-3',
       getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER)
     ),
+    ...(isClassLinkSsoEnabled
+      ? [
+          getRow(
+            'mt-3',
+            getSsoButton(
+              createAccountWithClassLink,
+              'ClassLink',
+              SsoProvider.CLASSLINK
+            )
+          ),
+        ]
+      : []),
     getRow(
       'justify-center italic mt-3',
       getTextElement(

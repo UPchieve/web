@@ -28,7 +28,10 @@
       </p>
 
       <div
-        v-if="(useGoogleSSO || useCleverSSO) && !useParentGuardianSignUpFlow"
+        v-if="
+          (useGoogleSSO || useCleverSSO || useClassLinkSSO) &&
+          !useParentGuardianSignUpFlow
+        "
       >
         <div class="uc-form-element">
           <FormSelect
@@ -54,6 +57,13 @@
           @click="signUpWithSso('clever')"
           buttonText="Sign Up with Clever"
           ssoMethod="clever"
+        />
+        <SsoButton
+          v-if="useClassLinkSSO && isClassLinkSsoEnabled"
+          class="mt-3"
+          @click="signUpWithSso('classlink')"
+          buttonText="Sign Up with ClassLink"
+          ssoMethod="classlink"
         />
         <p class="terms-text">
           By clicking the button above, you agree to our
@@ -407,6 +417,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, required, requiredIf } from '@vuelidate/validators'
 import LoggerService from '@/services/LoggerService'
@@ -419,6 +430,7 @@ import SsoButton from '@/components/SsoButton.vue'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import { SsoProvider } from '@/services/SsoService'
 import { backOff } from 'exponential-backoff'
 import { EVENTS, GRADES, INELIGIBLE_LOCAL_STORAGE_KEY } from '@/consts'
 import config from '../../config'
@@ -522,6 +534,9 @@ export default {
     if (this.shouldUseCleverSSO(params)) {
       this.useCleverSSO = true
     }
+    if (this.shouldUseClassLinkSSO(params)) {
+      this.useClassLinkSSO = true
+    }
     if (this.shouldUseParentGuardianSignUpFlow(params)) {
       this.useParentGuardianSignUpFlow = true
     }
@@ -536,6 +551,7 @@ export default {
     return {
       useGoogleSSO: false,
       useCleverSSO: false,
+      useClassLinkSSO: false,
       useParentGuardianSignUpFlow: false,
       showParentGuardianConfirmationPage: false,
       gradeLevels: GRADES,
@@ -571,6 +587,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      isClassLinkSsoEnabled: 'featureFlags/isClassLinkSsoEnabled',
+    }),
     PASSWORD_PATTERN() {
       return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
     },
@@ -676,10 +695,22 @@ export default {
       return Object.keys(params).includes('error')
     },
     shouldUseGoogleSSO(params) {
-      return params['sso'] === 'google' || params['provider'] === 'google'
+      return (
+        params['sso'] === SsoProvider.GOOGLE ||
+        params['provider'] === SsoProvider.GOOGLE
+      )
     },
     shouldUseCleverSSO(params) {
-      return params['sso'] === 'clever' || params['provider'] === 'clever'
+      return (
+        params['sso'] === SsoProvider.CLEVER ||
+        params['provider'] === SsoProvider.CLEVER
+      )
+    },
+    shouldUseClassLinkSSO(params) {
+      return (
+        params['sso'] === SsoProvider.CLASSLINK ||
+        params['provider'] === SsoProvider.CLASSLINK
+      )
     },
     shouldUseParentGuardianSignUpFlow(params) {
       for (const key in params) {
@@ -832,14 +863,19 @@ export default {
     },
 
     captureSsoClickEvent(provider) {
-      if (provider === 'google') {
+      if (provider === SsoProvider.GOOGLE) {
         AnalyticsService.captureEvent(
           EVENTS.PARTNER_STUDENT_CLICKED_SIGN_UP_WITH_GOOGLE
         )
       }
-      if (provider === 'clever') {
+      if (provider === SsoProvider.CLEVER) {
         AnalyticsService.captureEvent(
           EVENTS.PARTNER_STUDENT_CLICKED_SIGN_UP_WITH_CLEVER
+        )
+      }
+      if (provider === SsoProvider.CLASSLINK) {
+        AnalyticsService.captureEvent(
+          EVENTS.PARTNER_STUDENT_CLICKED_SIGN_UP_WITH_CLASSLINK
         )
       }
     },

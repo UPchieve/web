@@ -526,9 +526,6 @@ export default {
         userProps.schoolPartner = state.user.schoolName
       }
 
-      userProps.usesClever = state.user.usesClever
-      if (!userProps.usesClever) delete userProps.usesClever
-
       if (state.user?.ratings) {
         // Old schema for accounts w/ only one role (student or volunteer)
         userProps.averageRatingSelfReported =
@@ -580,13 +577,17 @@ export default {
       }
       if (getters.hasStudentRole) {
         userProps.gradeLevel = state.user.gradeLevel
-        userProps.usesClever = state.user.usesClever
-        userProps.usesGoogle = state.user.usesGoogle
 
         if (rootState.featureFlags.eligibleForChooseTutorType) {
           userProps.eligibleForChooseTutorType =
             rootState.featureFlags.eligibleForChooseTutorType
         }
+      }
+
+      if (getters.hasStudentRole || getters.hasTeacherRole) {
+        userProps.usesGoogle = !!state.user.usesGoogle
+        userProps.usesClever = !!state.user.usesClever
+        userProps.usesClassLink = !!state.user.usesClassLink
       }
 
       // Although 'fallIncentiveEnrollmentAt' is only relevant to student users,

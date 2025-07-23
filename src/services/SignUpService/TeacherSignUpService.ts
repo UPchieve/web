@@ -26,6 +26,8 @@ import type {
   PageDetailsUnion,
   SubmitActionResponse,
 } from '@/services/SignUpService'
+import { SsoProvider } from '@/services/SsoService'
+import featureFlags from '@/store/modules/feature-flags'
 
 const RoutePath = {
   account: `/sign-up/teacher/${SignUpPage.account}`,
@@ -259,7 +261,22 @@ function getAccountPageDetails(): PageDetail<TeacherAccountFormData> {
       }),
       getRow('mt-4', getTextElement('h1', 'Your school is eligible! 🎉')),
       getRow('mt-3', getTextElement('h2', 'Finish creating your account')),
-      getRow('mt-3', getSsoButton(createAccountWithClever, 'Clever', 'clever')),
+      getRow(
+        'mt-3',
+        getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER)
+      ),
+      ...(featureFlags.getters['isClassLinkSsoEnabled']
+        ? [
+            getRow(
+              'mt-3',
+              getSsoButton(
+                createAccountWithClassLink,
+                'ClassLink',
+                SsoProvider.CLASSLINK
+              )
+            ),
+          ]
+        : []),
       getRow(
         'justify-center italic mt-3',
         getTextElement(
@@ -324,13 +341,38 @@ async function createAccount(data: TeacherAccountFormData) {
   }
 }
 
-function createAccountWithClever(
+const signUpMethodByProvider: Partial<
+  Record<
+    SsoProvider,
+    (
+      userType: UserType,
+      data: TeacherAccountFormData
+    ) => SignUpService.SubmitActionResponse
+  >
+> = {
+  [SsoProvider.CLEVER]: SignUpService.createAccountWithClever,
+  [SsoProvider.CLASSLINK]: SignUpService.createAccountWithClassLink,
+}
+
+function createAccountWithProvider(
+  provider: SsoProvider,
   data: TeacherAccountFormData
-): SubmitActionResponse {
+) {
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT, {
-    provider: 'clever',
+    provider,
   })
-  return SignUpService.createAccountWithClever(UserType.teacher, data)
+  const method = signUpMethodByProvider[provider]
+  if (!method)
+    throw new Error(`No sign-up method found for provider: ${provider}`)
+  return method(UserType.teacher, data)
+}
+
+export function createAccountWithClever(data: TeacherAccountFormData) {
+  return createAccountWithProvider(SsoProvider.CLEVER, data)
+}
+
+export function createAccountWithClassLink(data: TeacherAccountFormData) {
+  return createAccountWithProvider(SsoProvider.CLASSLINK, data)
 }
 
 export async function beforeEnter(

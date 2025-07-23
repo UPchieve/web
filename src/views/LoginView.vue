@@ -59,6 +59,14 @@
           buttonText="Clever"
           ssoMethod="clever"
         />
+        <SsoButton
+          v-if="isClassLinkSsoEnabled"
+          class="mt-3"
+          data-testid="classLinkSsoButton"
+          @click="signInWithSso('classlink')"
+          buttonText="ClassLink"
+          ssoMethod="classlink"
+        />
       </form>
       <p class="uc-form-text">
         Need an account?
@@ -73,6 +81,7 @@ import { mapGetters } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
+import { SsoProvider } from '@/services/SsoService'
 import FormEmail from '@/components/FormEmail.vue'
 import FormPassword from '@/components/FormPassword.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
@@ -98,6 +107,7 @@ export default {
   computed: {
     ...mapGetters({
       useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
+      isClassLinkSsoEnabled: 'featureFlags/isClassLinkSsoEnabled',
     }),
     isValidForm() {
       const { email, password } = this.credentials
@@ -150,7 +160,7 @@ export default {
         })
         .catch(() => {
           this.error =
-            "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google or Clever SSO."
+            "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google, Clever, or ClassLink SSO."
         })
         .finally(() => {
           this.isLoggingIn = false
@@ -170,11 +180,16 @@ export default {
       this.isLoggingIn = false
     },
     captureSsoClickEvent(provider) {
-      if (provider === 'google') {
+      if (provider === SsoProvider.GOOGLE) {
         AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_GOOGLE)
       }
-      if (provider === 'clever') {
+      if (provider === SsoProvider.CLEVER) {
         AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_CLEVER)
+      }
+      if (provider === SsoProvider.CLASSLINK) {
+        AnalyticsService.captureEvent(
+          EVENTS.USER_CLICKED_SIGN_IN_WITH_CLASSLINK
+        )
       }
     },
   },
