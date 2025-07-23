@@ -134,44 +134,11 @@
           v-for="(message, index) in pendingTextMessages"
           :key="`pending-text-${index}`"
           class="message right"
-          :class="{
-            editing: isEditingMessage(index),
-            flagged: isFlaggedMessage(message),
-          }"
         >
           <div class="contents">
             <div class="bubble">
-              <span v-if="!isEditingMessage(index)">
-                {{ message.contents }}
-              </span>
-              <textarea
-                v-else
-                v-model="message.contents"
-                @keydown="onEditKeydown($event, index)"
-                class="edit-textarea"
-                ref="editTextarea"
-              />
+              {{ message.contents }}
             </div>
-            <div class="metadata">
-              <span v-if="isFlaggedMessage(message)">Flagged!</span>
-            </div>
-          </div>
-          <div v-if="isFlaggedMessage(message)" class="flagged-actions mr-1">
-            <button
-              @click="deleteFlaggedMessage(index)"
-              class="action-button delete"
-              title="Delete this flagged message and continue sending remaining messages."
-            >
-              <TrashIcon />
-            </button>
-            <button
-              v-if="!isEditingMessage(index)"
-              @click="editingMessageIndex = index"
-              class="action-button edit"
-              title="Edit this message to fix policy violations."
-            >
-              <PencilIcon />
-            </button>
           </div>
         </div>
 
@@ -219,15 +186,12 @@
 
     <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
       <loading-message
-        v-if="!this.isPendingMessagesEnabled && this.waitingForModeration"
+        v-if="this.waitingForModeration"
         class="waiting-for-moderation"
         message="Sending"
       />
       <transition name="fade">
-        <div v-if="hasFlaggedMessage" class="flagged-indicator">
-          Fix flagged message to send
-        </div>
-        <div class="typing-indicator" v-else-if="typingIndicatorShown">
+        <div class="typing-indicator" v-if="typingIndicatorShown">
           {{ sessionPartnerName || 'Chatbot' }} is typing...
         </div>
       </transition>
@@ -341,7 +305,6 @@ export default {
       isSessionAudioCallEnabled: false,
       isTutorJoiningForFirstTime: false,
       pendingTextMessages: [],
-      editingMessageIndex: -1,
     }
   },
 
@@ -425,17 +388,11 @@ export default {
         this.currentSession?.messages?.length > 20
       )
     },
-    hasFlaggedMessage() {
-      return this.pendingTextMessages.some((message) => {
-        return message.flagged
-      })
-    },
     isSendMessageDisabled() {
       return (
         this.newMessage.length === 0 ||
         !this.isSocketSessionRoomConnected ||
-        this.hasFlaggedMessage ||
-        (!this.isPendingMessagesEnabled && this.waitingForModeration)
+        this.waitingForModeration
       )
     },
   },
@@ -489,12 +446,6 @@ export default {
     formatTime(createdAt) {
       return moment(createdAt).format('h:mm a')
     },
-    isPendingMessage(message) {
-      return !message.createdAt
-    },
-    isFlaggedMessage(message) {
-      return message.flagged
-    },
 
     toggleEligibleForSessionRecapChat() {
       this.eligibleForSessionRecapChat = true
@@ -541,50 +492,27 @@ export default {
       // Early exit if message is blank.
       if (isEmpty(message) || this.isSendMessageDisabled) return
 
-      if (this.isPendingMessagesEnabled) {
-        const pendingMessage = {
-          contents: message,
-          user: this.user.id,
-          emitted: false,
-          moderated: false,
-          flagged: false,
-        }
-        this.pendingTextMessages.push(pendingMessage)
-      }
-
-      this.newMessage = ''
-      await this.$nextTick()
-      this.resizeTextarea({ target: this.$refs.textareaRef })
-      this.$refs.textareaRef.focus()
-      this.scrollToBottom()
-
       clearTimeout(this.typingTimeout)
       this.notTyping()
 
       const isClean = await this.moderateMessage(message)
 
-      if (this.isPendingMessagesEnabled) {
-        const messageToUpdate = this.pendingTextMessages.find(
-          (m) => m.contents === message && !m.moderated
-        )
-        if (!messageToUpdate) {
-          LoggerService.noticeError(
-            'Did not find message to update in pending messages.'
-          )
-          return
+      if (isClean) {
+        const newMessage = {
+          contents: message,
+          user: this.user.id,
         }
-        messageToUpdate.moderated = true
-        messageToUpdate.flagged = !isClean
-        this.processPendingMessageQueue()
-      } else if (isClean) {
-        this.handleOutgoingMessage({ contents: message })
-      } else if (!isClean) {
-        this.newMessage = message
-      }
+        if (this.isPendingMessagesEnabled) {
+          this.pendingTextMessages.push(newMessage)
+        }
+        this.newMessage = ''
+        await this.$nextTick()
+        this.resizeTextarea({ target: this.$refs.textareaRef })
+        this.$refs.textareaRef.focus()
+        this.scrollToBottom()
 
-      // This is temporary for `sendTranscriptMessage`,
-      // which will be removed shortly, theoretically.
-      return isClean
+        this.handleOutgoingMessage(newMessage)
+      }
     },
 
     async moderateMessage(message) {
@@ -614,25 +542,6 @@ export default {
       }
     },
 
-    async processPendingMessageQueue() {
-      for (const message of [...this.pendingTextMessages]) {
-        // If a message has already been emitted,
-        // continue to messages that haven't been emitted yet.
-        if (message.emitted) continue
-        // If a message has not received back a moderation result,
-        // or it's been flagged, end now until we have more information
-        // to continue with the rest of the queue.
-        if (!message.moderated || message.flagged) return
-
-        this.handleOutgoingMessage(message)
-        // Add a slight delay before processing the next message.
-        // This delay is basically imperceptible to the user (if anything,
-        // it adds a nicer UX feel), but it helps prevent a race condition
-        // on the server of emitting the message back to clients out of order.
-        await new Promise((resolve) => setTimeout(resolve, 500))
-      }
-    },
-
     handleOutgoingMessage(message) {
       message.emitted = true
       socket.emit('message', {
@@ -650,43 +559,6 @@ export default {
       })
       if (index > -1) {
         this.pendingTextMessages.splice(index, 1)
-      }
-    },
-
-    deleteFlaggedMessage(index) {
-      this.editingMessageIndex = -1
-      this.moderationWarningIsShown = false
-      this.pendingTextMessages.splice(index, 1)
-      this.processPendingMessageQueue()
-    },
-
-    isEditingMessage(index) {
-      return this.editingMessageIndex === index
-    },
-    async onEditKeydown(event, index) {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        this.editingMessageIndex = -1
-        return
-      }
-
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault()
-        this.sendEdittedMessage(this.pendingTextMessages[index])
-      }
-    },
-    async sendEdittedMessage(edittedMessage) {
-      const newContent = edittedMessage?.contents.trim()
-      if (newContent) {
-        this.editingMessageIndex = -1
-        edittedMessage.contents = newContent
-        edittedMessage.moderated = false
-        edittedMessage.flagged = false
-
-        const isClean = await this.moderateMessage(newContent)
-        edittedMessage.moderated = true
-        edittedMessage.flagged = !isClean
-        this.processPendingMessageQueue()
       }
     },
 
@@ -843,11 +715,6 @@ export default {
       const currentFormatted = this.formatTime(message.createdAt)
       const nextFormatted = this.formatTime(nextMessage.createdAt)
       return currentFormatted !== nextFormatted
-    },
-    shouldShowPendingMessage(index) {
-      if (index === this.pendingTextMessages.length - 1) return true
-      const nextMessage = this.pendingTextMessages[index + 1]
-      if (nextMessage.flagged) return true
     },
     celebrate() {
       this.$store.dispatch('celebrations/celebrate')
@@ -1133,89 +1000,6 @@ export default {
   opacity: 0;
 }
 
-.message.pending {
-  opacity: 0.7;
-  .contents {
-    .bubble {
-      background-color: $c-background-grey;
-    }
-  }
-
-  .metadata {
-    color: #73737a;
-    font-style: italic;
-    font-weight: normal;
-  }
-}
-
-.message.flagged {
-  .contents {
-    .bubble {
-      border: $c-error-red solid 1px;
-      background-color: lighten($c-error-red, 25%);
-    }
-  }
-
-  .metadata {
-    color: $c-error-red;
-    font-weight: 600;
-    font-style: normal;
-  }
-}
-
-.message.editing {
-  .contents {
-    .bubble {
-      background: white;
-      border: none;
-      padding: 0;
-    }
-  }
-}
-
-.flagged-actions {
-  align-items: flex-start;
-  display: flex;
-  gap: 4px;
-  padding-top: 8px;
-
-  .action-button {
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    padding: 6px;
-
-    svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    &:hover {
-      border-color: black;
-    }
-  }
-}
-
-.edit-textarea {
-  width: 100%;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-family: inherit;
-  font-size: inherit;
-  resize: vertical;
-  min-height: 20px;
-
-  &:focus {
-    outline: none;
-    border-color: #007cff;
-    box-shadow: 0 0 0 2px rgba(0, 124, 255, 0.3);
-  }
-}
-
 .chat-footer {
   position: relative;
   border-top: 1px solid $c-border-grey;
@@ -1255,16 +1039,6 @@ export default {
   padding-left: 1em;
   font-size: 13px;
   font-weight: 300;
-  transition: 0.25s;
-}
-
-.flagged-indicator {
-  color: $c-error-red;
-  font-size: 13px;
-  font-weight: 500;
-  padding-left: 1em;
-  position: absolute;
-  top: -20px;
   transition: 0.25s;
 }
 

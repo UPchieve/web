@@ -95,26 +95,6 @@ describe('SessionChat', () => {
   })
 
   describe('moderateMessage', () => {
-    test.each([{ failures: {} }, { failures: { profanity: ['butt'] } }])(
-      'It clears the textarea if pending messages is enabled',
-      async (isClean) => {
-        ModerationService.checkIfMessageIsClean = vi
-          .fn()
-          .mockResolvedValue(isClean)
-        const wrapper = getWrapper({ isPendingMessagesEnabled: true })
-        const textArea = wrapper.get('[data-testid="chat-textarea"]')
-        const message = await sendMessage(wrapper)
-        await flushPromises()
-
-        expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
-          message,
-          sessionId: currentSession.id,
-        })
-        await flushPromises()
-        expect(textArea.element.value).toEqual('')
-      }
-    )
-
     test.each([
       {
         hateful_language: ['1', '2'],
