@@ -88,6 +88,7 @@
                 <span v-if="message.hasHtml" v-html="message.contents"></span>
                 <transcribed-message
                   v-else-if="message.type === 'audio-transcription'"
+                  :message="message"
                 />
                 <span v-else-if="message.type === 'voice'">
                   <voice-message
