@@ -1087,6 +1087,7 @@ export default {
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes())
+      this.resetCanvas()
       this.hideHoveredToolbars()
     },
     hideHoveredToolbars() {
@@ -1238,6 +1239,15 @@ export default {
         }
       )
     },
+    resetCanvas() {
+      this.zwibblerCtx.setViewRectangle({
+        x: 0,
+        y: 0,
+        width: this.canvasWidth,
+        height: this.canvasHeight,
+      })
+      this.zwibblerCtx.setZoom(1)
+    },
     zoomToFit(event, nodes) {
       nodes = nodes ?? this.zwibblerCtx.getAllNodes()
       if (nodes.length) {
@@ -1253,6 +1263,8 @@ export default {
           width: bounds.width + paddingX * 2,
           height: bounds.height + paddingY * 2,
         })
+      } else {
+        this.resetCanvas()
       }
       if (event) {
         AnalyticsService.captureEvent(
@@ -1574,6 +1586,12 @@ export default {
         }
 
         this.checkIfNodesAreOutsideView(nodes)
+      })
+
+      this.zwibblerCtx.on('nodes-removed', () => {
+        if (this.zwibblerCtx.getAllNodes().length === 0) {
+          this.resetCanvas()
+        }
       })
 
       this.zwibblerCtx.on('connect-error', () => {
