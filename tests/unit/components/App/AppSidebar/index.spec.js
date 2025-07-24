@@ -79,8 +79,6 @@ describe('AppSidebar', () => {
 
       const links = content.findComponent(SidebarLinks)
       expect(links.exists()).toBe(true)
-
-      expect(content.find('.logout-link').exists()).toBe(true)
     })
 
     it('desktop', () => {
@@ -95,8 +93,6 @@ describe('AppSidebar', () => {
 
       const links = content.findComponent(SidebarLinks)
       expect(links.exists()).toBe(true)
-
-      expect(content.find('.logout-link').exists()).toBe(true)
     })
   })
 })

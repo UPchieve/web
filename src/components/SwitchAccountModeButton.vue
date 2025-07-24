@@ -3,10 +3,10 @@
     <div
       class="switch-role-button"
       id="switch-role-button"
-      type="button"
+      role="button"
       @click="switchRole"
     >
-      <span>{{ message }}</span>
+      {{ message }}
     </div>
     <Modal class="error-switching-modal" v-if="error">
       {{ error }}
@@ -119,8 +119,7 @@ const closeErrorModal = () => {
 }
 
 .switch-role-button {
-  span {
-    color: $c-information-blue;
-  }
+  color: $c-information-blue;
+  font-weight: 500;
 }
 </style>

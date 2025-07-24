@@ -7,7 +7,6 @@ import { storeOptions } from '@/store'
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
 const DASHBOARD_LINK = { to: '/dashboard', text: 'Dashboard' }
-const PROFILE_LINK = { to: '/profile', text: 'Profile' }
 
 // Student links
 const SESSION_HISTORY_LINK = {
@@ -54,7 +53,6 @@ const links = {
       SESSION_HISTORY_LINK,
       FAVORITE_COACHES_LINK,
       MY_CLASSES_LINK,
-      PROFILE_LINK,
       CONTACT_LINK,
     ],
     volunteer: [
@@ -62,7 +60,6 @@ const links = {
       TRAINING_LINK,
       CALENDAR_LINK,
       SESSION_HISTORY_LINK,
-      PROFILE_LINK,
       INVITE_FRIEND_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
@@ -73,12 +70,11 @@ const links = {
       CALENDAR_LINK,
       SESSION_HISTORY_LINK,
       ADMIN_LINK,
-      PROFILE_LINK,
       INVITE_FRIEND_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],
-    teacher: [MY_CLASSES_LINK_TEACHERS, PROFILE_LINK, CONTACT_LINK],
+    teacher: [MY_CLASSES_LINK_TEACHERS, CONTACT_LINK],
   },
   onboarding: {
     student: [],
@@ -94,7 +90,6 @@ const getWrapper = (options = {}) => {
     isStudent: true,
     isTeacher: false,
     isAdmin: false,
-    mobileMode: false,
     path: '/',
     numberOfStudentClasses: 0,
     ...options,
@@ -130,7 +125,6 @@ const getWrapper = (options = {}) => {
       authenticated: options.authenticated,
       userType: options.userType,
       isAdmin: options.isAdmin,
-      mobileMode: options.mobileMode,
       numberOfStudentClasses: options.numberOfStudentClasses,
     },
   })
@@ -145,9 +139,6 @@ describe('SidebarLinks', () => {
     const about = wrapper.find('.SidebarLinks-about')
     expect(about.exists()).toBe(true)
     expect(about.text()).toBe('About UPchieve')
-
-    await wrapper.setProps({ mobileMode: true })
-    expect(wrapper.find('.SidebarLinks-about').exists()).toBe(false)
   })
 
   describe('link tests', () => {
@@ -165,110 +156,56 @@ describe('SidebarLinks', () => {
       })
     }
 
-    describe('mobileMode: true', () => {
-      it('renders default links when not logged in', () => {
-        const wrapper = getWrapper({ mobileMode: true })
-        testLinks(wrapper, links.default.loggedOut)
-      })
-
-      it('renders default links for student', () => {
-        const wrapper = getWrapper({ mobileMode: true, authenticated: true })
-        testLinks(wrapper, links.default.student)
-      })
-
-      it('renders onboarding links for student', () => {
-        const wrapper = getWrapper({ mobileMode: true, path: '/onboarding' })
-        testLinks(wrapper, links.onboarding.student)
-      })
-
-      it('renders default links for volunteer', () => {
-        const wrapper = getWrapper({
-          mobileMode: true,
-          authenticated: true,
-          isVolunteer: true,
-          isStudent: false,
-        })
-        testLinks(wrapper, links.default.volunteer)
-      })
-
-      it('renders onboarding links for volunteer', () => {
-        const wrapper = getWrapper({
-          mobileMode: true,
-          isVolunteer: true,
-          isStudent: false,
-          path: '/onboarding',
-        })
-        testLinks(wrapper, links.onboarding.volunteer)
-      })
-
-      it('renders default links for admin', () => {
-        const wrapper = getWrapper({
-          mobileMode: true,
-          isAdmin: true,
-          authenticated: true,
-          isVolunteer: true,
-          isStudent: false,
-        })
-        testLinks(wrapper, links.default.admin)
-      })
-
-      it('renders default links for teacher', () => {
-        const wrapper = getWrapper({
-          authenticated: true,
-          isStudent: false,
-          mobileMode: true,
-          isTeacher: true,
-        })
-        testLinks(wrapper, links.default.teacher)
-      })
+    it('renders default links when not logged in', () => {
+      const wrapper = getWrapper()
+      testLinks(wrapper, links.default.loggedOut)
     })
 
-    describe('mobileMode: false', () => {
-      it('renders default links when not logged in', () => {
-        const wrapper = getWrapper({ mobileMode: false })
-        testLinks(wrapper, links.default.loggedOut)
-      })
+    it('renders default links for student', () => {
+      const wrapper = getWrapper({ authenticated: true })
+      testLinks(wrapper, links.default.student)
+    })
 
-      it('renders default links for student', () => {
-        const wrapper = getWrapper({ mobileMode: false, authenticated: true })
-        testLinks(wrapper, links.default.student)
-      })
+    it('renders onboarding links for student', () => {
+      const wrapper = getWrapper({ path: '/onboarding' })
+      testLinks(wrapper, links.onboarding.student)
+    })
 
-      it('renders onboarding links for student', () => {
-        const wrapper = getWrapper({ mobileMode: false, path: '/onboarding' })
-        testLinks(wrapper, links.onboarding.student)
+    it('renders default links for volunteer', () => {
+      const wrapper = getWrapper({
+        authenticated: true,
+        isVolunteer: true,
+        isStudent: false,
       })
+      testLinks(wrapper, links.default.volunteer)
+    })
 
-      it('renders default links for volunteer', () => {
-        const wrapper = getWrapper({
-          mobileMode: false,
-          authenticated: true,
-          isVolunteer: true,
-          isStudent: false,
-        })
-        testLinks(wrapper, links.default.volunteer)
+    it('renders onboarding links for volunteer', () => {
+      const wrapper = getWrapper({
+        isVolunteer: true,
+        isStudent: false,
+        path: '/onboarding',
       })
+      testLinks(wrapper, links.onboarding.volunteer)
+    })
 
-      it('renders onboarding links for volunteer', () => {
-        const wrapper = getWrapper({
-          mobileMode: false,
-          isVolunteer: true,
-          isStudent: false,
-          path: '/onboarding',
-        })
-        testLinks(wrapper, links.onboarding.volunteer)
+    it('renders default links for admin', () => {
+      const wrapper = getWrapper({
+        isAdmin: true,
+        authenticated: true,
+        isVolunteer: true,
+        isStudent: false,
       })
+      testLinks(wrapper, links.default.admin)
+    })
 
-      it('renders default links for admin', () => {
-        const wrapper = getWrapper({
-          mobileMode: false,
-          isAdmin: true,
-          isVolunteer: true,
-          isStudent: false,
-          authenticated: true,
-        })
-        testLinks(wrapper, links.default.admin)
+    it('renders default links for teacher', () => {
+      const wrapper = getWrapper({
+        authenticated: true,
+        isStudent: false,
+        isTeacher: true,
       })
+      testLinks(wrapper, links.default.teacher)
     })
   })
 })
