@@ -47,6 +47,7 @@ import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import { getSessionEndDMsMessage } from '@/utils/chatbot-utils'
 
 export default {
   name: 'chat-bot',
@@ -64,41 +65,55 @@ export default {
   },
 
   props: {
-    isSessionRecapBot: { type: Boolean, default: false },
-    isInRecap: { type: Boolean, default: false },
     currentSession: { type: Object },
-    isDisplayingLanguagesSpoken: { type: Boolean, default: false },
     languages: { type: Array },
+    isInRecap: { type: Boolean },
+    isDisplayingLanguagesSpoken: { type: Boolean, default: false },
   },
 
   computed: {
     ...mapState({
+      user: (state) => state.user.user,
       latestSession: (state) => state.session.latestSession,
     }),
     ...mapGetters({
       firstName: 'user/firstName',
+      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
+      isStudent: 'user/isStudent',
+      isVolunteer: 'user/isVolunteer',
+      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
     }),
-
+    canSendDms() {
+      const isStudentDmsEnabled =
+        this.isStudent && this.isStudentsInitiateDmsEnabled
+      return (
+        this.isSessionRecapDmsActive &&
+        (this.isVolunteer || isStudentDmsEnabled)
+      )
+    },
+    isSessionOver() {
+      return !!this.currentSession?.endedAt
+    },
+    isSessionWaitingForVolunteer() {
+      return !this.currentSession?.volunteer
+    },
     isStillMessaging() {
       return this.unsentBotMessages.length > 0
+    },
+    dmsSystemMessage() {
+      const isSessionStudent = this.currentSession.student.id === this.user.id
+      return getSessionEndDMsMessage(isSessionStudent, this.isInRecap)
     },
   },
 
   created() {
-    if (this.isInRecap) {
-      this.$store.dispatch('user/addRecapMessage', {
-        contents: `Your session has ended but you can still <b>share extra resources and tips with this student!</b>
-
-        You can continue conversations asynchronously by messaging in this chat!
-
-        Your student will receive an email notification about your message and may respond later.
-
-        (Only you are able to initiate a conversation after the session ends, a student cannot reach out to you first.)`,
-        createdAt: new Date().toISOString(),
-        user: null,
-        hasHtml: true,
-      })
-      this.showBotMessage()
+    if (this.isSessionOver && this.canSendDms) {
+      const hasAlreadySentDms = this.currentSession.messages.some(
+        (message) => message.createdAt > this.currentSession.endedAt
+      )
+      if (!hasAlreadySentDms) {
+        this.launchSessionEndedChatBot()
+      }
     } else if (this.isDisplayingLanguagesSpoken) {
       const formattedLanguages = this.formatLanguagesListWithEnglish(
         this.languages
@@ -122,7 +137,7 @@ export default {
           languageCount: this.languages.length,
         }
       )
-    } else if (!this.isSessionRecapBot) {
+    } else if (this.isSessionWaitingForVolunteer && !this.isSessionOver) {
       const botMessages = [
         {
           msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`,
@@ -141,7 +156,7 @@ export default {
         this.showBotMessage()
         this.botInterval = setInterval(this.showBotMessage, 4500)
       }, 3000)
-    } else this.launchSessionEndedChatBot()
+    }
   },
   emits: ['new-bot-message', 'recap-eligible', 'loading-chatbot-message'],
   methods: {
@@ -184,25 +199,21 @@ export default {
           if (response.data.isEligible) {
             this.$emit('recap-eligible')
             this.$store.dispatch('user/addMessage', {
-              contents: `Your session has ended but you can still <b>share extra resources and tips with this student!</b>
-
-              You can continue conversations asynchronously by messaging in this chat or later by going to the "Session History" tab and finding this session chat!
-
-              Your student will receive an email notification about your message and may respond later.
-
-              (Only you are able to initiate a conversation after the session ends, a student cannot reach out to you first.)`,
+              sessionId: this.currentSession.id,
+              contents: this.dmsSystemMessage,
               createdAt: new Date().toISOString(),
               user: null,
               hasHtml: true,
             })
-            AnalyticsService.captureEvent(
-              EVENTS.CHAT_BOT_GIVE_RESOURCES_MESSAGE_SHOWN,
-              {
-                sessionId: this.currentSession.id,
-              }
-            )
+            const event = this.isStudent
+              ? EVENTS.CHAT_BOT_STUDENT_DMS_MESSAGE_SHOWN
+              : EVENTS.CHAT_BOT_VOLUNTEER_DMS_MESSAGE_SHOWN
+            AnalyticsService.captureEvent(event, {
+              sessionId: this.currentSession.id,
+            })
           } else {
             this.$store.dispatch('user/addMessage', {
+              sessionId: this.currentSession.id,
               contents:
                 'The session has ended. Thanks so much for picking up this session!',
               createdAt: new Date().toISOString(),

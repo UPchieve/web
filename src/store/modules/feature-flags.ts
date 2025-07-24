@@ -59,6 +59,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS]: false,
       [POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES]: false,
       [POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO]: false,
+      [POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -250,6 +251,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES],
     isClassLinkSsoEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO],
+    isStudentsInitiateDmsEnabled: (state) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS],
   },
   actions: {
     isSessionAudioCallEnabled: async (

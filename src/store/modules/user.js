@@ -75,9 +75,6 @@ export default {
         )
       }
     },
-    addRecapMessage: (state, message) => {
-      if (message) state.recapSession.messages.push(message)
-    },
 
     setAvailability: (state, availability, date) => {
       if (availability) {
@@ -236,10 +233,6 @@ export default {
     addMessage: ({ commit }, message) => {
       commit('removePendingMessage', message)
       commit('addMessage', message)
-    },
-
-    addRecapMessage: ({ commit }, message) => {
-      commit('addRecapMessage', message)
     },
 
     firstDashboardVisit: ({ commit }, isFirstDashboardVisit) => {

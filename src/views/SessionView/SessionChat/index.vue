@@ -44,7 +44,9 @@
     <div class="messages-container">
       <div class="messages" ref="messages" @scroll="handleScroll" tabindex="0">
         <chat-bot
-          v-if="isStudent && isSessionWaitingForVolunteer && !aiWidgetPresent"
+          v-if="isStudent && isSessionWaitingForVolunteer"
+          :currentSession="currentSession"
+          :isInRecap="false"
           @new-bot-message="handleNewMessageScrollPosition"
         />
         <chat-bot
@@ -53,6 +55,7 @@
             isDisplayVolunteerLanguagesEnabled &&
             isTutorJoiningForFirstTime
           "
+          :isInRecap="isInRecap"
           :isDisplayingLanguagesSpoken="true"
           :currentSession="currentSession"
           :languages="currentSession.volunteerLanguages ?? []"
@@ -173,17 +176,21 @@
         </div>
 
         <chat-bot
-          v-if="sessionHasEnded && isSessionRecapDmsActive && isVolunteer"
-          :isSessionRecapBot="true"
+          v-if="
+            sessionHasEnded &&
+            isSessionRecapDmsActive &&
+            (isVolunteer || isStudentsInitiateDmsEnabled)
+          "
           :currentSession="currentSession"
+          :isInRecap="isInRecap"
           @recap-eligible="toggleEligibleForSessionRecapChat"
           @loading-chatbot-message="scrollToBottom"
         />
         <chat-bot
           v-if="
-            isVolunteer &&
             isInRecap &&
             currentSession.messages &&
+            (isVolunteer || (isStudent && isStudentsInitiateDmsEnabled)) &&
             !tutorSentMessageAfterSessionEnded
           "
           :isInRecap="isInRecap"
@@ -381,6 +388,7 @@ export default {
       sessionPartner: 'user/sessionPartner',
       isConfettiCelebrationEnabled: 'featureFlags/isConfettiCelebrationEnabled',
       isPendingMessagesEnabled: 'featureFlags/isPendingMessagesEnabled',
+      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
     }),
     showMyInProgressCaptionMessage() {
       return this.myInProgressCaptionMessage?.text?.length > 0
