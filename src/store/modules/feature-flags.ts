@@ -78,6 +78,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
       [POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION]: '',
+      [POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL]: null,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: {},
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]:
         'Interested in becoming a volunteer tutor on UPchieve?',
@@ -188,6 +189,8 @@ export default {
         payload.maxQualifiedSessionsPerWeek = 1
       return payload
     },
+    getUpdateSchoolConfig: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL],
     isFallIncentiveParentalConsentEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT
@@ -251,7 +254,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES],
     isClassLinkSsoEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO],
-    isStudentsInitiateDmsEnabled: (state) =>
+    isStudentsInitiateDmsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS],
   },
   actions: {

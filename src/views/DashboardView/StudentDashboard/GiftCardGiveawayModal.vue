@@ -1,5 +1,5 @@
 <template>
-  <modal :closeModal="closeModal" :useDefaultPadding="false">
+  <modal :closeModal="closeModal" :style{padding: 0}>
     <div>
       <header>
         <heavy-cross-icon class="upc-modal-close-icon" @click="closeModal" />

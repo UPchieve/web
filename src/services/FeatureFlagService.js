@@ -18,6 +18,7 @@ class FeatureFlagService {
             personProperties
           )
           FeatureFlagService.setPersonProperties(personProperties)
+
           FeatureFlagService.listenForFlagReload()
           resolve()
         },

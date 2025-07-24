@@ -60,6 +60,8 @@
       :closeModal="toggleImpactStudySurveyModal"
       :impactStudyCampaignId="impactStudySurveyCampaignId"
     />
+    <update-school-modal />
+
     <secondary-email-modal
       v-if="showSecondaryEmailModal"
       :showGrade12Messaging="this.user.gradeLevel === '12th'"
@@ -94,6 +96,7 @@ import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import ImpactStudySurveyModal from './ImpactStudySurveyModal.vue'
+import UpdateSchoolModal from './UpdateSchoolModal.vue'
 import SelectPreferredLanguageModal from './SelectPreferredLanguageModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import ProductDiscoveryService from '@/services/ProductDiscoveryService'
@@ -125,6 +128,7 @@ export default {
     JoinedClassModal,
     FallIncentiveEnrollmentModal,
     ImpactStudySurveyModal,
+    UpdateSchoolModal,
     ArrowIcon,
     LargeButton,
     StudentAssignments,

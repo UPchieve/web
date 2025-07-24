@@ -99,15 +99,33 @@
   &-secondary {
     background-color: $button-secondary-bg;
     border: 1px solid $button-secondary-border;
-    border-radius: 200px;
     color: $button-secondary-text;
+    border-radius: 200px;
     font-size: 16px;
     height: 48px;
+    
 
     &:hover,
     &:active {
       background-color: $button-secondary-bg-hover;
       border-color: $button-secondary-border-hover;
+    }
+  }
+
+  &-back-button {
+    
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-top: 24px;
+    height: 48px;
+    cursor: pointer;
+    
+
+    &:hover {
+      background: #f7fcfe;
     }
   }
 

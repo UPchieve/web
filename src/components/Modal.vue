@@ -1,3 +1,41 @@
+<script lang="ts" setup>
+import { useStore } from 'vuex'
+import ArrowIcon from '@/assets/arrow.svg'
+import { computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  closeModal: Function,
+  important: Boolean,
+  backText: { type: String, default: 'Back' },
+  disableModalMobileMode: { type: Boolean, default: false, required: false },
+})
+
+const store = useStore()
+
+onMounted(() => {
+  const body = document.querySelector('body')
+  body?.classList.add('disable-scroll')
+})
+
+onUnmounted(() => {
+  const body = document.querySelector('body')
+  body?.classList.remove('disable-scroll')
+})
+
+const mobileMode = computed(() => store.getters['app/mobileMode'])
+
+//TODO: Allow modal to hide itself of parent's v-if.
+//The closeModal func prop should be an trigger after the dialog closes/hides/destroys itself
+function handleClose(event: MouseEvent) {
+  const { target } = event
+  const targetHtmlElement = target as HTMLElement
+
+  if (props.closeModal && targetHtmlElement?.classList?.contains('upc-modal')) {
+    props.closeModal()
+  }
+}
+</script>
+
 <template>
   <div
     class="upc-modal"
@@ -11,53 +49,17 @@
       <div
         v-if="backText"
         class="upc-modal-header-close-button"
-        @click="closeModal"
+        @click="handleClose"
       >
         <arrow-icon class="icon" />
         <p>{{ backText }}</p>
       </div>
     </div>
 
-    <div class="upc-modal-form" :style="{ padding: !useDefaultPadding && 0 }">
+    <div class="upc-modal-form">
       <slot />
 
       <div class="upc-modal-form--bottom-padding" />
     </div>
   </div>
 </template>
-
-<script>
-import { mapGetters } from 'vuex'
-import ArrowIcon from '@/assets/arrow.svg'
-
-export default {
-  components: { ArrowIcon },
-  props: {
-    closeModal: { type: Function },
-    important: Boolean,
-    backText: { type: String, default: 'Back' },
-    useDefaultPadding: { type: Boolean, default: true, required: false },
-    disableModalMobileMode: { type: Boolean, default: false, required: false },
-  },
-  mounted() {
-    const body = document.querySelector('body')
-    body.classList.add('disable-scroll')
-  },
-  beforeUnmount() {
-    const body = document.querySelector('body')
-    body.classList.remove('disable-scroll')
-  },
-  computed: {
-    ...mapGetters({ mobileMode: 'app/mobileMode' }),
-  },
-  methods: {
-    handleClose(event) {
-      const { target } = event
-      if (this.closeModal && target.classList.contains('upc-modal'))
-        this.closeModal()
-    },
-  },
-}
-</script>
-
-<style lang="scss" scoped></style>
