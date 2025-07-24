@@ -340,6 +340,7 @@ function logout() {
   position: absolute;
   top: 85%;
   width: 242px;
+  z-index: 1;
 }
 
 .minor-text {
