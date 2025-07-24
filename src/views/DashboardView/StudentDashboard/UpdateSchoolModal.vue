@@ -11,6 +11,8 @@ import BackButton from '@/components/BackButton.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import { useStepper } from '@/composables/useStepper'
 import LoggerService from '@/services/LoggerService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const vuelidate = useVuelidate()
 const store = useStore()
@@ -82,6 +84,10 @@ async function handleLastStep() {
         userId: store.state.user.user.id,
         schoolId: schoolId.value,
       })
+      AnalyticsService.captureEvent(EVENTS.UPDATE_SCHOOL_MODAL_CHANGED, {
+        previousSchool: currentSchool.value,
+        newSchoolId: schoolId.value,
+      })
     } catch (err) {
       const toast = await toastController.create({
         color: 'danger',
@@ -101,12 +107,17 @@ async function handleLastStep() {
       })
       await toast.present()
       LoggerService.noticeError(err)
+      AnalyticsService.captureEvent(EVENTS.UPDATE_SCHOOL_MODAL_FAILED)
       return
     }
   }
 
   setSuccessMessage(currentStep.value)
-  handleModalClose()
+  if (currentStep.value == 1)
+    AnalyticsService.captureEvent(EVENTS.UPDATE_SCHOOL_MODAL_NOT_CHANGED, {
+      currentSchool,
+    })
+  handleModalClose(false)
   goToStep(3)
 }
 
@@ -115,9 +126,11 @@ function setSuccessMessage(currentStep: number) {
   successMessage.value = STEP_TO_SUCCESS_MESSAGES[step]
 }
 
-function handleModalClose() {
+function handleModalClose(ignoredModal: boolean) {
   localStorage.setItem(localStorageKey.value, 'true')
   hasSeenModal.value = 'true'
+  if (ignoredModal)
+    AnalyticsService.captureEvent(EVENTS.UPDATE_SCHOOL_MODAL_IGNORED)
 }
 </script>
 
@@ -126,7 +139,7 @@ function handleModalClose() {
     <modal
       v-if="showUpdateSchoolModal"
       :disableModalMobileMode="true"
-      :closeModal="handleModalClose"
+      :closeModal="() => handleModalClose(true)"
     >
       <template v-if="currentStep === 1">
         <div class="uc-column">
