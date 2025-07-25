@@ -194,12 +194,15 @@ describe('ChatBot', () => {
     it('Does not launch the session ended chatbot messages if DMs have already been sent', async () => {
       const mockAddMessage = vi.fn()
       const userId = currentSession.student.id
+      const sessionEndedAt = moment().subtract(1, 'hour').toDate()
+      const dmMessageSentAt = moment().add(1, 'hour').toDate()
       const session = {
         ...currentSession,
-        endedAt: new Date(),
+        endedAt: sessionEndedAt,
         messages: [
           {
-            createdAt: moment().add(1, 'hour').toDate(),
+            createdAt: dmMessageSentAt,
+            user: userId,
           },
         ],
       }

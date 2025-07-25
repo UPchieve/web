@@ -109,7 +109,8 @@ export default {
   created() {
     if (this.isSessionOver && this.canSendDms) {
       const hasAlreadySentDms = this.currentSession.messages.some(
-        (message) => message.createdAt > this.currentSession.endedAt
+        (message) =>
+          message.createdAt > this.currentSession.endedAt && message.user
       )
       if (!hasAlreadySentDms) {
         this.launchSessionEndedChatBot()
