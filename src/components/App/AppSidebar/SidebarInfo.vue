@@ -26,7 +26,7 @@ const userType = computed(() => $store.getters['user/userType'])
 const avatar = computed(() => $store.getters['user/avatar'])
 const isVolunteer = computed(() => $store.getters['user/isVolunteer'])
 const isStudentVolunteer = computed(
-  () => $store.getters['user/isStudentisStudentVolunteerolunteer']
+  () => $store.getters['user/isStudentVolunteer']
 )
 const mobileMode = computed(() => $store.getters['app/mobileMode'])
 const showAmbassadorTitle = computed(
