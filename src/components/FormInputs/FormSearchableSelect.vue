@@ -64,7 +64,7 @@
 
 <script lang="ts" setup>
 import { IonInput } from '@ionic/vue'
-import { type PropType, ref, computed } from 'vue'
+import { type PropType, ref, computed, onMounted } from 'vue'
 
 const props = defineProps({
   label: {
@@ -111,6 +111,18 @@ const showOptions = ref<boolean>(false)
 const selectedOption = ref<any>('')
 const validationError = ref<string | null>(null)
 const highlightedOptionIndex = ref<number>(0)
+
+onMounted(() => {
+  if (props.modelValue) {
+    const selectedOption = props.options.find((o) => {
+      const optionToCompare = props.reduce ? props.reduce(o) : o
+      return optionToCompare === props.modelValue
+    })
+    searchTerm.value = props.optionTextField
+      ? selectedOption[props.optionTextField]
+      : selectedOption
+  }
+})
 
 const displayValue = computed(() => {
   if (selectedOption.value) {

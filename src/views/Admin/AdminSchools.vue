@@ -20,7 +20,7 @@
           placeholder="NCES Id"
           :isRequired="false"
         />
-        <FormSelect
+        <FormSearchableSelect
           v-model="state"
           label="School State"
           name="state"
@@ -81,6 +81,7 @@
 import { toastController } from '@ionic/vue'
 import NetworkService from '@/services/NetworkService'
 import FormInput from '@/components/FormInput.vue'
+import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import Loader from '@/components/Loader.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
@@ -91,6 +92,7 @@ export default {
   name: 'AdminSchools',
   components: {
     FormInput,
+    FormSearchableSelect,
     FormSelect,
     Loader,
     PageControl,
