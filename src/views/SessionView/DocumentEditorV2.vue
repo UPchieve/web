@@ -59,7 +59,11 @@
           <ScreenShareIcon v-else />
         </button>
       </div>
-      <word-count class="ql-word-count" :text="text" />
+      <word-count
+        class="ql-word-count"
+        :text="text"
+        :selected-text="selectedText"
+      />
     </div>
 
     <div id="quill-container"></div>
@@ -196,7 +200,9 @@ export default {
       showRefreshModal: false,
       isConnecting: false,
       showScreenShareErrorTooltip: false,
+      // For determining word counts.
       text: '',
+      selectedText: '',
     }
   },
   computed: {
@@ -367,6 +373,10 @@ export default {
           range,
         })
       }
+
+      this.selectedText = range
+        ? this.quillEditor.getText(range.index, range.length)
+        : ''
     },
     requestQuillDoc() {
       socket.emit('requestQuillStateV2', {

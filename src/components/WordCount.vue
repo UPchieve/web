@@ -3,8 +3,11 @@ import { countWords } from '@/utils/word-count'
 import { computed } from 'vue'
 
 const props = defineProps<{
+  selectedText: string
   text: string
 }>()
+
+const selectedWordCount = computed(() => countWords(props.selectedText))
 
 const wordCount = computed(() => countWords(props.text))
 const inflectedLabel = computed(() =>
@@ -13,5 +16,8 @@ const inflectedLabel = computed(() =>
 </script>
 
 <template>
-  <span>{{ wordCount }} {{ inflectedLabel }}</span>
+  <div>
+    <span v-if="selectedWordCount">{{ selectedWordCount }} / </span>
+    <span>{{ wordCount }} {{ inflectedLabel }}</span>
+  </div>
 </template>
