@@ -1249,23 +1249,6 @@ export default {
       this.zwibblerCtx.setZoom(1)
     },
     zoomToFit(event, nodes) {
-      nodes = nodes ?? this.zwibblerCtx.getAllNodes()
-      if (nodes.length) {
-        // Add a bit of padding around the bounds,
-        // otherwise the nodes can be obnoxiously zoomed in.
-        const bounds = this.zwibblerCtx.getBoundingRectangle(nodes)
-        const paddingFactor = 0.5
-        const paddingX = bounds.width * paddingFactor
-        const paddingY = bounds.height * paddingFactor
-        this.zwibblerCtx.setViewRectangle({
-          x: bounds.x - paddingX,
-          y: bounds.y - paddingY,
-          width: bounds.width + paddingX * 2,
-          height: bounds.height + paddingY * 2,
-        })
-      } else {
-        this.resetCanvas()
-      }
       if (event) {
         AnalyticsService.captureEvent(
           EVENTS.USER_CLICKED_WHITEBOARD_ZOOM_TO_FIT,
@@ -1275,6 +1258,35 @@ export default {
         )
         this.maybeFocusZwibbler(event)
       }
+
+      nodes = nodes ?? this.zwibblerCtx.getAllNodes()
+      if (!nodes.length) {
+        this.resetCanvas()
+        return
+      }
+
+      const bounds = this.zwibblerCtx.getBoundingRectangle(nodes)
+      const minSize = 200
+      // For small bounds, have a minimum width/height,
+      // otherwise setViewRectangle will make the view
+      // obnoxiously zoomed in.
+      if (bounds.width < minSize && bounds.height < minSize) {
+        this.zwibblerCtx.setViewRectangle({
+          x: bounds.x,
+          y: bounds.y,
+          width: minSize,
+          height: minSize,
+        })
+        this.zwibblerCtx.setZoom(2)
+        return
+      }
+
+      this.zwibblerCtx.setViewRectangle({
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: bounds.height,
+      })
     },
     zoomOut(event) {
       this.zwibblerCtx.zoomOut()
