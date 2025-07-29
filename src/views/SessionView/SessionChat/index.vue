@@ -244,15 +244,6 @@
           ref="textareaRef"
         />
         <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
-        <record-voice-message
-          @idle="showTextMessage"
-          @not-idle="hideTextMessage"
-          v-if="showVoiceMessaging"
-          :onRecording="onRecording"
-          :onStopRecording="onStopRecording"
-          :sendAudioMessage="sendVoiceMessage"
-          :sendTextMessage="sendTranscriptMessage"
-        />
         <button
           :disabled="isSendMessageDisabled"
           class="send-button"
@@ -280,7 +271,6 @@ import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import TrashIcon from '@/assets/trash.svg'
 
 import ChatBot from './ChatBot.vue'
-import RecordVoiceMessage from '@/components/VoiceMessaging/RecordVoiceMessage.vue'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
@@ -291,7 +281,6 @@ import CelebrationButton from './CelebrationButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import ModerationService from '@/services/ModerationService'
-import VoiceMessageService from '@/services/VoiceMessageService'
 
 import { DEFAULT_CELEBRATION_DURATION } from '@/store/modules/celebrations'
 import getChatAvatar from '@/utils/get-chat-avatar'
@@ -301,9 +290,6 @@ const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
   RIGHT: 'right',
   CENTER: 'center',
-}
-function wasCensoredByChrome(transcript) {
-  return transcript.includes('*')
 }
 
 export default {
@@ -318,7 +304,6 @@ export default {
     ChatBot,
     LoadingMessage,
     DocumentTitle,
-    RecordVoiceMessage,
     VoiceMessage,
     CallStatusIndicator,
     TranscribedMessage,
@@ -351,8 +336,6 @@ export default {
       receiveMessageAudio: new Audio(sound),
       failureReasons: null,
       waitingForModeration: false,
-      voiceMessagingAvailable:
-        navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
       textMessageHidden: false,
       hasStartedTyping: false,
       isSessionAudioCallEnabled: false,
@@ -382,7 +365,6 @@ export default {
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
-      eligibleForVoiceMessaging: 'featureFlags/eligibleForVoiceMessaging',
       isDisplayVolunteerLanguagesEnabled:
         'featureFlags/isDisplayVolunteerLanguagesEnabled',
       sessionPartner: 'user/sessionPartner',
@@ -401,9 +383,6 @@ export default {
       const pendingVoiceMessages = this.currentSession?.pendingMessages ?? []
 
       return currentMessages.concat(pendingVoiceMessages)
-    },
-    showVoiceMessaging() {
-      return this.voiceMessagingAvailable && this.eligibleForVoiceMessaging
     },
     sessionPartner() {
       return this.isVolunteer
@@ -478,21 +457,6 @@ export default {
         partnerUserId
       )
     },
-
-    showTextMessage() {
-      this.textMessageHidden = false
-      this.hideModerationWarning()
-    },
-    hideTextMessage() {
-      this.textMessageHidden = true
-    },
-    onRecording() {
-      socket.emit('typing', { sessionId: this.currentSession.id })
-    },
-    onStopRecording() {
-      this.notTyping()
-    },
-
     getModerationFailureReason(reasonKey) {
       switch (reasonKey.toLowerCase()) {
         case 'platform circumvention':
@@ -723,81 +687,6 @@ export default {
         edittedMessage.moderated = true
         edittedMessage.flagged = !isClean
         this.processPendingMessageQueue()
-      }
-    },
-
-    async sendTranscriptMessage(transcript) {
-      this.hideModerationWarning()
-
-      if (wasCensoredByChrome(transcript)) {
-        this.showModerationWarning()
-        return false
-      }
-
-      try {
-        const isClean = await this.sendMessage(transcript)
-        return isClean
-      } catch {
-        return true
-      }
-    },
-
-    async sendVoiceMessage({ audio, transcript, userEditedTranscript }) {
-      try {
-        this.hideModerationWarning()
-        this.waitingForModeration = true
-
-        if (wasCensoredByChrome(transcript)) {
-          this.showModerationWarning()
-          this.waitingForModeration = false
-          return false
-        }
-
-        const { failures } = await ModerationService.checkIfMessageIsClean({
-          // Moderate both original audio transcript and user edited.
-          message: `${transcript} ${userEditedTranscript}`,
-          sessionId: this.currentSession.id,
-        })
-        const transcriptToSend = userEditedTranscript.length
-          ? userEditedTranscript
-          : transcript
-        const isClean = Object.keys(failures).length === 0
-        if (isClean) {
-          const form = new FormData()
-          form.append('message', audio)
-          form.append('senderId', this.user.id)
-          form.append('sessionId', this.currentSession.id)
-          form.append('transcript', transcriptToSend)
-          const voiceMessageId =
-            await VoiceMessageService.saveVoiceMessage(form)
-
-          // Not worrying about voice pending messages because
-          // voice messaging is going to be removed.
-          socket.emit('message', {
-            type: 'voice',
-            sessionId: this.currentSession.id,
-            user: this.user,
-            message: voiceMessageId,
-            transcript: transcriptToSend,
-            source:
-              this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
-          })
-          return true
-        } else {
-          // do not show the offending profanity to students
-          // in the event it was a typo
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { profanity, ...rest } = failures
-          this.failureReasons = this.isVolunteer ? failures : rest
-          this.showModerationWarning()
-          return false
-        }
-      } catch (e) {
-        this.showNewMessage(message)
-        LoggerService.noticeError(`ModerationService failed with`, e)
-        return true
-      } finally {
-        this.waitingForModeration = false
       }
     },
 

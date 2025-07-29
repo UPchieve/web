@@ -32,7 +32,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.VOICE_MESSAGE]: false,
       [POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: false,
@@ -172,8 +171,6 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW
       ],
-    eligibleForVoiceMessaging: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.VOICE_MESSAGE],
     isCollegePrepAdEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD],
     isTutorBotChatEnabled: (state: FeatureFlagState) =>

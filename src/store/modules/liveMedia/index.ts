@@ -38,7 +38,6 @@ export default {
       let source = ''
       switch (state.moderationInfraction?.source) {
         case 'audio_transcription':
-        case 'voice_chat':
           source = 'microphone'
           break
         case 'screenshare':
