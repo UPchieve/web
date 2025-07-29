@@ -779,29 +779,51 @@ function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
 }
 
 function getSsoSectionElements(): FormRow[] {
+  const isMobileMode = store.getters['app/mobileMode']
   const isClassLinkSsoEnabled =
     store.getters['featureFlags/isClassLinkSsoEnabled']
-  return [
-    getRow(
-      'mt-4',
-      getSsoButton(createAccountWithGoogle, 'Google', SsoProvider.GOOGLE)
-    ),
-    getRow(
-      'mt-3',
-      getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER)
-    ),
-    ...(isClassLinkSsoEnabled
-      ? [
-          getRow(
-            'mt-3',
-            getSsoButton(
+  const rows: FormRow[] = []
+
+  if (!isMobileMode)
+    rows.push(
+      getRow(
+        'mt-4',
+        getSsoButton(createAccountWithGoogle, 'Google', SsoProvider.GOOGLE),
+        getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER),
+        isClassLinkSsoEnabled
+          ? getSsoButton(
               createAccountWithClassLink,
               'ClassLink',
               SsoProvider.CLASSLINK
             )
-          ),
-        ]
-      : []),
+          : undefined
+      )
+    )
+  else {
+    rows.push(
+      getRow(
+        'mt-4',
+        getSsoButton(createAccountWithGoogle, 'Google', SsoProvider.GOOGLE)
+      ),
+      getRow(
+        'mt-3',
+        getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER)
+      )
+    )
+
+    if (isClassLinkSsoEnabled)
+      rows.push(
+        getRow(
+          'mt-3',
+          getSsoButton(
+            createAccountWithClassLink,
+            'ClassLink',
+            SsoProvider.CLASSLINK
+          )
+        )
+      )
+  }
+  rows.push(
     getRow(
       'justify-center italic mt-3',
       getTextElement(
@@ -809,8 +831,9 @@ function getSsoSectionElements(): FormRow[] {
         'By clicking the button above, you agree to our User Agreement'
       )
     ),
-    getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } }),
-  ]
+    getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } })
+  )
+  return rows
 }
 
 function getPartnerSitesElement(to: RouteLocation): FormElement | undefined {

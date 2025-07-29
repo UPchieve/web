@@ -44,29 +44,33 @@
         >
           {{ useNewSignUpFlow ? 'Log in' : 'Sign In' }}
         </button>
-        <LineDivider v-if="useNewSignUpFlow" text="Or continue with:" />
-        <SsoButton
-          class="mt-4"
-          data-testid="googleSsoButton"
-          @click="signInWithSso('google')"
-          :buttonText="useNewSignUpFlow ? 'Google' : 'Sign In with Google'"
-          ssoMethod="google"
+        <LineDivider
+          :text="useNewSignUpFlow ? 'Or continue with:' : 'Sign In with'"
         />
-        <SsoButton
-          class="mt-3"
-          data-testid="cleverSsoButton"
-          @click="signInWithSso('clever')"
-          buttonText="Clever"
-          ssoMethod="clever"
-        />
-        <SsoButton
-          v-if="isClassLinkSsoEnabled"
-          class="mt-3"
-          data-testid="classLinkSsoButton"
-          @click="signInWithSso('classlink')"
-          buttonText="ClassLink"
-          ssoMethod="classlink"
-        />
+        <div class="sso-container">
+          <SsoButton
+            @click="signInWithSso('google')"
+            class="sso-button"
+            data-testid="googleSsoButton"
+            :buttonText="'Google'"
+            :ssoMethod="SsoProvider.GOOGLE"
+          />
+          <SsoButton
+            @click="signInWithSso('clever')"
+            class="sso-button"
+            data-testid="cleverSsoButton"
+            buttonText="Clever"
+            :ssoMethod="SsoProvider.CLEVER"
+          />
+          <SsoButton
+            v-if="isClassLinkSsoEnabled"
+            @click="signInWithSso('classlink')"
+            class="sso-button"
+            data-testid="classLinkSsoButton"
+            buttonText="ClassLink"
+            :ssoMethod="SsoProvider.CLASSLINK"
+          />
+        </div>
       </form>
       <p class="uc-form-text">
         Need an account?
@@ -97,6 +101,9 @@ export default {
     FormPageTemplate,
     LineDivider,
     SsoButton,
+  },
+  setup() {
+    return { SsoProvider }
   },
   created() {
     localStorage.removeItem('isSSOSignUpRedirect')

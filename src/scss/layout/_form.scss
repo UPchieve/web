@@ -258,7 +258,7 @@
     height: auto;
     min-height: 48px;
   }
-  .vs__selected-options { 
+  .vs__selected-options {
     gap: 6px;
   }
   .vs__selected {
@@ -274,7 +274,6 @@
     padding: 0;
   }
 }
-
 
 /// Helper class for creating a basic form checkbox.
 ///
@@ -384,6 +383,26 @@
     &:hover,
     &:focus {
       background: #eee;
+    }
+  }
+}
+
+.sso {
+  &-container {
+    @include flex-container(column);
+    gap: 0.75em;
+    margin-top: 1em;
+
+    @include breakpoint-above('tiny') {
+      @include flex-container(row, space-between, center);
+      flex-wrap: wrap;
+    }
+  }
+
+  &-button {
+    @include breakpoint-above('tiny') {
+      width: auto;
+      flex: 1;
     }
   }
 }
@@ -511,7 +530,7 @@
     margin: 0 0 0 16px;
   }
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     @include flex-container(row, center, center);
     $size: 20px;
 

@@ -4,6 +4,7 @@ import type {
   NavigationGuardNext,
 } from 'vue-router'
 import { EVENTS } from '@/consts'
+import store from '@/store'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
@@ -25,9 +26,9 @@ import type {
   PageDetail,
   PageDetailsUnion,
   SubmitActionResponse,
+  FormRow,
 } from '@/services/SignUpService'
 import { SsoProvider } from '@/services/SsoService'
-import featureFlags from '@/store/modules/feature-flags'
 
 const RoutePath = {
   account: `/sign-up/teacher/${SignUpPage.account}`,
@@ -261,22 +262,7 @@ function getAccountPageDetails(): PageDetail<TeacherAccountFormData> {
       }),
       getRow('mt-4', getTextElement('h1', 'Your school is eligible! 🎉')),
       getRow('mt-3', getTextElement('h2', 'Finish creating your account')),
-      getRow(
-        'mt-3',
-        getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER)
-      ),
-      ...(featureFlags.getters['isClassLinkSsoEnabled']
-        ? [
-            getRow(
-              'mt-3',
-              getSsoButton(
-                createAccountWithClassLink,
-                'ClassLink',
-                SsoProvider.CLASSLINK
-              )
-            ),
-          ]
-        : []),
+      ...getSsoSectionElements(),
       getRow(
         'justify-center italic mt-3',
         getTextElement(
@@ -394,4 +380,29 @@ export async function beforeEnter(
     })
   }
   return next()
+}
+
+function getSsoSectionElements(): FormRow[] {
+  const isMobileMode = store.getters['app/mobileMode']
+  const isClassLinkSsoEnabled =
+    store.getters['featureFlags/isClassLinkSsoEnabled']
+  const cleverButton = getSsoButton(
+    createAccountWithClever,
+    'Clever',
+    SsoProvider.CLEVER
+  )
+  const classLinkButton = isClassLinkSsoEnabled
+    ? getSsoButton(
+        createAccountWithClassLink,
+        'ClassLink',
+        SsoProvider.CLASSLINK
+      )
+    : undefined
+
+  if (isMobileMode)
+    return [
+      getRow('mt-3', cleverButton),
+      ...(classLinkButton ? [getRow('mt-3', classLinkButton)] : []),
+    ]
+  return [getRow('mt-3', cleverButton, classLinkButton)]
 }

@@ -44,27 +44,31 @@
             :is-required="true"
           />
         </div>
-        <SsoButton
-          v-if="useGoogleSSO"
-          class="mt-3"
-          @click="signUpWithSso('google')"
-          buttonText="Sign Up with Google"
-          ssoMethod="google"
-        />
-        <SsoButton
-          v-if="useCleverSSO"
-          class="mt-3"
-          @click="signUpWithSso('clever')"
-          buttonText="Sign Up with Clever"
-          ssoMethod="clever"
-        />
-        <SsoButton
-          v-if="useClassLinkSSO && isClassLinkSsoEnabled"
-          class="mt-3"
-          @click="signUpWithSso('classlink')"
-          buttonText="Sign Up with ClassLink"
-          ssoMethod="classlink"
-        />
+
+        <LineDivider text="Sign up with" />
+        <div class="sso-container">
+          <SsoButton
+            v-if="useGoogleSSO"
+            @click="signUpWithSso('google')"
+            class="sso-button"
+            buttonText="Google"
+            :ssoMethod="SsoProvider.GOOGLE"
+          />
+          <SsoButton
+            v-if="useCleverSSO"
+            @click="signUpWithSso('clever')"
+            class="sso-button"
+            buttonText="Clever"
+            :ssoMethod="SsoProvider.CLEVER"
+          />
+          <SsoButton
+            v-if="useClassLinkSSO && isClassLinkSsoEnabled"
+            @click="signUpWithSso('classlink')"
+            class="sso-button"
+            buttonText="ClassLink"
+            :ssoMethod="SsoProvider.CLASSLINK"
+          />
+        </div>
         <p class="terms-text">
           By clicking the button above, you agree to our
           <a href="https://upchieve.org/legal" target="_blank" class="uc-link"
@@ -436,6 +440,8 @@ import { EVENTS, GRADES, INELIGIBLE_LOCAL_STORAGE_KEY } from '@/consts'
 import config from '../../config'
 import VerificationBadge from '@/assets/verification.svg'
 import * as signupUtils from '@/utils/signup-utils'
+import LineDivider from '@/components/LineDivider.vue'
+
 export default {
   name: 'student-partner-signup-view',
   components: {
@@ -445,9 +451,10 @@ export default {
     VerificationBadge,
     SsoButton,
     FormSelect,
+    LineDivider,
   },
   setup() {
-    return { v$: useVuelidate() }
+    return { v$: useVuelidate(), SsoProvider }
   },
   validations() {
     return {
@@ -849,6 +856,7 @@ export default {
     signUpWithSso(provider) {
       this.captureSsoClickEvent(provider)
 
+      // TODO: Early exit if grade isn't selected and add disabled to SSOButton until grade is selected?
       localStorage.setItem('isSSOSignUpRedirect', true)
       const data = {
         errorRedirect: this.$route.path,
