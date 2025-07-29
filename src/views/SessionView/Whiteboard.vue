@@ -1,10 +1,16 @@
 <template>
   <div class="zwib-wrapper" :class="toolClass">
     <transition name="whiteboard-warning">
+      <div
+        v-if="hasConnectionFailure"
+        class="whiteboard-warning whiteboard-warning--failure"
+      >
+        Failed to connect to the whiteboard. Please refresh your page.
+      </div>
       <loading-message
         message="Attempting to connect the whiteboard"
         class="whiteboard-warning whiteboard-warning--connection"
-        v-show="!isConnected"
+        v-else-if="!isConnected"
       />
     </transition>
     <div
@@ -680,6 +686,7 @@ export default {
       error: '',
       isLoading: false,
       isConnected: false,
+      hasConnectionFailure: false,
       hadConnectionIssue: false,
       pingPongInterval: null,
       uploadingPictureError: false,
@@ -1476,6 +1483,7 @@ export default {
           sessionId: this.sessionId,
         })
         this.isConnected = true
+        this.hasConnectionFailure = false
         this.zwibblerCtx.setConfig('readOnly', false)
 
         // TODO: _Is_ there a way to access the WS connection in a less sketchy way?
@@ -1688,7 +1696,7 @@ export default {
           }
         )
       } catch {
-        // TODO: If we have failed here, show a message to the user to try refreshing the page.
+        this.hasConnectionFailure = true
         LoggerService.noticeError(
           `Zwibbler: Failed to connect to collaboration server after ${MAX_RETRIES} retries.`,
           {
@@ -2178,11 +2186,15 @@ export default {
   left: 0;
   top: 0;
   padding: 12px;
-  z-index: 1000;
+  z-index: 10;
   transition: all 0.15s ease-in;
 
   &--connection {
     background-color: rgba(110, 140, 171, 0.87);
+  }
+
+  &--failure {
+    background-color: $c-shadow-warn;
   }
 }
 
