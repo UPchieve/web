@@ -142,7 +142,7 @@ function logout() {
           <div class="indicator" :class="sessionStatus.class"></div>
         </div>
       </div>
-      <div class="uc-column ml-2">
+      <div class="uc-column justify-center ml-2">
         <p class="first-name">{{ firstName }}</p>
         <div class="uc-row">
           <span class="account-type"
@@ -255,7 +255,7 @@ function logout() {
 <style lang="scss" scoped>
 .info-container {
   @include flex-container(row, center, center);
-  padding: 20px 15px;
+  padding: 25px 15px 15px;
   position: relative;
 
   &:hover {
@@ -322,6 +322,7 @@ function logout() {
 
 .caret {
   margin-left: auto;
+  margin-right: 4px;
   transform: rotate(90deg);
   transition: 200ms linear;
 

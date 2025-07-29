@@ -278,13 +278,13 @@ export default {
 
   .top {
     @include flex-container(column);
-    @include child-spacing(top, 8px);
+    @include child-spacing(top, 15px);
     margin-bottom: 30px;
   }
 
   .bottom {
     @include flex-container(column);
-    @include child-spacing(top, 8px);
+    @include child-spacing(top, 15px);
     margin-bottom: 100px;
   }
 
@@ -307,9 +307,7 @@ export default {
 
 .icon {
   margin-right: 0.8em;
+  height: 24px;
   width: 24px;
-  &--rewards {
-    height: 24px;
-  }
 }
 </style>
