@@ -64,6 +64,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
       [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE]: '', // tutor-count-shown | tutor-count-hidden
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY]: '', // completed-first-hour-of-tutoring | tutored-first-three-students
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
@@ -177,6 +178,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
     tutorBotChatType: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
+    getUpdateSchoolConfig: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL],
     isFallIncentiveProgramEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM],
     getFallIncentiveProgramPayload: (state: FeatureFlagState) => {
@@ -186,8 +189,6 @@ export default {
         payload.maxQualifiedSessionsPerWeek = 1
       return payload
     },
-    getUpdateSchoolConfig: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL],
     isFallIncentiveParentalConsentEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT
@@ -253,6 +254,10 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO],
     isStudentsInitiateDmsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS],
+    getVolunteerMilestoneSharingStudyVariant: (state: FeatureFlagState) =>
+      state.multivariantFlags[
+        POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY
+      ],
   },
   actions: {
     isSessionAudioCallEnabled: async (

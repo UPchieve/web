@@ -63,6 +63,7 @@ import SurveysView from './views/SurveysView.vue'
 import CombinedQuizView from '@/views/CombinedQuizView/index.vue'
 import { camelCase } from 'lodash-es'
 import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
+import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -562,6 +563,12 @@ const routes = [
     name: 'CleverSigninInstructions',
     component: CleverSigninInstructions,
     meta: { loggedOutOnly: true, hideNavigation: true },
+  },
+  {
+    path: '/social-media-sharing-instructions',
+    name: 'SocialMediaSharingInstructions',
+    component: SocialMediaSharingInstructions,
+    meta: { hideNavigation: true },
   },
   {
     path: '/:pathMatch(.*)*',

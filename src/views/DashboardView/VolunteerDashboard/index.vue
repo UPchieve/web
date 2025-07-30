@@ -148,6 +148,12 @@
       v-if="showWelcomeModal"
       :closeModal="toggleWelcomeModal"
     />
+
+    <share-milestone-modal
+      v-if="showMilestoneModal"
+      :closeModal="handleMilestoneModalClose"
+      :typeOfMilestone="typeOfMilestone"
+    />
   </div>
 </template>
 
@@ -174,6 +180,7 @@ import Loader from '@/components/Loader.vue'
 import { hoursToHoursAndMinutes } from '@/utils/time-utils'
 import InformationIcon from '@/assets/information.svg'
 import { vTooltip } from 'maz-ui'
+import ShareMilestoneModal from '@/views/DashboardView/VolunteerDashboard/ShareMilestoneModal.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -192,6 +199,7 @@ export default {
     ArrowIcon,
     Loader,
     InformationIcon,
+    ShareMilestoneModal,
   },
   directives: {
     tooltip: vTooltip,
@@ -218,6 +226,7 @@ export default {
       showWelcomeModal: false,
       lastUpdated: '',
       isLoadingImpactSummary: true,
+      hasSeenMilestoneModal: localStorage.getItem('hasSharedMilestone'),
     }
   },
   computed: {
@@ -225,6 +234,7 @@ export default {
       user: (state) => state.user.user,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
       openSessions: (state) => state.volunteer.openSessions,
+      hasSharedMilestone: (state) => state.user.hasSharedMilestone,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -232,8 +242,9 @@ export default {
       hasSelectedAvailability: 'user/hasSelectedAvailability',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       allSubjectNames: 'subjects/allSubtopicNames',
+      getVolunteerMilestoneSharingStudyVariant:
+        'featureFlags/getVolunteerMilestoneSharingStudyVariant',
     }),
-
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
         (org) => org === this.user.volunteerPartnerOrg
@@ -455,6 +466,42 @@ export default {
         numReferredVolunteers: this.user.numReferredVolunteers,
       })
     },
+    typeOfMilestone() {
+      if (
+        this.getVolunteerMilestoneSharingStudyVariant ===
+        'completed-first-hour-of-tutoring'
+      )
+        return 'hour'
+      else if (
+        this.getVolunteerMilestoneSharingStudyVariant ===
+        'tutored-first-three-students'
+      )
+        return 'students'
+      return ''
+    },
+    hasCompletedFirstHourOfTutoring() {
+      return (
+        this.getVolunteerMilestoneSharingStudyVariant ===
+          'completed-first-hour-of-tutoring' && this.user.hoursTutored >= 1
+      )
+    },
+    hasTutoredFirstThreeStudents() {
+      return (
+        this.getVolunteerMilestoneSharingStudyVariant ===
+          'tutored-first-three-students' &&
+        this.user.uniqueStudentsHelpedCount === 1
+      )
+    },
+    showMilestoneModal() {
+      return (
+        !this.hasSeenMilestoneModal &&
+        !this.hasSharedMilestone &&
+        ((this.hasTutoredFirstThreeStudents &&
+          this.typeOfMilestone === 'students') ||
+          (this.typeOfMilestone === 'hour' &&
+            this.hasCompletedFirstHourOfTutoring))
+      )
+    },
   },
   methods: {
     rejoinHelpSession() {
@@ -474,6 +521,11 @@ export default {
     },
     toggleWelcomeModal() {
       this.showWelcomeModal = !this.showWelcomeModal
+    },
+    handleMilestoneModalClose() {
+      localStorage.setItem('hasSharedMilestone', 'true')
+      this.$store.commit('user/sharedMilestone', true)
+      this.hasSeenMilestoneModal = true
     },
     togglePhotoUploadModal() {
       this.showPhotoUploadModal = !this.showPhotoUploadModal

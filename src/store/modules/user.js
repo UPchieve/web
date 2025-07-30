@@ -31,6 +31,7 @@ export default {
     progressReportOverviewSubjectStats: [],
     latestProgressReportOverview: {},
     sessionIsEnding: false,
+    hasSharedMilestone: false,
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -146,6 +147,9 @@ export default {
     },
     setSessionIsEnding: (state, isEnding) => {
       state.sessionIsEnding = isEnding
+    },
+    setHasSharedMilestone: (state, hasSharedMilestone) => {
+      state.hasSharedMilestone = hasSharedMilestone
     },
   },
   actions: {
