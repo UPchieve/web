@@ -1210,30 +1210,9 @@ export default {
       }
     },
     insertPhoto(imageUrl) {
-      const nodeId = this.zwibblerCtx.createNode('ImageNode', {
+      this.uploadingImageNodeId = this.zwibblerCtx.createNode('ImageNode', {
         url: imageUrl,
         opacity: 0,
-      })
-
-      this.zwibblerCtx.on('resource-loaded', () => {
-        const nodeDimensions = this.zwibblerCtx.getNodeRectangle(nodeId)
-        const whiteboard = document.querySelector('#zwib-div')
-        const whiteboardWidth = whiteboard.clientWidth
-        const whiteboardHeight = whiteboard.clientHeight
-        let scaleFactor = 1
-
-        // scale image below the whiteboard width and height
-        if (nodeDimensions.width > whiteboardWidth) {
-          scaleFactor = 1 / (nodeDimensions.width / whiteboardWidth + 1)
-          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor)
-        } else if (nodeDimensions.height > whiteboardHeight) {
-          scaleFactor = 1 / (nodeDimensions.height / whiteboardHeight + 1)
-          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor)
-        } else this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor)
-
-        // Keep opacity at 0 until image has been resized (avoids flashing full size)
-        this.zwibblerCtx.setNodeProperty(nodeId, 'opacity', 1)
-        this.isLoading = false
       })
     },
     goToRecentNodes() {
@@ -1623,6 +1602,33 @@ export default {
         if (this.zwibblerCtx.getAllNodes().length === 0) {
           this.resetCanvas()
         }
+      })
+
+      this.zwibblerCtx.on('resource-loaded', () => {
+        const nodeId = this.uploadingImageNodeId
+        const nodeDimensions = this.zwibblerCtx.getNodeRectangle(nodeId)
+
+        const whiteboard = document.querySelector('#zwib-div')
+        const whiteboardWidth = whiteboard.clientWidth
+        const whiteboardHeight = whiteboard.clientHeight
+        let scaleFactor = 1
+
+        // Scale image below the whiteboard width and height.
+        if (nodeDimensions.width > whiteboardWidth) {
+          scaleFactor = 1 / (nodeDimensions.width / whiteboardWidth + 1)
+          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor)
+        } else if (nodeDimensions.height > whiteboardHeight) {
+          scaleFactor = 1 / (nodeDimensions.height / whiteboardHeight + 1)
+          this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor)
+        } else this.zwibblerCtx.scaleNode(nodeId, scaleFactor, scaleFactor)
+
+        const currentView = this.zwibblerCtx.getViewRectangle()
+        this.zwibblerCtx.translateNode(nodeId, currentView.x, currentView.y)
+
+        // Keep opacity at 0 until image has been resized (avoids flashing full size)
+        this.zwibblerCtx.setNodeProperty(nodeId, 'opacity', 1)
+        this.uploadingImageNodeId = null
+        this.isLoading = false
       })
 
       this.zwibblerCtx.on('connect-error', () => {
