@@ -712,6 +712,9 @@ export default {
       // Infinite whiteboard and cursor.
       lastCursorBroadcastAt: 0,
       useInfiniteWhiteboard: false,
+      // Keep track of view when disconnect so can
+      // apply it again once reconnect.
+      lastViewRectangle: null,
       // Go to last action button.
       showGoToRecentNodesButton: false,
       recentNodesOutsideView: [],
@@ -1476,16 +1479,20 @@ export default {
           this.addFixedSizeListeners()
         }
 
+        this.isConnected = true
+        this.hasConnectionFailure = false
+        if (this.lastViewRectangle) {
+          this.zwibblerCtx.setViewRectangle(this.lastViewRectangle)
+          this.lastViewRectangle = null
+        }
+        this.zwibblerCtx.setConfig('readOnly', false)
+
         LoggerService.log('Zwibbler: Connected', {
           sessionId: this.sessionId,
         })
         AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECTED, {
           sessionId: this.sessionId,
         })
-        this.isConnected = true
-        this.hasConnectionFailure = false
-        this.zwibblerCtx.setConfig('readOnly', false)
-
         // TODO: _Is_ there a way to access the WS connection in a less sketchy way?
         // The Zwibbler WS connection is on different properties depending on the build you are using.
         // In order, try:
@@ -1511,6 +1518,10 @@ export default {
           // which we do before unmount of the component. If there is
           // no Zwibbler ctx, it means we are simply leaving the component.
           if (this.zwibblerCtx) {
+            this.lastViewRectangle = this.zwibblerCtx.getViewRectangle()
+            // TODO: This isn't technically always an error - for
+            // example if we are deploying the backend, the connection
+            // will close. Is there a way to not log if it's expected closure?
             LoggerService.noticeError(
               'Zwibbler: Unexpectedly closing WS connection',
               {
