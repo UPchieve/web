@@ -24,7 +24,7 @@
       </p>
     </transition>
     <div id="partner-cursor" ref="partnerCursor"></div>
-    <div id="partner-arrow" ref="partnerArrow"></div>
+    <div id="partner-arrow" ref="partnerArrow" @click="goToPartnerCursor"></div>
     <div v-if="useInfiniteWhiteboard && isConnected" class="zoom-toolbar">
       <announcement
         localStorageKey="showInfiniteWhiteboardAnnouncement"
@@ -712,6 +712,7 @@ export default {
       // Infinite whiteboard and cursor.
       lastCursorBroadcastAt: 0,
       useInfiniteWhiteboard: false,
+      lastPartnerCursorPosition: null,
       // Keep track of view when disconnect so can
       // apply it again once reconnect.
       lastViewRectangle: null,
@@ -812,12 +813,15 @@ export default {
       return /iPhone|iPad|iPod/i.test(navigator.userAgent)
     },
     resizeViewRectangle() {
-      this.zwibblerCtx.setViewRectangle({
-        x: 0,
-        y: 0,
-        width: this.canvasWidth,
-        height: 1,
-      })
+      this.zwibblerCtx.setViewRectangle(
+        {
+          x: 0,
+          y: 0,
+          width: this.canvasWidth,
+          height: 1,
+        },
+        true
+      )
     },
     addInfiniteSizeListeners() {
       const zwibDiv = this.$refs.zwibDiv
@@ -848,16 +852,19 @@ export default {
       if (now - this.lastCursorBroadcastAt < 100) return
 
       this.lastCursorBroadcastAt = now
-      // Get the x,y coordinates of the cursor within the Zwibbler canvas.
+      // Get the x,y coordinates of the cursor within the _Zwibbler_ canvas,
+      // instead of the coordinates of the mouse on the HTML window.
       const point = this.zwibblerCtx.getDocumentCoordinates(
         event.pageX,
         event.pageY
       )
+      const scale = this.zwibblerCtx.getCanvasScale()
       this.zwibblerCtx.setSessionKey(
         'cursorPosition',
         {
           x: point.x,
           y: point.y,
+          scale,
         },
         false
       )
@@ -1229,13 +1236,17 @@ export default {
       )
     },
     resetCanvas() {
-      this.zwibblerCtx.setViewRectangle({
-        x: 0,
-        y: 0,
-        width: this.canvasWidth,
-        height: this.canvasHeight,
-      })
       this.zwibblerCtx.setZoom(1)
+      const currentView = this.zwibblerCtx.getViewRectangle()
+      this.zwibblerCtx.setViewRectangle(
+        {
+          x: 0,
+          y: 0,
+          width: currentView.width,
+          height: currentView.height,
+        },
+        false
+      )
     },
     zoomToFit(event, nodes) {
       if (event) {
@@ -1260,22 +1271,28 @@ export default {
       // otherwise setViewRectangle will make the view
       // obnoxiously zoomed in.
       if (bounds.width < minSize && bounds.height < minSize) {
-        this.zwibblerCtx.setViewRectangle({
-          x: bounds.x,
-          y: bounds.y,
-          width: minSize,
-          height: minSize,
-        })
+        this.zwibblerCtx.setViewRectangle(
+          {
+            x: bounds.x,
+            y: bounds.y,
+            width: minSize,
+            height: minSize,
+          },
+          false
+        )
         this.zwibblerCtx.setZoom(2)
         return
       }
 
-      this.zwibblerCtx.setViewRectangle({
-        x: bounds.x,
-        y: bounds.y,
-        width: bounds.width,
-        height: bounds.height,
-      })
+      this.zwibblerCtx.setViewRectangle(
+        {
+          x: bounds.x,
+          y: bounds.y,
+          width: bounds.width,
+          height: bounds.height,
+        },
+        false
+      )
     },
     zoomOut(event) {
       this.zwibblerCtx.zoomOut()
@@ -1379,10 +1396,15 @@ export default {
               cursor.style.visibility = 'hidden'
               arrow.style.visibility = 'hidden'
             } else if (key.name === 'cursorPosition') {
-              const viewRect = this.zwibblerCtx.getViewRectangle()
+              this.lastPartnerCursorPosition = {
+                x: key.value.x,
+                y: key.value.y,
+                scale: key.value.scale,
+              }
               const whiteboardWidth = zwibDiv.clientWidth
               const whiteboardHeight = zwibDiv.clientHeight
 
+              const viewRect = this.zwibblerCtx.getViewRectangle()
               const scaleX = whiteboardWidth / viewRect.width
               const scaleY = whiteboardHeight / viewRect.height
 
@@ -1461,7 +1483,10 @@ export default {
         this.isConnected = true
         this.hasConnectionFailure = false
         if (this.lastViewRectangle) {
-          this.zwibblerCtx.setViewRectangle(this.lastViewRectangle)
+          this.zwibblerCtx.setViewRectangle(
+            this.lastViewRectangle,
+            !this.useInfiniteWhiteboard
+          )
           this.lastViewRectangle = null
         }
         this.zwibblerCtx.setConfig('readOnly', false)
@@ -1815,6 +1840,21 @@ export default {
         y: edgeY,
         angle: Math.atan2(distY, distX) * (180 / Math.PI),
       }
+    },
+
+    goToPartnerCursor() {
+      if (!this.lastPartnerCursorPosition) return
+
+      this.zwibblerCtx.setZoom(this.lastPartnerCursorPosition.scale)
+      const currentView = this.zwibblerCtx.getViewRectangle()
+      const centeredView = {
+        x: this.lastPartnerCursorPosition.x - currentView.width / 2,
+        y: this.lastPartnerCursorPosition.y - currentView.height / 2,
+        width: currentView.width,
+        height: currentView.height,
+      }
+      this.zwibblerCtx.setViewRectangle(centeredView, false)
+      this.$refs.partnerArrow.style.visibility = 'hidden'
     },
   },
   async beforeUnmount() {
@@ -2247,6 +2287,7 @@ export default {
 }
 
 #partner-arrow {
+  cursor: pointer;
   position: absolute;
 
   &:before {
