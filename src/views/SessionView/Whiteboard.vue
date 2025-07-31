@@ -1894,8 +1894,10 @@ export default {
       }
     },
     isSessionOver(isSessionOver, oldIsSessionOver) {
-      if (isSessionOver && !oldIsSessionOver)
+      if (isSessionOver && !oldIsSessionOver) {
         this.zwibblerCtx.setConfig('readOnly', true)
+        this.removeInfiniteSizeListeners()
+      }
     },
   },
 }
