@@ -255,7 +255,7 @@ function logout() {
 <style lang="scss" scoped>
 .info-container {
   @include flex-container(row, center, center);
-  padding: 25px 15px 15px;
+  padding: 25px 20px 15px 12px;
   position: relative;
 
   &:hover {
@@ -325,6 +325,7 @@ function logout() {
   margin-right: 4px;
   transform: rotate(90deg);
   transition: 200ms linear;
+  width: 8px;
 
   &--open {
     transform: rotate(-90deg);
