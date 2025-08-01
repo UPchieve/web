@@ -43,6 +43,7 @@ function getDates(daysAgo: number) {
 
 const twoDaysAgo = getDates(2)
 const tenDaysAgo = getDates(10)
+const tenDaysAgoFilter = moment().subtract(10, 'days').format('YYYY-MM-DD')
 
 const sessionDetails = [
   {
@@ -143,8 +144,15 @@ describe('Student Details View', () => {
     })
   })
 
-  test('Shows student sessions for default filters', async () => {
-    const wrapper = await getWrapper({ classInfo: algebraClassInfo })
+  test('Shows student sessions for default subject filters', async () => {
+    const wrapper = await getWrapper({
+      data: {
+        filters: {
+          sessionActivityFrom: tenDaysAgoFilter,
+        },
+      },
+      classInfo: algebraClassInfo,
+    })
 
     await flushPromises()
 
@@ -154,7 +162,12 @@ describe('Student Details View', () => {
 
   test('Filters sessions with just biology', async () => {
     const wrapper = await getWrapper({
-      data: { filters: { topic: { name: 'science' } } },
+      data: {
+        filters: {
+          topic: { name: 'science' },
+          sessionActivityFrom: tenDaysAgoFilter,
+        },
+      },
       classInfo: bioClassInfo,
     })
 
