@@ -96,7 +96,10 @@
         />
 
         <document-editor-v2
-          v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
+          v-else-if="
+            auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR &&
+            docEditorVersion === 2
+          "
           :sessionId="this.sessionId"
           :isAiWidgetEnabled="aiWidgetEnabled"
           :onWidgetClicked="toggleAiWidget"
@@ -109,6 +112,14 @@
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
           :unableToJoinCall="unableToJoinCall"
+        />
+        <!--
+        NOTE: this editor is used by the volunteer when the student is using the midtown app
+        as midtown is stuck on an older version of Quill
+      -->
+        <document-editor
+          v-else-if="auxiliaryType === sessionToolTypes.DOCUMENT_EDITOR"
+          :sessionId="this.sessionId"
         />
       </div>
 
@@ -293,6 +304,7 @@ import SessionChatHeader from './SessionChatHeader.vue'
 import SessionChat from './SessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
 import Whiteboard from './Whiteboard.vue'
+import DocumentEditor from './DocumentEditor.vue'
 import DocumentEditorV2 from './DocumentEditorV2.vue'
 import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
@@ -335,6 +347,7 @@ export default {
     SessionChatHeader,
     SessionChat,
     Whiteboard,
+    DocumentEditor,
     DocumentEditorV2,
     WebNotificationsModal,
     CaretIcon,
@@ -532,6 +545,7 @@ export default {
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
       user: (state) => state.user.user,
       session: (state) => state.user.session,
+      docEditorVersion: (state) => state.user.session.docEditorVersion,
       auxiliaryType: (state) => state.user.session.toolType,
       isSocketConnected: (state) => state.socket.isConnected,
       productFlags: (state) => state.productFlags.flags,
