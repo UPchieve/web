@@ -1,9 +1,7 @@
 <template>
   <div class="container">
     <section class="header">
-      <h1 class="title">
-        Your Favorite Coaches: {{ total }}/{{ favoriteLimit }}
-      </h1>
+      <h1 class="title">Your Favorite Coaches</h1>
       <p class="subtitle">
         Here's the list of your favorite coaches! Currently, the maximum
         favorite coaches you can have is 20.
