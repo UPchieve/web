@@ -137,6 +137,7 @@ ion-checkbox {
 
 <style lang="scss" scoped>
 ion-select {
+  background-color: #fff;
   height: auto;
   min-height: 48px;
   margin: 0;

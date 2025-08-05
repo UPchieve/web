@@ -920,10 +920,10 @@ export default {
       `${API_ROOT}/students/favorite-volunteers/${volunteerId}`
     ).then(this._successHandler, this._errorHandler)
   },
-  getSessionHistory(page, filter) {
+  getSessionHistory(filter) {
     const queryParams = new URLSearchParams(filter).toString()
     return httpGet(
-      `${API_ROOT}/sessions/history?page=${page}${queryParams.length ? `&${queryParams}` : ''}`
+      `${API_ROOT}/sessions/history${queryParams.length ? `?${queryParams}` : ''}`
     ).then(this._successHandler, this._errorHandler)
   },
   getTotalSessionHistory(filter) {

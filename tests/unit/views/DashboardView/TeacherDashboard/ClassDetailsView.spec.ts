@@ -1,5 +1,6 @@
 import ClassDetailsView from '@/views/DashboardView/TeacherDashboard/ClassDetailsView.vue'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
+import moment from 'moment'
 import { mount } from '@vue/test-utils'
 import router from '@/router'
 import NetworkService from '@/services/NetworkService'
@@ -207,7 +208,7 @@ describe('Assignments View', () => {
       title: 'Assignment 1',
       numberOfSessions: 1,
       minDurationInMinutes: 10,
-      dueDate: '2024-09-30T04:00:00.000Z',
+      dueDate: moment.utc('2024-09-30T04:00:00.000Z'),
       startDate: '2024-09-23T04:00:00.000Z',
       isRequired: false,
       subjectId: 2,

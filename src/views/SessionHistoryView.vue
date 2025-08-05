@@ -21,37 +21,31 @@
       </p>
     </div>
     <div v-if="!isFilteredFromSession" class="filters">
-      <form @submit.prevent="filter">
-        <form-input
+      <form @submit.prevent="filter" class="filters-form">
+        <FormSearchableSelect
           v-model="filters.firstName"
           name="firstName"
           :placeholder="`${isVolunteer ? 'Student' : 'Coach'} First Name`"
           :is-required="false"
+          :options="firstNames"
+          @update:modelValue="filter"
+          class="filter-input"
         />
         <form-select
           v-if="subjectsByTopics.length"
           v-model="filters.subjectName"
           name="subject"
+          class="filter-input"
           placeholder="Subject"
           :options="subjectsByTopics"
           :multiple="false"
           optionTextField="displayName"
           groupField="topicName"
           group="subjects"
-          :reduce="(option) => option.name"
+          :reduce="(option) => option.displayName"
+          @update:modelValue="filter"
         />
-        <div class="btn-container">
-          <large-button
-            class="w-full"
-            variant="primary-blue"
-            show-arrow="false"
-            @click="filter"
-            >Filter</large-button
-          >
-          <large-button class="w-full" variant="secondary" @click="clearFilters"
-            >Clear filters</large-button
-          >
-        </div>
+        <button class="clear-filters" @click="clearFilters">Clear all</button>
       </form>
     </div>
 
@@ -248,8 +242,8 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
-import FormInput from '@/components/FormInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
 
@@ -258,10 +252,10 @@ export default {
   components: {
     CaretIcon,
     FavoritingToggle,
-    FormInput,
     FormSelect,
     LargeButton,
     Loader,
+    FormSearchableSelect,
   },
   data() {
     return {
@@ -271,12 +265,14 @@ export default {
         subjectName: '',
         studentId: '',
         volunteerId: '',
+        filteredSessions: [],
       },
       page: 1,
-      totalCount: 0,
       isFetchingSessions: false,
       isLastPage: false,
       error: '',
+      allSessions: [],
+      sessionLimitPerPage: 5,
     }
   },
   computed: {
@@ -290,11 +286,6 @@ export default {
     isFirstPage() {
       return this.page === 1
     },
-    totalPages() {
-      const sessionLimitPerPage = 5
-      const totalPages = Math.ceil(this.total / sessionLimitPerPage)
-      return totalPages === 0 ? 1 : totalPages
-    },
     isFilteredFromSession() {
       return this.$route.query.studentId && this.$route.query.volunteerId
     },
@@ -302,6 +293,18 @@ export default {
       return this.isFilteredFromSession
         ? `Session History with ${this.sessionPartner.firstname}`
         : `Session History`
+    },
+    firstNames() {
+      const sessionFirstNames = new Set()
+      const firstName = this.isVolunteer
+        ? 'studentFirstName'
+        : 'volunteerFirstName'
+      this.sessions.forEach((session) => {
+        if (!sessionFirstNames.has(session[firstName])) {
+          sessionFirstNames.add(session[firstName])
+        }
+      })
+      return Array.from(sessionFirstNames.values())
     },
   },
   async created() {
@@ -326,7 +329,7 @@ export default {
       )
 
       this.page++
-      this.fetchSessionHistory()
+      this.paginate()
     },
     goToPreviousPage() {
       if (this.page === 0) return
@@ -335,7 +338,7 @@ export default {
         EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE
       )
       this.page--
-      this.fetchSessionHistory()
+      this.paginate()
     },
     clearFilters() {
       this.filters.firstName = ''
@@ -344,19 +347,49 @@ export default {
       this.filters.volunteerId = ''
       this.page = 1
 
-      this.fetchSessionHistory()
+      this.filter()
     },
     filter() {
+      this.$router.push({
+        query: { page: this.page, ...this.filters },
+      })
+
+      const { firstName, subjectName, studentId, volunteerId } = this.filters
+
+      const filtered = this.allSessions.filter((session) => {
+        const matchesName =
+          !firstName ||
+          session[
+            this.isVolunteer ? 'studentFirstName' : 'volunteerFirstName'
+          ] === firstName
+        const matchesSubject = !subjectName || session.subject === subjectName
+        const matchesStudent = !studentId || session.studentId === studentId
+        const matchesVolunteer =
+          !volunteerId || session.volunteerId === volunteerId
+
+        return (
+          matchesName && matchesSubject && matchesStudent && matchesVolunteer
+        )
+      })
+
+      this.filters.filteredSessions = filtered
       this.page = 1
-      this.fetchSessionHistory()
+      this.paginate()
+    },
+    paginate() {
+      this.$router.push({
+        query: { page: this.page, ...this.filters },
+      })
+
+      const start = (this.page - 1) * this.sessionLimitPerPage
+      const end = this.page * this.sessionLimitPerPage
+
+      this.isLastPage = end >= this.filters.filteredSessions.length
+      this.sessions = this.filters.filteredSessions.slice(start, end)
     },
     async fetchSessionHistory() {
       this.isFetchingSessions = true
       try {
-        this.$router.push({
-          query: { page: this.page, ...this.filters },
-        })
-
         const queryFilters = {
           [`${this.isVolunteer ? 'student' : 'volunteer'}FirstName`]:
             this.filters.firstName,
@@ -365,11 +398,11 @@ export default {
           volunteerId: this.filters.volunteerId,
         }
         const {
-          data: { pastSessions, isLastPage, totalCount },
-        } = await NetworkService.getSessionHistory(this.page, queryFilters)
-        this.sessions = pastSessions
-        this.isLastPage = isLastPage
-        this.totalCount = totalCount
+          data: { pastSessions },
+        } = await NetworkService.getSessionHistory(queryFilters)
+        this.allSessions = pastSessions
+
+        this.filter()
       } catch (error) {
         LoggerService.noticeError(error.response.data.err)
         this.error =
@@ -447,21 +480,29 @@ ul {
 }
 
 .filters {
-  background-color: white;
-  border: 1px solid $c-border-grey;
-  border-radius: 20px;
   margin-bottom: 1rem;
-  max-width: 700px;
-  padding: 20px;
   width: 100%;
 
   .btn-container {
     @include flex-container(row, space-between, center);
     gap: 1rem;
-    margin-top: 1rem;
   }
 }
 
+.filters-form {
+  @include flex-container(row, flex-start, center);
+  gap: 16px;
+  width: 100%;
+}
+
+.filter-input {
+  max-width: 300px;
+}
+
+.clear-filters {
+  color: $c-information-blue;
+  font-weight: 600;
+}
 .info {
   @include flex-container(row, center, center);
   font-weight: 500;
