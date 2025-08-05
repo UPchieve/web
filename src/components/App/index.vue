@@ -297,6 +297,18 @@ export default {
           AnalyticsService.captureEvent(
             EVENTS.USER_HAS_GRANTED_WEB_NOTIFICATION_PERMISSION
           )
+
+        //Chrome extension experiment; We want to track users who clicked the extension
+        if (this.$route.query?.utm_medium === 'upchieve_chrome_extension') {
+          AnalyticsService.captureEvent(EVENTS.CHROME_EXTENSION_CLICKED, {
+            utm_source: this.$route.query?.utm_source
+              ? this.$route.query.utm_source
+              : 'general-educational-site',
+            utm_content: this.$route.query?.utm_content
+              ? this.$route.query.utm_content
+              : 'extension',
+          })
+        }
       } else if (currentUserValue.id) {
         const userProps = this.getUserPropsForAnalytics()
         AnalyticsService.updateUser(userProps)
