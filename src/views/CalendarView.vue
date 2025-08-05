@@ -343,8 +343,7 @@ export default {
 }
 
 .header-title {
-  font-size: 24px;
-  font-weight: 500;
+  @include font-category('display-small');
 }
 
 .save-button {

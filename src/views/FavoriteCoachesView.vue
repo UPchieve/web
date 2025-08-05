@@ -178,13 +178,12 @@ ul {
 }
 
 .title {
-  font-weight: 500;
-  font-size: 22px;
+  @include font-category('display-small');
   margin-bottom: 1em;
 }
 
 .subtitle {
-  @include font-category('heading');
+  @include font-category('body');
   color: $c-secondary-grey;
 }
 

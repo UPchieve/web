@@ -205,8 +205,7 @@ export default {
   }
 
   .body-header {
-    font-size: 24px;
-    font-weight: 500;
+    @include font-category('display-small');
     text-align: left;
     margin: 0 0 20px 0;
   }

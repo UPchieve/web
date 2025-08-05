@@ -403,7 +403,7 @@ $padding-horizontal: 45px;
 }
 
 h1 {
-  font-size: 24px;
+  @include font-category('display-small');
   margin-bottom: 0;
 }
 

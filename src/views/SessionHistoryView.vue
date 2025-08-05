@@ -432,13 +432,8 @@ ul {
   margin-bottom: 2rem;
 
   h1 {
-    @include font-category('heading');
-    font-weight: 500;
+    @include font-category('display-small');
     margin-bottom: 1rem;
-
-    @include breakpoint-below('small') {
-      font-size: 18px;
-    }
   }
 
   @include breakpoint-below('small') {
