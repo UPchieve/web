@@ -95,7 +95,7 @@ import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import NetworkService from '@/services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
 import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
-import HeartIcon from '@/assets/heart.svg'
+import HeartIcon from '@/assets/icons/heart_icon.svg'
 
 export default {
   name: 'favorite-coaches-view',

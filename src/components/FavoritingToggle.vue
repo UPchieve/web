@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import HeartIcon from '@/assets/heart.svg'
+import HeartIcon from '@/assets/icons/heart_icon.svg'
 import VolunteerUnfavoritingModal from '@/views/VolunteerUnfavoritingModal.vue'
 import FavoritedListFullModal from '@/views/FavoritedListFullModal.vue'
 import NetworkService from '@/services/NetworkService'

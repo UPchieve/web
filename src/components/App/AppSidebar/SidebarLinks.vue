@@ -14,7 +14,7 @@
           text="Dashboard"
           id="dashboard-sidebar-link"
         >
-          <house-icon class="icon" />
+          <home-icon class="icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -46,7 +46,7 @@
           text="Session History"
           id="session-history-sidebar-link"
         >
-          <archive-icon class="icon" />
+          <clock-icon class="icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -55,7 +55,7 @@
           text="Favorite Coaches"
           id="favorite-coaches-sidebar-link"
         >
-          <heart-icon class="icon" />
+          <heart-icon class="icon heart-icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -96,7 +96,7 @@
           text="Session History"
           id="session-history-sidebar-link"
         >
-          <archive-icon class="icon" />
+          <clock-icon class="icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -141,7 +141,7 @@
           text="Rewards"
           id="rewards-sidebar-link"
         >
-          <rewards-sidebar-icon class="icon icon--rewards" />
+          <rewards-sidebar-icon class="icon" />
         </sidebar-link>
       </div>
 
@@ -171,18 +171,18 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import SidebarLink from './SidebarLink.vue'
-import ArchiveIcon from '@/assets/archive.svg'
-import BookIcon from '@/assets/book-icon.svg'
-import CalendarIcon from '@/assets/sidebar_icons/calendar.svg'
-import FolderIcon from '@/assets/sidebar_icons/folder.svg'
-import GraduationCapIcon from '@/assets/sidebar_icons/graduation-cap.svg'
-import HandWaveIcon from '@/assets/sidebar_icons/hand-wave.svg'
-import HeartIcon from '@/assets/heart.svg'
-import HouseIcon from '@/assets/sidebar_icons/house.svg'
-import ReferFriendIcon from '@/assets/sidebar_icons/refer-friend-icon.svg'
+import BookIcon from '@/assets/icons/open_book_icon.svg'
+import CalendarIcon from '@/assets/icons/calendar_icon.svg'
+import ClockIcon from '@/assets/icons/clock_icon.svg'
+import FolderIcon from '@/assets/icons/folder.svg'
+import GraduationCapIcon from '@/assets/icons/graduation_cap_icon.svg'
+import HandWaveIcon from '@/assets/icons/hand-wave.svg'
+import HeartIcon from '@/assets/icons/heart_icon.svg'
+import HomeIcon from '@/assets/icons/home_icon.svg'
+import ReferFriendIcon from '@/assets/icons/refer_friend_icon.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
-import YourProgressIcon from '@/assets/your-progress.svg'
-import RewardsSidebarIcon from '@/assets/rewards-sidebar-icon.svg'
+import YourProgressIcon from '@/assets/icons/trending_up_icon.svg'
+import RewardsSidebarIcon from '@/assets/icons/star_icon.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
@@ -192,15 +192,15 @@ import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 export default {
   components: {
     SidebarLink,
-    ArchiveIcon,
     BookIcon,
     CalendarIcon,
+    ClockIcon,
     FolderIcon,
     GraduationCapIcon,
     HandWaveIcon,
     HeartIcon,
     AiTutorButton,
-    HouseIcon,
+    HomeIcon,
     ReferFriendIcon,
     SlackLogoIcon,
     YourProgressIcon,
@@ -309,5 +309,15 @@ export default {
   margin-right: 0.8em;
   height: 24px;
   width: 24px;
+}
+
+:deep(.SidebarLink--active .icon path) {
+  fill: $c-success-green;
+}
+// Order here matters - we want to set fill to none for
+// the heart icon.
+:deep(.SidebarLink--active .heart-icon path) {
+  fill: none;
+  stroke: $c-success-green;
 }
 </style>
