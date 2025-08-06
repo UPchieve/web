@@ -37,14 +37,17 @@ function referralLink() {
   if (import.meta.env.NODE_ENV === 'development') {
     return `http://localhost:8080/referral/${referralCode}`
   } else {
-    AnalyticsService.captureEvent(EVENTS.STUDY_USER_CLICKED_COPY_REFERRAL_LINK)
     return `${config.serverRoot}/referral/${referralCode}`
   }
 }
 
 const onCopiedReferralLink = () => {
-  AnalyticsService.captureEvent(EVENTS.AMBASSADOR_REFERRAL_CLICKED_COPY)
-  if (isTextReferralLinksEnabled.value) copyLink()
+  if (isTextReferralLinksEnabled.value) {
+    AnalyticsService.captureEvent(EVENTS.STUDY_USER_CLICKED_SEND_REFERRAL_TEXT)
+  } else {
+    AnalyticsService.captureEvent(EVENTS.AMBASSADOR_REFERRAL_CLICKED_COPY)
+  }
+  copyLink()
 }
 
 async function copyLink() {
