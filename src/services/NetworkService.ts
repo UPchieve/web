@@ -31,6 +31,11 @@ export const axiosInstance = axios.create({
   withCredentials: true,
   baseURL: config.serverRoot,
 })
+const axiosFetchInstance = axios.create({
+  adapter: 'fetch',
+  withCredentials: true,
+  baseURL: config.serverRoot,
+})
 
 async function getRecaptchaToken(action: string) {
   return new Promise((resolve, reject) => {
@@ -79,6 +84,28 @@ export async function httpPatch<T>(
 
 export async function httpDelete<T>(path: string, config?: AxiosRequestConfig) {
   return axiosInstance.delete<T>(path, config)
+}
+
+/*
+ * Axios uses xhr by default (rather than fetch).
+ * We need to use their fetch adapter to take advantage of the new-ish `keepalive`
+ * flag. `keepalive` works like `navigator.sendBeacon` in that it is guaranteed to send
+ * even after the page `unload` event fires. Unlike `sendBeacon`, it allows us to use a
+ * regular post (with headers, etc...)
+ *
+ * see https://developer.mozilla.org/en-US/docs/Web/API/Request/keepalive
+ *
+ * we could switch our default axios instance to use the `fetch` adapter but
+ * it seems a little risky and out of scope for this current change.
+ */
+export async function httpPostKeepAlive<T>(path: string, data: Object) {
+  return axiosFetchInstance.post<T>(path, data, {
+    headers: axiosInstance.defaults.headers.common,
+    fetchOptions: {
+      credentials: 'include',
+      keepalive: true,
+    },
+  })
 }
 
 export default {
@@ -1300,5 +1327,15 @@ export default {
       this._successHandler,
       this._errorHandler
     )
+  },
+  trackPresenceActive(clientUUID: string) {
+    return httpPost(`${API_ROOT}/user/track-presence/active`, {
+      clientUUID,
+    }).then(this._successHandler, this._errorHandler)
+  },
+  trackPresenceInactive(clientUUID: string) {
+    return httpPostKeepAlive(`${API_ROOT}/user/track-presence/inactive`, {
+      clientUUID,
+    }).then(this._successHandler, this._errorHandler)
   },
 }

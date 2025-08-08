@@ -13,6 +13,7 @@ import LoggerService from './services/LoggerService'
 import { socket } from './socket'
 import { IonicVue } from '@ionic/vue'
 import VueDraggableResizable from 'vue-draggable-resizable'
+import { initActivityTracking } from './services/PresenceService'
 
 LoggerService.init()
 
@@ -56,6 +57,8 @@ async function main() {
       flagsResponse.value?.data?.personProperties
     )
     await AnalyticsService.init()
+
+    initActivityTracking(store)
 
     // Create Vue instance
     const app = createApp(App)

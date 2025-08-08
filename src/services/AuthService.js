@@ -5,11 +5,19 @@ import LoggerService from './LoggerService'
 import NetworkService, { axiosInstance } from './NetworkService'
 import ProductDiscoveryService from './ProductDiscoveryService'
 import { socket } from '@/socket'
+import { trackInactivity } from './PresenceService'
 
 export const INVALID_CSRF_ERROR = 'invalid csrf token'
 
 export async function logout(context, logoutRoute) {
   try {
+    /*
+     * NOTE: We need to call this before logout while we
+     * still have a user id. Alternatively, we could
+     * do this in the subway `logout` endpoint but we'd
+     * need to pass up the clientUUID
+     */
+    await trackInactivity()
     await NetworkService.logout()
   } finally {
     await handleLogout(context, logoutRoute)
