@@ -12,7 +12,22 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
 const fallIncentiveProgramPayload = computed(
   () => store.getters['featureFlags/getFallIncentiveProgramPayload']
 )
+const isIncentiveBannerEnabled = computed(
+  () => store.getters['featureFlags/isIncentiveBannerEnabled']
+)
+const incentiveBannerPayload = computed(
+  () => store.getters['featureFlags/getIncentiveBannerPayload']
+)
+const isHidingButtons = isIncentiveBannerEnabled.value
+
 const fallIncentiveHeaderText = computed(() => {
+  if (isIncentiveBannerEnabled.value) {
+    return incentiveBannerPayload.value.replace(
+      '{{schoolName}}',
+      user.value.schoolName
+    )
+  }
+
   if (productFlags.value.fallIncentiveEnrollmentAt) {
     if (user.value.isSchoolPartner)
       return `Earn $10, complete 5 sessions by February 28th!`
@@ -39,30 +54,38 @@ const toggleFallIncentiveEnrollmentModal = () => {
 
 <template>
   <div class="header">
-    <div class="header-message" :class="{ 'header-message-small': mobileMode }">
+    <div
+      class="header-message"
+      :class="{
+        'header-message-small': mobileMode,
+        'header-message--hidden-buttons': isHidingButtons,
+      }"
+    >
       <span>{{ fallIncentiveHeaderText }}</span>
     </div>
-    <a
-      v-if="productFlags.fallIncentiveEnrollmentAt"
-      href="https://upchieve.org/upchieve-10-challenge-2025"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="header-button"
-    >
-      Learn more 🎉
-      <arrow-icon class="arrow-icon" />
-    </a>
-    <span
-      @click="toggleFallIncentiveEnrollmentModal"
-      class="header-button"
-      v-else
-    >
-      Enroll now 🎉
-    </span>
-    <fall-incentive-enrollment-modal
-      v-if="showFallIncentiveEnrollmentModal"
-      :closeModal="toggleFallIncentiveEnrollmentModal"
-    />
+    <template v-if="!isHidingButtons">
+      <a
+        v-if="productFlags.fallIncentiveEnrollmentAt"
+        href="https://upchieve.org/upchieve-10-challenge-2025"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="header-button"
+      >
+        Learn more 🎉
+        <arrow-icon class="arrow-icon" />
+      </a>
+      <span
+        @click="toggleFallIncentiveEnrollmentModal"
+        class="header-button"
+        v-else
+      >
+        Enroll now 🎉
+      </span>
+      <fall-incentive-enrollment-modal
+        v-if="showFallIncentiveEnrollmentModal"
+        :closeModal="toggleFallIncentiveEnrollmentModal"
+      />
+    </template>
   </div>
 </template>
 
@@ -84,6 +107,11 @@ const toggleFallIncentiveEnrollmentModal = () => {
     &-small {
       font-size: 14px;
       margin-left: 48px;
+    }
+
+    &--hidden-buttons {
+      margin: 0 auto;
+      text-align: center;
     }
   }
 

@@ -59,6 +59,7 @@ export default {
       hasCooldown: 'session/hasCooldown',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
+      isIncentiveBannerEnabled: 'featureFlags/isIncentiveBannerEnabled',
       isStudentsBecomeVolunteersEnabled:
         'featureFlags/isStudentsBecomeVolunteersEnabled',
       hasVolunteerRole: 'user/hasVolunteerRole',
@@ -126,7 +127,10 @@ export default {
     },
 
     showFallIncentiveHeader() {
-      return this.isStudent && this.isFallIncentiveProgramEnabled
+      return (
+        this.isStudent &&
+        (this.isFallIncentiveProgramEnabled || this.isIncentiveBannerEnabled)
+      )
     },
 
     showBecomeAVolunteerHeader() {

@@ -889,6 +889,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   CLASSLINK_SSO = 'classlink-sso',
   STUDENTS_INITIATE_DMS = 'students-initiate-dms',
   VOLUNTEER_MILESTONE_SHARING_STUDY = 'volunteer-milestone-sharing-study',
+  INCENTIVE_BANNER = 'incentive-banner',
 }
 
 export const ANALYTICS_REPORT_ROW = {

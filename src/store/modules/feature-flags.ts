@@ -59,6 +59,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES]: false,
       [POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS]: false,
+      [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -82,6 +83,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: {},
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]:
         'Interested in becoming a volunteer tutor on UPchieve?',
+      [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
     },
     eligibleForChooseTutorType: false,
   },
@@ -258,6 +260,10 @@ export default {
       state.multivariantFlags[
         POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY
       ],
+    isIncentiveBannerEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
+    getIncentiveBannerPayload: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
   },
   actions: {
     isSessionAudioCallEnabled: async (
