@@ -6,11 +6,15 @@
     class="ButtonTemplate"
     @click="$emit('click')"
   >
+    <arrow-icon
+      v-if="doShowArrow && isLeftArrow"
+      class="ButtonTemplate-icon arrow-icon arrow-reversed"
+    />
     <div class="ButtonTemplate-content">
       <slot />
     </div>
     <arrow-icon
-      v-if="(primary || variant === 'primary') && showArrow"
+      v-if="doShowArrow && !isLeftArrow"
       class="ButtonTemplate-icon arrow-icon"
     />
   </router-link>
@@ -21,11 +25,15 @@
     :type="buttonType"
     class="ButtonTemplate"
   >
+    <arrow-icon
+      v-if="doShowArrow && isLeftArrow"
+      class="ButtonTemplate-icon arrow-icon arrow-reversed"
+    />
     <span class="ButtonTemplate-content">
       <slot />
     </span>
     <arrow-icon
-      v-if="(primary || variant === 'primary') && showArrow"
+      v-if="doShowArrow && !isLeftArrow"
       class="ButtonTemplate-icon arrow-icon"
     />
   </button>
@@ -46,9 +54,22 @@ export default {
     },
     routeTo: String,
     showArrow: Boolean,
+    arrowDirection: String, // 'right' | 'left'
     buttonType: {
       type: String,
       default: 'button',
+    },
+  },
+  computed: {
+    doShowArrow() {
+      return (
+        ((this.primary || this.variant?.includes('primary')) &&
+          this.showArrow) ||
+        this.showArrow
+      )
+    },
+    isLeftArrow() {
+      return this.doShowArrow && this.arrowDirection === 'left'
     },
   },
 }
@@ -72,7 +93,6 @@ export default {
 }
 
 .ButtonTemplate-icon {
-  margin-top: 2px; // nudge down
   margin-left: 8px; // space between text
 }
 
@@ -80,5 +100,11 @@ export default {
   fill: currentColor;
   height: 16px;
   width: 16px;
+}
+
+.arrow-reversed {
+  transform: scaleX(-1);
+  margin: 0;
+  margin-right: 8px;
 }
 </style>

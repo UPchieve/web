@@ -89,6 +89,8 @@ $c-student: #f9bef9;
 $c-volunteer: #fedf85;
 $c-teacher: #76e5fd;
 
+$c-hover-green: #0d8269;
+
 // Override Ionic colors
 :root {
   --ion-color-success: #{lighten($c-success-green, 50%)};

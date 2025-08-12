@@ -1,4 +1,5 @@
 <script lang="ts">
+// @TODO Remove all files in this folder after UPchieve 101 v3 launch
 import type {
   TrainingCourse,
   TrainingModule as TrainingModuleType,

@@ -29,6 +29,7 @@
           <!-- TODO: Also add an accept button on mobile. -->
           <large-button
             variant="primary-blue"
+            :showArrow="false"
             @click="$emit('accept')"
             :disabled="!enableAccept ? true : null"
             v-if="showAccept"

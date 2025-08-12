@@ -116,9 +116,13 @@ const text = computed(() => {
     <h1 class="title">{{ text.title }}</h1>
     <div class="body">{{ text.body }}</div>
 
-    <large-button v-if="mobileMode" @click="onAccept" variant="primary-blue">{{
-      modalData.acceptText
-    }}</large-button>
+    <large-button
+      v-if="mobileMode"
+      @click="onAccept"
+      variant="primary-blue"
+      :showArrow="false"
+      >{{ modalData.acceptText }}</large-button
+    >
   </div>
 </template>
 

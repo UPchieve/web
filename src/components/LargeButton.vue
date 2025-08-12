@@ -4,6 +4,7 @@
     :routeTo="routeTo"
     :class="buttonClasses"
     :showArrow="showArrow"
+    :arrowDirection="arrowDirection"
     :buttonType="buttonType"
     @click="(event) => $emit('click', event)"
   >
@@ -28,6 +29,10 @@ export default {
     showArrow: {
       type: Boolean,
       default: true,
+    },
+    arrowDirection: {
+      type: String,
+      default: 'right',
     },
     buttonType: {
       type: String,

@@ -20,6 +20,7 @@
           <large-button
             class="web-notifications-modal__yes_button"
             variant="primary-blue"
+            :showArrow="false"
             @click="requestNotificationPermission"
           >
             <notification-bell-icon class="icon" />
