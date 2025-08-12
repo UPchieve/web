@@ -13,20 +13,9 @@
       <div class="volunteer-welcome-modal-title-container">
         <h1 class="volunteer-welcome-modal-title">🎉 Nice work, coach!</h1>
         <p>You've just made a big impact — and that's worth celebrating.</p>
-        <div v-if="typeOfMilestone === 'hour'">
-          <p>
-            You just spent an hour changing lives. Your time makes a difference
-            — why not inspire someone else to do the same? Share your impact
-            with your network.
-          </p>
-        </div>
-        <div v-else-if="typeOfMilestone === 'students'">
-          <p>
-            Three students, one amazing tutor. You've helped multiple students
-            take a step closer to their goals. Let your friends know — and maybe
-            inspire them to join too!
-          </p>
-        </div>
+        <p>
+          {{ message }}
+        </p>
         <div class="share-buttons">
           <FormSelect
             name="sharing-options"
@@ -100,6 +89,21 @@ const referralLink = computed(() => {
     ? `http://localhost:8080/referral/${referralCode}`
     : `${config.serverRoot}/referral/${referralCode}`
 })
+
+const message = () => {
+  if (props.typeOfMilestone === 'hour') {
+    AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_ONE_HOUR_MODAL)
+    return `You just spent an hour changing lives. Your time makes a difference
+            — why not inspire someone else to do the same? Share your impact
+            with your network.`
+  } else if (props.typeOfMilestone === 'students') {
+    AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_THREE_STUDENTS_MODAL)
+    return `Three students, one amazing tutor. You've helped multiple students
+            take a step closer to their goals. Let your friends know — and maybe
+            inspire them to join too!`
+  } else
+    return `You've made a huge difference on UPchieve helping students reach their academic goals! Let your friends know - and maybe inspire them to join too!`
+}
 
 const shareMessage = computed(() => {
   if (props.typeOfMilestone === 'hour') {

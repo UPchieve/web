@@ -489,7 +489,7 @@ export default {
       return (
         this.getVolunteerMilestoneSharingStudyVariant ===
           'tutored-first-three-students' &&
-        this.user.uniqueStudentsHelpedCount === 1
+        this.user.uniqueStudentsHelpedCount === 3
       )
     },
     showMilestoneModal() {
