@@ -51,6 +51,34 @@
             </div>
           </div>
         </div>
+        <div v-if="showFeedbackFromStudent" class="chat-card-editor-container">
+          <div class="recap-card">
+            <header class="recap-card__header recap-card__header-start-session">
+              <h2 class="card-title">
+                {{
+                  isVolunteer
+                    ? `Feedback from ${session.studentFirstName}`
+                    : 'Your feedback'
+                }}
+              </h2>
+            </header>
+
+            <div v-for="[key, value] in feedbackStarQuestionAnswers" :key="key">
+              {{ key }}
+              <vue-star-rating
+                :rating="value"
+                inactive-color="#ffffff"
+                active-color="#36d2aa"
+                border-color="#36d2aa"
+                :read-only="true"
+                :border-width="2"
+                :star-size="18"
+                :padding="1"
+                :show-rating="false"
+              />
+            </div>
+          </div>
+        </div>
         <template v-if="mobileMode">
           <chat-log
             v-if="!isRecapDmsAvailable"
@@ -200,6 +228,13 @@ import config from '../config'
 import { socket } from '@/socket'
 import { markRaw } from 'vue'
 
+function camelCaseToQuestion(str) {
+  const allLowerCaseSentenceWithSpaces = str
+    .replace(/([A-Z])/g, ' $1')
+    .toLowerCase()
+  return `${allLowerCaseSentenceWithSpaces.charAt(0).toUpperCase()}${allLowerCaseSentenceWithSpaces.slice(1)}?`
+}
+
 export default {
   components: {
     ChatLog,
@@ -238,6 +273,14 @@ export default {
     },
     isJoinedSessionSocketReadyToEmit() {
       return [this.isConnected, this.session?.id]
+    },
+    feedbackStarQuestionAnswers() {
+      return Object.entries(this.session.feedbackFromStudent ?? {}).map(
+        ([key, value]) => [camelCaseToQuestion(key), value]
+      )
+    },
+    showFeedbackFromStudent() {
+      return this.feedbackStarQuestionAnswers.length > 0
     },
   },
   data() {
