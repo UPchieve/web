@@ -5,7 +5,7 @@
         {{ error }}
       </div>
 
-      <div v-if="forceSmsVerification" class="student-volunteer-info">
+      <div v-if="isStudentVolunteerVerification" class="student-volunteer-info">
         <span class="uc-form-header">Let's verify your phone number.</span>
         <div
           class="switch-account-mode"
@@ -16,11 +16,18 @@
         </div>
       </div>
       <verification-method-selector
-        v-if="step === 1 && (isSmsVerificationEnabled || forceSmsVerification)"
+        v-if="
+          step === 1 &&
+          (isSmsVerificationEnabled ||
+            isStudentVolunteerVerification ||
+            isForceSmsVerificationEnabled)
+        "
         data-testid="verification-method-selector"
         :email="user.email"
         v-model="verificationInputs"
-        :forceSmsVerification="forceSmsVerification"
+        :forceSmsVerification="
+          isStudentVolunteerVerification || isForceSmsVerificationEnabled
+        "
       />
 
       <!-- Verify code -->
@@ -130,7 +137,11 @@ export default {
     }
   },
   beforeMount() {
-    if (this.isSmsVerificationEnabled || this.isStudentVolunteer) {
+    if (
+      this.isSmsVerificationEnabled ||
+      this.isStudentVolunteer ||
+      this.isForceSmsVerificationEnabled
+    ) {
       this.step = 1
     } else {
       this.step = 2
@@ -140,12 +151,12 @@ export default {
   },
   mounted() {
     this.$store.dispatch('app/hideNavigation')
-    if (this.forceSmsVerification) {
+    if (this.isStudentVolunteerVerification) {
       this.verificationInputs.method = VERIFICATION_METHOD.SMS
     }
   },
   computed: {
-    forceSmsVerification() {
+    isStudentVolunteerVerification() {
       return this.isStudentVolunteer && this.isStudentsBecomeVolunteersEnabled
     },
     VERIFICATION_METHOD() {
@@ -161,6 +172,8 @@ export default {
         'featureFlags/isFallIncentiveProgramEnabled',
       isStudentsBecomeVolunteersEnabled:
         'featureFlags/isStudentsBecomeVolunteersEnabled',
+      isForceSmsVerificationEnabled:
+        'featureFlags/isForceSmsVerificationEnabled',
       userType: 'user/userType',
       isStudentVolunteer: 'user/isStudentVolunteer',
       mobileMode: 'app/mobileMode',

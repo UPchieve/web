@@ -61,6 +61,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_V3]: false,
+      [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: true,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -267,6 +268,8 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
     isUpchieve101V3Enabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_V3],
+    isForceSmsVerificationEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
   },
   actions: {
     isSessionAudioCallEnabled: async (

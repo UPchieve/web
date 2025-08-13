@@ -895,6 +895,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   VOLUNTEER_MILESTONE_SHARING_STUDY = 'volunteer-milestone-sharing-study',
   INCENTIVE_BANNER = 'incentive-banner',
   UPCHIEVE_101_V3 = 'upchieve-101-v3',
+  FORCE_SMS_VERIFICATION = 'force-sms-verification',
 }
 
 export const ANALYTICS_REPORT_ROW = {

@@ -30,6 +30,7 @@ describe('VerificationView', () => {
           getters: {
             ...storeOptions.modules.featureFlags.getters,
             isSmsVerificationEnabled: () => smsVerificationEnabled,
+            isForceSmsVerificationEnabled: () => false,
           },
         },
       },
