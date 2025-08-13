@@ -249,22 +249,6 @@
       </button>
       <button
         class="toolbar-item"
-        title="Upload photo"
-        tabindex="0"
-        @click="openFileDialog"
-        @keydown.enter="openFileDialog"
-        :disabled="!isConnected"
-      >
-        <FileDialog
-          ref="fileDialog"
-          class="upload-photo"
-          accept="image/*, image/heic"
-          @file-selected="uploadPhoto"
-        />
-        <PhotoUploadIcon class="toolbar-icon--photo" />
-      </button>
-      <button
-        class="toolbar-item"
         title="Shapes"
         tabindex="0"
         @click="toggleShapes"
@@ -539,9 +523,7 @@ import ZoomToFitIcon from '@/assets/whiteboard_icons/zoom_to_fit.svg'
 import DoubleArrowIcon from '@/assets/whiteboard_icons/double_arrow.svg'
 import DeleteSelectionIcon from '@/assets/whiteboard_icons/delete_selection.png'
 import RotateIcon from '@/assets/whiteboard_icons/rotate.png'
-import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import ErrorIcon from '@/assets/icons/exclamation.svg'
-import FileDialog from '@/components/FileDialog.vue'
 import ShapesIcon from '@/assets/whiteboard_icons/shapes.svg'
 import ArrowIcon from '@/assets/arrow.svg'
 import CircleIcon from '@/assets/whiteboard_icons/circle.svg'
@@ -597,8 +579,6 @@ export default {
     RedoIcon,
     ZoomToFitIcon,
     DoubleArrowIcon,
-    PhotoUploadIcon,
-    FileDialog,
     ShapesIcon,
     ArrowIcon,
     CircleIcon,
