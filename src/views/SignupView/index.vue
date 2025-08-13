@@ -78,6 +78,7 @@
           <p class="uc-form-text bold">I want to sign up as a...</p>
           <div class="btn-card-container">
             <button
+              v-if="!isDisableStudentSignupsEnabled"
               data-testid="studentCard"
               class="btn-card student"
               @click.prevent="selectStudent"
@@ -202,6 +203,8 @@ export default {
     ...mapGetters({
       useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
+      isDisableStudentSignupsEnabled:
+        'featureFlags/isDisableStudentSignupsEnabled',
     }),
     welcomeMessage() {
       if (this.referredBy?.firstName)
