@@ -4,6 +4,12 @@
     class="volunteer-welcome-modal-wrapper"
     backText="Dashboard"
   >
+    <header class="header">
+      <heavy-cross-icon
+        class="upc-modal-close-icon"
+        @click="handleCloseModal(EVENTS.STUDY_SHARING_CLOSED_MODAL)"
+      />
+    </header>
     <img
       class="volunteer-welcome-modal-header-img"
       src="@/assets/updog-certificate-cheer.png"
@@ -14,7 +20,7 @@
         <h1 class="volunteer-welcome-modal-title">🎉 Nice work, coach!</h1>
         <p>You've just made a big impact — and that's worth celebrating.</p>
         <p>
-          {{ message }}
+          {{ message() }}
         </p>
         <div class="share-buttons">
           <FormSelect
@@ -40,6 +46,8 @@ import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import config from '@/config'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import HeavyCrossIcon from '@/assets/heavy-cross.svg'
+import _ from 'lodash'
 
 const props = defineProps<{
   closeModal: () => void
@@ -50,36 +58,18 @@ const store = useStore()
 
 const user = computed(() => store.state.user.user)
 
-const sharingOptions = [
-  {
-    text: 'Text / SMS',
-    value: 'text',
-  },
-  {
-    text: 'WhatsApp',
-    value: 'whatsapp',
-  },
-  {
-    text: 'Email',
-    value: 'email',
-  },
-  {
-    text: 'LinkedIn',
-    value: 'linkedin',
-  },
-  {
-    text: 'Instagram',
-    value: 'instagram',
-  },
-  {
-    text: 'TikTok',
-    value: 'tiktok',
-  },
-  {
-    text: 'Snapchat',
-    value: 'snapchat',
-  },
+const baseSharingOptions = [
+  { text: 'Text / SMS', value: 'text' },
+  { text: 'WhatsApp', value: 'whatsapp' },
+  { text: 'Email', value: 'email' },
+  { text: 'LinkedIn', value: 'linkedin' },
+  { text: 'Instagram', value: 'instagram' },
+  { text: 'TikTok', value: 'tiktok' },
+  { text: 'Snapchat', value: 'snapchat' },
 ]
+
+const sharingOptions = _.shuffle(baseSharingOptions)
+
 const selectedOption = ref<string>('')
 
 const referralLink = computed(() => {
@@ -114,7 +104,12 @@ const shareMessage = computed(() => {
   return `I'm volunteering on UPchieve and helping students reach their academic goals! You can be a part of it too! Sign up to tutor with UPchieve here: ${referralLink.value}`
 })
 
-function handleCloseModal() {
+function handleCloseModal(event: string) {
+  if (event) {
+    AnalyticsService.captureEvent(event)
+  } else {
+    AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_CLICKED_OUTSIDE_MODAL)
+  }
   props.closeModal()
 }
 
@@ -134,8 +129,6 @@ async function shareVia() {
 
   switch (shareVia) {
     case 'text': {
-      AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_TEXT)
-
       if (navigator.share) {
         await navigator.share({
           title: message,
@@ -143,52 +136,46 @@ async function shareVia() {
       } else {
         alert('Sharing is not supported on this device.')
       }
-      handleCloseModal()
+      handleCloseModal(EVENTS.STUDY_SHARING_TEXT)
       break
     }
     case 'email': {
-      AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_EMAIL)
       const subject = `I'm volunteering with UPchieve!`
       const body = `${message}\n\nLearn more: ${referralLink.value}`
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-      handleCloseModal()
+      handleCloseModal(EVENTS.STUDY_SHARING_EMAIL)
       break
     }
     case 'whatsapp': {
-      AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_WHATSAPP)
       const text = message.trim()
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`
       window.open(url, '_blank')
-      handleCloseModal()
+      handleCloseModal(EVENTS.STUDY_SHARING_WHATSAPP)
       break
     }
     case 'linkedin': {
-      AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_LINKEDIN)
       const url = `https://www.linkedin.com/sharing/share-offsite/?url=${referralLink.value}`
       window.open(url, '_blank')
-      handleCloseModal()
+      handleCloseModal(EVENTS.STUDY_SHARING_LINKEDIN)
       break
     }
     case 'instagram': {
-      AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_INSTAGRAM)
       shareToSocials('instagram')
-      handleCloseModal()
+      handleCloseModal(EVENTS.STUDY_SHARING_INSTAGRAM)
       break
     }
     case 'tiktok': {
-      AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_TIKTOK)
       shareToSocials('tiktok')
-      handleCloseModal()
+      handleCloseModal(EVENTS.STUDY_SHARING_TIKTOK)
       break
     }
     case 'snapchat': {
-      AnalyticsService.captureEvent(EVENTS.STUDY_SHARING_SNAPCHAT)
       shareToSocials('snapchat')
-      handleCloseModal()
+      handleCloseModal(EVENTS.STUDY_SHARING_SNAPCHAT)
       break
     }
     default: {
-      handleCloseModal()
+      handleCloseModal('')
       break
     }
   }
@@ -198,5 +185,23 @@ async function shareVia() {
 <style lang="scss" scoped>
 .share-buttons {
   @include flex-container(column, center, center);
+}
+
+.header {
+  background-color: #e3f2fd;
+}
+
+.upc-modal-close-icon {
+  margin-left: auto;
+  margin-right: 1em;
+  margin-top: 1em;
+  font-weight: 600;
+  display: block;
+  align-self: flex-start;
+  flex-basis: 100%;
+}
+
+.volunteer-welcome-modal-header-img {
+  margin-top: 0;
 }
 </style>
