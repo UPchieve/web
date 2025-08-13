@@ -18,21 +18,21 @@ const isSafari =
 const maxImagesEvent = new Event(maxImagesEventName)
 const fileSizeEvent = new Event(fileSizeTooBigEventName)
 
-const getImagesFromDragEvent = (evt) => {
-  return Array.from(evt?.dataTransfer?.files ?? []).filter((f) =>
-    matchedFileType(f.type)
-  )
-}
+// const getImagesFromDragEvent = (evt) => {
+//   return Array.from(evt?.dataTransfer?.files ?? []).filter((f) =>
+//     matchedFileType(f.type)
+//   )
+// }
 
-const getImagesFromPasteEvent = (evt) => {
-  return Array.from(evt?.clipboardData?.items ?? []).filter((f) =>
-    matchedFileType(f.type)
-  )
-}
+// const getImagesFromPasteEvent = (evt) => {
+//   return Array.from(evt?.clipboardData?.items ?? []).filter((f) =>
+//     matchedFileType(f.type)
+//   )
+// }
 
-const matchedFileType = (fileType) => {
-  return fileType.match(/^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i)
-}
+// const matchedFileType = (fileType) => {
+//   return fileType.match(/^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i)
+// }
 
 const isValidImageCount = (quill) => {
   const currentCount =
@@ -152,29 +152,12 @@ class ImageDrop {
     )
   }
 
-  async handleImageUpload(evt, sessionId, callback) {
-    const images =
-      evt.type === 'drop'
-        ? getImagesFromDragEvent(evt)
-        : evt.type === 'paste'
-          ? getImagesFromPasteEvent(evt)
-          : null
-    if (!images?.length) {
-      return
-    }
-
+  // eslint-disable-next-line no-unused-vars
+  async handleImageUpload(evt, _sessionId, _callback) {
     evt.preventDefault()
     evt.stopImmediatePropagation()
-
-    const image = evt.type === 'paste' ? images[0].getAsFile() : images[0]
-    const { isClean, failures } = await this.isImageClean(image, sessionId)
-    if (!isClean) {
-      const event = new Event(imageFailedModerationEventName)
-      event.failures = failures
-      this.quill.root.dispatchEvent(event)
-    } else {
-      await callback(image)
-    }
+    // eslint-disable-next-line no-console
+    console.log('Dropping image upload.')
   }
 
   async isImageClean(imageFile, sessionId) {
