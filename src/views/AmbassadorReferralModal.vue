@@ -149,16 +149,6 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="scss">
-.uc-form-text-input {
-  border-radius: 12px !important;
-  width: 100%;
-}
-
-.uc-form-element {
-  margin-top: 0 !important;
-}
-</style>
 <style lang="scss" scoped>
 .referral-modal {
   display: flex;
@@ -220,6 +210,7 @@ onMounted(() => {
 
 .referral-link-input {
   width: 100%;
+  margin-top: 0;
 }
 
 .phone-number-form {
