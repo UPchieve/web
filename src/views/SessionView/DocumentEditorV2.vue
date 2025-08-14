@@ -6,6 +6,7 @@
       <button class="ql-italic" />
       <button class="ql-underline" />
       <button class="ql-strike" />
+      <button class="ql-image" />
       <select class="ql-color"></select>
       <select class="ql-background"></select>
       <button class="ql-list" value="ordered" />
