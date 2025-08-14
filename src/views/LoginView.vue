@@ -123,11 +123,13 @@ export default {
   },
   data() {
     let error
-    if (this.$route.query['401'] === 'true') {
+    const query = this.$route?.query ?? {}
+
+    if (query['401'] === 'true') {
       error = 'Your session has expired. Please log in again.'
     }
-    if (this.$route.query['400'] === 'true') {
-      const provider = this.$route.query['provider']
+    if (query['400'] === 'true') {
+      const provider = query['provider']
       if (provider === 'google') {
         AnalyticsService.captureEvent(
           EVENTS.USER_DOES_NOT_HAVE_LINKED_GOOGLE_ACCOUNT
@@ -145,11 +147,11 @@ export default {
     }
     return {
       credentials: {
-        email: this.$route.query.email ?? '',
+        email: query.email ?? '',
         password: '',
       },
       error,
-      message: this.$route.query.message ?? '',
+      message: query.message ?? '',
       isLoggingIn: false,
     }
   },
