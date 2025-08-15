@@ -7,22 +7,20 @@ import NetworkService from '@/services/NetworkService'
 import type { AxiosError } from 'axios'
 
 const districtId = ref<string>('')
-const cleverToUPchieveIds = ref<string>('')
+const cleverSchoolId = ref<string>('')
+const upchieveSchoolId = ref<string>('')
 const isSubmitting = ref<boolean>(false)
 const msg = ref<string | JSON>()
 const isError = ref<boolean>(false)
 
-async function submit() {
+async function onSubmitRoster() {
   isError.value = false
   msg.value = ''
 
   try {
     const {
       data: { report },
-    } = await NetworkService.adminCleverRoster(
-      districtId.value,
-      cleverToUPchieveIds.value
-    )
+    } = await NetworkService.adminCleverRoster(districtId.value)
     if (!isEmpty(report.failedSchools)) {
       isError.value = true
     }
@@ -35,20 +33,42 @@ async function submit() {
   }
 }
 
-function disableSubmit() {
+async function onSubmitSchool() {
+  isError.value = false
+  msg.value = ''
+
+  try {
+    await NetworkService.adminCleverAddSchoolMapping(
+      cleverSchoolId.value,
+      upchieveSchoolId.value
+    )
+    msg.value = 'Success!'
+    cleverSchoolId.value = ''
+    upchieveSchoolId.value = ''
+  } catch (err) {
+    msg.value =
+      ((err as AxiosError).response?.data as { err?: string }).err ??
+      'Something went wrong.'
+    isError.value = true
+  }
+}
+
+function disableRosterSubmit() {
   return !districtId.value
+}
+
+function disableSchoolSubmit() {
+  return !cleverSchoolId.value && !upchieveSchoolId.value
 }
 </script>
 
 <template>
-  <div class="card">
-    <h1>Clever Roster</h1>
-
+  <div>
     <loader v-if="isSubmitting" overlay />
 
     <div
       v-if="msg"
-      class="alert alert-success"
+      class="m-4 alert alert-success"
       :class="{
         'alert-danger': isError,
       }"
@@ -57,57 +77,69 @@ function disableSubmit() {
       <pre>{{ msg }}</pre>
     </div>
 
-    <p>
-      This integration assumes that we will be able to get both the nces_id for
-      a school as well as the email (and first and last name) for students from
-      Clever.
-    </p>
-    <p>
-      Before performing the roster, go into the Clever portal and browse the
-      data for the district (in Data Compatibility section). If any of the
-      required fields are missing, those records will be skipped and will be
-      marked as such in the output report.
-    </p>
-    <ul>
-      <li>
-        If a school is missing an nces_id, reach out to Clever support for them
-        to fill it in. Alternatively, you can use the `Clever to UPchieve IDs`
-        input field to create JSON string (something that looks like:
-        `{"cleverSchoolId": "upchieveSchoolId", "otherCleverSchoolId":
-        "otherUPchieveSchoolId"}` mapping the Clever School ID to UPchieve
-        school ID. The schools in that mapping take precedence.
-      </li>
-      <li>
-        If any students are missing required fields, reach out to the district
-        admin to ask for those fields to be filled. Otherwise, those students
-        will not be updated.
-      </li>
-    </ul>
-    <p>
-      If all looks good, you can use the district's id in the form below to
-      perform the roster.
-    </p>
-    <form @submit.prevent="submit">
-      <form-input
-        label="Clever District ID"
-        name="clever-district-id"
-        v-model="districtId"
-      ></form-input>
-      <div class="uc-form-element mt-4">
-        <label for="clever-to-upchieve-ids">Clever to UPchieve IDs</label>
-        <textarea
-          name="clever-to-upchieve-ids"
-          v-model="cleverToUPchieveIds"
-        ></textarea>
-      </div>
-      <button
-        class="uc-form-button"
-        type="submit"
-        :disabled="disableSubmit() ? true : undefined"
-      >
-        Submit
-      </button>
-    </form>
+    <div class="card">
+      <h1>Clever Roster</h1>
+
+      <p>
+        To perform this student roster, you first need to add any of the schools
+        you want rostered by using the Clever School Mapping form below. If a
+        school has not been explicitly added, even if it has an NCES ID in
+        Clever, it will NOT be processed.
+      </p>
+      <p>
+        This roster also requires that we can get the email, first name, and
+        last name for students from Clever. Before performing the roster, go
+        into the Clever portal and browse the data for the district (in Data
+        Compatibility section). If any of the required fields are missing, those
+        records will be skipped and will be marked as such in the output report.
+      </p>
+      <form @submit.prevent="onSubmitRoster">
+        <form-input
+          label="Clever District ID"
+          name="clever-district-id"
+          v-model="districtId"
+          :is-required="false"
+        ></form-input>
+        <button
+          class="uc-form-button"
+          type="submit"
+          :disabled="disableRosterSubmit() ? true : undefined"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h1>Clever School Mapping</h1>
+      <p>
+        Before running the Clever Roster above, you'll need to add explicit
+        mappings of schools in Clever to schools in UPchieve. Schools without
+        this explicit mapping, even if they have an NCES ID, will NOT roster.
+      </p>
+      <p>Simply enter the Clever and UPchieve school IDs below.</p>
+      <form @submit.prevent="onSubmitSchool">
+        <form-input
+          label="Clever School ID"
+          name="clever-school-id"
+          v-model="cleverSchoolId"
+          :is-required="false"
+        />
+        <form-input
+          label="UPchieve School ID"
+          name="upchieve-school-id"
+          v-model="upchieveSchoolId"
+          :is-required="false"
+        />
+        <button
+          class="uc-form-button"
+          type="submit"
+          :disabled="disableSchoolSubmit() ? true : undefined"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 

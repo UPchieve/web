@@ -598,10 +598,18 @@ export default {
       this._errorHandler
     )
   },
-  adminCleverRoster(districtId, cleverToUPchieveIds) {
+  adminCleverRoster(districtId: string) {
     return httpPost(`${ADMIN_ROOT}/clever/roster`, {
       districtId,
-      cleverToUPchieveIds,
+    }).then(this._successHandler, this._errorHandler)
+  },
+  adminCleverAddSchoolMapping(
+    cleverSchoolId: string,
+    upchieveSchoolId: string
+  ) {
+    return httpPost(`${ADMIN_ROOT}/clever/school`, {
+      cleverSchoolId,
+      upchieveSchoolId,
     }).then(this._successHandler, this._errorHandler)
   },
   adminGetSessionReport({
