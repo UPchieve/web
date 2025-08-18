@@ -116,6 +116,7 @@
       <label for="firstName" class="uc-form-label">First Name</label>
       <input
         id="firstName"
+        data-testId="firstNameField"
         type="text"
         class="uc-form-input"
         v-bind:class="{
@@ -132,6 +133,7 @@
       <label for="lastName" class="uc-form-label">Last Name</label>
       <input
         id="lastName"
+        data-testid="lastNameField"
         type="text"
         class="uc-form-input"
         v-bind:class="{
@@ -147,6 +149,7 @@
       <label for="phoneNumber" class="uc-form-label">Cell Phone Number</label>
       <maz-phone-number-input
         id="phoneNumber"
+        data-testid="phoneNumberField"
         class="phone-input"
         required="true"
         v-model="profile.phone"
@@ -164,6 +167,7 @@
         >How did you hear about us?</label
       >
       <FormSelect
+        data-testid="signupSourceField"
         name="signup-source"
         v-model="signupSourceId"
         :options="signupSourcesOptions"
@@ -175,6 +179,8 @@
     <div class="uc-column" v-if="shouldShowOtherSignupInput()">
       <input
         id="otherSignupSource"
+        data-testid="otherSignupSource"
+        :required="true"
         type="text"
         class="uc-form-input"
         v-model="otherSignupSource"
@@ -190,6 +196,7 @@
     <div class="uc-form-checkbox">
       <input
         id="userAgreement"
+        data-testid="userAgreementCheckbox"
         v-model="credentials.terms"
         type="checkbox"
         required
@@ -338,6 +345,11 @@ export default {
           'Please enter signup source in the text box if "Other" is selected'
         )
         this.invalidInputs.push('otherSignupSource')
+      }
+      if (!this.signupSourceId) {
+        this.validationErrors.push(
+          "Please select an option for 'How did you hear about us?'"
+        )
       }
       if (!this.validationErrors.length) {
         this.submit()
