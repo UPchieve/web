@@ -27,7 +27,7 @@
           <div>
             <li
               v-for="questionInfo in filteredQuestions"
-              :key="questionInfo.question.id"
+              :key="questionInfo.questionId"
               :class="{
                 'feedback__questions-item': !(
                   questionInfo.questionType === 'radio'
@@ -170,12 +170,10 @@
                     :key="`${response.responseId}-free-response`"
                   >
                     <div class="question__subtext">
-                      We read every single comment, but if you need to connect
-                      with UPchieve staff about a question or concern please
-                      email us directly:
-                      <a href="mailto:support@upchieve.org"
-                        >support@upchieve.org</a
-                      >
+                      Tell us about your experience. This could be about the
+                      app, the session you had, or anything else you want to
+                      share. We read every comment and use your ideas to make
+                      UPchieve better.
                     </div>
                     <feedback-textarea
                       :id="`${questionInfo.questionId}_${response.responseId}`"
@@ -203,15 +201,20 @@
               </div>
             </li>
           </div>
-          <li v-if="tutorFeedbackToTeacherQuestion && isSessionVolunteer">
-            <div class="question__section-header">Notes For Their Teacher</div>
-            <div class="question__title">
-              {{ tutorFeedbackToTeacherQuestion }}
+          <li v-if="volunteerFeedbackForStudentFlag && isSessionVolunteer">
+            <div class="question__section-header">
+              {{ volunteerFeedbackForStudentFlag.heading }}
             </div>
+            <div class="question__title">
+              {{ volunteerFeedbackForStudentFlag.question }}
+            </div>
+            <p class="question__subtext">
+              {{ volunteerFeedbackForStudentFlag.subtext }}
+            </p>
             <feedback-textarea
-              id="tutor-feedback-for-teacher"
+              id="volunteer-feedback-for-student"
               class="mt-4"
-              @input="(response) => (tutorFeedbackToTeacher = response)"
+              @input="(response) => (volunteerFeedbackForStudent = response)"
             />
           </li>
         </ul>
@@ -271,7 +274,7 @@ export default {
       allQuestions: [],
       error: '',
       userResponse: {},
-      tutorFeedbackToTeacher: '',
+      volunteerFeedbackForStudent: '',
     }
   },
   computed: {
@@ -279,8 +282,8 @@ export default {
       userType: 'user/userType',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
-      tutorFeedbackToTeacherQuestion:
-        'featureFlags/tutorFeedbackToTeacherQuestion',
+      volunteerFeedbackForStudentFlag:
+        'featureFlags/volunteerFeedbackForStudentFlag',
     }),
     ...mapState({
       subjects: (state) => state.subjects.subjects,
@@ -372,9 +375,9 @@ export default {
       }
     }
 
-    if (this.tutorFeedbackToTeacherQuestion)
+    if (this.volunteerFeedbackForStudentFlag)
       AnalyticsService.captureEvent(
-        EVENTS.VOLUNTEER_SHOWN_FEEDBACK_TO_TEACHER_QUESTION
+        EVENTS.VOLUNTEER_SHOWN_STUDENT_FEEDBACK_QUESTION
       )
 
     this.isLoading = false
@@ -575,13 +578,15 @@ export default {
         )
       }
 
-      if (this.tutorFeedbackToTeacher)
+      if (
+        this.volunteerFeedbackForStudentFlag &&
+        this.volunteerFeedbackForStudent
+      )
         AnalyticsService.captureEvent(
-          EVENTS.VOLUNTEER_SUBMITTED_FEEDBACK_TO_TEACHER,
+          EVENTS.VOLUNTEER_SUBMITTED_STUDENT_FEEDBACK_QUESTION,
           {
-            response: this.tutorFeedbackToTeacher,
+            response: this.volunteerFeedbackForStudent,
             sessionId: this.session.id,
-            question: this.tutorFeedbackToTeacherQuestion,
           }
         )
 

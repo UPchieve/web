@@ -81,12 +81,12 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
-      [POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION]: '',
       [POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL]: null,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: {},
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]:
         'Interested in becoming a volunteer tutor on UPchieve?',
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
     },
     eligibleForChooseTutorType: false,
   },
@@ -223,10 +223,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
     studentsBecomeVolunteersCopy: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
-    tutorFeedbackToTeacherQuestion: (state: FeatureFlagState) =>
-      state.payloadFlags[
-        POSTHOG_FEATURE_FLAGS.TUTOR_FEEDBACK_TO_TEACHER_QUESTION
-      ],
+    volunteerFeedbackForStudentFlag: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT],
     isTeacherGuidanceExperimentActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT],
     isCombinedOnboardingQuizEnabled: (state: FeatureFlagState) =>
