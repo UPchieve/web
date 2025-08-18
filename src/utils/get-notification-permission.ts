@@ -1,7 +1,11 @@
 const getNotificationPermission = () => {
   // Check browser support
   if (!('Notification' in window)) return 'denied'
-  return Notification.permission
+  if (Notification.permission === 'granted') {
+    return localStorage.getItem('notification-permission')
+  } else {
+    return Notification.permission
+  }
 }
 
 export default getNotificationPermission
