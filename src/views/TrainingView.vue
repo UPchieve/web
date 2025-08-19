@@ -1,5 +1,58 @@
 <template>
   <div v-if="isVolunteer" class="training-view">
+    <div class="certificate-container" v-if="canDownloadCertificate">
+      <div class="certificate-icon-and-text">
+        <div class="certificate-icon">
+          <certificate-icon />
+        </div>
+        <div class="certificate-text-container">
+          <div class="certificate-header">
+            <check />
+            <h1 class="certificate-heading">Nationally Certified Tutor</h1>
+          </div>
+          <div class="certificate-text">
+            <p>
+              You've completed Intro to UPchieve training and certified in 1 or
+              more subjects! Download your certificate & showcase your
+              achievement on LinkedIn, your resume, or college applications.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="certificate-buttons">
+        <button @click="downloadCertificate"><download-icon /></button>
+      </div>
+    </div>
+    <div v-else class="certificate-container-disabled">
+      <div class="certificate-icon-and-text">
+        <div class="certificate-icon">
+          <disabled-certificate-icon />
+        </div>
+        <div class="certificate-text-container">
+          <div class="certificate-header">
+            <h1 class="certificate-heading">Nationally Certified Tutor</h1>
+          </div>
+          <div>
+            <p>
+              Finish Intro to UPchieve training and certify in 1 or more
+              subjects below to complete your certification.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="certificate-buttons">
+        <ion-popover
+          side="top"
+          alignment="center"
+          :showBackdrop="false"
+          trigger="download-icon"
+          trigger-action="hover"
+        >
+          Complete training to download certificate
+        </ion-popover>
+        <download-icon id="download-icon" class="download-icon-disabled" />
+      </div>
+    </div>
     <div class="body-container">
       <div class="body-header">Volunteer Training and Certifications</div>
       <p class="instructions">
@@ -94,6 +147,11 @@ import TrainingDropDown from '@/components/TrainingDropDown.vue'
 import SubjectCertsDropDown from '@/components/SubjectCertsDropDown.vue'
 import AdditionalSubjectsDropDown from '@/components/AdditionalSubjectsDropDown.vue'
 import Loader from '@/components/Loader.vue'
+import CertificateIcon from '@/assets/certificate_badge_icon.svg'
+import DownloadIcon from '@/assets/icons/download_cert_icon.svg'
+import Check from '@/assets/check.svg'
+import DisabledCertificateIcon from '@/assets/disabled_certificate_icon.svg'
+import { IonPopover } from '@ionic/vue'
 
 export default {
   name: 'Training',
@@ -103,6 +161,11 @@ export default {
     SubjectCertsDropDown,
     AdditionalSubjectsDropDown,
     Loader,
+    CertificateIcon,
+    DownloadIcon,
+    Check,
+    DisabledCertificateIcon,
+    IonPopover,
   },
   data() {
     return {
@@ -171,6 +234,19 @@ export default {
         ) || []
       )
     },
+    canDownloadCertificate() {
+      const certifications = this.user.certifications
+
+      if (!certifications.upchieve101?.passed) {
+        return false
+      }
+
+      const othersPassed = Object.entries(certifications).filter(
+        ([key, value]) => key !== 'upchieve101' && value.passed
+      ).length
+
+      return othersPassed > 0
+    },
   },
   methods: {
     showTopicTraining(topic) {
@@ -178,6 +254,43 @@ export default {
     },
     setInitialTopic() {
       this.currentTopic = this.subjectTypes[0].key
+    },
+    downloadCertificate() {
+      const volunteerName = `${this.user.firstName} ${this.user.lastName}`
+      const effectiveDate =
+        this.user.certifications.upchieve101?.lastAttemptedAt
+      const canvas = document.createElement('canvas')
+      canvas.width = 2892
+      canvas.height = 1623
+      const ctx = canvas.getContext('2d')
+
+      const certificateImg = new Image()
+      certificateImg.src = '/blank_tutor_certificate.png'
+
+      certificateImg.onload = () => {
+        ctx.drawImage(certificateImg, 0, 0, canvas.width, canvas.height)
+
+        ctx.font = "80px 'Brush Script MT', cursive"
+        ctx.fillStyle = '#000'
+        ctx.textAlign = 'center'
+        ctx.fillText(volunteerName, canvas.width / 2, 850)
+
+        ctx.font = "40px 'Times New Roman', serif"
+        ctx.fillText(effectiveDate, canvas.width / 2 - 840, 1275)
+
+        const link = document.createElement('a')
+        link.href = canvas.toDataURL('image/png')
+        link.download = 'UPchieveTutorCertificate.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+
+      certificateImg.onerror = () => {
+        alert(
+          'Could not load certificate background image. Please try again later.'
+        )
+      }
     },
   },
   watch: {
@@ -193,6 +306,47 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.certificate-container {
+  @include flex-container(row, space-between, center);
+  max-width: 1200px;
+  width: 100%;
+  border-radius: 7px;
+  padding: 20px;
+  background: #f2fbf9;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.certificate-container-disabled {
+  @include flex-container(row, space-between, center);
+  max-width: 1200px;
+  width: 100%;
+  border-radius: 7px;
+  padding: 20px;
+  background: #f1f3f6;
+  margin-bottom: 20px;
+  gap: 16px;
+  border: 2px solid #d8dee5;
+}
+
+.certificate-icon-and-text {
+  @include flex-container(row, center, center);
+  gap: 16px;
+}
+
+.certificate-header {
+  @include flex-container(row, left, center);
+  gap: 8px;
+}
+
+.certificate-heading {
+  font-size: 26px;
+}
+
+.certificate-text {
+  margin-left: 36px;
+}
+
 .body-container {
   max-width: 1200px;
   width: 100%;
@@ -259,5 +413,12 @@ a {
 
 .error {
   color: $c-error-red;
+}
+
+ion-popover::part(content) {
+  background-color: #323338;
+  color: #fff;
+  font-size: 14px;
+  padding: 8px;
 }
 </style>
