@@ -12,9 +12,9 @@
           </div>
           <div class="certificate-text">
             <p>
-              You've completed Intro to UPchieve training and certified in 1 or
-              more subjects! Download your certificate & showcase your
-              achievement on LinkedIn, your resume, or college applications.
+              You've completed UPchieve's training and proven you're ready to
+              deliver high-quality academic support. Download your certification
+              and showcase it on LinkedIn, your resume, or college applications.
             </p>
           </div>
         </div>
@@ -34,8 +34,8 @@
           </div>
           <div>
             <p>
-              Finish Intro to UPchieve training and certify in 1 or more
-              subjects below to complete your certification.
+              Complete UPchieve's training course and pass a subject quiz to
+              earn your official tutor certification.
             </p>
           </div>
         </div>
@@ -152,6 +152,7 @@ import DownloadIcon from '@/assets/icons/download_cert_icon.svg'
 import Check from '@/assets/check.svg'
 import DisabledCertificateIcon from '@/assets/disabled_certificate_icon.svg'
 import { IonPopover } from '@ionic/vue'
+import moment from 'moment'
 
 export default {
   name: 'Training',
@@ -257,8 +258,9 @@ export default {
     },
     downloadCertificate() {
       const volunteerName = `${this.user.firstName} ${this.user.lastName}`
-      const effectiveDate =
+      const effectiveDate = moment(
         this.user.certifications.upchieve101?.lastAttemptedAt
+      ).format('MM/DD/YYYY')
       const canvas = document.createElement('canvas')
       canvas.width = 2892
       canvas.height = 1623
