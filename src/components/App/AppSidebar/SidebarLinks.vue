@@ -143,6 +143,16 @@
         >
           <rewards-sidebar-icon class="icon" />
         </sidebar-link>
+
+        <sidebar-link
+          v-if="isStudent && isGuidedJourneysEnabled"
+          to="/journeys"
+          text="My Journeys"
+          id="journeys-sidebar-link"
+        >
+          <!-- TODO: Change icon -->
+          <rewards-sidebar-icon class="icon" />
+        </sidebar-link>
       </div>
 
       <div class="bottom">
@@ -229,6 +239,7 @@ export default {
       userType: 'user/userType',
       isBecomeAnAmbassadorCtaEnabled:
         'featureFlags/isBecomeAnAmbassadorCtaEnabled',
+      isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
     }),
     isStandaloneAiEnabled() {
       return (

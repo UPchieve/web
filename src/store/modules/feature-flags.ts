@@ -63,6 +63,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_V3]: false,
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: true,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
+      [POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -271,6 +272,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
     isDisableStudentSignupsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION],
+    isGuidedJourneysEnabled: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS],
   },
   actions: {
     isSessionAudioCallEnabled: async (

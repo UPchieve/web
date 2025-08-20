@@ -39,6 +39,13 @@
         }}
         Finish up your survey <arrow-icon
       /></large-button>
+      <large-button
+        v-if="isGuidedJourneysEnabled"
+        class="dashboard-notice"
+        :class="'dashboard-notice--info'"
+        @click="goToJourneysPage"
+        >Your Path to College <arrow-icon
+      /></large-button>
     </div>
 
     <tell-them-college-prep-modal
@@ -60,6 +67,9 @@
       :closeModal="toggleImpactStudySurveyModal"
       :impactStudyCampaignId="impactStudySurveyCampaignId"
     />
+
+    <journey-modal v-if="showJourneyModal" :closeModal="toggleJourneyModal" />
+
     <update-school-modal />
 
     <secondary-email-modal
@@ -108,6 +118,7 @@ import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import StudentAssignments from '@/components/StudentAssignments.vue'
 import OnboardingModal from '@/components/OnboardingModal.vue'
+import JourneyModal from './JourneyModal.vue'
 import Student_Onboarding_Frame1 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame1.svg'
 import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.svg'
 import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.svg'
@@ -134,6 +145,7 @@ export default {
     StudentAssignments,
     OnboardingModal,
     SelectPreferredLanguageModal,
+    JourneyModal,
   },
   async created() {
     if (
@@ -217,6 +229,8 @@ export default {
       // We have to reset here so that this isn't triggered on every dashboard view
       this.$store.dispatch('user/updateHadASession', false)
     }
+
+    if (this.shouldSeeJourneyModal) this.showJourneyModal = true
   },
   data() {
     return {
@@ -226,6 +240,7 @@ export default {
       assignments: [],
       onboardingFrames: [],
       showImpactStudySurveyModal: false,
+      showJourneyModal: false,
       dismissedSecondaryEmailModal: false,
       showSelectPreferredLanguageModal: false,
       impactStudySurveyCampaignId: '',
@@ -265,6 +280,7 @@ export default {
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
       volunteerSubjectPresenceVariant:
         'featureFlags/volunteerSubjectPresenceVariant',
+      isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
     }),
     permanentlyDismissedSecondaryEmailModalKey() {
       return `${this.user.id}-permanently-dismissed-secondary-email-modal`
@@ -332,6 +348,10 @@ export default {
       if (cacheHit) return JSON.parse(cacheHit)
       return undefined
     },
+    shouldSeeJourneyModal() {
+      const hasSeen = localStorage.getItem('seenJourneyModal')
+      return this.isGuidedJourneysEnabled && !hasSeen
+    },
   },
   methods: {
     onPermanentlyDismissedSecondaryEmailModal() {
@@ -360,6 +380,9 @@ export default {
     },
     toggleImpactStudySurveyModal() {
       this.showImpactStudySurveyModal = !this.showImpactStudySurveyModal
+    },
+    toggleJourneyModal() {
+      this.showJourneyModal = !this.showJourneyModal
     },
     toggleSelectPreferredLanguageModal() {
       this.showSelectPreferredLanguageModal =
@@ -476,6 +499,10 @@ export default {
         LoggerService.noticeError(error)
       }
     },
+    goToJourneysPage() {
+      AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_BANNER_CLICKED)
+      this.$router.push(`/journeys`)
+    },
   },
   watch: {
     isFirstDashboardVisit(currValue, prevValue) {
@@ -553,6 +580,9 @@ export default {
     volunteerSubjectPresenceVariant(currentValue, prevValue) {
       if (currentValue && !prevValue)
         this.scheduleVolunteerPresenceNotification()
+    },
+    shouldSeeJourneyModal(currentValue, prevValue) {
+      if (currentValue && !prevValue) this.showJourneyModal = true
     },
   },
 }
