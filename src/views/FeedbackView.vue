@@ -247,7 +247,7 @@ import SurveyImage from '@/components/Surveys/SurveyImage.vue'
 import SurveyRateNumber from '../components/Surveys/SurveyRateNumber.vue'
 import SurveyChipOption from '../components/Surveys/SurveyChipOption.vue'
 import SurveyCheckbox from '../components/Surveys/SurveyCheckbox.vue'
-import { map, remove, orderBy, find, forEach } from 'lodash-es'
+import { map, remove, orderBy, find, forEach, isEmpty } from 'lodash-es'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 
@@ -312,6 +312,9 @@ export default {
     },
     filteredQuestions() {
       return this.allQuestions.filter((q) => q.isVisible)
+    },
+    hasVolunteerFeedbackForStudent() {
+      return !isEmpty(this.volunteerFeedbackForStudent)
     },
   },
   async beforeMount() {
@@ -566,6 +569,9 @@ export default {
         surveyTypeId: this.surveyDefinition.surveyTypeId,
         sessionId: this.session._id,
         submissions,
+        volunteerFeedbackForStudent: this.hasVolunteerFeedbackForStudent
+          ? this.volunteerFeedbackForStudent
+          : null,
       }
       const requests = []
       requests.push(NetworkService.submitSurvey(surveyResponse))
@@ -578,10 +584,7 @@ export default {
         )
       }
 
-      if (
-        this.volunteerFeedbackForStudentFlag &&
-        this.volunteerFeedbackForStudent
-      )
+      if (this.hasVolunteerFeedbackForStudent)
         AnalyticsService.captureEvent(
           EVENTS.VOLUNTEER_SUBMITTED_STUDENT_FEEDBACK_QUESTION,
           {
