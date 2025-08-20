@@ -43,7 +43,7 @@ function referralLink() {
 
 const onCopiedReferralLink = () => {
   if (isTextReferralLinksEnabled.value) {
-    AnalyticsService.captureEvent(EVENTS.STUDY_USER_CLICKED_SEND_REFERRAL_TEXT)
+    AnalyticsService.captureEvent(EVENTS.STUDY_USER_CLICKED_COPY_REFERRAL_LINK)
   } else {
     AnalyticsService.captureEvent(EVENTS.AMBASSADOR_REFERRAL_CLICKED_COPY)
   }
