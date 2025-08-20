@@ -150,8 +150,7 @@
           text="My Journeys"
           id="journeys-sidebar-link"
         >
-          <!-- TODO: Change icon -->
-          <rewards-sidebar-icon class="icon" />
+          <compass-icon class="icon compass-icon" />
         </sidebar-link>
       </div>
 
@@ -193,6 +192,7 @@ import ReferFriendIcon from '@/assets/icons/refer_friend_icon.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
 import YourProgressIcon from '@/assets/icons/trending_up_icon.svg'
 import RewardsSidebarIcon from '@/assets/icons/star_icon.svg'
+import CompassIcon from '@/assets/compass.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
@@ -216,6 +216,7 @@ export default {
     YourProgressIcon,
     RewardsSidebarIcon,
     ActivityDot,
+    CompassIcon,
   },
   props: {
     authenticated: Boolean,
@@ -330,5 +331,9 @@ export default {
 :deep(.SidebarLink--active .heart-icon path) {
   fill: none;
   stroke: $c-success-green;
+}
+
+:deep(.SidebarLink--active .compass-icon path) {
+  fill: $c-soft-black;
 }
 </style>

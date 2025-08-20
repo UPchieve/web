@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+     stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="title">
+  <title id="title">Compass icon</title>
+  <circle cx="12" cy="12" r="9"/>
+  <path d="M12 7l2.5 5L12 17l-2.5-5Z" fill="currentColor" stroke="none" transform="rotate(-45 12 12)"/>
+  <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+</svg>

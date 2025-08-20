@@ -60,7 +60,7 @@ const journeys = computed(() => [
         title: 'Step 3: Organize Your Requirements & Deadlines',
         beforeSession: `Make a copy of our <a href="https://docs.google.com/spreadsheets/d/1BlaqR5V5ipfWTqw2mBL7T2o8d9WFOnJ_wN6GwG-X-MY/edit?usp=sharing" target="_blank">Example College Application Organizer</a> and start investigating your target school's requirements.`,
         goal: `Know exactly what each college on your list requires and when.`,
-        sessionSubject: 'collegeList',
+        sessionSubject: 'collegeApps',
         sessionTopic: 'college',
         withTutor:
           'Review your Application Organizer together, research each schools application types, essays, requirements, and due dates.',
