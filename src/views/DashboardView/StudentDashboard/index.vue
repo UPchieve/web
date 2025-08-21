@@ -32,6 +32,7 @@
         class="dashboard-notice"
         :class="'dashboard-notice--info'"
         :routeTo="`/surveys/impact-study/${impactStudySurveyCache.surveyId}`"
+        :showArrow="false"
         >{{
           impactStudySurveyCache.rewardAmount
             ? `You almost earned $${impactStudySurveyCache.rewardAmount}!`
@@ -43,6 +44,7 @@
         v-if="isGuidedJourneysEnabled"
         class="dashboard-notice"
         :class="'dashboard-notice--info'"
+        :showArrow="false"
         @click="goToJourneysPage"
         >Your Path to College <arrow-icon
       /></large-button>
