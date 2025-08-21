@@ -273,7 +273,7 @@ export default {
     isDisableStudentSignupsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION],
     isGuidedJourneysEnabled: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS],
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS],
   },
   actions: {
     isSessionAudioCallEnabled: async (
