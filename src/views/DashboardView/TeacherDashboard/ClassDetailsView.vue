@@ -88,54 +88,76 @@
             </button>
           </div>
         </div>
-        <table v-else class="classes-table">
-          <tr>
-            <th>Student</th>
-            <th># of Sessions</th>
-            <th>Time Tutored</th>
-            <th>Last Session</th>
-            <th>Details</th>
-            <th></th>
-            <th v-if="!classData.cleverId"></th>
-          </tr>
-          <tr
-            v-for="student in students"
-            :key="student.id"
-            data-testid="student-row"
-          >
-            <td>{{ student.firstName }} {{ student.lastName }}</td>
-            <td>{{ student.numSessions }}</td>
-            <td>{{ student.timeTutored }}</td>
-            <td>{{ student.lastSession }}</td>
-            <td>
-              <button
-                class="view-details-btn"
-                @click="viewStudentDetails(student)"
-                :data-testid="`view-details-btn-${student.id}`"
-              >
-                View Details
-              </button>
-            </td>
-            <td v-if="!classData.cleverId">
-              <div class="menu-button">
+        <div v-else class="class-details">
+          <div class="filter-controls">
+            <div class="date-input-container">
+              <FormDateInput
+                class="date-input"
+                label="Sessions From"
+                id="session-activity-from"
+                :placeholder="filters.sessionActivityFrom"
+                v-model="filters.sessionActivityFrom"
+                @update:modelValue="submitFilter"
+              />
+              <FormDateInput
+                class="date-input"
+                label="To"
+                id="session-activity-to"
+                :placeholder="filters.sessionActivityTo"
+                v-model="filters.sessionActivityTo"
+                @update:modelValue="submitFilter"
+              />
+            </div>
+          </div>
+          <table class="classes-table">
+            <tr>
+              <th>Student</th>
+              <th># of Sessions</th>
+              <th>Time Tutored</th>
+              <th>Last Session</th>
+              <th>Details</th>
+              <th></th>
+              <th v-if="!classData.cleverId"></th>
+            </tr>
+            <tr
+              v-for="student in students"
+              :key="student.id"
+              data-testid="student-row"
+            >
+              <td>{{ student.firstName }} {{ student.lastName }}</td>
+              <td>{{ student.numSessions }}</td>
+              <td>{{ student.timeTutored }}</td>
+              <td>{{ student.lastSession }}</td>
+              <td>
                 <button
-                  @click="openStudentMenu(student)"
-                  class="student-menu-btns"
+                  class="view-details-btn"
+                  @click="viewStudentDetails(student)"
+                  :data-testid="`view-details-btn-${student.id}`"
                 >
-                  <MenuButtonsIcon class="menu-btns" />
+                  View Details
                 </button>
-              </div>
-              <div
-                class="student-menu"
-                v-if="toggledStudentMenuId === student.id"
-              >
-                <button @click="removeStudent(student.id)">
-                  <p><RemoveIcon /> Remove from class</p>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </table>
+              </td>
+              <td v-if="!classData.cleverId">
+                <div class="menu-button">
+                  <button
+                    @click="openStudentMenu(student)"
+                    class="student-menu-btns"
+                  >
+                    <MenuButtonsIcon class="menu-btns" />
+                  </button>
+                </div>
+                <div
+                  class="student-menu"
+                  v-if="toggledStudentMenuId === student.id"
+                >
+                  <button @click="removeStudent(student.id)">
+                    <p><RemoveIcon /> Remove from class</p>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
       <div
         v-else
@@ -282,6 +304,7 @@ import TrashIcon from '@/assets/trash.svg'
 import RemoveIcon from '@/assets/Remove.svg'
 import { toastController } from '@ionic/vue'
 import _ from 'lodash'
+import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 
 export default {
   name: 'ClassDetails',
@@ -297,6 +320,7 @@ export default {
     VerticalMenuButtonsIcon,
     RemoveIcon,
     TrashIcon,
+    FormDateInput,
   },
 
   data() {
@@ -315,6 +339,10 @@ export default {
       toggledStudentMenuId: '',
       toggledAssignmentMenuId: '',
       classData: {},
+      filters: {
+        sessionActivityFrom: '',
+        sessionActivityTo: moment().format('YYYY-MM-DD'),
+      },
     }
   },
   props: {
@@ -341,6 +369,12 @@ export default {
   },
 
   async created() {
+    this.filters.sessionActivityFrom = this.getSchoolYearStartDate()
+    this.classData = _.isEmpty(this.initialClassData)
+      ? await this.getClassInfo(this.$route.params.classId)
+      : this.initialClassData
+    this.className = this.classData.name
+    this.topicId = this.classData.topicId
     if (
       this.$route.params.classId &&
       !this.$route.path.includes('assignments') &&
@@ -357,16 +391,12 @@ export default {
     } else if (!this.$route.params.classId) {
       this.$router.push('/dashboard')
     }
-    this.classData = _.isEmpty(this.initialClassData)
-      ? await this.getClassInfo(this.$route.params.classId)
-      : this.initialClassData
-    this.className = this.classData.name
-    this.topicId = this.classData.topicId
   },
 
   computed: {
     ...mapState({
       topics: (state) => state.subjects.topics,
+      subjects: (state) => state.subjects.subjects,
     }),
     ...mapGetters({
       topicIdToTopic: 'subjects/topicIdToTopic',
@@ -427,33 +457,56 @@ export default {
             const {
               data: { sessionDetails },
             } = await NetworkService.getStudentSessionDetails(student.id)
-            let minTutored = 0
-            let lastSession = ''
 
-            sessionDetails.forEach((session) => {
-              const endedAt = new Date(session.endedAt)
-              const startedAt = new Date(session.createdAt)
-              const sessionLength = (endedAt - startedAt) / (1000 * 60)
-              minTutored += sessionLength
-              if (session.createdAt > lastSession)
-                lastSession = session.createdAt
-            })
-            let hoursTutored = 0
-            while (minTutored >= 60) {
-              hoursTutored++
-              minTutored -= 60
-            }
+            const from = new Date(
+              this.filters.sessionActivityFrom + 'T00:00:00Z'
+            )
+            const to = new Date(this.filters.sessionActivityTo + 'T23:59:59')
+            const filteredSubjectNames = Object.values(this.subjects)
+              .filter((subject) => subject.topicId === this.topicId)
+              .map((subject) => subject.name)
+
+            const filteredSessionDetails = sessionDetails
+              .map((session) => {
+                const endedAt = new Date(session.endedAt)
+                const startedAt = new Date(session.createdAt)
+                return { endedAt, startedAt, name: session.name }
+              })
+              .filter(
+                (session) =>
+                  filteredSubjectNames.includes(session.name) &&
+                  session.startedAt >= from &&
+                  session.startedAt <= to
+              )
+              .map((session) => {
+                return {
+                  endedAt: session.endedAt,
+                  duration: (session.endedAt - session.startedAt) / (1000 * 60),
+                }
+              })
+            let minTutored = filteredSessionDetails.reduce(
+              (acc, curr) => acc + curr.duration,
+              0
+            )
+            const hoursTutored = Math.floor(minTutored / 60)
+            minTutored %= 60
+            const lastSessionDate = filteredSessionDetails.sort(
+              (a, b) => b.endedAt - a.endedAt
+            )[0]?.endedAt
+            const lastSession = lastSessionDate
+              ? moment(lastSessionDate).format('MM/DD/YYYY')
+              : 'Has not completed a session.'
+
             const timeTutored =
               hoursTutored > 0
                 ? `${hoursTutored} hr and ${Math.round(minTutored)} m`
                 : `${Math.round(minTutored)} minutes`
+
             return {
               ...student,
-              numSessions: sessionDetails.length,
+              numSessions: filteredSessionDetails.length,
               timeTutored,
-              lastSession: lastSession
-                ? this.formatTimestamp(lastSession)
-                : 'Has not completed a session.',
+              lastSession,
             }
           })
         )
@@ -474,6 +527,10 @@ export default {
           err.response.data.err ??
           'Unable to load students. Please refresh the page and try again.'
       }
+    },
+
+    async submitFilter() {
+      this.students = await this.getStudents(this.$route.params.classId)
     },
 
     openTeacherCodeModal() {
@@ -818,6 +875,14 @@ export default {
           err.response.data.err ?? 'Unable to remove assignment from class.'
       }
     },
+
+    getSchoolYearStartDate() {
+      const augustFirst = moment().month('August').date(1)
+      if (moment().isBefore(augustFirst, 'day')) {
+        augustFirst.subtract(1, 'year')
+      }
+      return augustFirst.format('YYYY-MM-DD')
+    },
   },
 }
 </script>
@@ -831,6 +896,43 @@ export default {
 .class-details-view {
   padding: 0;
   height: 100%;
+}
+
+.class-details {
+  width: 100%;
+}
+
+.filter-controls {
+  @include flex-container(row, center);
+  margin-bottom: 10px;
+  align-items: center;
+  justify-content: start;
+
+  @include breakpoint-below('medium') {
+    @include flex-container(column, center);
+  }
+}
+
+.date-input {
+  margin: 0px;
+}
+
+.date-input-container {
+  @include flex-container(row, center, space-between);
+  gap: 10px;
+  @include breakpoint-below('medium') {
+    @include flex-container(column, center);
+    width: 100%;
+  }
+}
+
+.date-label {
+  @include flex-container(column, center, flex-start);
+  margin-right: 10px;
+
+  @include breakpoint-below('medium') {
+    width: 100%;
+  }
 }
 
 .breadcrumbs {
