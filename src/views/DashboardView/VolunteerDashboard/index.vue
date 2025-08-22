@@ -34,37 +34,76 @@
         </div>
         <div class="dashboard-card">
           <div class="dashboard-card__title">Your Impact Summary</div>
-
-          <div class="volunteer-impact">
-            <div class="volunteer-impact__stats">
-              <loader v-if="isLoadingImpactSummary" class="loader--center" />
-              <div
-                v-else
-                v-for="(stat, statIndex) in impactStats"
-                :key="statIndex"
-                class="volunteer-impact__stat"
-              >
-                <div class="volunteer-impact__stat-label">
-                  {{ stat.label }}
-                  <span
-                    class="stat-tooltip"
-                    v-if="stat.tooltip"
-                    v-tooltip="{
-                      text: stat.tooltip,
-                      color: 'black',
-                      position: 'top',
-                    }"
-                  >
-                    <InformationIcon />
-                  </span>
-                </div>
-                <div class="volunteer-impact__stat-value">{{ stat.value }}</div>
+          <loader v-if="isLoadingImpactSummary" class="loader--center" />
+          <div v-else class="impact-summary">
+            <div class="coaching-activity">
+              <div class="impact-summary__heading">
+                <chat-icon />
+                <h2 class="impact-summary__title">Coaching Activity</h2>
               </div>
-              <div
-                v-if="isCustomVolunteerPartner"
-                class="volunteer-impact__last-updated"
-              >
-                {{ lastUpdated }}
+
+              <div class="coaching-activity__hours-this-week-title">
+                <h3>Hours this week</h3>
+                <span
+                  class="stat-tooltip"
+                  v-tooltip="{
+                    text: 'Monday to Sunday UTC time',
+                    color: 'black',
+                    position: 'top',
+                  }"
+                >
+                  <InformationIcon />
+                </span>
+              </div>
+              <h4 class="coaching-activity__hours-this-week">
+                {{ impactStats.timeTutoredThisWeek }}
+              </h4>
+              <div class="coaching-activity__divider"></div>
+              <div class="impact-summary__stats">
+                <span class="stat-name">Hours all time</span
+                ><span class="stat">{{ impactStats.numHoursTutored }}</span>
+              </div>
+              <div class="impact-summary__stats">
+                <span class="stat-name">Requests filled</span
+                ><span class="stat">{{ impactStats.numRequestsFilled }}</span>
+              </div>
+              <div class="impact-summary__stats">
+                <span class="stat-name">Certifications</span
+                ><span class="stat">{{ impactStats.totalQuizzesPassed }}</span>
+              </div>
+            </div>
+            <div class="impact-summary-right">
+              <div class="community-impact">
+                <div class="impact-summary__heading">
+                  <notes-icon />
+                  <h2 class="impact-summary__title">Community Impact</h2>
+                </div>
+                <div class="impact-summary__stats">
+                  <span class="stat-name">Students helped</span
+                  ><span class="stat">{{
+                    impactStats.totalStudentsHelped
+                  }}</span>
+                </div>
+                <div class="impact-summary__stats">
+                  <span class="stat-name">Referral Hours</span
+                  ><span class="stat">{{ impactStats.numReferralHours }}</span>
+                </div>
+              </div>
+              <div class="availability">
+                <div class="impact-summary__heading">
+                  <clock-icon />
+                  <h2 class="impact-summary__title">Availability</h2>
+                </div>
+                <div class="impact-summary__stats">
+                  <span class="stat-name">Hours selected</span
+                  ><span class="stat">{{ impactStats.numHoursSelected }}</span>
+                </div>
+                <div class="impact-summary__stats">
+                  <span class="stat-name">Hours elapsed</span
+                  ><span class="stat">{{
+                    impactStats.numElapsedAvailabilityHours
+                  }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -181,6 +220,9 @@ import { hoursToHoursAndMinutes } from '@/utils/time-utils'
 import InformationIcon from '@/assets/information.svg'
 import { vTooltip } from 'maz-ui'
 import ShareMilestoneModal from '@/views/DashboardView/VolunteerDashboard/ShareMilestoneModal.vue'
+import ClockIcon from '@/assets/icons/clock_icon.svg'
+import ChatIcon from '@/assets/icons/chat-outline-rounded.svg'
+import NotesIcon from '@/assets/icons/notes-checkmark.svg'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -200,6 +242,9 @@ export default {
     Loader,
     InformationIcon,
     ShareMilestoneModal,
+    ClockIcon,
+    ChatIcon,
+    NotesIcon,
   },
   directives: {
     tooltip: vTooltip,
@@ -592,8 +637,7 @@ export default {
       // (3) Requests filled
       const numRequestsFilled = get(pastSessions, 'length', 0)
 
-      const formatFn = ({ hours, minutes }) =>
-        `${hours} ${hours === 1 ? 'hour' : 'hours'}, ${minutes}m`
+      const formatFn = ({ hours, minutes }) => `${hours} h ${minutes} m`
 
       // (4) Hours tutored
       const numHoursTutored = hoursToHoursAndMinutes(
@@ -608,48 +652,25 @@ export default {
       )
 
       // (6) Elapsed availability
-      const numElapsedAvailabilityHours = elapsedAvailability
+      const numElapsedAvailabilityHours = `${elapsedAvailability} h`
 
       const numReferralHours = hoursToHoursAndMinutes(
         (numReferredVolunteers * 12) / 60,
         formatFn
       )
 
-      return [
-        {
-          label: 'Hours of availability selected',
-          value: `${numHoursSelected} hours selected`,
-        },
-        {
-          label: 'Number of quizzes passed',
-          value: `${totalQuizzesPassed} quizzes passed`,
-        },
-        {
-          label: 'Number of requests filled',
-          value: `${numRequestsFilled} requests filled`,
-        },
-        {
-          label: 'Hours of tutoring completed (all time)',
-          value: `${numHoursTutored}`,
-        },
-        {
-          label: 'Hours of tutoring completed (this week)',
-          value: `${timeTutoredThisWeek}`,
-          tooltip: 'Monday to Sunday UTC time',
-        },
-        {
-          label: 'Hours of elapsed availability',
-          value: `${numElapsedAvailabilityHours} hours elapsed`,
-        },
-        {
-          label: 'Total students helped',
-          value: `${totalStudentsHelped} students helped`,
-        },
-        {
-          label: 'Total referral hours',
-          value: `${numReferralHours}`,
-        },
-      ]
+      numHoursSelected = `${numHoursSelected} h`
+
+      return {
+        numHoursSelected,
+        totalQuizzesPassed,
+        numRequestsFilled,
+        numHoursTutored,
+        timeTutoredThisWeek,
+        numElapsedAvailabilityHours,
+        totalStudentsHelped,
+        numReferralHours,
+      }
     },
     getCustomImpactStats({
       availability,
@@ -924,5 +945,105 @@ export default {
 
 .stat-tooltip:before {
   transition-duration: 0ms;
+}
+
+.impact-summary {
+  @include flex-container(row, center, stretch);
+  gap: 12px;
+  padding: 16px;
+
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    text-wrap: nowrap;
+    margin: 0;
+  }
+
+  &__stats {
+    @include flex-container(row, space-between, center);
+    margin: 6px 0;
+
+    .stat-name {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 150%;
+      margin-right: 16px;
+    }
+
+    .stat {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 150%;
+    }
+  }
+
+  &__heading {
+    @include flex-container(row, flex-start, center);
+    gap: 5px;
+    margin: 8px 0;
+  }
+}
+
+.coaching-activity {
+  @include flex-container(column, center, space-evenly);
+  flex: 1;
+  border: lightgray 1px solid;
+  border-radius: 12px;
+  padding: 6px 12px;
+  border-top: 10px solid rgba(22, 210, 170, 0.2);
+  width: 100%;
+  height: auto;
+
+  &__hours-this-week-title {
+    @include flex-container(row, flex-start, flex-end);
+    gap: 6px;
+
+    h3 {
+      font-size: 15px;
+      margin: 0;
+    }
+
+    svg {
+      width: 12px;
+      height: 12px;
+      margin-top: 2px;
+    }
+  }
+
+  &__hours-this-week {
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  &__divider {
+    width: 90%;
+    background-color: #d8dee5;
+    height: 1px;
+    margin: 20px 0;
+    justify-self: center;
+  }
+}
+
+.community-impact,
+.availability {
+  @include flex-container(column, center, space-between);
+  border: lightgray 1px solid;
+  border-radius: 12px;
+  padding: 8px;
+  width: 100%;
+}
+
+.community-impact {
+  border-top: 10px solid #e3f2fd;
+}
+
+.availability {
+  border-top: 10px solid #feefc2;
+}
+
+.impact-summary-right {
+  gap: 8px;
+  flex: 1;
+  @include flex-container(column, stretch, flex-start);
 }
 </style>
