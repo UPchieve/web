@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-import ReferralLink from '@/components/ReferralLink.vue'
-import AmbassadorIcon from '@/assets/user_avatars/ambassador-icon.svg'
 import CrossIcon from '@/assets/cross.svg'
 import { useStore } from 'vuex'
-import LargeButton from '@/components/LargeButton.vue'
 import { onMounted } from 'vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
@@ -12,6 +9,10 @@ import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import FormInput from '@/components/FormInput.vue'
 import config from '@/config'
 import NetworkService from '@/services/NetworkService'
+import EmailIcon from '@/assets/social_sharing_icons/email_icon.svg'
+import FacebookIcon from '@/assets/social_sharing_icons/facebook_icon.svg'
+import LinkedinIcon from '@/assets/social_sharing_icons/linkedin_icon.svg'
+import TextIcon from '@/assets/social_sharing_icons/text_icon.svg'
 
 const store = useStore()
 const closeModal = () => {
@@ -27,10 +28,12 @@ const isTextReferralLinksEnabled = computed(
   () => store.getters['featureFlags/isTextReferralLinksEnabled']
 )
 const user = computed(() => store.state.user.user)
-const copyText = ref('Copy Link')
+const firstName = computed(() => store.getters['user/firstName'])
+const copyText = ref('Copy')
 const sendText = ref('Send Text')
 const phoneNumber = ref('')
 const errorMessage = ref('')
+const isMobile = computed(() => store.getters['app/mobileMode'])
 
 function referralLink() {
   const { referralCode } = user.value
@@ -59,10 +62,10 @@ async function copyLink() {
     copyText.value = 'Copied'
     emit('copied')
     setTimeout(() => {
-      copyText.value = 'Copy Link'
+      copyText.value = 'Copy'
     }, 3000)
   } catch (error) {
-    copyText.value = 'Copy Link'
+    copyText.value = 'Copy'
   }
 }
 
@@ -80,6 +83,57 @@ async function sendTextMessage(phoneNumber: string) {
     errorMessage.value = `Sorry! We couldn't send your text. Please try again later.`
   }
 }
+
+function isMac() {
+  return /Mac|Macintosh|MacIntel|MacPPC|Mac68K/i.test(navigator.userAgent)
+}
+
+const textShareMessage = `I've been volunteering with UPchieve, a nonprofit that offers free online tutoring to students who need it most. It's easy to get started, flexible, low-commitment, and really meaningful. You should check it out: `
+
+const emailShareMessage = `Hi,
+
+I've been volunteering with UPchieve, a nonprofit that provides free online tutoring to students who need it most. It's super easy to get started, flexible, and low-commitment, and honestly really meaningful too.
+
+I think you'd be great at it, and I'd love for you to check it out:
+${referralLink()}
+
+${firstName.value}`
+
+const linkedinShareMessage = `I volunteer with UPchieve, a nonprofit that provides free, online tutoring to students from low-income communities.
+
+What I love about it is that it's completely virtual, flexible, and low-commitment—yet every session makes a real difference for a student who might not otherwise get academic support.
+
+If you're looking for a meaningful way to give back on your own schedule, I highly recommend checking it out:`
+
+function shareVia(method: 'text' | 'email' | 'linkedin' | 'facebook') {
+  switch (method) {
+    case 'text':
+      window.location.href = `sms:?body=${encodeURIComponent(`${textShareMessage} ${referralLink()}`)}`
+      break
+
+    case 'email':
+      window.location.href = `mailto:?subject=${encodeURIComponent(`I've been volunteering with UPchieve`)}&body=${encodeURIComponent(emailShareMessage)}`
+      break
+
+    case 'linkedin':
+      window.open(
+        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink())}&text=${encodeURIComponent(linkedinShareMessage)}`,
+        '_blank'
+      )
+      break
+
+    case 'facebook':
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink())}`,
+        '_blank'
+      )
+      break
+
+    default:
+      copyLink()
+  }
+}
+
 onMounted(() => {
   AnalyticsService.captureEvent(EVENTS.AMBASSADOR_REFERRAL_SAW_MODAL)
 })
@@ -87,20 +141,37 @@ onMounted(() => {
 
 <template>
   <div class="referral-modal">
-    <button class="x-button" @click="closeModal">
-      <CrossIcon class="x-icon" />
-    </button>
-    <ambassador-icon class="icon" />
-    <h1 class="referral-modal-title">Become an UPchieve Ambassador!</h1>
-    <div class="referral-links-enabled-div" v-if="isTextReferralLinksEnabled">
+    <div class="referral-modal__left">
+      <div class="close-button-container">
+        <button class="x-button" @click="closeModal">
+          <CrossIcon class="x-icon" />
+        </button>
+      </div>
+      <h1 class="referral-modal__title">Invite Coaches, Help More Students</h1>
       <p>
-        Did you know you can earn volunteer hours by recruiting new tutors for
-        UPchieve? Just send a text below or share your
-        <strong>unique signup link</strong> with your friends, family, and
-        colleagues.
+        Every Coach you invite helps up to
+        <strong>20 more students</strong> get the support they need.
+      </p>
+      <p>
+        Plus, earn 1 volunteer hour for every 5 signups and become an official
+        UPchieve Ambassador, great for resumés and college apps! 🎉
       </p>
 
-      <div class="text-or-link-container">
+      <div class="referral-link-input-div">
+        <p class="send-text"><strong>Copy Link</strong></p>
+        <div class="referral-link-input-container">
+          <FormInput
+            type="text"
+            class="referral-link-input"
+            :readOnly="true"
+            :modelValue="referralLink()"
+          />
+          <button class="send-btns" @click="onCopiedReferralLink">
+            {{ copyText }}
+          </button>
+        </div>
+      </div>
+      <div v-if="isTextReferralLinksEnabled" class="referral-link-input-div">
         <p class="send-text"><strong>Send Text</strong></p>
         <div class="phone-number-input-container">
           <maz-phone-number-input
@@ -112,74 +183,43 @@ onMounted(() => {
             {{ sendText }}
           </button>
         </div>
-        <div class="referral-link-input-div">
-          <p class="send-text"><strong>Copy Link</strong></p>
-          <div class="referral-link-input-container">
-            <FormInput
-              type="text"
-              class="referral-link-input"
-              :readOnly="true"
-              :modelValue="referralLink()"
-            />
-            <button class="send-btns" @click="onCopiedReferralLink">
-              {{ copyText }}
-            </button>
-          </div>
+      </div>
+      <div class="referral-link-input-div">
+        <p class="send-text"><strong>Share via</strong></p>
+        <div class="share-via-input-container">
+          <button v-if="isMac() || isMobile" @click="shareVia('text')">
+            <text-icon />
+          </button>
+          <button @click="shareVia('email')"><email-icon /></button>
+          <button @click="shareVia('linkedin')"><linkedin-icon /></button>
+          <button @click="shareVia('facebook')"><facebook-icon /></button>
         </div>
       </div>
-      <p class="errors">{{ errorMessage }}</p>
     </div>
-    <div v-else>
-      Did you know you can earn volunteer hours by recruiting new tutors for
-      UPchieve? Just share your <strong>unique signup link</strong> with your
-      friends, family, and colleagues:
-
-      <ReferralLink @copied="onCopiedReferralLink" />
-
-      Get 5 signups to earn 1 volunteer hour and become an official UPchieve
-      Ambassador-- <strong>great for resumés and college apps!</strong> 🎉
-    </div>
-    <LargeButton
-      variant="primary"
-      :showArrow="false"
-      class="close-modal-button"
-      @click="closeModal"
-      >Got it!</LargeButton
-    >
   </div>
 </template>
 
 <style lang="scss" scoped>
 .referral-modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  @include flex-container(row, flex-start, flex-start);
   gap: 8px;
-}
+  text-align: left;
 
-.x-button {
-  margin-left: auto;
-
-  .x-icon {
-    height: 20px;
-    width: 20px;
+  &__title {
+    font-size: 24px;
+    text-align: left;
   }
 }
 
-.referral-modal-title {
-  @include font-category('heading');
-  padding-top: 16px;
+.close-button-container {
+  text-align: right;
 }
-
-.icon {
-  height: fit-content;
-  width: 40%;
-}
-
-.close-modal-button {
+.x-button {
   margin-left: auto;
-  width: 100%;
-  margin-top: 8px;
+  .x-icon {
+    height: 16px;
+    width: 16px;
+  }
 }
 
 .send-text {
@@ -190,16 +230,6 @@ onMounted(() => {
   @include flex-container(column, flex-start, flex-start);
   margin-top: 16px;
   width: 100%;
-}
-
-.referral-links-enabled-div {
-  @include flex-container(column, center, center);
-}
-
-.text-or-link-container {
-  @include flex-container(column, flex-start, flex-start);
-  width: 100%;
-  padding: 24px;
 }
 
 .referral-link-input-container {
@@ -213,14 +243,10 @@ onMounted(() => {
   margin-top: 0;
 }
 
-.phone-number-form {
-  @include flex-container(column, flex-start, flex-start);
-  width: 100%;
-}
-
 .phone-number-input-container {
   @include flex-container(row, center, center);
   gap: 16px;
+  width: 100%;
 }
 
 .phone-number-input {
@@ -230,8 +256,14 @@ onMounted(() => {
 .send-btns {
   background-color: $c-information-blue;
   color: #fff;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 32px;
+  padding: 12px 20px;
   white-space: nowrap;
+}
+
+.share-via-input-container {
+  @include flex-container(row, center, flex-start);
+  gap: 24px;
+  margin: 8px 0;
 }
 </style>

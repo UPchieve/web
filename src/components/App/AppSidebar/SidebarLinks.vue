@@ -275,6 +275,7 @@ export default {
         component: 'AmbassadorReferralModal',
         data: {
           showAccept: false,
+          showTemplateButtons: false,
         },
       })
     },
