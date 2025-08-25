@@ -261,6 +261,7 @@ export function getSsoButton<T extends SignUpFormData>(
     element: 'SsoButton',
     submitAction,
     props: {
+      type: 'button',
       buttonText: content,
       ssoMethod,
     },
