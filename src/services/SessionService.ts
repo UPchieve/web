@@ -37,7 +37,8 @@ export default {
     subTopic: string,
     sessionId?: string,
     assignmentId?: string,
-    joinedFrom?: string
+    joinedFrom?: string,
+    isSettingGoalsSession?: boolean
   ) {
     const {
       data: { isValid },
@@ -71,6 +72,7 @@ export default {
       docEditorVersion: 2,
       assignmentId,
       presessionSurvey,
+      isSettingGoalsSession,
     })
     await Promise.all([
       store.dispatch('user/updateSession', {

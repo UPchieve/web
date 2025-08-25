@@ -64,6 +64,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: true,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
       [POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS]: false,
+      [POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -88,6 +89,7 @@ export default {
         'Interested in becoming a volunteer tutor on UPchieve?',
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
+      [POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION]: {},
     },
     eligibleForChooseTutorType: false,
   },
@@ -274,6 +276,10 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION],
     isGuidedJourneysEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS],
+    isGoalSettingSessionEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION],
+    goalSettingSessionPayload: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION],
   },
   actions: {
     isSessionAudioCallEnabled: async (

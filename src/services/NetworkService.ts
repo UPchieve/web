@@ -349,6 +349,7 @@ export default {
         openResponse: string
       }>
     }
+    isSettingGoalsSession?: boolean
   }) {
     return httpPost<{ session: Session }>(`${API_ROOT}/session/new`, data).then(
       this._successHandler,
