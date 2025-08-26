@@ -128,7 +128,9 @@ export default {
       const day = now.day()
       const isWeekday = day >= 1 && day <= 5
 
-      return isWeekday && hour >= startHour && hour < endHour
+      return (
+        !this.isCardDisabled && isWeekday && hour >= startHour && hour < endHour
+      )
     },
     goalSettingSessionTimeText() {
       const { startHour = 9, endHour = 17 } =
