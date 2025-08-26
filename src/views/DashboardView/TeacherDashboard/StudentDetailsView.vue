@@ -133,6 +133,7 @@ import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import BlueAlert from '@/assets/blue-alert.svg'
 import GenerationFeedback from '@/components/GenerationFeedback.vue'
 import { EVENTS } from '@/consts'
+import { getCurrentSchoolYearStartDate } from '@/utils/time-utils'
 
 export default {
   name: 'student-details',
@@ -157,14 +158,8 @@ export default {
         topic: {
           name: '',
         },
-        sessionActivityFrom: moment()
-          .month('August')
-          .date(1)
-          .subtract(
-            moment().isBefore(moment().month('August').date(1), 'day') ? 1 : 0,
-            'year'
-          )
-          .format('YYYY-MM-DD'),
+        sessionActivityFrom:
+          getCurrentSchoolYearStartDate().format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
       },
       subjectPlaceholder: '',

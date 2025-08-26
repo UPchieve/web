@@ -305,6 +305,10 @@ import RemoveIcon from '@/assets/Remove.svg'
 import { toastController } from '@ionic/vue'
 import _ from 'lodash'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
+import {
+  getCurrentSchoolYearStartDate,
+  minutesToHoursAndMinutes,
+} from '@/utils/time-utils'
 
 export default {
   name: 'ClassDetails',
@@ -340,7 +344,8 @@ export default {
       toggledAssignmentMenuId: '',
       classData: {},
       filters: {
-        sessionActivityFrom: '',
+        sessionActivityFrom:
+          getCurrentSchoolYearStartDate().format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
       },
     }
@@ -369,7 +374,6 @@ export default {
   },
 
   async created() {
-    this.filters.sessionActivityFrom = this.getSchoolYearStartDate()
     this.classData = _.isEmpty(this.initialClassData)
       ? await this.getClassInfo(this.$route.params.classId)
       : this.initialClassData
@@ -488,19 +492,22 @@ export default {
               (acc, curr) => acc + curr.duration,
               0
             )
-            const hoursTutored = Math.floor(minTutored / 60)
-            minTutored %= 60
+
+            const timeTutored = minutesToHoursAndMinutes(
+              minTutored,
+              ({ hours, minutes }) => {
+                return hours > 0
+                  ? `${hours} hr and ${Math.round(minutes)} m`
+                  : `${Math.round(minutes)} minutes`
+              }
+            )
+
             const lastSessionDate = filteredSessionDetails.sort(
               (a, b) => b.endedAt - a.endedAt
             )[0]?.endedAt
             const lastSession = lastSessionDate
               ? moment(lastSessionDate).format('MM/DD/YYYY')
               : 'Has not completed a session.'
-
-            const timeTutored =
-              hoursTutored > 0
-                ? `${hoursTutored} hr and ${Math.round(minTutored)} m`
-                : `${Math.round(minTutored)} minutes`
 
             return {
               ...student,
@@ -874,14 +881,6 @@ export default {
         this.error =
           err.response.data.err ?? 'Unable to remove assignment from class.'
       }
-    },
-
-    getSchoolYearStartDate() {
-      const augustFirst = moment().month('August').date(1)
-      if (moment().isBefore(augustFirst, 'day')) {
-        augustFirst.subtract(1, 'year')
-      }
-      return augustFirst.format('YYYY-MM-DD')
     },
   },
 }
