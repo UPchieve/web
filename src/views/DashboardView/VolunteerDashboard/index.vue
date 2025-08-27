@@ -952,6 +952,10 @@ export default {
   gap: 12px;
   padding: 16px;
 
+  @include breakpoint-below('small') {
+    @include flex-container(column, center, center);
+  }
+
   &__title {
     font-size: 20px;
     font-weight: 600;
@@ -1045,5 +1049,11 @@ export default {
   gap: 8px;
   flex: 1;
   @include flex-container(column, stretch, flex-start);
+
+  @include breakpoint-below('small') {
+    flex: 0;
+    width: 100%;
+    gap: 12px;
+  }
 }
 </style>
