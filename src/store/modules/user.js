@@ -210,8 +210,13 @@ export default {
       commit('clearChatScrolledToMessageIndex')
     },
 
-    updateSession: ({ commit }, sessionData) => {
+    updateSession: ({ commit, dispatch, getters }, sessionData) => {
       commit('setSession', sessionData)
+      if (sessionData.endedAt && getters.isVolunteer) {
+        dispatch('americaCountsVolunteer/startCooldown', null, {
+          root: true,
+        })
+      }
     },
 
     updateAvailability: ({ commit }, availability, date = Date.now()) => {

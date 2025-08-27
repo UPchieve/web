@@ -103,6 +103,7 @@ export default {
       if (isSessionStudent) {
         store.dispatch('session/startCooldownInterval')
       }
+      store.dispatch('americaCountsVolunteer/startCooldown')
     } catch (err) {
       if (err?.response?.data?.err !== 'Session has already ended') {
         throw err

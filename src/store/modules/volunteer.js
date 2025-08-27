@@ -1,6 +1,8 @@
 import sendWebNotification from '@/utils/send-web-notification'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
+import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
+import { AMERICA_COUNTS_SUBTOPICS } from '@/services/AmericaCountsVolunteerService'
 
 export default {
   namespaced: true,
@@ -145,6 +147,21 @@ export default {
           continue
         }
 
+        if (this.getters['americaCountsVolunteer/isAmericaCountsVolunteer']) {
+          if (
+            user.subjects.includes(subTopic) &&
+            AMERICA_COUNTS_SUBTOPICS.includes(subTopic)
+          ) {
+            results.push(session)
+          }
+          /*
+           * when we're in this if block, we always want to continue
+           * as America Counts volunteers should only ever get middle
+           * school math sessions
+           */
+          continue
+        }
+
         if (
           user.subjects.includes(subTopic) &&
           !user.mutedSubjectAlerts.includes(subTopic)
@@ -179,6 +196,12 @@ export default {
       const removedSessionIds = prevIds.filter((id) => !currentIds.includes(id))
       for (const removedSessionId of removedSessionIds) {
         this.dispatch('notifications/remove', removedSessionId)
+      }
+      if (
+        this.getters['americaCountsVolunteer/isAmericaCountsVolunteer'] &&
+        !this.state.user.session?.id
+      ) {
+        AmericaCountsVolunteerService.maybeAutoJoinOldestSession(results)
       }
     },
   },

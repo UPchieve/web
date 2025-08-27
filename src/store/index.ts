@@ -11,6 +11,7 @@ import sessionModule from './modules/session'
 import botConversationsModule from './modules/bot-conversations'
 import liveMediaModule from './modules/liveMedia'
 import celebrationsModule from './modules/celebrations'
+import americaCountsVolunteerModule from './modules/america-counts-volunteer'
 
 // TODO: Update with the type of all the modules once convert to TS.
 export type RootState = any
@@ -30,6 +31,7 @@ export const storeOptions = {
     liveMedia: liveMediaModule,
     botConversations: botConversationsModule,
     celebrations: celebrationsModule,
+    americaCountsVolunteer: americaCountsVolunteerModule,
   },
 }
 
