@@ -769,10 +769,10 @@ function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
     element: 'FormSelect',
     props: {
       blurEvent: EVENTS.STUDENT_SELECTED_GRADE,
-      getSelectOptions: () => GRADES,
+      options: GRADES,
       name: InputName.GRADE_LEVEL,
-      label: getLabelPrefix(isParentGuardian) + 'Grade in 2024-2025',
-      placeholder: getLabelPrefix(isParentGuardian) + 'Grade in 2024-2025',
+      label: getLabelPrefix(isParentGuardian) + 'Grade in 2025-2026',
+      placeholder: getLabelPrefix(isParentGuardian) + 'Grade in 2025-2026',
       reduce: (option: string) => option.split(' ')[0],
     },
   }

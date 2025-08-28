@@ -3,20 +3,26 @@ import store from './store'
 const AdminView = () => import('./views/Admin/index.vue')
 const AdminCleverRoster = () => import('./views/Admin/AdminCleverRoster.vue')
 const AdminEditSchool = () => import('./views/Admin/AdminEditSchool.vue')
-const AdminIneligibleStudents = () => import('./views/Admin/AdminIneligibleStudents.vue')
-const AdminPendingVolunteers = () => import('./views/Admin/AdminPendingVolunteers.vue')
+const AdminIneligibleStudents = () =>
+  import('./views/Admin/AdminIneligibleStudents.vue')
+const AdminPendingVolunteers = () =>
+  import('./views/Admin/AdminPendingVolunteers.vue')
 const AdminSchoolDetail = () => import('./views/Admin/AdminSchoolDetail.vue')
 const AdminSchools = () => import('./views/Admin/AdminSchools.vue')
 const AdminSessionDetail = () => import('./views/Admin/AdminSessionDetail.vue')
-const AdminSessionNotifications = () => import('./views/Admin/AdminSessionNotifications.vue')
+const AdminSessionNotifications = () =>
+  import('./views/Admin/AdminSessionNotifications.vue')
 const AdminSessionReview = () => import('./views/Admin/AdminSessionReview.vue')
 const AdminSessions = () => import('./views/Admin/AdminSessions.vue')
-const AdminStudentReports = () => import('./views/Admin/AdminStudentReports.vue')
+const AdminStudentReports = () =>
+  import('./views/Admin/AdminStudentReports.vue')
 const AdminUserDetail = () => import('./views/Admin/AdminUserDetail.vue')
 const AdminUsers = () => import('./views/Admin/AdminUsers.vue')
-const AdminVolunteerReports = () => import('./views/Admin/AdminVolunteerReports.vue')
+const AdminVolunteerReports = () =>
+  import('./views/Admin/AdminVolunteerReports.vue')
 const AdminZipCodes = () => import('./views/Admin/AdminZipCodes.vue')
-const AdminRosterStudents = () => import('./views/Admin/AdminRosterStudents.vue')
+const AdminRosterStudents = () =>
+  import('./views/Admin/AdminRosterStudents.vue')
 const VolunteerCoverage = () => import('./views/Admin/VolunteerCoverage.vue')
 import BackgroundInfoView from './views/BackgroundInfoView.vue'
 import CalendarView from './views/CalendarView.vue'
@@ -39,7 +45,8 @@ import SetPasswordView from './views/SetPasswordView.vue'
 const SignupView = () => import('./views/SignupView/index.vue')
 import StudentAssignmentView from './views/StudentAssignmentView.vue'
 import StudentClassesView from './views/StudentClassesView.vue'
-const StudentPartnerSignupView = () => import('./views/SignupView/StudentPartnerSignupView.vue')
+const StudentPartnerSignupView = () =>
+  import('./views/SignupView/StudentPartnerSignupView.vue')
 import TrainingView from './views/TrainingView.vue'
 const VerificationView = () => import('./views/VerificationView/index.vue')
 import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView.vue'
@@ -47,8 +54,10 @@ import SessionHistoryView from './views/SessionHistoryView.vue'
 import SessionRecapView from './views/SessionRecapView.vue'
 const AdminTestAudience = () => import('./views/Admin/AdminTestAudience.vue')
 import WelcomePage from './views/WelcomePage.vue'
-const ProgressReportsOverviewView = () => import('./views/ProgressReportsOverviewView.vue')
-const ProgressReportsOverviewSubjectView = () => import('./views/ProgressReportsOverviewSubjectView.vue')
+const ProgressReportsOverviewView = () =>
+  import('./views/ProgressReportsOverviewView.vue')
+const ProgressReportsOverviewSubjectView = () =>
+  import('./views/ProgressReportsOverviewSubjectView.vue')
 import TeacherDashboardView from './views/DashboardView/TeacherDashboard/index.vue'
 import CleverSigninInstructions from './views/SignupView/CleverSigninInstructions.vue'
 import Gleap from 'gleap'

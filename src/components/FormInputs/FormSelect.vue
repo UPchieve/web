@@ -10,16 +10,16 @@
       label-placement="stacked"
       :placeholder="props.placeholder"
       interface="popover"
-      :label="props.options.length ? undefined : 'No options available'"
+      :label="selectOptions.length ? undefined : 'No options available'"
       :multiple="props.multiple"
       :value="props.modelValue"
       @ionChange="updateValue"
-      :disabled="props.disabled || !props.options.length"
+      :disabled="props.disabled || !selectOptions.length"
     >
       <template>
         <div v-if="props.groupField">
           <template
-            v-for="group in props.options"
+            v-for="group in selectOptions"
             :key="group[props.groupField]"
           >
             {{ group[props.groupField] }}
@@ -42,7 +42,7 @@
         </div>
         <div v-else>
           <ion-select-option
-            v-for="option in props.options"
+            v-for="option in selectOptions"
             :key="
               props.optionTextField ? option[props.optionTextField] : option
             "
@@ -59,7 +59,7 @@
 
 <script lang="ts" setup>
 import { IonSelect, IonSelectOption } from '@ionic/vue'
-import { type PropType } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const props = defineProps({
   label: {
@@ -70,8 +70,11 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  getOptionsAsync: {
+    type: Function,
+  },
   options: {
-    type: Array as PropType<any[]>,
+    type: Array,
     default: () => [],
   },
   optionTextField: {
@@ -116,11 +119,20 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+const selectOptions = ref<any>([])
 
 function updateValue(event: CustomEvent) {
   const selectedValue = event.detail.value
   emit('update:modelValue', selectedValue)
 }
+
+onMounted(async () => {
+  if (props.getOptionsAsync) {
+    selectOptions.value = await props.getOptionsAsync()
+  } else {
+    selectOptions.value = props.options
+  }
+})
 </script>
 
 <style lang="scss">
@@ -149,6 +161,7 @@ ion-select {
   position: relative;
   padding: 0 13px;
   font-size: 14px;
+  z-index: 0;
   --highlight-color-focused: $border-grey;
 
   &.select-input {

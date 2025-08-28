@@ -316,7 +316,7 @@ export function getSignUpSourceElement(
     element: 'FormSelect',
     props: {
       blurEvent,
-      getSelectOptions: async function () {
+      getOptionsAsync: async function () {
         try {
           const {
             data: { signupSources },

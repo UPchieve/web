@@ -305,8 +305,12 @@ import SessionChat from './SessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
 import { defineAsyncComponent } from 'vue'
 const Whiteboard = defineAsyncComponent(() => import('./Whiteboard.vue'))
-const DocumentEditor = defineAsyncComponent(() => import('./DocumentEditor.vue'))
-const DocumentEditorV2 = defineAsyncComponent(() => import('./DocumentEditorV2.vue'))
+const DocumentEditor = defineAsyncComponent(
+  () => import('./DocumentEditor.vue')
+)
+const DocumentEditorV2 = defineAsyncComponent(
+  () => import('./DocumentEditorV2.vue')
+)
 import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
