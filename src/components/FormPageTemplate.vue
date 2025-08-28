@@ -14,9 +14,9 @@
       }"
     >
       <div v-if="layout.includes('panel')" class="img-content">
-        <component
-          v-if="panelImg"
-          :is="panelImg"
+        <img
+          v-if="panelImageUrl"
+          :src="panelImageUrl"
           class="img"
           :style="customPanelImgStyle"
         />
@@ -51,22 +51,14 @@
 </template>
 
 <script>
-import ChatOneOnOne from '@/assets/marketing_images/chat-1-on-1.svg'
-import ConnectYourStudents from '@/assets/marketing_images/connect-your-students.svg'
-import TrustedByStudents from '@/assets/marketing_images/trusted_by_students.svg'
-import UpdogSubjects from '@/assets/updog-subjects.svg'
-import WeCanHelpSubjects from '@/assets/marketing_images/we_can_help_in_any_core_subject.svg'
-import UpdogCrying from '@/assets/updog-crying.svg'
+import ChatOneOnOne from '@/assets/marketing_images/chat-1-on-1.svg?url'
+import ConnectYourStudents from '@/assets/marketing_images/connect-your-students.svg?url'
+import TrustedByStudents from '@/assets/marketing_images/trusted_by_students.svg?url'
+import UpdogSubjects from '@/assets/updog-subjects.svg?url'
+import WeCanHelpSubjects from '@/assets/marketing_images/we_can_help_in_any_core_subject.svg?url'
+import UpdogCrying from '@/assets/updog-crying.svg?url'
 
 export default {
-  components: {
-    ChatOneOnOne,
-    ConnectYourStudents,
-    TrustedByStudents,
-    UpdogSubjects,
-    WeCanHelpSubjects,
-    UpdogCrying,
-  },
   props: {
     layout: {
       type: String,
@@ -116,6 +108,18 @@ export default {
       }
 
       return {}
+    },
+
+    panelImageUrl() {
+      const imageMap = {
+        'chat-one-on-one': ChatOneOnOne,
+        'connect-your-students': ConnectYourStudents,
+        'trusted-by-students': TrustedByStudents,
+        'updog-subjects': UpdogSubjects,
+        'we-can-help-subjects': WeCanHelpSubjects,
+        'updog-crying': UpdogCrying,
+      }
+      return imageMap[this.panelImg] || null
     },
   },
 }

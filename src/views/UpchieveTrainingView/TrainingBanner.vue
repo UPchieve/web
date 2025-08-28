@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import CampingIcon from '@/assets/Training/camping.svg'
-import CheeringStudentIcon from '@/assets/Training/cheering_student.svg'
-import StudyingIcon from '@/assets/Training/desk_studying.svg'
-import GroupOfPeopleIcon from '@/assets/Training/group_of_people.svg'
-import SecurityIcon from '@/assets/Training/security.svg'
+import CampingIcon from '@/assets/Training/camping.svg?url'
+import CheeringStudentIcon from '@/assets/Training/cheering_student.svg?url'
+import StudyingIcon from '@/assets/Training/desk_studying.svg?url'
+import GroupOfPeopleIcon from '@/assets/Training/group_of_people.svg?url'
+import SecurityIcon from '@/assets/Training/security.svg?url'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -68,7 +68,7 @@ const moduleBannerInfo = computed(() => {
       <h1 class="banner-title">{{ props.title }}</h1>
     </div>
     <div class="banner-illustration">
-      <component :is="moduleBannerInfo.icon" />
+      <img :src="moduleBannerInfo.icon" />
     </div>
   </div>
 </template>

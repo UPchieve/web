@@ -54,7 +54,7 @@ const hasPreviousPage = () => {
     <div class="OnboardingModal">
       <div class="OnboardingModal-container">
         <div v-if="pages[currentPage].image" class="OnboardingModal-image">
-          <component :is="pages[currentPage].image" />
+          <img :src="pages[currentPage].image" />
         </div>
         <div class="OnboardingModal-text">
           <h1 class="OnboardingModal-title">

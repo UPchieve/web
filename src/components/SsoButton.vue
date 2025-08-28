@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import CleverLogo from '@/assets/clever_logo.svg'
-import GoogleLogo from '@/assets/google_logo.svg'
+import CleverLogo from '@/assets/clever_logo.svg?skipsvgo'
+import GoogleLogo from '@/assets/google_logo.svg?skipsvgo'
 
 export default {
   components: {

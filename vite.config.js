@@ -31,14 +31,14 @@ export default {
             params: {
               overrides: {
                 removeViewBox: false,
-                cleanupIds: false,
+                cleanupIds: true,
               },
             },
           },
         ],
       },
     }),
-    vueDevTools(),
+    vueDevTools()
   ],
   preview: {
     port: 8080,
