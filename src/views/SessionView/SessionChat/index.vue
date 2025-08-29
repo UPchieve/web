@@ -62,7 +62,7 @@
           @new-bot-message="handleNewMessageScrollPosition"
         />
         <div
-          v-for="(message, index) in withPendingVoiceMessages"
+          v-for="(message, index) in withPendingMessages"
           :key="`message-${index}`"
           :class="[messageAlignment(message), { 'mt-2': index === 0 }]"
           class="message"
@@ -128,18 +128,6 @@
               contents: partnerInProgressCaptionMessage.text,
             }"
           />
-        </div>
-
-        <div
-          v-for="(message, index) in pendingTextMessages"
-          :key="`pending-text-${index}`"
-          class="message right"
-        >
-          <div class="contents">
-            <div class="bubble">
-              {{ message.contents }}
-            </div>
-          </div>
         </div>
 
         <chat-bot
@@ -341,11 +329,13 @@ export default {
     showPartnerInProgressCaptionMessage() {
       return this.partnerInProgressCaptionMessage?.text?.length > 0
     },
-    withPendingVoiceMessages() {
+    withPendingMessages() {
       const currentMessages = this.currentSession?.messages ?? []
       const pendingVoiceMessages = this.currentSession?.pendingMessages ?? []
 
-      return currentMessages.concat(pendingVoiceMessages)
+      return currentMessages
+        .concat(pendingVoiceMessages)
+        .concat(this.pendingTextMessages)
     },
     sessionPartner() {
       return this.isVolunteer
@@ -501,6 +491,7 @@ export default {
         const newMessage = {
           contents: message,
           user: this.user.id,
+          createdAt: new Date().toISOString(),
         }
         if (this.isPendingMessagesEnabled) {
           this.pendingTextMessages.push(newMessage)
@@ -548,6 +539,7 @@ export default {
         sessionId: this.currentSession.id,
         user: this.user,
         message: message.contents,
+        createdAt: message.createdAt,
         source:
           this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
       })
@@ -694,20 +686,20 @@ export default {
     },
     shouldShowPartnerAvatar(message, index) {
       // Show the partner avatar if it's the last message.
-      if (index === this.withPendingVoiceMessages.length - 1) return true
+      if (index === this.withPendingMessages.length - 1) return true
 
       // Show the partner avatar if the next message isn't from the partner.
-      const nextMessage = this.withPendingVoiceMessages[index + 1]
+      const nextMessage = this.withPendingMessages[index + 1]
       if (nextMessage.user !== message.user) return true
 
       return false
     },
     shouldShowTimestamp(message, index) {
       // Show the timestamp on the last message.
-      if (index === this.withPendingVoiceMessages.length - 1) return true
+      if (index === this.withPendingMessages.length - 1) return true
 
       // Show the timestamp if the next message isn't from the same person.
-      const nextMessage = this.withPendingVoiceMessages[index + 1]
+      const nextMessage = this.withPendingMessages[index + 1]
       if (nextMessage.user !== message.user) return true
 
       // Show the timestamp if the times between this message
