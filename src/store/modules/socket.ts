@@ -191,7 +191,7 @@ export default {
 
       socket.on('messageSend', (data: MessageData) => {
         commit('setMessageData', data)
-        commit('user/addMessage', data, {
+        dispatch('user/addMessage', data, {
           root: true,
         })
       })
