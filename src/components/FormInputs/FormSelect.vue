@@ -59,7 +59,7 @@
 
 <script lang="ts" setup>
 import { IonSelect, IonSelectOption } from '@ionic/vue'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const props = defineProps({
   label: {
@@ -119,7 +119,11 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
-const selectOptions = ref<any>([])
+const asyncOptions = ref<any[]>([])
+
+const selectOptions = computed(() => {
+  return asyncOptions.value?.length ? asyncOptions.value : props.options
+})
 
 function updateValue(event: CustomEvent) {
   const selectedValue = event.detail.value
@@ -128,9 +132,7 @@ function updateValue(event: CustomEvent) {
 
 onMounted(async () => {
   if (props.getOptionsAsync) {
-    selectOptions.value = await props.getOptionsAsync()
-  } else {
-    selectOptions.value = props.options
+    asyncOptions.value = await props.getOptionsAsync()
   }
 })
 </script>
