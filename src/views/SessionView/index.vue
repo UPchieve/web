@@ -509,7 +509,7 @@ export default {
     Gleap.removeCustomData('sessionId')
     Gleap.showFeedbackButton(true)
     window.removeEventListener('resize', this.handleResize)
-    await store.commit('session/setIsGoalSettingSession', false)
+    await this.$store.commit('session/setIsGoalSettingSession', false)
   },
 
   data() {
