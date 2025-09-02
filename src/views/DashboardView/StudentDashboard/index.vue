@@ -347,7 +347,8 @@ export default {
       const cacheHit = localStorage.getItem(
         getImpactStudyCacheKey(this.user.id)
       )
-      if (cacheHit) return JSON.parse(cacheHit)
+      if (cacheHit && this.isImpactStudySurveyEnabled)
+        return JSON.parse(cacheHit)
       return undefined
     },
     shouldSeeJourneyModal() {
