@@ -130,7 +130,12 @@
           <div class="dashboard-card__subtitle">
             {{ approvalCardSubheader }}
           </div>
-          <template v-if="!user.volunteerPartnerOrg">
+          <template
+            v-if="
+              !user.volunteerPartnerOrg ||
+              partnerKeysThatRequirePhotoId.includes(user.volunteerPartnerOrg)
+            "
+          >
             <account-action
               v-for="accountAction in openVolunteerApprovalAccountActions"
               :key="accountAction.title"
@@ -408,6 +413,11 @@ export default {
 
       return 'Student safety is our top priority! Please complete our screening process before you can start working with students.'
     },
+
+    partnerKeysThatRequirePhotoId() {
+      return config.partnerKeysThatRequirePhotoId
+    },
+
     openVolunteerApprovalAccountActions() {
       const accountActions = [
         {

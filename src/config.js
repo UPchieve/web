@@ -16,4 +16,8 @@ config.customVolunteerPartnerOrgs = customVolunteerPartnerOrgs
 config.googleRecaptchaKey = import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_KEY
 config.langfusePublicKey = import.meta.env.VUE_APP_LANGFUSE_PUBLIC_KEY
 config.langfuseBaseUrl = import.meta.env.VUE_APP_LANGFUSE_BASEURL
+
+const partnerKeysThatRequirePhotoId =
+  import.meta.env.VUE_APP_PARTNER_KEYS_THAT_REQUIRE_PHOTO_ID || ''
+config.partnerKeysThatRequirePhotoId = partnerKeysThatRequirePhotoId.split(',')
 export default config
