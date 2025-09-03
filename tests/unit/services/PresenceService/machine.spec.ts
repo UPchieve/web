@@ -134,10 +134,11 @@ describe('activityMachine', () => {
 
   it('tracks visibility events (actors/visibilityWatcher)', async () => {
     const activityMock = vi.mocked(PresenceService.trackActivity)
-    const inactivityMock = vi.mocked(PresenceService.trackInactivity)
+    const passivitiyMock = vi.mocked(PresenceService.trackPassivity)
     const visibilityStateMock = vi.fn().mockReturnValue('visible')
 
     Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
       get: visibilityStateMock,
     })
 
@@ -162,11 +163,12 @@ describe('activityMachine', () => {
     expect(actor.getSnapshot().value).toStrictEqual({
       UserAuthenticated: 'TrackingPaused',
     })
+
     expect(
-      PresenceService.trackInactivity,
+      PresenceService.trackPassivity,
       'is called once when the document became hidden'
     ).toHaveBeenCalledOnce()
-    inactivityMock.mockRestore()
+    passivitiyMock.mockRestore()
 
     visibilityStateMock.mockReturnValue('visible')
     document.dispatchEvent(new Event('visibilitychange'))
@@ -174,8 +176,46 @@ describe('activityMachine', () => {
       UserAuthenticated: 'TrackingStarted',
     })
     expect(
-      PresenceService.trackInactivity,
+      PresenceService.trackPassivity,
       'is not called once when the document became visible'
+    ).not.toHaveBeenCalled()
+  })
+
+  it('prevents visibility watcher from firing when the page closes (actors/pagehideWatcher)', async () => {
+    const activityMock = vi.mocked(PresenceService.trackActivity)
+    const visibilityStateMock = vi.fn().mockReturnValue('visible')
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: visibilityStateMock,
+    })
+
+    expect(actor.getSnapshot().value).toBe('UserUnauthenticated')
+    store.commit('user/setUser', { id: '123' })
+    await nextTick()
+    expect(actor.getSnapshot().value).toStrictEqual({
+      UserAuthenticated: 'TrackingStarted',
+    })
+    expect(actor.getSnapshot().context.tabIsClosing).toBe(false)
+
+    expect(
+      PresenceService.trackActivity,
+      'is called once when transitioning into TrackingStarted'
+    ).toHaveBeenCalledOnce()
+    activityMock.mockRestore()
+
+    visibilityStateMock.mockReturnValue('hidden')
+    // order is important;
+    // pagehide is called first in the browser and will set tabIsClosing=true
+    // make sure visibilitychange is not called
+    window.dispatchEvent(new Event('pagehide'))
+    document.dispatchEvent(new Event('visibilitychange'))
+
+    await nextTick()
+
+    expect(actor.getSnapshot().context.tabIsClosing).toBe(true)
+    expect(
+      PresenceService.trackPassivity,
+      'it is not called because context.tabIsClosing is true'
     ).not.toHaveBeenCalled()
   })
 })

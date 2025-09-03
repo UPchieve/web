@@ -1347,4 +1347,15 @@ export default {
       clientUUID,
     }).then(this._successHandler, this._errorHandler)
   },
+  trackPresencePassive(clientUUID: string) {
+    return httpPostKeepAlive(`${API_ROOT}/user/track-presence/passive`, {
+      clientUUID,
+    }).then(this._successHandler, this._errorHandler)
+  },
+  trackPresenceCheckForInactivity(clientUUID: string) {
+    return httpPostKeepAlive(
+      `${API_ROOT}/user/track-presence/check-for-inactivity`,
+      { clientUUID }
+    ).then(this._successHandler, this._errorHandler)
+  },
 }

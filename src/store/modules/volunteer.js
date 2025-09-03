@@ -3,6 +3,7 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import { AMERICA_COUNTS_SUBTOPICS } from '@/services/AmericaCountsVolunteerService'
+import * as PresenceService from '@/services/PresenceService'
 
 export default {
   namespaced: true,
@@ -187,6 +188,12 @@ export default {
 
       const volunteerIsNotInSession = !this.getters['user/isSessionAlive']
       if (volunteerIsNotInSession && newSession) {
+        /*
+         * ping subway with this; if the user is currently PASSIVE_ON_SITE,
+         * subway will set a countdown for marking them as INACTIVE_ON_SITE.
+         * when the countdown reaches 0, if they are still passive, mark them as inactive.
+         */
+        PresenceService.checkForInactivity()
         dispatch('alertVolunteer', { context, session: newSession })
       }
 

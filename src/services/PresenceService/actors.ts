@@ -72,6 +72,15 @@ export const visibilityWatcher = fromCallback<EventObject>(({ sendBack }) => {
   }
 })
 
+export const pagehideWatcher = fromCallback<EventObject>(({ sendBack }) => {
+  const pagehideHandler = () => sendBack({ type: 'DOCUMENT_UNLOADED' })
+  window.addEventListener('pagehide', pagehideHandler)
+
+  return () => {
+    window.removeEventListener('pagehide', pagehideHandler)
+  }
+})
+
 export const trackingInterval = fromCallback<
   EventObject,
   { trackingInterval: number }

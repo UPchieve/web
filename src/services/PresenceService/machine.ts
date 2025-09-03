@@ -4,6 +4,7 @@ import {
   authWatcher,
   trackingInterval,
   visibilityWatcher,
+  pagehideWatcher,
 } from './actors'
 import * as PresenceService from '../PresenceService'
 import type { RootState } from '@/store'
@@ -15,6 +16,7 @@ const config = setup({
       getStore: () => Store<RootState>
       activityHappened: boolean
       trackingInterval: number
+      tabIsClosing: boolean
     },
     input: {} as { getStore: () => Store<RootState>; trackingInterval: number },
     events: {} as
@@ -26,13 +28,15 @@ const config = setup({
   },
   guards: {
     ifActivityHappened: ({ context }) => context.activityHappened,
+    tabIsNotClosing: ({ context }) => !context.tabIsClosing,
   },
   actions: {
     trackActivity: () => PresenceService.trackActivity(),
-    trackInactivity: () => PresenceService.trackInactivity(),
+    trackPassivity: () => PresenceService.trackPassivity(),
   },
   actors: {
     visibilityWatcher,
+    pagehideWatcher,
     authWatcher,
     activityListeners,
     trackingInterval,
@@ -45,6 +49,7 @@ export const activityMachine = config.createMachine({
     getStore: input.getStore,
     activityHappened: false,
     trackingInterval: input.trackingInterval,
+    tabIsClosing: false,
   }),
   initial: 'UserUnauthenticated',
   entry: [
@@ -60,11 +65,28 @@ export const activityMachine = config.createMachine({
       },
     },
     UserAuthenticated: {
-      entry: [spawnChild('visibilityWatcher', { id: 'visibilityWatcher' })],
-      exit: [stopChild('visibilityWatcher')],
+      description: `
+        Sets up our watchers to handle the user closing the tab/window and
+        the user backgrounding the tab/window. Those watchers will trigger
+        calls to the track passivitiy or inactivity.
+      `,
+      entry: [
+        spawnChild('visibilityWatcher', {
+          id: 'visibilityWatcher',
+          input: ({ context }) => context,
+        }),
+        spawnChild('pagehideWatcher', {
+          id: 'pagehideWatcher',
+          input: ({ context }) => context,
+        }),
+      ],
+      exit: [stopChild('visibilityWatcher'), stopChild('pagehideWatcher')],
       initial: 'TrackingPaused',
       on: {
         UNAUTHENTICATED: { target: 'UserUnauthenticated' },
+        DOCUMENT_UNLOADED: {
+          actions: [assign({ tabIsClosing: true })],
+        },
       },
       states: {
         TrackingPaused: {
@@ -109,8 +131,15 @@ export const activityMachine = config.createMachine({
               actions: ['trackActivity', assign({ activityHappened: false })],
             },
             DOCUMENT_HIDDEN: {
+              description: `
+                This event transition and actions should only happen when the
+                tab is being backgrounded.
+                When the tab is closing (the 'pagehideWatcher' takes care of this), stop
+                this transition with the guard.
+              `,
+              guard: 'tabIsNotClosing',
               target: 'TrackingPaused',
-              actions: ['trackInactivity', assign({ activityHappened: false })],
+              actions: ['trackPassivity', assign({ activityHappened: false })],
             },
           },
         },

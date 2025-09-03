@@ -19,24 +19,23 @@ export function initActivityTracking(
   return actor
 }
 
-export async function trackActivity() {
-  const savedClientUUID = localStorage.getItem('clientUUID')
-  const clientUUID = savedClientUUID ? savedClientUUID : crypto.randomUUID()
-  localStorage.setItem('clientUUID', clientUUID)
-  return NetworkService.trackPresenceActive(clientUUID)
+export function getClientUUID() {
+  const savedClientUUID = sessionStorage.getItem('clientUUID')
+  const clientUUID = savedClientUUID ?? crypto.randomUUID()
+  sessionStorage.setItem('clientUUID', clientUUID)
+  return clientUUID
 }
 
-export async function trackInactivity() {
-  /*
-   * NOTE: if there is no clientUUID in local storage
-   * (it could happen due to disk space usage but is unlikely.
-   * it's more likely that there's a bug and we didn't set clientUUID)
-   * then we will just let the redis key expire and create the INACTIVE_ON_SITE user_action
-   * this does mean that a presence session could be artifically longer by
-   * 2 minutes longer (or wheatever we set the TTL to in redis)
-   */
-  const clientUUID = localStorage.getItem('clientUUID')
+export async function trackActivity() {
+  return NetworkService.trackPresenceActive(getClientUUID())
+}
+
+export async function trackPassivity() {
+  const clientUUID = sessionStorage.getItem('clientUUID')
   if (clientUUID) {
-    return NetworkService.trackPresenceInactive(clientUUID)
+    return NetworkService.trackPresencePassive(clientUUID)
   }
+}
+export async function checkForInactivity() {
+  return NetworkService.trackPresenceCheckForInactivity(getClientUUID())
 }
