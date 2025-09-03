@@ -90,24 +90,37 @@
         </div>
         <div v-else class="class-details">
           <div class="filter-controls">
-            <div class="date-input-container">
-              <FormDateInput
-                class="date-input"
-                label="Sessions From"
-                id="session-activity-from"
-                :placeholder="filters.sessionActivityFrom"
-                v-model="filters.sessionActivityFrom"
-                @update:modelValue="submitFilter"
-              />
-              <FormDateInput
-                class="date-input"
-                label="To"
-                id="session-activity-to"
-                :placeholder="filters.sessionActivityTo"
-                v-model="filters.sessionActivityTo"
-                @update:modelValue="submitFilter"
-              />
-            </div>
+            <FormSelect
+              v-if="topics.length"
+              class="topics-dropdown"
+              name="topic"
+              label="Subject"
+              :placeholder="subjectPlaceholder"
+              optionTextField="displayName"
+              :reduce="(option) => option.name"
+              :options="[
+                ...topics,
+                { name: 'other', displayName: 'All Subjects' },
+              ]"
+              v-model="filters.topic.name"
+              @update:modelValue="submitFilter"
+            />
+            <FormDateInput
+              class="date-input"
+              label="Sessions From"
+              id="session-activity-from"
+              :placeholder="filters.sessionActivityFrom"
+              v-model="filters.sessionActivityFrom"
+              @update:modelValue="submitFilter"
+            />
+            <FormDateInput
+              class="date-input"
+              label="To"
+              id="session-activity-to"
+              :placeholder="filters.sessionActivityTo"
+              v-model="filters.sessionActivityTo"
+              @update:modelValue="submitFilter"
+            />
           </div>
           <table class="classes-table">
             <tr>
@@ -305,6 +318,7 @@ import RemoveIcon from '@/assets/Remove.svg'
 import { toastController } from '@ionic/vue'
 import _ from 'lodash'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import {
   getCurrentSchoolYearStartDate,
   minutesToHoursAndMinutes,
@@ -325,6 +339,7 @@ export default {
     RemoveIcon,
     TrashIcon,
     FormDateInput,
+    FormSelect,
   },
 
   data() {
@@ -344,6 +359,9 @@ export default {
       toggledAssignmentMenuId: '',
       classData: {},
       filters: {
+        topic: {
+          name: '',
+        },
         sessionActivityFrom:
           getCurrentSchoolYearStartDate().format('YYYY-MM-DD'),
         sessionActivityTo: moment().format('YYYY-MM-DD'),
@@ -379,6 +397,15 @@ export default {
       : this.initialClassData
     this.className = this.classData.name
     this.topicId = this.classData.topicId
+    await this.$store.dispatch('subjects/awaitTopics')
+    if (this.classData.topicId) {
+      const topic = this.topics.find((t) => t.id === this.classData.topicId)
+      this.filters.topic.name = topic.name
+      this.subjectPlaceholder = topic.displayName
+    } else {
+      this.filters.topic.name = 'other'
+      this.subjectPlaceholder = 'All Subjects'
+    }
     if (
       this.$route.params.classId &&
       !this.$route.path.includes('assignments') &&
@@ -467,7 +494,11 @@ export default {
             )
             const to = new Date(this.filters.sessionActivityTo + 'T23:59:59')
             const filteredSubjectNames = Object.values(this.subjects)
-              .filter((subject) => subject.topicId === this.topicId)
+              .filter((subject) =>
+                this.filters.topic.name === 'other'
+                  ? true
+                  : subject.topicName === this.filters.topic.name
+              )
               .map((subject) => subject.name)
 
             const filteredSessionDetails = sessionDetails
@@ -902,36 +933,26 @@ export default {
 }
 
 .filter-controls {
-  @include flex-container(row, center);
+  @include flex-container(row, center, flex-start);
+  gap: 10px;
   margin-bottom: 10px;
   align-items: center;
-  justify-content: start;
+  width: fit-content;
 
   @include breakpoint-below('medium') {
     @include flex-container(column, center);
   }
+}
+
+.topics-dropdown {
+  background-color: #ffffff;
+  border-radius: 5px;
+  margin: 0px;
+  min-width: 200px;
 }
 
 .date-input {
   margin: 0px;
-}
-
-.date-input-container {
-  @include flex-container(row, center, space-between);
-  gap: 10px;
-  @include breakpoint-below('medium') {
-    @include flex-container(column, center);
-    width: 100%;
-  }
-}
-
-.date-label {
-  @include flex-container(column, center, flex-start);
-  margin-right: 10px;
-
-  @include breakpoint-below('medium') {
-    width: 100%;
-  }
 }
 
 .breadcrumbs {
