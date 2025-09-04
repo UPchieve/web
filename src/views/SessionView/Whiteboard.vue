@@ -24,79 +24,6 @@
       </p>
     </transition>
     <div id="partner-cursor" ref="partnerCursor"></div>
-    <div id="partner-arrow" ref="partnerArrow" @click="goToPartnerCursor"></div>
-    <div v-if="useInfiniteWhiteboard && isConnected" class="zoom-toolbar">
-      <announcement
-        localStorageKey="showInfiniteWhiteboardAnnouncement"
-        title="Infinite Whiteboard!"
-        :body="`We're experimenting with infinite whiteboard, available to a select group only.\n\nYou can find additional tools for interacting with the infinite whiteboard in this toolbar.`"
-        :position="{ right: '110%' }"
-        :showEvent="EVENTS.INFINITE_WHITEBOARD_ANNOUNCEMENT_SEEN"
-        :closeEvent="EVENTS.INFINITE_WHITEBOARD_ANNOUNCEMENT_CLOSED"
-      />
-      <button
-        class="toolbar-item"
-        title="Pan tool"
-        v-bind:class="selectedTool === 'pan' ? 'selected-tool' : ''"
-        tabindex="0"
-        @click="usePanTool"
-        @keydown.enter="usePanTool"
-      >
-        <PanToolIcon class="toolbar-icon--pick" />
-      </button>
-      <button
-        v-if="showGoToRecentNodesButton"
-        class="toolbar-item go-to-action"
-        title="Go to last action"
-        tabindex="0"
-        @click="goToRecentNodes"
-        @keydown.enter="goToRecentNodes"
-      >
-        <NewBadgeIcon class="toolbar-icon" />
-      </button>
-      <button
-        v-if="showZoomOptions"
-        class="toolbar-item"
-        title="Zoom to fit all content"
-        tabindex="0"
-        @click="zoomToFit"
-        @keydown.enter="zoomToFit"
-      >
-        <ZoomToFitIcon class="toolbar-icon" />
-      </button>
-      <button
-        v-if="showZoomOptions"
-        class="toolbar-item"
-        title="Zoom out"
-        tabindex="0"
-        @click="zoomOut"
-        @keydown.enter="zoomOut"
-      >
-        <ZoomOutIcon class="toolbar-icon" />
-      </button>
-      <button
-        v-if="showZoomOptions"
-        class="toolbar-item"
-        title="Zoom in"
-        tabindex="0"
-        @click="zoomIn"
-        @keydown.enter="zoomIn"
-      >
-        <ZoomInIcon class="toolbar-icon" />
-      </button>
-      <button
-        class="toolbar-item"
-        title="More zoom options"
-        tabindex="0"
-        @click="() => (showZoomOptions = !showZoomOptions)"
-        @keydown.enter="() => (showZoomOptions = !showZoomOptions)"
-      >
-        <DoubleArrowIcon
-          class="toolbar-icon"
-          :class="showZoomOptions ? 'rotate-up' : 'rotate-down'"
-        />
-      </button>
-    </div>
     <div id="toolbar" class="toolbar">
       <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
@@ -524,10 +451,6 @@ import { mapGetters } from 'vuex'
 import { backOff } from 'exponential-backoff'
 import PickToolIcon from '@/assets/whiteboard_icons/selection.svg'
 import MoreIcon from '@/assets/VerticalMenuButtons.svg'
-import PanToolIcon from '@/assets/whiteboard_icons/pan.svg'
-import NewBadgeIcon from '@/assets/whiteboard_icons/new_badge.svg'
-import ZoomInIcon from '@/assets/whiteboard_icons/zoom_in.svg'
-import ZoomOutIcon from '@/assets/whiteboard_icons/zoom_out.svg'
 import ClearIcon from '@/assets/whiteboard_icons/clear.svg'
 import ColorPickerIcon from '@/assets/whiteboard_icons/color_picker.svg'
 import PenIcon from '@/assets/whiteboard_icons/pen.svg'
@@ -535,8 +458,6 @@ import ThickPenIcon from '@/assets/whiteboard_icons/thick_pen.svg'
 import ThinPenIcon from '@/assets/whiteboard_icons/thin_pen.svg'
 import UndoIcon from '@/assets/whiteboard_icons/undo.svg'
 import RedoIcon from '@/assets/whiteboard_icons/redo.svg'
-import ZoomToFitIcon from '@/assets/whiteboard_icons/zoom_to_fit.svg'
-import DoubleArrowIcon from '@/assets/whiteboard_icons/double_arrow.svg'
 import DeleteSelectionIcon from '@/assets/whiteboard_icons/delete_selection.png'
 import RotateIcon from '@/assets/whiteboard_icons/rotate.png'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
@@ -552,7 +473,6 @@ import EraserIcon from '@/assets/whiteboard_icons/eraser.svg'
 import EyeIcon from '@/assets/eye.svg'
 import TextIcon from '@/assets/whiteboard_icons/text_tool.svg'
 import SmallTextIcon from '@/assets/whiteboard_icons/small_text_tool.svg'
-import Announcement from '@/components/Announcement.vue'
 import Loader from '@/components/Loader.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import config from '../../config'
@@ -586,19 +506,13 @@ export default {
     WhiteboardAiTutorButton,
     PickToolIcon,
     MoreIcon,
-    PanToolIcon,
-    NewBadgeIcon,
     ClearIcon,
     ColorPickerIcon,
-    ZoomInIcon,
-    ZoomOutIcon,
     PenIcon,
     ThickPenIcon,
     ThinPenIcon,
     UndoIcon,
     RedoIcon,
-    ZoomToFitIcon,
-    DoubleArrowIcon,
     PhotoUploadIcon,
     FileDialog,
     ShapesIcon,
@@ -610,7 +524,6 @@ export default {
     EraserIcon,
     TextIcon,
     SmallTextIcon,
-    Announcement,
     Loader,
     LoadingMessage,
     StopScreenShareIcon,
@@ -711,24 +624,14 @@ export default {
       selectedSmallTextTool: false,
       lastSelectedBrushType: TOOLS.BRUSH,
       lastSelectedTextSize: TOOLS.TEXT,
-      // Infinite whiteboard and cursor.
+      // Debounce sending cursor position.
       lastCursorBroadcastAt: 0,
-      useInfiniteWhiteboard: false,
-      lastPartnerCursorPosition: null,
-      // Keep track of view when disconnect so can
-      // apply it again once reconnect.
-      lastViewRectangle: null,
-      // Go to last action button.
-      showGoToRecentNodesButton: false,
-      recentNodesOutsideView: [],
-      initialNodesLoaded: false,
     }
   },
   emits: ['toggleAiWidget', 'clickedShareScreen'],
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isInfiniteWhiteboardEnabled: 'featureFlags/isInfiniteWhiteboardEnabled',
       userType: 'user/userType',
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
@@ -781,13 +684,6 @@ export default {
       return BYTES_PER_MEGABYTE * 10
     },
   },
-  updated() {
-    if (this.error) {
-      setTimeout(() => {
-        this.error = ''
-      }, 2000)
-    }
-  },
   async mounted() {
     this.loadZwibbler()
   },
@@ -818,39 +714,7 @@ export default {
       return /iPhone|iPad|iPod/i.test(navigator.userAgent)
     },
     resizeViewRectangle() {
-      this.zwibblerCtx.setViewRectangle(
-        {
-          x: 0,
-          y: 0,
-          width: this.canvasWidth,
-          height: 1,
-        },
-        true
-      )
-    },
-    addInfiniteSizeListeners() {
-      const zwibDiv = this.$refs.zwibDiv
-      zwibDiv.addEventListener('mousemove', this.moveMouseEvent)
-      zwibDiv.addEventListener(
-        'mouseleave',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
-      )
-      zwibDiv.addEventListener(
-        'mouseenter',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', true, false)
-      )
-    },
-    removeInfiniteSizeListeners() {
-      const zwibDiv = this.$refs.zwibDiv
-      zwibDiv.removeEventListener('mousemove', this.moveMouseEvent)
-      zwibDiv.removeEventListener(
-        'mouseleave',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
-      )
-      zwibDiv.removeEventListener(
-        'mouseenter',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', true, false)
-      )
+      this.zwibblerCtx.setZoom('width')
     },
     moveMouseEvent(event) {
       const now = Date.now()
@@ -864,7 +728,7 @@ export default {
         event.pageY
       )
       const scale = this.zwibblerCtx.getCanvasScale()
-      this.zwibblerCtx.setSessionKey(
+      this.setSessionKey(
         'cursorPosition',
         {
           x: point.x,
@@ -877,16 +741,38 @@ export default {
     setSessionKey(key, value, persist) {
       this.zwibblerCtx.setSessionKey(key, value, persist)
     },
-    addFixedSizeListeners() {
+    addListeners() {
       window.addEventListener('orientationchange', this.handleOrientationChange)
       window.addEventListener('resize', this.handleWindowResize)
+
+      const zwibDiv = this.$refs.zwibDiv
+      zwibDiv.addEventListener('mousemove', this.moveMouseEvent)
+      zwibDiv.addEventListener(
+        'mouseleave',
+        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+      )
+      zwibDiv.addEventListener(
+        'mouseenter',
+        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+      )
     },
-    removeFixedSizeListeners() {
+    removeListeners() {
       window.removeEventListener(
         'orientationchange',
         this.handleOrientationChange
       )
       window.removeEventListener('resize', this.handleWindowResize)
+
+      const zwibDiv = this.$refs.zwibDiv
+      zwibDiv.removeEventListener('mousemove', this.moveMouseEvent)
+      zwibDiv.removeEventListener(
+        'mouseleave',
+        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+      )
+      zwibDiv.removeEventListener(
+        'mouseenter',
+        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+      )
     },
     handleOrientationChange() {
       setTimeout(this.resizeViewRectangle, 100)
@@ -1109,7 +995,6 @@ export default {
     },
     clearWhiteboard() {
       this.zwibblerCtx.deleteNodes(this.zwibblerCtx.getAllNodes())
-      this.resetCanvas()
       this.hideHoveredToolbars()
     },
     hideHoveredToolbars() {
@@ -1197,98 +1082,6 @@ export default {
         opacity: 0,
       })
     },
-    goToRecentNodes() {
-      if (!this.recentNodesOutsideView.length) return
-
-      this.zoomToFit(null, this.recentNodesOutsideView)
-      this.recentNodesOutsideView = []
-      this.showGoToRecentNodesButton = false
-      AnalyticsService.captureEvent(
-        EVENTS.USER_CLICKED_WHITEBOARD_GO_TO_LATEST,
-        {
-          sessionId: this.sessionId,
-        }
-      )
-    },
-    resetCanvas() {
-      this.zwibblerCtx.setZoom(1)
-      const currentView = this.zwibblerCtx.getViewRectangle()
-      this.zwibblerCtx.setViewRectangle(
-        {
-          x: 0,
-          y: 0,
-          width: currentView.width,
-          height: currentView.height,
-        },
-        false
-      )
-    },
-    zoomToFit(event, nodes) {
-      if (event) {
-        AnalyticsService.captureEvent(
-          EVENTS.USER_CLICKED_WHITEBOARD_ZOOM_TO_FIT,
-          {
-            sessionId: this.sessionId,
-          }
-        )
-        this.maybeFocusZwibbler(event)
-      }
-
-      nodes = nodes ?? this.zwibblerCtx.getAllNodes()
-      if (!nodes.length) {
-        this.resetCanvas()
-        return
-      }
-
-      const bounds = this.zwibblerCtx.getBoundingRectangle(nodes)
-      const minSize = 200
-      // For small bounds, have a minimum width/height,
-      // otherwise setViewRectangle will make the view
-      // obnoxiously zoomed in.
-      if (bounds.width < minSize && bounds.height < minSize) {
-        this.zwibblerCtx.setViewRectangle(
-          {
-            x: bounds.x,
-            y: bounds.y,
-            width: minSize,
-            height: minSize,
-          },
-          false
-        )
-        this.zwibblerCtx.setZoom(2)
-        return
-      }
-
-      this.zwibblerCtx.setViewRectangle(
-        {
-          x: bounds.x,
-          y: bounds.y,
-          width: bounds.width,
-          height: bounds.height,
-        },
-        false
-      )
-    },
-    zoomOut(event) {
-      this.zwibblerCtx.zoomOut()
-      AnalyticsService.captureEvent(
-        EVENTS.USER_CLICKED_WHITEBOARD_ZOOM_OUT_TOOL,
-        {
-          sessionId: this.sessionId,
-        }
-      )
-      this.maybeFocusZwibbler(event)
-    },
-    zoomIn(event) {
-      this.zwibblerCtx.zoomIn()
-      AnalyticsService.captureEvent(
-        EVENTS.USER_CLICKED_WHITEBOARD_ZOOM_IN_TOOL,
-        {
-          sessionId: this.sessionId,
-        }
-      )
-      this.maybeFocusZwibbler(event)
-    },
     setColor(color) {
       // Second parameter indicates whether the colour should affect the fill or outline colour.
       const useFill = true
@@ -1342,40 +1135,35 @@ export default {
         autoPickToolText: false,
         background: 'grid',
         collaborationServer: `${config.websocketRoot}/whiteboard/room/{name}`,
-        confine: 'page',
+        confine: 'view',
         defaultBrushWidth: 5,
         defaultFontSize: 32,
         defaultSmoothness: 'sharpest',
-        maximumZoom: 5,
-        minimumZoom: 0.15,
         multilineText: true,
+        scrollbars: true,
         showColourPanel: false,
         showToolbar: false,
         showHints: false,
+        wheelAdjustsBrush: 'none',
         zoomOnResize: false,
       })
 
       this.zwibblerCtx = markRaw(zwibblerCtx)
+      this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight)
+      this.resizeViewRectangle()
+      this.addListeners()
 
       this.zwibblerCtx.on('set-keys', (keys) => {
         const cursor = this.$refs.partnerCursor
-        const arrow = this.$refs.partnerArrow
         const zwibDiv = this.$refs.zwibDiv
 
         try {
           cursor.setAttribute('data-content', this.sessionPartner?.firstName)
-          arrow.setAttribute('data-content', this.sessionPartner?.firstName)
 
           for (const key of keys) {
             if (key.name === 'isCursorOnCanvas' && !key.value) {
               cursor.style.visibility = 'hidden'
-              arrow.style.visibility = 'hidden'
             } else if (key.name === 'cursorPosition') {
-              this.lastPartnerCursorPosition = {
-                x: key.value.x,
-                y: key.value.y,
-                scale: key.value.scale,
-              }
               const whiteboardWidth = zwibDiv.clientWidth
               const whiteboardHeight = zwibDiv.clientHeight
 
@@ -1395,32 +1183,18 @@ export default {
                 partnerCursorY <= whiteboardHeight
 
               if (isPartnerCursorVisible) {
-                arrow.style.visibility = 'hidden'
-
                 cursor.style.left = partnerCursorX + 'px'
                 cursor.style.top = partnerCursorY + 'px'
                 cursor.style.visibility = 'visible'
               } else {
                 cursor.style.visibility = 'hidden'
-
-                const arrowPosition = this.calculateArrowPosition(
-                  partnerCursorX,
-                  partnerCursorY,
-                  whiteboardWidth,
-                  whiteboardHeight
-                )
-                arrow.style.left = arrowPosition.x + 'px'
-                arrow.style.top = arrowPosition.y + 'px'
-                arrow.style.transform = `rotate(${arrowPosition.angle}deg)`
-                arrow.style.visibility = 'visible'
               }
             }
           }
         } catch (err) {
           LoggerService.noticeError(err)
-          // If something goes wrong with the calculation, just hide the cursor and arrow.
+          // If something goes wrong with the calculation, just hide the cursor.
           cursor.style.visibility = 'hidden'
-          arrow.style.visibility = 'hidden'
         }
       })
 
@@ -1430,40 +1204,9 @@ export default {
       // Keep the canvas as read-only until connected.
       this.zwibblerCtx.setConfig('readOnly', true)
       this.zwibblerCtx.on('connected', () => {
-        if (
-          (this.isInfiniteWhiteboardEnabled && this.isStudent) ||
-          this.zwibblerCtx.getDocumentProperty('useInfiniteWhiteboard')
-        ) {
-          AnalyticsService.captureEvent(EVENTS.USER_USING_INFINITE_WHITEBOARD, {
-            sessionId: this.sessionId,
-          })
-          this.zwibblerCtx.setDocumentProperty('useInfiniteWhiteboard', true)
-          this.useInfiniteWhiteboard = true
-          this.zwibblerCtx.setConfig('allowZoom', true)
-          this.zwibblerCtx.setConfig('scrollbars', false)
-          this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'down')
-          this.zwibblerCtx.setConfig('rightButtonPans', true)
-          this.zoomToFit()
-          this.addInfiniteSizeListeners()
-        } else {
-          this.useInfiniteWhiteboard = false
-          this.zwibblerCtx.setConfig('allowZoom', false)
-          this.zwibblerCtx.setConfig('scrollbars', true)
-          this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'none')
-          this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight)
-          this.resizeViewRectangle()
-          this.addFixedSizeListeners()
-        }
-
         this.isConnected = true
         this.hasConnectionFailure = false
-        if (this.lastViewRectangle) {
-          this.zwibblerCtx.setViewRectangle(
-            this.lastViewRectangle,
-            !this.useInfiniteWhiteboard
-          )
-          this.lastViewRectangle = null
-        }
+        this.resizeViewRectangle()
         this.zwibblerCtx.setConfig('readOnly', false)
 
         LoggerService.log('Zwibbler: Connected', {
@@ -1497,7 +1240,6 @@ export default {
           // which we do before unmount of the component. If there is
           // no Zwibbler ctx, it means we are simply leaving the component.
           if (this.zwibblerCtx) {
-            this.lastViewRectangle = this.zwibblerCtx.getViewRectangle()
             // TODO: This isn't technically always an error - for
             // example if we are deploying the backend, the connection
             // will close. Is there a way to not log if it's expected closure?
@@ -1532,64 +1274,6 @@ export default {
             this.hideHoveredToolbars()
           } 
         })
-
-        this.zwibblerCtx.on('document-changed', (info) => {
-          const isRemoteChange = info && info.remote
-          if (
-            this.isVolunteer &&
-            isRemoteChange &&
-            this.zwibblerCtx.getDocumentProperty('useInfiniteWhiteboard') &&
-            !this.useInfiniteWhiteboard
-          ) {
-            AnalyticsService.captureEvent(
-              EVENTS.USER_USING_INFINITE_WHITEBOARD,
-              {
-                sessionId: this.sessionId,
-              }
-            )
-            this.useInfiniteWhiteboard = true
-            this.addInfiniteSizeListeners()
-            this.removeFixedSizeListeners()
-            setTimeout(() => {
-              this.zwibblerCtx.setDocumentSize(null, null)
-              this.zwibblerCtx.setConfig('allowZoom', true)
-              this.zwibblerCtx.setConfig('wheelAdjustsBrush', 'down')
-              this.zwibblerCtx.setConfig('rightButtonPans', true)
-              this.zoomToFit()
-            }, 500)
-          }
-
-          const isWhiteboardHidden = this.mobileMode && !this.isWhiteboardOpen
-          const shouldResizeView = isRemoteChange && isWhiteboardHidden
-          /**
-           * If mobile user is viewing chat when new whiteboard changes are made,
-           * resize the view so they can see everything on the whiteboard.
-           * TODO: Decide if this is actually the behaviour we want. The user
-           * will be able to see that there are additional changes on the whiteboard
-           * because of the scrollbars - it might actually be more annoying that you lose
-           * where you were focused/zoomed into.
-           */
-          if (shouldResizeView) {
-            setTimeout(() => {
-              this.zoomToFit()
-            }, 500)
-          }
-        })
-      })
-
-      this.zwibblerCtx.on('nodes-added', (nodes) => {
-        if (!this.initialNodesLoaded) {
-          this.initialNodesLoaded = true
-          return
-        }
-
-        this.checkIfNodesAreOutsideView(nodes)
-      })
-
-      this.zwibblerCtx.on('nodes-removed', () => {
-        if (this.zwibblerCtx.getAllNodes().length === 0) {
-          this.resetCanvas()
-        }
       })
 
       this.zwibblerCtx.on('resource-loaded', () => {
@@ -1717,112 +1401,9 @@ export default {
         })
       }
     },
-
-    checkIfNodesAreOutsideView(newNodes) {
-      if (!newNodes.length) return
-
-      const nodeBounds = this.zwibblerCtx.getBoundingRectangle(newNodes)
-      if (!nodeBounds) return
-
-      // Skip small nodes to prevent going to nodes that were unintentionally
-      // added while navigating the whiteboard.
-      // 50x50 just seemed like a reasonable size to prevent navigating to
-      // accidental dots or small dashes, but we might need to play around with
-      // these measurements.
-      if (nodeBounds.width < 50 && nodeBounds.height < 50) return
-
-      // This is unfortunately a bit of a hack until we update our Zwibbler version,
-      // because `remote` isn't an arg in the `nodes-added` callback. Instead, we
-      // check if the nodes added are outside of the view. If they are, we know
-      // that we couldn't have added them.
-      const currentView = this.zwibblerCtx.getViewRectangle()
-      const isOutsideView =
-        nodeBounds.x < currentView.x ||
-        nodeBounds.y < currentView.y ||
-        nodeBounds.x + nodeBounds.width > currentView.x + currentView.width ||
-        nodeBounds.y + nodeBounds.height > currentView.y + currentView.height
-
-      if (isOutsideView) {
-        this.showGoToRecentNodesButton = true
-        this.recentNodesOutsideView =
-          this.recentNodesOutsideView.concat(newNodes)
-      }
-    },
-
-    calculateArrowPosition(x, y, whiteboardWidth, whiteboardHeight) {
-      // Boundaries of the whiteboard (within which we can place the arrow).
-      // Leave additional space so as the arrow rotates, it doesn't get hidden off-screen.
-      const margin = 5
-      const bounds = {
-        left: margin,
-        right: whiteboardWidth - margin,
-        top: margin,
-        bottom: whiteboardHeight - margin,
-      }
-
-      // Determine the distance (and direction) from the center to the cursor.
-      // Positive means the partner's cursor is to the right (x) or bottom (y).
-      // Negative means the partner's cursor is to the left (x) or top (y).
-      const centerX = whiteboardWidth / 2
-      const centerY = whiteboardHeight / 2
-      const distX = x - centerX
-      const distY = y - centerY
-
-      // Determine distance to horizontal edge.
-      const horizontalDist =
-        distX > 0
-          ? (bounds.right - centerX) / distX
-          : (bounds.left - centerX) / distX
-
-      // Determine distance to vertical edge.
-      const verticalDist =
-        distY > 0
-          ? (bounds.bottom - centerY) / distY
-          : (bounds.top - centerY) / distY
-
-      let edgeX, edgeY
-      // On a straight line from the center of the whiteboard to the partner's
-      // cursor, determine which edge (horizontal i.e. left/right or vertical i.e. top/bottom)
-      // of the whiteboard would intersect first.
-      if (Math.abs(horizontalDist) < Math.abs(verticalDist)) {
-        // If a horizontal edge would intersect first, edgeX is just either the left or right.
-        edgeX = distX > 0 ? bounds.right : bounds.left
-        edgeY = centerY + distY * horizontalDist
-        // Account for edge cases at the corners to make sure the arrow stays in bounds.
-        edgeY = Math.max(bounds.top, Math.min(bounds.bottom, edgeY))
-      } else {
-        // If a vertical edge would intersect first, edgeX is just either the top or bottom.
-        edgeY = distY > 0 ? bounds.bottom : bounds.top
-        edgeX = centerX + distX * verticalDist
-        // Account for edge cases at the corners to make sure the arrow stays in bounds.
-        edgeX = Math.max(bounds.left, Math.min(bounds.right, edgeX))
-      }
-
-      return {
-        x: edgeX,
-        y: edgeY,
-        angle: Math.atan2(distY, distX) * (180 / Math.PI),
-      }
-    },
-
-    goToPartnerCursor() {
-      if (!this.lastPartnerCursorPosition) return
-
-      this.zwibblerCtx.setZoom(this.lastPartnerCursorPosition.scale)
-      const currentView = this.zwibblerCtx.getViewRectangle()
-      const centeredView = {
-        x: this.lastPartnerCursorPosition.x - currentView.width / 2,
-        y: this.lastPartnerCursorPosition.y - currentView.height / 2,
-        width: currentView.width,
-        height: currentView.height,
-      }
-      this.zwibblerCtx.setViewRectangle(centeredView, false)
-      this.$refs.partnerArrow.style.visibility = 'hidden'
-    },
   },
   async beforeUnmount() {
-    this.removeFixedSizeListeners()
-    this.removeInfiniteSizeListeners()
+    this.removeListeners()
     window.clearInterval(this.pingPongInterval)
     // Zwibbler cleanup.
     // This method doesn't exist in zwibbler-demo.js
@@ -1899,7 +1480,7 @@ export default {
     isSessionOver(isSessionOver, oldIsSessionOver) {
       if (isSessionOver && !oldIsSessionOver) {
         this.zwibblerCtx.setConfig('readOnly', true)
-        this.removeInfiniteSizeListeners()
+        this.removeListeners()
       }
     },
   },
@@ -1952,17 +1533,6 @@ export default {
 
 .zwibbler-scrollbar {
   cursor: default;
-}
-
-.zoom-toolbar {
-  background-color: rgb(238, 238, 238);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 50px;
 }
 
 .toolbar {
@@ -2026,51 +1596,6 @@ export default {
     cursor: auto;
     &:not(.selected-tool):hover {
       background: transparent;
-    }
-  }
-}
-
-.zoom-toolbar {
-  .toolbar-item {
-    height: 40px;
-
-    .toolbar-icon {
-      &.rotate-up {
-        rotate: 270deg;
-      }
-
-      &.rotate-down {
-        rotate: 90deg;
-      }
-    }
-
-    &:first-child {
-      border-radius: 8px 8px 0 0;
-    }
-
-    &:last-child {
-      border-radius: 0 0 8px 8px;
-    }
-
-    &.go-to-action {
-      animation: pulse-background 3s infinite;
-
-      .toolbar-icon {
-        height: 30px;
-        width: 30px;
-      }
-
-      @keyframes pulse-background {
-        0% {
-          background-color: transparent;
-        }
-        50% {
-          background-color: lighten($c-information-blue, 45%);
-        }
-        100% {
-          background-color: transparent;
-        }
-      }
     }
   }
 }
@@ -2246,31 +1771,6 @@ export default {
     content: attr(data-content);
     position: absolute;
     top: -25px;
-  }
-}
-
-#partner-arrow {
-  cursor: pointer;
-  position: absolute;
-
-  &:before {
-    border-bottom: 20px solid transparent;
-    border-left: 20px solid $c-information-blue;
-    border-top: 20px solid transparent;
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  &:after {
-    content: attr(data-content);
-    position: absolute;
-    right: 6px;
-    top: -100%;
-    bottom: 50%;
-    transform: rotate(90deg);
   }
 }
 </style>

@@ -47,7 +47,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ]: false,
       [POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES]: false,
-      [POSTHOG_FEATURE_FLAGS.INFINITE_WHITEBOARD]: false,
       [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE]: false,
@@ -237,8 +236,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ],
     isDisplayVolunteerLanguagesEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES],
-    isInfiniteWhiteboardEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.INFINITE_WHITEBOARD],
     isSecondaryEmailOnProfilePageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE],
     isConfettiCelebrationEnabled: (state: FeatureFlagState) =>
