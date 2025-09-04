@@ -73,8 +73,11 @@ export default {
       commit('setIsPartnerJustBannedFromLiveMedia', true)
     },
 
-    handleModerationInfraction({ commit }, data) {
+    handleModerationInfraction({ state, commit }, data) {
       commit('setModerationInfraction', data)
+      if (data.stopStreamImmediatelyReasons?.length) {
+        state.screenShareActor?.send({ type: 'stop_stream' })
+      }
     },
   },
 }

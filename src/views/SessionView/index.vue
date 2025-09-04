@@ -43,9 +43,6 @@
         :show="showModerationInfractionToast"
         :on-dismiss="dismissModerationInfraction"
         :on-click-more-info="toggleModerationInfractionModal"
-        :require-click-more-info-to-dismiss="
-          moderationInfraction?.isBanned ?? false
-        "
       />
       <ModerationInfractionModal
         v-if="showModerationInfractionModal"
@@ -753,7 +750,10 @@ export default {
   },
   watch: {
     moderationInfraction(newVal) {
-      if (newVal) {
+      if (newVal.stopStreamImmediatelyReasons?.length) {
+        this.showModerationInfractionModal = true
+        this.showModerationInfractionToast = false
+      } else if (newVal) {
         this.showModerationInfractionToast = true
       }
     },

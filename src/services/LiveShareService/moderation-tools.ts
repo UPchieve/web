@@ -29,10 +29,8 @@ function captureFrameFromCanvas(
     imageData,
   }
 }
-// 16 (4x4) seems to be the standard size of cursors in OSX and Windows
-const CURSOR_WIDTH_IN_PIXELS = 2 * window.devicePixelRatio
-const CURSOR_HEIGHT_IN_PIXELS = 2 * window.devicePixelRatio
-const MAX_PIXELS_DIFFERENCE = CURSOR_WIDTH_IN_PIXELS * CURSOR_HEIGHT_IN_PIXELS
+
+const PCT_DIFFERENCE_THRESHOLD = 0.05
 
 const lastModeratedFrameBuffer = ref<null | Uint8ClampedArray>(null)
 function shouldModerateFrame(
@@ -45,6 +43,9 @@ function shouldModerateFrame(
     return true
   }
 
+  const maxPixelsDifference =
+    frame.imageData.height * frame.imageData.width * PCT_DIFFERENCE_THRESHOLD
+
   try {
     const numDifferingPixels = pixelmatch(
       lastFrame,
@@ -53,8 +54,7 @@ function shouldModerateFrame(
       frame.imageData.width,
       frame.imageData.height
     )
-
-    return numDifferingPixels > MAX_PIXELS_DIFFERENCE
+    return numDifferingPixels > maxPixelsDifference
   } catch (err) {
     if (err instanceof Error && err.message !== 'Image sizes do not match.') {
       LoggerService.noticeError(

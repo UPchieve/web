@@ -87,6 +87,7 @@ describe('MeetingMachine', () => {
   beforeEach(() => {
     isBanned = false
   })
+
   it('follows the happy path', async () => {
     const machine = MeetingMachine.create()
     const mockMachine = createActor(machine.provide({ actors: defaultActors }))
@@ -336,11 +337,13 @@ describe('MeetingMachine', () => {
     expect(
       mockMachine
         .getSnapshot()
-        .matches('JoinedMeeting.ScreenShareControl.Banned'),
+        .matches('JoinedMeeting.ScreenShareControl.ViewingEligibleOnly'),
       'We should be in the screen share control banned state'
     ).toBe(true)
     expect(
-      mockMachine.getSnapshot().matches('JoinedMeeting.MicControl.Banned'),
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.MicControl.ViewingEligibleOnly'),
       'We should be in the mic control banned state'
     ).toBe(true)
   })
@@ -407,13 +410,15 @@ describe('MeetingMachine', () => {
     mockMachine.send({ type: 'ban_user_from_live_media' })
 
     expect(
-      mockMachine.getSnapshot().matches('Banned'),
+      mockMachine.getSnapshot().matches('ViewingEligibleOnly'),
       'We should be in the banned state'
     ).toBe(true)
     await new Promise((resolve) => setTimeout(resolve, 10))
 
     expect(
-      mockMachine.getSnapshot().matches('JoinedMeeting.MicControl.Banned'),
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.MicControl.ViewingEligibleOnly'),
       'We should be in the mic control banned state after being banned'
     ).toBe(true)
     expect(
@@ -425,7 +430,7 @@ describe('MeetingMachine', () => {
     expect(
       mockMachine
         .getSnapshot()
-        .matches('JoinedMeeting.ScreenShareControl.Banned'),
+        .matches('JoinedMeeting.ScreenShareControl.ViewingEligibleOnly'),
       'We should be in the screen share control banned state after being banned'
     ).toBe(true)
 
@@ -433,14 +438,109 @@ describe('MeetingMachine', () => {
     mockMachine.send({ type: 'share_screen' })
     await new Promise((resolve) => setTimeout(resolve, 10))
     expect(
-      mockMachine.getSnapshot().matches('JoinedMeeting.MicControl.Banned'),
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.MicControl.ViewingEligibleOnly'),
       'Transitions to unmuted should be ignored when banned'
     ).toBe(true)
     expect(
       mockMachine
         .getSnapshot()
-        .matches('JoinedMeeting.ScreenShareControl.Banned'),
+        .matches('JoinedMeeting.ScreenShareControl.ViewingEligibleOnly'),
       'Transitions to screensharing should be ignored when banned'
+    ).toBe(true)
+  })
+
+  it('takes the user out of mic-on and screenshare-on states when the stop_stream event is received', async () => {
+    const machine = MeetingMachine.create()
+    const mockMachine = createActor(
+      machine.provide({
+        actors: defaultActors,
+      })
+    )
+
+    expect(mockMachine).toBeDefined()
+
+    mockMachine.start()
+    await joinMeetingWithLiveMediaAccess(mockMachine)
+    // Unmute mic
+    mockMachine.send({ type: 'toggle_mute_self' })
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.MicControl.RequestingMicAccess'),
+      'We should be in the mic control requesting mic access state'
+    ).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(
+      mockMachine.getSnapshot().matches('JoinedMeeting.MicControl.MicUnmuted'),
+      'We should be in the mic control mic unmuted state'
+    ).toBe(true)
+
+    // Start sharing screen
+    mockMachine.send({
+      type: 'share_screen',
+    })
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.StartingShareMyScreen'),
+      'We should be in the screen share control starting share my screen state'
+    ).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.SharingMyScreen'),
+      'We should be in the screen share control sharing my screen state'
+    ).toBe(true)
+
+    // Now stop the stream (should cut screenshare AND mic)
+    mockMachine.send({ type: 'stop_stream' })
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(mockMachine.getSnapshot())
+    expect(
+      mockMachine.getSnapshot().matches('JoinedMeeting.MicControl.Waiting'),
+      'We should return to the Waiting state for microphone controls'
+    ).toBe(true)
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.Idle'),
+      'We should return to the Idle state for screenshare controls'
+    ).toBe(true)
+
+    // Assuming not banned, can return to mic-on and screenshare-on states
+    // Unmute mic
+    mockMachine.send({ type: 'toggle_mute_self' })
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.MicControl.RequestingMicAccess'),
+      'We should be in the mic control requesting mic access state'
+    ).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(
+      mockMachine.getSnapshot().matches('JoinedMeeting.MicControl.MicUnmuted'),
+      'We should be in the mic control mic unmuted state'
+    ).toBe(true)
+
+    // Start sharing screen
+    mockMachine.send({
+      type: 'share_screen',
+    })
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.StartingShareMyScreen'),
+      'We should be in the screen share control starting share my screen state'
+    ).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(
+      mockMachine
+        .getSnapshot()
+        .matches('JoinedMeeting.ScreenShareControl.SharingMyScreen'),
+      'We should be in the screen share control sharing my screen state'
     ).toBe(true)
   })
 

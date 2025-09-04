@@ -93,6 +93,7 @@ export type Events =
   | { type: 'banned' }
   | { type: 'not_banned' }
   | { type: 'transcription_status_changed'; status: 'started' | 'stopped' }
+  | { type: 'stop_stream' }
 export function create() {
   return setup({
     types: {
@@ -203,7 +204,10 @@ export function create() {
         target: '#MeetingMachine.Ended',
       },
       ban_user_from_live_media: {
-        target: '#MeetingMachine.Banned',
+        target: '#MeetingMachine.ViewingEligibleOnly',
+      },
+      stop_stream: {
+        target: '#MeetingMachine.ViewingEligibleOnly',
       },
       new_partner_attendee: {
         actions: assign({
@@ -462,7 +466,7 @@ export function create() {
                   },
                 },
               },
-              Banned: {
+              ViewingEligibleOnly: {
                 on: {
                   partner_shared_screen: {
                     target: 'ViewingPartnerScreenShare',
@@ -486,7 +490,7 @@ export function create() {
                       guard: ({ context }) => context.showPartnerScreenShare,
                     },
                     {
-                      target: 'Banned',
+                      target: 'ViewingEligibleOnly',
                     },
                   ],
                   not_banned: {
@@ -572,7 +576,7 @@ export function create() {
                     {
                       guard: () =>
                         store.getters['liveMedia/isBannedFromLiveMedia'],
-                      target: 'Banned',
+                      target: 'ViewingEligibleOnly',
                     },
                     {
                       target: 'Idle',
@@ -598,7 +602,7 @@ export function create() {
                 type: 'final',
                 tags: ['unableToJoinAudioCall'],
               },
-              Banned: { type: 'final' },
+              ViewingEligibleOnly: { type: 'final' },
               CheckingEligibility: {
                 tags: ['loadingScreenShare'],
                 invoke: {
@@ -607,7 +611,7 @@ export function create() {
                 },
                 on: {
                   banned: {
-                    target: 'Banned',
+                    target: 'ViewingEligibleOnly',
                   },
                   not_banned: {
                     target: 'Waiting',
@@ -802,9 +806,9 @@ export function create() {
           },
         },
       },
-      Banned: {
+      ViewingEligibleOnly: {
         invoke: {
-          id: 'Banned:stopShareMyScreenAndMic',
+          id: 'ViewingEligibleOnly:stopShareMyScreenAndMic',
           src: 'stopShareMyScreenAndMic',
           input: ({ context }) => ({ context }),
           onDone: {

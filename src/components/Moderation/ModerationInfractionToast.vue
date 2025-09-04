@@ -6,7 +6,6 @@
     icon="alert-circle-outline"
     :animated="true"
     position="middle"
-    :duration="props.requireClickMoreInfoToDismiss ? 0 : 5000"
     :buttons="moderationInfractionToastButtons"
     @didDismiss="props.onDismiss"
     :layout="mobileMode ? 'stacked' : 'baseline'"
@@ -23,7 +22,6 @@ const props = defineProps<{
   show: false
   onDismiss: Function
   onClickMoreInfo: Function
-  requireClickMoreInfoToDismiss: false
 }>()
 
 const store = useStore()
@@ -32,10 +30,9 @@ const moderationInfraction = computed(
   () => store.state.liveMedia.moderationInfraction
 )
 
-const heading = computed(() =>
-  moderationInfraction.value?.isBanned
-    ? 'We have temporarily disabled your screenshare and microphone use due to a potential policy violation.'
-    : `Our automated moderation system detected a potential policy issue with your ${moderationInfractionSource.value} use.`
+const heading = computed(
+  () =>
+    `Our automated moderation system detected a potential policy issue with your ${moderationInfractionSource.value} use.`
 )
 
 const message = computed(() => {
@@ -54,10 +51,7 @@ const moderationInfractionToastButtons = computed(() => {
     role: 'cancel',
     handler: props.onDismiss,
   }
-  const buttons = []
-  if (!props.requireClickMoreInfoToDismiss) {
-    buttons.push(dismissButton)
-  }
+  const buttons = [dismissButton]
   // Image uploads don't actually cause strikes against the user if they're censored,
   // so don't show them the modal about manual review.
   if (moderationInfraction.value?.source !== 'image_upload') {

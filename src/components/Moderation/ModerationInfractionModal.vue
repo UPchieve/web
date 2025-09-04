@@ -6,9 +6,23 @@
     </h3>
     <br />
     <div class="infraction-modal-body">
-      {{ detailedMessage }}&nbsp;Don't worry, we'll manually review to confirm
-      if this was a mistake. If you need support, send us a message or email us
-      at support@upchieve.org. Thanks for your patience!
+      <p
+        v-if="
+          props.moderationInfraction?.stopStreamImmediatelyReasons?.length ||
+          props.moderationInfraction.infraction
+        "
+        data-testid="potential-policy-violations"
+      >
+        Potential policy violations: {{ reasons }}
+      </p>
+      <p v-if="detailedMessage" data-testid="infraction-detail">
+        {{ detailedMessage }}
+      </p>
+      <p>
+        Don't worry, we'll manually review to confirm if this was a mistake. If
+        you need support, send us a message or email us at support@upchieve.org.
+      </p>
+      <p>Thanks for your patience!</p>
       <LargeButton @click="emit('close')" :show-arrow="false" variant="primary"
         >Close</LargeButton
       >
@@ -25,16 +39,34 @@ import { useStore } from 'vuex'
 const props = defineProps<{
   moderationInfraction: {
     isBanned: boolean
+    stopStreamImmediatelyReasons?: string[]
     infraction: string[]
     source: string
   }
 }>()
 
-const detailedMessage = computed(() =>
-  props.moderationInfraction?.isBanned
-    ? "For everyone's safety, your screenshare and microphone have been disabled."
-    : ''
-)
+const reasons = computed(() => {
+  const reasonsList = new Set<string>(
+    props.moderationInfraction.stopStreamImmediatelyReasons?.length
+      ? props.moderationInfraction.stopStreamImmediatelyReasons
+      : props.moderationInfraction.infraction
+  )
+  return Array.from(reasonsList).join(', ')
+})
+
+const RESHARE_SCREEN_MESSAGE = `Please check the content of your screen for any potentially problematic content, and remove it before sharing your screen again. `
+const detailedMessage = computed(() => {
+  let message =
+    "For everyone's safety, your screenshare and microphone have been disabled. "
+  if (
+    props.moderationInfraction.stopStreamImmediatelyReasons?.length &&
+    !props.moderationInfraction.isBanned &&
+    props.moderationInfraction.source === 'screenshare'
+  ) {
+    message += RESHARE_SCREEN_MESSAGE
+  }
+  return message
+})
 
 const store = useStore()
 const emit = defineEmits(['close'])
@@ -53,7 +85,7 @@ const moderationInfractionSource = computed(
   .infraction-modal-body {
     display: flex;
     flex-direction: column;
-    gap: 36px;
+    gap: 12px;
     margin-top: 0;
   }
 }
