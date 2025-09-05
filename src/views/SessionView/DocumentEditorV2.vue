@@ -110,6 +110,7 @@ import {
 import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
 import AnalyticsService from '@/services/AnalyticsService'
+import SessionService from '@/services/SessionService'
 import { EVENTS } from '@/consts'
 import { file2b64 } from '@/utils/fileToBase64'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
@@ -218,6 +219,8 @@ export default {
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       sessionPartner: 'user/sessionPartner',
       mobileMode: 'app/mobileMode',
+      isUpdatedDocEditorImageStorageEnabled:
+        'featureFlags/isUpdatedDocEditorImageStorageEnabled',
     }),
     showScreenShareTool() {
       // Show to students once a volunteer is sharing their screen
@@ -396,6 +399,22 @@ export default {
           this.onImageFailedModeration(failures)
           return
         }
+
+        if (this.isUpdatedDocEditorImageStorageEnabled) {
+          const imageUrl = await SessionService.uploadSessionImage(
+            this.sessionId,
+            file
+          )
+          const range = this.quillEditor.getSelection()
+          this.quillEditor.insertEmbed(range.index, 'image', imageUrl, 'user')
+        } else {
+          const range = this.quillEditor.getSelection()
+          const b64 = await file2b64(file)
+          this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
+        }
+        AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
+          tool: 'document-editor-v2',
+        })
       } catch (err) {
         AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_FAILED, {
           tool: 'document-editor-v2',
@@ -404,12 +423,6 @@ export default {
           'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
         )
       }
-      const range = this.quillEditor.getSelection()
-      const b64 = await file2b64(file)
-      this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
-      AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
-        tool: 'document-editor-v2',
-      })
     },
     onImageFailedModeration(failures) {
       AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_IMAGE_CENSORED, {

@@ -5,6 +5,7 @@ import AnalyticsService from './AnalyticsService'
 import NetworkService from './NetworkService'
 import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
+import axios from 'axios'
 
 export type Session = any
 
@@ -204,5 +205,20 @@ export default {
       .catch((error) => {
         throw errorFromHttpResponse(error)
       })
+  },
+
+  async uploadSessionImage(sessionId: string, file: File) {
+    const {
+      data: { uploadUrl, imageUrl },
+    } = await NetworkService.getSessionPhotoUploadUrl(sessionId)
+
+    await axios.put(uploadUrl, file, {
+      headers: {
+        'Content-Type': file.type,
+        // Required header for Azure
+        'x-ms-blob-type': 'BlockBlob',
+      },
+    })
+    return imageUrl
   },
 }

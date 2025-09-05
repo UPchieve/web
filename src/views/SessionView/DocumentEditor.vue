@@ -55,6 +55,7 @@ import {
 import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
 import { file2b64 } from '@/utils/fileToBase64'
+import SessionService from '@/services/SessionService'
 import WordCount from '@/components/WordCount.vue'
 
 Quill.register('modules/cursors', QuillCursors)
@@ -103,6 +104,8 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
+      isUpdatedDocEditorImageStorageEnabled:
+        'featureFlags/isUpdatedDocEditorImageStorageEnabled',
     }),
     isSocketReadyToRequestForDoc() {
       return [this.isConnected, this.currentSession?.id]
@@ -281,15 +284,24 @@ export default {
           this.onImageUploadModerationFailure(failures)
           return
         }
+
+        if (this.isUpdatedDocEditorImageStorageEnabled) {
+          const imageUrl = await SessionService.uploadSessionImage(
+            this.sessionId,
+            file
+          )
+          const range = this.quillEditor.getSelection()
+          this.quillEditor.insertEmbed(range.index, 'image', imageUrl, 'user')
+        } else {
+          const range = this.quillEditor.getSelection()
+          const b64 = await file2b64(file)
+          this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
+        }
       } catch (err) {
         alert(
           'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
         )
       }
-
-      const range = this.quillEditor.getSelection()
-      const b64 = await file2b64(file)
-      this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
     },
     onImageUploadModerationFailure(event) {
       this.$store.commit('liveMedia/setModerationInfraction', {

@@ -519,9 +519,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios'
 import { backOff } from 'exponential-backoff'
-import NetworkService from '@/services/NetworkService'
 import PickToolIcon from '@/assets/whiteboard_icons/selection.svg'
 import MoreIcon from '@/assets/VerticalMenuButtons.svg'
 import PanToolIcon from '@/assets/whiteboard_icons/pan.svg'
@@ -568,6 +566,7 @@ import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
 import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
 import StartScreenShareButton from './StartScreenShareButton.vue'
+import SessionService from '@/services/SessionService'
 
 const TOOLS = {
   BRUSH: 'brush',
@@ -1182,27 +1181,14 @@ export default {
           return
         }
 
-        const response = await NetworkService.getSessionPhotoUploadUrl(
-          this.sessionId
+        const imageUrl = await SessionService.uploadSessionImage(
+          this.sessionId,
+          file
         )
-        const {
-          data: { uploadUrl, imageUrl },
-        } = response
-
-        if (uploadUrl) {
-          await axios.put(uploadUrl, file, {
-            headers: {
-              'Content-Type': file.type,
-            },
-          })
-          this.insertPhoto(imageUrl)
-          AnalyticsService.captureEvent(
-            EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE,
-            {
-              tool: 'whiteboard',
-            }
-          )
-        }
+        this.insertPhoto(imageUrl)
+        AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
+          tool: 'whiteboard',
+        })
       } catch (error) {
         AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_FAILED, {
           tool: 'whiteboard',
