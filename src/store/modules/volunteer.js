@@ -2,7 +2,6 @@ import sendWebNotification from '@/utils/send-web-notification'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
-import { AMERICA_COUNTS_SUBTOPICS } from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
 
 export default {
@@ -150,8 +149,10 @@ export default {
 
         if (this.getters['americaCountsVolunteer/isAmericaCountsVolunteer']) {
           if (
-            user.subjects.includes(subTopic) &&
-            AMERICA_COUNTS_SUBTOPICS.includes(subTopic)
+            AmericaCountsVolunteerService.isEligibleSession({
+              volunteer: user,
+              session,
+            })
           ) {
             results.push(session)
           }

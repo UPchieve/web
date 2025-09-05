@@ -16,6 +16,25 @@ export const AMERICA_COUNTS_SUBTOPICS = [
   'algebraOne',
 ]
 
+export const AMERICA_COUNTS_GRADE_LEVELS = ['6th', '7th', '8th', '9th']
+
+export function isEligibleSession({
+  volunteer,
+  session,
+}: {
+  volunteer: { subjects: string[] }
+  session: {
+    student: { currentGradeName: string }
+    subTopic: string
+  }
+}) {
+  return (
+    volunteer.subjects.includes(session.subTopic) &&
+    AMERICA_COUNTS_SUBTOPICS.includes(session.subTopic) &&
+    AMERICA_COUNTS_GRADE_LEVELS.includes(session.student.currentGradeName)
+  )
+}
+
 function getOldestSession(sessions: Session[]) {
   return sessions.sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
@@ -45,9 +64,11 @@ function joinSession(session: Session) {
     2. not currently in a session
     3. they are outside of their cooldown period
     4. student is NOT a test user or shadow banned
-    5. is one of the whitelisted subjects - AMERICA_COUNTS_SUBTOPICS above
-        NOTE: this one happens in volunteer/handleIncomingSessions method
-        since we also don't want to display them on the dashboard
+    5. student is in one of the approved AMERICA_COUNTS_GRADE_LEVELS above
+        AND is one of the whitelisted subjects - AMERICA_COUNTS_SUBTOPICS above
+        NOTE: this check is `isEligibleSession` fn above which is called
+        in volunteer/handleIncomingSessions method since we also don't want
+        to display them on the dashboard
 
     If all of these conditions are met, we can automatically join the session.
 
