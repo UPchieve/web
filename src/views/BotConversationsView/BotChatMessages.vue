@@ -66,6 +66,7 @@ function messageAlignment(message: (typeof props.messages)[number]) {
   width: 100%;
   display: flex;
   flex-direction: column;
+  padding-inline: 1rem;
 }
 
 .message-container {

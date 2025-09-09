@@ -79,8 +79,7 @@ const followupFeedbackEvent = EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK
   display: flex;
   width: 100%;
   align-items: end;
-  padding-left: 20px;
-  padding-right: 20px;
+  gap: 8px;
 }
 .icon {
   flex-shrink: 0;
@@ -89,7 +88,6 @@ const followupFeedbackEvent = EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK
 }
 
 .message {
-  max-width: 80%;
   line-height: 140%;
   overflow-wrap: break-word;
   font-size: 16px;
@@ -105,6 +103,7 @@ const followupFeedbackEvent = EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK
 
 .right {
   justify-content: end;
+  padding-left: 3rem;
   & .message {
     padding: 10px 16px;
     background-color: $c-background-blue;
@@ -112,6 +111,7 @@ const followupFeedbackEvent = EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK
 }
 .left {
   justify-content: start;
+  padding-right: 1rem;
 
   & .bot {
     background-color: $selected-green;

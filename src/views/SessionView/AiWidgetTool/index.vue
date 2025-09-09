@@ -368,13 +368,11 @@ onUnmounted(() => {
   }
 }
 .body {
-  overflow-y: scroll;
   height: 100%;
   position: relative;
 }
 .overrides {
   padding-top: 18px;
-  overflow-y: scroll;
   height: 100%;
 }
 .header {
