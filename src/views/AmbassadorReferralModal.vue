@@ -290,7 +290,7 @@ onMounted(() => {
   }
 
   &__left {
-    max-width: 450px;
+    max-width: 500px;
     padding: 16px;
 
     @include breakpoint-below('medium') {
@@ -375,7 +375,6 @@ onMounted(() => {
 .phone-number-input-container {
   @include flex-container(row, center, center);
   gap: 16px;
-  width: 100%;
 }
 
 .phone-number-input {
