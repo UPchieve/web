@@ -917,6 +917,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   GOAL_SETTING_SESSION = 'goal-setting-session',
   REFERRAL_MODAL_REDESIGN = 'referral-modal-redesign',
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
+  GOAL_SETTING_VOLUNTEERS = 'goal-setting-volunteers',
 }
 
 export const ANALYTICS_REPORT_ROW = {

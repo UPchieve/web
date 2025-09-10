@@ -250,6 +250,7 @@ export default {
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       showInAppSessionNotifications:
         'featureFlags/showInAppSessionNotifications',
+      isGoalSettingVolunteer: 'featureFlags/isGoalSettingVolunteer',
     }),
     doMountRefreshAppAlert() {
       return this.$route.name !== 'SessionView'
@@ -353,6 +354,10 @@ export default {
       if (isConnected && isVolunteer) {
         this.emitList({ retryCount: 0, maxRetries: 5 })
       }
+    },
+    isGoalSettingVolunteer(currentValue, prevValue) {
+      if (currentValue && !prevValue)
+        this.emitList({ retryCount: 0, maxRetries: 5 })
     },
   },
 }

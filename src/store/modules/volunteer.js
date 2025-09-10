@@ -114,7 +114,7 @@ export default {
     },
 
     async handleIncomingSessions(
-      { commit, dispatch, state },
+      { commit, dispatch, state, rootGetters },
       { context, sessions }
     ) {
       const user = this.state.user.user
@@ -135,6 +135,8 @@ export default {
 
       const results = []
       const socketSessions = sessions.filter((session) => !session.volunteer)
+      const isGoalSettingVolunteer =
+        rootGetters['featureFlags/isGoalSettingVolunteer']
       for (const session of socketSessions) {
         const { subTopic } = session
 
@@ -145,6 +147,14 @@ export default {
           (session.student.isShadowBanned && !user.isAdmin)
         ) {
           continue
+        }
+
+        if (session.isGoalSettingSession) {
+          if (!isGoalSettingVolunteer) continue
+          else {
+            results.push({ ...session, subjectDisplayName: 'Goal Setting' })
+            continue
+          }
         }
 
         if (this.getters['americaCountsVolunteer/isAmericaCountsVolunteer']) {
