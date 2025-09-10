@@ -60,6 +60,7 @@
     "portal-gun": "git://github.com/claydotio/portal-gun.git",
     "posthog-js": "^1.216.1",
     "promise-retry": "^1.1.1",
+    "qr-code-styling": "^1.9.2",
     "quill": "^2.0.3",
     "quill-cursors": "^4.0.3",
     "sass": "1.54.8",

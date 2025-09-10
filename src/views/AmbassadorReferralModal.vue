@@ -13,17 +13,19 @@ import EmailIcon from '@/assets/social_sharing_icons/email_icon.svg'
 import FacebookIcon from '@/assets/social_sharing_icons/facebook_icon.svg'
 import LinkedinIcon from '@/assets/social_sharing_icons/linkedin_icon.svg'
 import TextIcon from '@/assets/social_sharing_icons/text_icon.svg'
+import Modal from '@/components/Modal.vue'
+import QRCodeStyling, { type DrawType, type DotType } from 'qr-code-styling'
 
 const store = useStore()
-const closeModal = () => {
-  AnalyticsService.captureEvent(EVENTS.REFERRAL_MODAL_CLOSE)
-  store.dispatch('app/modal/hide')
-}
 
 const emit = defineEmits<{
   (e: 'copied'): void
   (e: 'sent'): void
 }>()
+
+defineProps({
+  closeModal: { type: Function, required: true },
+})
 
 const isTextReferralLinksEnabled = computed(
   () => store.getters['featureFlags/isTextReferralLinksEnabled']
@@ -39,14 +41,48 @@ const sendText = ref('Send Text')
 const phoneNumber = ref('')
 const errorMessage = ref('')
 const isMobile = computed(() => store.getters['app/mobileMode'])
+const qrElement = ref<HTMLDivElement | null>(null)
 
-function referralLink() {
-  const { referralCode } = user.value
-  if (import.meta.env.NODE_ENV === 'development') {
-    return `http://localhost:8080/referral/${referralCode}`
-  } else {
-    return `${config.serverRoot}/referral/${referralCode}`
+const options = {
+  width: 200,
+  height: 200,
+  type: 'svg' as DrawType,
+  data: referralLink({ isQrCode: true }),
+  image: new URL('@/assets/logo-circle.svg', import.meta.url).href,
+  dotsOptions: {
+    color: '#000',
+    type: 'rounded' as DotType,
+  },
+  backgroundOptions: {
+    color: '#ffffff',
+  },
+  imageOptions: {
+    crossOrigin: 'anonymous',
+    margin: 5,
+  },
+}
+
+const qrCode = new QRCodeStyling(options)
+
+onMounted(() => {
+  if (qrElement.value) {
+    qrCode.append(qrElement.value)
   }
+})
+
+function referralLink({ isQrCode = false } = {}) {
+  const { referralCode } = user.value
+
+  const isDev = import.meta.env.NODE_ENV === 'development'
+  const base = isDev
+    ? `http://localhost:8080/referral/${referralCode}`
+    : `${config.serverRoot}/referral/${referralCode}`
+
+  if (isQrCode && !isDev) {
+    return `${base}?utm_source=referral_code&utm_medium=qr_code&utm_campaign=ambassadors`
+  }
+
+  return base
 }
 
 const onCopiedReferralLink = () => {
@@ -152,90 +188,167 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="referral-modal">
-    <div class="referral-modal__left">
-      <div class="close-button-container">
-        <button class="x-button" @click="closeModal">
-          <CrossIcon class="x-icon" />
-        </button>
-      </div>
-      <h1 class="referral-modal__title">Invite Coaches, Help More Students</h1>
-      <p>
-        Every Coach you invite helps up to
-        <strong>20 more students</strong> get the support they need.
-      </p>
-      <p>
-        Plus, earn 1 volunteer hour for every 5 signups and become an official
-        <strong>UPchieve Ambassador</strong>, great for resumés and college
-        apps! 🎉
-      </p>
+  <Modal :closeModal="() => closeModal()" class="modal">
+    <div class="referral-modal">
+      <div class="referral-modal__left">
+        <div class="close-button-left">
+          <CrossIcon class="x-icon" @click="closeModal" />
+        </div>
+        <h1 class="referral-modal__title">
+          Invite Coaches, Help More Students
+        </h1>
+        <p>
+          Every Coach you invite helps up to
+          <strong>20 more students</strong> get the support they need.
+        </p>
+        <p>
+          Plus, earn 1 volunteer hour for every 5 signups and become an official
+          <strong>UPchieve Ambassador</strong>, great for resumés and college
+          apps! 🎉
+        </p>
 
-      <div class="referral-link-input-div">
-        <p class="send-text"><strong>Copy Link</strong></p>
-        <div class="referral-link-input-container">
-          <FormInput
-            type="text"
-            class="referral-link-input"
-            :readOnly="true"
-            :modelValue="referralLink()"
-          />
-          <button class="send-btns" @click="onCopiedReferralLink">
-            {{ copyText }}
-          </button>
+        <div class="referral-link-input-div">
+          <p class="send-text"><strong>Copy Link</strong></p>
+          <div class="referral-link-input-container">
+            <FormInput
+              type="text"
+              class="referral-link-input"
+              :readOnly="true"
+              :modelValue="referralLink()"
+            />
+            <button class="send-btns" @click="onCopiedReferralLink">
+              {{ copyText }}
+            </button>
+          </div>
+        </div>
+        <div v-if="isTextReferralLinksEnabled" class="referral-link-input-div">
+          <p class="send-text"><strong>Send Text</strong></p>
+          <div class="phone-number-input-container">
+            <maz-phone-number-input
+              id="phoneNumber"
+              class="phone-number-input"
+              v-model="phoneNumber"
+            />
+            <button class="send-btns" @click="sendTextMessage(phoneNumber)">
+              {{ sendText }}
+            </button>
+          </div>
+        </div>
+        <div
+          class="referral-link-input-div"
+          v-if="isReferralModalRedesignEnabled"
+        >
+          <p class="send-text"><strong>Share via</strong></p>
+          <div class="share-via-input-container">
+            <button v-if="isMac() || isMobile" @click="shareVia('text')">
+              <text-icon />
+            </button>
+            <button @click="shareVia('email')"><email-icon /></button>
+            <button @click="shareVia('linkedin')"><linkedin-icon /></button>
+            <button @click="shareVia('facebook')"><facebook-icon /></button>
+          </div>
         </div>
       </div>
-      <div v-if="isTextReferralLinksEnabled" class="referral-link-input-div">
-        <p class="send-text"><strong>Send Text</strong></p>
-        <div class="phone-number-input-container">
-          <maz-phone-number-input
-            id="phoneNumber"
-            class="phone-number-input"
-            v-model="phoneNumber"
-          />
-          <button class="send-btns" @click="sendTextMessage(phoneNumber)">
-            {{ sendText }}
-          </button>
+      <div class="referral-modal__right">
+        <div class="close-button-right">
+          <CrossIcon class="x-icon" @click="closeModal" />
         </div>
-      </div>
-      <div
-        class="referral-link-input-div"
-        v-if="isReferralModalRedesignEnabled"
-      >
-        <p class="send-text"><strong>Share via</strong></p>
-        <div class="share-via-input-container">
-          <button v-if="isMac() || isMobile" @click="shareVia('text')">
-            <text-icon />
-          </button>
-          <button @click="shareVia('email')"><email-icon /></button>
-          <button @click="shareVia('linkedin')"><linkedin-icon /></button>
-          <button @click="shareVia('facebook')"><facebook-icon /></button>
+        <div class="qr-container">
+          <div ref="qrElement" class="qr-canvas"></div>
         </div>
       </div>
     </div>
-  </div>
+  </Modal>
 </template>
 
 <style lang="scss" scoped>
+::v-deep(.upc-modal-form) {
+  max-width: none;
+  padding: 0;
+  width: auto;
+}
+
+::v-deep(.upc-modal-form--bottom-padding) {
+  padding: 0;
+}
+
 .referral-modal {
-  @include flex-container(row, flex-start, flex-start);
+  @include flex-container(row, center, stretch);
+  width: 100%;
+  height: 100%;
+  min-height: 450px;
   gap: 8px;
   text-align: left;
+
+  @include breakpoint-below('medium') {
+    @include flex-container(column, flex-start, center);
+  }
 
   &__title {
     font-size: 24px;
     text-align: left;
   }
+
+  &__left {
+    max-width: 450px;
+    padding: 16px;
+
+    @include breakpoint-below('medium') {
+      max-width: 100%;
+    }
+
+    .close-button-left {
+      text-align: right;
+
+      @include breakpoint-above('medium') {
+        display: none;
+      }
+    }
+  }
+
+  &__right {
+    @include flex-container(column, center, center);
+    background-color: $c-success-green;
+    background-image: url('@/assets/referral_qr_code_background.svg');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-width: 490px;
+    height: auto;
+    padding: 16px;
+    position: relative;
+
+    @include breakpoint-below('large') {
+      min-width: 400px;
+    }
+
+    @include breakpoint-below('medium') {
+      min-height: 50%;
+      min-width: 100%;
+    }
+
+    .close-button-right {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: block;
+
+      @include breakpoint-below('medium') {
+        display: none;
+      }
+    }
+
+    .qr-container {
+      @include flex-container(column, center, center);
+      height: 100%;
+    }
+  }
 }
 
-.close-button-container {
-  text-align: right;
-}
-.x-button {
-  margin-left: auto;
-  .x-icon {
-    height: 16px;
-    width: 16px;
-  }
+.x-icon {
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
 }
 
 .send-text {

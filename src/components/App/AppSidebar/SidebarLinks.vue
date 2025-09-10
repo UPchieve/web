@@ -174,6 +174,10 @@
         </sidebar-link>
       </div>
     </div>
+    <AmbassadorReferralModal
+      v-if="ambassadorReferralModalIsOpen"
+      :closeModal="closeAmbassadorReferralModal"
+    />
   </div>
 </template>
 
@@ -198,6 +202,7 @@ import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
 import AiTutorButton from '../AiTutorButton.vue'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
+import AmbassadorReferralModal from '@/views/AmbassadorReferralModal.vue'
 
 export default {
   components: {
@@ -217,6 +222,7 @@ export default {
     RewardsSidebarIcon,
     ActivityDot,
     CompassIcon,
+    AmbassadorReferralModal,
   },
   props: {
     authenticated: Boolean,
@@ -251,6 +257,11 @@ export default {
       return !!getIncompleteAssignments(this.user.studentAssignments).length
     },
   },
+  data() {
+    return {
+      ambassadorReferralModalIsOpen: false,
+    }
+  },
   methods: {
     openReferFriendModal() {
       AnalyticsService.captureEvent(
@@ -271,13 +282,11 @@ export default {
         EVENTS.USER_CLICKED_LEVEL_UP_IMPACT_SIDEBAR_LINK,
         { userType: this.userType }
       )
-      this.$store.dispatch('app/modal/show', {
-        component: 'AmbassadorReferralModal',
-        data: {
-          showAccept: false,
-          showTemplateButtons: false,
-        },
-      })
+      this.ambassadorReferralModalIsOpen = true
+    },
+    closeAmbassadorReferralModal() {
+      AnalyticsService.captureEvent(EVENTS.REFERRAL_MODAL_CLOSE)
+      this.ambassadorReferralModalIsOpen = false
     },
   },
 }
