@@ -258,8 +258,10 @@
         <FileDialog
           ref="fileDialog"
           class="upload-photo"
-          accept="image/*, image/heic"
+          accept="image/png, image/jpeg, image/webp, image/heic"
           @file-selected="uploadPhoto"
+          @file-too-large="onFileTooLarge"
+          :maxFileSizeBytes="MAX_IMAGE_FILE_SIZE_BYTES"
         />
         <PhotoUploadIcon class="toolbar-icon--photo" />
       </button>
@@ -554,7 +556,6 @@ import Announcement from '@/components/Announcement.vue'
 import Loader from '@/components/Loader.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import config from '../../config'
-import heic2any from 'heic2any'
 import LoggerService from '@/services/LoggerService'
 import { markRaw } from 'vue'
 import { EVENTS } from '@/consts'
@@ -567,6 +568,8 @@ import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
 import StartScreenShareButton from './StartScreenShareButton.vue'
 import SessionService from '@/services/SessionService'
+import { processImage, getImageTooLargeMessage } from '@/utils/image-pipeline'
+import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
 
 const TOOLS = {
   BRUSH: 'brush',
@@ -773,6 +776,9 @@ export default {
         this.selectedTool === 'rectangle' ||
         this.selectedTool === 'xy_graph'
       )
+    },
+    MAX_IMAGE_FILE_SIZE_BYTES() {
+      return BYTES_PER_MEGABYTE * 10
     },
   },
   updated() {
@@ -1132,35 +1138,15 @@ export default {
     async uploadPhoto(uploadEvents) {
       const { files } = uploadEvents.fileSelectionEvent.target
       let file = files[0]
-      const tenMegabytes = 10 * 1000000
 
       if (!this.isWhiteboardOpen && this.mobileMode) this.toggleWhiteboard()
-
-      if (file.size > tenMegabytes) {
-        this.error =
-          'The photo is too large. Please upload a photo less than 10mb.'
-        return
-      }
 
       this.usePickTool(uploadEvents.dialogOpeningEvent)
 
       this.isLoading = true
 
       try {
-        // Convert HEIC images to jpeg on desktop devices
-        if (!this.isMobile() && file.type === 'image/heic') {
-          const convertedBlob = await heic2any({
-            blob: file,
-            toType: 'image/jpeg',
-          })
-
-          const fileType = convertedBlob.type.split('/')[1]
-          const previousFileName = file.name.split('.')[0]
-          const newFileName = `${previousFileName}.${fileType}`
-          file = new File([convertedBlob], newFileName, {
-            lastModified: new Date().getTime(),
-          })
-        }
+        file = await processImage(file)
 
         // Moderate the image
         const formData = new FormData()
@@ -1201,6 +1187,9 @@ export default {
         uploadEvents.fileSelectionEvent.target.value = ''
         this.isLoading = false
       }
+    },
+    onFileTooLarge() {
+      this.error = getImageTooLargeMessage(this.MAX_IMAGE_FILE_SIZE_BYTES)
     },
     insertPhoto(imageUrl) {
       this.uploadingImageNodeId = this.zwibblerCtx.createNode('ImageNode', {

@@ -49,7 +49,7 @@
     "chartjs-adapter-moment": "^1.0.1",
     "exponential-backoff": "^3.1.0",
     "gleap": "^14.6.7",
-    "heic2any": "^0.0.4",
+    "heic-convert": "^2.1.0",
     "langfuse": "^3.25.0",
     "libphonenumber-js": "^1.10.60",
     "lodash-es": "^4.17.21",

@@ -93,7 +93,7 @@
                   @file-selected="uploadDocument"
                   @file-too-large="handleFileTooLarge"
                   :multiple="true"
-                  :sizeLimitMB="maxSizeLimit"
+                  :maxFileSizeBytes="MAX_UPLOAD_SIZE_BYTES"
                 />
 
                 <div class="upload-button">
@@ -161,6 +161,7 @@ import Modal from '@/components/Modal.vue'
 import FileDialog from '@/components/FileDialog.vue'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import AnalyticsService from '@/services/AnalyticsService'
+import { BYTES_PER_MEGABYTE, formatBytes } from '@/utils/bytes'
 
 export default {
   components: {
@@ -204,6 +205,9 @@ export default {
     minDueDate() {
       return moment(this.startDate).add(1, 'day').endOf('day').toDate()
     },
+    MAX_UPLOAD_SIZE_BYTES() {
+      return BYTES_PER_MEGABYTE * 5
+    },
   },
 
   data() {
@@ -225,7 +229,6 @@ export default {
       assignmentId: '',
       removedStudents: [],
       files: [],
-      maxSizeLimit: 5,
     }
   },
 
@@ -291,8 +294,9 @@ export default {
 
     handleFileTooLarge(files) {
       const fileNames = files.map((file) => file.name).join(', ')
+      const maxLabel = formatBytes(this.MAX_UPLOAD_SIZE_BYTES)
       alert(
-        `${fileNames} ${files.length > 1 ? `are` : `is`} too large! Max size allowed is ${this.maxSizeLimit} MB. Please try again.`
+        `${fileNames} ${files.length > 1 ? 'are' : 'is'} too large! Max size allowed is ${maxLabel}. Please try again.`
       )
     },
 

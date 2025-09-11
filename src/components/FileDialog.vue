@@ -4,7 +4,6 @@
     class="hidden-file-input"
     :accept="accept"
     :multiple="multiple"
-    :sizeLimitMB="sizeLimitMB"
     @change="handleFileSelect"
   />
 </template>
@@ -20,7 +19,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    sizeLimitMB: {
+    maxFileSizeBytes: {
       type: Number,
       required: false,
     },
@@ -42,9 +41,9 @@ export default {
       const files = event.target.files
 
       const filesArr = Array.from(event.target.files)
-      if (this.sizeLimitMB) {
+      if (this.maxFileSizeBytes) {
         const oversizedFiles = filesArr.filter(
-          (file) => file.size > this.sizeLimitMB * 1024 * 1024
+          (file) => file.size > this.maxFileSizeBytes
         )
 
         if (oversizedFiles.length > 0) {

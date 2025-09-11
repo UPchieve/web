@@ -69,23 +69,23 @@
     <div id="quill-container"></div>
     <transition name="document-loading">
       <loading-message
-        message="Loading the document editor"
+        v-if="isLoading"
+        :message="loadingText"
         class="document-loading document-loading--connection"
-        v-show="isLoading"
       />
     </transition>
     <transition name="document-loading">
-      <loading-message
-        message="Attempting to connect the document editor"
-        class="document-loading document-loading--connection"
-        v-show="isConnecting"
-      />
+      <p v-if="error" class="document-loading document-loading--error">
+        {{ error }}
+      </p>
     </transition>
     <refresh-document-editor-modal v-if="showRefreshModal" />
     <FileDialog
-      accept="image/*, image/heic"
+      accept="image/png, image/jpeg, image/webp, image/heic"
       ref="fileDialog"
       @file-selected="onFileSelected"
+      @file-too-large="onFileTooLarge"
+      :maxFileSizeBytes="MAX_IMAGE_FILE_SIZE_BYTES"
     />
   </div>
 </template>
@@ -100,13 +100,6 @@ import { applyUpdate, Doc } from 'yjs'
 import { socket } from '@/socket'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
-import {
-  fileSizeTooBigEventName,
-  ImageCompressor,
-  imageFailedModerationEventName,
-  MAX_TOTAL_IMAGES,
-  maxImagesEventName,
-} from '@/utils/quill-image-optimizer'
 import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -123,11 +116,20 @@ import Spinner from '@/components/Spinner.vue'
 import { vTooltip } from 'maz-ui'
 import WordCount from '@/components/WordCount.vue'
 import EyeIcon from '@/assets/eye.svg'
+import {
+  processImage,
+  getImageTooLargeMessage,
+  isAllowedImageMime,
+} from '@/utils/image-pipeline'
+import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
+import { ImageDropPaste } from '@/quill/modules/image'
+
 Quill.register('modules/cursors', QuillCursors)
-Quill.register('modules/image', ImageCompressor)
+Quill.register('modules/image', ImageDropPaste)
 
 const encode = (array) => array.toString()
 const decode = (str) => Uint8Array.from(str.split(',').map(Number))
+const DEFAULT_IMAGE_QUALITY = 0.8
 
 export default {
   directives: {
@@ -196,11 +198,12 @@ export default {
       quillEditor: null,
       // set default loading state
       isLoading: true,
+      loadingText: 'Loading the document editor',
       incomingDeltas: [],
       retries: 0,
       showRefreshModal: false,
-      isConnecting: false,
       showScreenShareErrorTooltip: false,
+      error: '',
       // For determining word counts.
       text: '',
       selectedText: '',
@@ -230,6 +233,9 @@ export default {
     isSocketReadyToRequestForDoc() {
       return [this.isConnected, this.currentSession?.id]
     },
+    MAX_IMAGE_FILE_SIZE_BYTES() {
+      return BYTES_PER_MEGABYTE * 10
+    },
   },
   mounted() {
     this.quillEditor = markRaw(
@@ -249,11 +255,8 @@ export default {
         ],
         modules: {
           image: {
-            quality: 0.8,
-            maxWidth: 1000,
-            maxHeight: 1000,
-            imageType: 'image/webp',
-            sessionId: this.sessionId,
+            processAndInsertImage: this.processAndInsertImage,
+            isAllowedImageMime,
           },
           cursors: {
             selectionChangeSource: 'cursor-api',
@@ -280,28 +283,6 @@ export default {
     this.doc = new Doc()
     new QuillBinding(this.doc.getText('quill'), this.quillEditor)
 
-    this.quillEditor.root.addEventListener(
-      maxImagesEventName,
-      () =>
-        alert(
-          `Too many images uploaded. \n\n You can not have more than ${MAX_TOTAL_IMAGES} images in the document editor.`
-        ),
-      false
-    )
-    this.quillEditor.root.addEventListener(
-      fileSizeTooBigEventName,
-      () =>
-        alert(
-          `Image file size is too big. \n\n Please compress/resize the image before uploading.`
-        ),
-      false
-    )
-    this.quillEditor.root.addEventListener(
-      imageFailedModerationEventName,
-      (event) => this.onImageFailedModeration(event.failures),
-      false
-    )
-
     // do not allow user to make edits until the quill doc contents are set
     this.quillEditor.disable()
 
@@ -320,6 +301,7 @@ export default {
         applyUpdate(this.doc, decode(update))
       }
       this.isLoading = false
+      this.loadingText = ''
       this.quillEditor.enable()
 
       this.quillEditor
@@ -388,11 +370,25 @@ export default {
     },
     async onFileSelected(evt) {
       const { files } = evt.fileSelectionEvent.target
-      let file = files[0]
-      const formData = new FormData()
-      formData.append('image', file)
-      formData.append('sessionId', this.sessionId)
+      const file = files[0]
+      await this.processAndInsertImage(file)
+    },
+    async processAndInsertImage(file) {
+      if (!isAllowedImageMime(file.type)) return this.onWrongFileType()
+      if (file.size > this.MAX_IMAGE_FILE_SIZE_BYTES)
+        return this.onFileTooLarge()
+
+      this.isLoading = true
+      this.loadingText = 'Loading image'
+
       try {
+        file = await processImage(file, {
+          quality: DEFAULT_IMAGE_QUALITY,
+        })
+        const formData = new FormData()
+        formData.append('image', file)
+        formData.append('sessionId', this.sessionId)
+
         const { isClean, failures } =
           await ModerationService.checkIfImageIsClean(formData)
         if (!isClean) {
@@ -422,7 +418,25 @@ export default {
         alert(
           'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
         )
+      } finally {
+        this.isLoading = false
+        this.loadingText = ''
       }
+    },
+    onFileTooLarge() {
+      const imageTooLargeMessage = getImageTooLargeMessage(
+        this.MAX_IMAGE_FILE_SIZE_BYTES
+      )
+      this.setTemporaryErrorMessage(imageTooLargeMessage)
+    },
+    onWrongFileType() {
+      this.setTemporaryErrorMessage(
+        `That file type isn't supported. Please upload an image.`
+      )
+    },
+    setTemporaryErrorMessage(message, timeout = 2000) {
+      this.error = message
+      setTimeout(() => (this.error = ''), timeout)
     },
     onImageFailedModeration(failures) {
       AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_IMAGE_CENSORED, {
@@ -446,10 +460,12 @@ export default {
         // socket.io just reconnected, allow edits to the document editor
         // or the volunteer is able to send DMs after the session ends
         this.quillEditor.enable()
-        this.isConnecting = false
+        this.isLoading = false
+        this.loadingText = ''
       } else {
         this.quillEditor.disable()
-        this.isConnecting = true
+        this.isLoading = true
+        this.loadingText = 'Attempting to connect the document editor'
       }
     },
     isSocketReadyToRequestForDoc(currentVal) {
@@ -533,6 +549,10 @@ export default {
 
   &--connection {
     background-color: rgba(110, 140, 171, 0.87);
+  }
+
+  &--error {
+    background-color: $c-error-red;
   }
 }
 
