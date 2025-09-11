@@ -327,19 +327,6 @@ async function createAccount(data: TeacherAccountFormData) {
   }
 }
 
-const signUpMethodByProvider: Partial<
-  Record<
-    SsoProvider,
-    (
-      userType: UserType,
-      data: TeacherAccountFormData
-    ) => SignUpService.SubmitActionResponse
-  >
-> = {
-  [SsoProvider.CLEVER]: SignUpService.createAccountWithClever,
-  [SsoProvider.CLASSLINK]: SignUpService.createAccountWithClassLink,
-}
-
 function createAccountWithProvider(
   provider: SsoProvider,
   data: TeacherAccountFormData
@@ -347,14 +334,19 @@ function createAccountWithProvider(
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT, {
     provider,
   })
-  const method = signUpMethodByProvider[provider]
-  if (!method)
-    throw new Error(`No sign-up method found for provider: ${provider}`)
-  return method(UserType.teacher, data)
+  return SignUpService.createAccountWithProvider(
+    provider,
+    UserType.teacher,
+    data
+  )
 }
 
 export function createAccountWithClever(data: TeacherAccountFormData) {
   return createAccountWithProvider(SsoProvider.CLEVER, data)
+}
+
+export function createAccountWithGoogle(data: TeacherAccountFormData) {
+  return createAccountWithProvider(SsoProvider.GOOGLE, data)
 }
 
 export function createAccountWithClassLink(data: TeacherAccountFormData) {
@@ -391,6 +383,11 @@ function getSsoSectionElements(): FormRow[] {
     'Clever',
     SsoProvider.CLEVER
   )
+  const googleButton = getSsoButton(
+    createAccountWithGoogle,
+    'Google',
+    SsoProvider.GOOGLE
+  )
   const classLinkButton = isClassLinkSsoEnabled
     ? getSsoButton(
         createAccountWithClassLink,
@@ -399,10 +396,12 @@ function getSsoSectionElements(): FormRow[] {
       )
     : undefined
 
-  if (isMobileMode)
+  if (isMobileMode) {
     return [
       getRow('mt-3', cleverButton),
       ...(classLinkButton ? [getRow('mt-3', classLinkButton)] : []),
+      getRow('mt-3', googleButton),
     ]
-  return [getRow('mt-3', cleverButton, classLinkButton)]
+  }
+  return [getRow('mt-3', cleverButton, classLinkButton, googleButton)]
 }

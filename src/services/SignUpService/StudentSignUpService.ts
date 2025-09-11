@@ -627,18 +627,6 @@ async function createAccount(data: StudentAccountFormData) {
   }
 }
 
-const signUpMethodByProvider: Record<
-  SsoProvider,
-  (
-    userType: UserType,
-    data: StudentAccountFormData
-  ) => SignUpService.SubmitActionResponse
-> = {
-  [SsoProvider.GOOGLE]: SignUpService.createAccountWithGoogle,
-  [SsoProvider.CLEVER]: SignUpService.createAccountWithClever,
-  [SsoProvider.CLASSLINK]: SignUpService.createAccountWithClassLink,
-}
-
 function createAccountWithProvider(
   provider: SsoProvider,
   data: StudentAccountFormData
@@ -646,10 +634,11 @@ function createAccountWithProvider(
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
     provider,
   })
-  const method = signUpMethodByProvider[provider]
-  if (!method)
-    throw new Error(`No sign-up method found for provider: ${provider}`)
-  return method(UserType.student, data)
+  return SignUpService.createAccountWithProvider(
+    provider,
+    UserType.student,
+    data
+  )
 }
 
 function createAccountWithGoogle(data: StudentAccountFormData) {

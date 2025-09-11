@@ -166,6 +166,27 @@ export function getSubmitResponse(
   return [null, null]
 }
 
+const signUpMethodByProvider: Record<
+  SsoProvider,
+  (userType: UserType, data: AccountFormData) => SubmitActionResponse
+> = {
+  [SsoProvider.GOOGLE]: createAccountWithGoogle,
+  [SsoProvider.CLEVER]: createAccountWithClever,
+  [SsoProvider.CLASSLINK]: createAccountWithClassLink,
+}
+
+export function createAccountWithProvider(
+  provider: SsoProvider,
+  userType: UserType,
+  data: AccountFormData
+) {
+  const method = signUpMethodByProvider[provider]
+  if (!method) {
+    throw new Error(`No sign-up method found for provider: ${provider}`)
+  }
+  return method(userType, data)
+}
+
 export function createAccountWithGoogle(
   userType: UserType,
   data: AccountFormData
@@ -205,6 +226,7 @@ function createAccountWithSso(
         provider === SsoProvider.GOOGLE || provider === SsoProvider.CLASSLINK
           ? `/sign-up/${userType}/account`
           : '/clever-signin-instructions',
+      accountType: userType,
       ...data,
     })
     return [null, null]
