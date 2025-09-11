@@ -3,6 +3,8 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   namespaced: true,
@@ -153,6 +155,12 @@ export default {
           if (!isGoalSettingVolunteer) continue
           else {
             results.push({ ...session, subjectDisplayName: 'Goal Setting' })
+            AnalyticsService.captureEvent(
+              EVENTS.GOAL_SETTING_SESSION_SHOWN_TO_DASHBOARD,
+              {
+                userId: user.id,
+              }
+            )
             continue
           }
         }

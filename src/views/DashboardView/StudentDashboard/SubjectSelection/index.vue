@@ -18,10 +18,11 @@
         <section v-if="isGoalSettingSessionEnabled" class="goal-session">
           <div class="goal-session__card">
             <esl-icon />
-            <h2 class="goal-session__title">Study Plan</h2>
+            <h2 class="goal-session__title">
+              {{ goalSettingSessionPayload.title }}
+            </h2>
             <p class="goal-session__description">
-              Stressed about grades, tests, or college? We'll help you make a
-              clear personalized plan so you know your next move.
+              {{ goalSettingSessionPayload.description }}
             </p>
             <p class="goal-session__time-description">
               {{ goalSettingSessionTimeText }}
