@@ -171,13 +171,47 @@
           </div>
 
           <account-action
-            v-for="accountAction in onboaringAccountActions"
+            v-for="accountAction in onboardingAccountActions"
             :key="accountAction.title"
             :title="accountAction.title"
             :subtitle="accountAction.subtitle"
             :status="accountAction.status"
             :icon="accountAction.icon"
             @click="accountAction.clickFn"
+          />
+        </div>
+        <div
+          class="dashboard-card"
+          v-if="isSkipAvailabilityOnboardingRequirementEnabled"
+        >
+          <div class="dashboard-card__icon">
+            <RingingNotificationBellIcon />
+          </div>
+          <div class="dashboard-card__title">
+            Get Notified About Student Requests
+          </div>
+          <div class="dashboard-card__subtitle">
+            Never miss an opportunity to help students by enabling browser
+            notifications and opting-in to text messages.
+          </div>
+          <div class="video-wrapper">
+            <iframe
+              class="video"
+              src="https://player.vimeo.com/video/797113791?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+              title="Vimeo video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <account-action
+            v-for="notificationAction in notificationActions"
+            :key="notificationAction.title"
+            :title="notificationAction.title"
+            :subtitle="notificationAction.subtitle"
+            :status="notificationAction.status"
+            :icon="notificationAction.icon"
+            @click="notificationAction.clickFn"
           />
         </div>
       </template>
@@ -209,6 +243,7 @@ import DashboardBanner from '../DashboardBanner.vue'
 import AccountAction from './AccountAction.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
+import SquareTextIcon from '@/assets/square-text-icon.svg'
 import PersonCardIcon from '@/assets/person-card.svg'
 import PersonIcon from '@/assets/person.svg'
 import CalendarIcon from '@/assets/calendar.svg'
@@ -216,6 +251,8 @@ import CertificationIcon from '@/assets/certification.svg'
 import VerificationIcon from '@/assets/verification.svg'
 import OnboardingIcon from '@/assets/onboarding.svg'
 import TrainingIcon from '@/assets/training_icon.svg'
+import RingingNotificationBellIcon from '@/assets/icons/ringing-notification-bell.svg'
+import BlackNotificationBellIcon from '@/assets/icons/notification-bell-black.svg'
 import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
@@ -228,6 +265,8 @@ import ShareMilestoneModal from '@/views/DashboardView/VolunteerDashboard/ShareM
 import ClockIcon from '@/assets/icons/clock_icon.svg'
 import ChatIcon from '@/assets/icons/chat-outline-rounded.svg'
 import NotesIcon from '@/assets/icons/notes-checkmark.svg'
+import setNotificationPermission from '@/utils/set-notification-permission'
+import getNotificationPermission from '@/utils/get-notification-permission'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -239,7 +278,12 @@ export default {
     DashboardBanner,
     AccountAction,
     PhotoUploadModal,
+    // eslint-disable-next-line vue/no-unused-components
+    SquareTextIcon,
     VerificationIcon,
+    RingingNotificationBellIcon,
+    // eslint-disable-next-line vue/no-unused-components
+    BlackNotificationBellIcon,
     OnboardingIcon,
     VolunteerWelcomeModal,
     WebNotificationsButton,
@@ -269,6 +313,7 @@ export default {
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal()
     }
+    this.notificationPermission = getNotificationPermission()
   },
   data() {
     return {
@@ -277,6 +322,7 @@ export default {
       lastUpdated: '',
       isLoadingImpactSummary: true,
       hasSeenMilestoneModal: localStorage.getItem('hasSharedMilestone'),
+      notificationPermission: 'default',
     }
   },
   computed: {
@@ -285,6 +331,8 @@ export default {
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
       openSessions: (state) => state.volunteer.openSessions,
       hasSharedMilestone: (state) => state.user.hasSharedMilestone,
+      availabilityLastModifiedAt: (state) =>
+        state.user.user?.availabilityLastModifiedAt,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -294,15 +342,13 @@ export default {
       allSubjectNames: 'subjects/allSubtopicNames',
       getVolunteerMilestoneSharingStudyVariant:
         'featureFlags/getVolunteerMilestoneSharingStudyVariant',
+      isSkipAvailabilityOnboardingRequirementEnabled:
+        'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled',
     }),
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
         (org) => org === this.user.volunteerPartnerOrg
       )
-    },
-
-    isNewVolunteer() {
-      return !this.user.pastSessions || !this.user.pastSessions.length
     },
 
     photoIdAction() {
@@ -465,8 +511,8 @@ export default {
       return accountActions.sort((a, b) => a.priority - b.priority)
     },
 
-    onboaringAccountActions() {
-      const onboaringActions = [
+    onboardingAccountActions() {
+      const onboardingActions = [
         {
           title: 'Complete UPchieve 101',
           subtitle: this.trainingAction.subtitle,
@@ -474,14 +520,6 @@ export default {
           clickFn: this.clickUpchieve101Action,
           icon: TrainingIcon,
           priority: this.addSortPriorityNum(this.trainingAction.status),
-        },
-        {
-          title: 'Select availability',
-          subtitle: this.availabilityAction.subtitle,
-          status: this.availabilityAction.status,
-          clickFn: this.clickAvailabilityAction,
-          icon: CalendarIcon,
-          priority: this.addSortPriorityNum(this.availabilityAction.status),
         },
         {
           title: 'Unlock a subject',
@@ -492,7 +530,46 @@ export default {
           priority: this.addSortPriorityNum(this.certificationAction.status),
         },
       ]
-      return onboaringActions.sort((a, b) => a.priority - b.priority)
+      if (!this.isSkipAvailabilityOnboardingRequirementEnabled) {
+        onboardingActions.push({
+          title: 'Select availability',
+          subtitle: this.availabilityAction.subtitle,
+          status: this.availabilityAction.status,
+          clickFn: this.clickAvailabilityAction,
+          icon: CalendarIcon,
+          priority: this.addSortPriorityNum(this.availabilityAction.status),
+        })
+      }
+      return onboardingActions.sort((a, b) => a.priority - b.priority)
+    },
+
+    notificationActions() {
+      return [
+        {
+          title: 'Enable Browser Notifications',
+          subtitle:
+            this.notificationPermission === 'default'
+              ? 'Optional'
+              : this.notificationPermission === 'denied'
+                ? 'Please edit your browser settings to enable notifications'
+                : 'Completed',
+          status:
+            this.notificationPermission === 'granted'
+              ? 'COMPLETED'
+              : 'Enable now',
+          clickFn: this.onClickBrowserNotifications,
+          icon: BlackNotificationBellIcon,
+          priority: 0,
+        },
+        {
+          title: 'Sign Up for Texts',
+          subtitle: this.availabilityLastModifiedAt ? 'Completed' : 'Optional',
+          status: this.availabilityLastModifiedAt ? 'COMPLETED' : 'Sign up now',
+          clickFn: this.onClickSignupForTextNotifications,
+          icon: SquareTextIcon,
+          priority: 1,
+        },
+      ]
     },
 
     hourTrackingGuide() {
@@ -593,6 +670,18 @@ export default {
     },
     clickUpchieve101Action() {
       this.$router.push('/training/course/upchieve101')
+    },
+    onClickBrowserNotifications() {
+      const initialPermission = getNotificationPermission()
+      if (['default', 'denied'].includes(initialPermission)) {
+        Notification.requestPermission((permission) => {
+          setNotificationPermission(permission)
+          this.notificationPermission = permission
+        })
+      }
+    },
+    onClickSignupForTextNotifications() {
+      this.$router.push('/calendar')
     },
     goToBackgroundInfo() {
       this.$router.push('/background-information')
@@ -749,6 +838,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.video-wrapper {
+  margin-bottom: 24px;
+  width: 80%;
+  aspect-ratio: 16 / 9;
+
+  .video {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .btn {
   height: 60px;
   background-color: #16d2aa;
@@ -791,13 +891,9 @@ export default {
 
     @include breakpoint-above('huge') {
       @include child-spacing(top, 0);
-      @include child-spacing(right, 40px);
-
-      @include flex-container(row);
-
-      & > * {
-        flex-basis: 50%;
-      }
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
     }
   }
 }
@@ -806,6 +902,9 @@ export default {
   background: #fff;
   border-radius: 8px;
   padding: 40px 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   &__icon {
     display: flex;
@@ -820,6 +919,7 @@ export default {
     font-weight: 500;
     line-height: 1.25;
     text-align: center;
+    width: 80%;
   }
 
   &__subtitle {
@@ -836,6 +936,8 @@ export default {
 
   .account-action {
     margin: 0 10px;
+    align-items: normal;
+    width: 80%;
 
     @include breakpoint-above('medium') {
       margin: 0 20px;
