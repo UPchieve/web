@@ -14,7 +14,7 @@ import FacebookIcon from '@/assets/social_sharing_icons/facebook_icon.svg'
 import LinkedinIcon from '@/assets/social_sharing_icons/linkedin_icon.svg'
 import TextIcon from '@/assets/social_sharing_icons/text_icon.svg'
 import Modal from '@/components/Modal.vue'
-import QRCodeStyling, { type DrawType, type DotType } from 'qr-code-styling'
+import QRCodeStyling, { type DotType } from 'qr-code-styling'
 
 const store = useStore()
 
@@ -46,9 +46,7 @@ const qrElement = ref<HTMLDivElement | null>(null)
 const options = {
   width: 200,
   height: 200,
-  type: 'svg' as DrawType,
   data: referralLink({ isQrCode: true }),
-  image: new URL('@/assets/logo-circle.svg', import.meta.url).href,
   dotsOptions: {
     color: '#000',
     type: 'rounded' as DotType,
@@ -57,8 +55,7 @@ const options = {
     color: '#ffffff',
   },
   imageOptions: {
-    crossOrigin: 'anonymous',
-    margin: 5,
+    margin: 10,
   },
 }
 
