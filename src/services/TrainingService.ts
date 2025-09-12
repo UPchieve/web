@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash-es'
 import NetworkService from './NetworkService'
+import store from '@/store'
 
 export type TrainingMaterial = {
   name: string
@@ -118,9 +119,14 @@ export default {
     this.idAnswerMap[question.id] = picked
   },
   async submitQuiz() {
+    const skipAvailabilityOnboardingRequirement =
+      store.getters[
+        'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled'
+      ]
     return NetworkService.getQuizScore({
       idAnswerMap: this.idAnswerMap,
       category: this.category,
+      skipAvailabilityOnboardingRequirement,
     }).then((res) => {
       this.idCorrectAnswerMap = res.data.idCorrectAnswerMap
       return {

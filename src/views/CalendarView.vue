@@ -107,9 +107,6 @@ export default {
           return 'Save'
       }
     },
-    sortedTimes() {
-      return this.sortTimes()
-    },
     hasUserSchedule() {
       return !isEmpty(this.availability)
     },

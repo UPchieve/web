@@ -916,6 +916,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   REFERRAL_MODAL_REDESIGN = 'referral-modal-redesign',
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
   GOAL_SETTING_VOLUNTEERS = 'goal-setting-volunteers',
+  SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT = 'skip-availability-onboarding-requirement',
 }
 
 export const ANALYTICS_REPORT_ROW = {
