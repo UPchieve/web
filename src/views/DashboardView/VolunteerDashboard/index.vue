@@ -113,7 +113,7 @@
               :href="hourTrackingGuide"
               target="_blank"
               rel="noopener noreferrer"
-              >How to track your volunteer hours
+              ><strong>How to track your volunteer hours</strong>
               <arrow-icon class="arrow-icon" />
             </a>
           </div>
@@ -647,7 +647,7 @@ export default {
       // (3) Requests filled
       const numRequestsFilled = get(pastSessions, 'length', 0)
 
-      const formatFn = ({ hours, minutes }) => `${hours} h ${minutes} m`
+      const formatFn = ({ hours, minutes }) => `${hours}h ${minutes}m`
 
       // (4) Hours tutored
       const numHoursTutored = hoursToHoursAndMinutes(
@@ -960,7 +960,7 @@ export default {
 .impact-summary {
   @include flex-container(row, center, stretch);
   gap: 12px;
-  padding: 16px;
+  padding: 16px 30px;
 
   @include breakpoint-below('small') {
     @include flex-container(column, center, center);
@@ -968,7 +968,7 @@ export default {
 
   &__title {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 500;
     text-wrap: nowrap;
     margin: 0;
   }
@@ -1007,6 +1007,7 @@ export default {
   border-top: 10px solid rgba(22, 210, 170, 0.2);
   width: 100%;
   height: auto;
+  margin-right: 14px;
 
   &__hours-this-week-title {
     @include flex-container(row, flex-start, flex-end);
@@ -1030,7 +1031,6 @@ export default {
   }
 
   &__divider {
-    width: 90%;
     background-color: #d8dee5;
     height: 1px;
     margin: 20px 0;
@@ -1049,6 +1049,7 @@ export default {
 
 .community-impact {
   border-top: 10px solid #e3f2fd;
+  margin-bottom: 14px;
 }
 
 .availability {
