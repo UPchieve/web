@@ -933,16 +933,14 @@ export default {
     clickTextPicker() {
       this.toggleTextPicker()
 
+      if (!this.showTextPicker) return
       if (
-        this.showTextPicker &&
-        this.selectedTool !== TOOLS.SMALL_TEXT &&
-        this.selectedTool !== TOOLS.TEXT
+        !this.lastSelectedTextSize ||
+        this.lastSelectedTextSize === TOOLS.TEXT
       ) {
-        if (this.lastSelectedTextSize === TOOLS.TEXT) {
-          this.useTextTool()
-        } else {
-          this.useSmallTextTool()
-        }
+        this.useTextTool()
+      } else if (this.lastSelectedTextSize === TOOLS.SMALL_TEXT) {
+        this.useSmallTextTool()
       }
 
       this.zwibblerCtx.on('edit-text-shown', () => {
@@ -986,14 +984,14 @@ export default {
     useBrushTool(event) {
       this.zwibblerCtx.useBrushTool()
       this.maybeFocusZwibbler(event)
-      this.lastSelectedBrushType = TOOLS.BRUSH
+      this.selectedTool = TOOLS.BRUSH
       this.lastSelectedBrushType = TOOLS.BRUSH
     },
     useThinBrushTool(event) {
       this.selectedThinBrushTool = true
       this.zwibblerCtx.useBrushTool({ lineWidth: 3 })
       this.maybeFocusZwibbler(event)
-      this.lastSelectedBrushType = TOOLS.THIN_BRUSH
+      this.selectedTool = TOOLS.THIN_BRUSH
       this.lastSelectedBrushType = TOOLS.THIN_BRUSH
     },
     useEraserTool(event) {
@@ -1048,12 +1046,14 @@ export default {
       this.lastSelectedTextSize = TOOLS.TEXT
       this.selectedSmallTextTool = false
       this.zwibblerCtx.useTextTool()
+      this.selectedTool = TOOLS.TEXT
       this.maybeFocusZwibbler(event)
     },
     useSmallTextTool(event) {
       this.lastSelectedTextSize = TOOLS.SMALL_TEXT
       this.selectedSmallTextTool = true
-      this.zwibblerCtx.useTextTool({ fontSize: 26, fontName: 'Arial' })
+      this.zwibblerCtx.useTextTool({ fontSize: 20, fontName: 'Arial' })
+      this.selectedTool = TOOLS.SMALL_TEXT
       this.maybeFocusZwibbler(event)
     },
     // TODO: Use a generic "toggle" method.
@@ -1526,23 +1526,11 @@ export default {
           // The eraser uses the brush tool. In order to make it seem as the eraser
           // is active for the user, we're overriding the selectedTool to be
           // `eraser` instead of `brush`
-          if (this.selectedEraserTool) {
+           if (this.selectedEraserTool) {
             this.selectedEraserTool = false
             this.selectedTool = 'eraser'
             this.hideHoveredToolbars()
-            this.hideHoveredToolbars()
-          } else if (this.selectedThinBrushTool) {
-            this.selectedThinBrushTool = false
-            this.selectedTool = TOOLS.THIN_BRUSH
-            this.selectedTool = TOOLS.THIN_BRUSH
-          } else if (this.selectedSmallTextTool) {
-            this.selectedSmallTextTool = false
-            this.selectedTool = 'small-text'
-            this.hideHoveredToolbars()
-            this.hideHoveredToolbars()
-          } else {
-            this.selectedTool = toolname
-          }
+          } 
         })
 
         this.zwibblerCtx.on('document-changed', (info) => {
