@@ -164,8 +164,8 @@
           <hand-wave-icon class="icon" />
         </sidebar-link>
         <sidebar-link
-          v-if="isVolunteer"
-          to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-3bepgb2mf-gERSkUYPxqonCyY~tA2TMg"
+          v-if="isAdmin || (isVolunteer && isSlackCommunityEnabled)"
+          :onClick="openSlackCommunity"
           text="Community"
           :openNewTab="true"
           id="community-sidebar-link"
@@ -247,6 +247,7 @@ export default {
       isBecomeAnAmbassadorCtaEnabled:
         'featureFlags/isBecomeAnAmbassadorCtaEnabled',
       isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
+      isSlackCommunityEnabled: 'featureFlags/isSlackCommunityEnabled',
     }),
     isStandaloneAiEnabled() {
       return (
@@ -261,6 +262,12 @@ export default {
     return {
       ambassadorReferralModalIsOpen: false,
     }
+  },
+  created() {
+    const group = this.isSlackCommunityEnabled ? 'test' : 'control'
+    AnalyticsService.captureEvent(EVENTS.SAW_SLACK_COMMUNITY_LINK, {
+      group,
+    })
   },
   methods: {
     openReferFriendModal() {
@@ -287,6 +294,13 @@ export default {
     closeAmbassadorReferralModal() {
       AnalyticsService.captureEvent(EVENTS.REFERRAL_MODAL_CLOSE)
       this.ambassadorReferralModalIsOpen = false
+    },
+    openSlackCommunity() {
+      window.open(
+        'https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-3bepgb2mf-gERSkUYPxqonCyY~tA2TMg',
+        '_blank'
+      )
+      AnalyticsService.captureEvent(EVENTS.CLICKED_SLACK_COMMUNITY)
     },
   },
 }
