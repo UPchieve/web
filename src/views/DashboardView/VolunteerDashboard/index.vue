@@ -913,7 +913,6 @@ export default {
   padding: 40px 0 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
 
   &__icon {
     display: flex;
