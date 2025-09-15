@@ -183,6 +183,7 @@
         <div
           class="dashboard-card"
           v-if="isSkipAvailabilityOnboardingRequirementEnabled"
+          id="dashboard-notifications-card"
         >
           <div class="dashboard-card__icon">
             <RingingNotificationBellIcon />
@@ -267,6 +268,8 @@ import ChatIcon from '@/assets/icons/chat-outline-rounded.svg'
 import NotesIcon from '@/assets/icons/notes-checkmark.svg'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -672,6 +675,9 @@ export default {
       this.$router.push('/training/course/upchieve101')
     },
     onClickBrowserNotifications() {
+      AnalyticsService.captureEvent(
+        EVENTS.SKIP_AVAILABILITY_REQT_CLICKED_ENABLE_BROWSER_NOTIFICATIONS
+      )
       const initialPermission = getNotificationPermission()
       if (['default', 'denied'].includes(initialPermission)) {
         Notification.requestPermission((permission) => {
@@ -681,6 +687,9 @@ export default {
       }
     },
     onClickSignupForTextNotifications() {
+      AnalyticsService.captureEvent(
+        EVENTS.SKIP_AVAILABILITY_REQT_CLICKED_SIGN_UP_FOR_TEXT_NOTIFICATIONS
+      )
       this.$router.push('/calendar')
     },
     goToBackgroundInfo() {
