@@ -167,7 +167,6 @@
           v-if="isAdmin || (isVolunteer && isSlackCommunityEnabled)"
           :onClick="openSlackCommunity"
           text="Community"
-          :openNewTab="true"
           id="community-sidebar-link"
         >
           <slack-logo-icon class="icon" />
@@ -297,7 +296,7 @@ export default {
     },
     openSlackCommunity() {
       window.open(
-        'https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-3bepgb2mf-gERSkUYPxqonCyY~tA2TMg',
+        'https://upchieveaccommunity.slack.com/join/shared_invite/zt-3ddtu0s8n-0GTFhvj674v_BTXnc8tlmQ',
         '_blank'
       )
       AnalyticsService.captureEvent(EVENTS.CLICKED_SLACK_COMMUNITY)
