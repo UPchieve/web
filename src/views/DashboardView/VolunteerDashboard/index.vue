@@ -180,41 +180,29 @@
             @click="accountAction.clickFn"
           />
         </div>
-        <div
-          class="dashboard-card"
+        <TaskCard
           v-if="isSkipAvailabilityOnboardingRequirementEnabled"
           id="dashboard-notifications-card"
+          title="Get Notified About Student Requests"
+          subtitle="Never miss an opportunity to help students by enabling browser notifications and opting-in to text messages."
+          :actions="notificationActions"
         >
-          <div class="dashboard-card__icon">
+          <template v-slot:icon>
             <RingingNotificationBellIcon />
-          </div>
-          <div class="dashboard-card__title">
-            Get Notified About Student Requests
-          </div>
-          <div class="dashboard-card__subtitle">
-            Never miss an opportunity to help students by enabling browser
-            notifications and opting-in to text messages.
-          </div>
-          <div class="video-wrapper">
-            <iframe
-              class="video"
-              src="https://player.vimeo.com/video/797113791?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
-              title="Vimeo video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-            ></iframe>
-          </div>
-          <account-action
-            v-for="notificationAction in notificationActions"
-            :key="notificationAction.title"
-            :title="notificationAction.title"
-            :subtitle="notificationAction.subtitle"
-            :status="notificationAction.status"
-            :icon="notificationAction.icon"
-            @click="notificationAction.clickFn"
-          />
-        </div>
+          </template>
+          <template v-slot:content>
+            <div class="video-wrapper">
+              <iframe
+                class="video"
+                src="https://player.vimeo.com/video/797113791?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+                title="Vimeo video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </template>
+        </TaskCard>
       </template>
     </div>
 
@@ -253,7 +241,7 @@ import VerificationIcon from '@/assets/verification.svg'
 import OnboardingIcon from '@/assets/onboarding.svg'
 import TrainingIcon from '@/assets/training_icon.svg'
 import RingingNotificationBellIcon from '@/assets/icons/ringing-notification-bell.svg'
-import BlackNotificationBellIcon from '@/assets/icons/notification-bell-black.svg'
+import SimpleRingingBellIcon from '@/assets/icons/simple-ringing-notification-bell.svg'
 import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
@@ -270,6 +258,7 @@ import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import TaskCard from '@/components/TaskCard.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -277,6 +266,7 @@ const userHasSchedule = flow([get, isBoolean])
 export default {
   name: 'volunteer-dashboard',
   components: {
+    TaskCard,
     ListSessions,
     DashboardBanner,
     AccountAction,
@@ -286,7 +276,7 @@ export default {
     VerificationIcon,
     RingingNotificationBellIcon,
     // eslint-disable-next-line vue/no-unused-components
-    BlackNotificationBellIcon,
+    SimpleRingingBellIcon,
     OnboardingIcon,
     VolunteerWelcomeModal,
     WebNotificationsButton,
@@ -558,19 +548,17 @@ export default {
                 : 'Completed',
           status:
             this.notificationPermission === 'granted'
-              ? 'COMPLETED'
-              : 'Enable now',
-          clickFn: this.onClickBrowserNotifications,
-          icon: BlackNotificationBellIcon,
-          priority: 0,
+              ? 'complete'
+              : 'not-started',
+          onClick: this.onClickBrowserNotifications,
+          icon: SimpleRingingBellIcon,
         },
         {
           title: 'Sign Up for Texts',
           subtitle: this.availabilityLastModifiedAt ? 'Completed' : 'Optional',
-          status: this.availabilityLastModifiedAt ? 'COMPLETED' : 'Sign up now',
-          clickFn: this.onClickSignupForTextNotifications,
+          status: this.availabilityLastModifiedAt ? 'complete' : 'not-started',
+          onClick: this.onClickSignupForTextNotifications,
           icon: SquareTextIcon,
-          priority: 1,
         },
       ]
     },
