@@ -1,3 +1,10 @@
+* {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}
+
 $app-header-height-map: (
   "default": 80px,
   "medium": 64px
