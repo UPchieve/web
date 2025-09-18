@@ -921,6 +921,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
   GOAL_SETTING_VOLUNTEERS = 'goal-setting-volunteers',
   SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT = 'skip-availability-onboarding-requirement',
+  SLACK_COMMUNITY_ENABLED = 'study-slack-coach-community',
 }
 
 export const ANALYTICS_REPORT_ROW = {

@@ -68,6 +68,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
       [POSTHOG_FEATURE_FLAGS.GOAL_SETTING_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT]: false,
+      [POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -291,6 +292,8 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT
       ],
+    isSlackCommunityEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED],
   },
   actions: {
     isSessionAudioCallEnabled: async (
