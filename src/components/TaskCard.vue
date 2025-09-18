@@ -6,7 +6,7 @@ import CheckIcon from '@/assets/check.svg'
 export type ActionListItem = {
   title: string
   subtitle?: string
-  status: 'not-started' | 'in-progress' | 'complete'
+  status: 'not-started' | 'in-progress' | 'complete' | 'error'
   onClick: Function
   icon: Component
 }
@@ -38,6 +38,7 @@ const props = defineProps<{
           :class="{
             'in-progress': action.status === 'in-progress',
             complete: action.status === 'complete',
+            error: action.status === 'error',
           }"
         >
           <component
@@ -146,6 +147,10 @@ const props = defineProps<{
 
     .in-progress {
       border-color: $c-warning-orange;
+    }
+
+    .error {
+      border-color: $c-error-red;
     }
 
     .caret-icon {

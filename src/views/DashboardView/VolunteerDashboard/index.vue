@@ -11,11 +11,13 @@
 
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && user.isOnboarded">
-        <div class="dashboard-card">
-          <div class="students-waiting">
-            <web-notifications-button class="notifications-button" />
-            <div class="dashboard-card__title">Waiting Students</div>
-            <div v-if="isSessionAlive" class="rejoin-session-container">
+        <TaskCard
+          title="Waiting Students"
+          subtitle="Students waiting for help will show up below"
+        >
+          <template v-slot:content>
+            <ListSessions v-if="!isSessionAlive" :style="{ width: '100%' }" />
+            <div v-else class="rejoin-session-container">
               <button
                 class="btn rejoinSessionBtn"
                 type="button"
@@ -24,162 +26,126 @@
                 Rejoin your coaching session
               </button>
             </div>
-            <div v-else>
-              <div class="dashboard-card__subtitle">
-                Students waiting for help will show up below.
-              </div>
-              <list-sessions />
-            </div>
-          </div>
-        </div>
-        <div class="dashboard-card">
-          <div class="dashboard-card__title">Your Impact Summary</div>
-          <loader v-if="isLoadingImpactSummary" class="loader--center" />
-          <div v-else class="impact-summary">
-            <div class="coaching-activity">
-              <div class="impact-summary__heading">
-                <chat-icon />
-                <h2 class="impact-summary__title">Coaching Activity</h2>
-              </div>
+          </template>
+        </TaskCard>
+        <TaskCard title="Your Impact Summary">
+          <template v-slot:content>
+            <loader v-if="isLoadingImpactSummary" class="loader--center" />
+            <div v-else class="impact-summary-content">
+              <div class="impact-summary">
+                <div class="coaching-activity">
+                  <div class="impact-summary__heading">
+                    <chat-icon />
+                    <h2 class="impact-summary__title">Coaching Activity</h2>
+                  </div>
 
-              <div class="coaching-activity__hours-this-week-title">
-                <h3>Hours this week</h3>
-                <span
-                  class="stat-tooltip"
-                  v-tooltip="{
-                    text: 'Monday to Sunday UTC time',
-                    color: 'black',
-                    position: 'top',
-                  }"
-                >
-                  <InformationIcon />
-                </span>
+                  <div class="coaching-activity__hours-this-week-title">
+                    <h3>Hours this week</h3>
+                    <span
+                      class="stat-tooltip"
+                      v-tooltip="{
+                        text: 'Monday to Sunday UTC time',
+                        color: 'black',
+                        position: 'top',
+                      }"
+                    >
+                      <InformationIcon />
+                    </span>
+                  </div>
+                  <h4 class="coaching-activity__hours-this-week">
+                    {{ impactStats.timeTutoredThisWeek }}
+                  </h4>
+                  <div class="coaching-activity__divider"></div>
+                  <div class="impact-summary__stats">
+                    <span class="stat-name">Hours all time</span
+                    ><span class="stat">{{ impactStats.numHoursTutored }}</span>
+                  </div>
+                  <div class="impact-summary__stats">
+                    <span class="stat-name">Requests filled</span
+                    ><span class="stat">{{
+                      impactStats.numRequestsFilled
+                    }}</span>
+                  </div>
+                  <div class="impact-summary__stats">
+                    <span class="stat-name">Certifications</span
+                    ><span class="stat">{{
+                      impactStats.totalQuizzesPassed
+                    }}</span>
+                  </div>
+                </div>
+                <div class="impact-summary-right">
+                  <div class="community-impact">
+                    <div class="impact-summary__heading">
+                      <notes-icon />
+                      <h2 class="impact-summary__title">Community Impact</h2>
+                    </div>
+                    <div class="impact-summary__stats">
+                      <span class="stat-name">Students helped</span
+                      ><span class="stat">{{
+                        impactStats.totalStudentsHelped
+                      }}</span>
+                    </div>
+                    <div class="impact-summary__stats">
+                      <span class="stat-name">Referral Hours</span
+                      ><span class="stat">{{
+                        impactStats.numReferralHours
+                      }}</span>
+                    </div>
+                  </div>
+                  <div class="availability">
+                    <div class="impact-summary__heading">
+                      <clock-icon />
+                      <h2 class="impact-summary__title">Availability</h2>
+                    </div>
+                    <div class="impact-summary__stats">
+                      <span class="stat-name">Hours selected</span
+                      ><span class="stat">{{
+                        impactStats.numHoursSelected
+                      }}</span>
+                    </div>
+                    <div class="impact-summary__stats">
+                      <span class="stat-name">Hours elapsed</span
+                      ><span class="stat">{{
+                        impactStats.numElapsedAvailabilityHours
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h4 class="coaching-activity__hours-this-week">
-                {{ impactStats.timeTutoredThisWeek }}
-              </h4>
-              <div class="coaching-activity__divider"></div>
-              <div class="impact-summary__stats">
-                <span class="stat-name">Hours all time</span
-                ><span class="stat">{{ impactStats.numHoursTutored }}</span>
-              </div>
-              <div class="impact-summary__stats">
-                <span class="stat-name">Requests filled</span
-                ><span class="stat">{{ impactStats.numRequestsFilled }}</span>
-              </div>
-              <div class="impact-summary__stats">
-                <span class="stat-name">Certifications</span
-                ><span class="stat">{{ impactStats.totalQuizzesPassed }}</span>
+              <div class="dashboard-card-link">
+                <a
+                  class="track-hours-link"
+                  :href="hourTrackingGuide"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><strong>How to track your volunteer hours</strong>
+                  <arrow-icon class="arrow-icon" />
+                </a>
               </div>
             </div>
-            <div class="impact-summary-right">
-              <div class="community-impact">
-                <div class="impact-summary__heading">
-                  <notes-icon />
-                  <h2 class="impact-summary__title">Community Impact</h2>
-                </div>
-                <div class="impact-summary__stats">
-                  <span class="stat-name">Students helped</span
-                  ><span class="stat">{{
-                    impactStats.totalStudentsHelped
-                  }}</span>
-                </div>
-                <div class="impact-summary__stats">
-                  <span class="stat-name">Referral Hours</span
-                  ><span class="stat">{{ impactStats.numReferralHours }}</span>
-                </div>
-              </div>
-              <div class="availability">
-                <div class="impact-summary__heading">
-                  <clock-icon />
-                  <h2 class="impact-summary__title">Availability</h2>
-                </div>
-                <div class="impact-summary__stats">
-                  <span class="stat-name">Hours selected</span
-                  ><span class="stat">{{ impactStats.numHoursSelected }}</span>
-                </div>
-                <div class="impact-summary__stats">
-                  <span class="stat-name">Hours elapsed</span
-                  ><span class="stat">{{
-                    impactStats.numElapsedAvailabilityHours
-                  }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="dashboard-card__link">
-            <a
-              class="track-hours-link"
-              :href="hourTrackingGuide"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><strong>How to track your volunteer hours</strong>
-              <arrow-icon class="arrow-icon" />
-            </a>
-          </div>
-        </div>
+          </template>
+        </TaskCard>
       </template>
       <template v-else>
-        <div v-if="!user.isApproved" class="dashboard-card">
-          <div class="dashboard-card__icon">
-            <verification-icon />
-          </div>
-          <div class="dashboard-card__title" data-testid="safety-screening">
-            Safety Screening
-          </div>
-          <div class="dashboard-card__subtitle">
-            {{ approvalCardSubheader }}
-          </div>
-          <template
-            v-if="
-              !user.volunteerPartnerOrg ||
-              partnerKeysThatRequirePhotoId.includes(user.volunteerPartnerOrg)
-            "
-          >
-            <account-action
-              v-for="accountAction in openVolunteerApprovalAccountActions"
-              :key="accountAction.title"
-              :title="accountAction.title"
-              :subtitle="accountAction.subtitle"
-              :status="accountAction.status"
-              :icon="accountAction.icon"
-              @click="accountAction.clickFn"
-              :data-testid="accountAction.title"
-            />
+        <TaskCard
+          v-if="!user.isApproved"
+          title="Safety Screening"
+          :subtitle="approvalCardSubheader"
+          :actions="safetyScreeningActions"
+        >
+          <template v-slot:icon>
+            <VerificationIcon />
           </template>
-          <template v-else>
-            <account-action
-              v-for="accountAction in partnerVolunteerApprovalAccountActions"
-              :key="accountAction.title"
-              :title="accountAction.title"
-              :subtitle="accountAction.subtitle"
-              :status="accountAction.status"
-              :icon="accountAction.icon"
-              @click="accountAction.clickFn"
-            />
+        </TaskCard>
+        <TaskCard
+          title="Onboarding Process"
+          subtitle="While waiting for your safety screening to process, complete our quick onboarding so you're ready to start helping students as soon as possible"
+          :actions="onboardingAccountActions"
+        >
+          <template v-slot:icon>
+            <OnboardingIcon />
           </template>
-        </div>
-        <div class="dashboard-card">
-          <div class="dashboard-card__icon">
-            <onboarding-icon />
-          </div>
-          <div class="dashboard-card__title">Onboarding Process</div>
-          <div class="dashboard-card__subtitle">
-            While waiting for your safety screening to process, complete our
-            quick onboarding so you're ready to start helping students as soon
-            as possible.
-          </div>
-
-          <account-action
-            v-for="accountAction in onboardingAccountActions"
-            :key="accountAction.title"
-            :title="accountAction.title"
-            :subtitle="accountAction.subtitle"
-            :status="accountAction.status"
-            :icon="accountAction.icon"
-            @click="accountAction.clickFn"
-          />
-        </div>
+        </TaskCard>
         <TaskCard
           v-if="isSkipAvailabilityOnboardingRequirementEnabled"
           id="dashboard-notifications-card"
@@ -229,7 +195,6 @@ import { flow, reduce, get, isBoolean } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 import ListSessions from './ListSessions.vue'
 import DashboardBanner from '../DashboardBanner.vue'
-import AccountAction from './AccountAction.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
 import SquareTextIcon from '@/assets/square-text-icon.svg'
@@ -242,7 +207,6 @@ import OnboardingIcon from '@/assets/onboarding.svg'
 import TrainingIcon from '@/assets/training_icon.svg'
 import RingingNotificationBellIcon from '@/assets/icons/ringing-notification-bell.svg'
 import SimpleRingingBellIcon from '@/assets/icons/simple-ringing-notification-bell.svg'
-import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
@@ -269,7 +233,6 @@ export default {
     TaskCard,
     ListSessions,
     DashboardBanner,
-    AccountAction,
     PhotoUploadModal,
     // eslint-disable-next-line vue/no-unused-components
     SquareTextIcon,
@@ -279,7 +242,6 @@ export default {
     SimpleRingingBellIcon,
     OnboardingIcon,
     VolunteerWelcomeModal,
-    WebNotificationsButton,
     ArrowIcon,
     Loader,
     InformationIcon,
@@ -349,27 +311,27 @@ export default {
         case 'EMPTY':
           return {
             subtitle: 'Upload a photo ID',
-            status: 'DEFAULT',
+            status: 'not-started',
           }
         case 'SUBMITTED':
           return {
             subtitle: 'Waiting for review (1-2 business days)',
-            status: 'PENDING',
+            status: 'in-progress',
           }
         case 'APPROVED':
           return {
             subtitle: 'Completed',
-            status: 'COMPLETED',
+            status: 'complete',
           }
         case 'REJECTED':
           return {
             subtitle: 'Please upload a different photo',
-            status: 'ERROR',
+            status: 'error',
           }
         default:
           return {
             subtitle: 'Upload a photo ID',
-            status: 'DEFAULT',
+            status: 'not-started',
           }
       }
     },
@@ -378,12 +340,12 @@ export default {
       if (this.hasSelectedAvailability)
         return {
           subtitle: 'Completed',
-          status: 'COMPLETED',
+          status: 'complete',
         }
 
       return {
         subtitle: 'Select at least one hour',
-        status: 'DEFAULT',
+        status: 'not-started',
       }
     },
 
@@ -394,12 +356,12 @@ export default {
         if (this.user.certifications[cert].passed)
           return {
             subtitle: 'Completed',
-            status: 'COMPLETED',
+            status: 'complete',
           }
       }
       return {
         subtitle: 'Pass at least one quiz',
-        status: 'DEFAULT',
+        status: 'not-started',
       }
     },
 
@@ -408,32 +370,19 @@ export default {
       if (passedQuiz)
         return {
           subtitle: 'Completed',
-          status: 'COMPLETED',
+          status: 'complete',
         }
 
       const startedCourse = this.user.trainingCourses.upchieve101.progress > 0
       if (startedCourse)
         return {
           subtitle: 'In progress',
-          status: 'PENDING',
+          status: 'in-progress',
         }
 
       return {
         subtitle: 'Go through our training',
-        status: 'DEFAULT',
-      }
-    },
-
-    backgroundInfoAction() {
-      if (this.hasCompletedBackgroundInfo)
-        return {
-          subtitle: 'Completed',
-          status: 'COMPLETED',
-        }
-
-      return {
-        subtitle: 'Fill out form',
-        status: 'DEFAULT',
+        status: 'not-started',
       }
     },
 
@@ -457,21 +406,32 @@ export default {
       return config.partnerKeysThatRequirePhotoId
     },
 
+    safetyScreeningActions() {
+      return !this.user.volunteerPartnerOrg ||
+        this.partnerKeysThatRequirePhotoId.includes(
+          this.user.volunteerPartnerOrg
+        )
+        ? this.openVolunteerApprovalAccountActions
+        : this.partnerVolunteerApprovalAccountActions
+    },
+
     openVolunteerApprovalAccountActions() {
       const accountActions = [
         {
           title: 'Background information',
-          subtitle: this.backgroundInfoAction.subtitle,
-          status: this.backgroundInfoAction.status,
-          clickFn: this.goToBackgroundInfo,
+          subtitle: this.hasCompletedBackgroundInfo
+            ? 'Completed'
+            : 'Fill out form',
+          status: this.hasCompletedBackgroundInfo ? 'complete' : 'not-started',
+          onClick: this.goToBackgroundInfo,
           icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status),
+          priority: this.hasCompletedBackgroundInfo ? 0 : 1,
         },
         {
           title: 'Proof of identity',
           subtitle: this.photoIdAction.subtitle,
           status: this.photoIdAction.status,
-          clickFn: this.togglePhotoUploadModal,
+          onClick: this.togglePhotoUploadModal,
           icon: PersonCardIcon,
           priority: this.addSortPriorityNum(this.photoIdAction.status),
         },
@@ -484,20 +444,21 @@ export default {
       const accountActions = [
         {
           title: 'Background information',
-          subtitle: this.backgroundInfoAction.subtitle,
-          status: this.backgroundInfoAction.status,
-          clickFn: this.goToBackgroundInfo,
+          subtitle: this.hasCompletedBackgroundInfo
+            ? 'Completed'
+            : 'Fill out form',
+          status: this.hasCompletedBackgroundInfo ? 'complete' : 'not-started',
+          onClick: this.goToBackgroundInfo,
           icon: PersonIcon,
-          priority: this.addSortPriorityNum(this.backgroundInfoAction.status),
+          priority: this.hasCompletedBackgroundInfo ? 0 : 1,
         },
         {
           title: 'Proof of identity',
-          // @todo: change copy for subtitle
           subtitle: 'Completed',
-          status: 'COMPLETED',
-          clickFn: () => {},
+          status: 'complete',
+          onClick: () => {},
           icon: PersonCardIcon,
-          priority: this.addSortPriorityNum('COMPLETED'),
+          priority: 0,
         },
       ]
 
@@ -510,7 +471,7 @@ export default {
           title: 'Complete UPchieve 101',
           subtitle: this.trainingAction.subtitle,
           status: this.trainingAction.status,
-          clickFn: this.clickUpchieve101Action,
+          onClick: this.clickUpchieve101Action,
           icon: TrainingIcon,
           priority: this.addSortPriorityNum(this.trainingAction.status),
         },
@@ -518,7 +479,7 @@ export default {
           title: 'Unlock a subject',
           subtitle: this.certificationAction.subtitle,
           status: this.certificationAction.status,
-          clickFn: this.clickCertificationAction,
+          onClick: this.clickCertificationAction,
           icon: CertificationIcon,
           priority: this.addSortPriorityNum(this.certificationAction.status),
         },
@@ -528,7 +489,7 @@ export default {
           title: 'Select availability',
           subtitle: this.availabilityAction.subtitle,
           status: this.availabilityAction.status,
-          clickFn: this.clickAvailabilityAction,
+          onClick: this.clickAvailabilityAction,
           icon: CalendarIcon,
           priority: this.addSortPriorityNum(this.availabilityAction.status),
         })
@@ -684,11 +645,9 @@ export default {
       this.$router.push('/background-information')
     },
     addSortPriorityNum(status) {
-      if (status === 'COMPLETED') return 0
-      if (status === 'ERROR') return 1
-      if (status === 'PENDING') return 2
-      if (status === 'PROGRESS') return 3
-      if (status === 'DEFAULT') return 4
+      if (status === 'complete') return 0
+      if (status === 'error') return 1
+      if (status === 'in-progress') return 2
     },
     async getLastUpdated() {
       const res = await NetworkService.getVolunteerLastUpdated()
@@ -895,96 +854,21 @@ export default {
   }
 }
 
-.dashboard-card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 40px 0 24px;
-  display: flex;
-  flex-direction: column;
-
-  &__icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-
-  &__title {
-    margin-bottom: 4px;
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 1.25;
-    text-align: center;
-  }
-
-  &__subtitle {
-    font-size: 16px;
-    color: $c-secondary-grey;
-    margin-bottom: 24px;
-    padding: 0 15px;
-    text-align: center;
-
-    @include breakpoint-above('medium') {
-      padding: 0 42px;
-    }
-  }
-
-  .account-action {
-    margin: 0 10px;
-    align-items: normal;
-    width: 80%;
-
-    @include breakpoint-above('medium') {
-      margin: 0 20px;
-    }
-  }
-
-  &__link {
-    text-align: center;
-  }
+.dashboard-card-link {
+  text-align: center;
 }
 
-.students-waiting {
+.track-hours-link {
+  @include font-category('button');
+  display: inline-flex;
+  align-items: center;
+  margin: 0 auto;
   padding: 0;
+  color: $c-success-green;
+  text-decoration: none;
 
-  @include breakpoint-above('medium') {
-    padding: 0 30px;
-  }
-}
-
-.volunteer-impact {
-  padding: 0 10px;
-
-  @include breakpoint-above('medium') {
-    padding: 0 30px;
-  }
-
-  &__stats {
-    width: 100%;
-    padding: 10px 5px 0;
-  }
-
-  &__stat-label {
-    text-align: left;
-  }
-
-  &__stat {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 0;
-    font-size: 16px;
-  }
-
-  &__stat-value {
-    font-weight: bold;
-    text-align: right;
-  }
-
-  &__last-updated {
-    width: 100%;
-    text-align: right;
-    padding: 10px 0;
-    font-size: 12px;
+  &:hover {
+    text-decoration: none;
   }
 }
 
@@ -1005,25 +889,6 @@ export default {
       color: #f3f3f3;
       text-decoration: none;
     }
-  }
-}
-
-.notifications-button {
-  @include flex-container(row, flex-end);
-  margin-bottom: 1.4em;
-}
-
-.track-hours-link {
-  @include font-category('button');
-  display: inline-flex;
-  align-items: center;
-  margin: 0 auto;
-  padding: 0;
-  color: $c-success-green;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: none;
   }
 }
 
@@ -1052,6 +917,10 @@ export default {
 
 .stat-tooltip:before {
   transition-duration: 0ms;
+}
+
+.impact-summary-content {
+  width: 100%;
 }
 
 .impact-summary {
