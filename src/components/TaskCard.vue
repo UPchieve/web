@@ -2,6 +2,11 @@
 import type { Component } from 'vue'
 import RightCaretIcon from '@/assets/right-caret.svg'
 import CheckIcon from '@/assets/check.svg'
+import CrossIcon from '@/assets/heavy-cross.svg'
+
+export type DismissOptions = {
+  onDismiss: Function
+}
 
 export type ActionListItem = {
   title: string
@@ -14,13 +19,23 @@ const props = defineProps<{
   title: string
   subtitle: string
   actions?: ActionListItem[]
+  dismissOptions?: DismissOptions
 }>()
 </script>
 
 <template>
   <div class="card-main">
+    <div
+      v-if="props.dismissOptions"
+      class="dismiss-button"
+      type="button"
+      @click="props.dismissOptions.onDismiss"
+    >
+      <CrossIcon />
+    </div>
     <slot name="icon" />
     <div class="heading-container">
+      <slot name="heading-content" />
       <div class="title">{{ props.title }}</div>
       <div v-if="props.subtitle" class="subtitle">{{ props.subtitle }}</div>
     </div>
@@ -62,7 +77,7 @@ const props = defineProps<{
 .card-main {
   background: #fff;
   border-radius: 8px;
-  padding: 40px 0 24px;
+  padding: 4.5% 1%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -159,5 +174,12 @@ const props = defineProps<{
       margin-left: 5%;
     }
   }
+}
+
+.dismiss-button {
+  display: flex;
+  flex-direction: column;
+  margin-right: 3%;
+  align-self: flex-end;
 }
 </style>

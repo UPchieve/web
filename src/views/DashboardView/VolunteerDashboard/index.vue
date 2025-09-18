@@ -15,16 +15,29 @@
           title="Waiting Students"
           subtitle="Students waiting for help will show up below"
         >
+          <template v-slot:heading-content>
+            <div class="notifications-button-container">
+              <WebNotificationsButton
+                v-if="
+                  !isSkipAvailabilityOnboardingRequirementEnabled ||
+                  notificationsCardWasDismissed
+                "
+                class="notifications-button"
+              />
+            </div>
+          </template>
           <template v-slot:content>
-            <ListSessions v-if="!isSessionAlive" :style="{ width: '100%' }" />
-            <div v-else class="rejoin-session-container">
-              <button
-                class="btn rejoinSessionBtn"
-                type="button"
-                @click.prevent="rejoinHelpSession()"
-              >
-                Rejoin your coaching session
-              </button>
+            <div class="waiting-students-content">
+              <ListSessions v-if="!isSessionAlive" :style="{ width: '100%' }" />
+              <div v-else class="rejoin-session-container">
+                <button
+                  class="btn rejoinSessionBtn"
+                  type="button"
+                  @click.prevent="rejoinHelpSession()"
+                >
+                  Rejoin your coaching session
+                </button>
+              </div>
             </div>
           </template>
         </TaskCard>
@@ -148,11 +161,15 @@
         </TaskCard>
       </template>
       <TaskCard
-        v-if="isSkipAvailabilityOnboardingRequirementEnabled"
+        v-if="
+          isSkipAvailabilityOnboardingRequirementEnabled &&
+          !notificationsCardWasDismissed
+        "
         id="dashboard-notifications-card"
         title="Get Notified About Student Requests"
         subtitle="Never miss an opportunity to help students by enabling browser notifications and opting-in to text messages."
         :actions="notificationActions"
+        :dismissOptions="{ onDismiss: toggleDidDismissNotificationsCard }"
       >
         <template v-slot:icon>
           <RingingNotificationBellIcon />
@@ -193,6 +210,7 @@
 <script>
 import { flow, reduce, get, isBoolean } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
+import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
 import ListSessions from './ListSessions.vue'
 import DashboardBanner from '../DashboardBanner.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
@@ -231,6 +249,7 @@ export default {
   name: 'volunteer-dashboard',
   components: {
     TaskCard,
+    WebNotificationsButton,
     ListSessions,
     DashboardBanner,
     PhotoUploadModal,
@@ -264,6 +283,12 @@ export default {
       deep: true,
     },
   },
+  beforeMount() {
+    const dismissingUser = sessionStorage.getItem(
+      'DISMISSED_NOTIFICATIONS_CARD'
+    )
+    this.notificationsCardWasDismissed = dismissingUser === this.user.id
+  },
   async created() {
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal()
@@ -278,6 +303,7 @@ export default {
       isLoadingImpactSummary: true,
       hasSeenMilestoneModal: localStorage.getItem('hasSharedMilestone'),
       notificationPermission: 'default',
+      notificationsCardWasDismissed: false,
     }
   },
   computed: {
@@ -588,6 +614,13 @@ export default {
     },
   },
   methods: {
+    toggleDidDismissNotificationsCard() {
+      AnalyticsService.captureEvent(
+        EVENTS.SKIP_AVAILABILITY_REQT_CARD_DISMISSED
+      )
+      sessionStorage.setItem('DISMISSED_NOTIFICATIONS_CARD', this.user.id)
+      this.notificationsCardWasDismissed = !this.notificationsCardWasDismissed
+    },
     rejoinHelpSession() {
       const path = this.sessionPath
       if (path) {
@@ -854,6 +887,17 @@ export default {
   }
 }
 
+.notifications-button-container {
+  display: flex;
+  flex-direction: row;
+  align-self: flex-end;
+}
+
+.notifications-button {
+  @include flex-container(row, flex-end);
+  margin-bottom: 1.4em;
+}
+
 .dashboard-card-link {
   text-align: center;
 }
@@ -905,6 +949,10 @@ export default {
     fill: $upchieve-white;
     margin-left: 0.5em;
   }
+}
+
+.waiting-students-content {
+  width: 90%;
 }
 
 .rejoin-session-container {
