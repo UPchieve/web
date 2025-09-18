@@ -146,30 +146,30 @@
             <OnboardingIcon />
           </template>
         </TaskCard>
-        <TaskCard
-          v-if="isSkipAvailabilityOnboardingRequirementEnabled"
-          id="dashboard-notifications-card"
-          title="Get Notified About Student Requests"
-          subtitle="Never miss an opportunity to help students by enabling browser notifications and opting-in to text messages."
-          :actions="notificationActions"
-        >
-          <template v-slot:icon>
-            <RingingNotificationBellIcon />
-          </template>
-          <template v-slot:content>
-            <div class="video-wrapper">
-              <iframe
-                class="video"
-                src="https://player.vimeo.com/video/797113791?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
-                title="Vimeo video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </template>
-        </TaskCard>
       </template>
+      <TaskCard
+        v-if="isSkipAvailabilityOnboardingRequirementEnabled"
+        id="dashboard-notifications-card"
+        title="Get Notified About Student Requests"
+        subtitle="Never miss an opportunity to help students by enabling browser notifications and opting-in to text messages."
+        :actions="notificationActions"
+      >
+        <template v-slot:icon>
+          <RingingNotificationBellIcon />
+        </template>
+        <template v-slot:content>
+          <div class="video-wrapper">
+            <iframe
+              class="video"
+              src="https://player.vimeo.com/video/797113791?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+              title="Vimeo video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </template>
+      </TaskCard>
     </div>
 
     <photo-upload-modal
