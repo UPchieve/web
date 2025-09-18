@@ -915,7 +915,6 @@ export default {
     font-weight: 500;
     line-height: 1.25;
     text-align: center;
-    width: 80%;
   }
 
   &__subtitle {

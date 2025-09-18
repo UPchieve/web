@@ -57,6 +57,10 @@
         </div>
       </div>
     </div>
+    <AmbassadorReferralModal
+      v-if="ambassadorReferralModalIsOpen"
+      :closeModal="closeAmbassadorReferralModal"
+    />
   </div>
 </template>
 
@@ -66,6 +70,7 @@ import Case from 'case'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ArrowIcon from '@/assets/arrow.svg'
+import AmbassadorReferralModal from '@/views/AmbassadorReferralModal.vue'
 
 export default {
   name: 'ListSessions',
@@ -73,9 +78,10 @@ export default {
     return {
       emitListIntervalId: null,
       hasError: false,
+      ambassadorReferralModalIsOpen: false,
     }
   },
-  components: { ArrowIcon },
+  components: { ArrowIcon, AmbassadorReferralModal },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
@@ -111,12 +117,11 @@ export default {
       AnalyticsService.captureEvent(
         EVENTS.AMBASSADOR_NO_STUDENTS_EARN_VOLUNTEER_HOURS_CTA_CLICKED
       )
-      this.$store.dispatch('app/modal/show', {
-        component: 'AmbassadorReferralModal',
-        data: {
-          showTemplateButtons: false,
-        },
-      })
+      this.ambassadorReferralModalIsOpen = true
+    },
+    closeAmbassadorReferralModal() {
+      AnalyticsService.captureEvent(EVENTS.REFERRAL_MODAL_CLOSE)
+      this.ambassadorReferralModalIsOpen = false
     },
     gotoSession(session) {
       const { type, subTopic, _id } = session
