@@ -76,7 +76,6 @@
 
     <secondary-email-modal
       v-if="showSecondaryEmailModal"
-      :showGrade12Messaging="this.user.gradeLevel === '12th'"
       :showPermanentDismissOption="true"
       @dismissed="onSecondaryEmailDismissed"
       @completed="updateSecondaryEmail"
@@ -148,6 +147,10 @@ export default {
     OnboardingModal,
     SelectPreferredLanguageModal,
     JourneyModal,
+  },
+  beforeMount() {
+    this.hasDismissedSecondaryEmailModalForCurrentSession =
+      this.temporarilyDismissedSecondaryEmailModal
   },
   async created() {
     if (
@@ -246,6 +249,7 @@ export default {
       dismissedSecondaryEmailModal: false,
       showSelectPreferredLanguageModal: false,
       impactStudySurveyCampaignId: '',
+      hasDismissedSecondaryEmailModalForCurrentSession: false,
     }
   },
   computed: {
@@ -287,10 +291,20 @@ export default {
     permanentlyDismissedSecondaryEmailModalKey() {
       return `${this.user.id}-permanently-dismissed-secondary-email-modal`
     },
+    temporarilyDismissedSecondaryEmailModalKey() {
+      return `${this.user.id}-temporarily-dismissed-secondary-email-modal`
+    },
     permanentlyDismissedSecondaryEmailModal() {
       return (
         localStorage.getItem(
           this.permanentlyDismissedSecondaryEmailModalKey
+        ) !== null
+      )
+    },
+    temporarilyDismissedSecondaryEmailModal() {
+      return (
+        sessionStorage.getItem(
+          this.temporarilyDismissedSecondaryEmailModalKey
         ) !== null
       )
     },
@@ -302,7 +316,8 @@ export default {
         this.user?.gradeLevel === '12th' &&
         !this.dismissedSecondaryEmailModal &&
         !this.permanentlyDismissedSecondaryEmailModal &&
-        !this.user.proxyEmail
+        !this.user.proxyEmail &&
+        !this.hasDismissedSecondaryEmailModalForCurrentSession
       )
     },
 
@@ -363,8 +378,15 @@ export default {
         'true'
       )
     },
+    onTemporarilyDismissedSecondaryEmailModal() {
+      sessionStorage.setItem(
+        this.temporarilyDismissedSecondaryEmailModalKey,
+        'true'
+      )
+    },
     onSecondaryEmailDismissed() {
       this.toggleSecondaryEmailModal()
+      this.onTemporarilyDismissedSecondaryEmailModal()
     },
     async updateSecondaryEmail(email) {
       await this.$store.dispatch('user/addToUser', {

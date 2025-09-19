@@ -13,7 +13,6 @@ import isEmail from 'validator/lib/isEmail'
 import AnalyticsService from '@/services/AnalyticsService'
 
 const props = defineProps<{
-  showGrade12Messaging: false
   showPermanentDismissOption: false
 }>()
 
@@ -124,12 +123,14 @@ onUnmounted(() => {
   AnalyticsService.captureEvent(EVENTS.SECONDARY_EMAIL_CLOSED_MODAL)
 })
 
-const messageForSeniors = {
-  main: `📣 Hey Senior! Add your personal email now so that you don't lose access to UPchieve when you graduate! This is a great way to stay in the loop about internships, volunteer opportunities, and the UPchieve community.`,
-  sub: 'Please be sure to add a secondary email ASAP if you are using a school email!',
-}
 const message = computed((): { main: string; sub?: string } => {
-  return props.showGrade12Messaging ? messageForSeniors : null
+  const firstName = store.getters['user/firstName']
+  return {
+    main: `📣 Hey ${firstName}! Add your personal email now so that you can stay in the loop about internships, volunteer opportunities, and the UPchieve community.`,
+    sub: store.state.user.user.email.endsWith('.edu')
+      ? 'Please be sure to add a secondary email ASAP if you are using a school email!'
+      : undefined,
+  }
 })
 
 const onPermanentlyDismissed = () => {
@@ -160,7 +161,7 @@ const onPermanentlyDismissed = () => {
         {{ errorMessage }}
       </div>
       <div class="message" v-if="formStep === 'enter_email'">
-        <span v-if="message?.main">{{ message.main }}</span>
+        <span>{{ message.main }}</span>
         <span class="sub-message" v-if="message?.sub">{{ message?.sub }}</span>
       </div>
 
