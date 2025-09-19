@@ -137,7 +137,8 @@ export default {
       return (
         this.user.userType === 'student' &&
         !this.hasVolunteerRole &&
-        this.isStudentsBecomeVolunteersEnabled
+        this.isStudentsBecomeVolunteersEnabled &&
+        !this.user.isSchoolPartner
       )
     },
 
