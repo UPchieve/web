@@ -331,7 +331,13 @@ export default {
         const container = document.querySelector('.quill-container')
         this.quillEditor = new Quill(container)
         this.quillEditor.enable(false)
-        this.quillEditor.setContents(JSON.parse(this.session.quillDoc))
+
+        let delta = this.session.quillDoc
+        // If it's a string, parse once
+        if (typeof delta === 'string') delta = JSON.parse(delta)
+        // If it was double-encoded, parse again
+        if (typeof delta === 'string') delta = JSON.parse(delta)
+        this.quillEditor.setContents(delta)
       }
 
       if (this.session.hasWhiteboardDoc) {
