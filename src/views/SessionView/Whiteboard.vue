@@ -1264,7 +1264,7 @@ export default {
         this.useBrushTool()
 
         // Don't start setting selected tool until connected
-        this.zwibblerCtx.on('tool-changed', (toolname) => {
+        this.zwibblerCtx.on('tool-changed', () => {
           // The eraser uses the brush tool. In order to make it seem as the eraser
           // is active for the user, we're overriding the selectedTool to be
           // `eraser` instead of `brush`

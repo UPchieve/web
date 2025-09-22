@@ -297,7 +297,7 @@ export default {
         if (typeof delta === 'string') delta = JSON.parse(delta)
         // If it was double-encoded, parse again
         if (typeof delta === 'string') delta = JSON.parse(delta)
-        this.quillEditor.setContents(delta)
+        this.setQuillContentInChunks(delta)
       }
 
       if (this.isWhiteboardSession) {
@@ -343,6 +343,22 @@ export default {
   },
 
   methods: {
+    setQuillContentInChunks(delta) {
+      for (const op of delta.ops ?? []) {
+        if (typeof op.insert === 'string') {
+          const CHUNK_SIZE = 1000
+          const text = op.insert
+
+          for (let i = 0; i < text.length; i += CHUNK_SIZE) {
+            const chunk = text.substring(i, i + CHUNK_SIZE)
+            this.quillEditor.insertText(this.quillEditor.getLength(), chunk)
+          }
+        } else {
+          this.quillEditor.updateContents(op)
+        }
+      }
+    },
+
     async toggleReviewedSession(event) {
       const {
         target: { checked },
