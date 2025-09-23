@@ -51,7 +51,7 @@
             </div>
           </div>
         </div>
-        <div v-if="showFeedbackFromStudent" class="chat-card-editor-container">
+        <div v-if="showFeedbackFromStudent">
           <div class="recap-card">
             <header class="recap-card__header recap-card__header-start-session">
               <h2 class="card-title">
@@ -482,7 +482,11 @@ export default {
 <style lang="scss" scoped>
 .chat-card-editor-container {
   @include flex-container(column);
-  flex-basis: 60%;
+  width: 60%;
+
+  @include breakpoint-below('medium') {
+    width: 100%;
+  }
 }
 
 .card-title {
