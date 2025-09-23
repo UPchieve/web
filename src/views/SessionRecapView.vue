@@ -219,8 +219,8 @@ import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
-import StudentIcon from '@/assets/user_avatars/student-icon.svg'
-import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg?skipsvgo'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
 import moment from 'moment'
 import Quill from 'quill'
 import { mapGetters, mapState } from 'vuex'
@@ -246,6 +246,8 @@ export default {
     Dropdown,
     Separator,
     LargeButton,
+    StudentIcon,
+    VolunteerIcon,
   },
   computed: {
     ...mapState({

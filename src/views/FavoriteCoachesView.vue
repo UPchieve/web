@@ -92,7 +92,7 @@ import { mapState, mapGetters } from 'vuex'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import NetworkService from '@/services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
-import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
+import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
 import HeartIcon from '@/assets/icons/heart_icon.svg'
 
 export default {
@@ -360,6 +360,9 @@ ul {
 }
 
 .coach-icon {
+  height: 40px;
+  width: 40px;
+
   @include breakpoint-above('medium') {
     margin-right: 1em;
   }

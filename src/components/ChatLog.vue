@@ -35,8 +35,8 @@
 
 <script>
 import getChatAvatar from '@/utils/get-chat-avatar'
-import StudentIcon from '@/assets/user_avatars/student-icon.svg'
-import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
+import StudentIcon from '@/assets/user_avatars/student-icon.svg?skipsvgo'
+import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
