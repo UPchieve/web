@@ -22,7 +22,6 @@ export type SessionState = {
   isPartnerOnline: boolean
   latestSession?: Session
   cooldownMinutes: number
-  isGoalSettingSession: boolean
 }
 
 export default {
@@ -31,7 +30,6 @@ export default {
     isPartnerOnline: false,
     latestSession: undefined,
     cooldownMinutes: 0,
-    isGoalSettingSession: false,
   } as SessionState,
 
   getters: {
@@ -47,8 +45,6 @@ export default {
       (state.latestSession = session),
     setCooldownMinutes: (state: SessionState, cooldownMinutes: number) =>
       (state.cooldownMinutes = cooldownMinutes),
-    setIsGoalSettingSession: (state: SessionState, flag: boolean) =>
-      (state.isGoalSettingSession = flag),
   },
 
   actions: {

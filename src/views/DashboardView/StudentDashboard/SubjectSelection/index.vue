@@ -13,28 +13,7 @@
         v-if="isMostRecentSubjectsActive"
         :disabled="isCardDisabled"
       />
-
       <div :class="showDashboardRedesign ? 'cards' : 'cards-old'">
-        <section v-if="isGoalSettingSessionEnabled" class="goal-session">
-          <div class="goal-session__card">
-            <esl-icon />
-            <h2 class="goal-session__title">
-              {{ goalSettingSessionPayload.title }}
-            </h2>
-            <p class="goal-session__description">
-              {{ goalSettingSessionPayload.description }}
-            </p>
-            <p class="goal-session__time-description">
-              {{ goalSettingSessionTimeText }}
-            </p>
-            <large-button
-              @click="handleGoalSettingSession"
-              primary
-              :disabled="!isRequestingGoalSettingSessionAvailable"
-              >Start session</large-button
-            >
-          </div>
-        </section>
         <subject-card
           v-for="(card, index) in cards"
           v-bind:key="index"
@@ -55,18 +34,15 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import moment from 'moment'
 import SubjectCard from './SubjectCard.vue'
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
 import LightBulbSVG from '@/assets/dashboard_icons/student/light-bulb.svg'
 import Loader from '@/components/Loader.vue'
-import LargeButton from '@/components/LargeButton.vue'
 import RecentSubjects from './RecentSubjects.vue'
-import EslIcon from '@/assets/subject_icons/esl.svg'
 
 export default {
   name: 'subject-selection',
-  components: { SubjectCard, Loader, RecentSubjects, EslIcon, LargeButton },
+  components: { SubjectCard, Loader, RecentSubjects },
   beforeUnmount() {
     clearTimeout(this.waitingPeriodTimeoutId)
   },
@@ -90,8 +66,6 @@ export default {
       showDashboardRedesign: 'user/showDashboardRedesign',
       isMostRecentSubjectsActive: 'featureFlags/isMostRecentSubjectsActive',
       hasCooldown: 'session/hasCooldown',
-      isGoalSettingSessionEnabled: 'featureFlags/isGoalSettingSessionEnabled',
-      goalSettingSessionPayload: 'featureFlags/goalSettingSessionPayload',
     }),
     cards() {
       const cards = [...this.topicCards]
@@ -120,35 +94,6 @@ export default {
         this.isSessionAlive ||
         this.user.banType === 'complete'
       )
-    },
-    isRequestingGoalSettingSessionAvailable() {
-      const { startHour = 9, endHour = 17 } =
-        this.goalSettingSessionPayload || {}
-      const now = moment().tz('America/New_York')
-      const hour = now.hour()
-      const day = now.day()
-      const isWeekday = day >= 1 && day <= 5
-
-      return (
-        !this.isCardDisabled && isWeekday && hour >= startHour && hour < endHour
-      )
-    },
-    goalSettingSessionTimeText() {
-      const { startHour = 9, endHour = 17 } =
-        this.goalSettingSessionPayload || {}
-      const start = moment.tz('America/New_York').hour(startHour).minute(0)
-      const end = moment.tz('America/New_York').hour(endHour).minute(0)
-      const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone
-      const startLocal = start.clone().tz(userTz)
-      const endLocal = end.clone().tz(userTz)
-      return `Available M-F from ${startLocal.format('h:mm A')} to ${endLocal.format('h:mm A')} ${startLocal.format('z')}.`
-    },
-  },
-  methods: {
-    async handleGoalSettingSession() {
-      if (!this.isRequestingGoalSettingSessionAvailable) return
-      await this.$store.commit('session/setIsGoalSettingSession', true)
-      this.$router.push('/session/college/college-prep/')
     },
   },
 }
@@ -225,38 +170,5 @@ h2 {
 
 .error {
   color: $c-error-red;
-}
-
-.goal-session {
-  &__card {
-    @include flex-container(column, center, center);
-    background-color: $upchieve-white;
-    border-radius: 8px;
-    padding: 2em;
-    height: 100%;
-  }
-
-  &__title {
-    @include font-category('heading');
-    font-weight: 500;
-    margin-top: 16px;
-    margin-bottom: 8px;
-
-    @include breakpoint-above('medium') {
-      @include font-category('display-small');
-    }
-  }
-
-  &__description {
-    font-weight: 400;
-    color: $c-secondary-grey;
-    text-align: center;
-  }
-
-  &__time-description {
-    @include font-category('helper-text');
-    color: $c-secondary-grey;
-    font-style: italic;
-  }
 }
 </style>

@@ -63,10 +63,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: true,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
       [POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS]: false,
-      [POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION]: false,
       [POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
-      [POSTHOG_FEATURE_FLAGS.GOAL_SETTING_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT]: false,
       [POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
@@ -94,7 +92,6 @@ export default {
         'Interested in becoming a volunteer tutor on UPchieve?',
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
-      [POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION]: {},
     },
     eligibleForChooseTutorType: false,
   },
@@ -279,16 +276,10 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION],
     isGuidedJourneysEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS],
-    isGoalSettingSessionEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION],
-    goalSettingSessionPayload: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.GOAL_SETTING_SESSION],
     isReferralModalRedesignEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN],
     isUpdatedDocEditorImageStorageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE],
-    isGoalSettingVolunteer: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.GOAL_SETTING_VOLUNTEERS],
     isSkipAvailabilityOnboardingRequirementEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT

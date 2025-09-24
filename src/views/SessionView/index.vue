@@ -400,16 +400,10 @@ export default {
         this.$route.params.subTopic,
         this.$route.params.sessionId,
         this.$route.query?.assignmentId,
-        this.prevRoute?.name ?? '',
-        this.isGoalSettingSession
+        this.prevRoute?.name ?? ''
       )
       this.session = session
       this.sessionId = session.id
-
-      if (this.isGoalSettingSession)
-        AnalyticsService.captureEvent(EVENTS.GOAL_SETTING_SESSION_REQUESTED, {
-          sessionId: this.sessionId,
-        })
 
       // Consider putting analytics into service.
       if (!this.$route.params.sessionId && this.isStudent) {
@@ -496,7 +490,7 @@ export default {
     window.addEventListener('resize', this.handleResize)
   },
 
-  async beforeUnmount() {
+  beforeUnmount() {
     if (this.joinSocketSessionAbortController) {
       this.joinSocketSessionAbortController.abort()
     }
@@ -506,7 +500,6 @@ export default {
     Gleap.removeCustomData('sessionId')
     Gleap.showFeedbackButton(true)
     window.removeEventListener('resize', this.handleResize)
-    await this.$store.commit('session/setIsGoalSettingSession', false)
   },
 
   data() {
@@ -561,7 +554,6 @@ export default {
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
       isPartnerOnline: (state) => state.session.isPartnerOnline,
-      isGoalSettingSession: (state) => state.session.isGoalSettingSession,
       everShownDisplayCallStatus: (state) =>
         state.liveMedia.audio.everShownDisplayCallStatus,
     }),

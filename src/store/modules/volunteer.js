@@ -3,8 +3,6 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 export default {
   namespaced: true,
@@ -116,7 +114,7 @@ export default {
     },
 
     async handleIncomingSessions(
-      { commit, dispatch, state, rootGetters },
+      { commit, dispatch, state },
       { context, sessions }
     ) {
       const user = this.state.user.user
@@ -137,8 +135,6 @@ export default {
 
       const results = []
       const socketSessions = sessions.filter((session) => !session.volunteer)
-      const isGoalSettingVolunteer =
-        rootGetters['featureFlags/isGoalSettingVolunteer']
       for (const session of socketSessions) {
         const { subTopic } = session
 
@@ -149,20 +145,6 @@ export default {
           (session.student.isShadowBanned && !user.isAdmin)
         ) {
           continue
-        }
-
-        if (session.isGoalSettingSession) {
-          if (!isGoalSettingVolunteer) continue
-          else {
-            results.push({ ...session, subjectDisplayName: 'Goal Setting' })
-            AnalyticsService.captureEvent(
-              EVENTS.GOAL_SETTING_SESSION_SHOWN_TO_DASHBOARD,
-              {
-                userId: user.id,
-              }
-            )
-            continue
-          }
         }
 
         if (this.getters['americaCountsVolunteer/isAmericaCountsVolunteer']) {
