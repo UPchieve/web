@@ -924,6 +924,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   GOAL_SETTING_VOLUNTEERS = 'goal-setting-volunteers',
   SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT = 'skip-availability-onboarding-requirement',
   SLACK_COMMUNITY_ENABLED = 'study-slack-coach-community',
+  PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',
 }
 
 export const ANALYTICS_REPORT_ROW = {
