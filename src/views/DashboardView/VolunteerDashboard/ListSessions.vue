@@ -176,6 +176,9 @@ function gotoSession(session: any) {
 }
 
 function goToSubjectCert(session: any) {
+  AnalyticsService.captureEvent(EVENTS.LOCKED_SESSIONS_CLICKED_UNLOCK_SUBJECT, {
+    subject: session.subTopic,
+  })
   const route = `/training/${kebab(session.subTopic)}/quiz`
   router.push(route)
 }
