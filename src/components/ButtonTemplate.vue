@@ -1,6 +1,24 @@
 <template>
+  <a
+    class="ButtonTemplate"
+    v-if="isExternalLink"
+    :href="routeTo"
+    @click="$emit('click')"
+  >
+    <arrow-icon
+      v-if="doShowArrow && isLeftArrow"
+      class="ButtonTemplate-icon arrow-icon arrow-reversed"
+    />
+    <div class="ButtonTemplate-content">
+      <slot />
+    </div>
+    <arrow-icon
+      v-if="doShowArrow && !isLeftArrow"
+      class="ButtonTemplate-icon arrow-icon"
+    />
+  </a>
   <router-link
-    v-if="routeTo"
+    v-else-if="routeTo"
     tag="button"
     :to="routeTo"
     class="ButtonTemplate"
@@ -70,6 +88,9 @@ export default {
     },
     isLeftArrow() {
       return this.doShowArrow && this.arrowDirection === 'left'
+    },
+    isExternalLink() {
+      return typeof this.routeTo === 'string' && this.routeTo.startsWith('http')
     },
   },
 }

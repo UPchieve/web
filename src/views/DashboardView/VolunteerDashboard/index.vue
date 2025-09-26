@@ -42,6 +42,16 @@
           </template>
         </TaskCard>
         <TaskCard title="Your Impact Summary">
+          <template v-slot:heading-content>
+            <div v-if="isVerifyHoursButtonEnabled" class="verify-hours">
+              <LargeButton
+                routeTo="https://upchieve.org/verify-volunteer-hours"
+                @click="trackVerifyHoursClick"
+              >
+                Verify hours
+              </LargeButton>
+            </div>
+          </template>
           <template v-slot:content>
             <loader v-if="isLoadingImpactSummary" class="loader--center" />
             <div v-else class="impact-summary-content">
@@ -241,6 +251,7 @@ import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import TaskCard from '@/components/TaskCard.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -268,6 +279,7 @@ export default {
     ClockIcon,
     ChatIcon,
     NotesIcon,
+    LargeButton,
   },
   directives: {
     tooltip: vTooltip,
@@ -325,6 +337,7 @@ export default {
         'featureFlags/getVolunteerMilestoneSharingStudyVariant',
       isSkipAvailabilityOnboardingRequirementEnabled:
         'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled',
+      isVerifyHoursButtonEnabled: 'featureFlags/isVerifyHoursButtonEnabled',
     }),
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
@@ -565,6 +578,7 @@ export default {
           totalQuizzesPassed: this.user.totalQuizzesPassed,
         })
       }
+
       return this.getImpactStats({
         availability: this.user.availability,
         pastSessions: this.user.pastSessions,
@@ -614,6 +628,9 @@ export default {
     },
   },
   methods: {
+    trackVerifyHoursClick() {
+      AnalyticsService.captureEvent(EVENTS.VERIFY_HOURS_BUTTON_CLICKED)
+    },
     toggleDidDismissNotificationsCard() {
       AnalyticsService.captureEvent(
         EVENTS.SKIP_AVAILABILITY_REQT_CARD_DISMISSED
@@ -817,6 +834,9 @@ export default {
       try {
         if (this.isCustomVolunteerPartner) {
           this.lastUpdated = await this.getLastUpdated()
+        }
+        if (this.isVerifyHoursButtonEnabled) {
+          AnalyticsService.captureEvent(EVENTS.VERIFY_HOURS_BUTTON_SEEN)
         }
       } finally {
         this.isLoadingImpactSummary = false
@@ -1080,5 +1100,11 @@ export default {
     width: 100%;
     gap: 12px;
   }
+}
+.verify-hours {
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: end;
 }
 </style>

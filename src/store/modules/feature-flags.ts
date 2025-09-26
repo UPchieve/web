@@ -68,6 +68,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT]: false,
       [POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
+      [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -286,6 +287,8 @@ export default {
       ],
     isSlackCommunityEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED],
+    isVerifyHoursButtonEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON],
   },
   actions: {
     isSessionAudioCallEnabled: async (
