@@ -57,9 +57,10 @@ const getWrapper = async (overrides = {}) => {
     modules: {
       ...storeOptions.modules,
       user: {
+        ...storeOptions.modules.user,
         state: {
           user: {
-            ...storeOptions.modules.state,
+            ...storeOptions.modules.user.state.user,
             userType: 'volunteer',
             subjects: ['algebraOne', 'algebraTwo', 'biology'],
             mutedSubjectAlerts: [],
@@ -68,6 +69,10 @@ const getWrapper = async (overrides = {}) => {
             isBanned: false,
             ...(overrides.user?.state?.user ?? {}),
           },
+        },
+        getters: {
+          ...storeOptions.modules.user.getters,
+          ...(overrides.user?.getters ?? {}),
         },
       },
       volunteer: {
@@ -78,6 +83,7 @@ const getWrapper = async (overrides = {}) => {
         },
       },
       featureFlags: {
+        ...storeOptions.modules.featureFlags,
         getters: {
           ...(overrides.featureFlags?.getters ?? {}),
         },
@@ -154,8 +160,45 @@ describe('Dashboard with banned students', () => {
 })
 
 describe('Empty state', () => {
-  it.todo('Should show a special message when there are no students waiting')
-  it.todo('Should show the Become an Ambassador CTA')
+  it('Should show a special message when there are no students waiting', async () => {
+    const wrapper = await getWrapper({
+      sessions: [],
+      featureFlags: {
+        getters: {
+          isBecomeAnAmbassadorCtaEnabled: () => false,
+        },
+      },
+    })
+    expect(
+      wrapper.find('[data-testid="no-students-waiting-message"]').exists()
+    ).toBeTruthy()
+    expect(
+      wrapper.find('[data-testid="no-students-ambassador-message"]').exists()
+    ).toBeFalsy()
+  })
+
+  it('Should show the Become an Ambassador CTA', async () => {
+    const wrapper = await getWrapper({
+      user: {
+        getters: {
+          isVolunteer: () => true,
+          isAmbassador: () => false,
+        },
+      },
+      sessions: [],
+      featureFlags: {
+        getters: {
+          isBecomeAnAmbassadorCtaEnabled: () => true,
+        },
+      },
+    })
+    expect(
+      wrapper.find('[data-testid="no-students-waiting-message"]').exists()
+    ).toBeTruthy()
+    expect(
+      wrapper.find('[data-testid="no-students-ambassador-message"]').exists()
+    ).toBeTruthy()
+  })
 })
 
 describe('Locked sessions', () => {
@@ -210,27 +253,24 @@ describe('Locked sessions', () => {
     },
   ]
 
-  const wrapperOptions = {
-    props: {
-      showLockedSessions: true,
-    },
-    featureFlags: {
-      getters: {
-        isShowLockedSessionsEnabled: () => true,
-      },
-    },
-    sessions: testSessions,
-    user: {
-      state: {
-        user: {
-          subjects: ['prealgebra', 'algebraOne'],
+  it('Should show locked sessions at the bottom of the list', async () => {
+    const wrapper = await getWrapper({
+      user: {
+        state: {
+          user: {
+            mutedSubjectAlerts: [],
+            subjects: ['prealgebra', 'algebraOne'],
+          },
         },
       },
-    },
-  }
-
-  it('Should show locked sessions at the bottom of the list', async () => {
-    const wrapper = await getWrapper({ ...wrapperOptions })
+      sessions: testSessions,
+      featureFlags: {
+        getters: {
+          isShowLockedSessionsEnabled: () => true,
+        },
+      },
+      props: { showLockedSessions: true },
+    })
 
     const tableRows = wrapper.findAll('tr')
     expect(tableRows.length).toEqual(5) // 1 header row and 4 sessions
@@ -280,7 +320,24 @@ describe('Locked sessions', () => {
 
   it('Clicking a locked session should take you to the subject quiz', async () => {
     const routerPushSpy = vi.spyOn(router, 'push')
-    const getTestWrapper = async () => getWrapper({ ...wrapperOptions })
+    const getTestWrapper = () =>
+      getWrapper({
+        user: {
+          state: {
+            user: {
+              mutedSubjectAlerts: [],
+              subjects: ['prealgebra', 'algebraOne'],
+            },
+          },
+        },
+        sessions: testSessions,
+        featureFlags: {
+          getters: {
+            isShowLockedSessionsEnabled: () => true,
+          },
+        },
+        props: { showLockedSessions: true },
+      })
     const prealgebraSessionRow = (await getTestWrapper()).find(
       '[data-testid="session-row-session-1"]'
     )

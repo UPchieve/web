@@ -58,12 +58,19 @@
         </tr>
       </tbody>
     </table>
-    <div class="no-students-message-container" v-if="!sortedSessions?.length">
+    <div
+      class="no-students-message-container"
+      v-if="!sortedSessions?.length"
+      data-testid="no-students-waiting-message"
+    >
       Currently there are no students waiting for help.
       <div
         v-if="isBecomeAnAmbassadorCtaEnabled && isVolunteer && !isAmbassador"
       >
-        <div id="no-students-ambassador-message">
+        <div
+          id="no-students-ambassador-message"
+          data-testid="no-students-ambassador-message"
+        >
           While you wait, you can still earn volunteer hours by
           <button
             class="ambassador-button"

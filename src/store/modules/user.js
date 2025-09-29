@@ -426,7 +426,7 @@ export default {
 
     isSessionAlive: (state) => {
       // Early exit if the session doesn't exist
-      if (!state.session.createdAt) {
+      if (!state.session?.createdAt) {
         return false
       }
 
