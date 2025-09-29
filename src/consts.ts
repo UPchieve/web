@@ -923,6 +923,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   SLACK_COMMUNITY_ENABLED = 'study-slack-coach-community',
   PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',
   VERIFY_HOURS_BUTTON = 'verify-hours-button',
+  SHOW_LOCKED_SESSIONS = 'show-locked-sessions',
 }
 
 export const ANALYTICS_REPORT_ROW = {

@@ -28,15 +28,21 @@
           </template>
           <template v-slot:content>
             <div class="waiting-students-content">
-              <ListSessions v-if="!isSessionAlive" :style="{ width: '100%' }" />
-              <div v-else class="rejoin-session-container">
-                <button
-                  class="btn rejoinSessionBtn"
-                  type="button"
-                  @click.prevent="rejoinHelpSession()"
-                >
-                  Rejoin your coaching session
-                </button>
+              <div class="available-sessions-container sessions-list-container">
+                <ListSessions
+                  v-if="!isSessionAlive"
+                  :showLockedSessions="isShowLockedSessionsEnabled"
+                  :style="{ width: '100%' }"
+                />
+                <div v-else class="rejoin-session-container">
+                  <button
+                    class="btn rejoinSessionBtn"
+                    type="button"
+                    @click.prevent="rejoinHelpSession()"
+                  >
+                    Rejoin your coaching session
+                  </button>
+                </div>
               </div>
             </div>
           </template>
@@ -322,7 +328,6 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
-      openSessions: (state) => state.volunteer.openSessions,
       hasSharedMilestone: (state) => state.user.hasSharedMilestone,
       availabilityLastModifiedAt: (state) =>
         state.user.user?.availabilityLastModifiedAt,
@@ -338,6 +343,7 @@ export default {
       isSkipAvailabilityOnboardingRequirementEnabled:
         'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled',
       isVerifyHoursButtonEnabled: 'featureFlags/isVerifyHoursButtonEnabled',
+      isShowLockedSessionsEnabled: 'featureFlags/isShowLockedSessionsEnabled',
     }),
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
@@ -971,10 +977,6 @@ export default {
   }
 }
 
-.waiting-students-content {
-  width: 90%;
-}
-
 .rejoin-session-container {
   text-align: center;
 }
@@ -1106,5 +1108,39 @@ export default {
   display: flex;
   flex-direction: column-reverse;
   align-items: end;
+}
+
+.waiting-students-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  .sessions-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .heading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 16px;
+      gap: 8px;
+      width: 90%;
+    }
+
+    .title {
+      @include font-category('display-small');
+      text-align: center;
+      width: 80%;
+    }
+
+    .subtitle {
+      @include font-category('body');
+      color: $c-secondary-grey;
+      text-align: center;
+    }
+  }
 }
 </style>

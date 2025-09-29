@@ -12,11 +12,11 @@ export default {
   },
 
   actions: {
-    startCooldown({ commit, rootState, getters }, cooldown) {
+    startCooldown({ commit, getters, rootGetters }, cooldown) {
       if (getters['isAmericaCountsVolunteer']) {
         const id = setTimeout(() => {
           commit('setCooldownId', null)
-          const sessions = rootState.volunteer.openSessions
+          const sessions = rootGetters['volunteer/unlockedOpenSessions']
           AmericaCountsVolunteerService.maybeAutoJoinOldestSession(sessions)
         }, cooldown)
         commit('setCooldownId', id)

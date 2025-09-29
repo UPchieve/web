@@ -33,11 +33,11 @@ describe('Volunteer store module', () => {
     })
   }
   describe('handleIncomingSessions', () => {
-    it('Sets openSessions to an empty array when the volunteer is not ready to tutor', async () => {
+    it('Sets allOpenSessions to an empty array when the volunteer is not ready to tutor', async () => {
       const mockVueContext = {
         $router: {},
       }
-      const mockSetOpenSessions = vi.fn()
+      const mockSetAllOpenSessions = vi.fn()
       const store = getStore({
         user: {
           state: {
@@ -54,22 +54,22 @@ describe('Volunteer store module', () => {
         },
         volunteer: {
           state: {
-            openSessions: ['test-session-1'],
+            allOpenSessions: ['test-session-1'],
           },
           mutations: {
-            setOpenSessions: mockSetOpenSessions,
+            setAllOpenSessions: mockSetAllOpenSessions,
           },
         },
       })
 
-      expect(store.state.volunteer.openSessions.length).toEqual(1) // Initially
+      expect(store.state.volunteer.allOpenSessions.length).toEqual(1) // Initially
       expect(store.getters['volunteer/isReadyToTutor']).toEqual(false)
 
       await store.dispatch('volunteer/handleIncomingSessions', {
         mockVueContext,
         sessions: ['test-session-2'],
       })
-      expect(mockSetOpenSessions).toHaveBeenCalledWith(expect.anything(), [])
+      expect(mockSetAllOpenSessions).toHaveBeenCalledWith(expect.anything(), [])
     })
   })
 

@@ -8,19 +8,27 @@ export default {
   namespaced: true,
   state: {
     newWaitingStudentAudioElement: null,
-    openSessions: [],
+    allOpenSessions: [],
     tickIntervalId: null,
     ticks: 0,
   },
   mutations: {
     setNewWaitingStudentAudioElement: (state, element) =>
       (state.newWaitingStudentAudioElement = element),
-    setOpenSessions: (state, openSessions) =>
-      (state.openSessions = openSessions),
+    setAllOpenSessions: (state, allOpenSessions) =>
+      (state.allOpenSessions = allOpenSessions),
     setTickIntervalId: (state, tickIntervalId) =>
       (state.tickIntervalId = tickIntervalId),
     incTicks: (state) => (state.ticks = state.ticks + 1),
     resetTicks: (state) => (state.ticks = 0),
+    removeSession: (state, sessionId) => {
+      const indexOfSession = state.allOpenSessions.findIndex(
+        (session) => session.id === sessionId
+      )
+      if (indexOfSession >= 0) {
+        state.allOpenSessions.splice(indexOfSession, 1)
+      }
+    },
   },
   actions: {
     gotoSession({ dispatch }, { context, session }) {
@@ -33,17 +41,31 @@ export default {
       }
     },
 
-    alertVolunteer({ state, dispatch, rootGetters }, { context, session }) {
+    alertVolunteer(
+      { state, dispatch, rootGetters, getters },
+      { context, session }
+    ) {
       try {
-        state.newWaitingStudentAudioElement.play()
+        const isUnlockedSession = this.state.user.user.subjects.includes(
+          session.subTopic
+        )
+        if (
+          getters['featureFlags/isShowLockedSessionsEnabled'] ||
+          isUnlockedSession
+        ) {
+          state.newWaitingStudentAudioElement.play()
+        }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log('Unable to play audio', error)
       }
 
-      sendWebNotification(`${session.student.firstname} needs help`, {
-        body: `Can you help them with ${session.subjectDisplayName}?`,
-      })
+      sendWebNotification(
+        `${session.student?.firstname ?? 'A student'} needs help`,
+        {
+          body: `Can you help them with ${session.subjectDisplayName}?`,
+        }
+      )
       const isMobile = rootGetters['app/mobileMode']
       const isDashboard =
         context.$router.currentRoute.value.path === '/dashboard'
@@ -54,20 +76,20 @@ export default {
       const rollupShowing =
         notifications.findIndex(({ id }) => id === 'rollup-alert') > -1
       if (
-        (!isMobile && state.openSessions.length > 4) ||
-        (isMobile && state.openSessions.length > 3)
+        (!isMobile && getters.unlockedOpenSessions.length > 4) ||
+        (isMobile && getters.unlockedOpenSessions.length > 3)
       ) {
         if (rollupShowing) {
           this.dispatch('notifications/updateTitle', {
             notificationId: 'rollup-alert',
-            title: `There are ${state.openSessions.length} students that need help`,
+            title: `There are ${getters.unlockedOpenSessions.length} students that need help`,
           })
         } else {
           this.dispatch('notifications/clear')
           this.dispatch('notifications/add', {
             id: 'rollup-alert',
             icon: StudentIcon,
-            title: `There are ${state.openSessions.length} students that need help`,
+            title: `There are ${getters.unlockedOpenSessions.length} students that need help`,
             cta: {
               text: 'Go to dashboard',
               action: () => context.$router.push('/'),
@@ -80,7 +102,7 @@ export default {
         this.dispatch('notifications/add', {
           id: session.id,
           icon: StudentIcon,
-          title: `${session.student.firstname} needs help with ${session.subjectDisplayName}`,
+          title: `${session.student?.firstname ?? 'A student'} needs help with ${session.subjectDisplayName}`,
           cta: {
             text: 'Join session',
             action: () => dispatch('gotoSession', { context, session }),
@@ -102,7 +124,7 @@ export default {
       commit(
         'setTickIntervalId',
         setInterval(() => {
-          if (state.openSessions.length === 0) {
+          if (state.allOpenSessions.length === 0) {
             clearInterval(state.tickIntervalId)
             commit('setTickIntervalId', null)
             commit('resetTicks', null)
@@ -111,6 +133,13 @@ export default {
           }
         }, wait)
       )
+    },
+
+    setSessionToExpire({ commit }, sessionId) {
+      const ONE_MINUTE_IN_MS = 1000 * 60
+      setTimeout(() => {
+        commit('removeSession', sessionId)
+      }, ONE_MINUTE_IN_MS)
     },
 
     async handleIncomingSessions(
@@ -124,7 +153,7 @@ export default {
         !Array.isArray(sessions) ||
         !this.getters['volunteer/isReadyToTutor']
       if (cantJoinSessions) {
-        commit('setOpenSessions', [])
+        commit('setAllOpenSessions', [])
         return
       }
 
@@ -164,16 +193,32 @@ export default {
           continue
         }
 
-        if (
-          user.subjects.includes(subTopic) &&
-          !user.mutedSubjectAlerts.includes(subTopic)
-        ) {
+        if (!user.mutedSubjectAlerts.includes(subTopic)) {
           results.push(session)
         }
       }
 
-      const prevOpenSessions = state.openSessions
-      commit('setOpenSessions', results)
+      const prevOpenSessions = state.allOpenSessions
+      /*
+       * Remove any existing notifications of sessions that were picked up or canceled.
+       * If showing locked sessions is enabled, set a 1-minute timeout before removing
+       * this session from the list.
+       */
+      const removedSessions = prevOpenSessions.filter(
+        (session) => !results.some((s) => s.id === session.id)
+      )
+      for (const removedSession of removedSessions) {
+        this.dispatch('notifications/remove', removedSession.id)
+        const isLockedSession = !user.subjects.includes(removedSession.subTopic)
+        if (
+          this.getters['featureFlags/isShowLockedSessionsEnabled'] &&
+          isLockedSession
+        ) {
+          dispatch('setSessionToExpire', removedSession.id)
+          results.push(removedSession) // Add session back to the list for now
+        }
+      }
+      commit('setAllOpenSessions', results)
 
       // Look for the new session added
       let newSession
@@ -198,13 +243,6 @@ export default {
         dispatch('alertVolunteer', { context, session: newSession })
       }
 
-      // Remove any existing notifications of sessions that were picked up or canceled
-      const currentIds = results.map(({ id }) => id)
-      const prevIds = prevOpenSessions.map(({ id }) => id)
-      const removedSessionIds = prevIds.filter((id) => !currentIds.includes(id))
-      for (const removedSessionId of removedSessionIds) {
-        this.dispatch('notifications/remove', removedSessionId)
-      }
       if (
         this.getters['americaCountsVolunteer/isAmericaCountsVolunteer'] &&
         !this.state.user.session?.id
@@ -221,6 +259,18 @@ export default {
         rootState.user.user.isOnboarded &&
         rootState.user.user.isApproved &&
         rootState.user.user.banType !== 'complete'
+      )
+    },
+    unlockedOpenSessions: (state, _getters, rootState) => {
+      const unlockedSubjects = rootState.user.user.subjects ?? []
+      return state.allOpenSessions.filter((session) =>
+        unlockedSubjects.includes(session.subTopic)
+      )
+    },
+    lockedOpenSessions: (state, _getters, rootState) => {
+      const unlockedSubjects = rootState.user.user.subjects ?? []
+      return state.allOpenSessions.filter(
+        (session) => !unlockedSubjects.includes(session.subTopic)
       )
     },
   },

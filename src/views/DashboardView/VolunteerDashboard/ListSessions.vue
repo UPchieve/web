@@ -3,44 +3,62 @@
     <div v-if="hasError" class="session-list__error">
       <p>Failed to load a list of students. Please try refreshing</p>
     </div>
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th scope="col">Student</th>
-          <th scope="col">Help Topic</th>
-          <th scope="col">Wait Time</th>
-        </tr>
-      </thead>
+    <table class="table table-striped">
+      <tr>
+        <th scope="col">Student</th>
+        <th scope="col">Help Topic</th>
+        <th scope="col">Wait Time</th>
+        <th v-if="props.showLockedSessions" scope="col" />
+      </tr>
       <tbody>
         <tr
-          v-for="session in sortedOpenSessions"
-          :key="`session-${session.id}`"
+          v-for="(session, index) in sortedSessions"
+          :key="`session-${index}`"
           :id="session.id"
-          :data-testid="`session-row-${session.student.firstname}`"
-          class="session-row"
-          @click="gotoSession(session)"
+          :data-testid="`session-row-${session.id}`"
+          :class="{
+            'session-row': true,
+            'session-row-locked': !session.isUnlocked,
+          }"
+          @click="
+            session.isUnlocked ? gotoSession(session) : goToSubjectCert(session)
+          "
         >
           <td>
-            {{ session.student.firstname }}
+            {{
+              session.isUnlocked
+                ? session.student?.firstname ?? 'Student'
+                : 'Student'
+            }}
             <span
-              v-if="session.student.isShadowBanned && user.isAdmin"
+              v-if="session.student?.isShadowBanned && user.isAdmin"
               class="shadow-ban"
               >Shadow Banned</span
             >
           </td>
-          <td>
-            {{ session.subjectDisplayName }}
+          <td :data-testid="`subject-${session.id}`">
+            {{ session.isUnlocked ? '' : '🔒' }}{{ session.subjectDisplayName }}
           </td>
-          <td>
+          <td :data-testid="`wait-time-${session.id}`">
             {{ waitTime(session) }}
+          </td>
+          <td v-if="props.showLockedSessions">
+            <div
+              type="button"
+              v-if="!session.isUnlocked"
+              @click="goToSubjectCert(session)"
+              class="unlock-subject-button"
+            >
+              <strong
+                >Unlock{{ isNarrowScreen ? '' : ' Subject' }}
+                <ArrowIcon class="arrow-icon"
+              /></strong>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
-    <div
-      class="no-students-message-container"
-      v-if="!sortedOpenSessions?.length"
-    >
+    <div class="no-students-message-container" v-if="!sortedSessions?.length">
       Currently there are no students waiting for help.
       <div
         v-if="isBecomeAnAmbassadorCtaEnabled && isVolunteer && !isAmbassador"
@@ -64,104 +82,123 @@
   </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from 'vuex'
-import Case from 'case'
+<script lang="ts" setup>
+import { useStore } from 'vuex'
+import Case, { kebab } from 'case'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ArrowIcon from '@/assets/arrow.svg'
 import AmbassadorReferralModal from '@/views/AmbassadorReferralModal.vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-export default {
-  name: 'ListSessions',
-  data() {
-    return {
-      emitListIntervalId: null,
-      hasError: false,
-      ambassadorReferralModalIsOpen: false,
-    }
-  },
-  components: { ArrowIcon, AmbassadorReferralModal },
-  computed: {
-    ...mapState({
-      user: (state) => state.user.user,
-      isWebPageHidden: (state) => state.app.isWebPageHidden,
-      newWaitingStudentAudioElement: (state) =>
-        state.volunteer.newWaitingStudentAudioElement,
-      ticks: (state) => state.volunteer.ticks,
-      openSessions: (state) => state.volunteer.openSessions,
-      sortedOpenSessions(state) {
-        return (state.volunteer.openSessions ?? [])
-          .slice()
-          .sort((first, second) => {
-            if (first.createdAt < second.createdAt) return -1
-            if (first.createdAt > second.createdAt) return 1
-            return 0
-          })
-      },
-    }),
-    ...mapGetters({
-      isBecomeAnAmbassadorCtaEnabled:
-        'featureFlags/isBecomeAnAmbassadorCtaEnabled',
-      isVolunteer: 'user/isVolunteer',
-      isAmbassador: 'user/isAmbassador',
-    }),
-  },
-  watch: {
-    ticks() {
-      this.$forceUpdate()
-    },
-  },
-  methods: {
-    openAmbassadorReferralModal() {
-      AnalyticsService.captureEvent(
-        EVENTS.AMBASSADOR_NO_STUDENTS_EARN_VOLUNTEER_HOURS_CTA_CLICKED
-      )
-      this.ambassadorReferralModalIsOpen = true
-    },
-    closeAmbassadorReferralModal() {
-      AnalyticsService.captureEvent(EVENTS.REFERRAL_MODAL_CLOSE)
-      this.ambassadorReferralModalIsOpen = false
-    },
-    gotoSession(session) {
-      const { type, subTopic, _id } = session
-      const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${_id}`
+const hasError = ref<boolean>(false)
+const ambassadorReferralModalIsOpen = ref<boolean>(false)
+const MAX_AVAILABLE_SECTIONS = 5
 
-      if (type && subTopic && _id) {
-        this.$router.push(path)
-      } else {
-        this.$store.dispatch('user/clearSession')
-      }
-    },
-    waitTime({ createdAt }) {
-      const newTime = new Date().getTime() - new Date(createdAt).getTime()
-      const seconds = Number((newTime / 1000).toFixed(0))
-      const minutes = Number((newTime / (1000 * 60)).toFixed(0))
-      const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
+const store = useStore()
+const router = useRouter()
 
-      if (seconds < 60) {
-        return '< 1 min'
-      }
-      if (minutes < 60) {
-        if (minutes === 1) return `${minutes} min`
-        return `${minutes} mins`
-      }
-      if (hours < 24) {
-        if (hours === 1) return `${hours} hr`
-        return `${hours} hrs`
-      }
-    },
-  },
+const props = defineProps<{
+  showLockedSessions: false
+}>()
+
+const isNarrowScreen = computed(() => store.state.app.windowWidth < 500)
+const user = computed(() => store.state.user.user)
+const isBecomeAnAmbassadorCtaEnabled = computed(
+  () => store.getters['featureFlags/isBecomeAnAmbassadorCtaEnabled']
+)
+const isVolunteer = computed(() => store.getters['user/isVolunteer'])
+const isAmbassador = computed(() => store.getters['user/isAmbassador'])
+const sortByCreatedAt = (first: any, second: any) => {
+  if (first.createdAt < second.createdAt) return -1
+  if (first.createdAt > second.createdAt) return 1
+  return 0
+}
+
+const sortedUnlockedSessions = computed(() => {
+  const sessions = [...store.getters['volunteer/unlockedOpenSessions']]
+  sessions.sort(sortByCreatedAt)
+  sessions.forEach((session: any) => {
+    session.isUnlocked = true
+  })
+  return sessions
+})
+const sortedLockedSessions = computed(() => {
+  const sessions = [...store.getters['volunteer/lockedOpenSessions']]
+  sessions.forEach((session: any) => {
+    session.isUnlocked = false
+  })
+  sessions.sort(sortByCreatedAt)
+  return sessions
+})
+
+const sortedSessions = computed(() => {
+  // There must be no more than MAX_AVAILABLE_SECTIONS unlocked sessions for us to display the locked ones,
+  // and to display locked ones, props.showLockedSessions must be true.
+  if (
+    sortedUnlockedSessions.value.length > MAX_AVAILABLE_SECTIONS ||
+    !props.showLockedSessions
+  ) {
+    return sortedUnlockedSessions.value
+  }
+  return [...sortedUnlockedSessions.value, ...sortedLockedSessions.value]
+})
+
+function openAmbassadorReferralModal() {
+  AnalyticsService.captureEvent(
+    EVENTS.AMBASSADOR_NO_STUDENTS_EARN_VOLUNTEER_HOURS_CTA_CLICKED
+  )
+  ambassadorReferralModalIsOpen.value = true
+}
+
+function closeAmbassadorReferralModal() {
+  AnalyticsService.captureEvent(EVENTS.REFERRAL_MODAL_CLOSE)
+  ambassadorReferralModalIsOpen.value = false
+}
+
+function gotoSession(session: any) {
+  const { type, subTopic, id } = session
+  const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
+
+  if (type && subTopic && id) {
+    router.push(path)
+  } else {
+    store.dispatch('user/clearSession')
+  }
+}
+
+function goToSubjectCert(session: any) {
+  const route = `/training/${kebab(session.subTopic)}/quiz`
+  router.push(route)
+}
+
+const ticks = computed(() => store.state.volunteer.ticks)
+function waitTime(args: { createdAt: any }) {
+  ticks.value // This line makes waitTime recalculate as `ticks` changes in the store.
+  const newTime = new Date().getTime() - new Date(args.createdAt).getTime()
+  const seconds = Number((newTime / 1000).toFixed(0))
+  const minutes = Number((newTime / (1000 * 60)).toFixed(0))
+  const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
+
+  if (seconds < 60) {
+    return '< 1 min'
+  }
+  if (minutes < 60) {
+    if (minutes === 1) return `${minutes} min`
+    return `${minutes} mins`
+  }
+  if (hours < 24) {
+    if (hours === 1) return `${hours} hr`
+    return `${hours} hrs`
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-thead {
-  text-align: left;
-}
-
 .session-list {
   padding: 10px 20px;
+  overflow-x: auto;
 
   &__error {
     color: $c-error-red;
@@ -171,6 +208,19 @@ thead {
 
 .session-row {
   cursor: pointer;
+  &:hover {
+    background: lighten($c-information-blue, 50%);
+  }
+}
+
+.session-row-locked {
+  .unlock-subject-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: $c-success-green;
+    font-size: 16px;
+  }
 }
 
 .session-row td {
