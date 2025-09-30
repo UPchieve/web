@@ -93,6 +93,7 @@ const getWrapper = (options = {}) => {
     path: '/',
     numberOfStudentClasses: 0,
     isSlackCommunityEnabled: true,
+    user: {},
     ...options,
   }
 
@@ -101,6 +102,10 @@ const getWrapper = (options = {}) => {
       ...storeOptions.modules,
       user: {
         ...storeOptions.modules.user,
+        state: {
+          ...storeOptions.modules.user.state,
+          user: options.user,
+        },
         getters: {
           ...storeOptions.modules.user.getters,
           isVolunteer: () => options.isVolunteer,
@@ -181,6 +186,43 @@ describe('SidebarLinks', () => {
         isVolunteer: true,
         isStudent: false,
         isSlackCommunityEnabled: true,
+        user: {
+          isOnboarded: true,
+          hasCertification: true,
+        },
+      })
+      testLinks(wrapper, links.default.volunteer)
+    })
+
+    it('does not render any links for an autoflow volunteer', () => {
+      const wrapper = getWrapper({
+        authenticated: true,
+        isVolunteer: true,
+        isStudent: false,
+        isSlackCommunityEnabled: true,
+        user: {
+          isOnboarded: false,
+          hasCertification: false,
+          roleContext: {
+            roles: ['volunteer'],
+          },
+        },
+      })
+      testLinks(wrapper, [])
+    })
+    it('does render links for an student that has a volunteer role (not eligible for autoflow)', () => {
+      const wrapper = getWrapper({
+        authenticated: true,
+        isVolunteer: true,
+        isStudent: false,
+        isSlackCommunityEnabled: true,
+        user: {
+          isOnboarded: false,
+          hasCertification: false,
+          roleContext: {
+            roles: ['volunteer', 'student'],
+          },
+        },
       })
       testLinks(wrapper, links.default.volunteer)
     })
@@ -200,6 +242,10 @@ describe('SidebarLinks', () => {
         authenticated: true,
         isVolunteer: true,
         isStudent: false,
+        user: {
+          isOnboarded: true,
+          hasCertification: true,
+        },
       })
       testLinks(wrapper, links.default.admin)
     })

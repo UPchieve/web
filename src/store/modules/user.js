@@ -477,7 +477,15 @@ export default {
         !state.user.isOnboarded &&
         getters.isVolunteer &&
         !getters.hasCertification &&
-        !!state.user.phone
+        !getters.userRoles.includes('student')
+      )
+    },
+
+    shouldForceAboutPage: (state, getters) => {
+      return (
+        getters.isVolunteer &&
+        !getters.userRoles.includes('student') &&
+        !state.user.phone
       )
     },
 

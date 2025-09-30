@@ -72,4 +72,8 @@ export default {
     Gleap.getInstance().softReInitialize()
     return newActiveRole
   },
+
+  async completeGoogleSsoVolunteerSignup(data) {
+    return NetworkService.completeGoogleSsoVolunteerSignup(data)
+  },
 }

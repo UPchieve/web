@@ -75,6 +75,9 @@ import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
 import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
 import JourneysView from './views/JourneysView.vue'
 
+const VolunteerGoogleSSOSignupStep2View = () =>
+  import('./views/SignupView/VolunteerGoogleSSOSignupStep2View.vue')
+
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
   else next()
@@ -296,6 +299,23 @@ const routes = [
     meta: { protected: true, hideNavigation: true },
   },
   {
+    path: '/about-you',
+    name: 'VolunteerGoogleSSOSignupStep2View',
+    component: VolunteerGoogleSSOSignupStep2View,
+    meta: { protected: true },
+    beforeEnter: (to, from, next) => {
+      getUser()
+        .then(() => {
+          if (store.getters['user/shouldForceAboutPage']) {
+            next()
+          } else {
+            next('/dashboard')
+          }
+        })
+        .catch(() => {})
+    },
+  },
+  {
     path: '/verify',
     name: 'VerificationView',
     component: VerificationView,
@@ -315,6 +335,7 @@ const routes = [
         .catch(() => {})
     },
   },
+
   {
     path: '/training',
     name: 'TrainingView',
@@ -504,6 +525,7 @@ const routes = [
     component: WelcomePage,
     meta: { protected: true, hideNavigation: true },
   },
+
   {
     path: '/sessions/progress',
     name: 'ProgressReportsOverview',
@@ -634,6 +656,16 @@ router.beforeEach((to, from, next) => {
               redirect: to.fullPath,
             },
           })
+        } else if (store.getters['user/shouldForceAboutPage']) {
+          const route = '/about-you'
+          if (to.path.indexOf(route) !== -1) {
+            next()
+          } else {
+            next({
+              path: route,
+              redirect: to.fullPath,
+            })
+          }
         } else if (
           !store.getters['user/isVerified'] ||
           store.getters['user/isInStudentVolunteerVerifyFlow']

@@ -926,6 +926,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',
   VERIFY_HOURS_BUTTON = 'verify-hours-button',
   SHOW_LOCKED_SESSIONS = 'show-locked-sessions',
+  GOOGLE_SIGNUP_FOR_VOLUNTEERS = 'google-signup-for-volunteers',
 }
 
 export const ANALYTICS_REPORT_ROW = {

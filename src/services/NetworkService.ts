@@ -1357,4 +1357,17 @@ export default {
       { clientUUID }
     ).then(this._successHandler, this._errorHandler)
   },
+  completeGoogleSsoVolunteerSignup(data: {
+    terms: boolean
+    firstName: string
+    lastName: string
+    phone: string
+    signupSourceId: number
+    otherSignupSource?: string
+  }) {
+    return httpPut(`${API_ROOT}/user/volunteer/complete-sso-signup`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

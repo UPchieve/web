@@ -67,6 +67,25 @@
     <div v-if="submitError !== ''" role="alert" class="submission-error">
       {{ submitError }}
     </div>
+
+    <div v-if="isGoogleSignupForVolunteersEnabled">
+      <LineDivider text="Sign Up with" />
+      <div class="sso-container">
+        <SsoButton
+          @click="signUpWithGoogle"
+          class="sso-button"
+          data-testid="googleSsoButton"
+          :buttonText="'Google'"
+          :ssoMethod="SsoProvider.GOOGLE"
+        />
+        <p class="terms-text">
+          By clicking the button above, you agree to our
+          <a href="https://upchieve.org/legal" target="_blank" class="uc-link"
+            >User Agreement</a
+          >.
+        </p>
+      </div>
+    </div>
   </form>
 
   <form
@@ -235,12 +254,24 @@ import Loader from '@/components/Loader.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import NetworkService from '@/services/NetworkService'
 import { backOff } from 'exponential-backoff'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
+import config from '../../config'
+import { mapGetters } from 'vuex'
+import LineDivider from '@/components/LineDivider.vue'
+import SsoButton from '@/components/SsoButton.vue'
+import { SsoProvider } from '@/services/SsoService'
 
 export default {
   components: {
     MazPhoneNumberInput,
     Loader,
     FormSelect,
+    LineDivider,
+    SsoButton,
+  },
+  setup() {
+    return { SsoProvider }
   },
   data() {
     return {
@@ -268,6 +299,12 @@ export default {
   },
   mounted() {
     this.$router.push('/sign-up/volunteer/account')
+  },
+  computed: {
+    ...mapGetters({
+      isGoogleSignupForVolunteersEnabled:
+        'featureFlags/isGoogleSignupForVolunteersEnabled',
+    }),
   },
   methods: {
     nextPage() {
@@ -384,6 +421,28 @@ export default {
           }
         })
     },
+    signUpWithGoogle() {
+      AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE, {
+        isVolunteer: true,
+      })
+      localStorage.setItem('isSSOSignUpRedirect', true)
+      const data = {
+        errorRedirect: '/sign-up/volunteer/account',
+        isLogin: false,
+        provider: 'google',
+        referredByCode: window.localStorage.getItem('upcReferredByCode'),
+        accountType: 'volunteer',
+      }
+
+      if (this.partnerKey) {
+        data.volunteerPartnerOrgKey = this.partnerKey
+      }
+
+      // Allow for the provider to populate the email
+      const params = new URLSearchParams(data).toString()
+      const url = `${config.serverRoot}/auth/sso?${params}`
+      window.location.replace(url)
+    },
     onPhoneInputUpdate(phoneInputInfo) {
       this.phoneInputInfo = phoneInputInfo
     },
@@ -456,5 +515,14 @@ export default {
 
 .submission-error {
   color: $c-error-red;
+}
+.sso-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  :deep(.sso-button) {
+    min-width: 200px;
+  }
 }
 </style>
