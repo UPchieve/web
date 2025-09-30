@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
@@ -26,6 +27,7 @@ type Journey = {
 }
 
 const $router = useRouter()
+const store = useStore()
 
 const selectedJourney = ref<Journey | undefined>(undefined)
 
@@ -88,26 +90,21 @@ const journeys = computed(() => [
   },
 ])
 
-function startSession(journeyStep: JourneyStep, row: number) {
+async function startSession(journeyStep: JourneyStep, stepNumber: number) {
   if (!selectedJourney.value) return
   const { title, sessionTopic, sessionSubject } = journeyStep
   const { dropdownLabel, key } = selectedJourney.value
-  const journeyData = {
+  await store.commit('session/setJourneySessionData', {
     dropdownLabel,
     key,
-    row,
+    stepNumber,
     title,
     subject: sessionSubject,
-  }
-
-  AnalyticsService.captureEvent(
-    EVENTS.GUIDED_JOURNEY_SESSION_REQUESTED,
-    journeyData
-  )
+  })
   $router.push(`/session/${sessionTopic}/${sessionSubject}`)
 }
 
-onMounted(async () => {
+onMounted(() => {
   selectedJourney.value = journeys.value[0]
   AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_VIEWED)
 })
@@ -115,134 +112,132 @@ onMounted(async () => {
 
 <template>
   <section class="journey-page">
-    <div class="journey-wrapper">
-      <section class="journey-steps">
-        <div class="journey-steps-wrapper">
-          <h2>UPchieve College Journey</h2>
-          <p>
-            We've put together a plan to help you supercharge your path to
-            college! Follow these five steps to stay on track this fall!
-          </p>
+    <div class="journey-container">
+      <h2 class="journey-page__title">UPchieve College Journey</h2>
+      <p class="journey-page__subtitle">
+        We've put together a plan to help you supercharge your path to college!
+        Follow these five steps to stay on track this fall.
+      </p>
 
-          <div>
-            <div
-              v-for="(step, index) in selectedJourney?.steps"
-              :key="index"
-              class="journey-step"
-            >
-              <div class="journey-step__info">
-                <h2 class="journey-step__title">{{ step.title }}</h2>
-                <div>
-                  <p class="journey-step__action-title-container">
-                    <book-icon />
-                    <span class="journey-step__action-title"
-                      >Before your session:</span
-                    >
-                  </p>
-                  <p v-html="step.beforeSession"></p>
-                </div>
-                <div>
-                  <p class="journey-step__action-title-container">
-                    <tutor-icon />
-                    <span class="journey-step__action-title"
-                      >With a tutor:</span
-                    >
-                  </p>
-                  <p>{{ step.withTutor }}</p>
-                </div>
-              </div>
-              <large-button
-                @click="() => startSession(step, index + 1)"
-                variant="primary-blue"
-                >Start session</large-button
-              >
-            </div>
+      <div class="steps-container">
+        <div
+          v-for="(step, index) in selectedJourney?.steps"
+          :key="index"
+          class="steps-step"
+        >
+          <h2 class="steps-step__title">{{ step.title }}</h2>
+
+          <div class="steps-step__block steps-step__before-session">
+            <p class="steps-step__section">
+              <book-icon class="steps-step__section-icon" />
+              <span>Before your session</span>
+            </p>
+            <p class="steps-step__section-todo" v-html="step.beforeSession"></p>
           </div>
+
+          <div class="steps-step__block">
+            <p class="steps-step__section">
+              <tutor-icon class="steps-step__section-icon" />
+              <span>With a tutor</span>
+            </p>
+            <p class="steps-step__section-todo">{{ step.withTutor }}</p>
+          </div>
+
+          <large-button
+            class="steps-step__session-btn"
+            @click="() => startSession(step, index + 1)"
+            variant="primary-blue"
+            :show-arrow="false"
+            >Start session</large-button
+          >
         </div>
-      </section>
+      </div>
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-.journey {
-  &-page {
-    max-width: 1800px;
-    width: 100%;
+.journey-page {
+  max-width: 1000px;
+  width: 100%;
+  padding: 2em;
+
+  &__title {
+    @include font-category('display-small');
+    margin-bottom: 0.4em;
   }
 
-  &-description {
-    font-size: 18px;
-    margin: 1em 0;
-  }
-
-  &-wrapper {
-    padding: 2em;
-    border-radius: 2em;
-  }
-
-  &-steps {
-    &-wrapper {
-      background-color: $upchieve-white;
-      padding: 2em;
-      border-radius: 2em;
-    }
-  }
-
-  &-step {
-    @include flex-container(column, center, center);
-    border: 1px solid $border-grey;
-    padding: 2em;
-
-    @include breakpoint-above('large') {
-      @include flex-container(row, space-between, center);
-    }
-
-    &__info {
-      width: 75%;
-    }
-
-    &__title {
-      margin-bottom: 0.4em;
-      font-size: 22px;
-      font-weight: 500;
-    }
-
-    &__action-title-container {
-      @include flex-container(row, initial, center);
-      margin-bottom: 0;
-    }
-
-    &__action-title {
-      font-weight: 500;
-      margin-left: 0.4em;
-    }
-  }
-
-  &-goals {
-    width: 60%;
-    margin: 0 auto;
-    margin-top: 2em;
-
-    &__label {
-      font-size: 20px;
-      margin-bottom: 0;
-    }
-
-    &__select {
-      background-color: $upchieve-white;
-    }
-  }
-
-  &-how-helps {
-    @include font-category('heading');
-    margin-bottom: 0;
+  &__subtitle {
+    color: $c-secondary-grey;
+    margin: 0 0 1rem;
+    max-width: 60ch;
   }
 }
 
-.icon {
-  width: 80px;
-  height: 80px;
-  margin-right: 1em;
+.journey-container {
+  background-color: $upchieve-white;
+  padding: 2em;
+  border-radius: 2em;
+}
+
+.steps-container {
+  display: grid;
+  gap: 1.4em;
+  place-items: center;
+}
+
+.steps-step {
+  @include flex-container(column, initial, initial);
+  border: 1px solid $border-grey;
+  border-radius: 1em;
+  padding: 1.2em;
+  margin: 1em 0;
+  width: 100%;
+  @include breakpoint-above('large') {
+    width: 75%;
+  }
+
+  &__title {
+    margin-top: 0.6em;
+    margin-bottom: 1em;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1.25;
+    max-width: 38ch;
+  }
+
+  &__block {
+    padding: 0.6em 0.8em;
+  }
+
+  &__before-session {
+    background-color: rgba($c-success-green, 0.05);
+    border: 1px solid rgba($c-success-green, 0.3);
+    border-radius: 0.8em;
+  }
+
+  &__section {
+    @include flex-container(row, flex-start, center);
+    gap: 0.6em;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+
+  &__section-icon {
+    width: 20px;
+    height: 20px;
+    fill: $c-information-blue;
+  }
+
+  &__section-todo {
+    color: $c-secondary-grey;
+    margin: 0;
+    line-height: 1.45;
+  }
+
+  &__session-btn {
+    align-self: center;
+    margin-top: 1em;
+  }
 }
 </style>

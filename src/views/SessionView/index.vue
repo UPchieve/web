@@ -413,6 +413,15 @@ export default {
           subject: this.$route.params.subTopic,
         })
       }
+
+      if (this.journeySessionData) {
+        AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_SESSION_REQUESTED, {
+          ...this.journeySessionData,
+          sessionId: this.sessionId,
+        })
+        await this.$store.commit('session/setJourneySessionData', undefined)
+      }
+
       if (this.isStudentVolunteer) {
         if (this.isVolunteer) {
           AnalyticsService.captureEvent(
@@ -556,6 +565,7 @@ export default {
       isPartnerOnline: (state) => state.session.isPartnerOnline,
       everShownDisplayCallStatus: (state) =>
         state.liveMedia.audio.everShownDisplayCallStatus,
+      journeySessionData: (state) => state.session.journeySessionData,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',

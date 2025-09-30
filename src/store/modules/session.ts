@@ -18,10 +18,19 @@ type Session = {
   volunteerId?: string
 }
 
+type JourneySessionData = {
+  dropdownLabel: string
+  key: string
+  stepNumber: number
+  title: string
+  subject: string
+}
+
 export type SessionState = {
   isPartnerOnline: boolean
   latestSession?: Session
   cooldownMinutes: number
+  journeySessionData?: JourneySessionData
 }
 
 export default {
@@ -30,6 +39,7 @@ export default {
     isPartnerOnline: false,
     latestSession: undefined,
     cooldownMinutes: 0,
+    journeySessionData: undefined,
   } as SessionState,
 
   getters: {
@@ -45,6 +55,8 @@ export default {
       (state.latestSession = session),
     setCooldownMinutes: (state: SessionState, cooldownMinutes: number) =>
       (state.cooldownMinutes = cooldownMinutes),
+    setJourneySessionData: (state: SessionState, data: JourneySessionData) =>
+      (state.journeySessionData = data),
   },
 
   actions: {
