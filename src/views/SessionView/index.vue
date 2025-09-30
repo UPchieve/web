@@ -405,15 +405,6 @@ export default {
       this.session = session
       this.sessionId = session.id
 
-      // Consider putting analytics into service.
-      if (!this.$route.params.sessionId && this.isStudent) {
-        AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
-          event: EVENTS.SESSION_REQUESTED,
-          sessionId: this.session.id,
-          subject: this.$route.params.subTopic,
-        })
-      }
-
       if (this.journeySessionData) {
         AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_SESSION_REQUESTED, {
           ...this.journeySessionData,

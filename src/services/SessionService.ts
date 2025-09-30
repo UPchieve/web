@@ -73,6 +73,12 @@ export default {
       assignmentId,
       presessionSurvey,
     })
+
+    AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
+      event: EVENTS.SESSION_REQUESTED,
+      sessionId: session.id,
+      subject: subTopic,
+    })
     await Promise.all([
       store.dispatch('user/updateSession', {
         ...session,
