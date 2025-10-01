@@ -75,6 +75,10 @@ export default {
       type: String,
       default: '',
     },
+    isInitiallyOpen: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     isIntegratedMathDropDown() {
@@ -84,7 +88,7 @@ export default {
 
   data() {
     return {
-      isOpen: false,
+      isOpen: this.isInitiallyOpen,
     }
   },
   methods: {

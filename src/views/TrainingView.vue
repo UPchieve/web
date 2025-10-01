@@ -91,6 +91,7 @@
           sublabel="Complete the training in order to begin tutoring students"
           buttonSize="large"
           :alertMessage="requiredTrainingMessage"
+          ref="trainingCoursesAccordion"
         >
           <training-drop-down
             :headers="['Training', 'Progress', 'Actions']"
@@ -104,6 +105,10 @@
           sublabel="Complete at least 1 certification quiz in order to begin tutoring students"
           buttonSize="large"
           data-testid="subject-certifications"
+          :isInitiallyOpen="
+            initiallyOpenAccordion(currentSubject.certifications)
+          "
+          ref="subjectCertificationsAccordion"
         >
           <subject-certs-drop-down
             :headers="['Certification', 'Subjects Unlocked', 'Actions']"
@@ -116,6 +121,10 @@
           :sublabel="additionalSubjectsAccordionHeader.subheader"
           buttonSize="large"
           v-if="currentSubject.additionalSubjects.length > 0"
+          :isInitiallyOpen="
+            initiallyOpenAccordion(currentSubject.additionalSubjects)
+          "
+          ref="additionalSubjectsAccordion"
         >
           <additional-subjects-drop-down
             :headers="additionalSubjectsColHeaders"
@@ -128,6 +137,12 @@
           :sublabel="computedSubjectsHeader.subheader"
           buttonSize="large"
           v-if="currentSubject.computedSubjects.length > 0"
+          :isInitiallyOpen="
+            initiallyOpenAccordion(currentSubject.computedSubjects)
+          "
+          id="computed-subjects-accordion"
+          data-testid="computed-subjects-accordion"
+          ref="computedSubjectsAccordion"
         >
           <additional-subjects-drop-down
             :headers="additionalSubjectsColHeaders"
@@ -191,6 +206,30 @@ export default {
     ...mapGetters({
       training: 'subjects/activeTraining',
     }),
+    currentSectionRef() {
+      if (this.openToSubject && this.currentSubject) {
+        if (
+          this.currentSubject.certifications?.some(
+            (cert) => cert.key === this.openToSubject
+          )
+        ) {
+          return this.$refs.subjectCertificationsAccordion
+        } else if (
+          this.currentSubject.additionalSubjects?.some(
+            (cert) => cert.key === this.openToSubject
+          )
+        ) {
+          return this.$refs.additionalSubjectsAccordion
+        } else if (
+          this.currentSubject.computedSubjects?.some(
+            (cert) => cert.key === this.openToSubject
+          )
+        ) {
+          return this.$refs.computedSubjectsAccordion
+        }
+      }
+      return undefined
+    },
     currentSubject() {
       return this.training[this.currentTopic]
     },
@@ -248,8 +287,17 @@ export default {
 
       return othersPassed > 0
     },
+    openToSubject() {
+      return this.$route.query?.openTo
+    },
   },
   methods: {
+    initiallyOpenAccordion(certifications) {
+      return (
+        this.openToSubject &&
+        certifications.some((cert) => cert.key === this.openToSubject)
+      )
+    },
     showTopicTraining(topic) {
       this.currentTopic = topic
     },
@@ -302,6 +350,23 @@ export default {
         if (nowLoaded) this.setInitialTopic()
       },
       deep: true,
+    },
+    currentSubject(newValue, oldValue) {
+      /*
+      When the current subject loads, we check if there is the `openTo` route query parameter and then
+      scroll the correct dropdown into view.
+       */
+      if (!oldValue && newValue) {
+        if (this.openToSubject) {
+          this.$nextTick(() => {
+            // Refs are available after render
+            const ref = this.currentSectionRef
+            if (ref) {
+              ref?.$el.scrollIntoView({ behavior: 'smooth', block: 'end' })
+            }
+          })
+        }
+      }
     },
   },
 }

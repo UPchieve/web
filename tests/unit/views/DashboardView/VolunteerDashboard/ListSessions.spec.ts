@@ -88,6 +88,12 @@ const getWrapper = async (overrides = {}) => {
           ...(overrides.featureFlags?.getters ?? {}),
         },
       },
+      subjects: {
+        ...storeOptions.modules.subjects,
+        getters: {
+          isComputedUnlockSubject: () => () => false,
+        },
+      },
     },
   })
   const mockVueContext = {

@@ -179,8 +179,18 @@ function goToSubjectCert(session: any) {
   AnalyticsService.captureEvent(EVENTS.LOCKED_SESSIONS_CLICKED_UNLOCK_SUBJECT, {
     subject: session.subTopic,
   })
-  const route = `/training/${kebab(session.subTopic)}/quiz`
-  router.push(route)
+  const isComputedUnlockSession = store.getters[
+    'subjects/isComputedUnlockSubject'
+  ](session.subTopic)
+  if (isComputedUnlockSession) {
+    // These subjects require you to take multiple quizzes to unlock them.
+    // Send the user to the Training page
+    const route = `/training?openTo=${session.subTopic}`
+    router.push(route)
+  } else {
+    const route = `/training/${kebab(session.subTopic)}/quiz`
+    router.push(route)
+  }
 }
 
 const ticks = computed(() => store.state.volunteer.ticks)

@@ -221,5 +221,8 @@ export default {
       }
       return activeTraining
     },
+    isComputedUnlockSubject: (state) => (subject) => {
+      return state.subjects[subject].isComputedUnlock
+    },
   },
 }
