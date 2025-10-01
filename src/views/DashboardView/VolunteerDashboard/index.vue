@@ -301,17 +301,18 @@ export default {
       deep: true,
     },
   },
-  beforeMount() {
-    const dismissingUser = sessionStorage.getItem(
-      'DISMISSED_NOTIFICATIONS_CARD'
-    )
-    this.notificationsCardWasDismissed = dismissingUser === this.user.id
-  },
   async created() {
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal()
     }
-    this.notificationPermission = getNotificationPermission()
+    if ('Notification' in window) {
+      this.notificationPermission = Notification.permission
+    } else {
+      this.notificationPermission = 'denied'
+    }
+
+    this.notificationsCardWasDismissed =
+      sessionStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
   },
   data() {
     return {
