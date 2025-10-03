@@ -66,6 +66,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
       [POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT]: false,
+      [POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX]: false,
       [POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
       [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
@@ -287,6 +288,8 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT
       ],
+    isImageUploadUxEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX],
     isSlackCommunityEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED],
     isVerifyHoursButtonEnabled: (state: FeatureFlagState) =>
@@ -327,6 +330,17 @@ export default {
           partnerUserId
         )
       return isEnabledForPartner.isEnabled || getters.isScreenshareEnabled
+    },
+    isImageUploadUxEnabled: async (
+      { getters }: ActionContext<FeatureFlagState, RootState>,
+      partnerUserId: string
+    ) => {
+      const isEnabledForPartner =
+        await FeatureFlagService.isFeatureEnabledForUser(
+          POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX,
+          partnerUserId
+        )
+      return isEnabledForPartner.isEnabled || getters.isImageUploadUxEnabled
     },
   },
 }

@@ -38,16 +38,23 @@ export default {
       let source = ''
       switch (state.moderationInfraction?.source) {
         case 'audio_transcription':
-          source = 'microphone'
+          source = 'microphone use'
           break
         case 'screenshare':
-          source = 'screenshare'
+          source = 'screenshare use'
           break
         case 'image_upload':
-          source = 'image'
+          source = 'image use'
+          break
+        //used for a session partner's moderation toast message
+        case 'session_partner_student_image_upload':
+          source = "student's image upload"
+          break
+        case 'session_partner_coach_image_upload':
+          source = "coach's image upload"
           break
         default:
-          source = 'screenshare or microphone'
+          source = 'screenshare or microphone use'
           break
       }
       return source

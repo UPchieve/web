@@ -59,6 +59,7 @@
           <ScreenShareIcon v-else />
         </button>
       </div>
+
       <word-count
         class="ql-word-count"
         :text="text"
@@ -69,23 +70,19 @@
     <div id="quill-container"></div>
     <transition name="document-loading">
       <loading-message
-        v-if="isLoading"
+        v-if="loadingText"
         :message="loadingText"
         class="document-loading document-loading--connection"
       />
     </transition>
-    <transition name="document-loading">
-      <p v-if="error" class="document-loading document-loading--error">
-        {{ error }}
-      </p>
-    </transition>
-    <refresh-document-editor-modal v-if="showRefreshModal" />
+
     <FileDialog
       accept="image/png, image/jpeg, image/webp, image/heic"
       ref="fileDialog"
       @file-selected="onFileSelected"
       @file-too-large="onFileTooLarge"
       :maxFileSizeBytes="MAX_IMAGE_FILE_SIZE_BYTES"
+      :disabled="loadingText"
     />
   </div>
 </template>
@@ -98,8 +95,10 @@ import QuillCursors from 'quill-cursors'
 import { QuillBinding } from 'y-quill'
 import { applyUpdate, Doc } from 'yjs'
 import { socket } from '@/socket'
+import { vTooltip } from 'maz-ui'
+import { toastController } from '@ionic/vue'
+import { closeCircleOutline } from 'ionicons/icons'
 import LoadingMessage from '@/components/LoadingMessage.vue'
-import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
 import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -113,7 +112,6 @@ import ErrorIcon from '@/assets/icons/exclamation.svg'
 import LoggerService from '@/services/LoggerService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import Spinner from '@/components/Spinner.vue'
-import { vTooltip } from 'maz-ui'
 import WordCount from '@/components/WordCount.vue'
 import EyeIcon from '@/assets/eye.svg'
 import {
@@ -123,6 +121,13 @@ import {
 } from '@/utils/image-pipeline'
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
 import { ImageDropPaste } from '@/quill/modules/image'
+import { TEN_SECONDS_TO_MS } from '@/utils/time-utils'
+import {
+  IMAGE_UPLOAD_EVENTS,
+  getPartnerUploadingMsg,
+  IMAGE_UPLOADING_STATE_MESSAGES,
+  getPartnerUploadFailedMsg,
+} from '@/composables/imageUploadState'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageDropPaste)
@@ -138,7 +143,6 @@ export default {
   components: {
     FileDialog,
     LoadingMessage,
-    RefreshDocumentEditorModal,
     ChatBotIcon,
     ScreenShareIcon,
     StopScreenShareIcon,
@@ -192,21 +196,23 @@ export default {
       type: Boolean,
       default: false,
     },
+    isImageUploadingUxEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       quillEditor: null,
       // set default loading state
-      isLoading: true,
       loadingText: 'Loading the document editor',
       incomingDeltas: [],
       retries: 0,
-      showRefreshModal: false,
       showScreenShareErrorTooltip: false,
-      error: '',
       // For determining word counts.
       text: '',
       selectedText: '',
+      uploadingImageTimeout: null,
     }
   },
   computed: {
@@ -300,8 +306,10 @@ export default {
       for (const update of updates) {
         applyUpdate(this.doc, decode(update))
       }
-      this.isLoading = false
-      this.loadingText = ''
+
+      if (!this.uploadingImageTimeout) {
+        this.loadingText = null
+      }
       this.quillEditor.enable()
 
       this.quillEditor
@@ -317,9 +325,68 @@ export default {
       this.quillEditor.getModule('cursors').moveCursor('partnerCursor', range)
     })
 
+    if (this.isImageUploadingUxEnabled) {
+      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_UPLOADING_IMAGE, () => {
+        this.loadingText = getPartnerUploadingMsg(this.isStudent)
+        if (this.uploadingImageTimeout) {
+          this.clearUploadImageTimeout()
+        }
+        this.uploadingImageTimeout = setTimeout(() => {
+          if (this.loadingText && this.uploadingImageTimeout) {
+            this.loadingText = null
+            this.uploadingImageTimeout = null
+            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+          }
+        }, TEN_SECONDS_TO_MS)
+      })
+
+      socket.on(
+        IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_FAILED,
+        ({ moderationFailures, uploadError }) => {
+          this.clearUploadImageTimeout()
+
+          this.loadingText = null
+          if (moderationFailures) {
+            this.onImageFailedModeration(moderationFailures, true)
+          } else if (uploadError) {
+            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+          }
+        }
+      )
+
+      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_SUCCESS, () => {
+        this.clearUploadImageTimeout()
+        this.loadingText = null
+      })
+    }
+
     if (this.isConnected && this.currentSession?.id) this.requestQuillDoc()
   },
   methods: {
+    clearUploadImageTimeout() {
+      if (this.uploadingImageTimeout) {
+        clearTimeout(this.uploadingImageTimeout)
+        this.uploadingImageTimeout = null
+      }
+    },
+    async showErrorToast(message) {
+      const toast = await toastController.create({
+        message,
+        color: 'dark',
+        position: 'middle',
+        animated: true,
+        icon: 'alert-circle-outline',
+        duration: 5000,
+        swipeGesture: 'vertical',
+        buttons: [
+          {
+            icon: closeCircleOutline,
+            role: 'cancel',
+          },
+        ],
+      })
+      await toast.present()
+    },
     toggleScreenShareErrorTooltipOpen() {
       this.showScreenShareErrorTooltip = !this.showScreenShareErrorTooltip
       if (this.showScreenShareErrorTooltip)
@@ -369,17 +436,22 @@ export default {
       })
     },
     async onFileSelected(evt) {
-      const { files } = evt.fileSelectionEvent.target
-      const file = files[0]
+      const file = evt.files[0]
       await this.processAndInsertImage(file)
+      evt.fileSelectionEvent.target.value = ''
     },
     async processAndInsertImage(file) {
       if (!isAllowedImageMime(file.type)) return this.onWrongFileType()
       if (file.size > this.MAX_IMAGE_FILE_SIZE_BYTES)
         return this.onFileTooLarge()
 
-      this.isLoading = true
-      this.loadingText = 'Loading image'
+      this.loadingText =
+        IMAGE_UPLOADING_STATE_MESSAGES.SENDER[
+          IMAGE_UPLOAD_EVENTS.MODERATING_IMAGE
+        ]
+      socket.emit(IMAGE_UPLOAD_EVENTS.MODERATING_IMAGE, {
+        sessionId: this.currentSession.id,
+      })
 
       try {
         file = await processImage(file, {
@@ -392,6 +464,10 @@ export default {
         const { isClean, failures } =
           await ModerationService.checkIfImageIsClean(formData)
         if (!isClean) {
+          socket.emit(IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_FAILED, {
+            sessionId: this.currentSession.id,
+            moderationFailures: failures,
+          })
           this.onImageFailedModeration(failures)
           return
         }
@@ -408,45 +484,58 @@ export default {
           const b64 = await file2b64(file)
           this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
         }
+
+        socket.emit(IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_SUCCESS, {
+          sessionId: this.currentSession.id,
+        })
+
         AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
           tool: 'document-editor-v2',
         })
       } catch (err) {
+        socket.emit(IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_FAILED, {
+          sessionId: this.currentSession.id,
+          uploadError: true,
+        })
         AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_FAILED, {
           tool: 'document-editor-v2',
         })
-        alert(
-          'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
+
+        this.showErrorToast(
+          IMAGE_UPLOADING_STATE_MESSAGES.SENDER[
+            IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_FAILED
+          ]
         )
       } finally {
-        this.isLoading = false
-        this.loadingText = ''
+        this.loadingText = null
+        this.clearUploadImageTimeout()
       }
     },
     onFileTooLarge() {
       const imageTooLargeMessage = getImageTooLargeMessage(
         this.MAX_IMAGE_FILE_SIZE_BYTES
       )
-      this.setTemporaryErrorMessage(imageTooLargeMessage)
+      this.showErrorToast(imageTooLargeMessage)
     },
     onWrongFileType() {
-      this.setTemporaryErrorMessage(
+      this.showErrorToast(
         `That file type isn't supported. Please upload an image.`
       )
     },
-    setTemporaryErrorMessage(message, timeout = 2000) {
-      this.error = message
-      setTimeout(() => (this.error = ''), timeout)
-    },
-    onImageFailedModeration(failures) {
+    onImageFailedModeration(failures, isPartnerFailure) {
       AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_IMAGE_CENSORED, {
         tool: 'document-editor-v2',
       })
+
       this.$store.commit('liveMedia/setModerationInfraction', {
         // @TODO This is mixing liveMedia with non-live media concerns, ugh...
         infraction: failures,
         isBanned: false,
-        source: 'image_upload',
+        source: isPartnerFailure
+          ? this.isStudent
+            ? 'session_partner_coach_image_upload'
+            : 'session_partner_student_image_upload'
+          : 'image_upload',
         occurredAt: new Date(),
       })
     },
@@ -460,11 +549,10 @@ export default {
         // socket.io just reconnected, allow edits to the document editor
         // or the volunteer is able to send DMs after the session ends
         this.quillEditor.enable()
-        this.isLoading = false
-        this.loadingText = ''
+        this.loadingText = null
       } else {
+        this.clearUploadImageTimeout()
         this.quillEditor.disable()
-        this.isLoading = true
         this.loadingText = 'Attempting to connect the document editor'
       }
     },

@@ -32,13 +32,13 @@ const moderationInfraction = computed(
 
 const heading = computed(
   () =>
-    `Our automated moderation system detected a potential policy issue with your ${moderationInfractionSource.value} use.`
+    `Our automated moderation system detected a potential policy issue with your ${moderationInfractionSource.value}.`
 )
 
 const message = computed(() => {
   if (!moderationInfraction.value) return
   const infractions = moderationInfraction.value?.infraction ?? []
-  return `Potential ${moderationInfraction.value?.infraction.length > 0 ? 'violations' : 'violation'}: ${infractions.join(', ')}`
+  return `Potential ${infractions.length > 1 ? 'violations' : 'violation'}: ${infractions.join(', ')}`
 })
 
 const moderationInfractionSource = computed(
@@ -54,10 +54,12 @@ const moderationInfractionToastButtons = computed(() => {
   const buttons = [dismissButton]
   // Image uploads don't actually cause strikes against the user if they're censored,
   // so don't show them the modal about manual review.
-  if (moderationInfraction.value?.source !== 'image_upload') {
+
+  if (!moderationInfraction.value?.source?.includes('image_upload')) {
     buttons.push({
       text: 'More info',
       handler: props.onClickMoreInfo,
+      role: 'button',
     })
   }
   return buttons

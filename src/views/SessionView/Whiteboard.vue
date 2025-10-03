@@ -2,15 +2,15 @@
   <div class="zwib-wrapper" :class="toolClass">
     <transition name="whiteboard-warning">
       <div
-        v-if="hasConnectionFailure"
+        v-if="!loadingText && !isConnected"
         class="whiteboard-warning whiteboard-warning--failure"
       >
         Failed to connect to the whiteboard. Please refresh your page.
       </div>
       <loading-message
-        message="Attempting to connect the whiteboard"
+        :message="loadingText"
         class="whiteboard-warning whiteboard-warning--connection"
-        v-else-if="!isConnected"
+        v-else-if="loadingText"
       />
     </transition>
     <div
@@ -18,14 +18,8 @@
       ref="zwibDiv"
       :class="{ 'whiteboard-open': isWhiteboardOpen }"
     ></div>
-    <transition name="uploading-picture-error">
-      <p class="whiteboard-transition-error" v-show="uploadingPictureError">
-        {{ imageUploadErrorMessage }}
-      </p>
-    </transition>
     <div id="partner-cursor" ref="partnerCursor"></div>
     <div id="toolbar" class="toolbar">
-      <p v-if="error" class="whiteboard-error">{{ error }}</p>
       <div
         v-if="screenShareAvailable"
         class="toolbar-item"
@@ -189,6 +183,7 @@
           @file-selected="uploadPhoto"
           @file-too-large="onFileTooLarge"
           :maxFileSizeBytes="MAX_IMAGE_FILE_SIZE_BYTES"
+          :disabled="loadingText"
         />
         <PhotoUploadIcon class="toolbar-icon--photo" />
       </button>
@@ -440,15 +435,17 @@
         </div>
       </button>
     </div>
-    <div v-if="isLoading" class="loading-overlay">
-      <loader />
-    </div>
   </div>
 </template>
 
 <script>
+import { socket } from '@/socket'
 import { mapGetters } from 'vuex'
+import { vTooltip } from 'maz-ui'
+import { markRaw } from 'vue'
 import { backOff } from 'exponential-backoff'
+import { toastController } from '@ionic/vue'
+import { closeCircleOutline } from 'ionicons/icons'
 import PickToolIcon from '@/assets/whiteboard_icons/selection.svg'
 import MoreIcon from '@/assets/VerticalMenuButtons.svg'
 import ClearIcon from '@/assets/whiteboard_icons/clear.svg'
@@ -473,11 +470,9 @@ import EraserIcon from '@/assets/whiteboard_icons/eraser.svg'
 import EyeIcon from '@/assets/eye.svg'
 import TextIcon from '@/assets/whiteboard_icons/text_tool.svg'
 import SmallTextIcon from '@/assets/whiteboard_icons/small_text_tool.svg'
-import Loader from '@/components/Loader.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import config from '../../config'
 import LoggerService from '@/services/LoggerService'
-import { markRaw } from 'vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
@@ -485,11 +480,21 @@ import { WhiteboardNullTool } from './WhiteboardNullTool'
 import WhiteboardAiTutorButton from './WhiteboardAiTutorButton.vue'
 import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
 import Spinner from '@/components/Spinner.vue'
-import { vTooltip } from 'maz-ui'
 import StartScreenShareButton from './StartScreenShareButton.vue'
 import SessionService from '@/services/SessionService'
 import { processImage, getImageTooLargeMessage } from '@/utils/image-pipeline'
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
+import {
+  secondsToMs,
+  TEN_SECONDS_TO_MS,
+  FIVE_SECONDS_TO_MS,
+} from '@/utils/time-utils'
+import {
+  IMAGE_UPLOAD_EVENTS,
+  getPartnerUploadingMsg,
+  IMAGE_UPLOADING_STATE_MESSAGES,
+  getPartnerUploadFailedMsg,
+} from '@/composables/imageUploadState'
 
 const TOOLS = {
   BRUSH: 'brush',
@@ -524,7 +529,6 @@ export default {
     EraserIcon,
     TextIcon,
     SmallTextIcon,
-    Loader,
     LoadingMessage,
     StopScreenShareIcon,
     Spinner,
@@ -589,6 +593,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    isImageUploadingUxEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -598,15 +606,11 @@ export default {
       canvasHeight: 2800,
       canvasWidth: 1000,
       // Component state.
-      error: '',
-      isLoading: false,
+      loadingText: 'Attempting to connect the whiteboard',
       isConnected: false,
-      hasConnectionFailure: false,
-      hadConnectionIssue: false,
       pingPongInterval: null,
-      uploadingPictureError: false,
-      imageUploadErrorMessage: 'Unable to upload the image',
       screenShareErrorTooltipOpen: false,
+      uploadingImageTimeout: null,
       // Tools.
       // one-of: ai-tutor, pick, brush, thin-brush (i.e. brush), eraser (i.e. brush), line, arrow, circle, polygon (used for triangle), rectangle, imagestamp (used for xy graph), text, small-text (i.e. text)
       selectedTool: '',
@@ -686,8 +690,66 @@ export default {
   },
   async mounted() {
     this.loadZwibbler()
+
+    if (this.isImageUploadingUxEnabled) {
+      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_UPLOADING_IMAGE, () => {
+        this.loadingText = getPartnerUploadingMsg(this.isStudent)
+        this.clearUploadImageTimeout()
+
+        this.uploadingImageTimeout = setTimeout(() => {
+          if (this.loadingText && this.uploadingImageTimeout) {
+            this.loadingText = null
+            this.uploadingImageTimeout = null
+            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+          }
+        }, TEN_SECONDS_TO_MS)
+      })
+
+      socket.on(
+        IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_FAILED,
+        ({ moderationFailures, uploadError }) => {
+          this.clearUploadImageTimeout()
+
+          this.loadingText = null
+          if (moderationFailures) {
+            this.handleImageFailedModeration(moderationFailures, true)
+          } else if (uploadError) {
+            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+          }
+        }
+      )
+
+      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_SUCCESS, () => {
+        this.clearUploadImageTimeout()
+        this.loadingText = null
+      })
+    }
   },
   methods: {
+    clearUploadImageTimeout() {
+      if (this.uploadingImageTimeout) {
+        clearTimeout(this.uploadingImageTimeout)
+        this.uploadingImageTimeout = null
+      }
+    },
+    async showErrorToast(message) {
+      const toast = await toastController.create({
+        message,
+        color: 'dark',
+        position: 'middle',
+        animated: true,
+        icon: 'alert-circle-outline',
+        duration: 5000,
+        swipeGesture: 'vertical',
+        buttons: [
+          {
+            icon: closeCircleOutline,
+            role: 'cancel',
+          },
+        ],
+      })
+      await toast.present()
+    },
     toggleScreenShareWindow() {
       AnalyticsService.captureEvent(
         EVENTS.SCREENSHARE_USER_CLICKED_SCREENSHARE_BUTTON,
@@ -1013,22 +1075,21 @@ export default {
       )
       this.$refs.fileDialog.openFileDialog(event)
     },
-    async showImageUploadError(timeMs) {
-      this.uploadingPictureError = true
-      this.imageUploadErrorMessage = 'Unable to upload image'
-      setTimeout(() => {
-        this.uploadingPictureError = false
-      }, timeMs ?? 2000)
-    },
     async uploadPhoto(uploadEvents) {
-      const { files } = uploadEvents.fileSelectionEvent.target
-      let file = files[0]
+      let file = uploadEvents.files[0]
 
       if (!this.isWhiteboardOpen && this.mobileMode) this.toggleWhiteboard()
 
       this.usePickTool(uploadEvents.dialogOpeningEvent)
 
-      this.isLoading = true
+      this.loadingText =
+        IMAGE_UPLOADING_STATE_MESSAGES.SENDER[
+          IMAGE_UPLOAD_EVENTS.MODERATING_IMAGE
+        ]
+
+      socket.emit('moderatingImage', {
+        sessionId: this.sessionId,
+      })
 
       try {
         file = await processImage(file)
@@ -1040,15 +1101,11 @@ export default {
         const { isClean, failures } =
           await ModerationService.checkIfImageIsClean(formData)
         if (!isClean) {
-          AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_IMAGE_CENSORED, {
-            tool: 'whiteboard',
+          socket.emit('imageUploadFailed', {
+            sessionId: this.sessionId,
+            moderationFailures: failures,
           })
-          this.$store.commit('liveMedia/setModerationInfraction', {
-            infraction: failures,
-            source: 'image_upload',
-            isBanned: false,
-            occurredAt: new Date(),
-          })
+          this.handleImageFailedModeration(failures)
           return
         }
 
@@ -1057,24 +1114,38 @@ export default {
           file
         )
         this.insertPhoto(imageUrl)
+        socket.emit('imageUploadSuccess', {
+          sessionId: this.sessionId,
+        })
         AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
           tool: 'whiteboard',
         })
       } catch (error) {
+        socket.emit('imageUploadFailed', {
+          sessionId: this.sessionId,
+          uploadError: true,
+        })
         AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_FAILED, {
           tool: 'whiteboard',
         })
-        this.showImageUploadError()
+        this.showErrorToast(
+          IMAGE_UPLOADING_STATE_MESSAGES.SENDER[
+            IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_FAILED
+          ]
+        )
         LoggerService.noticeError(error)
         return
       } finally {
         // Reset the file input
         uploadEvents.fileSelectionEvent.target.value = ''
-        this.isLoading = false
+        this.loadingText = null
+        this.clearUploadImageTimeout()
       }
     },
     onFileTooLarge() {
-      this.error = getImageTooLargeMessage(this.MAX_IMAGE_FILE_SIZE_BYTES)
+      this.showErrorToast(
+        getImageTooLargeMessage(this.MAX_IMAGE_FILE_SIZE_BYTES)
+      )
     },
     insertPhoto(imageUrl) {
       this.uploadingImageNodeId = this.zwibblerCtx.createNode('ImageNode', {
@@ -1205,7 +1276,7 @@ export default {
       this.zwibblerCtx.setConfig('readOnly', true)
       this.zwibblerCtx.on('connected', () => {
         this.isConnected = true
-        this.hasConnectionFailure = false
+        this.loadingText = null
         this.resizeViewRectangle()
         this.zwibblerCtx.setConfig('readOnly', false)
 
@@ -1258,7 +1329,7 @@ export default {
         // Ping server every 45 seconds to keep the connection open.
         this.pingPongInterval = window.setInterval(() => {
           zwibblerWsConnection.send('p1ng')
-        }, 45 * 1000)
+        }, secondsToMs(45))
 
         // Set brush tool to default tool.
         this.useBrushTool()
@@ -1278,6 +1349,11 @@ export default {
 
       this.zwibblerCtx.on('resource-loaded', () => {
         const nodeId = this.uploadingImageNodeId
+
+        //partner resource was added
+        if (!nodeId) {
+          return
+        }
         const nodeDimensions = this.zwibblerCtx.getNodeRectangle(nodeId)
 
         const whiteboard = document.querySelector('#zwib-div')
@@ -1305,7 +1381,7 @@ export default {
 
       this.zwibblerCtx.on('connect-error', () => {
         this.isConnected = false
-        this.hadConnectionIssue = true
+        this.loadingText = null
         window.clearInterval(this.pingPongInterval)
         this.zwibblerCtx.setConfig('readOnly', true)
         LoggerService.noticeError('Zwibbler: Received connect-error.', {
@@ -1330,7 +1406,7 @@ export default {
 
     async joinSharedSessionWithRetry() {
       const MAX_RETRIES = 5
-      const TIMEOUT_MS = 5000
+      const TIMEOUT_MS = FIVE_SECONDS_TO_MS
       let currentAttempt = 1
 
       try {
@@ -1385,7 +1461,8 @@ export default {
           }
         )
       } catch {
-        this.hasConnectionFailure = true
+        this.isConnected = false
+        this.loadingText = null
         LoggerService.noticeError(
           `Zwibbler: Failed to connect to collaboration server after ${MAX_RETRIES} retries.`,
           {
@@ -1400,6 +1477,21 @@ export default {
           isFinal: true,
         })
       }
+    },
+    handleImageFailedModeration(failures, isPartnerFailure) {
+      AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_IMAGE_CENSORED, {
+        tool: 'whiteboard',
+      })
+      this.$store.commit('liveMedia/setModerationInfraction', {
+        infraction: failures,
+        source: isPartnerFailure
+          ? this.isStudent
+            ? 'session_partner_coach_image_upload'
+            : 'session_partner_student_image_upload'
+          : 'image_upload',
+        isBanned: false,
+        occurredAt: new Date(),
+      })
     },
   },
   async beforeUnmount() {

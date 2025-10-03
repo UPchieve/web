@@ -5,6 +5,7 @@
     :accept="accept"
     :multiple="multiple"
     @change="handleFileSelect"
+    :disabled="disabled"
   />
 </template>
 
@@ -22,6 +23,11 @@ export default {
     maxFileSizeBytes: {
       type: Number,
       required: false,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

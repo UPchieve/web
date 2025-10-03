@@ -90,6 +90,7 @@
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
           :unableToJoinCall="unableToJoinCall"
+          :isImageUploadingUxEnabled="isImageUploadingUxEnabled"
         />
 
         <document-editor-v2
@@ -109,6 +110,7 @@
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
           :unableToJoinCall="unableToJoinCall"
+          :isImageUploadingUxEnabled="isImageUploadingUxEnabled"
         />
         <!--
         NOTE: this editor is used by the volunteer when the student is using the midtown app
@@ -437,7 +439,9 @@ export default {
       await Promise.all([
         this.fetchSessionAudioFlag(),
         this.fetchScreenshareFlag(),
+        this.fetchImageUploadingUxFlag(),
       ])
+
       this.meetingActor.actorRef.start()
       this.meetingActor.actorRef.send({
         type: 'set_session_id',
@@ -540,6 +544,7 @@ export default {
       showScreenShareDisclaimer: false,
       joinSocketSessionAbortController: null,
       isSocketSessionRoomConnected: false,
+      isImageUploadingUxEnabled: false,
     }
   },
   computed: {
@@ -869,8 +874,12 @@ export default {
 
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
-        await this.fetchSessionAudioFlag()
-        await this.fetchScreenshareFlag()
+        Promise.all([
+          this.fetchSessionAudioFlag(),
+          this.fetchScreenshareFlag(),
+          this.fetchImageUploadingUxFlag(),
+        ])
+
         this.meetingActor.actorRef.send({
           type: 'session_started',
           isAudioEligible: this.isSessionAudioCallEnabled,
@@ -950,6 +959,17 @@ export default {
         )
       } catch (err) {
         this.isScreenshareEnabled = false
+      }
+    },
+    async fetchImageUploadingUxFlag() {
+      if (!this.sessionPartner?.id) return
+      try {
+        this.isImageUploadingUxEnabled = await this.$store.dispatch(
+          'featureFlags/isImageUploadUxEnabled',
+          this.sessionPartner.id
+        )
+      } catch (err) {
+        this.isImageUploadingUxEnabled = false
       }
     },
     toggleAiWidget() {
