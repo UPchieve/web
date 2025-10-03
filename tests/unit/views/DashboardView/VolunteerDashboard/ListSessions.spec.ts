@@ -92,6 +92,7 @@ const getWrapper = async (overrides = {}) => {
         ...storeOptions.modules.subjects,
         getters: {
           isComputedUnlockSubject: () => () => false,
+          ...(overrides.subjects?.getters ?? {}),
         },
       },
     },
@@ -270,11 +271,6 @@ describe('Locked sessions', () => {
         },
       },
       sessions: testSessions,
-      featureFlags: {
-        getters: {
-          isShowLockedSessionsEnabled: () => true,
-        },
-      },
       props: { showLockedSessions: true },
     })
 
@@ -337,11 +333,6 @@ describe('Locked sessions', () => {
           },
         },
         sessions: testSessions,
-        featureFlags: {
-          getters: {
-            isShowLockedSessionsEnabled: () => true,
-          },
-        },
         props: { showLockedSessions: true },
       })
     const prealgebraSessionRow = (await getTestWrapper()).find(
@@ -367,5 +358,46 @@ describe('Locked sessions', () => {
     )
     await lockedBiologySessionRow.trigger('click')
     expect(routerPushSpy).toHaveBeenNthCalledWith(3, '/training/biology/quiz')
+  })
+
+  it('Clicking on an integrated math session should take you to the Training page', async () => {
+    const routerPushSpy = vi.spyOn(router, 'push')
+    const wrapper = await getWrapper({
+      user: {
+        state: {
+          user: {
+            subjects: ['prealgebra'],
+          },
+        },
+      },
+      sessions: [
+        {
+          id: 'session-1',
+          student: {
+            firstname: 'Student1',
+            isTestUser: false,
+          },
+          studentFirstName: 'Student1',
+          subTopic: 'integratedMathOne',
+          subjectDisplayName: 'Integrated Math One',
+          type: 'math',
+          createdAt: moment().subtract(5, 'minutes').toDate(),
+        },
+      ],
+      props: { showLockedSessions: true },
+      subjects: {
+        getters: {
+          isComputedUnlockSubject: () => () => true,
+        },
+      },
+    })
+    const integratedMathRow = wrapper.find(
+      '[data-testid="session-row-session-1"]'
+    )
+    await integratedMathRow.trigger('click')
+    expect(routerPushSpy).toHaveBeenNthCalledWith(
+      1,
+      '/training?openTo=integratedMathOne'
+    )
   })
 })
