@@ -407,12 +407,15 @@ export default {
       return VERIFICATION_METHOD
     },
     userSubjects() {
-      const user = this.$store.state.user.user
+      const user = this.user
       const userSubjects = this.isFilterActiveSubjectsActive
         ? user.activeSubjects
         : user.subjects
 
-      const subjects = this.$store.state.subjects.subjects
+      const subjects = this.subjects
+      if (Object.keys(subjects).length === 0) {
+        return []
+      }
 
       const sortedSubjects = userSubjects
         .map((subject) => {
