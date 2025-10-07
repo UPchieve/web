@@ -21,7 +21,7 @@ export type FeedbackOptions = {
 
 type AnalyticsServiceType = {
   eventName: string
-  eventData?: Object
+  eventData?: object
 }
 
 const props = defineProps<{
@@ -40,10 +40,10 @@ const langfuse = new LangfuseWeb({
   publicKey: config.langfusePublicKey ?? '',
 })
 
-let selectedOption = ref()
-let additionalFeedback = ref('')
+const selectedOption = ref()
+const additionalFeedback = ref('')
 
-let feedbackArgs = computed(() =>
+const feedbackArgs = computed(() =>
   modalState.value === MODAL_STATE['negative-follow-up']
     ? negativeArgs(props.name)
     : positiveArgs(props.name)

@@ -20,7 +20,7 @@ const store = useStore()
 const router = useRouter()
 const route = useRoute()
 type PartialSubject = Pick<Subject, 'id' | 'displayName' | 'topicName' | 'name'>
-let currentSubject = ref<PartialSubject | undefined>(undefined)
+const currentSubject = ref<PartialSubject | undefined>(undefined)
 
 const sessionId = computed(() => store.state.user.session?.id)
 const isTransferToSessionEnabled = computed(() => {

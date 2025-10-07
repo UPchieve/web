@@ -11,11 +11,11 @@ type OnboardingFrame = {
 }
 
 interface OnboardingFrameProps {
-  closeModal: Function
+  closeModal: () => void
   pages: Array<OnboardingFrame>
-  nextButtonText?: String
-  acceptButtonText?: String
-  previousButtonText?: String
+  nextButtonText?: string
+  acceptButtonText?: string
+  previousButtonText?: string
 }
 
 const {

@@ -20,8 +20,8 @@ import { useStore } from 'vuex'
 
 const props = defineProps<{
   show: false
-  onDismiss: Function
-  onClickMoreInfo: Function
+  onDismiss: () => void
+  onClickMoreInfo: () => void
 }>()
 
 const store = useStore()

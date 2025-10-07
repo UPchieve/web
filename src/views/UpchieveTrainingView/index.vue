@@ -50,7 +50,7 @@ onBeforeMount(async () => {
     const trainingCourseResponse =
       await NetworkService.getTrainingCourse(COURSE_KEY)
     trainingCourseDefinition.value = trainingCourseResponse.data.course
-  } catch (err) {
+  } catch {
     // @TODO
   }
 })
@@ -82,7 +82,7 @@ async function next() {
     }
     currentModuleIndex.value = currentModuleIndex.value + 1
     await scrollToTop()
-  } catch (err) {
+  } catch {
     // @TODO
   } finally {
     isRecordingProgress.value = false

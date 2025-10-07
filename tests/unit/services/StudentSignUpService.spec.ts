@@ -26,13 +26,10 @@ vi.mock('@/services/NetworkService')
 const mockedAuthService = vi.mocked(AuthService)
 const mockedNetworkService = vi.mocked(NetworkService)
 
-window.location = {
+vi.stubGlobal('location', {
   ...window.location,
-  // Can't use spyOn `replace` because, based on how spyOn
-  // works, end up getting a TypeError that cannot redefine
-  // the property replace.
   replace: vi.fn(),
-}
+})
 
 function findElementAndRow(
   rows: (FormRow | SubmitFormRow<any> | null)[],
@@ -126,10 +123,10 @@ describe('StudentSignUpService', () => {
           pageDetails.rows,
           (e) => e.element === 'button' && e.content === 'Check eligibility'
         )
-        // @ts-ignore
-        expect(submitButton?.formElement.submitAction).toBe(
-          __test__.checkEligibility
-        )
+        expect(
+          (submitButton?.formElement as SubmitButtonFormElement<any>)
+            ?.submitAction
+        ).toBe(__test__.checkEligibility)
       })
 
       test('returns correct page details for parent/guardian', () => {
@@ -495,7 +492,7 @@ describe('StudentSignUpService', () => {
         (e) => e.element === 'button'
       )
       expect(continueButton?.formElement.content).toBe('Continue')
-      // @ts-ignore
+      // @ts-expect-error submit action does not exist on formElement
       expect(continueButton?.formElement.submitAction).toBe(
         __test__.ineligibleContinue
       )
@@ -613,7 +610,7 @@ describe('StudentSignUpService', () => {
           (e) => e.element === 'button' && e.content === 'Confirm'
         )
         expect(submitButton).toBeDefined()
-        // @ts-ignore
+        // @ts-expect-error submit action does not exist on formElement
         expect(submitButton?.formElement.submitAction).toBe(
           __test__.createAccount
         )

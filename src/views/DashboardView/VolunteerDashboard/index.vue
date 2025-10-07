@@ -395,7 +395,7 @@ export default {
     },
 
     certificationAction() {
-      for (let cert in this.user.certifications) {
+      for (const cert in this.user.certifications) {
         // skip certification for check for required training
         if (cert === 'upchieve101') continue
         if (this.user.certifications[cert].passed)
@@ -752,7 +752,7 @@ export default {
 
       // (4) Hours tutored
       const numHoursTutored = hoursToHoursAndMinutes(
-        Number(hoursTutored) ?? 0,
+        Number(hoursTutored ?? 0),
         formatFn
       )
 

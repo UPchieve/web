@@ -126,7 +126,7 @@ export default {
 
     this.listedPartnerOrgs = [...studentPartnerOrgs, ...volunteerPartnerOrgs]
     if (partnerOrg) {
-      for (let org of this.listedPartnerOrgs) {
+      for (const org of this.listedPartnerOrgs) {
         if (org.key === partnerOrg) {
           this.partnerOrg = org
           break

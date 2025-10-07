@@ -74,7 +74,7 @@ export default {
         } = await NetworkService.adminGetZipCodes(this.query)
 
         this.zipCode = zipCode
-      } catch (error) {
+      } catch {
         this.zipCode = {}
         this.error = 'Unable to find a matching zip code'
       }

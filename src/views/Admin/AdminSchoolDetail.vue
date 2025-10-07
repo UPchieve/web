@@ -138,7 +138,7 @@ export default {
       try {
         await NetworkService.adminUpdateSchoolApproval(data)
         this.school.isAdminApproved = checked
-      } catch (error) {
+      } catch {
         this.toggleSchoolApprovedError =
           "There was an error updating the school's approval status"
       }
@@ -158,7 +158,7 @@ export default {
       try {
         await NetworkService.adminUpdateSchoolPartnerStatus(data)
         this.school.isPartner = checked
-      } catch (error) {
+      } catch {
         this.toggleSchoolPartnerError =
           "There was an error updating the school's partner status"
       }

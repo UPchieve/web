@@ -71,7 +71,7 @@ const startSubway = async (subwayRepoPath) => {
         isUp = true
         break
       }
-    } catch (e) {
+    } catch {
       // eslint-disable-next-line no-console
       console.log(`waited ${waitTimeMs}ms, subway not started yet`)
     }

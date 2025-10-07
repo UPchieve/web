@@ -23,7 +23,7 @@ const store = useStore()
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 
 const { closeModal } = defineProps<{
-  closeModal: Function
+  closeModal: () => void
 }>()
 </script>
 

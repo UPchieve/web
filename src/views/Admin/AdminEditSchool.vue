@@ -85,7 +85,7 @@ export default {
 
         this.getSchool()
         this.toggleEditMode()
-      } catch (error) {
+      } catch {
         this.error = 'There was a problem updating the school.'
       }
     },

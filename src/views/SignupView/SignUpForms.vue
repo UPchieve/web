@@ -157,7 +157,7 @@ export default {
         if (next) {
           this.$router.replace(next)
         }
-      } catch (err) {
+      } catch {
         this.error = 'Unknown server error'
       } finally {
         this.isSubmitting = false

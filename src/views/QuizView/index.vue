@@ -163,7 +163,7 @@ import LoggerService from '@/services/LoggerService'
 export default {
   name: 'QuizView',
   data() {
-    let category = Case.camel(this.$route.params.category)
+    const category = Case.camel(this.$route.params.category)
 
     return {
       category,

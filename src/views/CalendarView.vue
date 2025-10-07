@@ -191,7 +191,7 @@ export default {
     convertAMPMtoTwentyFourHrs(hour) {
       const hourRegex = /^(\d{1,2})([ap])$/
       // capture the hour and the 'a/p' string
-      let [, hr, apm] = hour.match(hourRegex)
+      const [, hr, apm] = hour.match(hourRegex)
 
       if (apm === 'a') {
         if (hr === '12') {
@@ -257,7 +257,7 @@ export default {
         const times = availability[day]
         for (const time in times) {
           let newDay = day
-          let numericHour = this.convertAMPMtoTwentyFourHrs(time)
+          const numericHour = this.convertAMPMtoTwentyFourHrs(time)
           let newHour = numericHour + offset
           if (newHour >= 24) {
             newHour -= 24

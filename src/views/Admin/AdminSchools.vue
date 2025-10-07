@@ -182,7 +182,7 @@ export default {
         this.totalCount = totalCount
         this.schools = schools
         this.isLastPage = isLastPage
-      } catch (err) {
+      } catch {
         const toast = await toastController.create({
           message: 'Failed to get schools.',
           color: 'danger',

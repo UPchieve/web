@@ -136,7 +136,11 @@ const subjectCategory = computed(() =>
 )
 const isAutoFlowUser = computed(() => store.getters['user/isAutoFlowUser'])
 const goToSubjectsPage = () => {
-  isAutoFlowUser.value ? router.push('/welcome') : router.push('/training')
+  if (isAutoFlowUser.value) {
+    router.push('/welcome')
+  } else {
+    router.push('/training')
+  }
 }
 
 const upchieve101Questions = ref<QuizQuestion[]>([])

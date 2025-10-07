@@ -56,7 +56,7 @@ export default {
         setTimeout(() => {
           this.copyMessage = 'Copy'
         }, 3000)
-      } catch (error) {
+      } catch {
         this.copyMessage = 'Copy'
       }
     },

@@ -138,7 +138,7 @@ export default {
         })
         if (this.modalData.toggleReportSubmitted)
           this.modalData.toggleReportSubmitted()
-      } catch (error) {
+      } catch {
         alert('Failed to submit')
       }
 

@@ -102,7 +102,7 @@ async function copyLink() {
     setTimeout(() => {
       copyText.value = 'Copy'
     }, 3000)
-  } catch (error) {
+  } catch {
     copyText.value = 'Copy'
   }
 }
@@ -372,6 +372,10 @@ onMounted(() => {
 .phone-number-input-container {
   @include flex-container(row, center, center);
   gap: 16px;
+  width: 100%;
+  :deep(.m-input-wrapper) {
+    width: 100%;
+  }
 }
 
 .phone-number-input {

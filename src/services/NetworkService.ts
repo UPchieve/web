@@ -53,14 +53,14 @@ async function getAdditionalConfig(action: string) {
   return { headers: { 'g-recaptcha-response': token } }
 }
 
-export async function httpGet<T>(path: string, config?: Object) {
+export async function httpGet<T>(path: string, config?: object) {
   return axiosInstance.get<T>(path, config)
 }
 
 // TODO: Use generics instead of Object.
 export async function httpPost<T>(
   path: string,
-  data: Object,
+  data: object,
   config?: AxiosRequestConfig
 ) {
   return axiosInstance.post<T>(path, data, config)
@@ -68,7 +68,7 @@ export async function httpPost<T>(
 
 export async function httpPut<T>(
   path: string,
-  data: Object,
+  data: object,
   config?: AxiosRequestConfig
 ) {
   return axiosInstance.put<T>(path, data, config)
@@ -76,7 +76,7 @@ export async function httpPut<T>(
 
 export async function httpPatch<T>(
   path: string,
-  data: Object,
+  data: object,
   config?: AxiosRequestConfig
 ) {
   return axiosInstance.patch<T>(path, data, config)
@@ -98,7 +98,7 @@ export async function httpDelete<T>(path: string, config?: AxiosRequestConfig) {
  * we could switch our default axios instance to use the `fetch` adapter but
  * it seems a little risky and out of scope for this current change.
  */
-export async function httpPostKeepAlive<T>(path: string, data: Object) {
+export async function httpPostKeepAlive<T>(path: string, data: object) {
   return axiosFetchInstance.post<T>(path, data, {
     headers: axiosInstance.defaults.headers.common,
     fetchOptions: {
@@ -123,7 +123,7 @@ export default {
   },
   _faultTolerantHttp<T>(
     method: 'get' | 'post',
-    onRetry: Function,
+    onRetry: (res: any, fn: () => void) => void,
     url: string,
     data?: T & AxiosRequestConfig<T>
   ) {
@@ -143,7 +143,7 @@ export default {
     const requestState = { isAborted: false }
 
     return promiseRetry(
-      async (retry: Function) => {
+      async (retry: () => void) => {
         if (requestState.isAborted) {
           // early exit
           throw errcode(new Error('Aborted by user'), 'EUSERABORTED')

@@ -23,7 +23,7 @@ const becomeAVolunteer = async () => {
     await UserService.switchActiveRole({ $store: store }, 'volunteer')
     if (router.currentRoute.value.path === '/dashboard') router.go(0)
     else await router.replace('/dashboard')
-  } catch (err) {
+  } catch {
     // @TODO
   }
 }

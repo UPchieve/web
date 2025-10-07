@@ -375,8 +375,8 @@ export default {
      */
     onBeforeUnmount(() => {
       meetingActor.value.actorRef.send({ type: 'meeting_ended' })
-    }),
-      /*
+    })
+    /*
       NOTE: to use xstate live machine inspector:
 
       // import the inspector
@@ -386,7 +386,7 @@ export default {
       const options = { inspect: createBrowserInspector().inspect }
       meetingActor.value = useActor(MeetingMachine.create(), options)
     */
-      (meetingActor.value = useActor(MeetingMachine.create()))
+    meetingActor.value = useActor(MeetingMachine.create())
   },
 
   beforeRouteEnter(_, from, next) {
@@ -944,7 +944,7 @@ export default {
           'featureFlags/isSessionAudioCallEnabled',
           this.sessionPartner?.id
         )
-      } catch (err) {
+      } catch {
         this.isSessionAudioCallEnabled = false
       } finally {
         this.isFetchingSessionAudioCallFlag = false
@@ -957,7 +957,7 @@ export default {
           'featureFlags/isScreenshareEnabled',
           this.sessionPartner?.id
         )
-      } catch (err) {
+      } catch {
         this.isScreenshareEnabled = false
       }
     },
@@ -968,7 +968,7 @@ export default {
           'featureFlags/isImageUploadUxEnabled',
           this.sessionPartner.id
         )
-      } catch (err) {
+      } catch {
         this.isImageUploadingUxEnabled = false
       }
     },
@@ -1114,7 +1114,7 @@ export default {
         }
 
         this.studentAssignment = assignment
-      } catch (err) {
+      } catch {
         this.isLoadingSessionMetadata = false
       } finally {
         this.isLoadingSessionMetadata = false

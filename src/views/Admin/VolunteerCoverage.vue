@@ -137,7 +137,7 @@ export default {
         the number of volunteers available at that day and hour block who are certified
         in the "certifiedSubject". */
     getAvailability(certifiedSubject) {
-      let cert = certifiedSubject
+      const cert = certifiedSubject
       UserService.getVolunteersAvailability(cert)
         .then((availability) => {
           this.availabilityTable = availability

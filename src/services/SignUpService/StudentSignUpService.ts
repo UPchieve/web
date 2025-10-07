@@ -114,11 +114,11 @@ type CleverStudentRedirectFormData = {
 export function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.international },
   from: RouteLocation
-): PageDetail<{}>
+): PageDetail<{}> // eslint-disable-line @typescript-eslint/no-empty-object-type
 export function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.ineligible },
   from: RouteLocation
-): PageDetail<{}>
+): PageDetail<{}> // eslint-disable-line @typescript-eslint/no-empty-object-type
 export function getPageDetails(
   to: RouteLocation & { query: { isCleverStudentEmailRedirect: 'true' } },
   from: RouteLocation
@@ -383,6 +383,7 @@ async function checkEligibility(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 function getExperimentalIntlDetails(): PageDetail<{}> {
   return {
     backgroundLayout: 'full',
@@ -398,6 +399,7 @@ function getExperimentalIntlDetails(): PageDetail<{}> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 function getInternationalPageDetails(): PageDetail<{}> {
   return {
     backgroundLayout: 'full',
@@ -437,6 +439,7 @@ function getInternationalPageDetails(): PageDetail<{}> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 function getIneligiblePageDetails(): PageDetail<{}> {
   return {
     backgroundLayout: 'full',
@@ -662,7 +665,7 @@ function getParentGuardianConfirmationDetails(
       // If a parent/guardian wants to add another child,
       // reset only the parts of the form specific
       // to that child they just added.
-      // @ts-ignore
+      // @ts-expect-error todo - maybe update types to include optional reset
       reset: [
         'email',
         'firstName',
@@ -946,7 +949,7 @@ export async function beforeEnter(
   } else if (to.params.step !== 'international') {
     try {
       await NetworkService.checkIpAddress()
-    } catch (err) {
+    } catch {
       // TODO: Don't throw an error if the student is not in the US.
       return next({
         name: 'SignupView',

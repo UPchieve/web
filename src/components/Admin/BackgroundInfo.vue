@@ -36,7 +36,7 @@ export default {
       ]
 
       const mapBackgroundItemKeys = partialRight(map, (bgKey) => {
-        let bgValue = this.user[bgKey]
+        const bgValue = this.user[bgKey]
         if (isEmpty(bgValue)) return null
         if (Array.isArray(bgValue))
           return {

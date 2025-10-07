@@ -228,7 +228,7 @@ export default {
           data: { sessionDetails },
         } = await NetworkService.getStudentSessionDetails(this.studentId)
 
-        let filteredSessionDetails = sessionDetails.sort(
+        const filteredSessionDetails = sessionDetails.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )
 
@@ -255,9 +255,7 @@ export default {
           this.subjects,
           this.filters
         )
-      } catch (err) {
-        err.response.data.err ??
-          'Unable to get sessions. Please refresh the page and try again.'
+      } catch {
         return []
       } finally {
         this.isLoading = false

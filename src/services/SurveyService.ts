@@ -164,7 +164,7 @@ export async function submitSurvey(
 
   try {
     await backOff(() => NetworkService.submitSurvey(payload))
-  } catch (error) {
+  } catch {
     throw new Error(
       'Unable to submit the survey at this time. Please try again later.'
     )

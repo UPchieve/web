@@ -117,7 +117,7 @@ export default {
     },
   },
   mounted() {
-    let handlers = {}
+    const handlers = {}
 
     this.quillEditor = markRaw(
       new Quill('#quill-container', {
@@ -292,7 +292,7 @@ export default {
           const b64 = await file2b64(file)
           this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
         }
-      } catch (err) {
+      } catch {
         alert(
           'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
         )

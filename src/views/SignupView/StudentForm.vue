@@ -1224,7 +1224,7 @@ export default {
       try {
         await NetworkService.checkIpAddress()
         return true
-      } catch (error) {
+      } catch {
         return false
       }
     },
@@ -1406,7 +1406,7 @@ export default {
         await NetworkService.saveBigFutureEmailForStudy(
           this.eligibility.studentEmail
         )
-      } catch (error) {
+      } catch {
         // silently error
       }
     },
@@ -1435,7 +1435,7 @@ export default {
           AnalyticsService.captureEvent(EVENTS.STUDENT_SEARCHED_SCHOOL)
         this.hasStartedSearchingForSchool = true
 
-        let cantFindSchoolItem = {
+        const cantFindSchoolItem = {
           cantFindSchool: true,
         }
 

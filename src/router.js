@@ -124,7 +124,7 @@ const routes = [
         try {
           Gleap.open()
           if (!Gleap.isOpened) throw new Error('Unable to open Gleap.')
-        } catch (error) {
+        } catch {
           next()
         }
       } else {

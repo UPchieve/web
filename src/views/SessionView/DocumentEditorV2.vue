@@ -492,7 +492,7 @@ export default {
         AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
           tool: 'document-editor-v2',
         })
-      } catch (err) {
+      } catch {
         socket.emit(IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_FAILED, {
           sessionId: this.currentSession.id,
           uploadError: true,

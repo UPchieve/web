@@ -87,7 +87,7 @@ export default {
           volunteerId: this.volunteer.id,
           data,
         })
-      } catch (error) {
+      } catch {
         this.error = "There was an error updating the volunteer's status."
       }
     },

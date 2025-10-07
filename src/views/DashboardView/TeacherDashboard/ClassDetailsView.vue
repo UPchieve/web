@@ -519,7 +519,7 @@ export default {
                   duration: (session.endedAt - session.startedAt) / (1000 * 60),
                 }
               })
-            let minTutored = filteredSessionDetails.reduce(
+            const minTutored = filteredSessionDetails.reduce(
               (acc, curr) => acc + curr.duration,
               0
             )

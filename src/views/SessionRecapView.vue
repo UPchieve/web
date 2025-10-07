@@ -366,7 +366,7 @@ export default {
 
         try {
           await this.zwibblerCtx.joinSharedSession(this.session.id, false)
-        } catch (error) {
+        } catch {
           this.failedLoadingWhiteboard()
         }
 

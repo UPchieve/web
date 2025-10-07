@@ -5,14 +5,14 @@ import CheckIcon from '@/assets/check.svg'
 import CrossIcon from '@/assets/heavy-cross.svg'
 
 export type DismissOptions = {
-  onDismiss: Function
+  onDismiss: () => void
 }
 
 export type ActionListItem = {
   title: string
   subtitle?: string
   status: 'not-started' | 'in-progress' | 'complete' | 'error'
-  onClick: Function
+  onClick: () => void
   icon: Component
 }
 const props = defineProps<{

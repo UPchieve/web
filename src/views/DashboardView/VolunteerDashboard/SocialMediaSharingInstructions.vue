@@ -50,7 +50,7 @@ async function copyCaption() {
     setTimeout(() => {
       copyMessage.value = 'Copy caption'
     }, 3000)
-  } catch (error) {
+  } catch {
     copyMessage.value = 'Copy caption'
   }
 }

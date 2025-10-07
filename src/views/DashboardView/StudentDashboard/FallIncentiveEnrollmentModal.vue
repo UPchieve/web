@@ -25,7 +25,7 @@ import type { AxiosError } from 'axios'
 
 const store = useStore()
 const { closeModal, isFirstModalView } = defineProps<{
-  closeModal: Function
+  closeModal: () => void
   isFirstModalView?: boolean
 }>()
 
@@ -609,6 +609,9 @@ onMounted(() => {
     margin-top: 0.4em;
     width: 100%;
     font-weight: 500;
+    :deep(.m-input-wrapper) {
+      width: 100%;
+    }
   }
 }
 

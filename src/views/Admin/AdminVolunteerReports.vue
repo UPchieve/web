@@ -127,7 +127,7 @@ export default {
           )
         }
         this.isGeneratingReport = false
-      } catch (error) {
+      } catch {
         this.errorHandler()
       }
     },

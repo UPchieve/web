@@ -312,7 +312,7 @@ export default {
 
         try {
           await this.zwibblerCtx.joinSharedSession(this.session.id, false)
-        } catch (error) {
+        } catch {
           this.loadingWhiteboardError = 'Failed to load the whiteboard.'
         }
 
@@ -327,7 +327,7 @@ export default {
                   this.zwibblerCtx.getAllNodes()
                 )
               )
-            } catch (error) {
+            } catch {
               this.zwibblerCtx.setViewRectangle({
                 x: 0,
                 y: 0,
@@ -369,7 +369,7 @@ export default {
 
       try {
         await NetworkService.adminUpdateSession(sessionId, data)
-      } catch (error) {
+      } catch {
         this.reviewError = true
       }
     },

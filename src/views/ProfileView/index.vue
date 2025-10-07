@@ -613,7 +613,7 @@ export default {
             }
 
             // Update user state after successful API call
-            let addToUserData = {
+            const addToUserData = {
               isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
               smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
               preferredLanguage:
@@ -832,6 +832,10 @@ ul {
 
 .phone-input {
   margin: 5px 0 0;
+  width: 100%;
+  :deep(.m-input-wrapper) {
+    width: 100%;
+  }
 }
 
 .description {

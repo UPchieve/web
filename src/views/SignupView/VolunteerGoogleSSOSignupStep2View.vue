@@ -62,7 +62,7 @@ async function getSignupSources() {
   }
 }
 
-let shouldShowOtherSignupInput = computed(() => {
+const shouldShowOtherSignupInput = computed(() => {
   if (isLoadingSignupSources.value || !signupSourcesOptions.value) {
     return false
   }
@@ -222,6 +222,10 @@ async function submit() {
 
 .phone-input {
   margin: 10px 0 2px;
+  width: 100%;
+  :deep(.m-input-wrapper) {
+    width: 100%;
+  }
 }
 
 .step-title {

@@ -158,46 +158,46 @@ describe('Class Details View', () => {
     expect(firstRowCells[1].text()).toBe(String(students[0].numSessions))
     expect(firstRowCells[2].text()).toBe(students[0].timeTutored)
     expect(firstRowCells[3].text()).toBe(students[0].lastSession)
-  }),
-    test('Click student details', async () => {
-      const routerPushSpy = vi.spyOn(router, 'push')
+  })
+  test('Click student details', async () => {
+    const routerPushSpy = vi.spyOn(router, 'push')
 
-      const wrapper = await getWrapper({
-        data: {
-          students: [
-            {
-              userId: 'userId1',
-              id: 'userId1',
-              firstName: 'Student',
-              lastName: 'UPchieve',
-              email: 'student1@upchieve.org',
-              numSessions: 3,
-              timeTutored: '1 hour(s)',
-              lastSession: '07/26/2024',
-            },
-          ],
-          classData: {
-            id: 'class-id',
-            userId: 'user-id',
-            name: 'Algebra 1',
-            code: '4BNK46',
-            active: true,
-            topicId: 1,
-            totalStudents: '2',
+    const wrapper = await getWrapper({
+      data: {
+        students: [
+          {
+            userId: 'userId1',
+            id: 'userId1',
+            firstName: 'Student',
+            lastName: 'UPchieve',
+            email: 'student1@upchieve.org',
+            numSessions: 3,
+            timeTutored: '1 hour(s)',
+            lastSession: '07/26/2024',
           },
+        ],
+        classData: {
+          id: 'class-id',
+          userId: 'user-id',
+          name: 'Algebra 1',
+          code: '4BNK46',
+          active: true,
+          topicId: 1,
+          totalStudents: '2',
         },
-      })
-
-      const detailsButton = wrapper.find(
-        '[data-testid="view-details-btn-userId1"]'
-      )
-      expect(detailsButton.exists()).toBe(true)
-
-      await detailsButton.trigger('click')
-      expect(routerPushSpy).toHaveBeenCalledWith(
-        `/dashboard/teacher/class/class-id/student/userId1`
-      )
+      },
     })
+
+    const detailsButton = wrapper.find(
+      '[data-testid="view-details-btn-userId1"]'
+    )
+    expect(detailsButton.exists()).toBe(true)
+
+    await detailsButton.trigger('click')
+    expect(routerPushSpy).toHaveBeenCalledWith(
+      `/dashboard/teacher/class/class-id/student/userId1`
+    )
+  })
 })
 
 describe('Assignments View', () => {

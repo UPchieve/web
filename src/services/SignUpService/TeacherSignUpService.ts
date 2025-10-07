@@ -70,7 +70,7 @@ export type TeacherAccountFormData = {
 
 export function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.ineligible }
-): PageDetail<{}>
+): PageDetail<{}> // eslint-disable-line @typescript-eslint/no-empty-object-type
 export function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.account }
 ): PageDetail<TeacherAccountFormData>
@@ -185,6 +185,7 @@ async function checkEligibility(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 function getIneligiblePageDetails(): PageDetail<{}> {
   return {
     backgroundLayout: 'full',

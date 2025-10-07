@@ -212,7 +212,7 @@ export default {
         const listedPartnerOrgs = []
         const listedPartnerSchools = []
 
-        for (let org of partnerOrgs) {
+        for (const org of partnerOrgs) {
           if (org.isSchool) listedPartnerSchools.push(org)
           else listedPartnerOrgs.push(org)
         }
@@ -220,7 +220,7 @@ export default {
         this.listedPartnerOrgs = listedPartnerOrgs
         this.listedPartnerSchools = listedPartnerSchools
 
-        for (let partner of activePartners) {
+        for (const partner of activePartners) {
           if (partner.schoolId) activeSchoolPartnerName = partner.name
         }
       } else if (this.isTeacher) {
@@ -240,7 +240,7 @@ export default {
       this.isApproved = this.user.isApproved
       this.partnerOrg = {}
 
-      for (let org of this.listedPartnerOrgs) {
+      for (const org of this.listedPartnerOrgs) {
         if (
           org.name === this.user.studentPartnerOrg ||
           org.name === this.user.volunteerPartnerOrg
@@ -250,7 +250,7 @@ export default {
         }
       }
 
-      for (let org of this.listedPartnerSchools) {
+      for (const org of this.listedPartnerSchools) {
         if (activeSchoolPartnerName === org.name) {
           this.partnerSchool = org
           break
@@ -295,7 +295,7 @@ export default {
         await NetworkService.adminUpdateUser(this.user.id, data)
         this.getUser()
         this.toggleEditMode()
-      } catch (error) {
+      } catch {
         this.error = 'There was a problem updating the user.'
       } finally {
         this.isLoading = false

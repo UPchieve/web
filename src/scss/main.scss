@@ -3,6 +3,7 @@
 @import '~/bootstrap/scss/bootstrap';
 @import '~/typeface-work-sans/index.css';
 @import '~/vue-select/dist/vue-select.css';
+
 @import 'maz-ui/styles'; // or import 'maz-ui/css/main.css'
 @import '~/quill/dist/quill.core.css';
 @import '~/quill/dist/quill.snow.css';
@@ -15,6 +16,12 @@
 @import 'layout/form';
 @import 'layout/modal';
 @import 'layout/training';
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
 
 html {
   height: 100%;
@@ -29,6 +36,23 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   height: 100%;
+}
+
+button {
+  background-color: transparent;
+  border-width: 0;
+  border-style: solid;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 1em;
+  line-height: 1.15;
+  margin: 0;
 }
 
 #mount {

@@ -4,7 +4,7 @@ import { useStore } from 'vuex'
 import CrossIcon from '@/assets/cross.svg'
 
 const store = useStore()
-let errors = computed(() => store.state.botConversations.errors)
+const errors = computed(() => store.state.botConversations.errors)
 const dismiss = () => store.dispatch('botConversations/clearErrors')
 </script>
 

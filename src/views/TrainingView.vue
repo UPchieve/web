@@ -236,7 +236,7 @@ export default {
     // get the amount of required training material a user must complete
     requiredTrainingMessage() {
       let amount = 0
-      for (let subject of this.currentSubject.training) {
+      for (const subject of this.currentSubject.training) {
         if (!this.user.certifications[subject.key].passed) amount++
       }
 

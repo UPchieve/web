@@ -139,7 +139,7 @@ export default {
   },
   computed: {
     className() {
-      let { toggled, disabled } = this
+      const { toggled, disabled } = this
 
       return [
         'vue-js-switch',
@@ -198,7 +198,7 @@ export default {
     },
 
     colorChecked() {
-      let { color } = this
+      const { color } = this
 
       if (!isObject(color)) {
         return color || DEFAULT_COLOR_CHECKED

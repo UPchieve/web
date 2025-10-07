@@ -488,6 +488,10 @@ export default {
 
 .phone-input {
   margin: 10px 0 2px;
+  width: 100%;
+  :deep(.m-input-wrapper) {
+    width: 100%;
+  }
 }
 
 .step-title {

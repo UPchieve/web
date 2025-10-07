@@ -27,7 +27,7 @@
           <td>
             {{
               session.isUnlocked
-                ? session.student?.firstname ?? 'Student'
+                ? (session.student?.firstname ?? 'Student')
                 : 'Student'
             }}
             <span
@@ -195,7 +195,8 @@ function goToSubjectCert(session: any) {
 
 const ticks = computed(() => store.state.volunteer.ticks)
 function waitTime(args: { createdAt: any }) {
-  ticks.value // This line makes waitTime recalculate as `ticks` changes in the store.
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  ticks.value //This line makes waitTime recalculate as `ticks` changes in the store.
   const newTime = new Date().getTime() - new Date(args.createdAt).getTime()
   const seconds = Number((newTime / 1000).toFixed(0))
   const minutes = Number((newTime / (1000 * 60)).toFixed(0))

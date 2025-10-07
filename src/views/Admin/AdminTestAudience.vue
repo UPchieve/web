@@ -56,7 +56,7 @@ export default {
         Gleap.identify(user.data.userId, {
           value: 1,
         })
-      } catch (error) {
+      } catch {
         this.error = 'An error occurred'
       }
     },
@@ -67,7 +67,7 @@ export default {
         Gleap.identify(user.data.userId, {
           value: 0,
         })
-      } catch (error) {
+      } catch {
         this.error = 'An error occurred'
       }
     },

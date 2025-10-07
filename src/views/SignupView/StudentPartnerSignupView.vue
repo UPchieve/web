@@ -735,7 +735,7 @@ export default {
           return resolve([])
         }
 
-        let cantFindSchoolItem = {
+        const cantFindSchoolItem = {
           cantFindSchool: true,
         }
 

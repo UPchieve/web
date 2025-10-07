@@ -407,6 +407,9 @@ export default {
     margin-bottom: 1em;
     width: 100%;
     font-weight: 500;
+    :deep(.m-input-wrapper) {
+      width: 100%;
+    }
   }
 
   &__header--middle {

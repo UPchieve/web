@@ -50,6 +50,7 @@ const currentModuleIndex = computed(() => {
 
 const viewingFirstModule = computed(() => currentModuleIndex.value === 0)
 const viewingLastModule = computed(
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
   () => currentModuleIndex.value === trainingCourse.value?.modules.length! - 1
 )
 
@@ -69,6 +70,7 @@ const videoHeight = computed(() =>
 
 const showStepper = computed(() => currentModuleIndex.value !== 0) // Don't show stepper on the intro page.
 const stepperNumSteps = computed(
+  // eslint-disable-next-line no-constant-binary-expression
   () => trainingCourse.value!.modules.length - 2 ?? 0
 ) // Don't count intro page or quiz as steps
 const stepperStepNames = computed(() =>

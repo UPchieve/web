@@ -82,7 +82,7 @@ const topics = [
     trainingOrder: 6,
   },
 ]
-
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 const getWrapper = async (data: {}) => {
   const store = createStore({
     modules: {

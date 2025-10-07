@@ -132,7 +132,9 @@ export function getSubmitResponse(
     const error =
       typeof err === 'string'
         ? err
-        : err.response?.data?.err ?? err?.message ?? 'Failed: Please try again.'
+        : (err.response?.data?.err ??
+          err?.message ??
+          'Failed: Please try again.')
     if (error === EMAIL_ALREADY_IN_USE) {
       router.replace(
         '/login?' +
@@ -416,7 +418,7 @@ function hasRecentIneligibilityCheck(userType: UserType): boolean {
     const lastCheck = parseInt(value)
     const now = Date.now()
     return now - lastCheck < ELIGIBILITY_CHECK_TIMEOUT_MS
-  } catch (e) {
+  } catch {
     window.localStorage.removeItem(key)
     return false
   }

@@ -79,7 +79,7 @@ export default {
       // if waitTime provided is empty or invalid then ignore it
       try {
         return this.waitTimes[day][hour]
-      } catch (err) {
+      } catch {
         return 0
       }
     },

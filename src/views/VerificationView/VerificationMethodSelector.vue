@@ -141,4 +141,10 @@ export default {
     margin-bottom: unset;
   }
 }
+.ph-mask {
+  width: 100%;
+  :deep(.m-input-wrapper) {
+    width: 100%;
+  }
+}
 </style>

@@ -337,7 +337,7 @@ export default {
     } else {
       try {
         await NetworkService.checkReference(this.$route.params.referenceId)
-      } catch (error) {
+      } catch {
         this.isNoLongerReference = true
       }
     }

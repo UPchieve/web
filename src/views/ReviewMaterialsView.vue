@@ -99,7 +99,7 @@ export default {
           NetworkService.getReviewMaterials(this.category)
         )
         this.reviewMaterials = materials.data
-      } catch (error) {
+      } catch {
         this.error = true
       } finally {
         this.isLoadingMaterials = false

@@ -260,7 +260,6 @@ export const isBannedFromLiveMedia = fromCallback(
   }
 )
 
-// @ts-ignore
 const canKeepScreenFocus = typeof CaptureController !== 'undefined'
 
 async function getStream(input: { meetingSession: DefaultMeetingSession }) {
@@ -269,11 +268,9 @@ async function getStream(input: { meetingSession: DefaultMeetingSession }) {
     in focus (rather than jumping to the shared window) when starting a screen share.
   */
   if (canKeepScreenFocus) {
-    // @ts-ignore
     const controller = new CaptureController()
     controller.setFocusBehavior('no-focus-change')
     const contentShareStream = await navigator.mediaDevices.getDisplayMedia({
-      // @ts-ignore
       controller,
     })
 
