@@ -3,12 +3,7 @@
     <h1 class="report-modal__title">Report this session</h1>
     <h2 class="report-modal__subtitle">
       {{ reportModalSubtitle }}
-      <a
-        v-if="!isInRecap && !isStudent"
-        href="https://upc-training-materials.s3.us-east-2.amazonaws.com/reporting-guidelines.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <a :href="guidelineLink" target="_blank" rel="noopener noreferrer">
         Review guidelines here.
       </a>
     </h2>
@@ -64,6 +59,15 @@ const studentReportReasonOptions = [
   'Coach talked about inappropriate and offensive topics',
 ]
 
+const studentGuidelineLink =
+  'https://help.upchieve.org/en/articles/24-coach-community-guidelines'
+const volunteerGuidelineLink =
+  'https://upc-training-materials.s3.us-east-2.amazonaws.com/reporting-guidelines.pdf'
+const studentSubtitleText =
+  'Only report a tutor for serious safety or community guideline violations. For other concerns (tutor was unhelpful, ran out of time, technical issues), please use the feedback form after the session.'
+const volunteerSubtitleText =
+  'Reporting students will result in immediate action from UPchieve. If you have a concern that requires less immediate attention, please let us know in the feedback form after your session is complete. Not sure what to do?'
+
 export default {
   components: { LargeButton, FormSelect },
   props: {
@@ -115,16 +119,11 @@ export default {
         ? volunteerReportReasonOptions
         : studentReportReasonOptions
     },
+    guidelineLink() {
+      return this.isStudent ? studentGuidelineLink : volunteerGuidelineLink
+    },
     reportModalSubtitle() {
-      if (this.isInRecap && this.isStudent)
-        return `Reporting coaches will result in immediate action from UPchieve. The coach won't be able to help any students while UPchieve staff investigates the issue. Please only report a coach for the reasons listed below, otherwise reach out with your concerns by clicking the contact us link instead!`
-      else
-        return `Reporting ${
-          this.isVolunteer ? 'students' : 'tutors'
-        } will result
-      in immediate action from UPchieve. If you have a concern that requires
-      less immediate attention, please let us know in the feedback form after
-      your session is complete. Not sure what to do?`
+      return this.isStudent ? studentSubtitleText : volunteerSubtitleText
     },
   },
   methods: {
