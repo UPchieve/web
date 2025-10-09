@@ -77,9 +77,9 @@ describe('AuthService', () => {
     })
 
     it('Should call fetchAndSetCsrfHeader on successful login', async () => {
-      NetworkService.getCsrfToken = vi.fn().mockRejectedValue({
+      NetworkService.getCsrfToken = vi.fn().mockResolvedValue({
         data: {
-          err: 'Something went wrong',
+          csrfToken: '123',
         },
       })
       NetworkService.login = vi.fn().mockResolvedValue({

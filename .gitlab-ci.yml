@@ -17,7 +17,7 @@ variables:
 
 .build_artifact:
   stage: build
-  image: 'node:20.10.0-bullseye'
+  image: 'node:22.20.0-bullseye'
   cache: []
   environment:
     action: prepare
@@ -120,7 +120,7 @@ new_relic_deploy_tracker:
 
 test:
   stage: test
-  image: node:20.10.0-bullseye
+  image: node:22.20.0-bullseye
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
@@ -133,7 +133,7 @@ test:
 
 lint:
   stage: test
-  image: node:20.10.0-bullseye
+  image: node:22.20.0-bullseye
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
@@ -146,7 +146,7 @@ lint:
 
 html_validate:
   stage: test
-  image: node:20.10.0-bullseye
+  image: node:22.20.0-bullseye
   allow_failure: true
   before_script:
     - npm ci --cache .npm --prefer-offline

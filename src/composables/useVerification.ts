@@ -1,6 +1,6 @@
 import { ref, computed, reactive } from 'vue'
 import { useStore } from 'vuex'
-import PhoneNumber from 'awesome-phonenumber'
+import { parsePhoneNumber } from 'awesome-phonenumber'
 import type { AxiosError } from 'axios'
 import useVuelidate from '@vuelidate/core'
 import {
@@ -94,10 +94,10 @@ export function useVerification(data: UseVerificationPayload = {}) {
   const internationalPhoneInfo = computed(() => {
     if (!phone.value) return { number: '', country: 'US' as CountryCode }
 
-    const pn = new PhoneNumber(phone.value)
+    const pn = parsePhoneNumber(phone.value)
     return {
-      number: pn.getNumber('international'),
-      country: pn.getRegionCode() as CountryCode,
+      number: pn.number?.international,
+      country: pn.regionCode as CountryCode,
     }
   })
 

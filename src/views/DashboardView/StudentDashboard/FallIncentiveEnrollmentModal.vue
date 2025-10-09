@@ -12,7 +12,7 @@ import type {
   CountryCode,
   Result as PhoneResults,
 } from 'maz-ui/components/MazPhoneNumberInput'
-import PhoneNumber from 'awesome-phonenumber'
+import { parsePhoneNumber } from 'awesome-phonenumber'
 import { EVENTS, VERIFICATION_METHOD, VERIFICATION_TYPE } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
@@ -60,10 +60,10 @@ const isInternationalCountryCode = computed(
 const internationalPhoneInfo = computed(() => {
   if (!user.value.phone) return { number: '', country: 'US' as CountryCode }
 
-  const pn = new PhoneNumber(user.value.phone)
+  const pn = parsePhoneNumber(user.value.phone)
   return {
-    number: pn.getNumber('international'),
-    country: pn.getRegionCode() as CountryCode,
+    number: pn.number?.international,
+    country: pn.regionCode as CountryCode,
   }
 })
 const isValidVerificationCode = computed(() => {
@@ -270,11 +270,15 @@ onMounted(() => {
 
   if (verificationMethod.value === VERIFICATION_METHOD.SMS) {
     if (user.value.phone) {
-      const pn = new PhoneNumber(user.value.phone)
-      phone.value = pn.getNumber('national')
+      const pn = parsePhoneNumber(user.value.phone)
+      if (!pn.number) {
+        return
+      }
+      phone.value = pn.number?.national
+
       phoneInput.value = {
         isValid: true,
-        e164: pn.getNumber('e164'),
+        e164: pn.number?.e164,
       }
     }
   } else {
