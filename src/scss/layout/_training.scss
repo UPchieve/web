@@ -1,20 +1,25 @@
+@import '../setup/helpers';
+@import '../setup/breakpoints';
+@import '../setup/fonts';
+@import '../setup/colors';
+
 .training {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-row-gap: 2ch;
 
-  @include breakpoint-above("large") {
+  @include breakpoint-above('large') {
     grid-template-columns: 0.6fr 1fr 0.8fr;
     overflow-y: scroll;
   }
 
-  @include breakpoint-above("huge") {
+  @include breakpoint-above('huge') {
     grid-template-columns: 1fr 1fr 1fr;
     overflow-y: auto;
   }
 
   &__header {
-    @include font-category("subheading");
+    @include font-category('subheading');
     text-transform: uppercase;
     background-color: $c-backdrop;
     padding: 0.4em;
@@ -62,18 +67,18 @@
       color: $c-soft-black;
     }
 
-    @include breakpoint-above("small") {
+    @include breakpoint-above('small') {
       width: 50%;
     }
 
-    @include breakpoint-above("large") {
+    @include breakpoint-above('large') {
       width: 90%;
       align-self: center;
       justify-self: center;
       grid-column-start: auto;
     }
 
-    @include breakpoint-above("huge") {
+    @include breakpoint-above('huge') {
       width: 70%;
     }
   }
@@ -84,10 +89,10 @@
     text-align: left;
     grid-column-start: span 3;
 
-    @include breakpoint-above("large") {
+    @include breakpoint-above('large') {
       grid-column-start: auto;
     }
-    @include breakpoint-above("large") {
+    @include breakpoint-above('large') {
       padding-left: 3em;
     }
 
@@ -95,10 +100,10 @@
       @include flex-container(column, flex-start, flex-start);
       margin-left: 2em;
 
-      @include breakpoint-above("large") {
+      @include breakpoint-above('large') {
         width: 100px;
       }
-      @include breakpoint-above("huge") {
+      @include breakpoint-above('huge') {
         min-width: 125px;
       }
     }
@@ -119,7 +124,7 @@
     grid-column-start: span 3;
     flex-flow: row wrap;
 
-    @include breakpoint-above("large") {
+    @include breakpoint-above('large') {
       @include flex-container(column, center, center);
       height: auto;
       flex-flow: column wrap;
@@ -128,7 +133,7 @@
       grid-column-start: auto;
     }
 
-    @include breakpoint-above("huge") {
+    @include breakpoint-above('huge') {
       @include flex-container(column, center, center);
       height: 70px;
     }
@@ -169,7 +174,7 @@
   @include flex-container(row, flex-start, center);
   grid-column-start: span 3;
 
-  @include breakpoint-above("large") {
+  @include breakpoint-above('large') {
     justify-content: center;
     align-items: center;
     align-self: center;

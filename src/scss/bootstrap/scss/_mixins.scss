@@ -1,5 +1,6 @@
 // Vendor
-@import 'vendor/rfs';
+@use 'vendor/rfs';
 
-@import 'mixins/breakpoints';
-@import 'mixins/hover';
+@use 'mixins/breakpoints';
+@use 'mixins/hover';
+@use 'mixins/tables';

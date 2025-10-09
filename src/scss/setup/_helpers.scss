@@ -1,12 +1,14 @@
+@use 'sass:map';
+
 /// Validates a map key and returns the associated value.
 /// @param {map} $map
 /// @param {string} $key
 /// @return $value
 @function validate-map-key($map, $key) {
-  $value: map-get($map, $key);
+  $value: map.get($map, $key);
 
   @if not $value {
-    $keys: map-keys($map);
+    $keys: map.keys($map);
     @error "Invalid map key: '#{$key}'. Expected one of: [#{$keys}].";
   }
 
@@ -18,12 +20,12 @@
 /// @return {number} z-index
 @function get-z($key) {
   $map: (
-    "below": -1,
-    "above": 1,
-    "sidebar": 10,
-    "header": 20,
-    "banner": 21,
-    "modal": 30
+    'below': -1,
+    'above': 1,
+    'sidebar': 10,
+    'header': 20,
+    'banner': 21,
+    'modal': 30,
   );
 
   @return validate-map-key($map, $key);
@@ -53,7 +55,7 @@
     top: 1,
     right: 2,
     bottom: 3,
-    left: 4
+    left: 4,
   );
 
   @if validate-map-key($sides, $side) {
@@ -70,15 +72,5 @@
         }
       }
     }
-  }
-}
-
-@mixin header-child {
-  padding: 20px 20px 20px 45px;
-  height: 100%;
-  width: 100%;
-
-  @include breakpoint-above('medium') {
-    padding: 12px;
   }
 }

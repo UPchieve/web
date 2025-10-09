@@ -62,7 +62,7 @@
     "qr-code-styling": "^1.9.2",
     "quill": "^2.0.3",
     "quill-cursors": "^4.0.3",
-    "sass": "1.54.8",
+    "sass": "1.91.0",
     "socket.io-client": "^4.7.5",
     "typeface-work-sans": "^0.0.72",
     "validator": "^13.6.0",

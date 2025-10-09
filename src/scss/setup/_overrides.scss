@@ -1,5 +1,7 @@
+@use "colors";
+
 // vue-select overrides
-$vs-border-color: $c-border-grey;
+$vs-border-color: colors.$c-border-grey;
 
 .v-select {
   .vs__dropdown-toggle {

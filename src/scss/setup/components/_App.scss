@@ -1,34 +1,38 @@
+@use 'sass:map';
+@use '../breakpoints';
+@use '../helpers';
+
 * {
-    -webkit-user-select: auto;
-    -moz-user-select: auto;
-    -ms-user-select: auto;
-    user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
 }
 
 $app-header-height-map: (
-  "default": 80px,
-  "medium": 64px
+  'default': 80px,
+  'medium': 64px,
 );
 
 $app-sidebar-width-map: (
-  "default": 100%,
-  "medium": 250px
+  'default': 100%,
+  'medium': 250px,
 );
 
 /// Returns the `AppHeader` component height based on key.
 /// @requires {function} validate-map-key
 /// @param {string} $key ["default]
 /// @return {number} height
-@function get-app-header-height($key: "default") {
-  @return validate-map-key($app-header-height-map, $key);
+@function get-app-header-height($key: 'default') {
+  @return helpers.validate-map-key($app-header-height-map, $key);
 }
 
 /// Returns the `AppSidebar` component width based on key.
 /// @requires {function} validate-map-key
 /// @param {string} $key ["default"]
 /// @return {number} width
-@function get-app-sidebar-width($key: "default") {
-  @return validate-map-key($app-sidebar-width-map, $key);
+@function get-app-sidebar-width($key: 'default') {
+  @return helpers.validate-map-key($app-sidebar-width-map, $key);
 }
 
 /// Binds a property to the `AppHeader` component height.
@@ -39,8 +43,8 @@ $app-sidebar-width-map: (
   #{$property}: get-app-header-height();
 
   @each $key, $value in $app-header-height-map {
-    @if map-get($breakpoint-map, $key) {
-      @include breakpoint-above($key) {
+    @if map.get(breakpoints.$breakpoint-map, $key) {
+      @include breakpoints.breakpoint-above($key) {
         #{$property}: $value;
       }
     }
@@ -55,8 +59,8 @@ $app-sidebar-width-map: (
   #{$property}: get-app-sidebar-width();
 
   @each $key, $value in $app-sidebar-width-map {
-    @if map-get($breakpoint-map, $key) {
-      @include breakpoint-above($key) {
+    @if map.get(breakpoints.$breakpoint-map, $key) {
+      @include breakpoints.breakpoint-above($key) {
         #{$property}: $value;
       }
     }

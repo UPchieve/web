@@ -1,3 +1,5 @@
+@use 'helpers';
+
 /// Breakpoint key-value pairs
 $breakpoint-map: (
   'tiny': 414px,
@@ -5,7 +7,7 @@ $breakpoint-map: (
   'medium': 768px,
   'large': 992px,
   'huge': 1200px,
-  'massive': 1800px
+  'massive': 1800px,
 );
 
 /// Returns a breakpoint by key.
@@ -13,7 +15,7 @@ $breakpoint-map: (
 /// @param {string} $key - Key in $breakpoint-map
 /// @return {number} width
 @function get-breakpoint($key) {
-  @return validate-map-key($breakpoint-map, $key);
+  @return helpers.validate-map-key($breakpoint-map, $key);
 }
 
 /// Media query helper. Activates above a minimum width.
@@ -46,5 +48,15 @@ $breakpoint-map: (
     only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
     only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
     @content;
+  }
+}
+
+@mixin header-child {
+  padding: 20px 20px 20px 45px;
+  height: 100%;
+  width: 100%;
+
+  @include breakpoint-above('medium') {
+    padding: 12px;
   }
 }

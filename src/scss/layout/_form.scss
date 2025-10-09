@@ -1,3 +1,9 @@
+@use 'sass:color';
+@import '../setup/helpers';
+@import '../setup/breakpoints';
+@import '../setup/fonts';
+@import '../setup/colors';
+
 .uc-form {
   .alert {
     margin: 25px 0;
@@ -103,7 +109,6 @@
     border-radius: 200px;
     font-size: 16px;
     height: 48px;
-    
 
     &:hover,
     &:active {
@@ -113,7 +118,6 @@
   }
 
   &-back-button {
-    
     display: flex;
     align-items: center;
     font-size: 16px;
@@ -122,7 +126,6 @@
     margin-top: 24px;
     height: 48px;
     cursor: pointer;
-    
 
     &:hover {
       background: #f7fcfe;
@@ -421,7 +424,7 @@
 
   &:focus {
     outline: none;
-    border-bottom: 3px solid darken($c-accent, 15%);
+    border-bottom: 3px solid color.adjust($c-accent, $lightness: -15%);
   }
 
   &--invalid {
@@ -475,7 +478,7 @@
 
     &:focus {
       outline: none;
-      border-bottom: 3px solid darken($c-accent, 15%);
+      border-bottom: 3px solid color.adjust($c-accent, $lightness: -15%);
     }
   }
 

@@ -1,10 +1,13 @@
 // This file is imported in App.vue.
+@use 'sass:meta';
+
 // TODO: Figure out what styles we are relying on from bootstrap and remove.
-@import 'bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap';
+
 @import '~/typeface-work-sans/index.css';
 @import '~/vue-select/dist/vue-select.css';
 
-@import 'maz-ui/styles'; // or import 'maz-ui/css/main.css'
+@import 'maz-ui/css/main.css';
 @import '~/quill/dist/quill.core.css';
 @import '~/quill/dist/quill.snow.css';
 @import 'vue-draggable-resizable/style.css';
@@ -12,10 +15,10 @@
 /* Core CSS required for Ionic components to work properly */
 @import '~/@ionic/vue/css/core.css';
 
-@import 'layout/utils';
-@import 'layout/form';
-@import 'layout/modal';
-@import 'layout/training';
+@include meta.load-css('layout/utils');
+@include meta.load-css('layout/form');
+@include meta.load-css('layout/modal');
+@include meta.load-css('layout/training');
 
 *,
 ::before,

@@ -38,7 +38,7 @@ export default {
         ],
       },
     }),
-    vueDevTools()
+    vueDevTools(),
   ],
   preview: {
     port: 8080,
@@ -49,7 +49,8 @@ export default {
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "./src/scss/setup/all.scss";`,
+        api: 'modern',
+        additionalData: `@use "${path.resolve(__dirname, './src/scss/setup/all.scss')}" as *;`,
       },
     },
   },

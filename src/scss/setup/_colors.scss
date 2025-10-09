@@ -1,3 +1,5 @@
+@use "sass:color";
+@use "sass:map";
 /// Used for primary text.
 $c-soft-black: #343440;
 
@@ -52,7 +54,7 @@ $c-active-heart: #f41717;
 // Override default bootstrap variables
 $success: $c-success-green;
 $theme-colors: () !default;
-$theme-colors: map-merge(
+$theme-colors: map.merge(
   (
     'primary': #16d2aa,
     'warning': #ff8c5f,
@@ -93,7 +95,7 @@ $c-hover-green: #0d8269;
 
 // Override Ionic colors
 :root {
-  --ion-color-success: #{lighten($c-success-green, 50%)};
+  --ion-color-success: #{color.adjust($c-success-green, $lightness: 50%)};
 }
 
 .ion-color-sucess {

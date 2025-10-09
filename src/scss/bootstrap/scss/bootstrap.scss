@@ -11,10 +11,11 @@
   and remove them
 */
 
-@import 'functions';
-@import 'variables';
-@import 'mixins';
+@forward 'functions';
+@forward 'variables';
+@forward 'mixins';
 
 // We're relying on these two for nav link styles and spacing
-@import 'reboot';
-@import 'utilities';
+@forward 'reboot';
+@forward 'utilities';
+@forward 'tables';
