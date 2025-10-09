@@ -3,7 +3,7 @@
     :isOpen="props.show"
     :message="message"
     :header="heading"
-    icon="alert-circle-outline"
+    :icon="alertCircleOutline"
     :animated="true"
     position="middle"
     :buttons="moderationInfractionToastButtons"
@@ -17,6 +17,7 @@
 import { IonToast } from '@ionic/vue'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { alertCircleOutline } from 'ionicons/icons'
 
 const props = defineProps<{
   show: false

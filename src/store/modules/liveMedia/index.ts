@@ -23,7 +23,7 @@ export default {
   getters: {
     isBannedFromLiveMedia: (state, getters, rootState, rootGetters) => {
       const banType = rootGetters['user/banType']
-      return banType && banType === 'live_media'
+      return Boolean(banType && banType === 'live_media')
     },
     isPartnerBannedFromLiveMedia: (state, _getters, rootState, rootGetters) => {
       if (state.isPartnerJustBannedFromLiveMedia) return true

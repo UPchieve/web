@@ -404,7 +404,7 @@ export default {
         this.$route.query?.assignmentId,
         this.prevRoute?.name ?? ''
       )
-      this.session = session
+
       this.sessionId = session.id
 
       if (this.journeySessionData) {
@@ -428,7 +428,7 @@ export default {
       }
 
       this.joinSocketSession()
-      Gleap.setCustomData('sessionId', this.session.id)
+      Gleap.setCustomData('sessionId', this.sessionId)
 
       await this.getSessionContext()
 
@@ -445,8 +445,9 @@ export default {
       this.meetingActor.actorRef.start()
       this.meetingActor.actorRef.send({
         type: 'set_session_id',
-        sessionId: this.session.id,
+        sessionId: this.sessionId,
       })
+
       this.meetingActor.actorRef.send({
         type: 'session_started',
         isAudioEligible: this.isSessionAudioCallEnabled,
@@ -469,7 +470,7 @@ export default {
         })
         .catch((err) => {
           LoggerService.noticeError(
-            `Failed to check if AI tutor is enabled for user=${this.session.studentId}`,
+            `Failed to check if AI tutor is enabled for user=${session.studentId}`,
             err
           )
         })
@@ -874,7 +875,7 @@ export default {
 
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
-        Promise.all([
+        await Promise.all([
           this.fetchSessionAudioFlag(),
           this.fetchScreenshareFlag(),
           this.fetchImageUploadingUxFlag(),

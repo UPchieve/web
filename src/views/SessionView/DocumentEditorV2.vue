@@ -375,7 +375,6 @@ export default {
         color: 'dark',
         position: 'middle',
         animated: true,
-        icon: 'alert-circle-outline',
         duration: 5000,
         swipeGesture: 'vertical',
         buttons: [
