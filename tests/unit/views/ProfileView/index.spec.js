@@ -44,8 +44,12 @@ describe('ProfileView', () => {
           state: {
             user: {
               ...DEFAULT_USER,
-              ...(overrides.user ?? {}),
+              ...(overrides.user?.state ?? {}),
             },
+          },
+          getters: {
+            ...storeOptions.modules.user.getters,
+            ...(overrides.user?.getters ?? {}),
           },
         },
         featureFlags: {
@@ -102,7 +106,9 @@ describe('ProfileView', () => {
       (userType) => {
         const wrapper = getWrapper({
           user: {
-            userType,
+            state: {
+              userType,
+            },
           },
         })
         expect(wrapper.find('.description').exists()).toEqual(
@@ -116,7 +122,9 @@ describe('ProfileView', () => {
       (userType) => {
         const wrapper = getWrapper({
           user: {
-            userType,
+            state: {
+              userType,
+            },
           },
         })
         expect(
@@ -125,18 +133,25 @@ describe('ProfileView', () => {
       }
     )
 
-    test.each(['volunteer', 'student'])(
-      "Should show 'Remove phone number' option for students only",
-      async (userType) => {
+    test.each([
+      [true, false],
+      [false, true],
+    ])(
+      "Should show 'Remove phone number' option only if the user does not have the volunteer role",
+      async (hasVolunteerRole, expected) => {
         const wrapper = getWrapper({
           user: {
-            userType,
-            phone: '+18187776543',
+            state: {
+              phone: '+18187776543',
+            },
+            getters: {
+              hasVolunteerRole: () => hasVolunteerRole,
+            },
           },
         })
         expect(
           wrapper.find('[data-testid="delete-phone-button"]').exists()
-        ).toEqual(userType === 'student')
+        ).toEqual(expected)
       }
     )
   })
@@ -152,16 +167,19 @@ describe('ProfileView', () => {
     }
 
     test.each([
-      // userType, expected
-      ['volunteer', false],
-      ['student', true],
+      ['volunteer', null, false],
+      ['student', null, false],
+      ['volunteer', '+18608660033', true],
+      ['student', '+18608660033', true],
     ])(
-      'Should only show sms consent checkbox for students',
-      (userType, expected) => {
+      'Should only show sms consent checkbox if there is a phone number, regardless of userType',
+      (userType, phone, expected) => {
         const wrapper = getWrapper({
           user: {
-            userType,
-            phone: '+18188888857',
+            state: {
+              userType,
+              phone,
+            },
           },
         })
         expect(wrapper.find('#sms-consent-checkbox').exists()).toEqual(expected)
@@ -171,8 +189,10 @@ describe('ProfileView', () => {
     it('Should not show SMS checkbox for students who have no phone number', () => {
       const wrapper = getWrapper({
         user: {
-          userType: 'student',
-          phone: null,
+          state: {
+            userType: 'student',
+            phone: null,
+          },
         },
       })
       expect(wrapper.find('#sms-consent-checkbox').exists()).toBeFalsy()
@@ -181,7 +201,9 @@ describe('ProfileView', () => {
     it('Should NOT open the SMS verification modal if the profile was saved with no changes to phone number', async () => {
       const wrapper = getWrapper({
         user: {
-          phone: '+18607889345',
+          state: {
+            phone: '+18607889345',
+          },
         },
       })
       // Enter edit mode and save (no) changes
@@ -197,8 +219,10 @@ describe('ProfileView', () => {
     it('Should open the verification modal if the user changes their phone number', async () => {
       const wrapper = getWrapper({
         user: {
-          phone: '+18602124444',
-          phoneVerified: true,
+          state: {
+            phone: '+18602124444',
+            phoneVerified: true,
+          },
         },
       })
       // Enter edit mode and save changes
@@ -220,7 +244,9 @@ describe('ProfileView', () => {
     it('Should open the verification modal if the user adds a phone number for the first time', async () => {
       const wrapper = getWrapper({
         user: {
-          phone: null,
+          state: {
+            phone: null,
+          },
         },
       })
       // Enter edit mode and save changes
@@ -241,8 +267,10 @@ describe('ProfileView', () => {
     it('Should open the corresponding modal if a student clicks the Remove Phone button', async () => {
       const wrapper = getWrapper({
         user: {
-          phone: '+18609998765',
-          userType: 'student',
+          state: {
+            phone: '+18609998765',
+            userType: 'student',
+          },
         },
       })
       await wrapper.find('[data-testid="delete-phone-button"]').trigger('click')
@@ -253,7 +281,7 @@ describe('ProfileView', () => {
 
     it('Should not render the Remove Phone button if the user has no phone', async () => {
       const wrapper = getWrapper({
-        user: { phone: undefined, userType: 'student' },
+        user: { state: { phone: undefined, userType: 'student' } },
       })
       expect(
         wrapper.find('[data-testid="delete-phone-button"]').exists()
@@ -263,10 +291,12 @@ describe('ProfileView', () => {
 
   describe.skip('Muted Subject Alert Tests', async () => {
     const user = {
-      userType: 'volunteer',
-      subjects: ['algebraOne', 'algebraTwo', 'biology'],
-      activeSubjects: ['algebraOne', 'algebraTwo', 'biology'],
-      mutedSubjectAlerts: [],
+      state: {
+        userType: 'volunteer',
+        subjects: ['algebraOne', 'algebraTwo', 'biology'],
+        activeSubjects: ['algebraOne', 'algebraTwo', 'biology'],
+        mutedSubjectAlerts: [],
+      },
     }
 
     const subjects = {

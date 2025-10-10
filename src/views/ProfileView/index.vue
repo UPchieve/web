@@ -80,7 +80,7 @@
               <div id="phone-heading">
                 <div class="prompt">Your Phone Number</div>
                 <button
-                  v-if="user.phone && isStudent"
+                  v-if="user.phone && !hasVolunteerRole"
                   class="remove-phone-btn"
                   value="Remove"
                   @click="toggleDeletePhoneConfirmationModal"
@@ -134,22 +134,35 @@
               />
 
               <div class="sms-consent" v-if="shouldSeeSmsConsentCheckbox">
-                <checkbox
-                  id="sms-consent-checkbox"
-                  :disabled="!activeEdit ? true : null"
-                  v-model="smsConsent"
-                  @change="emitSmsConsentCheckboxChangedEvent"
-                  :checked="smsConsent"
-                />
-                <label for="sms-consent-input"
-                  >By checking this box, I consent to receiving SMS messages
-                  from UPchieve at the phone number provided above.</label
-                >
-              </div>
-              <div class="description" v-if="isVolunteer">
-                We will use this number to send you notifications when a student
-                needs help. You will only receive notifications during the
-                periods that you select in your schedule.
+                <div class="checkbox-container">
+                  <checkbox
+                    id="sms-consent-checkbox"
+                    :disabled="!activeEdit ? true : null"
+                    v-model="smsConsent"
+                    @change="emitSmsConsentCheckboxChangedEvent"
+                    :checked="smsConsent"
+                  />
+                  <label for="sms-consent-input"
+                    >By checking this box, I consent to receiving SMS messages
+                    from UPchieve at the phone number provided above.</label
+                  >
+                </div>
+                <div class="description" v-if="hasVolunteerRole">
+                  <span v-if="smsConsent">
+                    <strong class="sms-consent-true"
+                      >We will text you when a student needs your help.</strong
+                    >
+                    You will only be notified during the periods that you select
+                    in your schedule.
+                  </span>
+                  <span v-else>
+                    <span class="sms-consent-false"
+                      >You will not receive text messages when a student needs
+                      your help</span
+                    >
+                    unless you check the above checkbox.
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -395,6 +408,8 @@ export default {
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
       isSelectingPreferredLanguageEnabled:
         'featureFlags/isSelectingPreferredLanguageEnabled',
+      hasStudentRole: 'user/hasStudentRole',
+      hasVolunteerRole: 'user/hasVolunteerRole',
     }),
     isPartnerTeacher() {
       return this.isTeacher && this.user.isSchoolPartner
@@ -660,7 +675,7 @@ export default {
     },
 
     setFlagsForEditingPhoneNumber() {
-      this.shouldSeeSmsConsentCheckbox = this.isStudent && this.user.phone
+      this.shouldSeeSmsConsentCheckbox = this.user.phone
     },
   },
 }
@@ -843,7 +858,7 @@ ul {
 
 .description {
   margin-top: 10px;
-  font-size: 12px;
+  @include font-category('helper-text');
 }
 
 button {
@@ -1005,7 +1020,21 @@ button:hover {
 
 .sms-consent {
   display: flex;
+  flex-direction: column;
   align-items: baseline;
+
+  .checkbox-container {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .sms-consent-false {
+    color: $c-error-red;
+  }
+
+  .sms-consent-true {
+    color: $c-success-green;
+  }
 }
 
 .sync-clever-btn {
