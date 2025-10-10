@@ -1,16 +1,34 @@
 #!/bin/bash
 
-source "$(dirname "$0")/is-in-container.sh"
-
-# If .venv exists and we're not in a container, use it
-if [ -d ".venv" ] && ! is_in_container; then
-    echo "Using detect-secrets from .venv"
-    source ".venv/bin/activate"
-    git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json
-    result=$?
-    deactivate
-    exit $result
+# Check for Python 3 (hard requirement)
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Error: Python 3 is required but not installed."
+    echo "Please install Python 3 and try again."
+    exit 1
 fi
 
-# Otherwise use detect-secrets from PATH
-git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json
+# Auto-setup if needed by calling the setup script
+if [ ! -d ".venv" ] || [ ! -f ".venv/bin/detect-secrets" ]; then
+    "$(dirname "$0")/setup-detect-secrets.sh"
+fi
+
+# Get the command from first argument
+COMMAND="$1"
+shift  # Remove first argument, keep the rest
+
+case "$COMMAND" in
+    scan)
+        .venv/bin/detect-secrets scan --baseline .secrets.baseline --exclude-files package-lock.json "$@"
+        ;;
+    audit)
+        .venv/bin/detect-secrets audit .secrets.baseline "$@"
+        ;;
+    hook)
+        git diff --staged --name-only -z | xargs -0 .venv/bin/detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json "$@"
+        ;;
+    *)
+        echo "❌ Error: Unknown command '$COMMAND'"
+        echo "Valid commands: scan, audit, hook"
+        exit 1
+        ;;
+esac

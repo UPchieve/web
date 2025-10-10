@@ -21,13 +21,9 @@
     "test:e2e:snapshots": "export INCLUDE_SNAPSHOT_TESTS=true && npx playwright test",
     "test:e2e:update-snapshots": "npx playwright test --update-snapshots",
     "setup:detect-secrets": "./scripts/setup-detect-secrets.sh",
-    "scan:add": "detect-secrets scan --baseline .secrets.baseline --exclude-files package-lock.json",
-    "scan:diff": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json",
-    "scan:audit": "detect-secrets audit .secrets.baseline",
-    "scan:add:venv": "source .venv/bin/activate && detect-secrets scan --baseline .secrets.baseline --exclude-files package-lock.json; deactivate",
-    "scan:diff:venv": "source .venv/bin/activate && git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json; deactivate",
-    "scan:audit:venv": "source .venv/bin/activate && detect-secrets audit .secrets.baseline; deactivate",
-    "scan:diff:wrapped": "./scripts/wrap-detect-secrets.sh",
+    "scan:add": "./scripts/wrap-detect-secrets.sh scan",
+    "scan:diff": "./scripts/wrap-detect-secrets.sh hook",
+    "scan:audit": "./scripts/wrap-detect-secrets.sh audit",
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
@@ -112,7 +108,7 @@
     "vue-tsc": "^3.1.1"
   },
   "pre-commit": [
-    "scan:diff:wrapped",
+    "scan:diff",
     "lint:dry"
   ],
   "browserslist": [
