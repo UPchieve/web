@@ -12,6 +12,8 @@ import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { useRouter } from 'vue-router'
 import UserService from '@/services/UserService'
 import Loader from '@/components/Loader.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
 const router = useRouter()
@@ -26,6 +28,13 @@ const isRegistering = ref(false)
 const signupSourcesOptions = ref<{ name: string; id: number }[]>([])
 const otherSignupSource = ref()
 const submitError = ref('')
+
+if (localStorage.getItem('isSSOSignUpRedirect')) {
+  AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
+  AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+  localStorage.removeItem('isSSOSignUpRedirect')
+  store.dispatch('user/firstDashboardVisit', true)
+}
 
 onBeforeMount(() => {
   getSignupSources()
