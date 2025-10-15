@@ -22,6 +22,10 @@ export default async function () {
   // @TODO Wait for a signal or healthcheck instead
   await new Promise((resolve) => setTimeout(resolve, 2 * 1000))
 
+  // NOTE: This setup expects subway's .env.e2e to have:
+  //   SUBWAY_API_PORT=3001
+  //   SUBWAY_SOCKETS_PORT=3001
+  // This avoids port conflicts with the dev subway instance (which runs on port 3000)
   await startSubway(subwayPath)
 }
 
@@ -66,7 +70,7 @@ const startSubway = async (subwayRepoPath) => {
   for (const waitTimeMs of waitTimes) {
     await new Promise((r) => setTimeout(r, waitTimeMs))
     try {
-      const response = await fetch('http://localhost:3000/healthz')
+      const response = await fetch('http://localhost:3001/healthz')
       if (response.status === 200) {
         isUp = true
         break

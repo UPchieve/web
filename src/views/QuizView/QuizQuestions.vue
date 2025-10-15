@@ -48,14 +48,15 @@
         </div>
       </div>
       <form class="possible-answers" data-testid="quiz-questions">
-        <div v-for="(item, index) in items" :key="`item-${index}`">
-          <div class="options answer-option">
+        <div v-for="(item, index) in answersWithLabels" :key="`item-${index}`">
+          <div class="options answer-option" @click="selectAnswer(item.val)">
             <input
               :value="item.val"
               v-model="picked"
               type="radio"
               :id="item.val"
               :data-testid="item.val"
+              :aria-label="item.label"
               class="answer-option--input"
             />
             <label
@@ -64,7 +65,7 @@
               :data-testid="`$answer-${item.val}`"
               class="answer-option--label"
             >
-              {{ item.val }}. {{ item.txt }}
+              {{ item.label }}
             </label>
           </div>
         </div>
@@ -72,33 +73,35 @@
       </form>
     </div>
     <div class="btn-container">
-      <button
+      <large-button
         v-if="showPrevious"
         data-testid="btn-question-previous"
-        class="prev btn"
-        type="button"
-        @click.prevent="previous()"
+        variant="secondary"
+        :showArrow="false"
+        @click="previous"
       >
         PREVIOUS
-      </button>
-      <button
+      </large-button>
+
+      <large-button
         data-testid="btn-question-next"
         v-if="showNext"
-        class="next btn"
-        type="button"
-        @click.prevent="next()"
+        variant="secondary"
+        :showArrow="false"
+        @click="next"
       >
         NEXT
-      </button>
-      <button
+      </large-button>
+
+      <large-button
         data-testid="btn-submit-quiz"
         v-if="showSubmit"
-        class="submit btn"
-        type="submit"
-        @click.prevent="submit()"
+        variant="primary"
+        :showArrow="false"
+        @click="submit"
       >
         SUBMIT QUIZ
-      </button>
+      </large-button>
     </div>
   </div>
 </template>
@@ -110,6 +113,7 @@ import ProgressBar from './ProgressBar.vue'
 import ImageExpandIcon from '@/assets/image-expand.svg'
 import ImageCollapseIcon from '@/assets/image-collapse.svg'
 import LoggerService from '@/services/LoggerService'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   props: {
@@ -135,6 +139,15 @@ export default {
     ProgressBar,
     ImageExpandIcon,
     ImageCollapseIcon,
+    LargeButton,
+  },
+  computed: {
+    answersWithLabels() {
+      return this.items.map((item) => ({
+        ...item,
+        label: `${item.val}. ${item.txt}`,
+      }))
+    },
   },
   mounted() {
     this.getFirstQuestion()
@@ -316,6 +329,10 @@ export default {
         return
       } else this.isImageExpanded = !this.isImageExpanded
     },
+    selectAnswer(value) {
+      // Workaround for MathJax breaking label-input association
+      this.picked = value
+    },
   },
 }
 </script>
@@ -328,15 +345,17 @@ export default {
 
 .progress-bar-container {
   margin: 2em auto;
-  width: 90%;
+  width: 100%;
   max-width: 600px;
 }
 
 .quiz-body {
-  width: 400px;
+  width: 100%;
+  max-width: 600px;
   text-align: left;
   margin: 0 auto;
   margin-bottom: 2em;
+  @include child-spacing(top, $spacing-lg);
 }
 
 input[type='radio']:checked {
@@ -344,57 +363,51 @@ input[type='radio']:checked {
 }
 
 .possible-answers {
-  margin: 2em;
+  @include child-spacing(top, $spacing-xs);
 }
 
 label {
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   display: inline;
-}
-
-.options {
-  margin-bottom: 10px;
 }
 
 .answer-option {
   @include flex-container(row, initial, center);
+  cursor: pointer;
+
+  &:hover &--label {
+    background-color: $selected-green;
+  }
+
+  &--input,
+  &--label {
+    cursor: inherit;
+  }
 
   &--label {
-    margin-left: 0.2em;
+    margin-left: $spacing-xs;
     margin-bottom: 0;
+    flex: 1;
+    padding: $spacing-xs;
+    border-radius: $radius-sm;
+    transition: background-color $transition-standard;
+  }
+
+  &--input:checked + &--label {
+    background-color: $upchieve-chat-bot-green;
+    font-weight: $font-weight-medium;
   }
 }
 
 .question-number {
-  font-weight: 600;
-  width: 400px;
+  font-weight: $font-weight-bold;
+  width: 100%;
   align-self: center;
   text-align: left;
-  margin-bottom: 1.4em;
-}
-
-// todo: make global button
-.btn {
-  background: #f6f6f6;
-  border-radius: 20px;
-  width: 120px;
-  padding: 0.6em 0;
-  color: #16d2aa;
-  font-weight: 600;
-
-  @include breakpoint-above('large') {
-    width: 160px;
-  }
-}
-
-.btn:hover {
-  background-color: #16d2aa;
-  color: #fff;
 }
 
 .quiz-error {
   color: $c-error-red;
-  margin: 2em 0;
 }
 
 .btn-container {
@@ -452,35 +465,22 @@ label {
   position: absolute;
   width: 20px;
   height: 20px;
-  margin: 1em;
+  margin: $spacing-sm;
   top: 0;
   right: 0;
   &:hover {
     transform: scale(1.1);
-    transition: scale 0.5s ease;
+    transition: transform $transition-slow;
   }
 }
 
-@media screen and (max-width: 700px) {
-  .question-number,
-  .quiz-body {
-    width: 100%;
-  }
-
+@include breakpoint-below('medium') {
   .btn-container {
     width: 100%;
   }
-
-  .progress-bar-container {
-    width: 100%;
-  }
 }
 
-@media screen and (max-width: 400px) {
-  .btn {
-    width: 100px;
-  }
-
+@include breakpoint-below('small') {
   // override inline styling
   .question-image {
     width: 100% !important;

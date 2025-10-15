@@ -1,0 +1,4 @@
+// Transition scale - based on codebase usage patterns
+$transition-fast: 0.15s ease-in; // Quick interactions
+$transition-standard: 0.2s ease; // Standard transitions - most common
+$transition-slow: 0.3s ease; // Slower transitions

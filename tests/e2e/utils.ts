@@ -33,7 +33,7 @@ export const createStudent = async (
   }
   try {
     const response = await fetch(
-      `http://localhost:3000/auth/register/student/`,
+      `http://localhost:3001/auth/register/student/`,
       {
         method: 'POST',
         headers: {
@@ -87,7 +87,7 @@ export const createVolunteer = async (
     }
 
     const response = await fetch(
-      `http://localhost:3000/auth/register/volunteer/open`,
+      `http://localhost:3001/auth/register/volunteer/open`,
       {
         method: 'POST',
         headers: {
@@ -204,6 +204,22 @@ export const loginVolunteer = async (
     volunteerContext,
     volunteerPage,
   }
+}
+
+export const logInUserViaAPI = async (
+  browser: Browser,
+  user: { email: string; password: string },
+  authFilePath: string
+) => {
+  const context = await browser.newContext({ storageState: undefined })
+  await context.request.post('http://localhost:3001/auth/login', {
+    data: {
+      email: user.email,
+      password: user.password,
+    },
+  })
+  await context.storageState({ path: authFilePath })
+  await context.close()
 }
 
 export const setFeatureFlags = async (page: Page, featureFlags: any) => {

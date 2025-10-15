@@ -1,37 +1,37 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db.ts'
-import { createVolunteer } from '../utils.ts'
-import { Login } from '../page-object-models/login.js'
-import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard.js'
+import { createVolunteer, logInUserViaAPI } from '../utils.ts'
 import { VolunteerTraining } from '../page-object-models/volunteer-training.js'
+import path from 'path'
 
 let dbClient
+const authFile = path.join(
+  __dirname,
+  '../../../playwright/.auth/volunteer.json'
+)
+
 test.describe('Training', async () => {
   let volunteerUser
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ browser }) => {
     dbClient = await getClient().connect()
     volunteerUser = await createVolunteer(dbClient)
+
+    await logInUserViaAPI(browser, volunteerUser, authFile)
   })
 
   test.afterAll(async () => {
     await dbClient.release()
   })
 
+  test.use({ storageState: authFile })
+
   test('pass prealgebra quiz', async ({ page }) => {
-    //pass in page instead of browser
     /* Volunteer pages */
-    const volunteerDashboard = new VolunteerDashboard(page)
-    const volunteerLogin = new Login(page)
     const volunteerTraining = new VolunteerTraining(page)
 
-    /* Sign in volunteer */
-    await volunteerLogin.goto()
-    await volunteerLogin.loginWith(volunteerUser)
-
-    /* Go to training */
-    await page.waitForURL('**/dashboard')
-    await volunteerDashboard.goToTraining()
+    /* Go to training - already authenticated! */
+    await page.goto('/training')
     await page.waitForURL('**/training')
     await volunteerTraining.hasText('Volunteer Training and Certifications')
     await expect(page).toHaveScreenshot('volunteer-training-and-certs.png')
@@ -58,17 +58,10 @@ test.describe('Training', async () => {
     page,
   }) => {
     /* Volunteer pages */
-    const volunteerDashboard = new VolunteerDashboard(page)
-    const volunteerLogin = new Login(page)
     const volunteerTraining = new VolunteerTraining(page)
 
-    /* Sign in volunteer */
-    await volunteerLogin.goto()
-    await volunteerLogin.loginWith(volunteerUser)
-
-    /* Go to training */
-    await page.waitForURL('**/dashboard')
-    await volunteerDashboard.goToTraining()
+    /* Go to training - already authenticated! */
+    await page.goto('/training')
     await page.waitForURL('**/training')
     await volunteerTraining.hasText('Volunteer Training and Certifications')
     await expect(page).toHaveScreenshot('volunteer-training-and-certs.png')
@@ -103,17 +96,10 @@ test.describe('Training', async () => {
     page,
   }) => {
     /* Volunteer pages */
-    const volunteerDashboard = new VolunteerDashboard(page)
-    const volunteerLogin = new Login(page)
     const volunteerTraining = new VolunteerTraining(page)
 
-    /* Sign in volunteer */
-    await volunteerLogin.goto()
-    await volunteerLogin.loginWith(volunteerUser)
-
-    /* Go to training */
-    await page.waitForURL('**/dashboard')
-    await volunteerDashboard.goToTraining()
+    /* Go to training - already authenticated! */
+    await page.goto('/training')
     await page.waitForURL('**/training')
     await volunteerTraining.hasText('Volunteer Training and Certifications')
     await expect(page).toHaveScreenshot('volunteer-training-and-certs.png')

@@ -1,0 +1,5 @@
+// Border radius scale - based on codebase usage patterns
+$radius-sm: 4px; // Small radius (form inputs, small elements)
+$radius-md: 8px; // Standard radius (cards, containers) - most common
+$radius-lg: 20px; // Large radius (buttons, pills)
+$radius-round: 50%; // Circular elements

@@ -333,7 +333,7 @@ export default {
   background: #fff;
   border-radius: 8px;
   margin: 10px;
-  padding-bottom: 8em;
+  padding: $spacing-sm $spacing-sm 8em;
   border-left: 5px solid $c-information-blue;
 
   @include breakpoint-above('medium') {
@@ -457,28 +457,12 @@ export default {
 }
 
 @media screen and (max-width: 700px) {
-  .header {
-    padding: 1em 1em 1em 3em;
-  }
-
-  .quiz-inner {
-    padding: 2em;
-  }
-
   .done.btn {
     width: 6em;
   }
 }
 
 @media screen and (max-width: 426px) {
-  .header {
-    padding: 1em 0;
-  }
-
-  .quiz-inner {
-    padding: initial;
-  }
-
   .done-header {
     flex-direction: column;
   }
@@ -486,10 +470,6 @@ export default {
   .done.btn {
     margin-top: 2em;
     width: 80%;
-  }
-
-  .instructions {
-    padding: 0 1em;
   }
 }
 
