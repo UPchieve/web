@@ -6,22 +6,14 @@
     <LargeButton id="verify-button" primary @click="openVerificationModal"
       >Verify now!</LargeButton
     >
-    <VerificationModal
-      v-if="showVerificationModal"
-      :close-modal="onModalClosed"
-      :verification-method="verificationMethod"
-      :phone-or-email-to-verify="user.email"
-    />
   </div>
 </template>
 
 <script>
 import LargeButton from '@/components/LargeButton.vue'
-import VerificationModal from '@/views/VerificationModal.vue'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import { mapState } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
-
 export default {
   name: 'VerificationHeader',
   computed: {
@@ -35,7 +27,7 @@ export default {
       return 'email address'
     },
   },
-  components: { VerificationModal, LargeButton },
+  components: { LargeButton },
   data() {
     return {
       showVerificationModal: false,
@@ -43,14 +35,13 @@ export default {
   },
   methods: {
     openVerificationModal() {
-      this.showVerificationModal = true
+      this.$store.dispatch('app/modal/show', {
+        component: 'VerificationAppModal',
+      })
       AnalyticsService.captureEvent(EVENTS.VERIFICATION_HEADER_CLICKED, {
         verificationMethod: this.verificationMethod,
         userId: this.user.id,
       })
-    },
-    onModalClosed() {
-      this.showVerificationModal = false
     },
   },
 }
