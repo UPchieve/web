@@ -67,7 +67,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
       [POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT]: false,
       [POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX]: false,
-      [POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
       [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_LOCKED_SESSIONS]: false,
@@ -290,8 +289,6 @@ export default {
       ],
     isImageUploadUxEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX],
-    isSlackCommunityEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SLACK_COMMUNITY_ENABLED],
     isVerifyHoursButtonEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON],
     isShowLockedSessionsEnabled: (state: FeatureFlagState) =>
