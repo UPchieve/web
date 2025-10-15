@@ -38,7 +38,7 @@ const INVITE_FRIEND_LINK = {
 }
 const COMMUNITY_LINK = {
   // This link changes. Just match the consistent portion.
-  onClick: () => {},
+  to: 'https://upchieveaccommunity.slack.com/join/shared_invite/',
   text: 'Community',
 }
 // Admin links
@@ -92,7 +92,6 @@ const getWrapper = (options = {}) => {
     isAdmin: false,
     path: '/',
     numberOfStudentClasses: 0,
-    isSlackCommunityEnabled: true,
     user: {},
     ...options,
   }
@@ -115,9 +114,6 @@ const getWrapper = (options = {}) => {
       },
       featureFlags: {
         ...storeOptions.modules.featureFlags,
-        getters: {
-          isSlackCommunityEnabled: () => true,
-        },
       },
       productFlags: {
         ...storeOptions.modules.productFlags,
@@ -185,7 +181,6 @@ describe('SidebarLinks', () => {
         authenticated: true,
         isVolunteer: true,
         isStudent: false,
-        isSlackCommunityEnabled: true,
         user: {
           isOnboarded: true,
           hasCertification: true,
@@ -199,7 +194,6 @@ describe('SidebarLinks', () => {
         authenticated: true,
         isVolunteer: true,
         isStudent: false,
-        isSlackCommunityEnabled: true,
         user: {
           isOnboarded: false,
           hasCertification: false,
@@ -215,7 +209,6 @@ describe('SidebarLinks', () => {
         authenticated: true,
         isVolunteer: true,
         isStudent: false,
-        isSlackCommunityEnabled: true,
         user: {
           isOnboarded: false,
           hasCertification: false,

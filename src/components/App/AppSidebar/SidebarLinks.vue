@@ -164,11 +164,11 @@
           <hand-wave-icon class="icon" />
         </sidebar-link>
         <sidebar-link
-          v-if="isVolunteer"
+          v-if="isVolunteer && showSlackButton"
           to="https://upchieveaccommunity.slack.com/join/shared_invite/zt-3ddtu0s8n-0GTFhvj674v_BTXnc8tlmQ"
           text="Community"
-          id="community-sidebar-link"
           :openNewTab="true"
+          id="community-sidebar-link"
         >
           <slack-logo-icon class="icon" />
         </sidebar-link>
@@ -247,6 +247,10 @@ export default {
       isBecomeAnAmbassadorCtaEnabled:
         'featureFlags/isBecomeAnAmbassadorCtaEnabled',
       isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
+      isDisableStudentsJoinSlackCommunityEnabled:
+        'featureFlags/isDisableStudentsJoinSlackCommunityEnabled',
+      isDisabledSlackButtonForUnapprovedVolunteersEnabled:
+        'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
     }),
     isStandaloneAiEnabled() {
       return (
@@ -255,6 +259,12 @@ export default {
     },
     hasIncompleteAssignments() {
       return !!getIncompleteAssignments(this.user.studentAssignments).length
+    },
+    showSlackButton() {
+      return (
+        !this.isDisableStudentsJoinSlackCommunityEnabled &&
+        !this.isDisabledSlackButtonForUnapprovedVolunteersEnabled
+      )
     },
   },
   data() {

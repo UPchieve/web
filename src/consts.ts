@@ -921,11 +921,12 @@ export enum POSTHOG_FEATURE_FLAGS {
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
   SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT = 'skip-availability-onboarding-requirement',
   IMAGE_UPLOAD_UX = 'image-upload-ux',
-  SLACK_COMMUNITY_ENABLED = 'study-slack-coach-community',
   PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',
   VERIFY_HOURS_BUTTON = 'verify-hours-button',
   SHOW_LOCKED_SESSIONS = 'show-locked-sessions',
   GOOGLE_SIGNUP_FOR_VOLUNTEERS = 'google-signup-for-volunteers',
+  DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY = 'disable-students-join-slack-community',
+  DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS = 'disable-slack-button-for-unapproved-volunteers',
 }
 
 export const ANALYTICS_REPORT_ROW = {

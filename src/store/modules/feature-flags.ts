@@ -43,7 +43,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SCREENSHARE]: false,
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
-      [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
+      [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: true,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ]: false,
       [POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES]: false,
@@ -71,6 +71,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_LOCKED_SESSIONS]: false,
       [POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS]: false,
+      [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY]: false,
+      [POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -295,6 +297,16 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_LOCKED_SESSIONS],
     isGoogleSignupForVolunteersEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS],
+    isDisableStudentsJoinSlackCommunityEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY
+      ],
+    isDisabledSlackButtonForUnapprovedVolunteersEnabled: (
+      state: FeatureFlagState
+    ) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS
+      ],
   },
   actions: {
     isSessionAudioCallEnabled: async (
