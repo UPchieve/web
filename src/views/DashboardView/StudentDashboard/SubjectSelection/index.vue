@@ -9,10 +9,7 @@
       page.
     </p>
     <div v-else>
-      <recent-subjects
-        v-if="isMostRecentSubjectsActive"
-        :disabled="isCardDisabled"
-      />
+      <recent-subjects :disabled="isCardDisabled" />
       <div :class="showDashboardRedesign ? 'cards' : 'cards-old'">
         <subject-card
           v-for="(card, index) in cards"
@@ -64,7 +61,6 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       topicCards: 'subjects/sessionRequestTopicCards',
       showDashboardRedesign: 'user/showDashboardRedesign',
-      isMostRecentSubjectsActive: 'featureFlags/isMostRecentSubjectsActive',
       hasCooldown: 'session/hasCooldown',
     }),
     cards() {

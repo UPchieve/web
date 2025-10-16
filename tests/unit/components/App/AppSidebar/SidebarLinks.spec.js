@@ -50,9 +50,9 @@ const links = {
     loggedOut: [],
     student: [
       DASHBOARD_LINK,
-      SESSION_HISTORY_LINK,
-      FAVORITE_COACHES_LINK,
       MY_CLASSES_LINK,
+      FAVORITE_COACHES_LINK,
+      SESSION_HISTORY_LINK,
       CONTACT_LINK,
     ],
     volunteer: [
@@ -69,8 +69,8 @@ const links = {
       TRAINING_LINK,
       CALENDAR_LINK,
       SESSION_HISTORY_LINK,
-      ADMIN_LINK,
       INVITE_FRIEND_LINK,
+      ADMIN_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],
@@ -149,6 +149,7 @@ describe('SidebarLinks', () => {
   describe('link tests', () => {
     const testLinks = (wrapper, expectedLinks) => {
       const sidebarLinks = wrapper.findAllComponents(SidebarLink)
+
       expect(sidebarLinks.length).toBe(expectedLinks.length)
       expectedLinks.forEach((link, i) => {
         const sidebarLink = sidebarLinks.at(i)
@@ -249,6 +250,7 @@ describe('SidebarLinks', () => {
         isStudent: false,
         isTeacher: true,
       })
+
       testLinks(wrapper, links.default.teacher)
     })
   })

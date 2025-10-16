@@ -876,7 +876,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   USE_NEW_SIGN_UP_FLOW = 'use-new-sign-up-flow',
   SHOW_IN_APP_SESSION_NOTIFICATIONS = 'show-in-app-session-notifications',
   SESSION_PRESENCE = 'session-presence',
-  MOST_RECENT_SUBJECTS = 'most-recent-subjects',
   ABOUT_THIS_SESSION_SURVEY = 'about-this-session-feedback',
   BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW = 'big-future-email-eligibility-flow',
   BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW = 'big-future-two-question-eligibility-flow',

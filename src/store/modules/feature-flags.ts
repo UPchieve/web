@@ -28,7 +28,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE]: false,
-      [POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW]: false,
@@ -175,8 +174,6 @@ export default {
       ],
     isSessionPresenceActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE],
-    isMostRecentSubjectsActive: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.MOST_RECENT_SUBJECTS],
     isAboutThisSessionSurveyActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY],
     isBigFutureEmailFirstFlowActive: (state: FeatureFlagState) =>

@@ -40,14 +40,6 @@
         }}
         Finish up your survey <arrow-icon
       /></large-button>
-      <large-button
-        v-if="isGuidedJourneysEnabled"
-        class="dashboard-notice"
-        :class="'dashboard-notice--info'"
-        :showArrow="false"
-        @click="goToJourneysPage"
-        >Your Path to College <arrow-icon
-      /></large-button>
     </div>
 
     <tell-them-college-prep-modal
@@ -523,10 +515,6 @@ export default {
       } catch (error) {
         LoggerService.noticeError(error)
       }
-    },
-    goToJourneysPage() {
-      AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_BANNER_CLICKED)
-      this.$router.push(`/journeys`)
     },
   },
   watch: {

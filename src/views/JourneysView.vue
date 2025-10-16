@@ -160,46 +160,46 @@ onMounted(() => {
 .journey-page {
   max-width: 1000px;
   width: 100%;
-  padding: 2em;
+  padding: 2rem;
 
   &__title {
     @include font-category('display-small');
-    margin-bottom: 0.4em;
+    margin-bottom: 0.4rem;
   }
 
   &__subtitle {
     color: $c-secondary-grey;
-    margin: 0 0 1rem;
+    margin: 0 0 1rrem;
     max-width: 60ch;
   }
 }
 
 .journey-container {
   background-color: $upchieve-white;
-  padding: 2em;
-  border-radius: 2em;
+  padding: 2rem;
+  border-radius: 2rem;
 }
 
 .steps-container {
   display: grid;
-  gap: 1.4em;
-  place-items: center;
+  gap: 1.4rem;
+  padding: 0rem 1rem;
 }
 
 .steps-step {
   @include flex-container(column, initial, initial);
   border: 1px solid $border-grey;
-  border-radius: 1em;
-  padding: 1.2em;
-  margin: 1em 0;
+  border-radius: 1rem;
+  padding: 1.2rem;
+  margin: 1rem 0;
   width: 100%;
   @include breakpoint-above('large') {
     width: 75%;
   }
 
   &__title {
-    margin-top: 0.6em;
-    margin-bottom: 1em;
+    margin-top: 0.6rem;
+    margin-bottom: 1rem;
     font-weight: 600;
     font-size: 20px;
     line-height: 1.25;
@@ -207,18 +207,18 @@ onMounted(() => {
   }
 
   &__block {
-    padding: 0.6em 0.8em;
+    padding: 0.6rem 0.8rem;
   }
 
   &__before-session {
     background-color: rgba($c-success-green, 0.05);
     border: 1px solid rgba($c-success-green, 0.3);
-    border-radius: 0.8em;
+    border-radius: 0.8rem;
   }
 
   &__section {
     @include flex-container(row, flex-start, center);
-    gap: 0.6em;
+    gap: 0.6rem;
     font-weight: 500;
     margin: 0 0 4px;
   }
@@ -236,8 +236,8 @@ onMounted(() => {
   }
 
   &__session-btn {
-    align-self: center;
-    margin-top: 1em;
+    align-self: flex-end;
+    margin-top: 1rem;
   }
 }
 </style>

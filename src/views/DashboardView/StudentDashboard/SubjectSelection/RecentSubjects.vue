@@ -3,6 +3,14 @@
     <h2 class="recent-subjects-title">Your recent subjects</h2>
     <div class="recent-subjects-cards">
       <recent-subject-card
+        v-if="isGuidedJourneysEnabled"
+        @subject-clicked="goToCollegeJourney"
+        :subject="journeySubject"
+        :disabled="disabled"
+        class="recent-subjects-cards__card"
+      />
+
+      <recent-subject-card
         v-for="subject in user.latestRequestedSubjects"
         @subject-clicked="togglePresessionSurvey"
         :key="subject"
@@ -15,8 +23,10 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import RecentSubjectCard from './RecentSubjectCard.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   name: 'recent-subjects',
@@ -27,10 +37,22 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      journeySubject: {
+        displayName: 'Your Path to College',
+        topicIconLink:
+          'https://cdn.upchieve.org/site-images/topic-icons/college.svg',
+      },
+    }
+  },
   computed: {
     ...mapState({
       subjects: (state) => state.subjects.subjects,
       user: (state) => state.user.user,
+    }),
+    ...mapGetters({
+      isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
     }),
   },
   methods: {
@@ -44,6 +66,10 @@ export default {
           preSelectedSubtopic: subject.name,
         },
       })
+    },
+    goToCollegeJourney() {
+      AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_BANNER_CLICKED)
+      this.$router.push('/journeys')
     },
   },
 }

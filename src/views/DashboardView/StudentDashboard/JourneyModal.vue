@@ -41,7 +41,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <modal :backText="''">
+  <modal :backText="''" :closeModal="handleClose">
     <header class="cross-icon-container" @click="handleClose">
       <cross-icon class="cross-icon" />
     </header>

@@ -6,11 +6,11 @@
     @click="handleSubjectClick"
   >
     <img
-      :src="subject.topicIconLink"
+      :src="subject?.topicIconLink"
       class="subject-card-icon"
       aria-hidden="true"
     />
-    <span class="subject-card-title">{{ subject.displayName }}</span>
+    <span class="subject-card-title">{{ subject?.displayName }}</span>
     <arrow-icon class="arrow-icon" />
   </button>
 </template>

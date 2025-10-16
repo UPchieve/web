@@ -42,24 +42,6 @@
 
         <sidebar-link
           v-if="isStudent"
-          to="/sessions/history"
-          text="Session History"
-          id="session-history-sidebar-link"
-        >
-          <clock-icon class="icon" />
-        </sidebar-link>
-
-        <sidebar-link
-          v-if="isStudent"
-          to="/favorite-coaches"
-          text="Favorite Coaches"
-          id="favorite-coaches-sidebar-link"
-        >
-          <heart-icon class="icon heart-icon" />
-        </sidebar-link>
-
-        <sidebar-link
-          v-if="isStudent"
           to="/classes"
           text="My Classes"
           id="student-my-classes-sidebar-link"
@@ -69,6 +51,24 @@
             v-if="hasIncompleteAssignments"
             class="SidebarLinks__notification"
           />
+        </sidebar-link>
+
+        <sidebar-link
+          v-if="isStudent && isGuidedJourneysEnabled"
+          to="/journeys"
+          text="My Journeys"
+          id="journeys-sidebar-link"
+        >
+          <compass-icon class="icon compass-icon" />
+        </sidebar-link>
+
+        <sidebar-link
+          v-if="isStudent"
+          to="/favorite-coaches"
+          text="Favorite Coaches"
+          id="favorite-coaches-sidebar-link"
+        >
+          <heart-icon class="icon heart-icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -91,7 +91,7 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer"
+          v-if="isVolunteer | isStudent"
           to="/sessions/history"
           text="Session History"
           id="session-history-sidebar-link"
@@ -100,12 +100,12 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isAdmin"
-          to="/admin"
-          text="Admin"
-          id="admin-sidebar-link"
+          v-if="isStudent && productFlags.impactStudyEnrollmentAt"
+          to="/rewards"
+          text="Rewards"
+          id="rewards-sidebar-link"
         >
-          <folder-icon class="icon" />
+          <rewards-sidebar-icon class="icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -127,30 +127,12 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="showDashboardRedesign"
-          text="Refer a Friend"
-          :onClick="openReferFriendModal"
-          id="refer-a-friend-sidebar-link"
+          v-if="isAdmin"
+          to="/admin"
+          text="Admin"
+          id="admin-sidebar-link"
         >
-          <refer-friend-icon class="icon" />
-        </sidebar-link>
-
-        <sidebar-link
-          v-if="isStudent && productFlags.impactStudyEnrollmentAt"
-          to="/rewards"
-          text="Rewards"
-          id="rewards-sidebar-link"
-        >
-          <rewards-sidebar-icon class="icon" />
-        </sidebar-link>
-
-        <sidebar-link
-          v-if="isStudent && isGuidedJourneysEnabled"
-          to="/journeys"
-          text="My Journeys"
-          id="journeys-sidebar-link"
-        >
-          <compass-icon class="icon compass-icon" />
+          <folder-icon class="icon" />
         </sidebar-link>
       </div>
 
@@ -237,7 +219,6 @@ export default {
     ...mapGetters({
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
-      showDashboardRedesign: 'user/showDashboardRedesign',
       hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
