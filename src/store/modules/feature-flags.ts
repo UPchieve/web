@@ -20,7 +20,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
-      [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS]: false,
@@ -31,7 +30,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT]: false,
@@ -86,7 +84,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: '',
-      [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: '',
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
@@ -154,10 +151,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_RECAP_DMS],
     showDashboardRedesign: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN],
-    isAutoStartCollegeSessionActive: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
-    autoStartCollegeSession: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
     isSmsVerificationEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION],
     eligibilityEmail: (state: FeatureFlagState) =>
@@ -184,8 +177,6 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW
       ],
-    isCollegePrepAdEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.COLLEGE_PREP_AD],
     isTutorBotChatEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
     tutorBotChatType: (state: FeatureFlagState) =>

@@ -3,7 +3,6 @@ import AnalyticsService from './AnalyticsService'
 import { EVENTS } from '../consts'
 import type { Store } from 'vuex'
 import type { RootState } from '@/store'
-import LoggerService from './LoggerService'
 import type { ImpactStudyCampaign } from '@/types'
 
 export async function enrollStudentToIncentiveProgram(
@@ -40,18 +39,5 @@ export async function processImpactStudySurveySubmission(
     store.dispatch('productFlags/addToProductFlags', {
       impactStudyEnrollmentAt,
     })
-  }
-}
-
-export async function setTellThemCollegePrepModalSeenAt(
-  store: Store<RootState>
-) {
-  try {
-    store.dispatch('productFlags/addToProductFlags', {
-      tellThemCollegePrepModalSeenAt: new Date().toISOString(),
-    })
-    await NetworkService.setTellThemCollegePrepModalSeenAt()
-  } catch (err: unknown) {
-    LoggerService.noticeError(err)
   }
 }

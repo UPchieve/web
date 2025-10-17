@@ -32,7 +32,6 @@ import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSe
 import ReferralModal from '@/views/DashboardView/ReferralModal.vue'
 import VolunteerOnboardingModal from '@/views/DashboardView/VolunteerDashboard/VolunteerOnboardingModal.vue'
 import ReportSessionModal from '@/views/SessionView/ReportSessionModal.vue'
-import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
 import CreateTeacherClassModal from '@/components/CreateTeacherClassModal.vue'
 import TeacherClassCodeModal from '@/components/TeacherClassCodeModal.vue'
 import CreateAndEditAssignmentModal from '@/components/CreateAndEditAssignmentModal.vue'
@@ -52,7 +51,6 @@ export default {
     VolunteerOnboardingModal,
     UpgradeAppModal,
     ReportSessionModal,
-    StartCollegeSessionModal,
     CreateTeacherClassModal,
     TeacherClassCodeModal,
     CreateAndEditAssignmentModal,

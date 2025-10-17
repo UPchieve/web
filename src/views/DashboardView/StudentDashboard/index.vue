@@ -42,10 +42,6 @@
       /></large-button>
     </div>
 
-    <tell-them-college-prep-modal
-      v-if="showTellThemCollegePrepModal"
-      :closeModal="toggleTellThemCollegePrepModal"
-    />
     <joined-class-modal
       v-if="joinedClassCode"
       @close-modal="() => (joinedClassCode = '')"
@@ -95,7 +91,6 @@
 import { mapGetters, mapState } from 'vuex'
 import DashboardBanner from '../DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
-import TellThemCollegePrepModal from './TellThemCollegePrepModal.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import ImpactStudySurveyModal from './ImpactStudySurveyModal.vue'
@@ -128,7 +123,6 @@ export default {
     SecondaryEmailModal,
     DashboardBanner,
     SubjectSelection,
-    TellThemCollegePrepModal,
     JoinedClassModal,
     FallIncentiveEnrollmentModal,
     ImpactStudySurveyModal,
@@ -168,14 +162,6 @@ export default {
         this.orbitalSegments
       )
     }
-
-    if (
-      this.hadASession &&
-      !this.productFlags.tellThemCollegePrepModalSeenAt &&
-      this.user.pastSessions.length >= 1 &&
-      this.isCollegePrepAdEnabled
-    )
-      this.showTellThemCollegePrepModal = true
 
     const classCode = localStorage.getItem('joinedClassCode')
     if (classCode) {
@@ -231,7 +217,6 @@ export default {
   },
   data() {
     return {
-      showTellThemCollegePrepModal: false,
       joinedClassCode: '',
       showFallIncentiveEnrollmentModal: false,
       assignments: [],
@@ -263,10 +248,6 @@ export default {
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
-      isAutoStartCollegeSessionActive:
-        'featureFlags/isAutoStartCollegeSessionActive',
-      autoStartCollegeSession: 'featureFlags/autoStartCollegeSession',
-      isCollegePrepAdEnabled: 'featureFlags/isCollegePrepAdEnabled',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
@@ -387,9 +368,6 @@ export default {
     },
     toggleSecondaryEmailModal() {
       this.dismissedSecondaryEmailModal = true
-    },
-    toggleTellThemCollegePrepModal() {
-      this.showTellThemCollegePrepModal = !this.showTellThemCollegePrepModal
     },
     toggleFallIncentiveEnrollmentModal() {
       this.showFallIncentiveEnrollmentModal =
@@ -518,35 +496,8 @@ export default {
     },
   },
   watch: {
-    isFirstDashboardVisit(currValue, prevValue) {
-      const hasJustDismissedWelcomeModal = !currValue && prevValue
-      if (
-        hasJustDismissedWelcomeModal &&
-        !this.hadASession &&
-        this.isAutoStartCollegeSessionActive &&
-        this.autoStartCollegeSession
-      ) {
-        this.$store.dispatch('app/modal/show', {
-          component: 'StartCollegeSessionModal',
-          data: {
-            showTemplateButtons: false,
-            sessionTopic: this.autoStartCollegeSession,
-          },
-        })
-      }
-    },
     hadASession: {
       async handler(currentValue, prevValue) {
-        if (
-          currentValue &&
-          !prevValue &&
-          !this.productFlags.tellThemCollegePrepModalSeenAt &&
-          this.user.pastSessions.length >= 1 &&
-          this.isCollegePrepAdEnabled
-        ) {
-          this.showTellThemCollegePrepModal = true
-        }
-
         if (currentValue && !prevValue) {
           await this.processImpactStudySurvey()
           this.$store.dispatch('user/updateHadASession', false)
