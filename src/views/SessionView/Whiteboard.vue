@@ -116,8 +116,8 @@
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
         tabindex="0"
-        @click="usePickTool"
-        @keydown.enter="usePickTool"
+        @click="togglePickTool"
+        @keydown.enter="togglePickTool"
         :disabled="!isConnected"
       >
         <PickToolIcon class="toolbar-icon--pick" />
@@ -141,7 +141,7 @@
             class="toolbar-item option-item"
             :class="selectedTool === 'brush' ? 'selected-tool' : ''"
             tabindex="0"
-            @click="useBrushTool"
+            @click.stop="useBrushTool"
             @keydown.enter="useBrushTool"
           >
             <ThickPenIcon class="toolbar-icon" />
@@ -150,7 +150,7 @@
             class="toolbar-item option-item"
             :class="selectedTool === 'thin-brush' ? 'selected-tool' : ''"
             tabindex="0"
-            @click="useThinBrushTool"
+            @click.stop="useThinBrushTool"
             @keydown.enter="useThinBrushTool"
           >
             <ThinPenIcon class="toolbar-icon" />
@@ -191,7 +191,7 @@
         class="toolbar-item"
         title="Shapes"
         tabindex="0"
-        @click="toggleShapes"
+        @click.stop="toggleShapes"
         @keydown.enter="toggleShapes"
         :class="isShapeSelected ? 'selected-tool' : ''"
         :disabled="!isConnected"
@@ -202,7 +202,7 @@
             class="toolbar-item option-item"
             :class="selectedTool === 'line' ? 'selected-tool' : ''"
             tabindex="0"
-            @click="useLineTool"
+            @click.stop="useLineTool"
             @keydown.enter="useLineTool"
           >
             <line-icon class="toolbar-icon--shape" title="Line tool" />
@@ -211,7 +211,7 @@
             class="toolbar-item option-item"
             :class="selectedTool === 'arrow' ? 'selected-tool' : ''"
             tabindex="0"
-            @click="useArrowTool"
+            @click.stop="useArrowTool"
             @keydown.enter="useArrowTool"
           >
             <arrow-icon class="toolbar-icon--shape" title="Arrow tool" />
@@ -220,7 +220,7 @@
             class="toolbar-item option-item"
             :class="selectedTool === 'circle' ? 'selected-tool' : ''"
             tabindex="0"
-            @click="useCircleTool"
+            @click.stop="useCircleTool"
             @keydown.enter="useCircleTool"
           >
             <circle-icon class="toolbar-icon--shape" title="Circle tool" />
@@ -229,7 +229,7 @@
             class="toolbar-item option-item"
             :class="selectedTool === 'polygon' ? 'selected-tool' : ''"
             tabindex="0"
-            @click="useTriangleTool"
+            @click.stop="useTriangleTool"
             @keydown.enter="useTriangleTool"
           >
             <triangle-icon class="toolbar-icon--shape" title="Triangle tool" />
@@ -238,7 +238,7 @@
             class="toolbar-item option-item"
             :class="selectedTool === 'rectangle' ? 'selected-tool' : ''"
             tabindex="0"
-            @click="useRectangleTool"
+            @click.stop="useRectangleTool"
             @keydown.enter="useRectangleTool"
           >
             <rectangle-icon
@@ -263,7 +263,7 @@
         title="Text"
         tabindex="0"
         @click="clickTextPicker"
-        @keydown.enter="toggleTextPicker"
+        @keydown.enter="clickTextPicker"
         :class="
           selectedTool === 'small-text' || selectedTool === 'text'
             ? 'selected-tool'
@@ -278,7 +278,7 @@
             :class="selectedTool === 'text' ? 'selected-tool' : ''"
             title="Text"
             tabindex="0"
-            @click="useTextTool"
+            @click.stop="useTextTool"
             @keydown.enter="useTextTool"
           >
             <TextIcon class="toolbar-icon" />
@@ -288,7 +288,7 @@
             :class="selectedTool === 'small-text' ? 'selected-tool' : ''"
             title="Small Text"
             tabindex="0"
-            @click="useSmallTextTool"
+            @click.stop="useSmallTextTool"
             @keydown.enter="useSmallTextTool"
           >
             <SmallTextIcon class="toolbar-icon" />
@@ -628,6 +628,7 @@ export default {
       selectedSmallTextTool: false,
       lastSelectedBrushType: TOOLS.BRUSH,
       lastSelectedTextSize: TOOLS.TEXT,
+      lastSelectedShapeType: 'line',
       // Debounce sending cursor position.
       lastCursorBroadcastAt: 0,
     }
@@ -662,13 +663,6 @@ export default {
         this.selectedTool === 'imagestamp' // i.e. xy_graph
       ) {
         return 'zwib-wrapper--crosshair-curor'
-      }
-
-      if (
-        this.selectedTool === TOOLS.TEXT ||
-        this.selectedTool === TOOLS.SMALL_TEXT
-      ) {
-        return 'zwib-wrapper--text-cursor'
       }
 
       // For pick, eraser.
@@ -856,19 +850,15 @@ export default {
         this.zwibblerCtx.focus(true, this)
       }
     },
-    clickBrushTool(event) {
-      this.toggleBrushes(event)
-
+    clickBrushTool() {
+      this.toggleBrushes()
       if (
-        this.showBrushPicker &&
-        this.selectedTool !== TOOLS.BRUSH &&
-        this.selectedTool !== TOOLS.THIN_BRUSH
+        !this.lastSelectedBrushType ||
+        this.lastSelectedBrushType === TOOLS.BRUSH
       ) {
-        if (this.lastSelectedBrushType === TOOLS.BRUSH) {
-          this.useBrushTool(event)
-        } else {
-          this.useThinBrushTool(event)
-        }
+        this.useBrushTool()
+      } else if (this.lastSelectedBrushType === TOOLS.THIN_BRUSH) {
+        this.useThinBrushTool()
       }
 
       this.zwibblerCtx.on('draw', () => {
@@ -880,7 +870,6 @@ export default {
     clickTextPicker() {
       this.toggleTextPicker()
 
-      if (!this.showTextPicker) return
       if (
         !this.lastSelectedTextSize ||
         this.lastSelectedTextSize === TOOLS.TEXT
@@ -896,28 +885,8 @@ export default {
         }
       })
     },
-    clickBrushOnce(event) {
-      this.toggleBrushes(event)
-
-      if (
-        this.showBrushPicker &&
-        this.selectedTool !== TOOLS.BRUSH &&
-        this.selectedTool !== TOOLS.THIN_BRUSH
-      ) {
-        if (this.lastSelectedBrushType === TOOLS.BRUSH) {
-          this.useBrushTool(event)
-        } else {
-          this.useThinBrushTool(event)
-        }
-      }
-
-      this.zwibblerCtx.on('draw', () => {
-        if (this.showBrushPicker) {
-          this.showBrushPicker = false
-        }
-      })
-    },
     usePickTool(event) {
+      this.selectedTool = 'pick'
       this.zwibblerCtx.usePickTool()
       this.maybeFocusZwibbler(event)
     },
@@ -928,16 +897,14 @@ export default {
       })
       this.maybeFocusZwibbler(event)
     },
-    useBrushTool(event) {
+    useBrushTool() {
       this.zwibblerCtx.useBrushTool()
-      this.maybeFocusZwibbler(event)
       this.selectedTool = TOOLS.BRUSH
       this.lastSelectedBrushType = TOOLS.BRUSH
     },
-    useThinBrushTool(event) {
+    useThinBrushTool() {
       this.selectedThinBrushTool = true
       this.zwibblerCtx.useBrushTool({ lineWidth: 3 })
-      this.maybeFocusZwibbler(event)
       this.selectedTool = TOOLS.THIN_BRUSH
       this.lastSelectedBrushType = TOOLS.THIN_BRUSH
     },
@@ -953,6 +920,7 @@ export default {
       this.maybeFocusZwibbler(event)
     },
     useLineTool(event) {
+      this.selectedTool = 'line'
       this.zwibblerCtx.useLineTool(
         {},
         {
@@ -962,18 +930,22 @@ export default {
       this.maybeFocusZwibbler(event)
     },
     useArrowTool(event) {
+      this.selectedTool = 'arrow'
       this.zwibblerCtx.useArrowTool()
       this.maybeFocusZwibbler(event)
     },
     useCircleTool(event) {
+      this.selectedTool = 'circle'
       this.zwibblerCtx.useCircleTool()
       this.maybeFocusZwibbler(event)
     },
     useTriangleTool(event) {
+      this.selectedTool = 'polygon'
       this.zwibblerCtx.usePolygonTool(3, 0)
       this.maybeFocusZwibbler(event)
     },
     useRectangleTool(event) {
+      this.selectedTool = 'rectangle'
       this.zwibblerCtx.useRectangleTool()
       this.maybeFocusZwibbler(event)
     },
@@ -989,23 +961,29 @@ export default {
       )
       this.maybeFocusZwibbler(event)
     },
-    useTextTool(event) {
+    useTextTool() {
       this.lastSelectedTextSize = TOOLS.TEXT
       this.selectedSmallTextTool = false
       this.zwibblerCtx.useTextTool()
       this.selectedTool = TOOLS.TEXT
-      this.maybeFocusZwibbler(event)
     },
-    useSmallTextTool(event) {
+    useSmallTextTool() {
       this.lastSelectedTextSize = TOOLS.SMALL_TEXT
       this.selectedSmallTextTool = true
       this.zwibblerCtx.useTextTool({ fontSize: 20, fontName: 'Arial' })
       this.selectedTool = TOOLS.SMALL_TEXT
-      this.maybeFocusZwibbler(event)
     },
     // TODO: Use a generic "toggle" method.
     toggleBrushes() {
       this.showBrushPicker = !this.showBrushPicker
+      this.showShapePicker = false
+      this.showTextPicker = false
+      this.showColorPicker = false
+      this.showMoreMenu = false
+    },
+    togglePickTool(event) {
+      this.usePickTool(event)
+      this.showBrushPicker = false
       this.showShapePicker = false
       this.showTextPicker = false
       this.showColorPicker = false
@@ -1394,6 +1372,12 @@ export default {
       // disallow dragging and pasting to the whiteboard
       this.zwibblerCtx.on('paste', () => {
         return false
+      })
+
+      this.zwibblerCtx.on('document-changed', () => {
+        if (this.showShapePicker) {
+          this.showShapePicker = false
+        }
       })
 
       try {
