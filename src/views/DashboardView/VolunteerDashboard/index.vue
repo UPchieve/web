@@ -31,7 +31,6 @@
               <div class="available-sessions-container sessions-list-container">
                 <ListSessions
                   v-if="!isSessionAlive"
-                  :showLockedSessions="isShowLockedSessionsEnabled"
                   :style="{ width: '100%' }"
                 />
                 <div v-else class="rejoin-session-container">
@@ -344,7 +343,6 @@ export default {
       isSkipAvailabilityOnboardingRequirementEnabled:
         'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled',
       isVerifyHoursButtonEnabled: 'featureFlags/isVerifyHoursButtonEnabled',
-      isShowLockedSessionsEnabled: 'featureFlags/isShowLockedSessionsEnabled',
     }),
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(

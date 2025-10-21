@@ -1,17 +1,20 @@
 import { storeOptions } from '@/store'
 import router from '@/router'
 import { createStore } from 'vuex'
-import { shallowMount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions.vue'
 import moment from 'moment'
 import { it, describe, vi, expect, beforeEach } from 'vitest'
+import { getShowLockedSessionKey } from '@/views/DashboardView/VolunteerDashboard/ListSessions.vue'
 
 vi.mock('@/services/PresenceService')
 
 beforeEach(() => {
   vi.restoreAllMocks()
+  localStorage.clear()
 })
 
+const USER_ID = '123'
 const sessions = [
   {
     id: 'session-1',
@@ -61,6 +64,7 @@ const getWrapper = async (overrides = {}) => {
         state: {
           user: {
             ...storeOptions.modules.user.state.user,
+            id: USER_ID,
             userType: 'volunteer',
             subjects: ['algebraOne', 'algebraTwo', 'biology'],
             mutedSubjectAlerts: [],
@@ -85,6 +89,7 @@ const getWrapper = async (overrides = {}) => {
       featureFlags: {
         ...storeOptions.modules.featureFlags,
         getters: {
+          isShowLockedSessionsEnabled: () => true,
           ...(overrides.featureFlags?.getters ?? {}),
         },
       },
@@ -111,11 +116,7 @@ const getWrapper = async (overrides = {}) => {
     context: mockVueContext,
     sessions: overrides.sessions ?? sessions,
   })
-  return shallowMount(ListSessions, {
-    propsData: {
-      showLockedSessions: false,
-      ...(overrides.props ?? {}),
-    },
+  return mount(ListSessions, {
     global: { plugins: [store, router] },
   })
 }
@@ -209,6 +210,10 @@ describe('Empty state', () => {
 })
 
 describe('Locked sessions', () => {
+  beforeEach(() => {
+    localStorage.setItem(getShowLockedSessionKey(USER_ID), 'true')
+  })
+
   const testSessions = [
     {
       id: 'session-1',
@@ -271,7 +276,6 @@ describe('Locked sessions', () => {
         },
       },
       sessions: testSessions,
-      props: { showLockedSessions: true },
     })
 
     const tableRows = wrapper.findAll('tr')
@@ -320,6 +324,34 @@ describe('Locked sessions', () => {
     expect(session4Subject.text()).toEqual('🔒Calculus BC')
   })
 
+  it('Hides locked sessions when the toggle is off', async () => {
+    const wrapper = await getWrapper({
+      user: {
+        state: {
+          user: {
+            mutedSubjectAlerts: [],
+            subjects: ['prealgebra', 'algebraOne'],
+          },
+        },
+      },
+      sessions: testSessions,
+    })
+    // Initial state
+    let tableRows = wrapper.findAll('tr')
+    expect(tableRows.length).toEqual(5) // 1 header row and 4 sessions
+
+    // Update toggle to hide the 2 locked sessions
+    const toggle = wrapper.find('[data-testid="show-locked-sessions-toggle"]')
+    const toggleInput = toggle.find('[data-testid="toggle-input"]')
+    expect(toggleInput.element.checked).toEqual(true)
+
+    await toggleInput.trigger('change')
+    expect(toggleInput.element.checked).toEqual(false)
+
+    tableRows = wrapper.findAll('tr')
+    expect(tableRows.length).toEqual(3)
+  })
+
   it('Clicking a locked session should take you to the subject quiz', async () => {
     const routerPushSpy = vi.spyOn(router, 'push')
     const getTestWrapper = () =>
@@ -333,7 +365,6 @@ describe('Locked sessions', () => {
           },
         },
         sessions: testSessions,
-        props: { showLockedSessions: true },
       })
     const prealgebraSessionRow = (await getTestWrapper()).find(
       '[data-testid="session-row-session-1"]'
@@ -384,7 +415,6 @@ describe('Locked sessions', () => {
           createdAt: moment().subtract(5, 'minutes').toDate(),
         },
       ],
-      props: { showLockedSessions: true },
       subjects: {
         getters: {
           isComputedUnlockSubject: () => () => true,

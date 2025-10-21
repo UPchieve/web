@@ -6,6 +6,7 @@
     @keydown.space.prevent="keyToggle"
   >
     <input
+      data-testid="toggle-input"
       type="checkbox"
       class="v-switch-input"
       :name="name"

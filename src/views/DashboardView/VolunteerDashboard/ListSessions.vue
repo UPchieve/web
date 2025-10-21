@@ -3,12 +3,23 @@
     <div v-if="hasError" class="session-list__error">
       <p>Failed to load a list of students. Please try refreshing</p>
     </div>
+    <div v-if="isShowLockedSessionsEnabled" class="locked-sessions-toggle">
+      <label for="show-locked-sessions-toggle"> Show locked sessions? </label>
+      <ToggleButton
+        data-testid="show-locked-sessions-toggle"
+        id="show-locked-sessions-toggle"
+        :value="showLockedSessionsToggle"
+        @change="toggleShowLockedSessions"
+        :labels="{ checked: 'Show', unchecked: 'Hide' }"
+        :width="75"
+      />
+    </div>
     <table class="table table-striped">
       <tr>
         <th scope="col">Student</th>
         <th scope="col">Help Topic</th>
         <th scope="col">Wait Time</th>
-        <th v-if="props.showLockedSessions" scope="col" />
+        <th v-if="shouldShowLockedSessions" scope="col" />
       </tr>
       <tbody>
         <tr
@@ -42,7 +53,7 @@
           <td :data-testid="`wait-time-${session.id}`">
             {{ waitTime(session) }}
           </td>
-          <td v-if="props.showLockedSessions">
+          <td v-if="shouldShowLockedSessions">
             <div
               type="button"
               v-if="!session.isUnlocked"
@@ -89,6 +100,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export function getShowLockedSessionKey(userId?: string) {
+  return `SHOW_LOCKED_SESSIONS-${userId}`
+}
+</script>
+
 <script lang="ts" setup>
 import { useStore } from 'vuex'
 import Case, { kebab } from 'case'
@@ -96,8 +113,9 @@ import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ArrowIcon from '@/assets/arrow.svg'
 import AmbassadorReferralModal from '@/views/AmbassadorReferralModal.vue'
-import { computed, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import ToggleButton from '@/components/ToggleButton.vue'
 
 const hasError = ref<boolean>(false)
 const ambassadorReferralModalIsOpen = ref<boolean>(false)
@@ -106,10 +124,6 @@ const MAX_AVAILABLE_SECTIONS = 5
 const store = useStore()
 const router = useRouter()
 
-const props = defineProps<{
-  showLockedSessions: false
-}>()
-
 const isNarrowScreen = computed(() => store.state.app.windowWidth < 500)
 const user = computed(() => store.state.user.user)
 const isBecomeAnAmbassadorCtaEnabled = computed(
@@ -117,6 +131,33 @@ const isBecomeAnAmbassadorCtaEnabled = computed(
 )
 const isVolunteer = computed(() => store.getters['user/isVolunteer'])
 const isAmbassador = computed(() => store.getters['user/isAmbassador'])
+
+const isShowLockedSessionsEnabled = computed(
+  () => store.getters['featureFlags/isShowLockedSessionsEnabled']
+)
+const showLockedSessionsToggle = ref<boolean>(false)
+const showLockedSessionsKey = computed(() => {
+  return getShowLockedSessionKey(user.value?.id)
+})
+const shouldShowLockedSessions = computed(() => {
+  if (!isShowLockedSessionsEnabled.value) return false
+  if (showLockedSessionsToggle.value) return true
+  const localStorageValue = localStorage.getItem(showLockedSessionsKey.value)
+  return localStorageValue ? JSON.parse(localStorageValue) : false
+})
+
+const toggleShowLockedSessions = () => {
+  showLockedSessionsToggle.value = !showLockedSessionsToggle.value
+  localStorage.setItem(
+    showLockedSessionsKey.value,
+    JSON.stringify(showLockedSessionsToggle.value)
+  )
+}
+
+onBeforeMount(() => {
+  showLockedSessionsToggle.value = shouldShowLockedSessions.value
+})
+
 const sortByCreatedAt = (first: any, second: any) => {
   if (first.createdAt < second.createdAt) return -1
   if (first.createdAt > second.createdAt) return 1
@@ -145,7 +186,7 @@ const sortedSessions = computed(() => {
   // and to display locked ones, props.showLockedSessions must be true.
   if (
     sortedUnlockedSessions.value.length > MAX_AVAILABLE_SECTIONS ||
-    !props.showLockedSessions
+    !shouldShowLockedSessions.value
   ) {
     return sortedUnlockedSessions.value
   }
@@ -217,6 +258,14 @@ function waitTime(args: { createdAt: any }) {
 </script>
 
 <style lang="scss" scoped>
+.locked-sessions-toggle {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+  align-items: center;
+  justify-content: end;
+}
+
 .session-list {
   padding: 10px 20px;
   overflow-x: auto;
