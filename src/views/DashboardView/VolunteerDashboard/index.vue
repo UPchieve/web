@@ -176,10 +176,7 @@
         </TaskCard>
       </template>
       <TaskCard
-        v-if="
-          isSkipAvailabilityOnboardingRequirementEnabled &&
-          !notificationsCardWasDismissed
-        "
+        v-if="shouldShowNotificationsCard"
         id="dashboard-notifications-card"
         title="Get Notified About Student Requests"
         subtitle="Never miss an opportunity to help students by enabling browser notifications and opting-in to text messages."
@@ -311,7 +308,7 @@ export default {
     }
 
     this.notificationsCardWasDismissed =
-      sessionStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
+      localStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
   },
   data() {
     return {
@@ -344,6 +341,13 @@ export default {
         'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled',
       isVerifyHoursButtonEnabled: 'featureFlags/isVerifyHoursButtonEnabled',
     }),
+    shouldShowNotificationsCard() {
+      return (
+        this.isSkipAvailabilityOnboardingRequirementEnabled &&
+        !this.notificationsCardWasDismissed &&
+        !this.didCompleteAllNotificationActions
+      )
+    },
     isCustomVolunteerPartner() {
       return config.customVolunteerPartnerOrgs.some(
         (org) => org === this.user.volunteerPartnerOrg
@@ -541,6 +545,21 @@ export default {
       return onboardingActions.sort((a, b) => a.priority - b.priority)
     },
 
+    webNotificationsStatus() {
+      return this.notificationPermission === 'granted'
+        ? 'complete'
+        : 'not-started'
+    },
+    didSetAvailability() {
+      return this.availabilityLastModifiedAt ? 'complete' : 'not-started'
+    },
+    didCompleteAllNotificationActions() {
+      return (
+        this.webNotificationsStatus === 'complete' &&
+        this.didSetAvailability === 'complete'
+      )
+    },
+
     notificationActions() {
       return [
         {
@@ -551,17 +570,14 @@ export default {
               : this.notificationPermission === 'denied'
                 ? 'Please edit your browser settings to enable notifications'
                 : 'Completed',
-          status:
-            this.notificationPermission === 'granted'
-              ? 'complete'
-              : 'not-started',
+          status: this.webNotificationsStatus,
           onClick: this.onClickBrowserNotifications,
           icon: SimpleRingingBellIcon,
         },
         {
           title: 'Sign Up for Texts',
           subtitle: this.availabilityLastModifiedAt ? 'Completed' : 'Optional',
-          status: this.availabilityLastModifiedAt ? 'complete' : 'not-started',
+          status: this.didSetAvailability,
           onClick: this.onClickSignupForTextNotifications,
           icon: SquareTextIcon,
         },
@@ -640,7 +656,7 @@ export default {
       AnalyticsService.captureEvent(
         EVENTS.SKIP_AVAILABILITY_REQT_CARD_DISMISSED
       )
-      sessionStorage.setItem('DISMISSED_NOTIFICATIONS_CARD', this.user.id)
+      localStorage.setItem('DISMISSED_NOTIFICATIONS_CARD', this.user.id)
       this.notificationsCardWasDismissed = !this.notificationsCardWasDismissed
     },
     rejoinHelpSession() {
