@@ -1,9 +1,10 @@
+import { defineConfig, defineProject } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import svgLoader from 'vite-svg-loader'
 import path from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-export default {
+export default defineConfig({
   envPrefix: 'VUE_',
   define: {
     'import.meta.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
@@ -55,14 +56,37 @@ export default {
     },
   },
   test: {
-    environment: 'jsdom',
     globals: true,
-    setupFiles: ['tests/setup.js'],
     exclude: ['**/tests/e2e/**', '**/node_modules/**'],
-    server: {
-      deps: {
-        inline: [/maz-ui.*/],
+    projects: [{
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'jsdom',
+          setupFiles: ['tests/setup.js'],
+          include: ['tests/unit/**/*.{test,spec}.{js,ts}'],
+          server: {
+            deps: {
+              inline: [/maz-ui.*/],
+            },
+          },
+        },
+      },{
+        extends: true,
+        test: {
+          name: 'browser',
+          include: ['tests/browser/**/*.{test,spec}.{js,ts}'],
+          setupFiles: ['tests/browser/setup.ts'],
+          browser: {
+            enabled: true,
+            provider: 'playwright',
+            headless: false,
+            instances: [
+              { browser: 'chromium' },
+            ],
+          },
+        },
       },
-    },
+    ],
   },
-}
+})

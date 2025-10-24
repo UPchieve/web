@@ -114,7 +114,19 @@ this documentation as we decide how much we want to use storybook beyond atomic 
 
 All _new_ components should go into Storybook, with stories for each of their states.
 
-### Testing Components
+### Testing Components with Vitest Browser Tests instead
+
+Test components in a real Chromium browser using Vitest Browser Mode:
+
+```shell
+npm run test:browser
+```
+
+Tests live in `tests/browser/` and use `vitest-browser-vue` to render components. The setup file at `tests/browser/setup.ts` loads global styles so components render with production styling. Extract mock data into fixture files for maintainability. 
+
+### [Alternative] Testing Components with Storybook
+
+_(I suggest we remove this in the future)_
 
 Story states can be imported into unit tests for a component to check things like applied classes and simple behaviors.
 
@@ -125,7 +137,7 @@ rendering.
 
 Our unit tests do not incorporate visual testing for SVG components (refer to this [component](src/views/DashboardView/StudentDashboard/SubjectSelection/RecentSubjectCard.vue) and its [unit test](tests/unit/components/RecentSubjectCard.spec.js)). The SVG components get successfully rendered on the application itself but not within unit or snapshot test markups.
 
-So, after extensive research and exhausting nearly all possible options of rendering and testing SVGs, as of August 4 2021, we realized that this has been a prolonged JSDOM/JavaScript [issue](https://github.com/vuejs/vue-test-utils/issues/369) and not something that is occuring due to vue-test-utils or jest capabilities. Hence, consider it acceptable to not visually test SVGs for the time being.
+So, after extensive research and exhausting nearly all possible options of rendering and testing SVGs, as of August 4 2021, we realized that this has been a prolonged JSDOM/JavaScript [issue](https://github.com/vuejs/vue-test-utils/issues/369) and not something that is occuring due to vue-test-utils or jest capabilities. Hence, consider it acceptable to not visually test SVGs for the time being. Or, use Vitest browser tests with a real browser.
 
 ## E2E Testing (Under construction)
 

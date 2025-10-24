@@ -10,8 +10,8 @@ const props = defineProps<{
   <div class="live-caption">
     <div class="live-caption-contents">
       <speaker-filled-icon class="icon" />
+      <span class="message">{{ props.message.contents }}</span>
     </div>
-    <span class="message">{{ props.message.contents }}</span>
   </div>
 </template>
 
@@ -34,7 +34,6 @@ const props = defineProps<{
 
   .icon {
     flex-shrink: 0;
-    flex-grow: 1;
   }
 
   .icon {

@@ -33,3 +33,6 @@ newrelic_agent.log
 
 # python virtual environment
 .venv
+
+# Personal files
+todo.local.md

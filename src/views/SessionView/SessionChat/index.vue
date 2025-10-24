@@ -121,7 +121,9 @@
           />
         </div>
         <div v-if="showPartnerInProgressCaptionMessage" class="message left">
-          <component class="avatar" :is="avatar({ user: sessionPartner.id })" />
+          <div class="avatar-container">
+            <component class="avatar" :is="avatar({ user: sessionPartner.id })" />
+          </div>
           <transcribed-message
             class="contents"
             :message="{
@@ -905,8 +907,10 @@ export default {
 }
 
 .message {
-  display: flex;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: end;
   position: relative;
   margin-top: 4px;
 
@@ -918,12 +922,11 @@ export default {
   }
 
   &.right {
-    flex-direction: row-reverse;
+    grid-template-columns: 1fr auto;
+    justify-items: end;
     padding-right: 20px;
 
     .contents {
-      align-items: flex-end;
-
       .bubble {
         background-color: $c-background-blue;
       }
@@ -935,6 +938,7 @@ export default {
   }
 
   &.center {
+    display: flex;
     justify-content: center;
     align-items: center;
   }
@@ -949,19 +953,19 @@ export default {
     width: 32px;
     position: relative;
     margin-right: 4px;
+    grid-row: 1;
 
     .avatar {
       border-radius: 16px;
-      bottom: 29px;
       height: 32px;
-      position: absolute;
       width: 100%;
     }
   }
 
   .contents {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 2;
     max-width: 80%;
 
     .bubble {
