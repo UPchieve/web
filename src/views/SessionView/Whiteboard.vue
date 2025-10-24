@@ -490,6 +490,7 @@ import {
   FIVE_SECONDS_TO_MS,
 } from '@/utils/time-utils'
 import {
+  PARTNER_IMAGE_UPLOAD_STATUS,
   IMAGE_UPLOAD_EVENTS,
   getPartnerUploadingMsg,
   IMAGE_UPLOADING_STATE_MESSAGES,
@@ -593,10 +594,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    isImageUploadingUxEnabled: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -642,6 +639,8 @@ export default {
       isVolunteer: 'user/isVolunteer',
       sessionPartner: 'user/sessionPartner',
       isBanned: 'user/banType',
+      partnerImageUploadError: 'socket/partnerImageUploadError',
+      partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
     }),
     isLiveMediaBanned() {
       return this.isBanned
@@ -682,42 +681,11 @@ export default {
       return BYTES_PER_MEGABYTE * 10
     },
   },
+  beforeUnmount() {
+    this.$store.dispatch('socket/resetPartnerImageUploadStatus')
+  },
   async mounted() {
     this.loadZwibbler()
-
-    if (this.isImageUploadingUxEnabled) {
-      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_UPLOADING_IMAGE, () => {
-        this.loadingText = getPartnerUploadingMsg(this.isStudent)
-        this.clearUploadImageTimeout()
-
-        this.uploadingImageTimeout = setTimeout(() => {
-          if (this.loadingText && this.uploadingImageTimeout) {
-            this.loadingText = null
-            this.uploadingImageTimeout = null
-            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
-          }
-        }, TEN_SECONDS_TO_MS)
-      })
-
-      socket.on(
-        IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_FAILED,
-        ({ moderationFailures, uploadError }) => {
-          this.clearUploadImageTimeout()
-
-          this.loadingText = null
-          if (moderationFailures) {
-            this.handleImageFailedModeration(moderationFailures, true)
-          } else if (uploadError) {
-            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
-          }
-        }
-      )
-
-      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_SUCCESS, () => {
-        this.clearUploadImageTimeout()
-        this.loadingText = null
-      })
-    }
   },
   methods: {
     clearUploadImageTimeout() {
@@ -1489,6 +1457,37 @@ export default {
     this.zwibblerCtx = null
   },
   watch: {
+    partnerImageUploadStatus(newValue, oldValue) {
+      if (newValue != oldValue) {
+        this.clearUploadImageTimeout()
+
+        switch (newValue) {
+          case PARTNER_IMAGE_UPLOAD_STATUS.PARTNER_UPLOADING:
+            this.loadingText = getPartnerUploadingMsg(this.isStudent)
+
+            this.uploadingImageTimeout = setTimeout(() => {
+              if (this.loadingText && this.uploadingImageTimeout) {
+                this.uploadingImageTimeout = null
+                this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+                this.loadingText = null
+                this.$store.dispatch('socket/resetPartnerImageUploadStatus')
+              }
+            }, TEN_SECONDS_TO_MS)
+            break
+          case PARTNER_IMAGE_UPLOAD_STATUS.GENERAL_ERROR:
+            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+            this.loadingText = null
+            break
+          case PARTNER_IMAGE_UPLOAD_STATUS.MODERATION_FAILURE:
+            this.handleImageFailedModeration(this.partnerImageUploadError, true)
+            this.loadingText = null
+            break
+          case PARTNER_IMAGE_UPLOAD_STATUS.SUCCESS:
+            this.loadingText = null
+            break
+        }
+      }
+    },
     aiWidgetMoving(current) {
       /*
       This method prevents the selected tool (e.g. brush) from

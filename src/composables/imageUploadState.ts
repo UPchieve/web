@@ -9,6 +9,13 @@ export const IMAGE_UPLOAD_EVENTS = {
   PARTNER_IMAGE_UPLOAD_SUCCESS: 'partnerImageUploadSuccess',
 }
 
+export const PARTNER_IMAGE_UPLOAD_STATUS = {
+  MODERATION_FAILURE: 'moderation_failure',
+  GENERAL_ERROR: 'general_failure',
+  PARTNER_UPLOADING: 'partner_uploading',
+  SUCCESS: 'success',
+}
+
 export const IMAGE_UPLOADING_STATE_MESSAGES = {
   SENDER: {
     [IMAGE_UPLOAD_EVENTS.MODERATING_IMAGE]: 'Processing Image',

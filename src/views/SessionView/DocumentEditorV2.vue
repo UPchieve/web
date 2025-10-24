@@ -127,6 +127,7 @@ import {
   getPartnerUploadingMsg,
   IMAGE_UPLOADING_STATE_MESSAGES,
   getPartnerUploadFailedMsg,
+  PARTNER_IMAGE_UPLOAD_STATUS,
 } from '@/composables/imageUploadState'
 
 Quill.register('modules/cursors', QuillCursors)
@@ -196,10 +197,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    isImageUploadingUxEnabled: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -230,6 +227,8 @@ export default {
       mobileMode: 'app/mobileMode',
       isUpdatedDocEditorImageStorageEnabled:
         'featureFlags/isUpdatedDocEditorImageStorageEnabled',
+      partnerImageUploadError: 'socket/partnerImageUploadError',
+      partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
     }),
     showScreenShareTool() {
       // Show to students once a volunteer is sharing their screen
@@ -242,6 +241,9 @@ export default {
     MAX_IMAGE_FILE_SIZE_BYTES() {
       return BYTES_PER_MEGABYTE * 10
     },
+  },
+  beforeUnmount() {
+    this.$store.dispatch('socket/resetPartnerImageUploadStatus')
   },
   mounted() {
     this.quillEditor = markRaw(
@@ -324,41 +326,6 @@ export default {
     socket.on('quillPartnerSelection', ({ range }) => {
       this.quillEditor.getModule('cursors').moveCursor('partnerCursor', range)
     })
-
-    if (this.isImageUploadingUxEnabled) {
-      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_UPLOADING_IMAGE, () => {
-        this.loadingText = getPartnerUploadingMsg(this.isStudent)
-        if (this.uploadingImageTimeout) {
-          this.clearUploadImageTimeout()
-        }
-        this.uploadingImageTimeout = setTimeout(() => {
-          if (this.loadingText && this.uploadingImageTimeout) {
-            this.loadingText = null
-            this.uploadingImageTimeout = null
-            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
-          }
-        }, TEN_SECONDS_TO_MS)
-      })
-
-      socket.on(
-        IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_FAILED,
-        ({ moderationFailures, uploadError }) => {
-          this.clearUploadImageTimeout()
-
-          this.loadingText = null
-          if (moderationFailures) {
-            this.onImageFailedModeration(moderationFailures, true)
-          } else if (uploadError) {
-            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
-          }
-        }
-      )
-
-      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_SUCCESS, () => {
-        this.clearUploadImageTimeout()
-        this.loadingText = null
-      })
-    }
 
     if (this.isConnected && this.currentSession?.id) this.requestQuillDoc()
   },
@@ -540,6 +507,36 @@ export default {
     },
   },
   watch: {
+    partnerImageUploadStatus(newValue, oldValue) {
+      if (newValue != oldValue) {
+        this.clearUploadImageTimeout()
+
+        switch (newValue) {
+          case PARTNER_IMAGE_UPLOAD_STATUS.PARTNER_UPLOADING:
+            this.loadingText = getPartnerUploadingMsg(this.isStudent)
+            this.uploadingImageTimeout = setTimeout(() => {
+              if (this.loadingText && this.uploadingImageTimeout) {
+                this.uploadingImageTimeout = null
+                this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+                this.loadingText = null
+                this.$store.dispatch('socket/resetPartnerImageUploadStatus')
+              }
+            }, TEN_SECONDS_TO_MS)
+            break
+          case PARTNER_IMAGE_UPLOAD_STATUS.GENERAL_ERROR:
+            this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))
+            this.loadingText = null
+            break
+          case PARTNER_IMAGE_UPLOAD_STATUS.MODERATION_FAILURE:
+            this.onImageFailedModeration(this.partnerImageUploadError, true)
+            this.loadingText = null
+            break
+          case PARTNER_IMAGE_UPLOAD_STATUS.SUCCESS:
+            this.loadingText = null
+            break
+        }
+      }
+    },
     isSessionConnectionAlive(newValue, oldValue) {
       if (
         (newValue && !oldValue) ||

@@ -913,7 +913,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   REFERRAL_MODAL_REDESIGN = 'referral-modal-redesign',
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
   SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT = 'skip-availability-onboarding-requirement',
-  IMAGE_UPLOAD_UX = 'image-upload-ux',
   PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',
   VERIFY_HOURS_BUTTON = 'verify-hours-button',
   SHOW_LOCKED_SESSIONS = 'show-locked-sessions',

@@ -63,7 +63,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
       [POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT]: false,
-      [POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
       [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_LOCKED_SESSIONS]: false,
@@ -277,8 +276,6 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT
       ],
-    isImageUploadUxEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX],
     isVerifyHoursButtonEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON],
     isShowLockedSessionsEnabled: (state: FeatureFlagState) =>
@@ -301,6 +298,10 @@ export default {
       { getters, dispatch }: ActionContext<FeatureFlagState, RootState>,
       partnerUserId: string
     ) => {
+      if (getters.isSessionAudioCallEnabled) {
+        return true
+      }
+
       const isEnabledForPartner =
         await FeatureFlagService.isFeatureEnabledForUser(
           POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL,
@@ -311,33 +312,22 @@ export default {
         partnerUserId
       )
 
-      return (
-        isEnabledForPartner.isEnabled ||
-        getters.isSessionAudioCallEnabled ||
-        isScreenshareEnabled
-      )
+      return isEnabledForPartner.isEnabled || isScreenshareEnabled
     },
     isScreenshareEnabled: async (
       { getters }: ActionContext<FeatureFlagState, RootState>,
       partnerUserId: string
     ) => {
+      if (getters.isScreenshareEnabled) {
+        return true
+      }
+
       const isEnabledForPartner =
         await FeatureFlagService.isFeatureEnabledForUser(
           POSTHOG_FEATURE_FLAGS.SCREENSHARE,
           partnerUserId
         )
-      return isEnabledForPartner.isEnabled || getters.isScreenshareEnabled
-    },
-    isImageUploadUxEnabled: async (
-      { getters }: ActionContext<FeatureFlagState, RootState>,
-      partnerUserId: string
-    ) => {
-      const isEnabledForPartner =
-        await FeatureFlagService.isFeatureEnabledForUser(
-          POSTHOG_FEATURE_FLAGS.IMAGE_UPLOAD_UX,
-          partnerUserId
-        )
-      return isEnabledForPartner.isEnabled || getters.isImageUploadUxEnabled
+      return isEnabledForPartner.isEnabled
     },
   },
 }

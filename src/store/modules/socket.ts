@@ -3,6 +3,10 @@ import router from '@/router'
 import { socket } from '@/socket'
 import type { RootState } from '@/store/index'
 import LoggerService from '@/services/LoggerService'
+import {
+  IMAGE_UPLOAD_EVENTS,
+  PARTNER_IMAGE_UPLOAD_STATUS,
+} from '@/composables/imageUploadState'
 
 /**
  * These errors handled internally and shouldn't be forwarded to our logger.
@@ -20,6 +24,8 @@ export type SocketState = {
   isTyping: boolean
   messageData: MessageData
   socketJoinedRoom: boolean
+  partnerImageUploadStatus: string | null
+  partnerImageUploadError: object | string
 }
 
 // TODO: Replace any's with proper types.
@@ -34,6 +40,8 @@ export default {
     isTyping: false,
     messageData: {},
     socketJoinedRoom: false,
+    partnerImageUploadStatus: null,
+    partnerImageUploadError: null,
   },
   mutations: {
     setIsConnected: (state: SocketState, isConnected: boolean) => {
@@ -51,6 +59,21 @@ export default {
     setSocketJoinedRoom: (state: SocketState, bool: boolean) => {
       state.socketJoinedRoom = bool
     },
+    setPartnerImageUploadStatus: (state: SocketState, status: string) => {
+      state.partnerImageUploadStatus = status
+    },
+    setPartnerImageUploadError: (
+      state: SocketState,
+      error: object | string
+    ) => {
+      state.partnerImageUploadError = error
+    },
+  },
+  getters: {
+    partnerImageUploadError: (state: SocketState) =>
+      state.partnerImageUploadError,
+    partnerImageUploadStatus: (state: SocketState) =>
+      state.partnerImageUploadStatus,
   },
 
   actions: {
@@ -242,9 +265,55 @@ export default {
       socket.on('moderation-infraction', (data: any) => {
         dispatch('liveMedia/handleModerationInfraction', data, { root: true })
       })
+
+      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_UPLOADING_IMAGE, () => {
+        commit(
+          'setPartnerImageUploadStatus',
+          PARTNER_IMAGE_UPLOAD_STATUS.PARTNER_UPLOADING
+        )
+      })
+
+      socket.on(
+        IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_FAILED,
+        ({
+          moderationFailures,
+          uploadError,
+        }: {
+          moderationFailures: object | undefined
+          uploadError: string | undefined
+        }) => {
+          if (moderationFailures) {
+            commit('setPartnerImageUploadError', moderationFailures)
+            commit(
+              'setPartnerImageUploadStatus',
+              PARTNER_IMAGE_UPLOAD_STATUS.MODERATION_FAILURE
+            )
+            commit('setPartnerImageUploadError', moderationFailures)
+          } else if (uploadError) {
+            commit('setPartnerImageUploadError', uploadError)
+            commit(
+              'setPartnerImageUploadStatus',
+              PARTNER_IMAGE_UPLOAD_STATUS.GENERAL_ERROR
+            )
+          }
+        }
+      )
+
+      socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_IMAGE_UPLOAD_SUCCESS, () => {
+        commit(
+          'setPartnerImageUploadStatus',
+          PARTNER_IMAGE_UPLOAD_STATUS.SUCCESS
+        )
+      })
     },
     connect() {
       socket.connect()
+    },
+    resetPartnerImageUploadStatus({
+      commit,
+    }: ActionContext<SocketState, RootState>) {
+      commit('setPartnerImageUploadStatus', null)
+      commit('setPartnerImageUploadError', null)
     },
   },
 }
