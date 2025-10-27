@@ -5,10 +5,11 @@
     v-on:accept="onAccept"
     :back-text="modalData.backText"
     :accept-text="modalData.acceptText"
+    :accept-button-variant="modalData.acceptButtonVariant"
     :alert-modal="modalData.alertModal"
     :enable-accept="enableAccept"
     :important="modalData.important"
-    :showTemplateButtons="modalData.showTemplateButtons"
+    :showTemplateButtons="showTemplateButtons"
     :show-accept="modalData.showAccept"
     :modalComponentName="modalComponent && modalComponent.name"
   >
@@ -16,6 +17,7 @@
       v-if="modalComponent"
       v-bind:is="modalComponent"
       v-on:enable-accept="onEnableAccept"
+      v-on:show-template-buttons="onShowTemplateButtons"
       :modal-data="modalData"
       ref="AppModalChild"
     />
@@ -40,6 +42,7 @@ import EditTeacherClassModal from '@/components/EditTeacherClassModal.vue'
 import RemoveAssignmentConfirmationModal from '@/components/RemoveAssignmentConfirmationModal.vue'
 import BecomeAVolunteerModal from '@/views/BecomeAVolunteerModal.vue'
 import VerificationAppModal from './VerificationAppModal.vue'
+import DeleteAccountConfirmationModal from '@/components/DeleteAccountConfirmationModal.vue'
 
 export default {
   components: {
@@ -59,10 +62,12 @@ export default {
     RemoveAssignmentConfirmationModal,
     BecomeAVolunteerModal,
     VerificationAppModal,
+    DeleteAccountConfirmationModal,
   },
   data() {
     return {
       enableAccept: false,
+      showTemplateButtons: true,
     }
   },
   computed: {
@@ -72,8 +77,10 @@ export default {
     }),
   },
   mounted() {
-    // enable the accept button by default if an alert modal
+    // Enable the accept button by default if this is
+    // an alert modal.
     this.enableAccept = !!this.modalData.alertModal
+    this.showTemplateButtons = this.modalData.showTemplateButtons ?? true
   },
   methods: {
     onCancel() {
@@ -86,6 +93,9 @@ export default {
     },
     onEnableAccept(value) {
       this.enableAccept = value
+    },
+    onShowTemplateButtons(value) {
+      this.showTemplateButtons = value
     },
   },
 }

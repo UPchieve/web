@@ -13,14 +13,14 @@ export async function logout(context, logoutRoute) {
     await NetworkService.logout()
   } finally {
     await handleLogout(context, logoutRoute)
-    resetServices()
-    socket.disconnect()
   }
 }
 
-async function handleLogout(context, logoutRoute) {
+export async function handleLogout(context, logoutRoute) {
   await context.$router.push(logoutRoute ?? '/logout')
   await context.$store.dispatch('user/clear')
+  resetServices()
+  socket.disconnect()
 }
 
 function resetServices() {

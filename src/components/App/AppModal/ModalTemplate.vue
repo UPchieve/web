@@ -23,12 +23,15 @@
       <template v-if="!mobileMode && showTemplateButtons">
         <div class="ModalTemplate-separator" />
         <div class="ModalTemplate-buttons">
-          <large-button v-if="!alertModal" @click="handleCancel"
+          <large-button
+            v-if="!alertModal"
+            @click="handleCancel"
+            :showArrow="false"
             >Cancel</large-button
           >
           <!-- TODO: Also add an accept button on mobile. -->
           <large-button
-            variant="primary-blue"
+            :variant="acceptButtonVariant ?? 'primary-blue'"
             :showArrow="false"
             @click="$emit('accept')"
             :disabled="!enableAccept ? true : null"
@@ -55,6 +58,7 @@ export default {
   components: { LargeButton, ArrowIcon },
   props: {
     acceptText: { type: String, default: 'Accept' },
+    acceptButtonVariant: { type: String },
     backText: { type: String, default: 'Back' },
     enableAccept: Boolean,
     alertModal: Boolean,

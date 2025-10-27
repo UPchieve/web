@@ -1,4 +1,7 @@
 <template>
+  <!-- TODO: Just bring button-template into this component and
+             make HyperlinkButton a variant.
+  -->
   <button-template
     :variant="variant"
     :routeTo="routeTo"
@@ -172,6 +175,40 @@ export default {
 
   &--reverse {
     background: $c-background-grey;
+  }
+}
+
+.LargeButton-danger {
+  @extend %LargeButton;
+
+  background: $c-error-red;
+  color: white;
+
+  &:hover {
+    background: darken($c-error-red, 20%);
+  }
+
+  &:disabled {
+    background: $c-background-grey;
+    border-color: $c-background-grey;
+    color: $c-disabled-grey;
+  }
+
+  &--reverse {
+    background: white;
+    border-color: $c-error-red;
+    color: $c-error-red;
+
+    &:hover {
+      background: lighten($c-error-red, 55%);
+      color: $c-error-red;
+    }
+
+    &:disabled {
+      background: $c-background-grey;
+      border-color: $c-background-grey;
+      color: $c-disabled-grey;
+    }
   }
 }
 

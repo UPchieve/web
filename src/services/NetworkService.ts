@@ -305,6 +305,9 @@ export default {
   deletePhone() {
     return httpDelete(`${API_ROOT}/user/phone`)
   },
+  deleteAccount() {
+    return httpDelete(`${API_ROOT}/user`)
+  },
   getVolunteersAvailability(data) {
     return httpGet(`${API_ROOT}/volunteers/availability/${data}`).then(
       this._successHandler,

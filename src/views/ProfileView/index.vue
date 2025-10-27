@@ -243,11 +243,25 @@
 
           <hr />
 
-          <div class="uc-column">
-            <router-link to="/resetpassword" class="resetBtn"
-              >Reset password</router-link
-            >
-          </div>
+          <large-button
+            class="button-width"
+            variant="outlined"
+            route-to="/resetpassword"
+            :show-arrow="false"
+          >
+            Reset Password
+          </large-button>
+
+          <hr />
+
+          <large-button
+            class="button-width"
+            variant="danger"
+            :show-arrow="false"
+            @click="ModalService.showDeleteAccountConfirmation"
+          >
+            Delete Account
+          </large-button>
         </div>
       </div>
 
@@ -316,6 +330,7 @@ import { mapGetters, mapState } from 'vuex'
 import { toastController } from '@ionic/vue'
 import UserService from '@/services/UserService'
 import AnalyticsService from '@/services/AnalyticsService'
+import ModalService from '@/services/ModalService'
 import { SsoProvider, signInWithSso } from '@/services/SsoService'
 import DeactivateAccountModal from '../DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
@@ -331,6 +346,7 @@ import ToggleButton from '@/components/ToggleButton.vue'
 import PreferredLanguageSelect from '@/components/PreferredLanguageSelect.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'profile-view',
@@ -346,9 +362,11 @@ export default {
     CleverLogo,
     ToggleButton,
     PreferredLanguageSelect,
+    LargeButton,
   },
   data() {
     return {
+      ModalService,
       activeEdit: false,
       editBtnMsg: 'Edit',
       errors: [],
@@ -862,7 +880,6 @@ ul {
 }
 
 button {
-  height: 30px;
   border-radius: 20px;
   padding: 0px 10px;
   color: #16d2aa;
@@ -910,19 +927,6 @@ button:hover {
 .form-control:focus {
   border-bottom: 3px solid #16d2aa;
   box-shadow: none;
-}
-
-.resetBtn {
-  border: 1px solid $c-error-red;
-  border-radius: 20px;
-  color: darken($c-error-red, 25%);
-  padding: 10px 20px;
-  width: fit-content;
-
-  &:hover {
-    background-color: lighten($c-error-red, 30%);
-    text-decoration: none;
-  }
 }
 
 .remove-phone-btn {
@@ -1058,5 +1062,9 @@ button:hover {
 
 .preferred-language-select {
   margin-top: 1em;
+}
+
+.button-width {
+  max-width: 300px;
 }
 </style>

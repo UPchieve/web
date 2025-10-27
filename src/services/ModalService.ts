@@ -4,8 +4,9 @@ import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
 
 type ModalTemplateProps = {
   acceptText?: string
-  backText?: string
   enableAccept?: boolean
+  acceptButtonVariant?: string
+  backText?: string
   alertModal?: boolean
   important?: boolean
   showTemplateButtons?: boolean
@@ -18,14 +19,17 @@ export type SessionErrorModalData = ModalTemplateProps & {
   error: string
 }
 
-type ModalData = SessionErrorModalData
+type ModalData = ModalTemplateProps | SessionErrorModalData
 
-function show(component: Component, data: ModalData): void {
+// TODO: Make `component` just a string.
+function show(component: Component | string, data: ModalData): void {
+  const modalComponentName =
+    typeof component === 'string' ? component : (component as Component).name
   store.dispatch('app/modal/show', {
     component,
     data: {
       ...data,
-      modalComponentName: component.name,
+      modalComponentName,
     },
   })
 }
@@ -37,6 +41,13 @@ export default {
       alertModal: true,
       acceptText: 'OK',
       onAccept: action,
+    })
+  },
+
+  showDeleteAccountConfirmation() {
+    show('DeleteAccountConfirmationModal', {
+      acceptText: 'Delete Account',
+      acceptButtonVariant: 'danger',
     })
   },
 }
