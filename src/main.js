@@ -58,7 +58,7 @@ async function main() {
     )
     await AnalyticsService.init()
 
-    initActivityTracking(store)
+    // initActivityTracking(store)
 
     // Create Vue instance
     const app = createApp(App)
