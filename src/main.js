@@ -13,7 +13,7 @@ import LoggerService from './services/LoggerService'
 import { socket } from './socket'
 import { IonicVue } from '@ionic/vue'
 import VueDraggableResizable from 'vue-draggable-resizable'
-import { initActivityTracking } from './services/PresenceService'
+// import { initActivityTracking } from './services/PresenceService'
 
 LoggerService.init()
 
