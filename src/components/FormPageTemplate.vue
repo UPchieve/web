@@ -57,6 +57,7 @@ import TrustedByStudents from '@/assets/marketing_images/trusted_by_students.svg
 import UpdogSubjects from '@/assets/updog-subjects.svg?url'
 import WeCanHelpSubjects from '@/assets/marketing_images/we_can_help_in_any_core_subject.svg?url'
 import UpdogCrying from '@/assets/updog-crying.svg?url'
+import VolunteerSignUpIllustration from '@/assets/volunteer-signup-illustration.svg?url'
 
 export default {
   props: {
@@ -118,6 +119,7 @@ export default {
         'updog-subjects': UpdogSubjects,
         'we-can-help-subjects': WeCanHelpSubjects,
         'updog-crying': UpdogCrying,
+        'volunteer-signup-illustration': VolunteerSignUpIllustration,
       }
       return imageMap[this.panelImg] || null
     },

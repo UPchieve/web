@@ -69,6 +69,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS]: false,
+      [POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW]: true,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -292,6 +293,8 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS
       ],
+    isNewVolunteerSignUpFlowEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW],
   },
   actions: {
     isSessionAudioCallEnabled: async (

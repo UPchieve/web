@@ -122,7 +122,10 @@
         </div>
         <div v-if="showPartnerInProgressCaptionMessage" class="message left">
           <div class="avatar-container">
-            <component class="avatar" :is="avatar({ user: sessionPartner.id })" />
+            <component
+              class="avatar"
+              :is="avatar({ user: sessionPartner.id })"
+            />
           </div>
           <transcribed-message
             class="contents"

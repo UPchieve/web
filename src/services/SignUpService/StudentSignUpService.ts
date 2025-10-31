@@ -331,6 +331,7 @@ function getEligibilityPageDetails(
             'mt-2',
             getSignUpSourceElement(
               InputName.SIGNUP_SOURCE_ID,
+              true,
               EVENTS.STUDENT_SELECTED_HOW_DID_YOUR_HEAR_ABOUT_US
             )
           )

@@ -28,6 +28,15 @@
       :required="isRequired"
       :autofocus="isAutofocused"
     />
+    <div
+      v-if="metadata"
+      class="metadata"
+      :class="{
+        'metadata error': hasValidationError(),
+      }"
+    >
+      {{ metadata }}
+    </div>
   </div>
 </template>
 
@@ -66,6 +75,10 @@ export default {
       default: '',
     },
     modelValue: {
+      type: String,
+      default: '',
+    },
+    metadata: {
       type: String,
       default: '',
     },

@@ -5,6 +5,7 @@
       :name="name"
       class="checkbox-input"
       type="checkbox"
+      :checked="modelValue"
       @change="onChange"
       :required="isRequired"
     />
@@ -32,29 +33,27 @@ export default {
       type: String,
       default: 'checkbox',
     },
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
 
   setup() {
     const { v$, hasValidationError, getValidationErrors } = useInputValidation()
     return { v$, hasValidationError, getValidationErrors }
   },
 
-  data() {
-    return {
-      isChecked: false,
-    }
-  },
   methods: {
     onChange(e) {
-      this.isChecked = e.target.checked
-      this.$emit('input', this.isChecked)
+      this.$emit('update:modelValue', e.target.checked)
     },
   },
 
   validations() {
     return {
-      isChecked: {
+      modelValue: {
         required: requiredIf(this.isRequired),
         sameAs: sameAs(true),
       },

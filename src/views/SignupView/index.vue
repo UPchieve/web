@@ -13,9 +13,22 @@
   <div v-else-if="this.userSelection === UserType.teacher" class="h-full">
     <sign-up-forms :getPageDetails="getTeacherPageDetails" />
   </div>
+  <div
+    v-else-if="
+      this.userSelection === UserType.volunteer &&
+      isNewVolunteerSignUpFlowEnabled
+    "
+    class="h-full"
+  >
+    <sign-up-forms :getPageDetails="getVolunteerPageDetails" />
+  </div>
   <form-page-template v-else :formCardMaxWidth="'660px'">
     <div class="uc-form">
-      <volunteer-form v-if="this.userSelection === 'volunteer'" />
+      <volunteer-form
+        v-if="
+          this.userSelection === 'volunteer' && !isNewVolunteerSignUpFlowEnabled
+        "
+      />
       <student-form v-else-if="this.userSelection === 'student'" />
 
       <loader
@@ -135,6 +148,7 @@ import NetworkService from '@/services/NetworkService'
 import { UserType } from '@/services/SignUpService'
 import { getPageDetails as getStudentPageDetails } from '@/services/SignUpService/StudentSignUpService'
 import { getPageDetails as getTeacherPageDetails } from '@/services/SignUpService/TeacherSignUpService'
+import { getPageDetails as getVolunteerPageDetails } from '@/services/SignUpService/VolunteerSignUpService'
 import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
 import VolunteerAvatar from '@/assets/user_avatars/volunteer-avatar.svg'
 import TeacherAvatar from '@/assets/user_avatars/teacher-avatar.svg'
@@ -160,6 +174,7 @@ export default {
       UserType,
       getStudentPageDetails,
       getTeacherPageDetails,
+      getVolunteerPageDetails,
     }
   },
 
@@ -205,6 +220,8 @@ export default {
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       isDisableStudentSignupsEnabled:
         'featureFlags/isDisableStudentSignupsEnabled',
+      isNewVolunteerSignUpFlowEnabled:
+        'featureFlags/isNewVolunteerSignUpFlowEnabled',
     }),
     welcomeMessage() {
       if (this.referredBy?.firstName)
@@ -231,7 +248,7 @@ export default {
       else this.userSelection = null
     },
     selectVolunteer() {
-      this.$router.push('/sign-up/volunteer')
+      this.$router.push('/sign-up/volunteer/account')
       this.userSelection = 'volunteer'
     },
     selectStudent() {

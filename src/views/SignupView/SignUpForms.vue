@@ -59,6 +59,7 @@ import UpdogSmiling from '@/assets/updog-smiling.svg'
 import FormCheckBox from '@/components/FormCheckBox.vue'
 import FormEmail from '@/components/FormEmail.vue'
 import FormInput from '@/components/FormInput.vue'
+import FormPhoneInput from '@/components/FormPhoneInput.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import FormPassword from '@/components/FormPassword.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
@@ -80,6 +81,7 @@ export default {
     FormCheckBox,
     FormEmail,
     FormInput,
+    FormPhoneInput,
     FormErrors,
     FormPassword,
     FormSchoolSearch,

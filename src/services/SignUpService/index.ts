@@ -14,6 +14,7 @@ import type {
   TeacherEligibilityFormData,
   TeacherSignUpFormData,
 } from './TeacherSignUpService'
+import type { VolunteerAccountFormData } from './VolunteerSignUpService'
 
 export enum SignUpPage {
   account = 'account',
@@ -23,6 +24,7 @@ export enum SignUpPage {
   parentGuardianConfirmation = 'confirmation',
   partnerInfo = 'info',
   verify = 'verify',
+  about = 'about',
 }
 
 export enum UserType {
@@ -35,7 +37,10 @@ export type SignUpFormData = StudentSignUpFormData | TeacherSignUpFormData
 export type EligibilityFormData =
   | StudentEligibilityFormData
   | TeacherEligibilityFormData
-type AccountFormData = StudentAccountFormData | TeacherAccountFormData
+type AccountFormData =
+  | StudentAccountFormData
+  | TeacherAccountFormData
+  | VolunteerAccountFormData
 
 /**
 Create a union of all the PageDetail. So, for example,
@@ -104,6 +109,7 @@ type FormElementType =
   | 'FormEmail'
   | 'FormSchoolSearch'
   | 'FormPassword'
+  | 'FormPhoneInput'
   | 'SsoButton'
   | 'LineDivider'
   | 'router-link'
@@ -152,6 +158,7 @@ export function getSubmitResponse(
     case SignUpPage.parentGuardianConfirmation:
     case SignUpPage.account:
     case SignUpPage.ineligible:
+    case SignUpPage.about:
       return [
         {
           params: {
@@ -276,6 +283,21 @@ export function getInputElement(
   }
 }
 
+export function getPhoneInputElement(
+  name: string,
+  prettyName: string,
+  classes: string = ''
+): FormElement {
+  return {
+    element: 'FormPhoneInput',
+    classes,
+    props: {
+      name,
+      label: prettyName,
+    },
+  }
+}
+
 export function getSsoButton<T extends SignUpFormData>(
   submitAction: SubmitAction<T>,
   content: string,
@@ -334,7 +356,8 @@ export function getLinkElement(content: string, link: string): FormElement {
 
 export function getSignUpSourceElement(
   name: string,
-  blurEvent: string
+  isStudent: boolean,
+  blurEvent?: string
 ): FormElement {
   return {
     element: 'FormSelect',
@@ -345,7 +368,21 @@ export function getSignUpSourceElement(
           const {
             data: { signupSources },
           } = await NetworkService.getStudentSignupSources()
-          return signupSources
+
+          if (!isStudent) {
+            let allSources = signupSources
+
+            // volunteer sources drop School/Teacher and replace Friend/Classmate with Friend
+            allSources = allSources.filter(
+              (source: { name: string }) => source.name !== 'School / Teacher'
+            )
+            allSources.find(
+              (source: { name: string }) => source.name === 'Friend / Classmate'
+            ).name = 'Friend'
+            return allSources
+          } else {
+            return signupSources
+          }
         } catch (err) {
           LoggerService.noticeError(err)
           return []

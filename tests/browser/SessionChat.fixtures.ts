@@ -8,14 +8,16 @@ const now = () => new Date().toISOString()
 /**
  * Creates a mock Vuex store for SessionChat voice chat tests.
  * Includes in-progress caption messages for testing voice chat UI.
- * 
+ *
  * @param overrides - Partial state/getters to override defaults
  * @returns Configured Vuex store instance
  */
-export function createVoiceChatMockStore(overrides: {
-  state?: Record<string, any>
-  getters?: Record<string, any>
-} = {}) {
+export function createVoiceChatMockStore(
+  overrides: {
+    state?: Record<string, any>
+    getters?: Record<string, any>
+  } = {}
+) {
   const defaultState = {
     user: {
       user: { id: 'user-1', firstName: 'Test' },
@@ -59,16 +61,19 @@ export function createVoiceChatMockStore(overrides: {
 /**
  * Creates a mock session object for SessionChat voice chat tests.
  * Includes completed messages and audio transcriptions.
- * 
+ *
  * @param overrides - Partial session properties to override defaults
  * @returns Mock session object
  */
-export function createVoiceChatMockSession(overrides: Record<string, any> = {}) {
+export function createVoiceChatMockSession(
+  overrides: Record<string, any> = {}
+) {
   const defaultSession = {
     id: 'session-1',
     messages: [
       {
-        contents: 'This is a really long message from me to test how the chat interface handles multi-line messages with proper text wrapping and avatar alignment. It should wrap nicely and the avatar from the partner should align correctly with their subsequent message bubble.',
+        contents:
+          'This is a really long message from me to test how the chat interface handles multi-line messages with proper text wrapping and avatar alignment. It should wrap nicely and the avatar from the partner should align correctly with their subsequent message bubble.',
         user: 'user-1',
         createdAt: now(),
         type: 'text',

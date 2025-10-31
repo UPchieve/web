@@ -919,6 +919,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   GOOGLE_SIGNUP_FOR_VOLUNTEERS = 'google-signup-for-volunteers',
   DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY = 'disable-students-join-slack-community',
   DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS = 'disable-slack-button-for-unapproved-volunteers',
+  NEW_VOLUNTEER_SIGN_UP_FLOW = 'new-volunteer-sign-up-flow',
 }
 
 export const ANALYTICS_REPORT_ROW = {
