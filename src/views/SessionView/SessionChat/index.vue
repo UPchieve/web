@@ -914,6 +914,7 @@ export default {
   grid-template-columns: auto 1fr;
   grid-template-rows: auto auto;
   align-items: end;
+  justify-items: start;
   position: relative;
   margin-top: 4px;
 
