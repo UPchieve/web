@@ -48,14 +48,17 @@ function closeMenu() {
   isMenuOpen.value = false
 }
 // Toggle logic
-const showLockedSessions = ref<boolean>(false)
+const showLockedSessions = ref<boolean>(true)
 const showLockedSessionsKey = computed(() => {
   return getShowLockedSessionKey(store.state.user.user?.id)
 })
 const shouldShowLockedSessions = computed(() => {
   if (!isShowLockedSessionsEnabled.value) return false
-  const localStorageValue = localStorage.getItem(showLockedSessionsKey.value)
-  return localStorageValue ? JSON.parse(localStorageValue) : false
+  const localStorageValue: string | null = localStorage.getItem(
+    showLockedSessionsKey.value
+  )
+  if (!localStorageValue) return showLockedSessions.value
+  return JSON.parse(localStorageValue)
 })
 
 function toggleShowLockedSessions() {

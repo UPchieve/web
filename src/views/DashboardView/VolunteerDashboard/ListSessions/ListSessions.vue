@@ -21,7 +21,7 @@
           "
         >
           <td>
-<!--            Anonymize first name of student for locked sessions only-->
+            <!--            Anonymize first name of student for locked sessions only-->
             {{
               session.isUnlocked
                 ? (session.student?.firstname ?? 'Student')

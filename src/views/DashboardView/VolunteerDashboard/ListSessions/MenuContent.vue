@@ -16,12 +16,19 @@ const lockedSessionsLabel = '🔒Locked sessions'
 </script>
 
 <template>
-  <div v-if="!mobileMode">
-    <div class="menu-content">
+  <div>
+    <div
+      :class="{
+        'menu-content': !mobileMode,
+        'menu-content--mobile': mobileMode,
+      }"
+    >
       <label for="show-locked-sessions-toggle" class="setting-label">
         {{ lockedSessionsLabel }}</label
       >
+      <!--      Desktop view uses a tooltip-->
       <span
+        v-if="!mobileMode"
         class="helper"
         v-tooltip="{
           text: `${tooltipText}`,
@@ -31,24 +38,10 @@ const lockedSessionsLabel = '🔒Locked sessions'
       >
         <InformationIcon />
       </span>
-      <div class="toggle">
-        <ToggleButton
-          data-testid="show-locked-sessions-toggle"
-          id="show-locked-sessions-toggle"
-          :value="props.showLockedSessions"
-          @change="() => emit('toggleShowLockedSessions')"
-          :labels="{ checked: 'Show', unchecked: 'Hide' }"
-          :width="75"
-        />
-      </div>
-    </div>
-  </div>
-  <div v-else>
-    <div class="menu-content--mobile">
-      <label for="show-locked-sessions-toggle" class="setting-label">
-        {{ lockedSessionsLabel }}</label
-      >
-      <span class="helper-text">{{ tooltipText }}</span>
+
+      <!--      Mobile does not-->
+      <span v-else class="helper-text">{{ tooltipText }}</span>
+
       <div class="toggle">
         <ToggleButton
           data-testid="show-locked-sessions-toggle"
