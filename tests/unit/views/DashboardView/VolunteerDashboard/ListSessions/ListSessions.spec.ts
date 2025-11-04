@@ -2,10 +2,9 @@ import { storeOptions } from '@/store'
 import router from '@/router'
 import { createStore } from 'vuex'
 import { mount } from '@vue/test-utils'
-import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions.vue'
+import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessions.vue'
 import moment from 'moment'
 import { it, describe, vi, expect, beforeEach } from 'vitest'
-import { getShowLockedSessionKey } from '@/views/DashboardView/VolunteerDashboard/ListSessions.vue'
 
 vi.mock('@/services/PresenceService')
 
@@ -59,6 +58,12 @@ const getWrapper = async (overrides = {}) => {
   const store = createStore({
     modules: {
       ...storeOptions.modules,
+      app: {
+        ...storeOptions.modules.app,
+        getters: {
+          mobileMode: () => false,
+        },
+      },
       user: {
         ...storeOptions.modules.user,
         state: {
@@ -89,7 +94,6 @@ const getWrapper = async (overrides = {}) => {
       featureFlags: {
         ...storeOptions.modules.featureFlags,
         getters: {
-          isShowLockedSessionsEnabled: () => true,
           ...(overrides.featureFlags?.getters ?? {}),
         },
       },
@@ -117,7 +121,13 @@ const getWrapper = async (overrides = {}) => {
     sessions: overrides.sessions ?? sessions,
   })
   return mount(ListSessions, {
-    global: { plugins: [store, router] },
+    global: {
+      plugins: [store, router],
+    },
+    propsData: {
+      showLockedSessions: false,
+      ...(overrides.props ?? {}),
+    },
   })
 }
 
@@ -185,7 +195,7 @@ describe('Empty state', () => {
     ).toBeFalsy()
   })
 
-  it('Should show the Become an Ambassador CTA', async () => {
+  it('Should show the Become an Ambassador CTA when there are no students waiting', async () => {
     const wrapper = await getWrapper({
       user: {
         getters: {
@@ -210,10 +220,6 @@ describe('Empty state', () => {
 })
 
 describe('Locked sessions', () => {
-  beforeEach(() => {
-    localStorage.setItem(getShowLockedSessionKey(USER_ID), 'true')
-  })
-
   const testSessions = [
     {
       id: 'session-1',
@@ -267,6 +273,9 @@ describe('Locked sessions', () => {
 
   it('Should show locked sessions at the bottom of the list', async () => {
     const wrapper = await getWrapper({
+      props: {
+        showLockedSessions: true,
+      },
       user: {
         state: {
           user: {
@@ -324,8 +333,11 @@ describe('Locked sessions', () => {
     expect(session4Subject.text()).toEqual('🔒Calculus BC')
   })
 
-  it('Hides locked sessions when the toggle is off', async () => {
+  it('Hides locked sessions when the props.showLockedSessions is false', async () => {
     const wrapper = await getWrapper({
+      props: {
+        showLockedSessions: false,
+      },
       user: {
         state: {
           user: {
@@ -336,19 +348,7 @@ describe('Locked sessions', () => {
       },
       sessions: testSessions,
     })
-    // Initial state
-    let tableRows = wrapper.findAll('tr')
-    expect(tableRows.length).toEqual(5) // 1 header row and 4 sessions
-
-    // Update toggle to hide the 2 locked sessions
-    const toggle = wrapper.find('[data-testid="show-locked-sessions-toggle"]')
-    const toggleInput = toggle.find('[data-testid="toggle-input"]')
-    expect(toggleInput.element.checked).toEqual(true)
-
-    await toggleInput.trigger('change')
-    expect(toggleInput.element.checked).toEqual(false)
-
-    tableRows = wrapper.findAll('tr')
+    const tableRows = wrapper.findAll('tr')
     expect(tableRows.length).toEqual(3)
   })
 
@@ -356,6 +356,9 @@ describe('Locked sessions', () => {
     const routerPushSpy = vi.spyOn(router, 'push')
     const getTestWrapper = () =>
       getWrapper({
+        props: {
+          showLockedSessions: true,
+        },
         user: {
           state: {
             user: {
@@ -394,6 +397,9 @@ describe('Locked sessions', () => {
   it('Clicking on an integrated math session should take you to the Training page', async () => {
     const routerPushSpy = vi.spyOn(router, 'push')
     const wrapper = await getWrapper({
+      props: {
+        showLockedSessions: true,
+      },
       user: {
         state: {
           user: {

@@ -11,41 +11,9 @@
 
     <div class="volunteer-dashboard__body">
       <template v-if="user.isApproved && user.isOnboarded">
-        <TaskCard
-          title="Waiting Students"
-          subtitle="Students waiting for help will show up below"
-        >
-          <template v-slot:heading-content>
-            <div class="notifications-button-container">
-              <WebNotificationsButton
-                v-if="
-                  !isSkipAvailabilityOnboardingRequirementEnabled ||
-                  notificationsCardWasDismissed
-                "
-                class="notifications-button"
-              />
-            </div>
-          </template>
-          <template v-slot:content>
-            <div class="waiting-students-content">
-              <div class="available-sessions-container sessions-list-container">
-                <ListSessions
-                  v-if="!isSessionAlive"
-                  :style="{ width: '100%' }"
-                />
-                <div v-else class="rejoin-session-container">
-                  <button
-                    class="btn rejoinSessionBtn"
-                    type="button"
-                    @click.prevent="rejoinHelpSession()"
-                  >
-                    Rejoin your coaching session
-                  </button>
-                </div>
-              </div>
-            </div>
-          </template>
-        </TaskCard>
+        <ListSessionsCard
+          :notificationsCardWasDismissed="notificationsCardWasDismissed"
+        />
         <TaskCard title="Your Impact Summary">
           <template v-slot:heading-content>
             <div v-if="isVerifyHoursButtonEnabled" class="verify-hours">
@@ -222,8 +190,6 @@
 <script>
 import { flow, reduce, get, isBoolean } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
-import WebNotificationsButton from '@/components/WebNotificationsButton.vue'
-import ListSessions from './ListSessions.vue'
 import DashboardBanner from '../DashboardBanner.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
@@ -254,6 +220,7 @@ import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import TaskCard from '@/components/TaskCard.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -261,9 +228,8 @@ const userHasSchedule = flow([get, isBoolean])
 export default {
   name: 'volunteer-dashboard',
   components: {
+    ListSessionsCard,
     TaskCard,
-    WebNotificationsButton,
-    ListSessions,
     DashboardBanner,
     PhotoUploadModal,
     // eslint-disable-next-line vue/no-unused-components
@@ -658,14 +624,6 @@ export default {
       )
       localStorage.setItem('DISMISSED_NOTIFICATIONS_CARD', this.user.id)
       this.notificationsCardWasDismissed = !this.notificationsCardWasDismissed
-    },
-    rejoinHelpSession() {
-      const path = this.sessionPath
-      if (path) {
-        this.$router.push(path)
-      } else {
-        this.$router.push('/')
-      }
     },
 
     showOnboardingModal() {
@@ -1123,39 +1081,5 @@ export default {
   display: flex;
   flex-direction: column-reverse;
   align-items: end;
-}
-
-.waiting-students-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-
-  .sessions-list-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .heading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-bottom: 16px;
-      gap: 8px;
-      width: 90%;
-    }
-
-    .title {
-      @include font-category('display-small');
-      text-align: center;
-      width: 80%;
-    }
-
-    .subtitle {
-      @include font-category('body');
-      color: $c-secondary-grey;
-      text-align: center;
-    }
-  }
 }
 </style>
