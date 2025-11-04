@@ -565,7 +565,7 @@ const routes = [
           },
           {
             path: 'assignments',
-            name: 'ClassDetailsView',
+            name: 'ClassAssignmentsView',
             component: TeacherDashboardView,
           },
         ],

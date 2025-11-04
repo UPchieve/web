@@ -89,7 +89,7 @@
             <div class="subject-icon-container">
               <img
                 v-if="teacherClass.topicId"
-                :src="topicIdToTopic[teacherClass.topicId].iconLink"
+                :src="topicIdToTopic[teacherClass.topicId]?.iconLink"
                 :alt="altImageText"
                 class="subject-icon relative"
                 aria-hidden
@@ -102,7 +102,7 @@
                 <span class="class-name">{{ teacherClass.name }}</span>
                 <span class="class-topic">{{
                   teacherClass.topicId
-                    ? topicIdToTopic[teacherClass.topicId].displayName
+                    ? topicIdToTopic[teacherClass.topicId]?.displayName
                     : 'Other'
                 }}</span>
 
