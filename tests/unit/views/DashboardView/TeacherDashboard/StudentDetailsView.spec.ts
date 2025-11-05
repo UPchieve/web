@@ -1,6 +1,6 @@
 import StudentDetailsView from '@/views/DashboardView/TeacherDashboard/StudentDetailsView.vue'
 import NetworkService from '@/services/NetworkService'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import router from '@/router'
 import { createStore } from 'vuex'
@@ -142,13 +142,6 @@ describe('Student Details View', () => {
         sessionDetails,
       },
     })
-  })
-  afterEach(async () => {
-    // Somewhere in stack is an un-awaited async function (or maybe a timer?)
-    // that resolves after the test finishes. This will manifest as an error:
-    // ReferenceError: window is not defined
-    // I couldn't track it down but `await flushPromises()` seems to help
-    await flushPromises()
   })
 
   test('Shows student sessions for default subject filters', async () => {

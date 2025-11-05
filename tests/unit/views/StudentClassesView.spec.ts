@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import moment from 'moment'
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
@@ -143,13 +143,6 @@ function buildStudentAssignment(
 describe('StudentClassesView', () => {
   beforeEach(async () => {
     vi.restoreAllMocks()
-  })
-  afterEach(async () => {
-    // Somewhere in stack is an un-awaited async function (or maybe a timer?)
-    // that resolves after the test finishes. This will manifest as an error:
-    // ReferenceError: window is not defined
-    // I couldn't track it down but `await flushPromises()` seems to help
-    await flushPromises()
   })
 
   test('shows a list of the student classes', async () => {

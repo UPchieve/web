@@ -136,7 +136,8 @@ const routes = [
     path: '/legal',
     name: 'LegalView',
     beforeEnter: () => {
-      window.location.href = 'https://upchieve.org/legal'
+      if (typeof window !== 'undefined')
+        window.location.href = 'https://upchieve.org/legal'
     },
   },
   {
@@ -715,7 +716,8 @@ router.afterEach((to, from) => {
   store.dispatch('app/modal/hide')
 
   // Google Analytics.
-  if (window.gtag) {
+  // Use typeof to avoid ReferenceError in Vitest
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
     const isAuthenticated = store.getters['user/isAuthenticated']
     const gtagDimensions = {
       page_title: router.currentRoute.name,
