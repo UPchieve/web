@@ -914,7 +914,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
   PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',
   VERIFY_HOURS_BUTTON = 'verify-hours-button',
-  SHOW_LOCKED_SESSIONS = 'show-locked-sessions',
   GOOGLE_SIGNUP_FOR_VOLUNTEERS = 'google-signup-for-volunteers',
   DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY = 'disable-students-join-slack-community',
   DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS = 'disable-slack-button-for-unapproved-volunteers',

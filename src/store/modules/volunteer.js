@@ -49,10 +49,7 @@ export default {
         const isUnlockedSession = this.state.user.user.subjects.includes(
           session.subTopic
         )
-        if (
-          getters['featureFlags/isShowLockedSessionsEnabled'] ||
-          isUnlockedSession
-        ) {
+        if (isUnlockedSession) {
           state.newWaitingStudentAudioElement.play()
         }
       } catch (error) {
@@ -210,10 +207,7 @@ export default {
       for (const removedSession of removedSessions) {
         this.dispatch('notifications/remove', removedSession.id)
         const isLockedSession = !user.subjects.includes(removedSession.subTopic)
-        if (
-          this.getters['featureFlags/isShowLockedSessionsEnabled'] &&
-          isLockedSession
-        ) {
+        if (isLockedSession) {
           dispatch('setSessionToExpire', removedSession.id)
           results.push(removedSession) // Add session back to the list for now
         }

@@ -64,7 +64,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
       [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_LOCKED_SESSIONS]: false,
       [POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS]: false,
@@ -274,8 +273,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE],
     isVerifyHoursButtonEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON],
-    isShowLockedSessionsEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_LOCKED_SESSIONS],
     isGoogleSignupForVolunteersEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS],
     isDisableStudentsJoinSlackCommunityEnabled: (state: FeatureFlagState) =>

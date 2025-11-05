@@ -19,9 +19,6 @@ const store = useStore()
 const router = useRouter()
 const isSessionAlive = computed(() => store.getters['user/isSessionAlive'])
 const sessionPath = computed(() => store.getters['user/sessionPath'])
-const isShowLockedSessionsEnabled = computed(
-  () => store.getters['featureFlags/isShowLockedSessionsEnabled']
-)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 
 const props = defineProps<{
@@ -29,12 +26,6 @@ const props = defineProps<{
 }>()
 
 // Menu logic
-const shouldShowMenu = computed(() => {
-  // This is the only menu content for now, and it's driven by a FF.
-  // Once this is fully rolled out, we can drop shouldShowMenu since it
-  // will always be true.
-  return isShowLockedSessionsEnabled.value
-})
 const isMenuOpen = ref<boolean>(false)
 const listSessionsMenu = ref(null)
 function toggleIsMenuOpen() {
@@ -49,7 +40,6 @@ const showLockedSessionsKey = computed(() => {
   return getShowLockedSessionKey(store.state.user.user?.id)
 })
 const shouldShowLockedSessions = computed(() => {
-  if (!isShowLockedSessionsEnabled.value) return false
   const localStorageValue: string | null = localStorage.getItem(
     showLockedSessionsKey.value
   )
@@ -86,9 +76,8 @@ function rejoinHelpSession() {
       subtitle="Students waiting for help will show up below"
     >
       <template v-slot:heading-content>
-        <div v-if="isShowLockedSessionsEnabled" class="heading-content">
+        <div class="heading-content">
           <Caret
-            v-if="shouldShowMenu"
             role="button"
             @click="toggleIsMenuOpen"
             :class="{
