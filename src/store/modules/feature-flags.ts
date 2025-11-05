@@ -62,7 +62,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS]: false,
       [POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
-      [POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
       [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_LOCKED_SESSIONS]: false,
@@ -273,10 +272,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN],
     isUpdatedDocEditorImageStorageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE],
-    isSkipAvailabilityOnboardingRequirementEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[
-        POSTHOG_FEATURE_FLAGS.SKIP_AVAILABILITY_ONBOARDING_REQUIREMENT
-      ],
     isVerifyHoursButtonEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON],
     isShowLockedSessionsEnabled: (state: FeatureFlagState) =>

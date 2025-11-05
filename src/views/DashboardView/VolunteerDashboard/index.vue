@@ -197,7 +197,6 @@ import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/Volu
 import SquareTextIcon from '@/assets/square-text-icon.svg'
 import PersonCardIcon from '@/assets/person-card.svg'
 import PersonIcon from '@/assets/person.svg'
-import CalendarIcon from '@/assets/calendar.svg'
 import CertificationIcon from '@/assets/certification.svg'
 import VerificationIcon from '@/assets/verification.svg'
 import OnboardingIcon from '@/assets/onboarding.svg'
@@ -304,13 +303,10 @@ export default {
       allSubjectNames: 'subjects/allSubtopicNames',
       getVolunteerMilestoneSharingStudyVariant:
         'featureFlags/getVolunteerMilestoneSharingStudyVariant',
-      isSkipAvailabilityOnboardingRequirementEnabled:
-        'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled',
       isVerifyHoursButtonEnabled: 'featureFlags/isVerifyHoursButtonEnabled',
     }),
     shouldShowNotificationsCard() {
       return (
-        this.isSkipAvailabilityOnboardingRequirementEnabled &&
         !this.notificationsCardWasDismissed &&
         !this.didCompleteAllNotificationActions
       )
@@ -499,16 +495,6 @@ export default {
           priority: this.addSortPriorityNum(this.certificationAction.status),
         },
       ]
-      if (!this.isSkipAvailabilityOnboardingRequirementEnabled) {
-        onboardingActions.push({
-          title: 'Select availability',
-          subtitle: this.availabilityAction.subtitle,
-          status: this.availabilityAction.status,
-          onClick: this.clickAvailabilityAction,
-          icon: CalendarIcon,
-          priority: this.addSortPriorityNum(this.availabilityAction.status),
-        })
-      }
       return onboardingActions.sort((a, b) => a.priority - b.priority)
     },
 
@@ -643,9 +629,6 @@ export default {
     },
     togglePhotoUploadModal() {
       this.showPhotoUploadModal = !this.showPhotoUploadModal
-    },
-    clickAvailabilityAction() {
-      this.$router.push('/calendar')
     },
     clickCertificationAction() {
       this.$router.push('/training')

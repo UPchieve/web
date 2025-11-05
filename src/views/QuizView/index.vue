@@ -201,8 +201,6 @@ export default {
       hasCertification: 'user/hasCertification',
       isAutoFlowUser: 'user/isAutoFlowUser',
       isStudentVolunteer: 'user/isStudentVolunteer',
-      skipAvailabilityOnboardingRequirement:
-        'featureFlags/isSkipAvailabilityOnboardingRequirementEnabled',
     }),
     tries() {
       const { user } = this.$store.state.user

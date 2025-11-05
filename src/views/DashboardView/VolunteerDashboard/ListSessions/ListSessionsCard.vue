@@ -17,10 +17,6 @@ import MenuContent from '@/views/DashboardView/VolunteerDashboard/ListSessions/M
 
 const store = useStore()
 const router = useRouter()
-const isSkipAvailabilityOnboardingRequirementEnabled = computed(
-  () =>
-    store.getters['featureFlags/isSkipAvailabilityOnboardingRequirementEnabled']
-)
 const isSessionAlive = computed(() => store.getters['user/isSessionAlive'])
 const sessionPath = computed(() => store.getters['user/sessionPath'])
 const isShowLockedSessionsEnabled = computed(
@@ -129,10 +125,7 @@ function rejoinHelpSession() {
         </div>
         <div class="notifications-button-container">
           <WebNotificationsButton
-            v-if="
-              !isSkipAvailabilityOnboardingRequirementEnabled ||
-              props.notificationsCardWasDismissed
-            "
+            v-if="props.notificationsCardWasDismissed"
             class="notifications-button"
           />
         </div>
