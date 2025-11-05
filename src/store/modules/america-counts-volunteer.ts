@@ -12,6 +12,12 @@ export default {
   },
 
   actions: {
+    maybeJoin({ getters, rootGetters }) {
+      if (getters['isAmericaCountsVolunteer']) {
+        const sessions = rootGetters['volunteer/unlockedOpenSessions']
+        AmericaCountsVolunteerService.maybeAutoJoinOldestSession(sessions)
+      }
+    },
     startCooldown({ commit, getters, rootGetters }, cooldown) {
       if (getters['isAmericaCountsVolunteer']) {
         const id = setTimeout(() => {

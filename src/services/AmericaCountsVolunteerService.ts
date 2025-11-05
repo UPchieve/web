@@ -105,15 +105,24 @@ async function shouldAutoJoin() {
   }
 
   return (
-    isNotTrainingPage() &&
+    !isOnAutoJoinDisabledPage() &&
     store.getters['volunteer/isReadyToTutor'] &&
     store.getters['americaCountsVolunteer/isAmericaCountsVolunteer'] &&
     store.state.americaCountsVolunteer.cooldownId === null
   )
 }
 
-function isNotTrainingPage() {
+const NO_AUTO_JOIN_URL_FRAGMENTS = [
+  'feedback',
+  'sessions',
+  'session',
+  'training',
+]
+function isOnAutoJoinDisabledPage() {
   const path = router.currentRoute.value.path
   const pathParts = path.split('/')
-  return !pathParts.includes('training')
+  const doesIntersect = pathParts.some((part) =>
+    NO_AUTO_JOIN_URL_FRAGMENTS.includes(part)
+  )
+  return doesIntersect
 }

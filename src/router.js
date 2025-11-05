@@ -715,6 +715,9 @@ router.afterEach((to, from) => {
   }
   store.dispatch('app/modal/hide')
 
+  // check after a route change if there are any waiting, eligible sessions to auto-join
+  store.dispatch('americaCountsVolunteer/maybeJoin')
+
   // Google Analytics.
   // Use typeof to avoid ReferenceError in Vitest
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
