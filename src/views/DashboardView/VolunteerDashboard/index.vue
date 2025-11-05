@@ -18,6 +18,7 @@
           <template v-slot:heading-content>
             <div v-if="isVerifyHoursButtonEnabled" class="verify-hours">
               <LargeButton
+                target="_blank"
                 routeTo="https://upchieve.org/verify-volunteer-hours"
                 @click="trackVerifyHoursClick"
               >
