@@ -877,6 +877,8 @@ export default {
       this.lastSelectedBrushType = TOOLS.THIN_BRUSH
     },
     useEraserTool(event) {
+      this.selectedTool = 'eraser'
+      this.hideHoveredToolbars()
       const layer = this.zwibblerCtx.getActiveLayer()
       this.selectedEraserTool = true
       this.zwibblerCtx.useBrushTool({
@@ -1278,18 +1280,6 @@ export default {
 
         // Set brush tool to default tool.
         this.useBrushTool()
-
-        // Don't start setting selected tool until connected
-        this.zwibblerCtx.on('tool-changed', () => {
-          // The eraser uses the brush tool. In order to make it seem as the eraser
-          // is active for the user, we're overriding the selectedTool to be
-          // `eraser` instead of `brush`
-          if (this.selectedEraserTool) {
-            this.selectedEraserTool = false
-            this.selectedTool = 'eraser'
-            this.hideHoveredToolbars()
-          }
-        })
       })
 
       this.zwibblerCtx.on('resource-loaded', () => {
