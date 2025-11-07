@@ -16,8 +16,6 @@ const $store = useStore()
 
 const emit = defineEmits(['enable-accept'])
 
-$store.dispatch('app/modal/update', { showTemplateButtons: false })
-
 watch(deleteInput, (newValue) => {
   const isDeleteConfirmed = newValue.toLowerCase() === 'delete'
   emit('enable-accept', isDeleteConfirmed)
@@ -29,8 +27,10 @@ async function onAccept() {
   try {
     await NetworkService.deleteAccount()
   } catch {
+    $store.dispatch('app/modal/update', { showTemplateButtons: false })
     error.value =
       'Something went wrong. Please reach out to support to finish deleting your account.'
+    return
   }
 
   await handleLogout({ $router, $store }, '/logout?deleted=true')
