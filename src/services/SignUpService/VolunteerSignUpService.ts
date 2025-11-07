@@ -35,7 +35,7 @@ export enum InputName {
   LAST_NAME = 'lastName',
   PASSWORD = 'password',
   PHONE = 'phone',
-  SIGNUP_SOURCE = 'signupSource',
+  SIGNUP_SOURCE_ID = 'signupSourceId',
   TERMS = 'terms',
 }
 
@@ -45,7 +45,7 @@ export type VolunteerAccountFormData = {
   [InputName.FIRST_NAME]?: string
   [InputName.LAST_NAME]?: string
   [InputName.PHONE]?: string
-  [InputName.SIGNUP_SOURCE]?: string
+  [InputName.SIGNUP_SOURCE_ID]?: string
   [InputName.TERMS]?: boolean
 }
 
@@ -137,7 +137,7 @@ async function createAccount(
       [InputName.FIRST_NAME]: data.firstName,
       [InputName.LAST_NAME]: data.lastName,
       [InputName.PHONE]: data.phone,
-      [InputName.SIGNUP_SOURCE]: data.signupSource,
+      [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
       [InputName.TERMS]: data.terms,
     })
 
@@ -184,7 +184,8 @@ function getAboutDetails(): PageDetail<VolunteerAccountFormData> {
               can customize when you receive requests.`,
         },
       }),
-      getRow('mt-2', getSignUpSourceElement(InputName.SIGNUP_SOURCE, false)),
+      getRow('mt-2', getSignUpSourceElement(InputName.SIGNUP_SOURCE_ID, false)),
+
       ...getTermsCheckboxElements(),
       getRow(
         'justify-end mt-4',

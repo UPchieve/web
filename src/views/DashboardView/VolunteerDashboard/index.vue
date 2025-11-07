@@ -275,6 +275,13 @@ export default {
 
     this.notificationsCardWasDismissed =
       localStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
+
+    if (localStorage.getItem('isSSOSignUpRedirect')) {
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+      localStorage.removeItem('isSSOSignUpRedirect')
+      store.dispatch('user/firstDashboardVisit', true)
+    }
   },
   data() {
     return {

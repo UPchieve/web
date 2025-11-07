@@ -481,14 +481,6 @@ export default {
       )
     },
 
-    shouldForceAboutPage: (state, getters) => {
-      return (
-        getters.isVolunteer &&
-        !getters.userRoles.includes('student') &&
-        !state.user.phone
-      )
-    },
-
     isInStudentVolunteerVerifyFlow: (state, getters) => {
       return (
         getters.isVolunteer && // in volunteer mode

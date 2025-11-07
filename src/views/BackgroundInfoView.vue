@@ -27,6 +27,35 @@
         </p>
 
         <ol>
+          <li v-if="signedUpWithGoogle" class="uc-form-col">
+            <p>How did you hear about us?</p>
+            <p class="background-info__question-description">(optional)</p>
+            <FormSelect
+              data-testid="signupSourceField"
+              name="signup-source"
+              v-model="signupSourceId"
+              :options="signupSourcesOptions"
+              option-text-field="name"
+              :is-required="false"
+              :reduce="(option) => option.id"
+            />
+            <div class="uc-column" v-if="shouldShowOtherSignupInput">
+              <input
+                id="otherSignupSource"
+                data-testid="otherSignupSource"
+                :required="false"
+                type="text"
+                class="uc-form-input"
+                v-model="otherSignupSource"
+                v-bind:class="{
+                  'uc-form-input--invalid':
+                    invalidInputs.indexOf('otherSignupSource') > -1,
+                }"
+                autofocus
+              />
+              <p class="uc-form-subtext">Tell us where you heard about us!</p>
+            </div>
+          </li>
           <li class="uc-form-col">
             <p data-testid="question-i-am-currently">
               I am currently...<span class="background-info__question-required"
@@ -107,6 +136,27 @@
             <p v-if="!isValidLinkedInUrl" class="error">
               Your url should be in this format:
               https://www.linkedin.com/in/yourname
+            </p>
+          </li>
+
+          <li v-if="signedUpWithGoogle" class="uc-form-col">
+            <label for="phoneNumber" class="uc-form-label"
+              >Cell Phone Number<span class="background-info__question-required"
+                >*</span
+              ></label
+            >
+            <maz-phone-number-input
+              id="phoneNumber"
+              data-testid="phoneNumberField"
+              class="phone-input"
+              required="true"
+              show-code-on-list
+              @update="onPhoneInputUpdate"
+              v-model="phoneNumber"
+            />
+            <p class="uc-form-subtext">
+              UPchieve notifies volunteers of incoming student requests via
+              text. You can customize when you receive requests.
             </p>
           </li>
 
@@ -320,10 +370,14 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { COUNTRIES, STATES, EVENTS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
 import LargeButton from '@/components/LargeButton.vue'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import { backOff } from 'exponential-backoff'
+import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
+import _ from 'lodash'
 
 export default {
   name: 'background-info-view',
-  components: { LargeButton },
+  components: { LargeButton, FormSelect, MazPhoneNumberInput },
   data() {
     return {
       options: {
@@ -379,7 +433,17 @@ export default {
         options: ['Tutoring', 'College Counseling', 'Mentoring'],
         optionsAlias: ['tutoring', 'collegeCounseling', 'mentoring'],
       },
+      signupSourceId: '',
+      signupSourcesOptions: [],
+      otherSignupSource: '',
+      isLoadingSignupSources: false,
+      invalidInputs: [],
+      phoneInputInfo: {},
+      phoneNumber: '',
     }
+  },
+  async beforeMount() {
+    await this.getSignupSources()
   },
   computed: {
     ...mapState({
@@ -424,11 +488,52 @@ export default {
         !this.user.volunteerPartnerOrg
       )
     },
+    shouldShowOtherSignupInput() {
+      if (this.isLoadingSignupSources || !this.signupSourcesOptions) {
+        return false
+      }
+      const otherOption = this.signupSourcesOptions.find(
+        (s) => s.name === 'Other'
+      )
+      return otherOption && otherOption.id === this.signupSourceId
+    },
+    signedUpWithGoogle() {
+      return !_.isEmpty(this.user.issuers)
+    },
   },
   methods: {
     goToDashboard() {
       this.$router.push('/dashboard')
     },
+    onPhoneInputUpdate(pii) {
+      this.phoneInputInfo = pii
+    },
+    async getSignupSources() {
+      this.isLoadingSignupSources = true
+      try {
+        const response = await backOff(() =>
+          NetworkService.getStudentSignupSources()
+        )
+        let allSources = response.data.signupSources
+
+        // volunteer sources drop School/Teacher and replace Friend/Classmate with Friend
+        allSources = allSources
+          .filter((source) => source.name !== 'School / Teacher')
+          .map((source) => {
+            if (source.name === 'Friend / Classmate') {
+              source.name = 'Friend'
+            }
+            return source
+          })
+
+        this.signupSourcesOptions = allSources
+      } catch (err) {
+        LoggerService.noticeError(err)
+      } finally {
+        this.isLoadingSignupSources = false
+      }
+    },
+
     async submitForm(event) {
       event.preventDefault()
 
@@ -461,6 +566,9 @@ export default {
         city: this.city,
         college: this.college,
         company: this.company,
+        phoneNumber: this.phoneNumber,
+        signupSourceId: this.signupSourceId,
+        otherSignupSource: this.otherSignupSource,
       }
 
       if (this.languages.length > 0) {
@@ -510,6 +618,7 @@ export default {
 
       return (
         this.occupation.length === 0 ||
+        (this.signedUpWithGoogle && !this.phoneNumber) ||
         !tutoring ||
         !collegeCounseling ||
         !mentoring ||
