@@ -9,7 +9,7 @@
         >{{ label }}</label
       >
       <div v-if="hasValidationError()" class="error-caption">
-        {{ getValidationErrors() }}
+        {{ getRequiredError() }}
       </div>
     </div>
     <input
@@ -27,6 +27,21 @@
       @blur="onBlur"
       :required="isRequired"
     />
+
+    <div v-if="modelValue" class="password-requirements">
+      <div
+        v-for="(validation, key) in passwordValidationRules"
+        :key="key"
+        class="requirement"
+        :class="{ valid: !validation.$invalid, invalid: validation.$invalid }"
+      >
+        <span class="requirement-icon">{{
+          !validation.$invalid ? '✓' : '○'
+        }}</span>
+        {{ validation.$message }}
+      </div>
+    </div>
+
     <div
       v-if="metadata"
       class="metadata"
@@ -40,7 +55,7 @@
 </template>
 
 <script>
-import { helpers, requiredIf } from '@vuelidate/validators'
+import { helpers, requiredIf, minLength } from '@vuelidate/validators'
 import AnalyticsService from '@/services/AnalyticsService'
 import { useInputValidation } from '@/composables/InputValidation'
 
@@ -92,17 +107,42 @@ export default {
     }
   },
 
-  validations() {
-    return {
-      modelValue: {
-        required: helpers.withMessage('Required', requiredIf(this.isRequired)),
-        isPasswordValid: helpers.regex(this.PASSWORD_PATTERN),
-      },
-    }
+  computed: {
+    passwordValidationRules() {
+      const rules = this.v$.modelValue
+      return {
+        hasEightCharacters: rules.hasEightCharacters,
+        hasUpperCase: rules.hasUpperCase,
+        hasLowerCase: rules.hasLowerCase,
+        hasOneNumber: rules.hasOneNumber,
+      }
+    },
   },
 
-  created() {
-    this.PASSWORD_PATTERN = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
+  validations() {
+    const uppercaseLetters = /[A-Z]/
+    const lowercaseLetters = /[a-z]/
+    const numbers = /[0-9]/
+    const passwordValidations = {
+      required: helpers.withMessage('Required', requiredIf(this.isRequired)),
+      hasEightCharacters: helpers.withMessage(
+        'At least 8 characters',
+        minLength(8)
+      ),
+      hasUpperCase: helpers.withMessage(
+        'One uppercase letter',
+        helpers.regex(uppercaseLetters)
+      ),
+      hasLowerCase: helpers.withMessage(
+        'One lowercase letter',
+        helpers.regex(lowercaseLetters)
+      ),
+      hasOneNumber: helpers.withMessage('One number', helpers.regex(numbers)),
+    }
+
+    return {
+      modelValue: passwordValidations,
+    }
   },
 
   methods: {
@@ -113,6 +153,40 @@ export default {
         this.hasEnteredPassword = true
       }
     },
+    getRequiredError() {
+      const requiredError = this.v$.modelValue.$errors.find(
+        (e) => e.$validator === 'required'
+      )
+      return requiredError ? requiredError.$message : ''
+    },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.password-requirements {
+  margin-top: 8px;
+  font-size: 0.875rem;
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  transition: color 0.2s ease;
+}
+
+.requirement.valid {
+  color: $c-success-green;
+}
+
+.requirement.invalid {
+  color: $c-error-red;
+}
+
+.requirement-icon {
+  font-weight: bold;
+  font-size: 1rem;
+}
+</style>

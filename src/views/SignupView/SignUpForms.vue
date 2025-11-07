@@ -235,4 +235,8 @@ p {
 .updog {
   height: 185px;
 }
+
+.text-sm {
+  font-size: 12px;
+}
 </style>

@@ -94,14 +94,8 @@ function getLogInDetails(): PageDetail<VolunteerAccountFormData> {
         element: 'header-logo-teal',
       }),
       getRow('mt-4 justify-center', getTextElement('h1', `Become a Volunteer`)),
-      getRow(
-        'mt-2 justify-center',
-        getTextElement(
-          'p',
-          `Step 1 of 2: Share your email and set a password to get started`
-        )
-      ),
       ...(isGoogleSignupForVolunteersEnabled ? getSsoSectionElements() : []),
+      getRow('mt-2 justify-center'),
       getRow('mt-2', {
         element: 'FormEmail',
         props: {
@@ -114,8 +108,6 @@ function getLogInDetails(): PageDetail<VolunteerAccountFormData> {
         element: 'FormPassword',
         props: {
           name: InputName.PASSWORD,
-          metadata:
-            'Keep your account safe by choosing a password with one number, one uppercase letter, and one lowercase letter.',
         },
       }),
       getRow(
@@ -138,7 +130,7 @@ async function createAccount(
       [InputName.LAST_NAME]: data.lastName,
       [InputName.PHONE]: data.phone,
       [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
-      [InputName.TERMS]: data.terms,
+      [InputName.TERMS]: true,
     })
 
     return getSubmitResponse(SignUpPage.verify)
@@ -151,16 +143,12 @@ function getAboutDetails(): PageDetail<VolunteerAccountFormData> {
   return {
     backgroundLayout: 'panel-right-50p',
     submitAction: createAccount,
-    panelImage: 'connect-your-students',
+    panelImage: 'volunteer-signup-illustration',
     classes: 'uc-column justify-center justify-start-sm',
     rows: [
       getRow('justify-center', {
         element: 'header-logo-teal',
       }),
-      getRow(
-        'mt-4',
-        getTextElement('h1', `Step 2 of 2: Tell us about yourself!`)
-      ),
       getRow('mt-4', {
         element: 'FormInput',
         props: {
@@ -185,8 +173,6 @@ function getAboutDetails(): PageDetail<VolunteerAccountFormData> {
         },
       }),
       getRow('mt-2', getSignUpSourceElement(InputName.SIGNUP_SOURCE_ID, false)),
-
-      ...getTermsCheckboxElements(),
       getRow(
         'justify-end mt-4',
         getButtonElement<VolunteerAccountFormData>(
@@ -195,25 +181,28 @@ function getAboutDetails(): PageDetail<VolunteerAccountFormData> {
           'button-narrow'
         )
       ),
+      ...getTermsCheckboxElements('text-sm', 'justify-end', 'mt-2'),
     ],
   }
 }
 
-function getTermsCheckboxElements() {
+function getTermsCheckboxElements(
+  sizeClass: string = '',
+  justify: string = 'justify-start',
+  mt: string = 'mt-4'
+) {
   return [
     getRow(
-      'justify-start mt-4 el-gap-sm',
+      `${justify} ${mt} el-gap-sm ${sizeClass}`.trim(),
       {
-        element: 'FormCheckBox',
-        props: {
-          label: 'I have read and accept the',
-          name: InputName.TERMS,
-        },
+        element: 'p',
+        classes: 'metadata',
+        content: 'By clicking this button above, you agree to our',
       },
       {
         element: 'a',
         classes: 'uc-link',
-        content: 'User Agreement',
+        content: 'User',
         props: {
           href: 'https://upchieve.org/legal',
           target: '_blank',
@@ -221,7 +210,7 @@ function getTermsCheckboxElements() {
       },
       {
         element: 'p',
-        classes: '',
+        classes: 'metadata',
         content: 'and',
         props: {},
       },
@@ -257,20 +246,17 @@ function getSsoSectionElements(): FormRow[] {
   const rows: FormRow[] = []
 
   rows.push(
-    getRow('justify-center mt-3', getTextElement('p', 'Sign Up With')),
     getRow(
       'mt-4',
-      getSsoButton(createAccountWithGoogle, 'Google', SsoProvider.GOOGLE)
+      getSsoButton(
+        createAccountWithGoogle,
+        'Sign Up with Google',
+        SsoProvider.GOOGLE
+      )
     )
   )
   rows.push(
-    getRow(
-      'justify-center italic mt-3',
-      getTextElement(
-        'p',
-        'By clicking the button above, you agree to our User Agreement'
-      )
-    ),
+    ...getTermsCheckboxElements(),
     getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } })
   )
   return rows
