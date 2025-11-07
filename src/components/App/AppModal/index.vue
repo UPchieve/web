@@ -9,7 +9,7 @@
     :alert-modal="modalData.alertModal"
     :enable-accept="enableAccept"
     :important="modalData.important"
-    :showTemplateButtons="showTemplateButtons"
+    :showTemplateButtons="modalData.showTemplateButtons"
     :show-accept="modalData.showAccept"
     :modalComponentName="modalComponent && modalComponent.name"
   >
@@ -17,7 +17,6 @@
       v-if="modalComponent"
       v-bind:is="modalComponent"
       v-on:enable-accept="onEnableAccept"
-      v-on:show-template-buttons="onShowTemplateButtons"
       :modal-data="modalData"
       ref="AppModalChild"
     />
@@ -67,7 +66,6 @@ export default {
   data() {
     return {
       enableAccept: false,
-      showTemplateButtons: true,
     }
   },
   computed: {
@@ -80,7 +78,6 @@ export default {
     // Enable the accept button by default if this is
     // an alert modal.
     this.enableAccept = !!this.modalData.alertModal
-    this.showTemplateButtons = this.modalData.showTemplateButtons ?? true
   },
   methods: {
     onCancel() {
@@ -93,9 +90,6 @@ export default {
     },
     onEnableAccept(value) {
       this.enableAccept = value
-    },
-    onShowTemplateButtons(value) {
-      this.showTemplateButtons = value
     },
   },
 }
