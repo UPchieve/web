@@ -580,8 +580,7 @@ function getAccountPageDetails(
             props: {
               label: 'Password',
               name: InputName.PASSWORD,
-              metadata:
-                'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
+              showPasswordRequirements: true,
               blurEvent: EVENTS.STUDENT_ENTERED_PASSWORD,
             },
           })

@@ -108,6 +108,7 @@ function getLogInDetails(): PageDetail<VolunteerAccountFormData> {
         element: 'FormPassword',
         props: {
           name: InputName.PASSWORD,
+          showPasswordRequirements: true,
         },
       }),
       getRow(

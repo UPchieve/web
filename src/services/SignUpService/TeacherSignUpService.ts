@@ -297,8 +297,7 @@ function getAccountPageDetails(): PageDetail<TeacherAccountFormData> {
         element: 'FormPassword',
         props: {
           name: InputName.PASSWORD,
-          metadata:
-            'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.',
+          showPasswordRequirements: true,
           blurEvent: EVENTS.TEACHER_ENTERED_PASSWORD,
         },
       }),
