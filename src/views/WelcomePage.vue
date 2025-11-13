@@ -53,6 +53,14 @@ export default {
     if (Object.entries(this.training).length === 0)
       await this.$store.dispatch('subjects/getTrainingSubjects')
   },
+  created() {
+    if (localStorage.getItem('isSSOSignUpRedirect')) {
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+      localStorage.removeItem('isSSOSignUpRedirect')
+      store.dispatch('user/firstDashboardVisit', true)
+    }
+  },
   data() {
     return {
       subjectSelection: '',
