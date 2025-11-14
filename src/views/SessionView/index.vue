@@ -49,6 +49,10 @@
         @close="toggleModerationInfractionModal"
         :moderation-infraction="moderationInfraction"
       />
+
+      <PartnerAckScreenShareInfractionModal />
+      <AckPartnerIntiatedPotentialBan />
+
       <div
         class="auxiliary-container"
         ref="auxiliaryContainer"
@@ -329,6 +333,8 @@ import { useActor } from '@xstate/vue'
 import * as MeetingMachine from '@/state-machines/meeting-machine'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
 import ModerationInfractionModal from '@/components/Moderation/ModerationInfractionModal.vue'
+import PartnerAckScreenShareInfractionModal from '@/components/Moderation/PartnerAckScreenShareInfractionModal.vue'
+import AckPartnerIntiatedPotentialBan from '@/components/Moderation/AckPartnerIntiatedPotentialBan.vue'
 import ModerationInfractionToast from '@/components/Moderation/ModerationInfractionToast.vue'
 import ModerationDisclaimerModal from '@/views/SessionView/ModerationDisclaimerModal.vue'
 import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
@@ -359,6 +365,8 @@ export default {
     FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
     LiveMediaChatHeader,
+    PartnerAckScreenShareInfractionModal,
+    AckPartnerIntiatedPotentialBan,
   },
 
   setup() {
@@ -547,6 +555,8 @@ export default {
   computed: {
     ...mapState({
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
+      potentialPartnerInfraction: (state) =>
+        state.liveMedia.potentialPartnerInfraction,
       user: (state) => state.user.user,
       session: (state) => state.user.session,
       docEditorVersion: (state) => state.user.session.docEditorVersion,
@@ -745,7 +755,7 @@ export default {
   },
   watch: {
     moderationInfraction(newVal) {
-      if (newVal.stopStreamImmediatelyReasons?.length) {
+      if (newVal?.stopStreamImmediatelyReasons?.length) {
         this.showModerationInfractionModal = true
         this.showModerationInfractionToast = false
       } else if (newVal) {

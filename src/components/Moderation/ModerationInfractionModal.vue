@@ -1,9 +1,12 @@
 <template>
   <Modal class="moderation-infraction-info-modal upc-modal">
-    <h3>
-      We detected a potential policy violation with your
-      {{ moderationInfractionSource }} use
-    </h3>
+    <div class="header">
+      <Warning class="warning-icon" src="@/assets/warning_icon.svg" />
+      <h1>
+        We detected a potential policy violation with your
+        {{ moderationInfractionSource }}
+      </h1>
+    </div>
     <br />
     <div class="infraction-modal-body">
       <p
@@ -13,7 +16,7 @@
         "
         data-testid="potential-policy-violations"
       >
-        Potential policy violations: {{ reasons }}
+        Potential policy violations: <b>{{ reasons }}</b>
       </p>
       <p v-if="detailedMessage" data-testid="infraction-detail">
         {{ detailedMessage }}
@@ -35,6 +38,7 @@ import { computed } from 'vue'
 import Modal from '@/components/Modal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { useStore } from 'vuex'
+import Warning from '@/assets/warning.svg'
 
 const props = defineProps<{
   moderationInfraction: {
@@ -57,7 +61,7 @@ const reasons = computed(() => {
 const RESHARE_SCREEN_MESSAGE = `Please check the content of your screen for any potentially problematic content, and remove it before sharing your screen again. `
 const detailedMessage = computed(() => {
   let message =
-    "For everyone's safety, your screenshare and microphone have been disabled. "
+    "For everyone's safety, your screen share and microphone have been disabled. "
   if (
     props.moderationInfraction.stopStreamImmediatelyReasons?.length &&
     !props.moderationInfraction.isBanned &&
@@ -87,6 +91,20 @@ const moderationInfractionSource = computed(
     flex-direction: column;
     gap: 12px;
     margin-top: 0;
+  }
+
+  .warning-icon {
+    height: 2.4rem;
+    width: 3rem;
+  }
+
+  .header {
+    display: flex;
+    column-gap: 8px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
   }
 }
 </style>

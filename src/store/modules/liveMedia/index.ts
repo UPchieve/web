@@ -9,6 +9,8 @@ export default {
     isPartnerJustBannedFromLiveMedia: false,
     screenShareActor: null,
     moderationInfraction: null,
+    potentialPartnerInfraction: null,
+    partnerAckLiveMediaBan: null,
   },
   mutations: {
     setIsPartnerJustBannedFromLiveMedia: (state, val) =>
@@ -19,6 +21,13 @@ export default {
     setModerationInfraction(state, infraction) {
       state.moderationInfraction = infraction
     },
+
+    setPotentialPartnerInfraction(state, infraction) {
+      state.potentialPartnerInfraction = infraction
+    },
+    setPartnerAckLiveMediaBan(state, banType: string) {
+      state.partnerAckLiveMediaBan = banType
+    },
   },
   getters: {
     isBannedFromLiveMedia: (state, getters, rootState, rootGetters) => {
@@ -26,7 +35,7 @@ export default {
       return Boolean(banType && banType === 'live_media')
     },
     isPartnerBannedFromLiveMedia: (state, _getters, rootState, rootGetters) => {
-      if (state.isPartnerJustBannedFromLiveMedia) return true
+      if (state?.isPartnerJustBannedFromLiveMedia) return true
       const session = rootState.user.session
       const key =
         rootGetters['user/userType'] === 'student'
@@ -61,12 +70,16 @@ export default {
     },
   },
   actions: {
-    reset({ commit, dispatch }) {
-      commit('setScreenShareActor', null)
+    reset({ commit, dispatch }, data) {
+      if (!data?.dontDeleteScreenShareActor) {
+        commit('setScreenShareActor', null)
+      }
       commit('setIsPartnerJustBannedFromLiveMedia', false)
       commit('setModerationInfraction', null)
+      commit('setPotentialPartnerInfraction', null)
       dispatch('liveMedia/audio/resetSessionAudio', null, { root: true })
     },
+
     async bannedFromLiveMedia({ dispatch, state }) {
       await dispatch(
         'user/addToUser',
@@ -84,6 +97,21 @@ export default {
       commit('setModerationInfraction', data)
       if (data.stopStreamImmediatelyReasons?.length) {
         state.screenShareActor?.send({ type: 'stop_stream' })
+      }
+    },
+    handlePotentialPartnerInfraction({ commit }, data) {
+      commit('setPotentialPartnerInfraction', data)
+    },
+    async handlePartnerAckLiveMediaBan({ dispatch, commit, state }, data) {
+      if (!data.isBanned) {
+        await dispatch('user/addToUser', { banType: null }, { root: true })
+        await dispatch('reset', { dontDeleteScreenShareActor: true })
+        commit('setPartnerAckLiveMediaBan', 'not_banned')
+        state.screenShareActor?.send({
+          type: 'not_banned',
+        })
+      } else {
+        commit('setPartnerAckLiveMediaBan', 'banned')
       }
     },
   },

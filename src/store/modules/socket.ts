@@ -266,6 +266,18 @@ export default {
         dispatch('liveMedia/handleModerationInfraction', data, { root: true })
       })
 
+      socket.on('potentialPartnerModerationInfraction', (data: any) => {
+        dispatch('liveMedia/handlePotentialPartnerInfraction', data, {
+          root: true,
+        })
+      })
+
+      socket.on('partnerAckLiveMediaBan', (data: any) => {
+        dispatch('liveMedia/handlePartnerAckLiveMediaBan', data, {
+          root: true,
+        })
+      })
+
       socket.on(IMAGE_UPLOAD_EVENTS.PARTNER_UPLOADING_IMAGE, () => {
         commit(
           'setPartnerImageUploadStatus',

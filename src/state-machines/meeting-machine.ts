@@ -479,6 +479,9 @@ export function create() {
                       },
                     ],
                   },
+                  not_banned: {
+                    target: 'CheckingEligibility',
+                  },
                 },
               },
               CheckingEligibility: {
@@ -602,7 +605,13 @@ export function create() {
                 type: 'final',
                 tags: ['unableToJoinAudioCall'],
               },
-              ViewingEligibleOnly: { type: 'final' },
+              ViewingEligibleOnly: {
+                on: {
+                  not_banned: {
+                    target: 'CheckingEligibility',
+                  },
+                },
+              },
               CheckingEligibility: {
                 tags: ['loadingScreenShare'],
                 invoke: {
