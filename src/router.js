@@ -595,6 +595,10 @@ const routes = [
     name: 'NTHSGroupsView',
     component: NTHSGroupsView,
     meta: { protected: true },
+    beforeEnter: (_to, _from, next) => {
+      if (store.getters['featureFlags/isNTHSGroupsPageEnabled']) next()
+      else next('/dashboard')
+    },
   },
 
   {

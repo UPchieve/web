@@ -18,6 +18,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
+    <h2 class="title">{{ store.state.volunteer.NTHSGroups[0].groupName }}</h2>
     <iframe
       ref="iframe"
       class="iframe"
@@ -27,11 +28,23 @@ onMounted(() => {
       height="100%"
       loading="lazy"
     />
-    <Spinner v-if="!isLoaded" />
+    <div class="spinner-container" v-if="!isLoaded">
+      <Spinner />
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.title {
+  padding: 1em 0 0 1em;
+}
+.spinner-container {
+  flex-grow: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
 .hide {
   width: 0;
   height: 0;
@@ -41,8 +54,9 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: start;
 }
 .iframe {
   border: none;

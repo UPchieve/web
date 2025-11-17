@@ -249,9 +249,12 @@ export default {
         'featureFlags/isDisableStudentsJoinSlackCommunityEnabled',
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
+      isNTHSGroupsPageEnabled: 'featureFlags/isNTHSGroupsPageEnabled',
     }),
     isMemberOfNHTSGroup() {
-      return this.volunteersNHTSGroups.length > 0
+      return (
+        this.isNTHSGroupsPageEnabled && this.volunteersNHTSGroups.length > 0
+      )
     },
     isStandaloneAiEnabled() {
       return (
