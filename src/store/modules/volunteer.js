@@ -3,6 +3,7 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
+import NetworkService from '@/services/NetworkService'
 
 export default {
   namespaced: true,
@@ -11,6 +12,7 @@ export default {
     allOpenSessions: [],
     tickIntervalId: null,
     ticks: 0,
+    NTHSGroups: [],
   },
   mutations: {
     setNewWaitingStudentAudioElement: (state, element) =>
@@ -29,8 +31,16 @@ export default {
         state.allOpenSessions.splice(indexOfSession, 1)
       }
     },
+    setNTHSGroups: (state, groups) => {
+      state.NTHSGroups = groups
+    },
   },
   actions: {
+    async fetchNTHSGroupsForUser({ commit }) {
+      const results = await NetworkService.getNHTSGroupsForUser()
+      commit('setNTHSGroups', results.data.groups)
+    },
+
     gotoSession({ dispatch }, { context, session }) {
       const { type, subTopic, id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`

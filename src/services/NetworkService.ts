@@ -1367,4 +1367,7 @@ export default {
       this._errorHandler
     )
   },
+  getNHTSGroupsForUser() {
+    return httpGet(`${API_ROOT}/nths-groups`, {}).catch(this._axiosErrorHandler)
+  },
 }

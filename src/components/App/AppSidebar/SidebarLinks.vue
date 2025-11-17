@@ -127,6 +127,15 @@
         </sidebar-link>
 
         <sidebar-link
+          v-if="isVolunteer && isMemberOfNHTSGroup"
+          to="/groups"
+          text="Teams"
+          id="nths-group-sidebar-link"
+        >
+          <groups-icon class="icon" />
+        </sidebar-link>
+
+        <sidebar-link
           v-if="isAdmin"
           to="/admin"
           text="Admin"
@@ -175,6 +184,7 @@ import HandWaveIcon from '@/assets/icons/hand-wave.svg'
 import HeartIcon from '@/assets/icons/heart_icon.svg'
 import HomeIcon from '@/assets/icons/home_icon.svg'
 import ReferFriendIcon from '@/assets/icons/refer_friend_icon.svg'
+import GroupsIcon from '@/assets/icons/groups_icon.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
 import YourProgressIcon from '@/assets/icons/trending_up_icon.svg'
 import RewardsSidebarIcon from '@/assets/icons/star_icon.svg'
@@ -205,6 +215,12 @@ export default {
     ActivityDot,
     CompassIcon,
     AmbassadorReferralModal,
+    GroupsIcon,
+  },
+  created() {
+    if (import.meta.env.NODE_ENV !== 'test') {
+      this.$store.dispatch('volunteer/fetchNTHSGroupsForUser')
+    }
   },
   props: {
     authenticated: Boolean,
@@ -215,6 +231,7 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       productFlags: (state) => state.productFlags.flags,
+      volunteersNHTSGroups: (state) => state.volunteer.NTHSGroups,
     }),
     ...mapGetters({
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
@@ -233,6 +250,9 @@ export default {
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
     }),
+    isMemberOfNHTSGroup() {
+      return this.volunteersNHTSGroups.length > 0
+    },
     isStandaloneAiEnabled() {
       return (
         this.isAiTutorActive && this.isAiTutorActive.includes('stand-alone')

@@ -74,6 +74,7 @@ import { camelCase } from 'lodash-es'
 import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
 import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
 import JourneysView from './views/JourneysView.vue'
+import NTHSGroupsView from './views/NTHSGroupsView.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -589,6 +590,13 @@ const routes = [
     component: JourneysView,
     meta: { protected: true },
   },
+  {
+    path: '/groups',
+    name: 'NTHSGroupsView',
+    component: NTHSGroupsView,
+    meta: { protected: true },
+  },
+
   {
     path: '/:pathMatch(.*)*',
     name: 'Not Found',
