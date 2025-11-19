@@ -49,7 +49,7 @@ export default {
 
     if (sessionId) {
       const {
-        data: { session },
+        data: { session, isZwibserveSession },
       } = await NetworkService.joinSession({ sessionId, joinedFrom })
       await store.dispatch('user/updateSession', {
         ...session,
@@ -57,7 +57,7 @@ export default {
         subTopic,
         _id: session.id,
       })
-      return session
+      return { session, isZwibserveSession }
     }
 
     const presessionSurvey = Object.keys(store.state.user.presessionSurvey)
@@ -65,7 +65,7 @@ export default {
       ? store.state.user.presessionSurvey
       : undefined
     const {
-      data: { session },
+      data: { session, isZwibserveSession },
     } = await NetworkService.newSession({
       sessionType: topic,
       sessionSubTopic: subTopic,
@@ -89,7 +89,7 @@ export default {
       store.dispatch('user/clearPresessionSurvey'),
     ])
     await router.replace(store.getters['user/sessionPath'])
-    return session
+    return { session, isZwibserveSession }
   },
 
   // TODO: Make all paths use `endAndExitSession` instead.

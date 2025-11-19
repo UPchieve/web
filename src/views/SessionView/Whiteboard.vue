@@ -594,6 +594,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    isZwibserveSession: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -1147,12 +1151,15 @@ export default {
     },
 
     async loadZwibbler() {
+      const collabRoot = this.isZwibserveSession
+        ? `${config.websocketRoot}/graffiti`
+        : config.websocketRoot
       const zwibblerCtx = window.Zwibbler.create('zwib-div', {
         allowZoom: false,
         autoPickTool: false,
         autoPickToolText: false,
         background: 'grid',
-        collaborationServer: `${config.websocketRoot}/whiteboard/room/{name}`,
+        collaborationServer: `${collabRoot}/whiteboard/room/{name}`,
         confine: 'view',
         defaultBrushWidth: 5,
         defaultFontSize: 32,
@@ -1239,44 +1246,46 @@ export default {
         // - public/static/zwibbler-demo.js
         // - (CDN) march2024/zwibbler2.js
         // - (CDN) june2021/zwibbler2.js
-        const zwibblerWsConnection =
-          this.zwibblerCtx?.zc?.Pb?.Pb ??
-          this.zwibblerCtx?.kc?.Ac?.Ac ??
-          this.zwibblerCtx?.Ec?.rc?.rc
-        const zwibblerOnMessage = zwibblerWsConnection.onmessage
-        const zwibblerOnClose = zwibblerWsConnection.onclose
+        if (!this.isZwibserveSession) {
+          const zwibblerWsConnection =
+            this.zwibblerCtx?.zc?.Pb?.Pb ??
+            this.zwibblerCtx?.kc?.Ac?.Ac ??
+            this.zwibblerCtx?.Ec?.rc?.rc
+          const zwibblerOnMessage = zwibblerWsConnection.onmessage
+          const zwibblerOnClose = zwibblerWsConnection.onclose
 
-        // Intercept Zwibbler's websocket message handler
-        zwibblerWsConnection.onmessage = (messageEvent) => {
-          // Forward message to Zwibbler unless it's our "pong" response
-          if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
-        }
-
-        // Intercept Zwibbler's websocket close handler to throw custom error
-        zwibblerWsConnection.onclose = (closeEvent) => {
-          // The onclose callback is called _after_ calling `onDestroy`,
-          // which we do before unmount of the component. If there is
-          // no Zwibbler ctx, it means we are simply leaving the component.
-          if (this.zwibblerCtx) {
-            // TODO: This isn't technically always an error - for
-            // example if we are deploying the backend, the connection
-            // will close. Is there a way to not log if it's expected closure?
-            LoggerService.noticeError(
-              'Zwibbler: Unexpectedly closing WS connection',
-              {
-                sessionId: this.sessionId,
-                userType: this.userType,
-              }
-            )
+          // Intercept Zwibbler's websocket message handler
+          zwibblerWsConnection.onmessage = (messageEvent) => {
+            // Forward message to Zwibbler unless it's our "pong" response
+            if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
           }
 
-          zwibblerOnClose(closeEvent)
-        }
+          // Intercept Zwibbler's websocket close handler to throw custom error
+          zwibblerWsConnection.onclose = (closeEvent) => {
+            // The onclose callback is called _after_ calling `onDestroy`,
+            // which we do before unmount of the component. If there is
+            // no Zwibbler ctx, it means we are simply leaving the component.
+            if (this.zwibblerCtx) {
+              // TODO: This isn't technically always an error - for
+              // example if we are deploying the backend, the connection
+              // will close. Is there a way to not log if it's expected closure?
+              LoggerService.noticeError(
+                'Zwibbler: Unexpectedly closing WS connection',
+                {
+                  sessionId: this.sessionId,
+                  userType: this.userType,
+                }
+              )
+            }
 
-        // Ping server every 45 seconds to keep the connection open.
-        this.pingPongInterval = window.setInterval(() => {
-          zwibblerWsConnection.send('p1ng')
-        }, secondsToMs(45))
+            zwibblerOnClose(closeEvent)
+          }
+
+          // Ping server every 45 seconds to keep the connection open.
+          this.pingPongInterval = window.setInterval(() => {
+            zwibblerWsConnection.send('p1ng')
+          }, secondsToMs(45))
+        }
 
         // Set brush tool to default tool.
         this.useBrushTool()

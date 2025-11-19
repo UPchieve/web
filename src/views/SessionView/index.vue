@@ -94,6 +94,7 @@
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isJoiningCall="isJoiningCall"
           :unableToJoinCall="unableToJoinCall"
+          :isZwibserveSession="isZwibserveSession"
         />
 
         <document-editor-v2
@@ -403,15 +404,17 @@ export default {
 
   async created() {
     try {
-      const session = await SessionService.createOrJoinSession(
-        this.$route.params.topic,
-        this.$route.params.subTopic,
-        this.$route.params.sessionId,
-        this.$route.query?.assignmentId,
-        this.prevRoute?.name ?? ''
-      )
+      const { session, isZwibserveSession } =
+        await SessionService.createOrJoinSession(
+          this.$route.params.topic,
+          this.$route.params.subTopic,
+          this.$route.params.sessionId,
+          this.$route.query?.assignmentId,
+          this.prevRoute?.name ?? ''
+        )
 
       this.sessionId = session.id
+      this.isZwibserveSession = isZwibserveSession
 
       if (this.journeySessionData) {
         AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_SESSION_REQUESTED, {
@@ -550,6 +553,7 @@ export default {
       showScreenShareDisclaimer: false,
       joinSocketSessionAbortController: null,
       isSocketSessionRoomConnected: false,
+      isZwibserveSession: false,
     }
   },
   computed: {
