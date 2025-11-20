@@ -65,7 +65,6 @@ import NetworkService, { axiosInstance } from './services/NetworkService'
 import { UserType } from '@/services/SignUpService'
 import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/StudentSignUpService'
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
-import { INVALID_CSRF_ERROR } from '@/services/AuthService'
 import Case from 'case'
 import RewardsView from './views/RewardsView.vue'
 import SurveysView from './views/SurveysView.vue'
@@ -739,16 +738,6 @@ axiosInstance.interceptors.response.use(
       !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt)
     )
       router.push('/login?401=true').catch(() => {})
-    return Promise.reject(error)
-  }
-)
-
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error?.response?.data?.err === INVALID_CSRF_ERROR) {
-      store.commit('app/setShowCsrfRefreshAlert', true)
-    }
     return Promise.reject(error)
   }
 )

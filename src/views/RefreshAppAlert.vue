@@ -38,6 +38,7 @@ export default {
     }
   },
   methods: {
+    // TODO: Make this a header instead of modal.
     async getCurrentServerVersion() {
       const version = await VersionService.getCurrentServerVersion()
       if (!this.version) {
@@ -55,16 +56,13 @@ export default {
   },
   computed: {
     ...mapState({
-      showCsrfRefreshAlert: (state) => state.app.showCsrfRefreshAlert,
       version: (state) => state.app.version,
     }),
     shouldShow() {
-      return this.newServerVersionAvailable || this.showCsrfRefreshAlert
+      return this.newServerVersionAvailable
     },
     getHeader() {
-      return this.showCsrfRefreshAlert
-        ? 'Oops! Something went wrong.'
-        : 'New version of UPchieve available!'
+      return 'New version of UPchieve available!'
     },
     getButtons() {
       return [
@@ -74,7 +72,7 @@ export default {
           cssClass: 'alert-button-cancel',
         },
         {
-          text: this.showCsrfRefreshAlert ? 'Refresh' : 'Upgrade',
+          text: 'Upgrade',
           rol: 'confirm',
           cssClass: 'alert-button-confirm',
           handler: () => {
@@ -84,12 +82,7 @@ export default {
       ]
     },
     getMessage() {
-      if (this.showCsrfRefreshAlert) {
-        // Prefer the more urgent message when both apply
-        return 'Please refresh the page.'
-      } else {
-        return 'Upgrade now to get the latest version.'
-      }
+      return 'Upgrade now to get the latest version.'
     },
   },
 }

@@ -23,32 +23,6 @@ describe('AuthService', () => {
     vi.resetAllMocks()
   })
 
-  describe('fetchAndSetCsrfHeader', () => {
-    it('Should throw an error if a CSRF token is not in the response', async () => {
-      NetworkService.getCsrfToken = vi.fn().mockResolvedValue({
-        data: {
-          err: 'Something went wrong',
-        },
-      })
-      await expect(() =>
-        AuthService.fetchAndSetCsrfHeader('testUser123')
-      ).rejects.toThrowError(
-        'Something went wrong. Please refresh the page and try again.'
-      )
-    })
-
-    it('Should throw an error if request is rejected', async () => {
-      NetworkService.getCsrfToken = vi.fn().mockRejectedValue({
-        data: {
-          err: 'Rejection',
-        },
-      })
-      await expect(() =>
-        AuthService.fetchAndSetCsrfHeader('testUser123')
-      ).rejects.toThrowError()
-    })
-  })
-
   describe('login', () => {
     it.each([
       ['test@test.com', ''],
@@ -69,29 +43,9 @@ describe('AuthService', () => {
       NetworkService.login = vi.fn().mockResolvedValue({
         err: 'Something went wrong',
       })
-      vi.spyOn(AuthService, 'fetchAndSetCsrfHeader')
       await expect(AuthService.login(testLoginCreds)).rejects.toThrow(
         'No user returned from auth service'
       )
-      expect(AuthService.fetchAndSetCsrfHeader).not.toHaveBeenCalled()
-    })
-
-    it('Should call fetchAndSetCsrfHeader on successful login', async () => {
-      NetworkService.getCsrfToken = vi.fn().mockResolvedValue({
-        data: {
-          csrfToken: '123',
-        },
-      })
-      NetworkService.login = vi.fn().mockResolvedValue({
-        data: {
-          user: {
-            id: 'userId',
-          },
-        },
-      })
-      vi.spyOn(AuthService, 'fetchAndSetCsrfHeader')
-      await AuthService.login(testLoginCreds)
-      expect(AuthService.fetchAndSetCsrfHeader).toHaveBeenCalledWith('userId')
     })
   })
 })

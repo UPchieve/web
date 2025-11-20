@@ -18,8 +18,6 @@ export default {
     isMobileApp: false,
     isWebPageHidden: false,
     version: '',
-    csrfToken: '',
-    showCsrfRefreshAlert: false,
     prefersReducedMotion: false,
   },
   mutations: {
@@ -30,8 +28,6 @@ export default {
     setIsMobileApp: (state, isMobileApp) => (state.isMobileApp = isMobileApp),
     setVersion: (state, version) => (state.version = version),
     isWebPageHidden: (state, isVisible) => (state.isWebPageHidden = isVisible),
-    setCsrfToken: (state, csrfToken) => (state.csrfToken = csrfToken),
-    setShowCsrfRefreshAlert: (state, val) => (state.showCsrfRefreshAlert = val),
     setPrefersReducedMotion: (state, val) => (state.prefersReducedMotion = val),
   },
   actions: {
@@ -70,6 +66,5 @@ export default {
       getters.mobileMode && state.windowWidth > state.windowHeight,
     isMobilePortrait: (state, getters) =>
       getters.mobileMode && state.windowWidth < state.windowHeight,
-    csrfToken: (state) => state.csrfToken,
   },
 }

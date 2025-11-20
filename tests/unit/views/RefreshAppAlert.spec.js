@@ -4,7 +4,6 @@ import { createStore } from 'vuex'
 import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
 import * as VersionService from '@/services/VersionService'
 import appModule from '@/store/modules/app/index'
-import { nextTick } from 'vue'
 
 const mockVersionService = vi.mocked(VersionService)
 const SERVER_VERSION = '1'
@@ -17,7 +16,6 @@ beforeEach(() => {
       app: {
         ...appModule,
         state: {
-          showCsrfRefreshAlert: false,
           version: SERVER_VERSION,
         },
       },
@@ -67,54 +65,6 @@ describe('RefreshAppAlert', () => {
         }),
         expect.objectContaining({
           text: 'Upgrade',
-        }),
-      ])
-    )
-  })
-
-  test('Shows refresh alert for csrf', async () => {
-    const wrapper = getWrapper(defaultStore)
-    expect(
-      wrapper.find('[data-testid="refresh-app-ion-alert"]').exists()
-    ).toBeFalsy()
-    defaultStore.commit('app/setShowCsrfRefreshAlert', true)
-    await nextTick()
-    const alert = wrapper.find('[data-testid="refresh-app-ion-alert"]')
-    expect(alert.exists()).toBeTruthy()
-    expect(wrapper.vm.getHeader).toEqual('Oops! Something went wrong.')
-    expect(wrapper.vm.getMessage).toEqual('Please refresh the page.')
-    expect(wrapper.vm.getButtons).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          text: 'Not now',
-        }),
-        expect.objectContaining({
-          text: 'Refresh',
-        }),
-      ])
-    )
-  })
-
-  test('When both csrf and new version, shows csrf messaging', async () => {
-    const wrapper = getWrapper(defaultStore)
-    expect(
-      wrapper.find('[data-testid="refresh-app-ion-alert"]').exists()
-    ).toBeFalsy()
-    defaultStore.commit('app/setShowCsrfRefreshAlert', true)
-    defaultStore.commit('app/setVersion', '2')
-    await nextTick()
-
-    const alert = wrapper.find('[data-testid="refresh-app-ion-alert"]')
-    expect(alert.exists()).toBeTruthy()
-    expect(wrapper.vm.getHeader).toEqual('Oops! Something went wrong.')
-    expect(wrapper.vm.getMessage).toEqual('Please refresh the page.')
-    expect(wrapper.vm.getButtons).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          text: 'Not now',
-        }),
-        expect.objectContaining({
-          text: 'Refresh',
         }),
       ])
     )

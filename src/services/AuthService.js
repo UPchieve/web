@@ -2,11 +2,9 @@ import Validator from 'validator'
 import errorFromHttpResponse from '../utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
-import NetworkService, { axiosInstance } from './NetworkService'
+import NetworkService from './NetworkService'
 import ProductDiscoveryService from './ProductDiscoveryService'
 import { socket } from '@/socket'
-
-export const INVALID_CSRF_ERROR = 'invalid csrf token'
 
 export async function logout(context, logoutRoute) {
   try {
@@ -45,22 +43,7 @@ export default {
     if (!('data' in loginResponse)) {
       throw new Error('No user returned from auth service')
     }
-    await this.fetchAndSetCsrfHeader(loginResponse.data.user.id)
     return loginResponse.data
-  },
-
-  async fetchAndSetCsrfHeader(userId = undefined) {
-    const csrfResponse = await NetworkService.getCsrfToken()
-    if (!csrfResponse?.data?.csrfToken) {
-      LoggerService.noticeError(
-        `Failed to fetch CSRF token for userId=${userId}`
-      )
-      throw new Error(
-        'Something went wrong. Please refresh the page and try again.'
-      )
-    }
-    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] =
-      csrfResponse.data.csrfToken
   },
 
   registerOpenVolunteer(signupData) {

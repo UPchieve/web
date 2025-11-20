@@ -173,12 +173,6 @@ export default {
   },
 
   // Server route defintions
-  getCsrfToken() {
-    return httpGet(`${API_ROOT}/csrftoken`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
   async getBootstrappedFeatureFlags() {
     return httpGet(`${API_PUBLIC_ROOT}/feature-flags`).then(
       this._successHandler,

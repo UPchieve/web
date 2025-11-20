@@ -6,7 +6,6 @@ import PortalService from './services/PortalService'
 import router from './router'
 import store from './store'
 import NetworkService, { axiosInstance } from './services/NetworkService'
-import { backOff } from 'exponential-backoff'
 import AnalyticsService from './services/AnalyticsService'
 import FeatureFlagService from './services/FeatureFlagService'
 import LoggerService from './services/LoggerService'
@@ -41,20 +40,16 @@ PortalService.call('top.onData', handlePortalData)
 
 async function main() {
   try {
-    const [csrfResponse, flagsResponse] = await Promise.allSettled([
-      backOff(() => NetworkService.getCsrfToken()),
-      NetworkService.getBootstrappedFeatureFlags(),
-    ])
+    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = crypto.randomUUID()
 
-    const csrfToken = csrfResponse.value.data.csrfToken
-    store.commit('app/setCsrfToken', csrfToken)
-    axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken
+    const featureFlagsResult =
+      await NetworkService.getBootstrappedFeatureFlags()
 
     await FeatureFlagService.init(
-      flagsResponse.value?.data?.id,
-      flagsResponse.value?.data?.featureFlags,
-      flagsResponse.value?.data?.featureFlagPayloads,
-      flagsResponse.value?.data?.personProperties
+      featureFlagsResult?.data?.id,
+      featureFlagsResult?.data?.featureFlags,
+      featureFlagsResult?.data?.featureFlagPayloads,
+      featureFlagsResult?.data?.personProperties
     )
     await AnalyticsService.init()
 

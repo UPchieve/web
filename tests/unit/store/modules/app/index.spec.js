@@ -21,8 +21,6 @@ describe('`app` store module', () => {
       isMobileApp: false,
       isWebPageHidden: false,
       version: '',
-      csrfToken: '',
-      showCsrfRefreshAlert: false,
       prefersReducedMotion: false,
     })
   })
@@ -48,17 +46,6 @@ describe('`app` store module', () => {
 
       mutations.setWindowHeight(state, -100)
       expect(state.windowHeight).toBe(0)
-    })
-
-    it('setShowCsrfRefreshAlert', () => {
-      expect(typeof mutations.setShowCsrfRefreshAlert).toBe('function')
-      const state = { showCsrfRefreshAlert: false }
-
-      mutations.setShowCsrfRefreshAlert(state, true)
-      expect(state.showCsrfRefreshAlert).toBeTruthy()
-
-      mutations.setShowCsrfRefreshAlert(state, false)
-      expect(state.showCsrfRefreshAlert).toBeFalsy()
     })
   })
 
