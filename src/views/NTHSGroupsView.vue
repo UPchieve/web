@@ -1,32 +1,27 @@
 <script setup lang="ts">
 import Spinner from '@/components/Spinner.vue'
-import { onMounted, ref, useTemplateRef } from 'vue'
+import config from '@/config'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
-const email = store.state.user.user.email
-const iframe = useTemplateRef('iframe')
+const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
 const isLoaded = ref(false)
-onMounted(() => {
-  if (iframe.value !== null) {
-    iframe.value.onload = () => {
-      isLoaded.value = true
-    }
-  }
-})
 </script>
 
 <template>
   <div class="container">
-    <h2 class="title">{{ store.state.volunteer.NTHSGroups[0].groupName }}</h2>
+    <h2 class="title" v-if="group?.groupName">{{ group.groupName }}</h2>
     <iframe
+      v-if="Boolean(group?.groupId)"
       ref="iframe"
       class="iframe"
       :class="isLoaded ? '' : 'hide'"
-      :src="`https://upchieve.retool.com/embedded/public/3362bf53-b543-40ea-b47d-e8d25fd86583?email=${email}`"
+      :src="`${config.NTHSRetoolDashboardUrl}?groupId=${group.groupId}`"
       width="100%"
       height="100%"
       loading="lazy"
+      :onload="() => (isLoaded = true)"
     />
     <div class="spinner-container" v-if="!isLoaded">
       <Spinner />
