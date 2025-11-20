@@ -1084,7 +1084,10 @@ export default {
             IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_FAILED
           ]
         )
-        LoggerService.noticeError(error)
+        LoggerService.noticeError(error, {
+          sessionId: this.sessionId,
+          isZwibserveSession: this.isZwibserveSession,
+        })
         return
       } finally {
         // Reset the file input
@@ -1217,7 +1220,10 @@ export default {
             }
           }
         } catch (err) {
-          LoggerService.noticeError(err)
+          LoggerService.noticeError(err, {
+            sessionId: this.sessionId,
+            isZwibserveSession: this.isZwibserveSession,
+          })
           // If something goes wrong with the calculation, just hide the cursor.
           cursor.style.visibility = 'hidden'
         }
@@ -1236,6 +1242,7 @@ export default {
 
         LoggerService.log('Zwibbler: Connected', {
           sessionId: this.sessionId,
+          isZwibserveSession: this.isZwibserveSession,
         })
         AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECTED, {
           sessionId: this.sessionId,
@@ -1274,6 +1281,7 @@ export default {
                 {
                   sessionId: this.sessionId,
                   userType: this.userType,
+                  isZwibserveSession: this.isZwibserveSession,
                 }
               )
             }
@@ -1330,6 +1338,7 @@ export default {
         this.zwibblerCtx.setConfig('readOnly', true)
         LoggerService.noticeError('Zwibbler: Received connect-error.', {
           sessionId: this.sessionId,
+          isZwibserveSession: this.isZwibserveSession,
         })
         AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECT_ERROR, {
           sessionId: this.sessionId,
@@ -1350,7 +1359,10 @@ export default {
       try {
         await this.joinSharedSessionWithRetry()
       } catch (err) {
-        LoggerService.noticeError(err)
+        LoggerService.noticeError(err, {
+          sessionId: this.sessionId,
+          isZwibserveSession: this.isZwibserveSession,
+        })
       }
     },
 
@@ -1376,6 +1388,7 @@ export default {
                     {
                       sessionId: this.sessionId,
                       attemptNumber: currentAttempt,
+                      isZwibserveSession: this.isZwibserveSession,
                     }
                   )
                   AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECTED, {
@@ -1400,6 +1413,7 @@ export default {
                 {
                   sessionId: this.sessionId,
                   attemptNumber,
+                  isZwibserveSession: this.isZwibserveSession,
                 }
               )
               AnalyticsService.captureEvent(EVENTS.ZWIBBLER_FAILED_TO_CONNECT, {
@@ -1419,6 +1433,7 @@ export default {
             sessionId: this.sessionId,
             retries: MAX_RETRIES,
             timeout: TIMEOUT_MS,
+            isZwibserveSession: this.isZwibserveSession,
           }
         )
         AnalyticsService.captureEvent(EVENTS.ZWIBBLER_FAILED_TO_CONNECT, {

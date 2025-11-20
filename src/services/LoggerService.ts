@@ -34,23 +34,32 @@ export default class LoggerService {
     }
   }
 
-  static log(customData: unknown) {
-    // eslint-disable-next-line no-console
-    console.log(customData)
+  static log(message: string, customData?: object) {
+    if (newrelic) {
+      newrelic.log(message, { customAttributes: customData, level: 'info' })
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(message, customData)
+    }
   }
 
-  static info(customData: unknown) {
-    // eslint-disable-next-line no-console
-    console.info(customData)
+  static info(message: string, customData?: object) {
+    if (newrelic) {
+      newrelic.log(message, { customAttributes: customData, level: 'info' })
+    } else {
+      // eslint-disable-next-line no-console
+      console.info(message, customData)
+    }
   }
 
   static noticeError(err: unknown, customData?: unknown) {
     if (newrelic) {
       newrelic.noticeError(err, customData)
+      newrelic.log(err, { customAttributes: customData, level: 'error' })
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(err, customData)
     }
-    // Also log to console.error so it shows up in NR logs.
-    // eslint-disable-next-line no-console
-    console.error(err, customData)
   }
 
   static reset() {
