@@ -248,9 +248,11 @@ export default {
       }
     },
     requestQuillDoc() {
-      socket.emit('requestQuillState', {
-        sessionId: this.currentSession.id,
-      })
+      if (!this.currentSession?.endedAt) {
+        socket.emit('requestQuillState', {
+          sessionId: this.currentSession.id,
+        })
+      }
     },
     async onFileSelected(evt) {
       const { files } = evt.fileSelectionEvent.target
