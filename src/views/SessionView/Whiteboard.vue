@@ -721,6 +721,7 @@ export default {
         {
           tool: 'whiteboard',
           userType: this.userType,
+          isZwibserveSession: this.isZwibserveSession,
         }
       )
       this.usePickTool()
@@ -734,6 +735,7 @@ export default {
           {
             tool: 'whiteboard',
             userType: this.userType,
+            isZwibserveSession: this.isZwibserveSession,
           }
         )
     },
@@ -866,6 +868,7 @@ export default {
       this.zwibblerCtx.usePanTool()
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_WHITEBOARD_PAN_TOOL, {
         sessionId: this.sessionId,
+        isZwibserveSession: this.isZwibserveSession,
       })
       this.maybeFocusZwibbler(event)
     },
@@ -1246,6 +1249,7 @@ export default {
         })
         AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECTED, {
           sessionId: this.sessionId,
+          isZwibserveSession: this.isZwibserveSession,
         })
         // TODO: _Is_ there a way to access the WS connection in a less sketchy way?
         // The Zwibbler WS connection is on different properties depending on the build you are using.
@@ -1342,6 +1346,7 @@ export default {
         })
         AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECT_ERROR, {
           sessionId: this.sessionId,
+          isZwibserveSession: this.isZwibserveSession,
         })
       })
 
@@ -1394,6 +1399,7 @@ export default {
                   AnalyticsService.captureEvent(EVENTS.ZWIBBLER_CONNECTED, {
                     sessionId: this.sessionId,
                     attemptNumber: currentAttempt,
+                    isZwibserveSession: this.isZwibserveSession,
                   })
                   clearTimeout(timeoutId)
                   resolve()
@@ -1419,6 +1425,7 @@ export default {
               AnalyticsService.captureEvent(EVENTS.ZWIBBLER_FAILED_TO_CONNECT, {
                 sessionId: this.sessionId,
                 attemptNumber,
+                isZwibserveSession: this.isZwibserveSession,
               })
               return true
             },
@@ -1440,6 +1447,7 @@ export default {
           sessionId: this.sessionId,
           attemptNumber: MAX_RETRIES,
           isFinal: true,
+          isZwibserveSession: this.isZwibserveSession,
         })
       }
     },
