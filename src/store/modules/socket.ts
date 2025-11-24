@@ -267,6 +267,10 @@ export default {
       })
 
       socket.on('potentialPartnerModerationInfraction', (data: any) => {
+        LoggerService.info(
+          'received potentialPartnerModerationInfraction event',
+          data
+        )
         dispatch('liveMedia/handlePotentialPartnerInfraction', data, {
           root: true,
         })
