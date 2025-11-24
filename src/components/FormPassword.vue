@@ -28,7 +28,10 @@
       :required="isRequired"
     />
 
-    <div v-if="modelValue && showPasswordRequirements" class="password-requirements">
+    <div
+      v-if="modelValue && showPasswordRequirements"
+      class="password-requirements"
+    >
       <div
         v-for="(validation, key) in passwordValidationRules"
         :key="key"
@@ -94,8 +97,8 @@ export default {
     },
     showPasswordRequirements: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   emits: ['update:modelValue'],
