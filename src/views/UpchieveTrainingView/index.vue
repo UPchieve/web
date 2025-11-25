@@ -55,11 +55,11 @@ onBeforeMount(async () => {
   }
 })
 
-const hasNextModule = computed(
-  () =>
-    currentModuleIndex.value + 1 <
-    trainingCourseDefinition.value!.modules.length
-)
+// const hasNextModule = computed(
+//   () =>
+//     currentModuleIndex.value + 1 <
+//     trainingCourseDefinition.value!.modules.length
+// )
 const hasPreviousModule = computed(() => currentModuleIndex.value > 0)
 
 const trainingBanner = ref()
@@ -75,10 +75,10 @@ async function next() {
   try {
     if (!isModuleComplete.value) {
       // @TODO uncomment me when ready.
-      // await NetworkService.recordTrainingCourseProgress(
-      //   COURSE_KEY,
-      //   currentMaterialKey.value
-      // )
+      await NetworkService.recordTrainingCourseProgress(
+        COURSE_KEY,
+        currentMaterialKey.value
+      )
     }
     currentModuleIndex.value = currentModuleIndex.value + 1
     await scrollToTop()
@@ -159,7 +159,6 @@ const overallProgress = computed(() => {
           >{{ isMobile ? ' ' : 'Previous' }}</LargeButton
         >
         <LargeButton
-          :disabled="!hasNextModule"
           variant="primary-blue"
           :showArrow="true"
           @click="next"
@@ -192,7 +191,6 @@ const overallProgress = computed(() => {
     grid-template-rows: [banner] auto [main-content] auto [navigation-buttons] auto auto;
   }
 
-  grid-row-gap: 2%;
   border-radius: 8px;
   background-color: white;
   padding: 3%;

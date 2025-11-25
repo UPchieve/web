@@ -234,4 +234,9 @@ watch(isExpanded, (value) => {
   transform: rotate(90deg);
   transition: 200ms linear;
 }
+
+.status-icon {
+  height: 16px;
+  width: 16px;
+}
 </style>
