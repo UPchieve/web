@@ -78,18 +78,14 @@ export default {
     }),
     ...mapGetters({
       firstName: 'user/firstName',
-      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
       isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
     }),
     canSendDms() {
-      const isStudentDmsEnabled =
+      const canInitiateDmsAsStudent =
         this.isStudent && this.isStudentsInitiateDmsEnabled
-      return (
-        this.isSessionRecapDmsActive &&
-        (this.isVolunteer || isStudentDmsEnabled)
-      )
+      return this.isVolunteer || canInitiateDmsAsStudent
     },
     isSessionOver() {
       return !!this.currentSession?.endedAt

@@ -129,12 +129,13 @@ export default {
       store.state.user.session.subTopic
     )
 
-    const isSessionRecapDmsActive =
-      store.getters['featureFlags/isSessionRecapDmsActive']
-    const isStudent = store.getters['user/isStudent']
-    if (!isSessionRecapDmsActive || isStudent) {
-      // Do not send the coach directly to the feedback page if
-      // they can leave DMs.
+    // Do not send the user directly to the feedback page if they can leave DMs.
+    const isStudentWhoCanInitiateDms =
+      store.getters['user/isStudent'] &&
+      store.getters['featureFlags/isStudentsInitiateDmsEnabled']
+    const canInitiateDms =
+      isStudentWhoCanInitiateDms || store.getters['user/isVolunteer']
+    if (!canInitiateDms) {
       this.postSessionRedirect(endedSession)
     }
 

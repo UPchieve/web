@@ -101,11 +101,11 @@ export default {
       currentSession: (state) => state.user.session,
       isSessionConnectionAlive: (state) => state.user.isSessionConnectionAlive,
       isConnected: (state) => state.socket.isConnected,
+      isSessionEnded: (state) => !!state.user.session?.endedAt,
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
-      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isUpdatedDocEditorImageStorageEnabled:
         'featureFlags/isUpdatedDocEditorImageStorageEnabled',
     }),
@@ -329,12 +329,9 @@ export default {
   },
   watch: {
     isSessionConnectionAlive(newValue, oldValue) {
-      if (
-        (newValue && !oldValue) ||
-        (this.isSessionRecapDmsActive && this.isVolunteer)
-      ) {
-        // socket.io just reconnected, allow edits to the document editor
-        // or the volunteer is able to send DMs after the session ends
+      const isReconnected = !oldValue && newValue
+      if (isReconnected && !this.isSessionEnded) {
+        // socket.io just reconnected and the session isn't over, allow edits to the document editor
         this.quillEditor.enable()
         this.isLoading = false
         this.loadingText = ''

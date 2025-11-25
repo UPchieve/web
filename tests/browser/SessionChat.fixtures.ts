@@ -45,7 +45,6 @@ export function createVoiceChatMockStore(
     'user/isSessionWaitingForVolunteer': () => false,
     'user/numberOfUnreadChatMessages': () => 0,
     'user/sessionPartner': () => ({ id: 'partner-1', firstName: 'Partner' }),
-    'featureFlags/isSessionRecapDmsActive': () => false,
     'featureFlags/isDisplayVolunteerLanguagesEnabled': () => false,
     'featureFlags/isConfettiCelebrationEnabled': () => false,
     'featureFlags/isPendingMessagesEnabled': () => false,

@@ -137,9 +137,8 @@
 
         <chat-bot
           v-if="
-            sessionHasEnded &&
-            isSessionRecapDmsActive &&
-            (isVolunteer || isStudentsInitiateDmsEnabled)
+            (sessionHasEnded && isVolunteer) ||
+            (isStudent && isStudentsInitiateDmsEnabled)
           "
           :currentSession="currentSession"
           :isInRecap="isInRecap"
@@ -320,7 +319,6 @@ export default {
       isStudent: 'user/isStudent',
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
-      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isDisplayVolunteerLanguagesEnabled:
         'featureFlags/isDisplayVolunteerLanguagesEnabled',
       sessionPartner: 'user/sessionPartner',

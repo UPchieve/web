@@ -40,7 +40,6 @@ describe('ChatBot', () => {
           ...storeOptions.modules.featureFlags,
           getters: {
             ...storeOptions.modules.featureFlags.getters,
-            isSessionRecapDmsActive: () => true,
             ...(overrides?.featureFlags?.getters ?? {}),
           },
         },

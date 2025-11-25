@@ -861,7 +861,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   CC_INTRO_COPY = 'cc-intro-copy',
   BF_INTRO_COPY = 'bf-intro-copy',
   REFERRAL_COPY = 'referral-copy',
-  SESSION_RECAP_DMS = 'session-recap-dms',
   DASHBOARD_REDESIGN = 'dashboard-redesign',
   FORCE_DASHBOARD_REDESIGN_ORG = 'force-dashboard-redesign-org',
   SMS_VERIFICATION = 'sms-verification',

@@ -42,7 +42,6 @@ describe('SessionChat', () => {
           ...storeOptions.modules.featureFlags,
           getters: {
             ...storeOptions.modules.featureFlags.getters,
-            isSessionRecapDmsActive: () => true,
             isPendingMessagesEnabled: () =>
               overrides.isPendingMessagesEnabled ?? false,
           },

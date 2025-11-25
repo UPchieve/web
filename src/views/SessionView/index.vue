@@ -583,7 +583,6 @@ export default {
       isStudentVolunteer: 'user/isStudentVolunteer',
       isSessionOver: 'user/isSessionOver',
       isSessionAlive: 'user/isSessionAlive',
-      isSessionRecapDmsActive: 'featureFlags/isSessionRecapDmsActive',
       isTutorBotChatEnabled: 'featureFlags/isTutorBotChatEnabled',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
