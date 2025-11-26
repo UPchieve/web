@@ -226,9 +226,7 @@ function createAccountWithSso(
   data: AccountFormData
 ): SubmitActionResponse {
   try {
-    if (userType === UserType.student) {
-      localStorage.setItem('isSSOSignUpRedirect', 'true')
-    }
+    localStorage.setItem('isSSOSignUpRedirect', 'true')
     signInWithSso({
       provider,
       errorRedirect:

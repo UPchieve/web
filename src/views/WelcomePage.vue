@@ -58,7 +58,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
       AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
       localStorage.removeItem('isSSOSignUpRedirect')
-      store.dispatch('user/firstDashboardVisit', true)
+      this.$store.dispatch('user/firstDashboardVisit', true)
     }
   },
   data() {
