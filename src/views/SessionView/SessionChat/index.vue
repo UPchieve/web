@@ -965,9 +965,6 @@ export default {
   }
 
   .contents {
-    display: grid;
-    grid-template-rows: subgrid;
-    grid-row: span 2;
     max-width: 80%;
 
     .bubble {
