@@ -137,8 +137,8 @@
 
         <chat-bot
           v-if="
-            (sessionHasEnded && isVolunteer) ||
-            (isStudent && isStudentsInitiateDmsEnabled)
+            sessionHasEnded &&
+            (isVolunteer || (isStudent && isStudentsInitiateDmsEnabled))
           "
           :currentSession="currentSession"
           :isInRecap="isInRecap"
