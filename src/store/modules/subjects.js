@@ -135,7 +135,9 @@ export default {
         return {
           topicId: t.id,
           topicName: t.displayName,
-          subjects: subjects.filter((s) => s.topicId === t.id),
+          subjects: subjects
+            .filter((s) => s.topicId === t.id)
+            .sort((a, b) => a.displayName > b.displayName),
         }
       })
     },
