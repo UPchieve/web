@@ -955,6 +955,7 @@ export default {
     width: 32px;
     position: relative;
     margin-right: 4px;
+    margin-bottom: 30px;
     grid-row: 1;
 
     .avatar {
