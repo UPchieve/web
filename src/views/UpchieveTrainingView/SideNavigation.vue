@@ -7,13 +7,14 @@ import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import ContinuousProgressBar from '@/views/UpchieveTrainingView/ContinuousProgressBar.vue'
 
+export type StepStatus = 'complete' | 'in-progress' | 'not-started'
 export type NavigationStep = {
   name: string
-  status: 'complete' | 'in-progress' | 'not-started'
+  status: StepStatus
 }
 
 const props = defineProps<{
-  steps: NavigationStep[] | null // @TODO: Show loader while null.
+  steps: NavigationStep[]
   overallProgress: number // 0-100 please
 }>()
 
@@ -66,8 +67,8 @@ watch(isExpanded, (value) => {
         class="expand-collapse-button"
       >
         <CaretIcon
+          class="expand-icon"
           :class="{
-            'expand-icon': true,
             'expand-icon-collapsed': !isExpanded,
             'expand-icon-expanded': isExpanded,
           }"

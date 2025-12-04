@@ -1,3 +1,5 @@
+import type { AnswerMap, LetterChoice } from '@/services/TrainingService'
+
 export type UpchieveTrainingCourse = {
   isComplete: boolean
   progress: number
@@ -12,6 +14,7 @@ export type UpchieveTrainingCourseModule = {
   name: string
   key: string
   materials: UpchieveTrainingMaterial[]
+  quizKey: string
 }
 
 export type UpchieveTrainingMaterial = {
@@ -25,4 +28,24 @@ export type SimplifiedUpchieveTrainingModule = {
   name: string
   key: string
   material: UpchieveTrainingMaterial
+}
+
+export type AnswerChoice = {
+  txt: string
+  val: LetterChoice
+}
+
+export type QuizQuestion = {
+  id: number
+  questionText: string
+  correctAnswer: LetterChoice
+  category: string
+  subcategory: string
+  possibleAnswers: AnswerChoice[]
+}
+
+export type QuizResults = {
+  didPass: boolean
+  numCorrect: number
+  answerKey: AnswerMap
 }

@@ -258,4 +258,154 @@ describe('User store module', () => {
       )
     })
   })
+
+  describe('addCertification', () => {
+    it('Overrides an existing certification or adds a new one', async () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              certifications: {
+                algebraOne: {
+                  passed: false,
+                  tries: 1,
+                },
+              },
+            },
+          },
+        },
+      })
+
+      await store.dispatch('user/addCertification', {
+        certificationName: 'algebraOne',
+        certificationInfo: {
+          passed: true,
+          tries: 2,
+        },
+      })
+      const updated = store.state.user.user.certifications
+      expect(updated).toEqual({
+        algebraOne: {
+          passed: true,
+          tries: 2,
+        },
+      })
+    })
+
+    it('Adds a new certification', async () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              certifications: {
+                algebraOne: {
+                  passed: false,
+                  tries: 1,
+                },
+              },
+            },
+          },
+        },
+      })
+
+      await store.dispatch('user/addCertification', {
+        certificationName: 'dei',
+        certificationInfo: {
+          passed: true,
+          tries: 2,
+        },
+      })
+      const updated = store.state.user.user.certifications
+      expect(updated).toEqual({
+        algebraOne: {
+          passed: false,
+          tries: 1,
+        },
+        dei: {
+          passed: true,
+          tries: 2,
+        },
+      })
+    })
+  })
+
+  describe('hasCertification', () => {
+    it('Returns whether the user has the given certification (and it is passed)', () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              certifications: {
+                algebraOne: { passed: true },
+                dei: { passed: false },
+              },
+            },
+          },
+        },
+      })
+      expect(store.getters['user/hasCertification']('algebraOne')).toEqual(true)
+      expect(store.getters['user/hasCertification']('dei')).toEqual(false)
+    })
+  })
+
+  describe('hasASubjectCertification', () => {
+    it('Does not return true if all certs are non-subject certs', () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              certifications: {
+                coachingStrategies: { passed: true },
+                academicIntegrity: { passed: true },
+                dei: { passed: true },
+                communitySafety: { passed: true },
+                upchieve101: { passed: true },
+              },
+            },
+          },
+        },
+      })
+      expect(store.getters['user/hasASubjectCertification']).toEqual(false)
+    })
+
+    it('Returns true if there is at least one passed subject certification', () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              certifications: {
+                coachingStrategies: { passed: true },
+                academicIntegrity: { passed: true },
+                dei: { passed: true },
+                communitySafety: { passed: true },
+                upchieve101: { passed: true },
+                algebraOne: { passed: true },
+              },
+            },
+          },
+        },
+      })
+      expect(store.getters['user/hasASubjectCertification']).toEqual(true)
+    })
+
+    it('Returns false if there is a subject cert but it has not been passed', () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              certifications: {
+                coachingStrategies: { passed: true },
+                academicIntegrity: { passed: true },
+                dei: { passed: true },
+                communitySafety: { passed: true },
+                upchieve101: { passed: true },
+                algebraOne: { passed: false },
+              },
+            },
+          },
+        },
+      })
+      expect(store.getters['user/hasASubjectCertification']).toEqual(false)
+    })
+  })
 })

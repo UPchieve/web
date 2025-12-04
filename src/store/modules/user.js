@@ -325,6 +325,19 @@ export default {
         LoggerService.error(error.response.data.err)
       }
     },
+
+    addCertification: async (
+      { state, dispatch },
+      { certificationName, certificationInfo }
+    ) => {
+      const updatedCerts = {
+        ...(state.user.certifications ?? {}),
+        [certificationName]: certificationInfo,
+      }
+      await dispatch('addToUser', {
+        certifications: updatedCerts,
+      })
+    },
   },
   getters: {
     avatar(_state, getters) {
@@ -382,11 +395,21 @@ export default {
 
     isVerified: (state) => state.user.verified,
 
-    hasCertification: (state) => {
-      // UPchieve 101 is a training course and not technically considered
-      // a certification. It's nested in user.certifications for legacy purposes
+    hasCertification: (state) => (certKey) => {
+      return Object.entries(state.user.certifications).some(
+        (certInfo) => certInfo[0] === certKey && certInfo[1].passed
+      )
+    },
+
+    hasASubjectCertification: (state) => {
       const certs = Object.assign({}, state.user.certifications)
+      // TODO: Eventually clean this up. This is manually excluding all of the non-subject certs.
+      // We should have the backend pass whether something is a subject cert or not.
       delete certs.upchieve101
+      delete certs.dei
+      delete certs.communitySafety
+      delete certs.coachingStrategies
+      delete certs.academicIntegrity
       return some(certs, { passed: true })
     },
 
@@ -476,7 +499,7 @@ export default {
       return (
         !state.user.isOnboarded &&
         getters.isVolunteer &&
-        !getters.hasCertification &&
+        !getters.hasASubjectCertification &&
         !getters.userRoles.includes('student')
       )
     },
@@ -493,7 +516,7 @@ export default {
       return (
         getters.isVolunteer &&
         !state.user.isOnboarded &&
-        !getters.hasCertification
+        !getters.hasASubjectCertification
       )
     },
 
@@ -570,7 +593,7 @@ export default {
           return acc
         }, {})
 
-        const hasSubjectCertification = getters.hasCertification
+        const hasSubjectCertification = getters.hasASubjectCertification
         userProps = {
           ...userProps,
           ...certificationInfo,

@@ -198,7 +198,7 @@ export default {
       isVolunteer: 'user/isVolunteer',
       allSubtopics: 'subjects/allSubtopics',
       isQuizStudyMaterialUser: 'user/isQuizStudyMaterialUser',
-      hasCertification: 'user/hasCertification',
+      hasCertification: 'user/hasASubjectCertification',
       isAutoFlowUser: 'user/isAutoFlowUser',
       isStudentVolunteer: 'user/isStudentVolunteer',
     }),

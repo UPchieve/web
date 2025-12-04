@@ -48,7 +48,8 @@ export type QuizQuestion = {
   updatedAt: Date
 }
 
-export type AnswerMap = { [k: number]: string }
+export type LetterChoice = 'a' | 'b' | 'c' | 'd'
+export type AnswerMap = Record<number, LetterChoice>
 
 export default {
   idAnswerMap: {} as AnswerMap,
@@ -141,5 +142,34 @@ export default {
       question.correctAnswer = idCorrectAnswerMap[question.id]
     })
     return questionsReview
+  },
+
+  async getQuizScore(
+    quizCategory: string,
+    idAnswerMap: AnswerMap
+  ): Promise<{
+    didPass: boolean
+    answerKey: AnswerMap
+    score: number
+    isTrainingSubject: boolean
+  }> {
+    const { default: store } = await import('@/store')
+    const quizScoreResponse = await NetworkService.getQuizScore({
+      idAnswerMap: idAnswerMap,
+      category: quizCategory,
+    })
+    const { passed, tries, score, idCorrectAnswerMap, isTrainingSubject } =
+      quizScoreResponse.data
+    await store.dispatch('user/addCertification', {
+      certificationName: quizCategory,
+      certificationInfo: { passed, score, isTrainingSubject, tries },
+    })
+
+    return {
+      didPass: passed,
+      answerKey: idCorrectAnswerMap,
+      score,
+      isTrainingSubject,
+    }
   },
 }

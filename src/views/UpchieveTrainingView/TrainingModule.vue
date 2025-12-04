@@ -3,6 +3,8 @@ import type { SimplifiedUpchieveTrainingModule } from '@/views/UpchieveTrainingV
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { defineAsyncComponent } from 'vue'
+import TrainingPage from '@/views/UpchieveTrainingView/Quizzes/TrainingPage.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 function load(name: string) {
   return defineAsyncComponent(() => import(`@/assets/Training/${name}.svg`))
@@ -40,9 +42,13 @@ const SafetyReportChatBoxes = load('safety_report_chat_boxes')
 const store = useStore()
 const props = defineProps<{
   module: SimplifiedUpchieveTrainingModule
+  hasPreviousModule: boolean
+  onPrevious: () => void
+  onNext: () => void
 }>()
 
-const videoWidth = computed(() => (store.getters['app/mobileMode'] ? 300 : 560))
+const isMobile = computed(() => store.getters['app/mobileMode'])
+const videoWidth = computed(() => (isMobile.value ? 300 : 560))
 const videoHeight = computed(() =>
   store.getters['app/mobileMode'] ? 150 : 315
 )
@@ -53,8 +59,8 @@ function goToResource(externalLink: string) {
 </script>
 
 <template>
-  <div class="training-module">
-    <div class="module-content">
+  <TrainingPage>
+    <template v-slot:main-content>
       <div v-if="props.module.key === 'introduction'" class="module-intro">
         <strong>OVERVIEW</strong>
         <p>
@@ -955,8 +961,28 @@ function goToResource(externalLink: string) {
         {{ props.module.key }}
         <h2>Complete</h2>
       </div>
-    </div>
-  </div>
+    </template>
+    <template v-slot:previous-button>
+      <LargeButton
+        class="previous-button"
+        v-if="hasPreviousModule"
+        variant="secondary"
+        @click="props.onPrevious"
+        :showArrow="true"
+        arrowDirection="left"
+        >{{ isMobile ? ' ' : 'Previous' }}</LargeButton
+      >
+    </template>
+    <template v-slot:next-button>
+      <LargeButton
+        variant="primary-blue"
+        :showArrow="true"
+        @click="props.onNext"
+        class="next-button"
+        >Next</LargeButton
+      >
+    </template>
+  </TrainingPage>
 </template>
 <style lang="scss" scoped>
 .module-intro {

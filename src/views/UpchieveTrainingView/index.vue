@@ -1,14 +1,17 @@
 <script lang="ts" setup>
-import LargeButton from '@/components/LargeButton.vue'
 import { computed, nextTick, onBeforeMount, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import type { UpchieveTrainingCourse } from '@/views/UpchieveTrainingView/types'
 import TrainingModule from '@/views/UpchieveTrainingView/TrainingModule.vue'
 import SideNavigation from '@/views/UpchieveTrainingView/SideNavigation.vue'
-import type { NavigationStep } from '@/views/UpchieveTrainingView/SideNavigation.vue'
-import Loader from '@/components/Loader.vue'
+import type {
+  NavigationStep,
+  StepStatus,
+} from '@/views/UpchieveTrainingView/SideNavigation.vue'
 import TrainingBanner from '@/views/UpchieveTrainingView/TrainingBanner.vue'
 import { useStore } from 'vuex'
+import TrainingQuiz from '@/views/UpchieveTrainingView/Quizzes/TrainingQuiz.vue'
+import LoggerService from '@/services/LoggerService'
 
 const store = useStore()
 const COURSE_KEY = 'upchieveTraining'
@@ -21,45 +24,51 @@ const currentModule = computed(
 const currentMaterialKey = computed(
   () => currentModule.value?.materials[0].materialKey
 )
-const isModuleComplete = computed(() => {
-  if (
-    !currentModule.value ||
-    !trainingCourseDefinition.value ||
-    !currentMaterialKey.value
-  )
-    return true
-  return trainingCourseDefinition.value.completedMaterials.includes(
-    currentMaterialKey.value
-  )
-})
 const isRecordingProgress = ref<boolean>(false)
 
+// This is while we deal with some of the legacy stuff for training courses.
+// Legacy training course had multiple materials per module
+// Now we just have one material.
+// @TODO Eventually drop this altogether once we update the backend to no longer require us to record per-material progress.
 const simplifiedTrainingModule = computed(() => {
   if (!currentModule.value) return
   return {
     name: currentModule.value?.name,
     key: currentModule.value?.key,
     material: currentModule.value?.materials[0],
+    quizKey: currentModule.value?.quizKey,
   }
 })
 
-const isMobile = computed(() => store.getters['app/mobileMode'])
+const hasPassedModuleQuiz = computed(
+  () =>
+    currentModule.value && hasModuleCertification(currentModule.value?.quizKey)
+)
+
+function hasModuleCertification(module: string): boolean {
+  return store.getters['user/hasCertification'](module)
+}
+
+type StepType = 'viewMaterials' | 'takeQuiz' | 'viewQuizResults'
+const currentStepType = ref<StepType>('viewMaterials')
 
 onBeforeMount(async () => {
   try {
     const trainingCourseResponse =
       await NetworkService.getTrainingCourse(COURSE_KEY)
     trainingCourseDefinition.value = trainingCourseResponse.data.course
-  } catch {
-    // @TODO
+    // Open to last incomplete step
+    const lastIncompleteStep = navigationSteps.value.findIndex(
+      (step) => step.status !== 'complete'
+    )
+    currentModuleIndex.value = lastIncompleteStep
+  } catch (err) {
+    handleError(
+      err,
+      `Failed to get training course definition for course ${COURSE_KEY}`
+    )
   }
 })
-
-// const hasNextModule = computed(
-//   () =>
-//     currentModuleIndex.value + 1 <
-//     trainingCourseDefinition.value!.modules.length
-// )
 const hasPreviousModule = computed(() => currentModuleIndex.value > 0)
 
 const trainingBanner = ref()
@@ -70,60 +79,122 @@ async function scrollToTop() {
   }
 }
 
-async function next() {
+async function recordTrainingProgress() {
   isRecordingProgress.value = true
   try {
-    if (!isModuleComplete.value) {
-      // @TODO uncomment me when ready.
+    if (!hasPassedModuleQuiz.value) {
       await NetworkService.recordTrainingCourseProgress(
         COURSE_KEY,
         currentMaterialKey.value
       )
     }
-    currentModuleIndex.value = currentModuleIndex.value + 1
-    await scrollToTop()
-  } catch {
-    // @TODO
+  } catch (err) {
+    handleError(
+      err,
+      `Failed to record training course progress for course ${COURSE_KEY} and material ${currentMaterialKey.value}`
+    )
   } finally {
     isRecordingProgress.value = false
   }
 }
 
-async function previous() {
-  currentModuleIndex.value = currentModuleIndex.value - 1
+async function goToNextStep() {
+  const proceedToNextModule = () => {
+    currentModuleIndex.value = currentModuleIndex.value + 1
+    currentStepType.value = 'viewMaterials'
+  }
+
+  if (currentStepType.value === 'viewMaterials') {
+    await recordTrainingProgress()
+    if (!currentModule.value?.quizKey || hasPassedModuleQuiz.value) {
+      proceedToNextModule()
+    } else {
+      currentStepType.value = 'takeQuiz'
+    }
+  } else if (currentStepType.value === 'takeQuiz') {
+    currentStepType.value = 'viewQuizResults'
+  } else if (currentStepType.value === 'viewQuizResults') {
+    currentStepType.value = 'viewMaterials'
+    if (hasPassedModuleQuiz.value) {
+      proceedToNextModule()
+    }
+  }
   await scrollToTop()
 }
 
-const navigationSteps = computed(() => {
-  if (!trainingCourseDefinition.value) return null
+async function goToPreviousStep() {
+  currentModuleIndex.value = currentModuleIndex.value - 1
+  currentStepType.value = 'viewMaterials'
+  await scrollToTop()
+}
 
-  const completedMaterials =
-    trainingCourseDefinition.value?.completedMaterials ?? []
+async function onBackOutOfQuiz() {
+  currentStepType.value = 'viewMaterials'
+  await scrollToTop()
+}
 
+async function onPassedQuiz() {
+  currentStepType.value = 'viewQuizResults'
+  await goToNextStep()
+  await scrollToTop()
+}
+
+const quizComponentKey = ref<number>(0) // Change this key to force a rerender
+function incrementQuizComponentKey() {
+  quizComponentKey.value = quizComponentKey.value + 1
+}
+
+const navigationSteps = computed((): NavigationStep[] => {
+  if (!trainingCourseDefinition.value) return []
+  const quizNames = trainingCourseDefinition.value?.modules.map(
+    (m) => m.quizKey
+  )
+  const hasPassedSomeQuiz = quizNames.filter((quiz) =>
+    store.getters['user/hasCertification'](quiz)
+  ).length
   return trainingCourseDefinition.value?.modules.map((module, index) => {
-    const materialKey = module.materials[0].materialKey
-    const isModuleComplete = completedMaterials.includes(materialKey)
+    const status: StepStatus =
+      module.key === 'introduction'
+        ? hasPassedSomeQuiz || currentModuleIndex.value > 0
+          ? 'complete'
+          : 'in-progress'
+        : hasModuleCertification(module.quizKey)
+          ? 'complete'
+          : index === currentModuleIndex.value
+            ? 'in-progress'
+            : 'not-started'
     return {
+      status,
       name: module.name,
-      status: isModuleComplete
-        ? 'complete'
-        : index === currentModuleIndex.value
-          ? 'in-progress'
-          : 'not-started',
-    } as NavigationStep
+    }
   })
 })
 
 const overallProgress = computed(() => {
-  if (!trainingCourseDefinition.value) {
-    return 0
-  }
-  return Math.floor(
-    (trainingCourseDefinition.value.completedMaterials.length /
-      trainingCourseDefinition.value.modules.length) *
-      100.0
+  if (!trainingCourseDefinition.value) return 0
+  const quizzesToPass = trainingCourseDefinition.value.modules.map(
+    (module) => module.quizKey
   )
+  let earnedCertifications = 0
+  for (const quizKey of quizzesToPass) {
+    if (store.getters['user/hasCertification'](quizKey)) {
+      earnedCertifications++
+    }
+  }
+  // Include Intro module which has no quiz
+  const totalStepsToPass = quizzesToPass.length + 1
+  if (currentModule.value?.key !== 'introduction') {
+    earnedCertifications++
+  }
+  return Math.floor((earnedCertifications / totalStepsToPass) * 100.0)
 })
+
+const errorMessage = ref<string>('')
+function handleError(error: any, message: string) {
+  LoggerService.noticeError({ error }, { message })
+  errorMessage.value =
+    'Something went wrong. Please refresh the page and try again'
+}
 </script>
 
 <template>
@@ -141,31 +212,25 @@ const overallProgress = computed(() => {
         :steps="navigationSteps"
         :overallProgress="overallProgress"
       />
-      <div class="main-content-area">
-        <Loader v-if="isRecordingProgress" overlay />
-        <TrainingModule
-          v-if="simplifiedTrainingModule"
-          :module="simplifiedTrainingModule"
-        />
+      <div v-if="errorMessage" class="error-callout">
+        {{ errorMessage }}
       </div>
-      <div class="navigation-buttons">
-        <LargeButton
-          class="previous-button"
-          v-if="hasPreviousModule"
-          variant="secondary"
-          @click="previous"
-          :showArrow="true"
-          arrowDirection="left"
-          >{{ isMobile ? ' ' : 'Previous' }}</LargeButton
-        >
-        <LargeButton
-          variant="primary-blue"
-          :showArrow="true"
-          @click="next"
-          class="next-button"
-          >Next</LargeButton
-        >
-      </div>
+      <TrainingModule
+        v-if="simplifiedTrainingModule && currentStepType === 'viewMaterials'"
+        :module="simplifiedTrainingModule"
+        :hasPreviousModule="hasPreviousModule"
+        :onPrevious="goToPreviousStep"
+        :onNext="goToNextStep"
+      />
+      <TrainingQuiz
+        v-else-if="currentStepType === 'takeQuiz'"
+        :quizCategory="currentModule?.quizKey ?? ''"
+        @exitQuiz="onBackOutOfQuiz"
+        @resetQuiz="incrementQuizComponentKey"
+        @passedQuiz="onPassedQuiz"
+        @error="handleError"
+        :key="quizComponentKey"
+      />
     </div>
   </div>
 </template>
@@ -221,39 +286,20 @@ const overallProgress = computed(() => {
       bottom: 0;
     }
   }
+}
 
-  .main-content-area {
-    grid-column: main;
-    grid-row: main-content;
-    display: flex;
-    flex-direction: column;
-    max-width: 833px;
-  }
-  .navigation-buttons {
-    grid-column: main;
-    margin: 16px 5%;
-    max-height: 40px;
-    justify-content: space-between;
-
-    @include breakpoint-below('medium') {
-      grid-row: navigation-buttons;
-      column-gap: 10%;
-      padding-bottom: 140px;
-    }
-    display: inline-grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: [previous-btn] 1fr [next-btn] 1fr;
-    column-gap: 20%;
-
-    .previous-button {
-      grid-row: 1;
-      grid-column: previous-btn;
-    }
-
-    .next-button {
-      grid-row: 1;
-      grid-column: next-btn;
-    }
-  }
+.error-callout {
+  background-color: lighten($c-error-red, $amount: 30%);
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0px;
+  text-align: center;
+  grid-row: main-content;
+  justify-self: center;
+  padding: 3%;
+  border-radius: 5px;
+  border: 1px solid $c-error-red;
 }
 </style>
