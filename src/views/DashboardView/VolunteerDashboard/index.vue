@@ -486,7 +486,7 @@ export default {
     onboardingAccountActions() {
       const onboardingActions = [
         {
-          title: 'Complete UPchieve 101',
+          title: 'Complete Intro to UPchieve',
           subtitle: this.trainingAction.subtitle,
           status: this.trainingAction.status,
           onClick: this.clickUpchieve101Action,

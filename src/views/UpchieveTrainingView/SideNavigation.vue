@@ -200,7 +200,7 @@ watch(isExpanded, (value) => {
 }
 
 .step-name-container {
-  margin-right: auto;
+  margin-right: 12px;
   padding-left: 5%;
   padding-right: 5%;
   grid-row: 1;

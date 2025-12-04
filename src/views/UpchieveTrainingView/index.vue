@@ -172,16 +172,17 @@ const overallProgress = computed(() => {
 
 <style lang="scss" scoped>
 .main-container {
-  padding: 40px;
   @include breakpoint-below('medium') {
     padding: 10px;
   }
+  width: 100%;
 }
 
 .main-grid-container {
   display: grid;
 
   @include breakpoint-above('medium') {
+    overflow-y: auto;
     grid-template-columns: [main] fit-content(768px) [stepper] 1fr;
     grid-template-rows: [banner] 169px [main-content] auto [navigation-buttons] auto;
   }
