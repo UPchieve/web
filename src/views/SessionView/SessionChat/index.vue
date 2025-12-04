@@ -584,6 +584,7 @@ export default {
     },
     handleScroll() {
       const messageElements = this.getUserMessageElements()
+      if (!messageElements.length) return
 
       if (this.unreadChatMessageIndices.length > 0) {
         const readMessageIndices = this.unreadChatMessageIndices.filter(
@@ -604,6 +605,8 @@ export default {
     },
     isMessageElementInView(messageElement) {
       const messagesBox = this.$refs.messages
+      if (!messagesBox || !messageElement) return false
+
       return (
         messageElement.offsetTop +
           messageElement.clientTop +
@@ -626,6 +629,8 @@ export default {
     scrollToUnread() {
       const messagesBox = this.$refs.messages
       const userMessageElements = this.getUserMessageElements()
+      if (!messagesBox || !userMessageElements.length) return
+
       const firstUnreadIndex = Math.min(...this.unreadChatMessageIndices)
 
       messagesBox.scrollTop = userMessageElements[firstUnreadIndex].offsetTop
@@ -659,7 +664,9 @@ export default {
     getUserMessageElements() {
       // the DOM elements corresponding to messages sent by users
       // (as opposed to the chatbot)
-      return Array.from(this.$refs.messages.children).filter((element) =>
+      const messagesBox = this.$refs.messages
+      if (!messagesBox) return []
+      return Array.from(messagesBox.children).filter((element) =>
         element.classList.contains('message')
       )
     },
