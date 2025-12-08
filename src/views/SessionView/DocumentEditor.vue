@@ -171,7 +171,10 @@ export default {
       this.emptyIncomingDeltas()
       this.isLoading = false
       this.loadingText = ''
-      this.quillEditor.enable()
+
+      if (!this.isSessionEnded) {
+        this.quillEditor.enable()
+      }
 
       this.quillEditor
         .getModule('cursors')
@@ -339,6 +342,11 @@ export default {
         this.quillEditor.disable()
         this.isLoading = true
         this.loadingText = 'Attempting to connect the document editor'
+      }
+    },
+    isSessionEnded(newValue, oldValue) {
+      if (newValue || oldValue) {
+        this.quillEditor.disable()
       }
     },
     isSocketReadyToRequestForDoc(currentVal) {

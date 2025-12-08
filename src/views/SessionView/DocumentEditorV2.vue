@@ -312,7 +312,9 @@ export default {
       if (!this.uploadingImageTimeout) {
         this.loadingText = null
       }
-      this.quillEditor.enable()
+      if (!this.isSessionEnded) {
+        this.quillEditor.enable()
+      }
 
       this.quillEditor
         .getModule('cursors')
@@ -547,6 +549,11 @@ export default {
         this.clearUploadImageTimeout()
         this.quillEditor.disable()
         this.loadingText = 'Attempting to connect the document editor'
+      }
+    },
+    isSessionEnded(newValue, oldValue) {
+      if (newValue || oldValue) {
+        this.quillEditor.disable()
       }
     },
     isSocketReadyToRequestForDoc(currentVal) {
