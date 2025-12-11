@@ -8,6 +8,7 @@ export type UpchieveTrainingCourse = {
   description: string
   modules: UpchieveTrainingCourseModule[]
   completedMaterials: string[]
+  requiredCertifications: string[]
 }
 
 export type UpchieveTrainingCourseModule = {

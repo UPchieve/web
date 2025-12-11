@@ -57,6 +57,8 @@ onBeforeMount(async () => {
     const trainingCourseResponse =
       await NetworkService.getTrainingCourse(COURSE_KEY)
     trainingCourseDefinition.value = trainingCourseResponse.data.course
+    completedMaterials.value =
+      trainingCourseDefinition.value?.completedMaterials ?? []
     // Open to last incomplete step
     const lastIncompleteStep = navigationSteps.value.findIndex(
       (step) => step.status !== 'complete'
@@ -79,14 +81,19 @@ async function scrollToTop() {
   }
 }
 
+const completedMaterials = ref<string[]>([])
 async function recordTrainingProgress() {
   isRecordingProgress.value = true
   try {
-    if (!hasPassedModuleQuiz.value) {
-      await NetworkService.recordTrainingCourseProgress(
+    if (
+      currentMaterialKey.value &&
+      !completedMaterials.value.includes(currentMaterialKey.value)
+    ) {
+      const response = await NetworkService.recordTrainingCourseProgress(
         COURSE_KEY,
         currentMaterialKey.value
       )
+      completedMaterials.value = response.data.completedMaterialKeys
     }
   } catch (err) {
     handleError(
@@ -152,6 +159,7 @@ const navigationSteps = computed((): NavigationStep[] => {
   const hasPassedSomeQuiz = quizNames.filter((quiz) =>
     store.getters['user/hasCertification'](quiz)
   ).length
+  // @TODO Update me when adding new Knowledge Checks step into the stepper.
   return trainingCourseDefinition.value?.modules.map((module, index) => {
     const status: StepStatus =
       module.key === 'introduction'
@@ -172,21 +180,27 @@ const navigationSteps = computed((): NavigationStep[] => {
 
 const overallProgress = computed(() => {
   if (!trainingCourseDefinition.value) return 0
-  const quizzesToPass = trainingCourseDefinition.value.modules.map(
-    (module) => module.quizKey
+  const requiredCerts: string[] =
+    trainingCourseDefinition.value?.requiredCertifications ?? []
+  const requiredMaterials: string[] =
+    trainingCourseDefinition.value?.modules.reduce((acc, module) => {
+      acc.push(
+        module.materials
+          .filter((mat) => mat.isRequired)
+          .map((mat) => mat.materialKey)
+      )
+      return acc
+    }, [] as string[])
+  const totalSteps = requiredCerts.length + requiredMaterials.length
+
+  const completedCerts = requiredCerts.filter((cert) =>
+    store.getters['user/hasCertification'](cert)
   )
-  let earnedCertifications = 0
-  for (const quizKey of quizzesToPass) {
-    if (store.getters['user/hasCertification'](quizKey)) {
-      earnedCertifications++
-    }
-  }
-  // Include Intro module which has no quiz
-  const totalStepsToPass = quizzesToPass.length + 1
-  if (currentModule.value?.key !== 'introduction') {
-    earnedCertifications++
-  }
-  return Math.floor((earnedCertifications / totalStepsToPass) * 100.0)
+  return Math.floor(
+    ((completedCerts.length + (completedMaterials.value?.length ?? 0)) /
+      totalSteps) *
+      100.0
+  )
 })
 
 const errorMessage = ref<string>('')
