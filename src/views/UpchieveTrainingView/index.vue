@@ -151,6 +151,23 @@ function incrementQuizComponentKey() {
   quizComponentKey.value = quizComponentKey.value + 1
 }
 
+async function navigateToStep(index: number) {
+  if (currentMaterialKey.value) {
+    try {
+      await NetworkService.recordTrainingCourseProgress(
+        COURSE_KEY,
+        currentMaterialKey.value
+      )
+      currentModuleIndex.value = index
+      await scrollToTop()
+    } catch {
+      // still navigate even if recording fails
+      currentModuleIndex.value = index
+      await scrollToTop()
+    }
+  }
+}
+
 const navigationSteps = computed((): NavigationStep[] => {
   if (!trainingCourseDefinition.value) return []
   const quizNames = trainingCourseDefinition.value?.modules.map(
@@ -174,6 +191,7 @@ const navigationSteps = computed((): NavigationStep[] => {
     return {
       status,
       name: module.name,
+      currentStepIndex: index,
     }
   })
 })
@@ -225,6 +243,8 @@ function handleError(error: any, message: string) {
         class="side-navigation"
         :steps="navigationSteps"
         :overallProgress="overallProgress"
+        :currentStepIndex="currentModuleIndex"
+        @navigate-to-step="navigateToStep"
       />
       <div v-if="errorMessage" class="error-callout">
         {{ errorMessage }}

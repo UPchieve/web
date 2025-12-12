@@ -11,7 +11,12 @@ export type StepStatus = 'complete' | 'in-progress' | 'not-started'
 export type NavigationStep = {
   name: string
   status: StepStatus
+  currentStepIndex: number
 }
+
+const emit = defineEmits<{
+  'navigate-to-step': [index: number]
+}>()
 
 const props = defineProps<{
   steps: NavigationStep[]
@@ -23,6 +28,13 @@ const isMobile = computed(() => store.getters['app/mobileMode'])
 
 function toggleExpand() {
   didClickToExpand.value = !didClickToExpand.value
+}
+
+function clickStep(index: number) {
+  emit('navigate-to-step', index)
+  if (isMobile.value) {
+    didClickToExpand.value = false
+  }
 }
 
 // Mobile mode: drawer logic
@@ -78,7 +90,12 @@ watch(isExpanded, (value) => {
 
     <!--    Individual steps' progress-->
     <div v-show="!isMobile || isExpanded">
-      <div class="step-container" v-for="step in props.steps" :key="step.name">
+      <button
+        class="step-container"
+        v-for="(step, index) in props.steps"
+        :key="step.name"
+        @click="clickStep(index)"
+      >
         <div class="step-name-container">
           {{ step.name }}
         </div>
@@ -96,7 +113,7 @@ watch(isExpanded, (value) => {
             class="status-icon status-icon-not-started"
           />
         </div>
-      </div>
+      </button>
     </div>
   </div>
 </template>
@@ -206,6 +223,7 @@ watch(isExpanded, (value) => {
   padding-right: 5%;
   grid-row: 1;
   grid-column: step-name;
+  text-align: left;
 }
 
 .step-icon-container {
