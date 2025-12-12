@@ -49,7 +49,11 @@ function hasModuleCertification(module: string): boolean {
   return store.getters['user/hasCertification'](module)
 }
 
-type StepType = 'viewMaterials' | 'takeQuiz' | 'viewQuizResults'
+export type StepType =
+  | 'viewMaterials'
+  | 'takeQuiz'
+  | 'viewQuizResultsPassed'
+  | 'viewQuizResultsFailed'
 const currentStepType = ref<StepType>('viewMaterials')
 
 onBeforeMount(async () => {
@@ -119,14 +123,22 @@ async function goToNextStep() {
       currentStepType.value = 'takeQuiz'
     }
   } else if (currentStepType.value === 'takeQuiz') {
-    currentStepType.value = 'viewQuizResults'
-  } else if (currentStepType.value === 'viewQuizResults') {
+    currentStepType.value = 'viewQuizResultsPassed'
+  } else if (currentStepType.value === 'viewQuizResultsPassed') {
     currentStepType.value = 'viewMaterials'
     if (hasPassedModuleQuiz.value) {
       proceedToNextModule()
     }
   }
   await scrollToTop()
+}
+
+async function submitQuiz() {
+  if (hasPassedModuleQuiz.value) {
+    currentStepType.value = 'viewQuizResultsPassed'
+  } else {
+    currentStepType.value = 'viewQuizResultsFailed'
+  }
 }
 
 async function goToPreviousStep() {
@@ -141,7 +153,6 @@ async function onBackOutOfQuiz() {
 }
 
 async function onPassedQuiz() {
-  currentStepType.value = 'viewQuizResults'
   await goToNextStep()
   await scrollToTop()
 }
@@ -192,6 +203,7 @@ const navigationSteps = computed((): NavigationStep[] => {
       status,
       name: module.name,
       currentStepIndex: index,
+      hasKnowledgeCheck: module.key === 'introduction' ? false : true,
     }
   })
 })
@@ -244,6 +256,7 @@ function handleError(error: any, message: string) {
         :steps="navigationSteps"
         :overallProgress="overallProgress"
         :currentStepIndex="currentModuleIndex"
+        :currentStepType="currentStepType"
         @navigate-to-step="navigateToStep"
       />
       <div v-if="errorMessage" class="error-callout">
@@ -257,12 +270,13 @@ function handleError(error: any, message: string) {
         :onNext="goToNextStep"
       />
       <TrainingQuiz
-        v-else-if="currentStepType === 'takeQuiz'"
+        v-else-if="currentStepType !== 'viewMaterials'"
         :quizCategory="currentModule?.quizKey ?? ''"
         @exitQuiz="onBackOutOfQuiz"
         @resetQuiz="incrementQuizComponentKey"
-        @passedQuiz="onPassedQuiz"
+        @finishedQuiz="submitQuiz"
         @error="handleError"
+        @passedQuizAndExit="onPassedQuiz"
         :key="quizComponentKey"
       />
     </div>

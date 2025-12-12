@@ -2,16 +2,20 @@
 import StepCompleteIcon from '@/assets/check-circled.svg'
 import StepNotStartedIcon from '@/assets/whiteboard_icons/circle.svg'
 import StepInProgressIcon from '@/assets/filled_circle.svg'
+import StepHalfInProgressIcon from '@/assets/half_filled_circle.svg'
+import LockedKnowledgeCheck from '@/assets/lock_circle.svg'
 import CaretIcon from '@/assets/right-caret.svg'
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import ContinuousProgressBar from '@/views/UpchieveTrainingView/ContinuousProgressBar.vue'
+import type { StepType } from './index.vue'
 
 export type StepStatus = 'complete' | 'in-progress' | 'not-started'
 export type NavigationStep = {
   name: string
   status: StepStatus
   currentStepIndex: number
+  hasKnowledgeCheck: boolean
 }
 
 const emit = defineEmits<{
@@ -21,6 +25,8 @@ const emit = defineEmits<{
 const props = defineProps<{
   steps: NavigationStep[]
   overallProgress: number // 0-100 please
+  currentStepType: StepType
+  currentStepIndex: number
 }>()
 
 const store = useStore()
@@ -96,12 +102,19 @@ watch(isExpanded, (value) => {
         :key="step.name"
         @click="clickStep(index)"
       >
-        <div class="step-name-container">
+        <div
+          class="step-name-container"
+          :class="index === currentStepIndex ? 'current-step' : ''"
+        >
           {{ step.name }}
         </div>
         <div class="status-icon-container">
           <StepInProgressIcon
-            v-if="step.status === 'in-progress'"
+            v-if="step.hasKnowledgeCheck && step.status === 'in-progress'"
+            class="status-icon status-icon-in-progress"
+          />
+          <StepHalfInProgressIcon
+            v-else-if="step.status === 'in-progress'"
             class="status-icon status-icon-in-progress"
           />
           <StepCompleteIcon
@@ -111,6 +124,46 @@ watch(isExpanded, (value) => {
           <StepNotStartedIcon
             v-else
             class="status-icon status-icon-not-started"
+          />
+        </div>
+
+        <div
+          v-if="step.hasKnowledgeCheck && index === currentStepIndex"
+          class="knowledge-check-container"
+        >
+          <span
+            :class="
+              props.currentStepType === 'viewMaterials'
+                ? 'disabled-knowledge-check'
+                : 'knowledge-check'
+            "
+          >
+            Knowledge check
+          </span>
+        </div>
+        <div
+          v-if="step.hasKnowledgeCheck && index === currentStepIndex"
+          class="status-icon-container"
+        >
+          <StepCompleteIcon
+            class="status-icon"
+            v-if="
+              props.currentStepType === 'viewQuizResultsPassed' ||
+              step.status === 'complete'
+            "
+          />
+          <LockedKnowledgeCheck
+            v-if="
+              (props.currentStepType === 'viewMaterials' &&
+                step.status !== 'complete') ||
+              props.currentStepType === 'viewQuizResultsFailed'
+            "
+          />
+          <StepInProgressIcon
+            class="status-icon"
+            v-if="
+              props.currentStepType === 'takeQuiz' && step.status !== 'complete'
+            "
           />
         </div>
       </button>
@@ -226,15 +279,6 @@ watch(isExpanded, (value) => {
   text-align: left;
 }
 
-.step-icon-container {
-  grid-row: 1;
-  grid-column: status-icon;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
 .step-icon {
   width: 20px;
   height: 20px;
@@ -254,8 +298,38 @@ watch(isExpanded, (value) => {
   transition: 200ms linear;
 }
 
+.status-icon-container {
+  display: flex;
+  justify-content: center;
+  grid-column: status-icon;
+  height: 100%;
+  align-items: center;
+}
+
 .status-icon {
   height: 16px;
   width: 16px;
+}
+
+.knowledge-check-container {
+  padding: 0 20px;
+  width: 100%;
+  align-items: center;
+  text-align: left;
+  margin: 16px 0;
+}
+
+.disabled-knowledge-check {
+  color: $c-secondary-grey;
+}
+
+.knowledge-check,
+.disabled-knowledge-check {
+  font-size: 14px;
+  grid-column: step-name;
+}
+
+.current-step {
+  font-weight: 500;
 }
 </style>

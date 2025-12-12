@@ -23,6 +23,14 @@
   flex-direction: column;
   padding: 2% 4%;
   max-width: 833px;
+  min-width: 800px;
+
+  @include breakpoint-below(huge) {
+    min-width: 500px;
+  }
+  @include breakpoint-below(medium) {
+    min-width: 300px;
+  }
 }
 
 .navigation-buttons {

@@ -25,7 +25,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'exitQuiz'): void
   (e: 'resetQuiz'): void
-  (e: 'passedQuiz'): void
+  (e: 'finishedQuiz'): void
+  (e: 'passedQuizAndExit'): void
   (e: 'error', error: any, message: string): void
 }>()
 
@@ -161,7 +162,7 @@ function next() {
     case 'retakeQuiz':
       return emit('resetQuiz')
     case 'exitQuizOnPass':
-      return emit('passedQuiz')
+      return emit('passedQuizAndExit')
   }
 }
 
@@ -178,6 +179,7 @@ async function submitQuiz() {
       answerKey: results.answerKey,
     }
     currentStep.value = 'viewingResults'
+    return emit('finishedQuiz')
   } catch (err) {
     emit(
       'error',
