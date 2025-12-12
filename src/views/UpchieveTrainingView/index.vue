@@ -401,6 +401,14 @@ function onClickGoToDashboard() {
     align-items: center;
   }
 
+  #loader {
+    grid-row: main-content;
+    grid-column: main;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .banner {
     grid-column: main;
     grid-row: banner;
@@ -424,16 +432,22 @@ function onClickGoToDashboard() {
     align-self: stretch;
     max-width: 300px;
     border: 1px solid $c-border-grey;
+    position: sticky;
+    top: 64px; // height of the app banner
+    height: calc(100vh - 64px);
+    box-sizing: border-box;
 
     @media screen and (max-width: 1372px) {
       display: flex;
       flex-direction: column;
-      position: sticky;
       bottom: 0;
+      top: 0;
       width: 100%;
+      height: 50vh;
       grid-row: stepper;
       grid-column: main;
       max-width: inherit;
+      overflow-y: auto;
     }
   }
 }
