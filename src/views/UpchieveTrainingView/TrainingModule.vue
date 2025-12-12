@@ -48,11 +48,6 @@ const props = defineProps<{
 }>()
 
 const isMobile = computed(() => store.getters['app/mobileMode'])
-const videoWidth = computed(() => (isMobile.value ? 300 : 560))
-const videoHeight = computed(() =>
-  store.getters['app/mobileMode'] ? 150 : 315
-)
-
 function goToResource(externalLink: string) {
   window.open(externalLink, '_blank')
 }
@@ -77,8 +72,6 @@ function goToResource(externalLink: string) {
         <!--        @TODO move to Vimeo-->
         <div class="video-content">
           <iframe
-            :width="videoWidth"
-            :height="videoHeight"
             src="https://www.youtube.com/embed/zlxwGBg4fqU?si=Pf6jGYEU30TaipU8"
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -104,8 +97,6 @@ function goToResource(externalLink: string) {
             <iframe
               title="vimeo-player"
               src="https://player.vimeo.com/video/760386859?h=abee3e6389"
-              :width="videoWidth"
-              :height="videoHeight"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -312,8 +303,6 @@ function goToResource(externalLink: string) {
             <iframe
               title="vimeo-player"
               src="https://player.vimeo.com/video/776267126?h=4b09b31c01"
-              :width="videoWidth"
-              :height="videoHeight"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -460,8 +449,6 @@ function goToResource(externalLink: string) {
             <iframe
               title="vimeo-player"
               src="https://player.vimeo.com/video/459021056?h=8b6ff78fa6"
-              :width="videoWidth"
-              :height="videoHeight"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -648,8 +635,6 @@ function goToResource(externalLink: string) {
             <iframe
               title="vimeo-player"
               src="https://player.vimeo.com/video/773599358?h=6edf900bfc"
-              :width="videoWidth"
-              :height="videoHeight"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -995,6 +980,12 @@ function goToResource(externalLink: string) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  iframe {
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .section {

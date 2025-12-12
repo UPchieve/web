@@ -6,7 +6,6 @@ import StepHalfInProgressIcon from '@/assets/half_filled_circle.svg'
 import LockedKnowledgeCheck from '@/assets/lock_circle.svg'
 import CaretIcon from '@/assets/right-caret.svg'
 import { computed, ref, watch } from 'vue'
-import { useStore } from 'vuex'
 import ContinuousProgressBar from '@/views/UpchieveTrainingView/ContinuousProgressBar.vue'
 import type { StepType } from './index.vue'
 
@@ -22,15 +21,17 @@ const emit = defineEmits<{
   'navigate-to-step': [index: number]
 }>()
 
-const props = defineProps<{
+const {
+  steps,
+  drawerMode = false,
+  overallProgress,
+} = defineProps<{
   steps: NavigationStep[]
+  drawerMode: boolean
   overallProgress: number // 0-100 please
   currentStepType: StepType
   currentStepIndex: number
 }>()
-
-const store = useStore()
-const isMobile = computed(() => store.getters['app/mobileMode'])
 
 function toggleExpand() {
   didClickToExpand.value = !didClickToExpand.value
@@ -38,17 +39,17 @@ function toggleExpand() {
 
 function clickStep(index: number) {
   emit('navigate-to-step', index)
-  if (isMobile.value) {
+  if (drawerMode) {
     didClickToExpand.value = false
   }
 }
 
-// Mobile mode: drawer logic
+// Drawer logic
 const didClickToExpand = ref<boolean>(false)
 const isExpanded = computed(() => {
-  // On mobile views only, the SideNavigation is a bottom drawer that shows overall progress
+  // When the prop drawerMode is true, the SideNavigation is a bottom drawer that shows overall progress
   // and can be expanded to show each step.
-  if (!isMobile.value) return false
+  if (!drawerMode) return false
   return didClickToExpand.value
 })
 
@@ -80,7 +81,7 @@ watch(isExpanded, (value) => {
         />
       </div>
       <button
-        v-if="isMobile"
+        v-if="drawerMode"
         @click="toggleExpand"
         class="expand-collapse-button"
       >
@@ -95,10 +96,10 @@ watch(isExpanded, (value) => {
     </div>
 
     <!--    Individual steps' progress-->
-    <div v-show="!isMobile || isExpanded">
+    <div v-show="!drawerMode || isExpanded">
       <button
         class="step-container"
-        v-for="(step, index) in props.steps"
+        v-for="(step, index) in steps"
         :key="step.name"
         @click="clickStep(index)"
       >
@@ -133,7 +134,7 @@ watch(isExpanded, (value) => {
         >
           <span
             :class="
-              props.currentStepType === 'viewMaterials'
+              currentStepType === 'viewMaterials'
                 ? 'disabled-knowledge-check'
                 : 'knowledge-check'
             "
@@ -148,22 +149,20 @@ watch(isExpanded, (value) => {
           <StepCompleteIcon
             class="status-icon"
             v-if="
-              props.currentStepType === 'viewQuizResultsPassed' ||
+              currentStepType === 'viewQuizResultsPassed' ||
               step.status === 'complete'
             "
           />
           <LockedKnowledgeCheck
             v-if="
-              (props.currentStepType === 'viewMaterials' &&
+              (currentStepType === 'viewMaterials' &&
                 step.status !== 'complete') ||
-              props.currentStepType === 'viewQuizResultsFailed'
+              currentStepType === 'viewQuizResultsFailed'
             "
           />
           <StepInProgressIcon
             class="status-icon"
-            v-if="
-              props.currentStepType === 'takeQuiz' && step.status !== 'complete'
-            "
+            v-if="currentStepType === 'takeQuiz' && step.status !== 'complete'"
           />
         </div>
       </button>
@@ -173,26 +172,20 @@ watch(isExpanded, (value) => {
 
 <style lang="scss" scoped>
 .overall-progress-container {
-  border-top: 1px solid $c-border-grey;
-  border-left: 1px solid $c-border-grey;
-  border-right: 1px solid $c-border-grey;
+  border-bottom: 1px solid $c-border-grey;
   width: 100%;
   padding-left: 5%;
   padding-right: 5%;
-  @include breakpoint-above('medium') {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 0 8px 0 0;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0 8px 0 0;
 
-  @include breakpoint-below('medium') {
+  @media screen and (max-width: 1372px) {
     display: flex;
     flex-direction: row;
     align-items: center;
-    &:hover {
-      cursor: pointer;
-    }
+    width: 100%;
   }
 }
 
@@ -220,22 +213,18 @@ watch(isExpanded, (value) => {
   width: 100%;
   height: 100%;
   transition: transform 0.3s ease;
+  position: static;
+  border-radius: 0 8px 0 0;
+  background-color: $c-background-grey;
+  max-width: 100%;
 
-  @include breakpoint-above('medium') {
-    max-width: 277px;
-    position: static;
-    border-radius: 0 8px 0 0;
-    background-color: $c-background-grey;
-  }
-
-  @include breakpoint-below('medium') {
+  @media screen and (max-width: 1372px) {
     background-color: white;
     box-shadow: 0 -4px 8px 0 rgba(0, 0, 0, 0.08);
     height: 80%;
-    bottom: 0;
-    left: 0;
     position: fixed;
     z-index: 2;
+    width: 100%;
 
     &.collapsed {
       transform: translateY(calc(100% - 93px));
@@ -244,14 +233,16 @@ watch(isExpanded, (value) => {
 
     &.expanded {
       transform: translateY(0%);
+      overflow-y: scroll;
     }
   }
 }
 
 .step-container {
   border-top: 1px solid $c-border-grey;
-  border-left: 1px solid $c-border-grey;
-  border-right: 1px solid $c-border-grey;
+  &:first-child {
+    border-top: none;
+  }
   &:last-child {
     border-bottom: 1px solid $c-border-grey;
   }
@@ -261,11 +252,9 @@ watch(isExpanded, (value) => {
   grid-template-columns: [step-name] 4fr [status-icon] 1fr;
   width: 100%;
   align-items: center;
+  background-color: $c-background-grey;
 
-  @include breakpoint-above('medium') {
-    background-color: $c-background-grey;
-  }
-  @include breakpoint-below('medium') {
+  @media screen and (max-width: 1372px) {
     background-color: white;
   }
 }

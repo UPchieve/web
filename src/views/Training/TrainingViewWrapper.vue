@@ -25,5 +25,14 @@ const trainingComponent = computed(() => {
 </script>
 
 <template>
-  <component :is="trainingComponent" />
+  <div class="training-component">
+    <component :is="trainingComponent" />
+  </div>
 </template>
+
+<style lang="scss" scoped>
+.training-component {
+  display: flex;
+  margin: 40px;
+}
+</style>

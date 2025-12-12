@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Loader from '@/components/Loader.vue'
 import { computed, nextTick, onBeforeMount, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import type { UpchieveTrainingCourse } from '@/views/UpchieveTrainingView/types'
@@ -182,15 +183,8 @@ async function onBackOutOfQuiz() {
 }
 
 async function onPassedQuiz() {
-  console.log('Received passedQuiz event', {
-    isTrainingComplete: isTrainingComplete.value,
-    doForceGoToFinishedPageOnNext: doForceGoToFinishedPageOnNext.value,
-  })
   if (isTrainingComplete.value) {
     doForceGoToFinishedPageOnNext.value = true
-    console.log(
-      `Set doForceGoToFinishedPageOnNext to ${doForceGoToFinishedPageOnNext.value}`
-    )
   }
   await goToNextStep()
 }
@@ -289,129 +283,125 @@ function onClickGoToDashboard() {
 </script>
 
 <template>
-  <div class="main-container">
-    <div class="main-grid-container">
-      <div
-        class="banner"
-        ref="trainingBanner"
-        v-if="currentStepType !== 'finishedPage'"
-      >
-        <TrainingBanner
-          :moduleName="currentModule?.name ?? ''"
-          :title="currentModule?.name ?? ''"
-          subtitle="TRAINING"
-        />
-      </div>
-      <SideNavigation
-        class="side-navigation"
-        :steps="navigationSteps"
-        :overallProgress="overallProgress"
-        :currentStepIndex="currentModuleIndex"
-        :currentStepType="currentStepType"
-        @navigate-to-step="navigateToStep"
+  <div class="main-grid-container">
+    <div
+      class="banner"
+      ref="trainingBanner"
+      v-if="currentStepType !== 'finishedPage'"
+    >
+      <TrainingBanner
+        :moduleName="currentModule?.name ?? ''"
+        :title="currentModule?.name ?? 'Intro to UPchieve'"
+        subtitle="TRAINING"
       />
-      <div v-if="errorMessage" class="error-callout">
-        {{ errorMessage }}
-      </div>
-      <TrainingModule
-        v-if="simplifiedTrainingModule && currentStepType === 'viewMaterials'"
-        :module="simplifiedTrainingModule"
-        :hasPreviousModule="hasPreviousModule"
-        :onPrevious="goToPreviousStep"
-        :onNext="goToNextStep"
-      />
-      <TrainingQuiz
-        v-else-if="
-          [
-            'takeQuiz',
-            'viewQuizResultsPassed',
-            'viewQuizResultsFailed',
-          ].includes(currentStepType)
-        "
-        :quizCategory="currentModule?.quizKey ?? ''"
-        @exitQuiz="onBackOutOfQuiz"
-        @resetQuiz="incrementQuizComponentKey"
-        @finishedQuiz="submitQuiz"
-        @error="handleError"
-        @passedQuizAndExit="onPassedQuiz"
-        :key="quizComponentKey"
-      />
-      <TrainingPage
-        v-else-if="isTrainingComplete && currentStepType === 'finishedPage'"
-        class="congrats-page"
-      >
-        <template v-slot:main-content>
-          <NationallyCertifiedTutorBanner class="banner banner--congrats" />
-          <div class="congrats-content">
-            <span class="congrats-heading">
-              Congratulations on completing the Intro to UPchieve Course!
-            </span>
-            Welcome to the UPchieve Coach Community. You're now equipped with
-            the proven coaching tools and strategies to support learners from
-            all backgrounds.
-          </div>
-        </template>
-        <template v-slot:previous-button>
-          <LargeButton
-            class="previous-button"
-            variant="secondary"
-            :showArrow="true"
-            arrowDirection="left"
-            @click="onClickReviewTraining"
-            >Review Training</LargeButton
-          >
-        </template>
-        <template v-slot:next-button>
-          <LargeButton
-            variant="primary-blue"
-            :showArrow="false"
-            class="next-button"
-            @click="onClickGoToDashboard"
-            >Go to Dashboard</LargeButton
-          >
-        </template>
-      </TrainingPage>
     </div>
+    <SideNavigation
+      class="side-navigation"
+      :steps="navigationSteps"
+      :overallProgress="overallProgress"
+      :currentStepIndex="currentModuleIndex"
+      :currentStepType="currentStepType"
+      :drawerMode="store.getters['app/widthLessThanPx'](1372)"
+      @navigate-to-step="navigateToStep"
+    />
+    <div v-if="errorMessage" class="error-callout">
+      {{ errorMessage }}
+    </div>
+    <TrainingModule
+      v-if="simplifiedTrainingModule && currentStepType === 'viewMaterials'"
+      :module="simplifiedTrainingModule"
+      :hasPreviousModule="hasPreviousModule"
+      :onPrevious="goToPreviousStep"
+      :onNext="goToNextStep"
+    />
+    <TrainingQuiz
+      v-else-if="
+        ['takeQuiz', 'viewQuizResultsPassed', 'viewQuizResultsFailed'].includes(
+          currentStepType
+        )
+      "
+      :quizCategory="currentModule?.quizKey ?? ''"
+      @exitQuiz="onBackOutOfQuiz"
+      @resetQuiz="incrementQuizComponentKey"
+      @finishedQuiz="submitQuiz"
+      @error="handleError"
+      @passedQuizAndExit="onPassedQuiz"
+      :key="quizComponentKey"
+    />
+    <TrainingPage
+      v-else-if="isTrainingComplete && currentStepType === 'finishedPage'"
+      class="congrats-page"
+    >
+      <template v-slot:main-content>
+        <NationallyCertifiedTutorBanner class="banner banner--congrats" />
+        <div class="congrats-content">
+          <span class="congrats-heading">
+            Congratulations on completing the Intro to UPchieve Course!
+          </span>
+          Welcome to the UPchieve Coach Community. You're now equipped with the
+          proven coaching tools and strategies to support learners from all
+          backgrounds.
+        </div>
+      </template>
+      <template v-slot:previous-button>
+        <LargeButton
+          class="previous-button"
+          variant="secondary"
+          :showArrow="true"
+          arrowDirection="left"
+          @click="onClickReviewTraining"
+          >Review Training</LargeButton
+        >
+      </template>
+      <template v-slot:next-button>
+        <LargeButton
+          variant="primary-blue"
+          :showArrow="false"
+          class="next-button"
+          @click="onClickGoToDashboard"
+          >Go to Dashboard</LargeButton
+        >
+      </template>
+    </TrainingPage>
+    <Loader id="loader" v-else />
   </div>
 </template>
 
 <style lang="scss" scoped>
-.main-container {
-  @include breakpoint-below('medium') {
-    padding: 10px;
-  }
-  width: 100%;
-}
-
 .main-grid-container {
-  display: grid;
-
-  @include breakpoint-above('medium') {
-    overflow-y: auto;
-    grid-template-columns: [main] fit-content(768px) [stepper] 1fr;
-    grid-template-rows: [banner] 169px [main-content] auto [navigation-buttons] auto;
-  }
-
-  @include breakpoint-below('medium') {
-    grid-template-columns: [main] 1fr;
-    grid-template-rows: [banner] auto [main-content] auto [navigation-buttons] auto auto;
-  }
-
-  border-radius: 8px;
   background-color: white;
-  padding: 3%;
+  display: grid;
+  justify-content: center;
+  grid-template-columns: [main] auto [stepper] auto;
+  grid-template-rows: [banner] auto [main-content] auto [navigation-buttons] auto;
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  @media screen and (max-width: 1372px) {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: [main] auto;
+    grid-template-rows: [banner] auto [main-content] auto [navigation-buttons] auto [stepper] auto;
+    padding: 0;
+  }
+
+  #loader {
+    grid-row: main-content;
+    grid-column: main;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
   .banner {
     grid-column: main;
     grid-row: banner;
     background-size: cover;
-    width: 100%;
-    height: 100%;
     max-width: 833px;
     max-height: 169px;
     padding: 0;
 
-    @include breakpoint-below('medium') {
+    @media screen and (max-width: 1372px) {
       max-height: 280px;
     }
 
@@ -421,15 +411,21 @@ function onClickGoToDashboard() {
   }
 
   .side-navigation {
-    @include breakpoint-above('medium') {
-      grid-row: banner / -banner;
-      grid-column: stepper;
-      align-self: stretch;
-    }
+    grid-row: -1 / 1;
+    grid-column: stepper;
+    align-self: stretch;
+    max-width: 300px;
+    border: 1px solid $c-border-grey;
 
-    @include breakpoint-below('medium') {
-      // Move SideNavigation into bottom drawer position on small layouts
+    @media screen and (max-width: 1372px) {
+      display: flex;
+      flex-direction: column;
+      position: sticky;
       bottom: 0;
+      width: 100%;
+      grid-row: stepper;
+      grid-column: main;
+      max-width: inherit;
     }
   }
 }
@@ -447,6 +443,10 @@ function onClickGoToDashboard() {
   padding: 3%;
   border-radius: 5px;
   border: 1px solid $c-error-red;
+}
+
+:deep(.main-content-area) {
+  overflow-x: auto;
 }
 
 .congrats-page {

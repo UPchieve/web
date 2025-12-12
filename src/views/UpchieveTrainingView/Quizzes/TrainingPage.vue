@@ -14,8 +14,10 @@
 .page-grid {
   display: grid;
   grid-template-rows: [main-content] auto [navigation-buttons] auto auto;
-  grid-template-columns: [main] 1fr;
+  grid-template-columns: [main] auto;
+  justify-items: center;
 }
+
 .main-content-area {
   grid-row: main-content;
   grid-column: main;
@@ -23,14 +25,7 @@
   flex-direction: column;
   padding: 2% 4%;
   max-width: 833px;
-  min-width: 800px;
-
-  @include breakpoint-below(huge) {
-    min-width: 500px;
-  }
-  @include breakpoint-below(medium) {
-    min-width: 300px;
-  }
+  width: 100%;
 }
 
 .navigation-buttons {
@@ -38,6 +33,8 @@
   margin: 16px 5%;
   max-height: 40px;
   justify-content: space-between;
+  width: 100%;
+  padding: 0px 16px;
 
   display: inline-grid;
   grid-template-rows: [main] 1fr;
@@ -54,7 +51,7 @@
     grid-column: next-btn;
   }
 
-  @include breakpoint-below('medium') {
+  @media screen and (max-width: 1372px) {
     grid-row: navigation-buttons;
     column-gap: 10%;
     padding-bottom: 140px;
