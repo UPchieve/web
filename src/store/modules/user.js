@@ -413,8 +413,8 @@ export default {
       return some(certs, { passed: true })
     },
 
-    passedUpchieve101: (state) => {
-      return state.user.certifications.upchieve101.passed
+    hasCompletedVolunteerTraining: (state) => {
+      return state.user.user?.hasCompletedVolunteerTraining ?? false
     },
 
     hasSelectedAvailability: (state) => !!state.user.availabilityLastModifiedAt,
@@ -443,7 +443,7 @@ export default {
 
     roleInCurrentSession: (state) => {
       if (!state.session) return undefined
-      const studentId = state.session.student.id
+      const studentId = state.session?.student?.id
       return studentId === state.user.id ? 'student' : 'volunteer'
     },
 
@@ -535,7 +535,7 @@ export default {
         ucId: state.user.id,
         userType: state.user.userType,
         createdAt: state.user.createdAt,
-        totalSessions: state.user.pastSessions.length,
+        totalSessions: state.user.pastSessions?.length ?? 0,
         banType: state.user.banType,
         isTestUser: state.user.isTestUser,
         hasStudentRole: getters.hasStudentRole,

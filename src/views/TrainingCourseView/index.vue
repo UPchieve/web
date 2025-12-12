@@ -81,7 +81,7 @@ export default {
       isCombinedOnboardingQuizEnabled:
         'featureFlags/isCombinedOnboardingQuizEnabled',
       isAutoFlowUser: 'user/isAutoFlowUser',
-      passedUpchieve101: 'user/passedUpchieve101',
+      passedUpchieve101: 'user/hasCompletedVolunteerTraining',
     }),
     quizCertification() {
       return this.certifications[this.course.quizKey]

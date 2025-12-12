@@ -54,7 +54,9 @@ const viewingLastModule = computed(
   () => currentModuleIndex.value === trainingCourse.value?.modules.length! - 1
 )
 
-const hasPassedQuiz = computed(() => store.getters['user/passedUpchieve101'])
+const hasPassedQuiz = computed(
+  () => store.getters['user/hasCompletedVolunteerTraining']
+)
 
 const nextButtonLabel = computed(() => {
   if (currentModule.value?.name === CustomModules.quiz) {

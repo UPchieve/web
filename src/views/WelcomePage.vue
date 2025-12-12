@@ -76,7 +76,6 @@ export default {
       mobileMode: 'app/mobileMode',
       topicCards: 'subjects/quizTopicCards',
       hasCertification: 'user/hasASubjectCertification',
-      passedUpchieve101: 'user/passedUpchieve101',
       isStudentsBecomeVolunteersEnabled:
         'featureFlags/isStudentsBecomeVolunteersEnabled',
       isStudentVolunteer: 'user/isStudentVolunteer',

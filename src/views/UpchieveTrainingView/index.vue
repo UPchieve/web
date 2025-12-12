@@ -12,8 +12,13 @@ import TrainingBanner from '@/views/UpchieveTrainingView/TrainingBanner.vue'
 import { useStore } from 'vuex'
 import TrainingQuiz from '@/views/UpchieveTrainingView/Quizzes/TrainingQuiz.vue'
 import LoggerService from '@/services/LoggerService'
+import TrainingPage from '@/views/UpchieveTrainingView/Quizzes/TrainingPage.vue'
+import NationallyCertifiedTutorBanner from '@/assets/Training/nationally_certified_tutor_banner.svg'
+import LargeButton from '@/components/LargeButton.vue'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
+const router = useRouter()
 const COURSE_KEY = 'upchieveTraining'
 const trainingCourseDefinition = ref<UpchieveTrainingCourse | null>(null)
 
@@ -54,6 +59,7 @@ export type StepType =
   | 'takeQuiz'
   | 'viewQuizResultsPassed'
   | 'viewQuizResultsFailed'
+  | 'finishedPage'
 const currentStepType = ref<StepType>('viewMaterials')
 
 onBeforeMount(async () => {
@@ -63,11 +69,10 @@ onBeforeMount(async () => {
     trainingCourseDefinition.value = trainingCourseResponse.data.course
     completedMaterials.value =
       trainingCourseDefinition.value?.completedMaterials ?? []
-    // Open to last incomplete step
     const lastIncompleteStep = navigationSteps.value.findIndex(
       (step) => step.status !== 'complete'
     )
-    currentModuleIndex.value = lastIncompleteStep
+    currentModuleIndex.value = Math.max(lastIncompleteStep, 0)
   } catch (err) {
     handleError(
       err,
@@ -109,7 +114,31 @@ async function recordTrainingProgress() {
   }
 }
 
+const isTrainingComplete = computed(() => {
+  if (!trainingCourseDefinition.value) return false
+  const requiredCerts =
+    trainingCourseDefinition.value.requiredCertifications ?? []
+  const unlockedCerts = requiredCerts.filter((cert) =>
+    store.getters['user/hasCertification'](cert)
+  )
+  return requiredCerts.length === unlockedCerts.length
+})
+const doForceGoToFinishedPageOnNext = ref<boolean>(false)
+
 async function goToNextStep() {
+  const isLastStep =
+    isTrainingComplete.value &&
+    trainingCourseDefinition.value &&
+    currentModuleIndex.value ===
+      trainingCourseDefinition.value.modules.length - 1
+  if (
+    doForceGoToFinishedPageOnNext.value ||
+    (isLastStep && isTrainingComplete.value)
+  ) {
+    currentStepType.value = 'finishedPage'
+    doForceGoToFinishedPageOnNext.value = false
+    return
+  }
   const proceedToNextModule = () => {
     currentModuleIndex.value = currentModuleIndex.value + 1
     currentStepType.value = 'viewMaterials'
@@ -153,8 +182,17 @@ async function onBackOutOfQuiz() {
 }
 
 async function onPassedQuiz() {
+  console.log('Received passedQuiz event', {
+    isTrainingComplete: isTrainingComplete.value,
+    doForceGoToFinishedPageOnNext: doForceGoToFinishedPageOnNext.value,
+  })
+  if (isTrainingComplete.value) {
+    doForceGoToFinishedPageOnNext.value = true
+    console.log(
+      `Set doForceGoToFinishedPageOnNext to ${doForceGoToFinishedPageOnNext.value}`
+    )
+  }
   await goToNextStep()
-  await scrollToTop()
 }
 
 const quizComponentKey = ref<number>(0) // Change this key to force a rerender
@@ -170,10 +208,10 @@ async function navigateToStep(index: number) {
         currentMaterialKey.value
       )
       currentModuleIndex.value = index
-      await scrollToTop()
     } catch {
       // still navigate even if recording fails
       currentModuleIndex.value = index
+    } finally {
       await scrollToTop()
     }
   }
@@ -203,7 +241,7 @@ const navigationSteps = computed((): NavigationStep[] => {
       status,
       name: module.name,
       currentStepIndex: index,
-      hasKnowledgeCheck: module.key === 'introduction' ? false : true,
+      hasKnowledgeCheck: !!module.quizKey,
     }
   })
 })
@@ -239,12 +277,25 @@ function handleError(error: any, message: string) {
   errorMessage.value =
     'Something went wrong. Please refresh the page and try again'
 }
+
+function onClickReviewTraining() {
+  currentModuleIndex.value = 0
+  currentStepType.value = 'viewMaterials'
+}
+
+function onClickGoToDashboard() {
+  router.push('/dashboard')
+}
 </script>
 
 <template>
   <div class="main-container">
     <div class="main-grid-container">
-      <div class="banner" ref="trainingBanner">
+      <div
+        class="banner"
+        ref="trainingBanner"
+        v-if="currentStepType !== 'finishedPage'"
+      >
         <TrainingBanner
           :moduleName="currentModule?.name ?? ''"
           :title="currentModule?.name ?? ''"
@@ -270,7 +321,13 @@ function handleError(error: any, message: string) {
         :onNext="goToNextStep"
       />
       <TrainingQuiz
-        v-else-if="currentStepType !== 'viewMaterials'"
+        v-else-if="
+          [
+            'takeQuiz',
+            'viewQuizResultsPassed',
+            'viewQuizResultsFailed',
+          ].includes(currentStepType)
+        "
         :quizCategory="currentModule?.quizKey ?? ''"
         @exitQuiz="onBackOutOfQuiz"
         @resetQuiz="incrementQuizComponentKey"
@@ -279,6 +336,41 @@ function handleError(error: any, message: string) {
         @passedQuizAndExit="onPassedQuiz"
         :key="quizComponentKey"
       />
+      <TrainingPage
+        v-else-if="isTrainingComplete && currentStepType === 'finishedPage'"
+        class="congrats-page"
+      >
+        <template v-slot:main-content>
+          <NationallyCertifiedTutorBanner class="banner banner--congrats" />
+          <div class="congrats-content">
+            <span class="congrats-heading">
+              Congratulations on completing the Intro to UPchieve Course!
+            </span>
+            Welcome to the UPchieve Coach Community. You're now equipped with
+            the proven coaching tools and strategies to support learners from
+            all backgrounds.
+          </div>
+        </template>
+        <template v-slot:previous-button>
+          <LargeButton
+            class="previous-button"
+            variant="secondary"
+            :showArrow="true"
+            arrowDirection="left"
+            @click="onClickReviewTraining"
+            >Review Training</LargeButton
+          >
+        </template>
+        <template v-slot:next-button>
+          <LargeButton
+            variant="primary-blue"
+            :showArrow="false"
+            class="next-button"
+            @click="onClickGoToDashboard"
+            >Go to Dashboard</LargeButton
+          >
+        </template>
+      </TrainingPage>
     </div>
   </div>
 </template>
@@ -317,15 +409,21 @@ function handleError(error: any, message: string) {
     height: 100%;
     max-width: 833px;
     max-height: 169px;
+    padding: 0;
 
     @include breakpoint-below('medium') {
       max-height: 280px;
+    }
+
+    &--congrats {
+      max-height: none;
     }
   }
 
   .side-navigation {
     @include breakpoint-above('medium') {
       grid-row: banner / -banner;
+      grid-column: stepper;
       align-self: stretch;
     }
 
@@ -349,5 +447,27 @@ function handleError(error: any, message: string) {
   padding: 3%;
   border-radius: 5px;
   border: 1px solid $c-error-red;
+}
+
+.congrats-page {
+  :deep(.main-content-area) {
+    padding: 0px;
+  }
+}
+
+.congrats-heading {
+  font-weight: 500;
+  font-size: 20px;
+  color: $c-hover-green;
+  padding-bottom: 8px;
+  padding-top: 24px;
+}
+
+.congrats-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 24px;
 }
 </style>

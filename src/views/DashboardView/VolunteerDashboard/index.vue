@@ -384,7 +384,7 @@ export default {
     },
 
     trainingAction() {
-      const passedQuiz = this.user.certifications.upchieve101.passed
+      const passedQuiz = this.$store.getters['user/completedVolunteerTraining']
       if (passedQuiz)
         return {
           subtitle: 'Completed',
