@@ -229,7 +229,7 @@ async function submitQuiz() {
           </div>
           <QuizQuestionView
             :selectedAnswer="questionIdToAnswerMap[question.id]"
-            :questionWithAnswers="quizQuestions[0]"
+            :questionWithAnswers="quizQuestions[index]"
             :showAnswers="true"
           />
         </div>

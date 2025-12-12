@@ -393,6 +393,14 @@ function onClickGoToDashboard() {
     align-items: center;
   }
 
+  #loader {
+    grid-row: main-content;
+    grid-column: main;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .banner {
     grid-column: main;
     grid-row: banner;
