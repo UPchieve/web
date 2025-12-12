@@ -216,7 +216,7 @@ import ChatIcon from '@/assets/icons/chat-outline-rounded.svg'
 import NotesIcon from '@/assets/icons/notes-checkmark.svg'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
-import { EVENTS } from '@/consts'
+import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import TaskCard from '@/components/TaskCard.vue'
 import LargeButton from '@/components/LargeButton.vue'
@@ -277,8 +277,11 @@ export default {
       localStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
 
     if (localStorage.getItem('isSSOSignUpRedirect')) {
-      AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
-      AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+      AnalyticsService.registerVolunteer(this.user)
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
+        verificationMethod: VERIFICATION_METHOD.EMAIL,
+      })
+
       localStorage.removeItem('isSSOSignUpRedirect')
       store.dispatch('user/firstDashboardVisit', true)
     }

@@ -41,7 +41,7 @@ import { mapState, mapGetters } from 'vuex'
 import TopicChip from '@/components/TopicChip.vue'
 import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
+import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 
 export default {
   name: 'volunteer-welcome-page',
@@ -55,8 +55,10 @@ export default {
   },
   created() {
     if (localStorage.getItem('isSSOSignUpRedirect')) {
-      AnalyticsService.captureEvent(EVENTS.ACCOUNT_CREATED)
-      AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED)
+      AnalyticsService.registerVolunteer(this.user)
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_VERIFIED, {
+        verificationMethod: VERIFICATION_METHOD.EMAIL,
+      })
       localStorage.removeItem('isSSOSignUpRedirect')
       this.$store.dispatch('user/firstDashboardVisit', true)
     }

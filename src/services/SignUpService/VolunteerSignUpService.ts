@@ -20,6 +20,7 @@ import type {
 import store from '@/store'
 import { SsoProvider } from '@/services/SsoService'
 import * as SignUpService from '@/services/SignUpService'
+import AnalyticsService from '@/services/AnalyticsService'
 
 const RoutePath = {
   account: `/sign-up/volunteer/account`,
@@ -33,7 +34,7 @@ export enum InputName {
   EMAIL = 'email',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
-  PASSWORD = 'password',
+  PASSWORD = 'password', // pragma: allowlist secret
   PHONE = 'phone',
   SIGNUP_SOURCE_ID = 'signupSourceId',
   TERMS = 'terms',
@@ -124,7 +125,7 @@ async function createAccount(
   data: VolunteerAccountFormData
 ): Promise<SubmitActionResponse> {
   try {
-    await NetworkService.registerOpenVolunteer({
+    const result = await NetworkService.registerOpenVolunteer({
       [InputName.EMAIL]: data.email,
       [InputName.PASSWORD]: data.password,
       [InputName.FIRST_NAME]: data.firstName,
@@ -133,7 +134,7 @@ async function createAccount(
       [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
       [InputName.TERMS]: true,
     })
-
+    AnalyticsService.registerVolunteer(result.data.user)
     return getSubmitResponse(SignUpPage.verify)
   } catch (err) {
     return getSubmitResponse(null, null, err)
