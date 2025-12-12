@@ -311,6 +311,7 @@ export default {
       getVolunteerMilestoneSharingStudyVariant:
         'featureFlags/getVolunteerMilestoneSharingStudyVariant',
       isVerifyHoursButtonEnabled: 'featureFlags/isVerifyHoursButtonEnabled',
+      hasCompletedVolunteerTraining: 'user/hasCompletedVolunteerTraining',
     }),
     shouldShowNotificationsCard() {
       return (
@@ -384,7 +385,7 @@ export default {
     },
 
     trainingAction() {
-      const passedQuiz = this.$store.getters['user/completedVolunteerTraining']
+      const passedQuiz = this.hasCompletedVolunteerTraining
       if (passedQuiz)
         return {
           subtitle: 'Completed',

@@ -414,7 +414,7 @@ export default {
     },
 
     hasCompletedVolunteerTraining: (state) => {
-      return state.user.user?.hasCompletedVolunteerTraining ?? false
+      return state.user?.hasCompletedVolunteerTraining ?? false
     },
 
     hasSelectedAvailability: (state) => !!state.user.availabilityLastModifiedAt,
