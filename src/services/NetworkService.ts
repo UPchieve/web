@@ -1361,7 +1361,24 @@ export default {
       this._errorHandler
     )
   },
-  getNHTSGroupsForUser() {
+  getNTHSGroupsForUser() {
     return httpGet(`${API_ROOT}/nths-groups`, {}).catch(this._axiosErrorHandler)
+  },
+  getNTHSGroupByCode(code: string) {
+    return httpGet(`${API_PUBLIC_ROOT}/nths-groups/${code}`, {}).catch(
+      this._axiosErrorHandler
+    )
+  },
+  joinVolunteerToNTHSGroup({
+    email,
+    inviteCode,
+  }: {
+    email: string
+    inviteCode: string
+  }) {
+    return httpPost(`${API_PUBLIC_ROOT}/nths-groups/join`, {
+      email,
+      inviteCode,
+    }).then(this._successHandler, this._errorHandler)
   },
 }

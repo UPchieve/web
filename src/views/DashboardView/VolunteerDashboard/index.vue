@@ -170,6 +170,13 @@
       </TaskCard>
     </div>
 
+    <joined-team-modal
+      v-if="joinedTeamCode"
+      @close-modal="() => (joinedTeamCode = '')"
+      :teamCode="joinedTeamCode"
+      :teamName="group.groupName"
+    />
+
     <photo-upload-modal
       v-if="showPhotoUploadModal"
       :closeModal="togglePhotoUploadModal"
@@ -221,6 +228,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import TaskCard from '@/components/TaskCard.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
+import JoinedTeamModal from '../StudentDashboard/JoinedTeamModal.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -248,6 +256,7 @@ export default {
     ChatIcon,
     NotesIcon,
     LargeButton,
+    JoinedTeamModal,
   },
   directives: {
     tooltip: vTooltip,
@@ -285,6 +294,12 @@ export default {
       localStorage.removeItem('isSSOSignUpRedirect')
       store.dispatch('user/firstDashboardVisit', true)
     }
+
+    const joinedTeamCode = localStorage.getItem('joinedTeamCode')
+    if (joinedTeamCode) {
+      this.joinedTeamCode = joinedTeamCode
+      localStorage.removeItem('joinedTeamCode')
+    }
   },
   data() {
     return {
@@ -295,6 +310,7 @@ export default {
       hasSeenMilestoneModal: localStorage.getItem('hasSharedMilestone'),
       notificationPermission: 'default',
       notificationsCardWasDismissed: false,
+      joinedTeamCode: '',
     }
   },
   computed: {
@@ -304,6 +320,7 @@ export default {
       hasSharedMilestone: (state) => state.user.hasSharedMilestone,
       availabilityLastModifiedAt: (state) =>
         state.user.user?.availabilityLastModifiedAt,
+      group: (state) => state.volunteer.NTHSGroups?.[0],
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',

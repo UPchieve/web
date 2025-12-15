@@ -37,7 +37,7 @@ export default {
   },
   actions: {
     async fetchNTHSGroupsForUser({ commit }) {
-      const results = await NetworkService.getNHTSGroupsForUser()
+      const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
     },
 

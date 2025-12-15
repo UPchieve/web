@@ -206,6 +206,9 @@ export default {
         this.isCheckingReferral = false
       }
     }
+    if (this.$route.params.inviteCode) {
+      localStorage.setItem('joinedTeamCode', this.$route.params.inviteCode)
+    }
 
     this.userSelectionFrom(this.$route.params)
   },

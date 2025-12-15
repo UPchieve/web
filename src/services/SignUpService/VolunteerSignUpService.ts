@@ -1,4 +1,8 @@
-import type { RouteLocation } from 'vue-router'
+import type {
+  NavigationGuardNext,
+  RouteLocation,
+  RouteLocationNormalized,
+} from 'vue-router'
 import NetworkService from '@/services/NetworkService'
 import {
   SignUpPage,
@@ -38,6 +42,7 @@ export enum InputName {
   PHONE = 'phone',
   SIGNUP_SOURCE_ID = 'signupSourceId',
   TERMS = 'terms',
+  INVITE_CODE = 'inviteCode',
 }
 
 export type VolunteerAccountFormData = {
@@ -48,9 +53,10 @@ export type VolunteerAccountFormData = {
   [InputName.PHONE]?: string
   [InputName.SIGNUP_SOURCE_ID]?: string
   [InputName.TERMS]?: boolean
+  [InputName.INVITE_CODE]?: string
 }
 
-const isGoogleSignupForVolunteersEnabled =
+const isGoogleSignupForVolunteersEnabled = () =>
   store.getters['featureFlags/isGoogleSignupForVolunteersEnabled']
 
 export function getPageDetails(
@@ -95,7 +101,7 @@ function getLogInDetails(): PageDetail<VolunteerAccountFormData> {
         element: 'header-logo-teal',
       }),
       getRow('mt-4 justify-center', getTextElement('h1', `Become a Volunteer`)),
-      ...(isGoogleSignupForVolunteersEnabled ? getSsoSectionElements() : []),
+      ...(isGoogleSignupForVolunteersEnabled() ? getSsoSectionElements() : []),
       getRow('mt-2 justify-center'),
       getRow('mt-2', {
         element: 'FormEmail',
@@ -126,6 +132,7 @@ async function createAccount(
 ): Promise<SubmitActionResponse> {
   try {
     const result = await NetworkService.registerOpenVolunteer({
+      [InputName.INVITE_CODE]: data.inviteCode,
       [InputName.EMAIL]: data.email,
       [InputName.PASSWORD]: data.password,
       [InputName.FIRST_NAME]: data.firstName,
@@ -262,4 +269,18 @@ function getSsoSectionElements(): FormRow[] {
     getRow('mt-2 mb-2', { element: 'LineDivider', props: { text: 'or' } })
   )
   return rows
+}
+
+export async function beforeEnter(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+) {
+  if (to.query.inviteCode) {
+    to.params.inviteCode = to.query.inviteCode as string
+    to.params.email = to.query.email as string
+    delete to.query.inviteCode
+    delete to.query.email
+  }
+  return next()
 }

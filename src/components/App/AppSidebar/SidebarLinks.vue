@@ -127,7 +127,7 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer && isMemberOfNHTSGroup"
+          v-if="isVolunteer && isMemberOfNTHSGroup"
           to="/groups"
           text="Teams"
           id="nths-group-sidebar-link"
@@ -231,7 +231,7 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       productFlags: (state) => state.productFlags.flags,
-      volunteersNHTSGroups: (state) => state.volunteer.NTHSGroups,
+      volunteersNTHSGroups: (state) => state.volunteer.NTHSGroups,
     }),
     ...mapGetters({
       isProgressReportsActive: 'featureFlags/isProgressReportsActive',
@@ -251,9 +251,9 @@ export default {
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
       isNTHSGroupsPageEnabled: 'featureFlags/isNTHSGroupsPageEnabled',
     }),
-    isMemberOfNHTSGroup() {
+    isMemberOfNTHSGroup() {
       return (
-        this.isNTHSGroupsPageEnabled && this.volunteersNHTSGroups.length > 0
+        this.isNTHSGroupsPageEnabled && this.volunteersNTHSGroups.length > 0
       )
     },
     isStandaloneAiEnabled() {

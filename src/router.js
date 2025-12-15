@@ -31,6 +31,7 @@ import DashboardView from './views/DashboardView/index.vue'
 import FavoriteCoachesView from './views/FavoriteCoachesView.vue'
 import FeedbackView from './views/FeedbackView.vue'
 import JoinClassView from './views/JoinClassView.vue'
+import JoinNTHSGroupView from './views/JoinNTHSGroupView.vue'
 import LoginView from './views/LoginView.vue'
 import LogoutView from './views/LogoutView.vue'
 import ProfileView from './views/ProfileView/index.vue'
@@ -65,6 +66,7 @@ import NetworkService, { axiosInstance } from './services/NetworkService'
 import { UserType } from '@/services/SignUpService'
 import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/StudentSignUpService'
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
+import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/VolunteerSignUpService'
 import Case from 'case'
 import RewardsView from './views/RewardsView.vue'
 import SurveysView from './views/SurveysView.vue'
@@ -162,6 +164,12 @@ const routes = [
     meta: { authOptional: true, hideNavigation: true },
   },
   {
+    path: '/join-team/:inviteCode?',
+    name: 'JoinNTHSGroupView',
+    component: JoinNTHSGroupView,
+    meta: { authOptional: true, hideNavigation: true },
+  },
+  {
     path: '/signup',
     name: 'Signup',
     beforeEnter: (to, from, next) => {
@@ -181,7 +189,7 @@ const routes = [
         case UserType.teacher:
           return teacherBeforeEnter(to, from, next)
         case UserType.volunteer:
-          return next()
+          return volunteerBeforeEnter(to, from, next)
         default:
           // Unknown userType.
           delete to.params.userType
@@ -235,6 +243,10 @@ const routes = [
     component: DashboardView,
     meta: { protected: true },
     beforeEnter: async (to, from, next) => {
+      if (to.query.inviteCode) {
+        localStorage.setItem('joinedTeamCode', to.query.inviteCode)
+        delete to.query.inviteCode
+      }
       if (store.getters['user/isAutoFlowUser']) {
         next('/welcome')
       }

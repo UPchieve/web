@@ -423,6 +423,7 @@ export default {
       this.isRegistering = true
       AuthService.registerPartnerVolunteer({
         volunteerPartnerOrg: this.$route.params.partnerId,
+        inviteCode: this.$route.params.inviteCode,
         partnerUserId: this.$route.query.uid,
         email: this.formData.email,
         password: this.formData.password,

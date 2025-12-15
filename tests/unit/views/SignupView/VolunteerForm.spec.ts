@@ -32,6 +32,7 @@ describe('VolunteerForm', () => {
     signupSourceId: 3,
     otherSignupSource: '',
     referredByCode: null,
+    inviteCode: null,
   }
 
   beforeEach(() => {

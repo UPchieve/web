@@ -395,6 +395,11 @@ export default {
     submit() {
       this.submitError = ''
       if (this.isRegistering) return
+      const joinedTeamCode = localStorage.getItem('joinedTeamCode')
+      if (joinedTeamCode) {
+        this.joinedTeamCode = joinedTeamCode
+        localStorage.removeItem('joinedTeamCode')
+      }
       this.isRegistering = true
       AuthService.registerOpenVolunteer({
         email: this.credentials.email,
@@ -406,6 +411,7 @@ export default {
         signupSourceId: this.signupSourceId,
         otherSignupSource: this.otherSignupSource,
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
+        inviteCode: joinedTeamCode,
       })
         .then(() => {
           this.isRegistering = false
@@ -426,12 +432,14 @@ export default {
         isVolunteer: true,
       })
       localStorage.setItem('isSSOSignUpRedirect', true)
+      const joinedTeamCode = localStorage.getItem('joinedTeamCode')
       const data = {
         errorRedirect: '/sign-up/volunteer/account',
         isLogin: false,
         provider: 'google',
         referredByCode: window.localStorage.getItem('upcReferredByCode'),
         accountType: 'volunteer',
+        inviteCode: joinedTeamCode,
       }
 
       if (this.partnerKey) {
