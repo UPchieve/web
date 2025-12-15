@@ -23,7 +23,7 @@
   grid-column: main;
   display: flex;
   flex-direction: column;
-  padding: 2% 4%;
+  padding: 16px 32px;
   max-width: 833px;
   width: 100%;
 }
@@ -54,7 +54,6 @@
   @media screen and (max-width: 1372px) {
     grid-row: navigation-buttons;
     column-gap: 10%;
-    padding-bottom: 140px;
   }
 }
 </style>

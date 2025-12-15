@@ -326,6 +326,7 @@ function onClickGoToDashboard() {
       @finishedQuiz="submitQuiz"
       @error="handleError"
       @passedQuizAndExit="onPassedQuiz"
+      @clickedNextOrPrevious="scrollToTop"
       :key="quizComponentKey"
     />
     <TrainingPage
@@ -393,22 +394,6 @@ function onClickGoToDashboard() {
     align-items: center;
   }
 
-  #loader {
-    grid-row: main-content;
-    grid-column: main;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #loader {
-    grid-row: main-content;
-    grid-column: main;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
   .banner {
     grid-column: main;
     grid-row: banner;
@@ -429,12 +414,12 @@ function onClickGoToDashboard() {
   .side-navigation {
     grid-row: -1 / 1;
     grid-column: stepper;
-    align-self: stretch;
+    align-self: start;
     max-width: 300px;
     border: 1px solid $c-border-grey;
     position: sticky;
     top: 64px; // height of the app banner
-    height: calc(100vh - 64px);
+    max-height: 100vh;
     box-sizing: border-box;
 
     @media screen and (max-width: 1372px) {
@@ -443,7 +428,7 @@ function onClickGoToDashboard() {
       bottom: 0;
       top: 0;
       width: 100%;
-      height: 50vh;
+      height: auto;
       grid-row: stepper;
       grid-column: main;
       max-width: inherit;

@@ -28,6 +28,7 @@ const emit = defineEmits<{
   (e: 'finishedQuiz'): void
   (e: 'passedQuizAndExit'): void
   (e: 'error', error: any, message: string): void
+  (e: 'clickedNextOrPrevious'): void
 }>()
 
 type StepType = 'takingQuiz' | 'viewingResults'
@@ -142,6 +143,7 @@ const nextButtonLabel = computed(() => {
 })
 
 function previous() {
+  emit('clickedNextOrPrevious')
   if (previousButtonAction.value === 'reviewTraining') {
     emit('exitQuiz')
   } else if (previousButtonAction.value === 'previousQuestion') {
@@ -154,6 +156,7 @@ function goToNextQuestion() {
 }
 
 function next() {
+  emit('clickedNextOrPrevious')
   switch (nextButtonAction.value) {
     case 'nextQuestion':
       return goToNextQuestion()
