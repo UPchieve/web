@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import StepCompleteIcon from '@/assets/check-circled.svg'
 import StepNotStartedIcon from '@/assets/whiteboard_icons/circle.svg'
-import StepInProgressIcon from '@/assets/filled_circle.svg'
 import StepHalfInProgressIcon from '@/assets/half_filled_circle.svg'
 import LockedKnowledgeCheck from '@/assets/lock_circle.svg'
 import CaretIcon from '@/assets/right-caret.svg'
@@ -11,7 +10,7 @@ import type { StepType } from './index.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 
-export type StepStatus = 'complete' | 'in-progress' | 'not-started'
+export type StepStatus = 'complete' | 'started' | 'not-started'
 export type NavigationStep = {
   name: string
   status: StepStatus
@@ -106,32 +105,26 @@ watch(isExpanded, (value) => {
     <div v-show="!drawerMode || isExpanded">
       <button
         class="step-container"
+        :class="{ 'current-step': index === currentStepIndex }"
         v-for="(step, index) in steps"
         :key="step.name"
         @click="clickStep(index)"
       >
-        <div
-          class="step-name-container"
-          :class="index === currentStepIndex ? 'current-step' : ''"
-        >
+        <div class="step-name-container">
           {{ step.name }}
         </div>
         <div class="status-icon-container">
-          <StepInProgressIcon
-            v-if="step.hasKnowledgeCheck && step.status === 'in-progress'"
-            class="status-icon status-icon-in-progress"
-          />
           <StepHalfInProgressIcon
-            v-else-if="step.status === 'in-progress'"
-            class="status-icon status-icon-in-progress"
+            v-if="step.status === 'started'"
+            class="status-icon"
           />
           <StepCompleteIcon
             v-else-if="step.status === 'complete'"
-            class="status-icon status-icon-complete"
+            class="status-icon"
           />
           <StepNotStartedIcon
             v-else
-            class="status-icon status-icon-not-started"
+            class="status-icon"
           />
         </div>
 
@@ -167,9 +160,9 @@ watch(isExpanded, (value) => {
               currentStepType === 'viewQuizResultsFailed'
             "
           />
-          <StepInProgressIcon
+          <StepHalfInProgressIcon
             class="status-icon"
-            v-if="currentStepType === 'takeQuiz' && step.status !== 'complete'"
+            v-if="currentStepType === 'takeQuiz'"
           />
         </div>
       </button>
@@ -181,8 +174,8 @@ watch(isExpanded, (value) => {
 .overall-progress-container {
   border-bottom: 1px solid $c-border-grey;
   width: 100%;
-  padding-left: 5%;
-  padding-right: 5%;
+  padding-left: 12px;
+  padding-right: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -268,8 +261,8 @@ watch(isExpanded, (value) => {
 
 .step-name-container {
   margin-right: 12px;
-  padding-left: 5%;
-  padding-right: 5%;
+  padding-left: 12px;
+  padding-right: 12px;
   grid-row: 1;
   grid-column: step-name;
   text-align: left;
@@ -327,5 +320,6 @@ watch(isExpanded, (value) => {
 
 .current-step {
   font-weight: 500;
+  background-color: darken($c-background-grey, 5%);
 }
 </style>

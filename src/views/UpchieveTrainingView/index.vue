@@ -2,7 +2,10 @@
 import Loader from '@/components/Loader.vue'
 import { computed, nextTick, onBeforeMount, ref, watch } from 'vue'
 import NetworkService from '@/services/NetworkService'
-import type { UpchieveTrainingCourse } from '@/views/UpchieveTrainingView/types'
+import type {
+  UpchieveTrainingCourse,
+  UpchieveTrainingCourseModule,
+} from '@/views/UpchieveTrainingView/types'
 import TrainingModule from '@/views/UpchieveTrainingView/TrainingModule.vue'
 import SideNavigation from '@/views/UpchieveTrainingView/SideNavigation.vue'
 import type {
@@ -103,6 +106,16 @@ async function scrollToTop() {
 }
 
 const completedMaterials = ref<string[]>([])
+
+watch(currentModule, async (curr) => {
+  if (!curr) return
+  const hasCompletedThisMaterial =
+    completedMaterials.value &&
+    completedMaterials.value.includes(curr.materials[0].materialKey)
+  if (!hasCompletedThisMaterial) {
+    await recordTrainingProgress()
+  }
+})
 async function recordTrainingProgress() {
   isRecordingProgress.value = true
   try {
@@ -161,7 +174,6 @@ async function goToNextStep() {
   }
 
   if (currentStepType.value === 'viewMaterials') {
-    await recordTrainingProgress()
     if (!currentModule.value?.quizKey || hasPassedModuleQuiz.value) {
       proceedToNextModule()
     } else {
@@ -207,47 +219,51 @@ async function onPassedQuiz() {
 const quizComponentKey = ref<number>(0) // Change this key to force a rerender
 function incrementQuizComponentKey() {
   quizComponentKey.value = quizComponentKey.value + 1
+  currentStepType.value = 'takeQuiz'
 }
 
 async function navigateToStep(index: number) {
-  if (currentMaterialKey.value) {
-    try {
-      await NetworkService.recordTrainingCourseProgress(
-        COURSE_KEY,
-        currentMaterialKey.value
-      )
-      currentModuleIndex.value = index
-    } catch {
-      // still navigate even if recording fails
-      currentModuleIndex.value = index
-    } finally {
-      await scrollToTop()
-    }
-  }
+  currentModuleIndex.value = index
+  currentStepType.value = 'viewMaterials'
+  await scrollToTop()
 }
 
 const navigationSteps = computed((): NavigationStep[] => {
   if (!trainingCourseDefinition.value) return []
-  const quizNames = trainingCourseDefinition.value?.modules.map(
-    (m) => m.quizKey
-  )
-  const hasPassedSomeQuiz = quizNames.filter((quiz) =>
-    store.getters['user/hasCertification'](quiz)
-  ).length
-  // @TODO Update me when adding new Knowledge Checks step into the stepper.
+  function getStepStatus(module: UpchieveTrainingCourseModule): StepStatus {
+    if (module.key === 'introduction') {
+      // The intro module has no quiz so it is technically completed as soon as the user views the material.
+      // However, if they are just starting the training, we want to wait until they move past the intro module to show
+      // it as complete.
+      const introModuleMaterialKey = module.materials[0].materialKey
+      const hasProgressedPastIntro = completedMaterials.value?.filter(
+        (matKey) => matKey !== introModuleMaterialKey
+      ).length
+      const hasCompletedIntroModule = completedMaterials.value?.includes(
+        introModuleMaterialKey
+      )
+      return hasProgressedPastIntro
+        ? 'complete'
+        : hasCompletedIntroModule
+          ? 'started'
+          : 'not-started'
+    }
+    const isQuizComplete =
+      !module.quizKey ||
+      (module.quizKey && store.getters['user/hasCertification'](module.quizKey))
+    const isMaterialComplete = completedMaterials.value?.includes(
+      module.materials[0].materialKey
+    )
+
+    return isQuizComplete && isMaterialComplete
+      ? 'complete'
+      : isMaterialComplete
+        ? 'started'
+        : 'not-started'
+  }
   return trainingCourseDefinition.value?.modules.map((module, index) => {
-    const status: StepStatus =
-      module.key === 'introduction'
-        ? hasPassedSomeQuiz || currentModuleIndex.value > 0
-          ? 'complete'
-          : 'in-progress'
-        : hasModuleCertification(module.quizKey)
-          ? 'complete'
-          : index === currentModuleIndex.value
-            ? 'in-progress'
-            : 'not-started'
     return {
-      status,
+      status: getStepStatus(module),
       name: module.name,
       currentStepIndex: index,
       hasKnowledgeCheck: !!module.quizKey,
