@@ -398,7 +398,6 @@ export default {
       const joinedTeamCode = localStorage.getItem('joinedTeamCode')
       if (joinedTeamCode) {
         this.joinedTeamCode = joinedTeamCode
-        localStorage.removeItem('joinedTeamCode')
       }
       this.isRegistering = true
       AuthService.registerOpenVolunteer({
@@ -416,6 +415,7 @@ export default {
         .then(() => {
           this.isRegistering = false
           window.localStorage.removeItem('upcReferredByCode')
+          localStorage.removeItem('joinedTeamCode')
           this.$router.push('/verify')
         })
         .catch((err) => {

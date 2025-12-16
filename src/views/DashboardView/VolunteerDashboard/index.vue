@@ -171,7 +171,7 @@
     </div>
 
     <joined-team-modal
-      v-if="joinedTeamCode"
+      v-if="joinedTeamCode && group?.groupName"
       @close-modal="() => (joinedTeamCode = '')"
       :teamCode="joinedTeamCode"
       :teamName="group.groupName"
