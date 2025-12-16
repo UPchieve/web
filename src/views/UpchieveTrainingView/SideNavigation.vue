@@ -8,6 +8,8 @@ import CaretIcon from '@/assets/right-caret.svg'
 import { computed, ref, watch } from 'vue'
 import ContinuousProgressBar from '@/views/UpchieveTrainingView/ContinuousProgressBar.vue'
 import type { StepType } from './index.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export type StepStatus = 'complete' | 'in-progress' | 'not-started'
 export type NavigationStep = {
@@ -25,6 +27,7 @@ const {
   steps,
   drawerMode = false,
   overallProgress,
+  currentStepIndex,
 } = defineProps<{
   steps: NavigationStep[]
   drawerMode: boolean
@@ -38,6 +41,10 @@ function toggleExpand() {
 }
 
 function clickStep(index: number) {
+  AnalyticsService.captureEvent(EVENTS.TRAINING_JUMPED_TO_MODULE, {
+    currentModule: steps[currentStepIndex].name,
+    targetModule: steps[index].name,
+  })
   emit('navigate-to-step', index)
   if (drawerMode) {
     didClickToExpand.value = false

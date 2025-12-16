@@ -152,6 +152,7 @@ export default {
     answerKey: AnswerMap
     score: number
     isTrainingSubject: boolean
+    tries: number
   }> {
     const { default: store } = await import('@/store')
     const quizScoreResponse = await NetworkService.getQuizScore({
@@ -170,6 +171,7 @@ export default {
       answerKey: idCorrectAnswerMap,
       score,
       isTrainingSubject,
+      tries,
     }
   },
 }

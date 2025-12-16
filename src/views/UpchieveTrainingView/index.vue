@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Loader from '@/components/Loader.vue'
-import { computed, nextTick, onBeforeMount, ref } from 'vue'
+import { computed, nextTick, onBeforeMount, ref, watch } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import type { UpchieveTrainingCourse } from '@/views/UpchieveTrainingView/types'
 import TrainingModule from '@/views/UpchieveTrainingView/TrainingModule.vue'
@@ -17,6 +17,8 @@ import TrainingPage from '@/views/UpchieveTrainingView/Quizzes/TrainingPage.vue'
 import NationallyCertifiedTutorBanner from '@/assets/Training/nationally_certified_tutor_banner.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import { useRouter } from 'vue-router'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
 const router = useRouter()
@@ -31,6 +33,15 @@ const currentMaterialKey = computed(
   () => currentModule.value?.materials[0].materialKey
 )
 const isRecordingProgress = ref<boolean>(false)
+
+watch(currentModule, (curr, prev) => {
+  if (curr && curr.key !== prev?.key) {
+    AnalyticsService.captureEvent(EVENTS.TRAINING_VIEWED_MODULE, {
+      moduleKey: curr.key,
+      moduleName: curr.name,
+    })
+  }
+})
 
 // This is while we deal with some of the legacy stuff for training courses.
 // Legacy training course had multiple materials per module
@@ -103,6 +114,9 @@ async function recordTrainingProgress() {
         COURSE_KEY,
         currentMaterialKey.value
       )
+      AnalyticsService.captureEvent(EVENTS.TRAINING_COMPLETED_MATERIAL, {
+        materialKey: currentMaterialKey.value,
+      })
       completedMaterials.value = response.data.completedMaterialKeys
     }
   } catch (err) {
@@ -136,6 +150,7 @@ async function goToNextStep() {
     doForceGoToFinishedPageOnNext.value ||
     (isLastStep && isTrainingComplete.value)
   ) {
+    AnalyticsService.captureEvent(EVENTS.TRAINING_VIEWED_FINISHED_PAGE)
     currentStepType.value = 'finishedPage'
     doForceGoToFinishedPageOnNext.value = false
     return

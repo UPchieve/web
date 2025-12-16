@@ -5,6 +5,9 @@ import { useStore } from 'vuex'
 import { defineAsyncComponent } from 'vue'
 import TrainingPage from '@/views/UpchieveTrainingView/Quizzes/TrainingPage.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
+import ExternalResourceLink from '@/views/UpchieveTrainingView/ExternalResourceLink.vue'
 
 function load(name: string) {
   return defineAsyncComponent(() => import(`@/assets/Training/${name}.svg`))
@@ -48,7 +51,11 @@ const props = defineProps<{
 }>()
 
 const isMobile = computed(() => store.getters['app/mobileMode'])
+
 function goToResource(externalLink: string) {
+  AnalyticsService.captureEvent(EVENTS.TRAINING_CLICKED_ON_EXTERNAL_LINK, {
+    link: externalLink,
+  })
   window.open(externalLink, '_blank')
 }
 </script>
@@ -895,27 +902,27 @@ function goToResource(externalLink: string) {
                 <h3>Qualified Resources to Share</h3>
                 <ul class="resources-list">
                   <li>
-                    <a
-                      href="https://www.crisistextline.org/"
+                    <ExternalResourceLink
+                      link="https://www.crisistextline.org/"
+                      text="Crisis Text Line"
                       class="bold-underline safety-link"
-                      >Crisis Text Line</a
-                    >
+                    />
                     (mental health crisis)
                   </li>
                   <li>
-                    <a
-                      href="https://childhelphotline.org/"
+                    <ExternalResourceLink
+                      link="https://childhelphotline.org/"
+                      text="Childhelp"
                       class="bold-underline safety-link"
-                      >Childhelp</a
-                    >
+                    />
                     (child abuse)
                   </li>
                   <li>
-                    <a
-                      href="https://www.1800runaway.org/youth-teens/get-help"
+                    <ExternalResourceLink
+                      link="https://www.1800runaway.org/youth-teens/get-help"
+                      text="National Runaway Safeline"
                       class="bold-underline safety-link"
-                      >National Runaway Safeline</a
-                    >
+                    />
                     (homelessness)
                   </li>
                 </ul>

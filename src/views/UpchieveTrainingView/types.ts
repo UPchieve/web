@@ -49,4 +49,5 @@ export type QuizResults = {
   didPass: boolean
   numCorrect: number
   answerKey: AnswerMap
+  tries: number
 }

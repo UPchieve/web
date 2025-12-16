@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Loader from '@/components/Loader.vue'
-import { computed, onBeforeMount, ref } from 'vue'
+import { computed, onBeforeMount, onMounted, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import type {
   QuizQuestion as QuizQuestionType,
@@ -14,6 +14,8 @@ import CrossMark from '@/assets/cross.svg'
 import CheckMark from '@/assets/check.svg'
 import TrainingService from '@/services/TrainingService'
 import type { LetterChoice, AnswerMap } from '@/services/TrainingService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
 const isMobile = store.getters['app/mobileMode']
@@ -65,6 +67,12 @@ onBeforeMount(async () => {
   } finally {
     showLoader.value = false
   }
+})
+
+onMounted(() => {
+  AnalyticsService.captureEvent(EVENTS.TRAINING_VIEWED_MINI_QUIZ, {
+    quiz: props.quizCategory,
+  })
 })
 
 function setAnswerChoice(questionId: number, answerChoice: LetterChoice) {
@@ -145,6 +153,13 @@ const nextButtonLabel = computed(() => {
 function previous() {
   emit('clickedNextOrPrevious')
   if (previousButtonAction.value === 'reviewTraining') {
+    AnalyticsService.captureEvent(
+      EVENTS.TRAINING_MINI_QUIZ_CLICKED_REVIEW_MATERIALS,
+      {
+        quiz: props.quizCategory,
+        score: quizResults.value?.numCorrect,
+      }
+    )
     emit('exitQuiz')
   } else if (previousButtonAction.value === 'previousQuestion') {
     currentQuestionIndex.value = currentQuestionIndex.value - 1
@@ -163,6 +178,13 @@ function next() {
     case 'getQuizScore':
       return submitQuiz()
     case 'retakeQuiz':
+      AnalyticsService.captureEvent(
+        EVENTS.TRAINING_MINI_QUIZ_CLICKED_RETAKE_QUIZ,
+        {
+          quiz: props.quizCategory,
+          score: quizResults.value?.numCorrect,
+        }
+      )
       return emit('resetQuiz')
     case 'exitQuizOnPass':
       return emit('passedQuizAndExit')
@@ -180,9 +202,18 @@ async function submitQuiz() {
       didPass: results.didPass,
       numCorrect: results.score,
       answerKey: results.answerKey,
+      tries: results.tries,
     }
     currentStep.value = 'viewingResults'
-    return emit('finishedQuiz')
+    emit('finishedQuiz')
+    const quizEvent = results.didPass
+      ? EVENTS.TRAINING_MINI_QUIZ_PASSED
+      : EVENTS.TRAINING_MINI_QUIZ_FAILED
+    AnalyticsService.captureEvent(quizEvent, {
+      quiz: props.quizCategory,
+      score: results.score,
+      tries: results.tries,
+    })
   } catch (err) {
     emit(
       'error',
