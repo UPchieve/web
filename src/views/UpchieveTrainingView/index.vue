@@ -384,18 +384,20 @@ function onClickGoToDashboard() {
 
 <style lang="scss" scoped>
 .main-grid-container {
+  max-width: calc(833px + 300px); // maximum size of banner and side navigation
   background-color: white;
   display: grid;
   justify-content: center;
-  grid-template-columns: [main] auto [stepper] auto;
+  grid-template-columns: [main] minmax(0, 833px) [stepper] auto;
   grid-template-rows: [banner] auto [main-content] auto [navigation-buttons] auto;
   border-radius: 8px;
   box-sizing: border-box;
+  width: 100%;
 
   @media screen and (max-width: 1372px) {
     display: grid;
     justify-content: center;
-    grid-template-columns: [main] auto;
+    grid-template-columns: [main] 1fr;
     grid-template-rows: [banner] auto [main-content] auto [navigation-buttons] auto [stepper] auto;
     padding: 0;
   }
@@ -422,6 +424,8 @@ function onClickGoToDashboard() {
 
     &--congrats {
       max-height: none;
+      width: 100%;
+      height: auto;
     }
   }
 
