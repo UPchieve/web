@@ -6,92 +6,92 @@
       </h3>
     </template>
 
-    <template v-for="cert in certData" :key="`training-${cert.displayName}`">
-      <div class="training__cert">
-        <check-mark :checked="isComplete(cert.key)" />
-        <div class="training__cert-title">
-          <span>{{ cert.displayName }}</span>
-          <span
-            class="training__status"
-            :class="{
-              'training__status--progress':
-                progressStatus(cert.key) === 'In progress',
-              'training__status--completed':
-                progressStatus(cert.key) === 'Completed',
-            }"
-            >{{ progressStatus(cert.key) }}</span
-          >
-        </div>
-      </div>
-
-      <div class="training__progress-bar">
-        <div
-          class="training__progress-bar--bg"
-          :style="{ width: progressBarNumber(cert.key) + '%' }"
+    <div class="training__cert">
+      <check-mark :checked="isComplete" />
+      <div class="training__cert-title">
+        <span>{{ trainingCourseData.name }}</span>
+        <span
+          class="training__status"
+          :class="{
+            'training__status--progress': progressStatus === 'In progress',
+            'training__status--completed': progressStatus === 'Completed',
+          }"
+          >{{ progressStatus }}</span
         >
-          <span
-            class="training__progress-bar--number"
-            :class="{
-              'training__progress-bar--number-center':
-                progressBarNumber(cert.key) < 30,
-            }"
-            >{{ progressBarNumber(cert.key) }}%</span
-          >
-        </div>
       </div>
+    </div>
 
-      <div class="action-btns">
-        <router-link
-          :to="`/training/course/${cert.key}`"
-          class="action-btns__review-link"
-          v-if="isComplete(cert.key)"
+    <div class="training__progress-bar">
+      <div
+        class="training__progress-bar--bg"
+        :style="{ width: progressBarNumber + '%' }"
+      >
+        <span
+          class="training__progress-bar--number"
+          :class="{
+            'training__progress-bar--number-center': progressBarNumber < 30,
+          }"
+          >{{ progressBarNumber }}%</span
         >
-          <span class="action-btns__review-link--text">Review</span>
-          <arrow-icon class="action-btns__review-link--arrow-icon" />
-        </router-link>
-
-        <large-button
-          primary
-          :showArrow="false"
-          :routeTo="
-            !isComplete(cert.key) ? `/training/course/${cert.key}` : null
-          "
-          class="action-btns__quiz-btn"
-          :disabled="isComplete(cert.key)"
-        >
-          <span>{{ actionButtonText(cert.key) }}</span>
-        </large-button>
       </div>
+    </div>
 
-      <div class="training__row-border" />
-    </template>
+    <div class="action-btns">
+      <router-link
+        :to="`/training/course/${trainingCourseData.courseKey}`"
+        class="action-btns__review-link"
+        v-if="isComplete"
+      >
+        <span class="action-btns__review-link--text">Review</span>
+        <arrow-icon class="action-btns__review-link--arrow-icon" />
+      </router-link>
+
+      <large-button
+        primary
+        :showArrow="false"
+        :routeTo="
+          !isComplete
+            ? `/training/course/${trainingCourseData.courseKey}`
+            : null
+        "
+        class="action-btns__quiz-btn"
+        :disabled="isComplete"
+      >
+        <span>{{ actionButtonText }}</span>
+      </large-button>
+    </div>
+
+    <div class="training__row-border" />
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import CheckMark from '@/components/CheckMark.vue'
 import LargeButton from '@/components/LargeButton.vue'
-import ArrowIcon from '@/assets/arrow.svg'
+import {
+  getLegacyTrainingProgress,
+  getTrainingProgress,
+} from '@/utils/get-training-progress'
 
 export default {
   name: 'TrainingDropDown',
   components: {
     CheckMark,
     LargeButton,
-    ArrowIcon,
   },
   props: {
     headers: {
       type: Array,
       required: true,
     },
-    certData: {
-      type: Array,
+    trainingCourseData: {
+      type: Object,
       required: true,
     },
-    trainingCourse: {
+    isLegacyTrainingCourse: {
       type: Boolean,
+      required: true,
     },
   },
 
@@ -100,61 +100,37 @@ export default {
       user: (state) => state.user.user,
       windowWidth: (state) => state.app.windowWidth,
     }),
-    ...mapGetters({
-      isCombinedOnboardingQuizEnabled:
-        'featureFlags/isCombinedOnboardingQuizEnabled',
-    }),
+    progressStatus() {
+      const progress = this.isLegacyTrainingCourse
+        ? getLegacyTrainingProgress(this.trainingCourseData)
+        : getTrainingProgress(
+            this.trainingCourseData,
+            this.trainingCourseData.completedMaterials ?? []
+          )
+      if (progress === 0) return 'Not started'
+      if (this.isComplete) return 'Completed'
+      return 'In progress'
+    },
+    progressBarNumber() {
+      return this.isLegacyTrainingCourse
+        ? getLegacyTrainingProgress(this.trainingCourseData)
+        : getTrainingProgress(
+            this.trainingCourseData,
+            this.trainingCourseData.completedMaterials
+          )
+    },
+    isComplete() {
+      return this.trainingCourseData.isComplete
+    },
     isLargeDevice() {
       const largeScreenBreakpoint = 992
 
       return this.windowWidth <= largeScreenBreakpoint
     },
-  },
-
-  methods: {
-    isComplete(cert) {
-      return this.user.certifications[cert].passed
-    },
-    isCompleteForCombinedQuizUser(cert) {
-      // For users going through the combined quiz experiment, we'll consider their tranining course
-      // complete as long as they passed the quiz.
-      return (
-        cert.trainingCourse === 'upchieve101' &&
-        this.isComplete(cert) &&
-        this.isCombinedOnboardingQuizEnabled
-      )
-    },
-    progressStatus(cert) {
-      const certificationInfo = this.user.trainingCourses[cert]
-      if (this.isCompleteForCombinedQuizUser(cert)) {
-        return 'Completed'
-      }
-
-      const progress = certificationInfo.progress
-      if (progress === 0) return 'Not started'
-      if (this.isComplete(cert)) return 'Completed'
-      return 'In progress'
-    },
-    progressBarNumber(cert) {
-      const certificationInfo = this.user.trainingCourses[cert]
-      if (this.isCompleteForCombinedQuizUser(cert)) {
-        return 100
-      }
-
-      const { progress, isComplete } = certificationInfo
-      // If user has not completed the course quiz show 99% in the progress bar
-      if (isComplete && !this.isComplete(cert)) return 99
-      else return progress
-    },
-    actionButtonText(cert) {
-      const certificationInfo = this.user.trainingCourses[cert]
-      if (this.isCompleteForCombinedQuizUser(cert)) {
-        return 'Completed'
-      }
-
-      if (certificationInfo.progress === 0) return 'Start course'
-      if (this.isComplete(cert)) return 'Completed'
-      return 'Resume course'
+    actionButtonText() {
+      if (this.progressStatus === 'Not started') return 'Start course'
+      if (this.progressStatus === 'In progress') return 'Resume course'
+      return 'Completed'
     },
   },
 }

@@ -122,10 +122,7 @@ watch(isExpanded, (value) => {
             v-else-if="step.status === 'complete'"
             class="status-icon"
           />
-          <StepNotStartedIcon
-            v-else
-            class="status-icon"
-          />
+          <StepNotStartedIcon v-else class="status-icon" />
         </div>
 
         <div

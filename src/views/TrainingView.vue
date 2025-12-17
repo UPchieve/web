@@ -64,7 +64,7 @@
         that subject.
       </p>
       <loader
-        v-if="isFetchingTraining"
+        v-if="isLoadingTrainingCourse"
         class="loader--center"
         :height="40"
         :width="40"
@@ -95,8 +95,8 @@
         >
           <training-drop-down
             :headers="['Training', 'Progress', 'Actions']"
-            :certData="currentSubject.training"
-            trainingCourse
+            :trainingCourseData="trainingCourseData"
+            :isLegacyTrainingCourse="trainingCourseData.isLegacyTraining"
           />
         </accordion-item>
 
@@ -167,7 +167,9 @@ import DownloadIcon from '@/assets/icons/download_cert_icon.svg'
 import Check from '@/assets/check.svg'
 import DisabledCertificateIcon from '@/assets/disabled_certificate_icon.svg'
 import { IonPopover } from '@ionic/vue'
+import NetworkService from '@/services/NetworkService'
 import moment from 'moment'
+import { isTrainingComplete } from '@/utils/get-training-progress'
 
 export default {
   name: 'Training',
@@ -186,6 +188,9 @@ export default {
   data() {
     return {
       currentTopic: '',
+      trainingCourseData: null,
+      fetchingTrainingError: false,
+      isLoadingTrainingCourse: true,
     }
   },
 
@@ -194,17 +199,28 @@ export default {
       await this.$store.dispatch('subjects/getTrainingSubjects')
     else this.setInitialTopic()
   },
+
+  async beforeMount() {
+    try {
+      this.isLoadingTrainingCourse = true
+      await this.getTrainingCourseData()
+    } catch {
+      this.fetchingTrainingError = true
+    } finally {
+      this.isLoadingTrainingCourse = false
+    }
+  },
   computed: {
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
+      training: 'subjects/activeTraining',
+      isUpchieve101V3Enabled: 'featureFlags/isUpchieve101V3Enabled',
+      hasCompletedVolunteerTraining: 'user/hasCompletedVolunteerTraining',
+      hasASubjectCertification: 'user/hasASubjectCertification',
     }),
     ...mapState({
       user: (state) => state.user.user,
       isFetchingTraining: (state) => state.subjects.isFetchingTraining,
-      fetchingTrainingError: (state) => state.subjects.fetchingTrainingError,
-    }),
-    ...mapGetters({
-      training: 'subjects/activeTraining',
     }),
     currentSectionRef() {
       if (this.openToSubject && this.currentSubject) {
@@ -235,14 +251,7 @@ export default {
     },
     // get the amount of required training material a user must complete
     requiredTrainingMessage() {
-      let amount = 0
-      for (const subject of this.currentSubject.training) {
-        if (!this.user.certifications[subject.key].passed) amount++
-      }
-
-      if (!amount) return ''
-      if (amount === 1) return `${amount} course required`
-      return `${amount} courses required`
+      return !this.hasCompletedVolunteerTraining ? '1 course required' : ''
     },
     additionalSubjectsColHeaders() {
       return ['Subject', 'Alternative Certifications', '']
@@ -275,23 +284,25 @@ export default {
       )
     },
     canDownloadCertificate() {
-      const certifications = this.user.certifications
-
-      if (!certifications.upchieve101?.passed) {
-        return false
-      }
-
-      const othersPassed = Object.entries(certifications).filter(
-        ([key, value]) => key !== 'upchieve101' && value.passed
-      ).length
-
-      return othersPassed > 0
+      return this.hasCompletedVolunteerTraining && this.hasASubjectCertification
     },
     openToSubject() {
       return this.$route.query?.openTo
     },
   },
   methods: {
+    async getTrainingCourseData() {
+      const courseKey = this.isUpchieve101V3Enabled
+        ? 'upchieveTraining'
+        : 'upchieve101'
+      const trainingCourseResponse =
+        await NetworkService.getTrainingCourse(courseKey)
+      this.trainingCourseData = {
+        ...trainingCourseResponse.data.course,
+        isComplete: isTrainingComplete(),
+        isLegacyTraining: courseKey === 'upchieve101',
+      }
+    },
     initiallyOpenAccordion(certifications) {
       return (
         this.openToSubject &&
@@ -306,9 +317,23 @@ export default {
     },
     downloadCertificate() {
       const volunteerName = `${this.user.firstName} ${this.user.lastName}`
-      const effectiveDate = moment(
-        this.user.certifications.upchieve101?.lastAttemptedAt
-      ).format('MM/DD/YYYY')
+      const earnedCerts = Object.entries(this.user.certifications).filter(
+        ([name]) => {
+          return [
+            'coachingStrategies',
+            'academicIntegrity',
+            'dei',
+            'communitySafety',
+            'upchieve101',
+          ].includes(name)
+        }
+      )
+      earnedCerts.sort((certA, certB) => {
+        return certA.lastAttemptedAt < certB.lastAttemptedAt
+      })
+      const effectiveDate = moment(earnedCerts[0].lastAttemptedAt).format(
+        'MM/DD/YYYY'
+      )
       const canvas = document.createElement('canvas')
       canvas.width = 2892
       canvas.height = 1623

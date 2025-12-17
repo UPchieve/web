@@ -22,6 +22,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import { useRouter } from 'vue-router'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import { getTrainingProgress } from '@/utils/get-training-progress'
 
 const store = useStore()
 const router = useRouter()
@@ -272,27 +273,9 @@ const navigationSteps = computed((): NavigationStep[] => {
 })
 
 const overallProgress = computed(() => {
-  if (!trainingCourseDefinition.value) return 0
-  const requiredCerts: string[] =
-    trainingCourseDefinition.value?.requiredCertifications ?? []
-  const requiredMaterials: string[] =
-    trainingCourseDefinition.value?.modules.reduce((acc, module) => {
-      acc.push(
-        module.materials
-          .filter((mat) => mat.isRequired)
-          .map((mat) => mat.materialKey)
-      )
-      return acc
-    }, [] as string[])
-  const totalSteps = requiredCerts.length + requiredMaterials.length
-
-  const completedCerts = requiredCerts.filter((cert) =>
-    store.getters['user/hasCertification'](cert)
-  )
-  return Math.floor(
-    ((completedCerts.length + (completedMaterials.value?.length ?? 0)) /
-      totalSteps) *
-      100.0
+  return getTrainingProgress(
+    trainingCourseDefinition.value,
+    completedMaterials.value
   )
 })
 
