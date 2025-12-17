@@ -70,8 +70,6 @@ function passInitialLoading(machine) {
 
   machine.send({
     type: 'session_started',
-    isAudioEligible: true,
-    isScreenshareEligible: true,
   })
 }
 
@@ -234,91 +232,6 @@ describe('MeetingMachine', () => {
       mockMachine.getSnapshot().matches('Ended'),
       'The meeting should be ended'
     ).toBe(true)
-  })
-
-  it('is not eligible for live media', () => {
-    const machine = MeetingMachine.create()
-    const mockMachine = createActor(machine.provide({ actors: defaultActors }))
-
-    expect(mockMachine).toBeDefined()
-
-    mockMachine.start()
-    expect(
-      mockMachine.getSnapshot().matches('FetchingState'),
-      'We should be in the fetching state'
-    ).toBe(true)
-    mockMachine.send({
-      type: 'audio_ui_loaded',
-      audioOutputElement: {},
-    })
-    mockMachine.send({
-      type: 'video_ui_loaded',
-      videoOutputElement: {},
-    })
-    mockMachine.send({
-      type: 'set_session_id',
-      sessionId: 'mock-session-id',
-    })
-
-    mockMachine.send({
-      type: 'session_started',
-      isAudioEligible: false,
-      isScreenshareEligible: false,
-    })
-
-    expect(
-      mockMachine.getSnapshot().matches('IneligibleForLiveMedia'),
-      'We should be in the ineligible for live media state'
-    ).toBe(true)
-  })
-
-  it('is eligible for voice but not screenshare', async () => {
-    const machine = MeetingMachine.create()
-    const mockMachine = createActor(machine.provide({ actors: defaultActors }))
-
-    expect(mockMachine).toBeDefined()
-
-    mockMachine.start()
-    mockMachine.send({
-      type: 'audio_ui_loaded',
-      audioOutputElement: {},
-    })
-    mockMachine.send({
-      type: 'video_ui_loaded',
-      videoOutputElement: {},
-    })
-    mockMachine.send({
-      type: 'set_session_id',
-      sessionId: 'mock-session-id',
-    })
-
-    mockMachine.send({
-      type: 'session_started',
-      isAudioEligible: true,
-      isScreenshareEligible: false,
-    })
-    await new Promise((resolve) => setTimeout(resolve, 10))
-    mockMachine.send({
-      type: 'meeting_started',
-    })
-    expect(
-      mockMachine.getSnapshot().matches('JoinedMeeting'),
-      'We have joined the meeting'
-    ).toBe(true)
-
-    mockMachine.send({
-      type: 'share_screen',
-    })
-    expect(
-      mockMachine
-        .getSnapshot()
-        .matches('JoinedMeeting.ScreenShareControl.Idle'),
-      'We should stay in idle state if screenshare is not eligible'
-    ).toBe(true)
-    expect(
-      mockMachine.getSnapshot().context.isScreenshareEligible,
-      'Our context should have `isScreenshareEligible === false`'
-    ).toBe(false)
   })
 
   it('is banned from live media', async () => {

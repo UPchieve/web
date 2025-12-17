@@ -1,8 +1,5 @@
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import FeatureFlagService from '@/services/FeatureFlagService'
-import type { RootState } from '..'
-import type { ActionContext } from 'vuex'
-
 export type FeatureFlagState = {
   toggleFlags: Record<POSTHOG_FEATURE_FLAGS, boolean>
   multivariantFlags: Record<POSTHOG_FEATURE_FLAGS, boolean | string>
@@ -35,9 +32,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE]: false,
-      [POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL]: false,
-      [POSTHOG_FEATURE_FLAGS.SCREENSHARE]: false,
-      [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
@@ -201,16 +195,10 @@ export default {
     showChooseTutorType: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE] ||
       state.eligibleForChooseTutorType,
-    isSessionAudioCallEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL],
-    isScreenshareEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SCREENSHARE],
     videoModerationSampleInterval: (state: FeatureFlagState) =>
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL
       ],
-    isVideoModerationEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_ENABLED],
     isImpactStudySurveyEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
     getImpactStudySurveyPayload: (state: FeatureFlagState) =>
@@ -287,42 +275,5 @@ export default {
       ],
     isNewVolunteerSignUpFlowEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW],
-  },
-  actions: {
-    isSessionAudioCallEnabled: async (
-      { getters, dispatch }: ActionContext<FeatureFlagState, RootState>,
-      partnerUserId: string
-    ) => {
-      if (getters.isSessionAudioCallEnabled) {
-        return true
-      }
-
-      const isEnabledForPartner =
-        await FeatureFlagService.isFeatureEnabledForUser(
-          POSTHOG_FEATURE_FLAGS.SESSION_AUDIO_CALL,
-          partnerUserId
-        )
-      const isScreenshareEnabled = await dispatch(
-        'isScreenshareEnabled',
-        partnerUserId
-      )
-
-      return isEnabledForPartner.isEnabled || isScreenshareEnabled
-    },
-    isScreenshareEnabled: async (
-      { getters }: ActionContext<FeatureFlagState, RootState>,
-      partnerUserId: string
-    ) => {
-      if (getters.isScreenshareEnabled) {
-        return true
-      }
-
-      const isEnabledForPartner =
-        await FeatureFlagService.isFeatureEnabledForUser(
-          POSTHOG_FEATURE_FLAGS.SCREENSHARE,
-          partnerUserId
-        )
-      return isEnabledForPartner.isEnabled
-    },
   },
 }

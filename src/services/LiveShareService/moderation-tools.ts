@@ -170,7 +170,6 @@ export function moderateScreenShare(
   async function beginScreenShareModeration(
     targetElement: HTMLCanvasElement | HTMLVideoElement | null
   ) {
-    if (!store.getters['featureFlags/isVideoModerationEnabled']) return
     if (targetElement instanceof HTMLVideoElement) {
       // If the video is already loaded, start moderation immediately
       if (targetElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {

@@ -158,10 +158,7 @@
         />
       </div>
       <transition name="fade">
-        <CallStatusIndicator
-          class="messages-overlay call-status-indicator"
-          v-if="isSessionAudioCallEnabled"
-        />
+        <CallStatusIndicator class="messages-overlay call-status-indicator" />
       </transition>
       <transition name="fade">
         <button
@@ -294,7 +291,6 @@ export default {
       waitingForModeration: false,
       textMessageHidden: false,
       hasStartedTyping: false,
-      isSessionAudioCallEnabled: false,
       isTutorJoiningForFirstTime: false,
       pendingTextMessages: [],
     }
@@ -391,7 +387,6 @@ export default {
   },
 
   async created() {
-    await this.fetchIsSessionAudioCallEnabled(this.sessionPartner?.id)
     if (this.chatScrolledToMessageIndex) {
       const messageElements = this.getUserMessageElements()
       this.$refs.messages.scrollTop =
@@ -400,13 +395,6 @@ export default {
   },
 
   methods: {
-    async fetchIsSessionAudioCallEnabled(partnerUserId) {
-      if (!partnerUserId) return
-      this.isSessionAudioCallEnabled = await this.$store.dispatch(
-        'featureFlags/isSessionAudioCallEnabled',
-        partnerUserId
-      )
-    },
     getModerationFailureReason(reasonKey) {
       switch (reasonKey.toLowerCase()) {
         case 'platform circumvention':
@@ -733,7 +721,6 @@ export default {
   watch: {
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
-        await this.fetchIsSessionAudioCallEnabled(current?.id)
         if (this.isStudent) this.isTutorJoiningForFirstTime = true
       }
     },

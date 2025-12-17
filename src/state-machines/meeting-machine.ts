@@ -40,8 +40,6 @@ export type Context = {
   attendee: Attendee | null
   partnerAttendeeId: string | null
   meetingSession: DefaultMeetingSession | null
-  isAudioEligible: boolean
-  isScreenshareEligible: boolean
   showPartnerScreenShare: boolean
   isSharingMyScreen: boolean
   endScreenShareModeration: () => void
@@ -83,8 +81,6 @@ export type Events =
   | { type: 'received_partner_audio_info' }
   | {
       type: 'session_started'
-      isAudioEligible: boolean
-      isScreenshareEligible: boolean
     }
   | { type: 'ban_user_from_live_media' }
   | { type: 'transcription_not_started' }
@@ -94,6 +90,8 @@ export type Events =
   | { type: 'not_banned' }
   | { type: 'transcription_status_changed'; status: 'started' | 'stopped' }
   | { type: 'stop_stream' }
+
+//TODO: Move checking live media ban before creating chime meeting
 export function create() {
   return setup({
     types: {
@@ -184,8 +182,6 @@ export function create() {
       partnerAttendeeId: null,
       meetingSession: null,
       showPartnerScreenShare: false,
-      isAudioEligible: false,
-      isScreenshareEligible: false,
       isSharingMyScreen: false,
       endScreenShareModeration: () => {},
       isPartnerMicMuted: true,
@@ -242,7 +238,7 @@ export function create() {
         tags: ['loadingScreenShare', 'loadingAudioCall'],
         type: 'parallel',
         onDone: {
-          target: 'CheckingLiveMediaEligibility',
+          target: 'FetchingChimeMeeting',
         },
         states: {
           LoadingAudioUI: {
@@ -307,44 +303,11 @@ export function create() {
                 on: {
                   session_started: {
                     target: 'Loaded',
-                    actions: assign({
-                      isAudioEligible: ({ event }) => event.isAudioEligible,
-                      isScreenshareEligible: ({ event }) =>
-                        event.isScreenshareEligible,
-                    }),
                   },
                 },
               },
               Loaded: { type: 'final' },
             },
-          },
-        },
-      },
-      CheckingLiveMediaEligibility: {
-        always: [
-          {
-            target: 'FetchingChimeMeeting',
-            guard: ({ context }) =>
-              context.isAudioEligible || context.isScreenshareEligible,
-          },
-          {
-            target: 'IneligibleForLiveMedia',
-          },
-        ],
-      },
-
-      IneligibleForLiveMedia: {
-        tags: ['unableToJoinCall'],
-        description: `This state is reached when the user is not eligible for either audio
-        or screenshare (posthog flags). Since that can change, we need to handle transitioning
-        out of this state when the user becomes eligible.`,
-        on: {
-          session_started: {
-            target: 'CheckingLiveMediaEligibility',
-            actions: assign({
-              isAudioEligible: ({ event }) => event.isAudioEligible,
-              isScreenshareEligible: ({ event }) => event.isScreenshareEligible,
-            }),
           },
         },
       },
@@ -451,7 +414,6 @@ export function create() {
                 on: {
                   share_screen: {
                     target: 'StartingShareMyScreen',
-                    guard: ({ context }) => context.isScreenshareEligible,
                   },
                   partner_shared_screen: {
                     target: 'ViewingPartnerScreenShare',

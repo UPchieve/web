@@ -32,22 +32,12 @@ export default {
   data() {
     return {
       logoUrl: LogoImageUrl,
-      isSessionAudioCallEnabled: false,
     }
-  },
-  methods: {
-    async fetchIsSessionAudioCallEnabled(partnerUserId) {
-      this.isSessionAudioCallEnabled = await this.$store.dispatch(
-        'featureFlags/isSessionAudioCallEnabled',
-        partnerUserId
-      )
-    },
   },
   computed: {
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
-      sessionPartner: 'user/sessionPartner',
     }),
     sessionId() {
       return this.$store.state.user?.session?.id
@@ -55,17 +45,8 @@ export default {
     canReport() {
       return (
         this.isVolunteer ||
-        (this.isStudent &&
-          this.isSessionAudioCallEnabled &&
-          !this.isSessionWaitingForVolunteer)
+        (this.isStudent && !this.isSessionWaitingForVolunteer)
       )
-    },
-  },
-  watch: {
-    async sessionPartner(current, previous) {
-      if (current?.id !== previous?.id && current?.id) {
-        await this.fetchIsSessionAudioCallEnabled(current?.id)
-      }
     },
   },
 }

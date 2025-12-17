@@ -19,9 +19,7 @@
       />
       <screen-share
         v-if="
-          isScreenshareEnabled &&
-          meetingActor.snapshot.context.sessionId &&
-          !!mobileMode
+          meetingActor.snapshot.context.sessionId && !!mobileMode
             ? this.$refs.sessionContentsContainerMobile
             : this.$refs.auxiliaryContainer
         "
@@ -85,7 +83,6 @@
           :aiWidgetMoving="aiWidgetDragging || aiWidgetResizing"
           :screenShareAvailable="
             isSessionInProgress &&
-            isScreenshareEnabled &&
             getDisplayMediaSupported &&
             meetingHasNotEnded
           "
@@ -106,9 +103,7 @@
           :isAiWidgetEnabled="aiWidgetEnabled"
           :onWidgetClicked="toggleAiWidget"
           :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
-          :isScreenShareEnabled="
-            isSessionInProgress && isScreenshareEnabled && meetingHasNotEnded
-          "
+          :isScreenShareEnabled="isSessionInProgress && meetingHasNotEnded"
           @clickedShareScreen="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
@@ -126,15 +121,10 @@
       </div>
 
       <div class="session-header-container">
-        <session-chat-header
-          v-if="
-            !isSessionAudioCallEnabled ||
-            (isSessionAudioCallEnabled && !isSessionInProgress)
-          "
-        />
+        <session-chat-header v-if="!isSessionInProgress" />
 
         <LiveMediaChatHeader
-          v-else-if="isSessionInProgress && isSessionAudioCallEnabled"
+          v-else-if="isSessionInProgress"
           class="live-media-header-container"
           :isMyMicMuted="isMyMicMuted"
           :isSpeakerMuted="isSpeakerMuted"
@@ -445,11 +435,6 @@ export default {
         this.showNotificationModal = true
       }
 
-      await Promise.all([
-        this.fetchSessionAudioFlag(),
-        this.fetchScreenshareFlag(),
-      ])
-
       this.meetingActor.actorRef.start()
       this.meetingActor.actorRef.send({
         type: 'set_session_id',
@@ -458,8 +443,6 @@ export default {
 
       this.meetingActor.actorRef.send({
         type: 'session_started',
-        isAudioEligible: this.isSessionAudioCallEnabled,
-        isScreenshareEligible: this.isScreenshareEnabled,
       })
 
       /*
@@ -536,9 +519,6 @@ export default {
       aiWidgetDragging: false,
       aiWidgetResizing: false,
       didAutoOpen: false,
-      isFetchingSessionAudioCallFlag: false,
-      isSessionAudioCallEnabled: false,
-      isScreenshareEnabled: false,
       draggingScreenShare: false,
       resizingScreenShare: false,
       // chime uses getDisplayMedia for screen sharing and iOS safari does not support it
@@ -589,7 +569,6 @@ export default {
       currentTutorBotConversation: 'botConversations/currentConversation',
       isSessionInProgress: 'user/isSessionInProgress',
       sessionPartner: 'user/sessionPartner',
-      isScreenshareEnabledFeatureFlag: 'featureFlags/isScreenshareEnabled',
       isLiveMediaBanned: 'liveMedia/isBannedFromLiveMedia',
       isPartnerLiveMediaBanned: 'liveMedia/isPartnerBannedFromLiveMedia',
     }),
@@ -884,15 +863,8 @@ export default {
 
     async sessionPartner(current, previous) {
       if (current?.id !== previous?.id && current?.id) {
-        await Promise.all([
-          this.fetchSessionAudioFlag(),
-          this.fetchScreenshareFlag(),
-        ])
-
         this.meetingActor.actorRef.send({
           type: 'session_started',
-          isAudioEligible: this.isSessionAudioCallEnabled,
-          isScreenshareEligible: this.isScreenshareEnabled,
         })
       }
     },
@@ -943,31 +915,6 @@ export default {
         } else {
           this.startScreenShare()
         }
-      }
-    },
-    async fetchSessionAudioFlag() {
-      if (!this.sessionPartner?.id) return
-      this.isFetchingSessionAudioCallFlag = true
-      try {
-        this.isSessionAudioCallEnabled = await this.$store.dispatch(
-          'featureFlags/isSessionAudioCallEnabled',
-          this.sessionPartner?.id
-        )
-      } catch {
-        this.isSessionAudioCallEnabled = false
-      } finally {
-        this.isFetchingSessionAudioCallFlag = false
-      }
-    },
-    async fetchScreenshareFlag() {
-      if (!this.sessionPartner?.id) return
-      try {
-        this.isScreenshareEnabled = await this.$store.dispatch(
-          'featureFlags/isScreenshareEnabled',
-          this.sessionPartner?.id
-        )
-      } catch {
-        this.isScreenshareEnabled = false
       }
     },
     toggleAiWidget() {
