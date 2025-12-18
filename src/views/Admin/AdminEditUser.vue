@@ -24,6 +24,9 @@
           v-model="partnerOrg"
           option-text-field="displayName"
         />
+        <div class="clear-button-container">
+          <button class="clear-button" @click="clearPartnerOrg">Clear</button>
+        </div>
       </div>
       <div class="row" v-if="hasStudentRole && partnerOrg && partnerOrg.sites">
         <FormSelect
@@ -304,6 +307,10 @@ export default {
     goBack() {
       this.toggleEditMode()
     },
+    clearPartnerOrg(event) {
+      event.preventDefault()
+      this.partnerOrg = {}
+    },
   },
 }
 </script>
@@ -352,5 +359,16 @@ select {
 .error {
   color: $c-error-red;
   margin: 2em 0;
+}
+
+.clear-button-container {
+  margin-top: 6px;
+  width: 100%;
+  text-align: right;
+}
+
+.clear-button {
+  font-size: 14px;
+  color: $c-information-blue;
 }
 </style>
