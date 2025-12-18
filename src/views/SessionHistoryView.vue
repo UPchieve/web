@@ -299,7 +299,7 @@ export default {
       const firstName = this.isVolunteer
         ? 'studentFirstName'
         : 'volunteerFirstName'
-      this.sessions.forEach((session) => {
+      this.allSessions.forEach((session) => {
         if (!sessionFirstNames.has(session[firstName])) {
           sessionFirstNames.add(session[firstName])
         }
