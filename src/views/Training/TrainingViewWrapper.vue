@@ -29,5 +29,9 @@ const trainingComponent = computed(() => {
 .training-component {
   display: flex;
   margin: 40px;
+
+  @include breakpoint-below('small') {
+    margin: 0;
+  }
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Loader from '@/components/Loader.vue'
+import ArrowIcon from '@/assets/arrow.svg'
 import { computed, onBeforeMount, onMounted, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import type {
@@ -248,6 +249,36 @@ async function submitQuiz() {
         v-else-if="currentStep === 'viewingResults'"
         class="training-quiz-content"
       >
+        <div class="quiz-results-summary">
+          <div
+            class="quiz-results-callout"
+            :class="{
+              'quiz-results-callout--passed': quizResults?.didPass,
+              'quiz-results-callout--failed': !quizResults?.didPass,
+            }"
+          >
+            <div
+              v-if="quizResults?.didPass"
+              class="quiz-results-callout--passed"
+            >
+              Great job! You passed the quiz and completed the module!
+              <button class="quick-next-button" @click="next">
+                {{ nextButtonLabel }}
+                <ArrowIcon class="arrow-icon" />
+              </button>
+            </div>
+            <div v-else>
+              Good try! You got
+              <strong
+                >{{ quizResults?.numCorrect ?? 0 }} out of
+                {{ quizQuestions.length }}</strong
+              >
+              questions correct. Review your answers below and give it another
+              try!
+            </div>
+          </div>
+        </div>
+        <hr class="separator" />
         <div
           v-for="(question, index) in quizQuestions"
           :key="question.id"
@@ -293,10 +324,60 @@ async function submitQuiz() {
 </template>
 
 <style scoped lang="scss">
+.separator {
+  width: 100%;
+  color: $c-border-grey;
+}
 .training-quiz-content {
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+.quiz-results-summary {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  padding-bottom: 16px;
+  padding-top: 16px;
+}
+.quiz-results-callout {
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid $c-border-grey;
+  width: 80%;
+  align-self: center;
+
+  .quick-next-button {
+    padding-right: 16px;
+    color: $c-hover-green;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    @include font-category('button');
+    margin-left: auto;
+
+    .arrow-icon {
+      fill: $c-hover-green;
+      height: 16px;
+      width: 16px;
+      margin-top: 2px;
+      margin-left: 8px;
+    }
+  }
+
+  &--passed {
+    border-color: $c-success-green;
+    background-color: lighten($c-success-green, $amount: 50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &--failed {
+    border-color: $c-error-red;
+    background-color: lighten($c-error-red, 30%);
+  }
 }
 .question-container {
   display: flex;
