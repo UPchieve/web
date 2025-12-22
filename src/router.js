@@ -70,8 +70,6 @@ import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/Vo
 import Case from 'case'
 import RewardsView from './views/RewardsView.vue'
 import SurveysView from './views/SurveysView.vue'
-import CombinedQuizView from '@/views/CombinedQuizView/index.vue'
-import { camelCase } from 'lodash-es'
 import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
 import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
 import JourneysView from './views/JourneysView.vue'
@@ -347,18 +345,6 @@ const routes = [
     name: 'QuizView',
     component: QuizView,
     meta: { protected: true },
-  },
-  {
-    path: '/training/:category/quiz/combined',
-    name: 'CombinedQuizView',
-    component: CombinedQuizView,
-    meta: { protected: true },
-    props: (route) => {
-      const category = camelCase(route.params.category ?? '')
-      return {
-        subjectDisplayName: store.state.subjects.subjects[category].displayName,
-      }
-    },
   },
   {
     path: '/training/course/:courseKey',

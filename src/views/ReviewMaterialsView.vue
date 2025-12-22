@@ -123,8 +123,6 @@ export default {
     }),
     ...mapGetters({
       allSubtopics: 'subjects/allSubtopics',
-      isCombinedOnboardingQuizEnabled:
-        'featureFlags/isCombinedOnboardingQuizEnabled',
     }),
     categoryDisplayName() {
       const subtopics = this.subjects
@@ -134,9 +132,7 @@ export default {
       return ''
     },
     quizLink() {
-      let url = `/training/${Case.kebab(this.category)}/quiz`
-      if (this.isCombinedOnboardingQuizEnabled) url += '/combined'
-      return url
+      return `/training/${Case.kebab(this.category)}/quiz`
     },
   },
 }

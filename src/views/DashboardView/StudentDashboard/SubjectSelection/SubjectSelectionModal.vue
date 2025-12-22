@@ -98,8 +98,6 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
-      isCombinedOnboardingQuizEnabled:
-        'featureFlags/isCombinedOnboardingQuizEnabled',
     }),
     title() {
       if (this.modalData.title)
@@ -165,9 +163,7 @@ export default {
       return /[AEIOUaeiou]/i.test(word[0])
     },
     handleTrainingRedirect() {
-      let path = `/training/${Case.kebab(this.selectedSubtopic)}/quiz`
-      if (this.isCombinedOnboardingQuizEnabled) path += '/combined'
-      this.$router.push(path)
+      this.$router.push(`/training/${Case.kebab(this.selectedSubtopic)}/quiz`)
     },
   },
 }

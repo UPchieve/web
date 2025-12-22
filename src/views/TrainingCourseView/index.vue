@@ -15,31 +15,12 @@
           v-on:material-completed="trackMaterialProgress"
         />
         <quiz-link
-          v-if="!isCombinedOnboardingQuizEnabled"
           :isDisabled="!course.isComplete"
           :quizKey="course.quizKey"
           :quizName="course.quizName"
           :certification="quizCertification"
         />
       </div>
-      <LargeButton
-        v-if="isCombinedOnboardingQuizEnabled && this.isAutoFlowUser"
-        variant="primary"
-        class="back-to-quiz-button"
-        :showArrow="false"
-        @click="goToSubjectSelection"
-      >
-        Back To Quiz
-      </LargeButton>
-      <LargeButton
-        v-else-if="isCombinedOnboardingQuizEnabled && !this.passedUpchieve101"
-        variant="primary"
-        class="back-to-quiz-button"
-        :showArrow="false"
-        @click="goToUpchieve101Quiz"
-      >
-        Back To Quiz
-      </LargeButton>
     </div>
   </div>
 </template>
@@ -52,12 +33,10 @@ import QuizLink from './QuizLink.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
-import LargeButton from '@/components/LargeButton.vue'
 
 export default {
   name: 'TrainingCourseView',
   components: {
-    LargeButton,
     Module,
     QuizLink,
   },
@@ -78,8 +57,6 @@ export default {
       certifications: (state) => state.user.user.certifications,
     }),
     ...mapGetters({
-      isCombinedOnboardingQuizEnabled:
-        'featureFlags/isCombinedOnboardingQuizEnabled',
       isAutoFlowUser: 'user/isAutoFlowUser',
       passedUpchieve101: 'user/hasCompletedVolunteerTraining',
     }),
@@ -88,12 +65,6 @@ export default {
     },
   },
   methods: {
-    goToUpchieve101Quiz() {
-      this.$router.push('/training/upchieve101/quiz')
-    },
-    goToSubjectSelection() {
-      this.$router.push('/welcome')
-    },
     async trackMaterialProgress(materialKey) {
       let materialName = ''
       this.course.modules.forEach((mod) => {

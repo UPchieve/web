@@ -35,7 +35,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
-      [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ]: false,
       [POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES]: false,
       [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION]: false,
@@ -210,8 +209,6 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT],
     isTeacherGuidanceExperimentActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT],
-    isCombinedOnboardingQuizEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_QUIZ],
     isDisplayVolunteerLanguagesEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES],
     isSecondaryEmailOnProfilePageEnabled: (state: FeatureFlagState) =>
