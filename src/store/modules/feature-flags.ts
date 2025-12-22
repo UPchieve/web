@@ -43,7 +43,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.STUDENT_PREFERRED_LANGUAGE]: false,
       [POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_NEW_INTERNATIONAL_MESSAGE]: false,
-      [POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_LMS_FORMAT]: false,
       [POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS]: false,
       [POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES]: false,
       [POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO]: false,
@@ -229,8 +228,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA],
     showNewInternationalMessage: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_NEW_INTERNATIONAL_MESSAGE],
-    isUpchieve101LMSFormatEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_LMS_FORMAT],
     isTextReferralLinksEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS],
     isPendingMessagesEnabled: (state: FeatureFlagState) =>
