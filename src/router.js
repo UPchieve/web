@@ -207,6 +207,14 @@ const routes = [
     name: 'VolunteerPartnerSignupView',
     component: VolunteerPartnerSignupView,
     meta: { loggedOutOnly: true, hideNavigation: true },
+    beforeEnter: async (to, from, next) => {
+      if (store.getters['featureFlags/isNewVolunteerSignUpFlowEnabled']) {
+        const partner = to.params.partnerId
+        next(`sign-up/volunteer?partnerId=${partner}`)
+      } else {
+        next()
+      }
+    },
   },
   {
     path: '/sessions/history',

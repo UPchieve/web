@@ -30,6 +30,7 @@ const RoutePath = {
   account: `/sign-up/volunteer/account`,
   about: '/sign-up/volunteer/about',
   verify: `/${SignUpPage.verify}`,
+  partnerSignup: `/sign-up/volunteer?partnerId`,
 }
 
 // The following values are used as the `name` attribute on form elements,
@@ -59,14 +60,19 @@ export type VolunteerAccountFormData = {
 const isGoogleSignupForVolunteersEnabled = () =>
   store.getters['featureFlags/isGoogleSignupForVolunteersEnabled']
 
-export function getPageDetails(
+let partnerId: string = ''
+
+export async function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.account }
-): PageDetail<VolunteerAccountFormData>
-export function getPageDetails(
+): Promise<PageDetail<VolunteerAccountFormData>>
+export async function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.about }
-): PageDetailsUnion<VolunteerAccountFormData> {
+): Promise<PageDetailsUnion<VolunteerAccountFormData>> {
   if (isAccountRoute(to)) {
-    return getLogInDetails()
+    return await getLogInDetails()
+  } else if (isPartnerSignup(to)) {
+    partnerId = to.query.partnerId as string
+    return await getLogInDetails(true)
   }
   return getAboutDetails()
 }
@@ -90,7 +96,23 @@ function isAccountRoute(to: RouteLocation) {
   return to.path === RoutePath.account
 }
 
-function getLogInDetails(): PageDetail<VolunteerAccountFormData> {
+function isPartnerSignup(to: RouteLocation) {
+  return to.fullPath.includes(RoutePath.partnerSignup)
+}
+
+async function getLogInDetails(
+  isPartnerSignup: boolean = false
+): Promise<PageDetail<VolunteerAccountFormData>> {
+  let volunteerPartnerName: string = ''
+  if (isPartnerSignup) {
+    const { data } = await NetworkService.getVolunteerPartner(partnerId)
+    volunteerPartnerName = data.volunteerPartner.name
+  }
+
+  const welcomeText = isPartnerSignup
+    ? `Welcome ${volunteerPartnerName} Volunteer!`
+    : `Become a Volunteer`
+
   return {
     backgroundLayout: 'panel-right-50p',
     submitAction: continueToSignUp,
@@ -100,7 +122,10 @@ function getLogInDetails(): PageDetail<VolunteerAccountFormData> {
       getRow('justify-center', {
         element: 'header-logo-teal',
       }),
-      getRow('mt-4 justify-center', getTextElement('h1', `Become a Volunteer`)),
+      getRow('mt-4 justify-center', getTextElement('h1', welcomeText)),
+      ...(isPartnerSignup
+        ? getPartnerRedirectElement(volunteerPartnerName)
+        : []),
       ...(isGoogleSignupForVolunteersEnabled() ? getSsoSectionElements() : []),
       getRow('mt-2 justify-center'),
       getRow('mt-2', {
@@ -131,16 +156,25 @@ async function createAccount(
   data: VolunteerAccountFormData
 ): Promise<SubmitActionResponse> {
   try {
-    const result = await NetworkService.registerOpenVolunteer({
+    const options = {
       [InputName.INVITE_CODE]: data.inviteCode,
       [InputName.EMAIL]: data.email,
       [InputName.PASSWORD]: data.password,
       [InputName.FIRST_NAME]: data.firstName,
       [InputName.LAST_NAME]: data.lastName,
       [InputName.PHONE]: data.phone,
-      [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
       [InputName.TERMS]: true,
-    })
+    }
+
+    const result = partnerId
+      ? await NetworkService.registerPartnerVolunteer({
+          ...options,
+          volunteerPartnerOrg: partnerId,
+        })
+      : await NetworkService.registerOpenVolunteer({
+          ...options,
+          [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
+        })
     AnalyticsService.registerVolunteer(result.data.user)
     return getSubmitResponse(SignUpPage.verify)
   } catch (err) {
@@ -193,6 +227,27 @@ function getAboutDetails(): PageDetail<VolunteerAccountFormData> {
       ...getTermsCheckboxElements('text-sm', 'justify-end', 'mt-2'),
     ],
   }
+}
+
+function getPartnerRedirectElement(partnerName: string) {
+  return [
+    getRow(
+      `justify-left mt-1 el-gap-sm text-sm`,
+      {
+        element: 'p',
+        content: `Not with ${partnerName}?`,
+      },
+      {
+        element: 'a',
+        classes: 'uc-link',
+        content: 'Click here.',
+        props: {
+          href: 'https://upchieve.org/volunteer',
+          target: '_blank',
+        },
+      }
+    ),
+  ]
 }
 
 function getTermsCheckboxElements(

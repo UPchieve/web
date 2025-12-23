@@ -173,8 +173,8 @@ export default {
       }
       return merged
     },
-    loadPageDetails(to, from) {
-      this.pageDetails = this.getPageDetails(to, from)
+    async loadPageDetails(to, from) {
+      this.pageDetails = await this.getPageDetails(to, from)
     },
     isDisabled(el) {
       if (el.isDisabledOnInvalid) {
