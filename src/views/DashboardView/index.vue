@@ -10,7 +10,6 @@ import { mapGetters, mapState } from 'vuex'
 import StudentDashboard from './StudentDashboard/index.vue'
 import TeacherDashboard from './TeacherDashboard/index.vue'
 import VolunteerDashboard from './VolunteerDashboard/index.vue'
-import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 
 export default {
   name: 'dashboard-view',
@@ -24,41 +23,12 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
-      gleapSegmentExperiments: 'featureFlags/gleapSegmentExperiments',
-      isGleapSegmentExperimentsActive:
-        'featureFlags/isGleapSegmentExperimentsActive',
     }),
-    userGleapSegments() {
-      return [this.user, this.gleapSegmentExperiments]
-    },
   },
   mounted() {
     if (this.isTeacher) {
       this.$router.replace(`/dashboard/teacher`)
     }
-    if (this.isGleapSegmentExperimentsActive)
-      ProductDiscoveryService.triggerDynamicGleapWidget(
-        this,
-        this.user,
-        this.gleapSegmentExperiments
-      )
-  },
-  watch: {
-    userGleapSegments: {
-      handler: function (currentValue, prevValue) {
-        if (
-          Object.keys(currentValue[0]).length &&
-          currentValue[1].length &&
-          (!Object.keys(prevValue[0]).length || !prevValue[1].length)
-        )
-          ProductDiscoveryService.triggerDynamicGleapWidget(
-            this,
-            this.user,
-            this.gleapSegmentExperiments
-          )
-      },
-      deep: true,
-    },
   },
 }
 </script>

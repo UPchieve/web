@@ -97,7 +97,6 @@ import ImpactStudySurveyModal from './ImpactStudySurveyModal.vue'
 import UpdateSchoolModal from './UpdateSchoolModal.vue'
 import SelectPreferredLanguageModal from './SelectPreferredLanguageModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import ProductDiscoveryService from '@/services/ProductDiscoveryService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import { EVENTS, POSTHOG_FEATURE_FLAGS } from '@/consts'
@@ -153,14 +152,6 @@ export default {
       AnalyticsService.captureGoogleAnalyticsEvent('student_sign_up')
       localStorage.removeItem('isSSOSignUpRedirect')
       this.$store.dispatch('user/firstDashboardVisit', true)
-    }
-
-    if (this.isOrbitalSegmentsActive) {
-      ProductDiscoveryService.triggerOrbitalSegment(
-        this,
-        this.user,
-        this.orbitalSegments
-      )
     }
 
     const classCode = localStorage.getItem('joinedClassCode')
@@ -244,8 +235,6 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       aiTutor: 'featureFlags/aiTutor',
-      orbitalSegments: 'featureFlags/orbitalSegments',
-      isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
@@ -301,10 +290,6 @@ export default {
 
     isStandaloneAiTutorEnabled() {
       return this.aiTutor && this.aiTutor.includes('stand-alone')
-    },
-
-    userAndOrbitalSegment() {
-      return [this.user, this.orbitalSegments, this.isOrbitalSegmentsActive]
     },
     shouldSeeIncentiveModalForFirstTime() {
       return (
@@ -502,25 +487,6 @@ export default {
           this.$store.dispatch('user/updateHadASession', false)
         }
       },
-    },
-    userAndOrbitalSegment: {
-      handler: function (currentValue, prevValue) {
-        if (
-          this.isOrbitalSegmentsActive &&
-          Object.keys(currentValue[0]).length &&
-          currentValue[1].length &&
-          currentValue[2] &&
-          (!Object.keys(prevValue[0]).length ||
-            !prevValue[1].length ||
-            !prevValue[2])
-        )
-          ProductDiscoveryService.triggerOrbitalSegment(
-            this,
-            this.user,
-            this.orbitalSegments
-          )
-      },
-      deep: true,
     },
     isFallIncentiveProgramEnabled(currentValue, prevValue) {
       if (!currentValue && prevValue) {

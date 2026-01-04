@@ -3,7 +3,6 @@ import errorFromHttpResponse from '../utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
 import NetworkService from './NetworkService'
-import ProductDiscoveryService from './ProductDiscoveryService'
 import { socket } from '@/socket'
 
 export async function logout(context, logoutRoute) {
@@ -24,7 +23,6 @@ export async function handleLogout(context, logoutRoute) {
 function resetServices() {
   AnalyticsService.reset()
   LoggerService.reset()
-  ProductDiscoveryService.reset()
 }
 
 export default {

@@ -13,7 +13,6 @@ export default {
     toggleFlags: {
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
-      [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: false,
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
@@ -67,11 +66,9 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY]: '', // completed-first-hour-of-tutoring | tutored-first-three-students
     },
     payloadFlags: {
-      [POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
-      [POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS]: [],
       [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: '',
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
@@ -118,20 +115,12 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
     isPollingFlagsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.POLL_FLAGS],
-    orbitalSegments: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
-    isOrbitalSegmentsActive: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.ORBITAL_SEGMENTS],
     downtimeBannerMessage: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER],
     subjectRequestRollout: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT] ?? [],
     quizRollout: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
-    gleapSegmentExperiments: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.GLEAP_SEGMENT_EXPERIMENTS] ?? [],
-    isGleapSegmentExperimentsActive: (_state: FeatureFlagState, getters: any) =>
-      getters.gleapSegmentExperiments.length > 0,
     ccIntroCopy: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
     isBfIntroCopyEnabled: (state: FeatureFlagState) =>
