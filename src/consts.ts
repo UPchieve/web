@@ -882,7 +882,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   FORCE_DASHBOARD_REDESIGN_ORG = 'force-dashboard-redesign-org',
   SMS_VERIFICATION = 'sms-verification',
   ELIGIBILITY_EMAIL = 'eligibility-email',
-  PROGRESS_REPORTS = 'progress-reports',
   PROGRESS_REPORT_SURVEY = 'progress-report-survey',
   USE_NEW_SIGN_UP_FLOW = 'use-new-sign-up-flow',
   SHOW_IN_APP_SESSION_NOTIFICATIONS = 'show-in-app-session-notifications',

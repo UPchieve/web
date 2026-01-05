@@ -484,11 +484,7 @@ import StartScreenShareButton from './StartScreenShareButton.vue'
 import SessionService from '@/services/SessionService'
 import { processImage, getImageTooLargeMessage } from '@/utils/image-pipeline'
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
-import {
-  secondsToMs,
-  TEN_SECONDS_TO_MS,
-  FIVE_SECONDS_TO_MS,
-} from '@/utils/time-utils'
+import { secondsInMs } from '@/utils/time-utils'
 import {
   PARTNER_IMAGE_UPLOAD_STATUS,
   IMAGE_UPLOAD_EVENTS,
@@ -1303,7 +1299,7 @@ export default {
           // Ping server every 45 seconds to keep the connection open.
           this.pingPongInterval = window.setInterval(() => {
             zwibblerWsConnection.send('p1ng')
-          }, secondsToMs(45))
+          }, secondsInMs(45))
         }
 
         // Set brush tool to default tool.
@@ -1380,7 +1376,7 @@ export default {
 
     async joinSharedSessionWithRetry() {
       const MAX_RETRIES = 5
-      const TIMEOUT_MS = FIVE_SECONDS_TO_MS
+      const TIMEOUT_MS = secondsInMs(5)
       let currentAttempt = 1
 
       try {
@@ -1501,7 +1497,7 @@ export default {
                 this.loadingText = null
                 this.$store.dispatch('socket/resetPartnerImageUploadStatus')
               }
-            }, TEN_SECONDS_TO_MS)
+            }, secondsInMs(10))
             break
           case PARTNER_IMAGE_UPLOAD_STATUS.GENERAL_ERROR:
             this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))

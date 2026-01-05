@@ -22,8 +22,6 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       name: 'user/firstName',
-      isProgressReportsActive: 'featureFlags/isProgressReportsActive',
-      hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
     }),
   },
 }

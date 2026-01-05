@@ -3,11 +3,7 @@
     <div v-if="mobileMode" class="menu-container">
       <!-- TOOD: Also show notification if has assignment? -->
       <activity-dot
-        v-if="
-          hasUnreadProgressOverviewReports &&
-          isProgressReportsActive &&
-          isStudent
-        "
+        v-if="hasUnreadProgressOverviewReports && isStudent"
         class="menu-notification"
       />
       <hamburger-button

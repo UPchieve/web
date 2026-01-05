@@ -121,7 +121,7 @@ import {
 } from '@/utils/image-pipeline'
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
 import { ImageDropPaste } from '@/quill/modules/image'
-import { TEN_SECONDS_TO_MS } from '@/utils/time-utils'
+import { secondsInMs } from '@/utils/time-utils'
 import {
   IMAGE_UPLOAD_EVENTS,
   getPartnerUploadingMsg,
@@ -523,7 +523,7 @@ export default {
                 this.loadingText = null
                 this.$store.dispatch('socket/resetPartnerImageUploadStatus')
               }
-            }, TEN_SECONDS_TO_MS)
+            }, secondsInMs(10))
             break
           case PARTNER_IMAGE_UPLOAD_STATUS.GENERAL_ERROR:
             this.showErrorToast(getPartnerUploadFailedMsg(this.isStudent))

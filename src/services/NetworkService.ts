@@ -1037,7 +1037,7 @@ export default {
       this._errorHandler
     )
   },
-  getProgressReportOverviewSubjectStats() {
+  getUnreadProgressReports() {
     return httpGet(`${API_ROOT}/progress-reports/overview/stats`).then(
       this._successHandler,
       this._errorHandler

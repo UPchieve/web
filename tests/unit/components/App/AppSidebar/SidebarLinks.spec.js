@@ -26,6 +26,11 @@ const MY_CLASSES_LINK_TEACHERS = {
   text: 'My Classes',
 }
 
+const PROGRESS_REPORTS = {
+  text: 'My Progress',
+  onClick: () => {},
+}
+
 // Volunteer links
 const CALENDAR_LINK = { to: '/calendar', text: 'Schedule' }
 const TRAINING_LINK = {
@@ -50,6 +55,7 @@ const links = {
     loggedOut: [],
     student: [
       DASHBOARD_LINK,
+      PROGRESS_REPORTS,
       MY_CLASSES_LINK,
       FAVORITE_COACHES_LINK,
       SESSION_HISTORY_LINK,

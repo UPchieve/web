@@ -247,7 +247,6 @@ export default {
       orbitalSegments: 'featureFlags/orbitalSegments',
       isOrbitalSegmentsActive: 'featureFlags/isOrbitalSegmentsActive',
       showDashboardRedesign: 'user/showDashboardRedesign',
-      isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',

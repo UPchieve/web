@@ -18,7 +18,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
-      [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: false,
@@ -145,8 +144,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION],
     eligibilityEmail: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
-    isProgressReportsActive: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORTS],
     isProgressReportsSurveyActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY],
     useNewSignUpFlow: (state: FeatureFlagState) =>

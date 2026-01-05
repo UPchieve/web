@@ -594,6 +594,8 @@ export default {
         .map((summary) => summary.reportId)
 
       this.$store.dispatch('user/updateProgressReportsReadStatus', reportIds)
+      //remove reports in store to mark reports are read
+      this.$store.dispatch('user/setProgressReportOverviewSubjectStats', [])
     },
     gradeLabel(grade) {
       return gradeLabel(grade)
@@ -715,8 +717,7 @@ export default {
     },
     async getProgressReportOverviewSubjectStats() {
       try {
-        const response =
-          await NetworkService.getProgressReportOverviewSubjectStats()
+        const response = await NetworkService.getUnreadProgressReports()
         this.subjectByProgressReports = response.data
       } catch (error) {
         LoggerService.noticeError(error)

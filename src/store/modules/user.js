@@ -15,6 +15,7 @@ import {
   isVolunteerUserType,
 } from '@/utils/user-type'
 import AnalyticsService from '@/services/AnalyticsService'
+import { minutesInMs } from '@/utils/time-utils'
 
 export default {
   namespaced: true,
@@ -32,6 +33,7 @@ export default {
     latestProgressReportOverview: {},
     sessionIsEnding: false,
     hasSharedMilestone: false,
+    progressReportIntervalId: null,
   },
   mutations: {
     setUser: (state, user = {}) => (state.user = user),
@@ -150,6 +152,10 @@ export default {
     },
     setHasSharedMilestone: (state, hasSharedMilestone) => {
       state.hasSharedMilestone = hasSharedMilestone
+    },
+
+    setProgressReportIntervalId: (state, intervalId) => {
+      state.progressReportIntervalId = intervalId
     },
   },
   actions: {
@@ -294,24 +300,45 @@ export default {
       commit('setPrevSessionSubject', subject)
     },
 
-    getProgressReportOverviewSubjectStats: async ({ commit, getters }) => {
-      if (getters.isVolunteer) return
-
-      try {
-        const response =
-          await NetworkService.getProgressReportOverviewSubjectStats()
-        commit('setProgressReportOverviewSubjectStats', response.data ?? [])
-      } catch (error) {
-        LoggerService.error(error.response.data.err)
-      }
+    setProgressReportOverviewSubjectStats: ({ commit }, report) => {
+      commit('setProgressReportOverviewSubjectStats', report)
     },
 
-    updateProgressReportsReadStatus: async ({ dispatch }, reportIds) => {
+    getProgressReportOverviewSubjectStats: async ({
+      commit,
+      dispatch,
+      state,
+      getters,
+    }) => {
+      if (getters.isVolunteer) return
+
+      const progressReport = await dispatch('progressReport')
+      commit(
+        'setProgressReportOverviewSubjectStats',
+        progressReport?.data ?? []
+      )
+
+      if (state.progressReportIntervalId) {
+        clearInterval(progressReportIntervalId)
+      }
+
+      const progressReportIntervalId = setInterval(async () => {
+        const progressReport = await dispatch('progressReport')
+        commit(
+          'setProgressReportOverviewSubjectStats',
+          progressReport?.data ?? []
+        )
+      }, minutesInMs(10))
+
+      commit('setProgressReportIntervalId', progressReportIntervalId)
+    },
+
+    // eslint-disable-next-line no-empty-pattern
+    updateProgressReportsReadStatus: async ({}, reportIds) => {
       if (!Array.isArray(reportIds) || !reportIds.length) return
 
       try {
         await NetworkService.updateProgressReportsReadStatus(reportIds)
-        dispatch('getProgressReportOverviewSubjectStats')
       } catch (error) {
         LoggerService.error(error.response.data.err)
       }
@@ -337,6 +364,16 @@ export default {
       await dispatch('addToUser', {
         certifications: updatedCerts,
       })
+    },
+    progressReport: async () => {
+      try {
+        const response = await NetworkService.getUnreadProgressReports()
+        return response
+      } catch (error) {
+        LoggerService.error(error.response.data.err)
+      }
+
+      return null
     },
   },
   getters: {

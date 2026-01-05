@@ -27,11 +27,10 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isStudent && isProgressReportsActive"
+          v-if="isStudent"
           @click="onClickMyProgressSidebarLink"
           text="My Progress"
           class="SidebarLinks__container"
-          to="/sessions/progress"
           id="my-progress-sidebar-link"
         >
           <your-progress-icon class="icon" />
@@ -235,7 +234,6 @@ export default {
       volunteersNTHSGroups: (state) => state.volunteer.NTHSGroups,
     }),
     ...mapGetters({
-      isProgressReportsActive: 'featureFlags/isProgressReportsActive',
       isAutoFlowUser: 'user/isAutoFlowUser',
       hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
       isVolunteer: 'user/isVolunteer',

@@ -26,10 +26,8 @@ export function getCurrentSchoolYearStartDate(): Moment {
   return augustFirst
 }
 
-export function secondsToMs(seconds: number) {
-  return seconds * 1000
-}
-
-export const TEN_SECONDS_TO_MS = secondsToMs(10)
-export const FIVE_SECONDS_TO_MS = secondsToMs(5)
-export const TWO_SECONDS_TO_MS = secondsToMs(2)
+export const secondsInMs = (second: number) => second * 1000
+export const minutesInMs = (minute: number) => minute * secondsInMs(60)
+export const hoursInMs = (hour: number) => hour * minutesInMs(60)
+export const minutesInSeconds = (minutes: number) => minutes * 60
+export const hoursInSeconds = (hour: number) => hour * minutesInSeconds(60)
