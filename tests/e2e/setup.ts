@@ -1,35 +1,30 @@
-import { spawn, spawnSync } from 'node:child_process'
+import { spawn, spawnSync, type ChildProcessByStdio } from 'node:child_process'
 
-let subwayProcess
-async function exitSubway() {
-  // Kill all pids spawned by subwayProcess
-  // https://azimi.me/2014/12/31/kill-child_process-node-js.html
-  if (subwayProcess?.pid) {
-    process.kill(-subwayProcess.pid)
-  }
-  destroySubwayE2eEnvironment(getSubwayRepoPath())
-  process.exit()
-}
-
+let subwayProcess: ChildProcessByStdio<null, null, null>
 ;['exit', 'SIGTERM', 'uncaughtException', 'rejectionHandled', 'SIGINT'].forEach(
   (signal) => process.on(signal, exitSubway)
 )
 
 export default async function () {
+  if (process.env.CI) {
+    // eslint-disable-next-line no-console
+    console.log('CI environment detected, skipping environment setup.')
+    return
+  }
+
   const subwayPath = getSubwayRepoPath()
-  await createSubwayE2eEnvironment(subwayPath)
+  createSubwayE2eEnvironment(subwayPath)
   // Give time for db to be ready for connections
   // @TODO Wait for a signal or healthcheck instead
   await new Promise((resolve) => setTimeout(resolve, 2 * 1000))
-
   // NOTE: This setup expects subway's .env.e2e to have:
   //   SUBWAY_API_PORT=3001
   //   SUBWAY_SOCKETS_PORT=3001
-  // This avoids port conflicts with the dev subway instance (which runs on port 3000)
+  // This avoids port conflicts with the dev subway instance (which runs on port 3000).
   await startSubway(subwayPath)
 }
 
-const getSubwayRepoPath = () => {
+function getSubwayRepoPath() {
   const subwayRepoPath = process.env.SUBWAY_REPO_PATH
   if (!subwayRepoPath) {
     throw new Error(
@@ -39,33 +34,26 @@ const getSubwayRepoPath = () => {
   return subwayRepoPath
 }
 
-const createSubwayE2eEnvironment = (subwayRepoPath) => {
+function createSubwayE2eEnvironment(subwayRepoPath: string) {
   const { error } = spawnSync('npm', ['run', 'e2e:create'], {
     cwd: subwayRepoPath,
     stdio: ['ignore', 'inherit', 'inherit'],
   })
   if (error) {
     throw new Error(
-      'Error occurred while creating subway e2e environment',
-      error
+      `Error occurred while creating subway e2e environment: ${error}`
     )
   }
 }
 
-const destroySubwayE2eEnvironment = (subwayRepoPath) => {
-  spawnSync('npm', ['run', 'e2e:destroy'], {
-    cwd: subwayRepoPath,
-    stdio: ['ignore', 'inherit', 'inherit'],
-  })
-}
-
-const startSubway = async (subwayRepoPath) => {
+async function startSubway(subwayRepoPath: string) {
   let isUp = false
-  subwayProcess = await spawn('npm', ['run', 'e2e:backend'], {
+  subwayProcess = spawn('npm', ['run', 'e2e:backend'], {
     cwd: subwayRepoPath,
     stdio: ['ignore', 'inherit', 'inherit'],
     detached: true,
   })
+
   const waitTimes = [5000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]
   for (const waitTimeMs of waitTimes) {
     await new Promise((r) => setTimeout(r, waitTimeMs))
@@ -73,7 +61,7 @@ const startSubway = async (subwayRepoPath) => {
       const response = await fetch('http://localhost:3001/healthz')
       if (response.status === 200) {
         isUp = true
-      // eslint-disable-next-line no-console
+        // eslint-disable-next-line no-console
         console.log('subway has started!')
         break
       }
@@ -88,5 +76,21 @@ const startSubway = async (subwayRepoPath) => {
       `Subway did not start after ${waitTimes.reduce((acc, v) => (acc += v), 0) / 1000} seconds`
     )
   }
-  return isUp
+}
+
+async function exitSubway() {
+  // Kill all pids spawned by subwayProcess:
+  // https://azimi.me/2014/12/31/kill-child_process-node-js.html
+  if (subwayProcess?.pid) {
+    process.kill(-subwayProcess.pid)
+  }
+  destroySubwayE2eEnvironment(getSubwayRepoPath())
+  process.exit()
+}
+
+function destroySubwayE2eEnvironment(subwayRepoPath: string) {
+  spawnSync('npm', ['run', 'e2e:destroy'], {
+    cwd: subwayRepoPath,
+    stdio: ['ignore', 'inherit', 'inherit'],
+  })
 }

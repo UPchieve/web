@@ -15,8 +15,8 @@ module.exports = defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  /* Retry on CI only. (TODO: Disabled for now) */
+  retries: process.env.CI ? 0 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -25,7 +25,6 @@ module.exports = defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://localhost:8081',
-
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
@@ -38,14 +37,16 @@ module.exports = defineConfig({
     },
   },
   webServer: {
-    command: 'npm run serve -- --port 8081 --mode test_e2e',
+    command: process.env.CI
+      ? 'npm run serve -- --port 8081 --mode test_e2e_ci'
+      : 'npm run serve -- --port 8081 --mode test_e2e',
     url: 'http://localhost:8081',
     reuseExistingServer: false,
     stdout: 'pipe',
     stderr: 'pipe',
     timeout: 30000,
     env: {
-      NODE_ENV: 'test_e2e',
+      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
     },
   },
 

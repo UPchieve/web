@@ -131,6 +131,79 @@ test:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
+e2e-test:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.56.1-jammy
+  services:
+    - postgres:14
+    - redis:6.2.1
+  variables:
+    CI: 'true'
+    POSTGRES_HOST: postgres
+    POSTGRES_PASSWORD: Password123 # pragma: allowlist secret
+    POSTGRES_USER: admin
+    POSTGRES_DB: upchieve
+    POSTGRES_PORT: 5432
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+  before_script:
+    - echo 'Set up high-line...'
+    - npm ci --cache .npm --prefer-offline
+    - echo 'Set up subway...'
+    - git clone --depth=1 https://gitlab.com/upchieve/subway.git
+    # TODO: Figure out a way to cache subway node_modules.
+    - cd subway && npm ci
+    - echo 'Verify Postgres is running and seed database...'
+    - apt-get update && apt-get install -y postgresql-client
+    - export PGPASSWORD=$POSTGRES_PASSWORD
+    - psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -c "SELECT 'OK' AS status;"
+    - |
+      for file in database/db_init/{schema,auth,local_auth,test_seeds,seed_migrations,refresh_materialized_views}.sql; do
+        PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -f $file
+      done
+    - echo 'Verify Redis is running...'
+    - apt-get install -y redis-tools
+    - redis-cli -h $REDIS_HOST -p $REDIS_PORT PING
+    - echo 'Set environment variables we do not want defaults...'
+    - export SUBWAY_POSTGRES_HOST=$POSTGRES_HOST
+    - export SUBWAY_POSTGRES_RO_HOST=$POSTGRES_HOST
+    - export SUBWAY_POSTGRES_ANALYTICS_HOST=$POSTGRES_HOST
+    - export SUBWAY_REDIS_HOST=$REDIS_HOST
+    - echo 'Start subway server...'
+    - npm run dev:backend > subway.log 2>&1 &
+    - |
+      for i in {1..30}; do
+        if curl -f http://localhost:3000/healthz 2>/dev/null; then
+          echo ' Subway is up!'
+          break
+        fi
+        if [ $i -eq 30 ]; then
+          echo 'Subway never started.'
+          exit 1
+        fi
+        echo "Attempt $i/30 to start subway. Waiting..."
+        sleep 2
+      done
+    - cd $CI_PROJECT_DIR
+    - echo 'e2e environment ready!'
+  script:
+    - npm run test:e2e
+  artifacts:
+    access: developer
+    when: on_failure
+    paths:
+      - subway/subway.log
+    expire_in: 7 days
+  rules:
+    - if: '$TEST_DISABLED'
+      when: never
+    - when: manual
+    # TODO: Probably only want to run when merge to main?
+    # And also every, say, hour during work day? Since subway
+    # changes could affect. Is there a way instead to check
+    # that a MR has been merged in subway?
+    # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+
 lint:
   stage: test
   image: node:22.20.0-bullseye
