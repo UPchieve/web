@@ -73,6 +73,8 @@ const startSubway = async (subwayRepoPath) => {
       const response = await fetch('http://localhost:3001/healthz')
       if (response.status === 200) {
         isUp = true
+      // eslint-disable-next-line no-console
+        console.log('subway has started!')
         break
       }
     } catch {

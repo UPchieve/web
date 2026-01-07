@@ -1,5 +1,6 @@
-import { Pool } from 'pg'
-let client: Pool = undefined
+import { Pool, type PoolClient } from 'pg'
+
+let client: Pool
 
 function buildClient(): Pool {
   const pool = new Pool({
@@ -9,7 +10,7 @@ function buildClient(): Pool {
     port: 5500,
     host: 'localhost',
   })
-  pool.on('connect', async (client: Pool) => {
+  pool.on('connect', async (client: PoolClient) => {
     await client.query('SET search_path TO upchieve;')
   })
   return pool
