@@ -1,8 +1,12 @@
 import { faker } from '@faker-js/faker'
 import { StudentDashboard } from './page-object-models/student-dashboard'
 import { Login } from './page-object-models/login'
-import { Pool } from 'pg'
+import { Pool, type PoolClient } from 'pg'
 import type { Browser, Page } from '@playwright/test'
+import { post } from './utils/network'
+
+// TODO: This is an overloaded utils file. Break out into
+// separate files.
 
 export const createPassword = (): string => {
   return faker.internet.password({
@@ -20,7 +24,7 @@ export type StudentUser = {
   verified: boolean
 }
 export const createStudent = async (
-  dbClient: Pool,
+  dbClient: PoolClient,
   args = {}
 ): Promise<StudentUser | undefined> => {
   const params = {
@@ -32,17 +36,7 @@ export const createStudent = async (
     ...args,
   }
   try {
-    const response = await fetch(
-      `http://localhost:3001/auth/register/student/`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(params),
-      }
-    )
-    const { user } = await response.json()
+    const { user } = await post(`/auth/register/student/`, params)
     await dbClient.query(
       `UPDATE users SET verified = true WHERE id = '${user.id}'`
     )
@@ -50,6 +44,7 @@ export const createStudent = async (
   } catch (e) {
     // eslint-disable-next-line no-console
     console.dir(e, { depth: null })
+    // TODO: We might actually want to throw errors here etc.
   }
 }
 
@@ -86,18 +81,8 @@ export const createVolunteer = async (
       ...options,
     }
 
-    const response = await fetch(
-      `http://localhost:3001/auth/register/volunteer/open`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(params),
-      }
-    )
+    const { user } = await post(`/auth/register/volunteer/open`, params)
 
-    const { user } = await response.json()
     await dbClient.query(
       `UPDATE users SET verified = true WHERE id = '${user.id}'`
     )
