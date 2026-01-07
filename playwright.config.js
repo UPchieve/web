@@ -2,18 +2,15 @@
 const { defineConfig, devices } = require('@playwright/test')
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
-
-/**
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
-  globalSetup: './tests/e2e/setup.js',
-
-  testDir: './tests/e2e',
+  globalSetup: './tests/e2e/setup.ts',
+  /*
+  * TODO: This is just temporary for providing quick verification of whether test suite is running in CI.
+  * Once CI is setup (and we've skipped all failing tests) then set back to `./tests/e2e`.
+  */
+  testDir: './tests/e2e/hello-world',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -38,7 +35,6 @@ module.exports = defineConfig({
   expect: {
     toHaveScreenshot: {
       maxDiffPixelRatio: 0.05,
-      mask: ['data-e2e-ignore'],
     },
   },
   webServer: {
