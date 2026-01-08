@@ -37,7 +37,6 @@ function shouldModerateFrame(
   frame: ReturnType<typeof captureFrameFromCanvas>
 ): boolean {
   const lastFrame = lastModeratedFrameBuffer.value
-  lastModeratedFrameBuffer.value = frame.imageData.data
 
   if (lastFrame === null) {
     return true
@@ -72,6 +71,7 @@ async function moderateFrame(
   try {
     // Basic check to prevent tons of duplicate moderation requests
     if (shouldModerateFrame(frameToModerate)) {
+      lastModeratedFrameBuffer.value = frameToModerate.imageData.data
       const formData = new FormData()
       formData.append('frame', frameToModerate.binary)
       formData.append('sessionId', store.state.user.session.id)
@@ -122,12 +122,16 @@ function startModeration({
     captureCanvas.height = targetElement.height
   }
 
+  const baseWidth = captureCanvas.width
+  const baseHeight = captureCanvas.height
+
   function scaleDownFrame(frame: ReturnType<typeof captureFrameFromCanvas>) {
     // if the frame is too large, let's scale it down to 70% of the max byte size for frame and try again
     const targetSize = MAX_BYTE_SIZE_FOR_FRAME * 0.7
-    const scaleFactor = Math.round(Math.sqrt(targetSize / frame.binary.size))
-    captureCanvas.width = captureCanvas.width * scaleFactor
-    captureCanvas.height = captureCanvas.height * scaleFactor
+    const scaleFactor = Math.sqrt(targetSize / frame.binary.size)
+    // AWS Rekognition has a minimum size of 80x80
+    captureCanvas.width = Math.max(80, Math.floor(baseWidth * scaleFactor))
+    captureCanvas.height = Math.max(80, Math.floor(baseHeight * scaleFactor))
     return processFrameForModeration({
       canvas: captureCanvas,
       targetElement,
