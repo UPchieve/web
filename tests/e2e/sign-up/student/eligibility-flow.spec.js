@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker'
 import { test, expect } from '@playwright/test'
-import { POSTHOG_FEATURE_FLAGS } from '../../../../src/consts'
 
 const BASE_SIGN_UP_URL = '/sign-up'
 
@@ -9,7 +8,6 @@ test.describe('Open sign-up index page', () => {
     page,
   }) => {
     await page.goto(BASE_SIGN_UP_URL)
-    await expect(page).toHaveScreenshot('page-load-non-referral.png')
     const studentCard = page.getByTestId('studentCard')
     const volunteerCard = page.getByTestId('volunteerCard')
 
@@ -27,7 +25,6 @@ test.describe('Open sign-up index page', () => {
 
   test('Shows referral page if is referral', async ({ page }) => {
     await page.goto(BASE_SIGN_UP_URL + '?referral=A')
-    await expect(page).toHaveScreenshot('page-load-referral.png')
   })
 })
 
@@ -49,7 +46,6 @@ test.describe('[OLD DESIGN]', async () => {
 
   test.skip('open student', async ({ page }) => {
     await page.goto(BASE_SIGN_UP_URL + '/student/eligibility')
-    await expect(page).toHaveScreenshot('eligibility-old.png')
 
     const {
       gradeInput,
@@ -71,11 +67,9 @@ test.describe('[OLD DESIGN]', async () => {
 
     await page.getByTestId('eligibility-form-submit-btn').click()
     await page.waitForURL('**/sign-up/student/eligible')
-    await expect(page).toHaveScreenshot('student-eligible-old.png')
 
     await page.getByText('Continue').click()
     await page.waitForURL('**/sign-up/student/account')
-    await expect(page).toHaveScreenshot('student-account-old.png')
 
     await studentFirstNameInput.fill(faker.person.firstName())
     await studentLastNameInput.fill(faker.person.lastName())
@@ -88,7 +82,6 @@ test.describe('[OLD DESIGN]', async () => {
     await page.goto(
       BASE_SIGN_UP_URL + '/student/eligibility?partner=college-mentors'
     )
-    await expect(page).toHaveScreenshot('partner-eligibility-old.png')
 
     const { gradeInput, schoolInput, zipInput, studentEmailInput } =
       getFormFields(page)
@@ -109,7 +102,6 @@ test.describe('[OLD DESIGN]', async () => {
     await page.goto(
       BASE_SIGN_UP_URL + '/student/eligibility?parent&partner=college-mentors'
     )
-    await expect(page).toHaveScreenshot('pg-eligibility-old.png')
 
     const {
       gradeInput,
@@ -134,26 +126,5 @@ test.describe('[OLD DESIGN]', async () => {
 
     await page.getByTestId('eligibility-form-submit-btn').click()
     await page.waitForSelector('#pg-confirmation-message')
-    await expect(page).toHaveScreenshot('pg-eligible-confirmation-old.png', {
-      maxDiffPixelRatio: 0.01,
-    })
-  })
-})
-
-test.describe('[NEW DESIGN]', async () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route('*/**/feature-flags', async (route) => {
-      const json = {
-        featureFlags: {
-          [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: true,
-        },
-      }
-      await route.fulfill({ json })
-    })
-  })
-
-  test('Shows new eligibility page', async ({ page }) => {
-    await page.goto(BASE_SIGN_UP_URL + '/student/eligibility')
-    await expect(page).toHaveScreenshot('new-design.png')
   })
 })

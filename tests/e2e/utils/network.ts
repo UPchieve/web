@@ -18,7 +18,6 @@ export async function post(route: string, body: Record<string, unknown>) {
   })
 
   if (!response.ok) {
-    console.error(response)
     throw new Error('TODO make this error better')
   }
 
