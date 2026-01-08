@@ -328,7 +328,7 @@ export default {
           'setProgressReportOverviewSubjectStats',
           progressReport?.data ?? []
         )
-      }, minutesInMs(10))
+      }, minutesInMs(3))
 
       commit('setProgressReportIntervalId', progressReportIntervalId)
     },
