@@ -18,7 +18,7 @@ export class VolunteerPartnerSignup {
     this.step2Title = page.getByTestId('vp-signup-step-2-title')
     this.firstName = page.getByTestId('vp-signup-first-name')
     this.lastName = page.getByTestId('vp-signup-last-name')
-    this.phoneNumber = page.getByLabel('Example: (201) 555-0123')
+    this.phoneNumber = page.getByLabel('Phone number')
     this.userAgreementCheckbox = page.getByTestId('vp-signup-user-agreement')
     this.step2SignupButton = page.getByTestId('vp-signup-complete-button')
   }
