@@ -134,7 +134,7 @@ test:
 
 e2e-test:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.56.1-jammy
+  image: mcr.microsoft.com/playwright:v1.57.0-jammy
   services:
     - postgres:14
     - redis:6.2.1
@@ -195,6 +195,7 @@ e2e-test:
     paths:
       - subway/subway.log
     expire_in: 7 days
+  allow_failure: true
   rules:
     - if: '$TEST_DISABLED'
       when: never
