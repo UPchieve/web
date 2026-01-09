@@ -37,6 +37,7 @@ const getWrapper = (options = {}) => {
   )
 
   return mount(App, {
+    attachTo: window.document.body,
     global: {
       plugins: [router, store],
       mocks: {

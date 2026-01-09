@@ -5,12 +5,21 @@ import { mount } from '@vue/test-utils'
 import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessions.vue'
 import moment from 'moment'
 import { it, describe, vi, expect, beforeEach } from 'vitest'
+import { merge } from 'lodash-es'
 
 vi.mock('@/services/PresenceService')
+
+let wrapper: VueWrapper
 
 beforeEach(() => {
   vi.restoreAllMocks()
   localStorage.clear()
+})
+
+afterEach(() => {
+  if (wrapper) {
+    wrapper?.unmount()
+  }
 })
 
 const USER_ID = '123'
@@ -53,59 +62,51 @@ const sessions = [
     createdAt: moment().subtract(2, 'minutes'),
   },
 ]
-
 const getWrapper = async (overrides = {}) => {
-  const store = createStore({
-    modules: {
-      ...storeOptions.modules,
-      app: {
-        ...storeOptions.modules.app,
-        getters: {
-          mobileMode: () => false,
-        },
-      },
-      user: {
-        ...storeOptions.modules.user,
-        state: {
-          user: {
-            ...storeOptions.modules.user.state.user,
-            id: USER_ID,
-            userType: 'volunteer',
-            subjects: ['algebraOne', 'algebraTwo', 'biology'],
-            mutedSubjectAlerts: [],
-            isApproved: true,
-            isOnboarded: true,
-            isBanned: false,
-            ...(overrides.user?.state?.user ?? {}),
+  const store = createStore(
+    merge({}, storeOptions, {
+      modules: {
+        app: {
+          getters: {
+            mobileMode: () => false,
           },
         },
-        getters: {
-          ...storeOptions.modules.user.getters,
-          ...(overrides.user?.getters ?? {}),
+        user: {
+          state: {
+            user: {
+              id: USER_ID,
+              userType: 'volunteer',
+              subjects: ['algebraOne', 'algebraTwo', 'biology'],
+              mutedSubjectAlerts: [],
+              isApproved: true,
+              isOnboarded: true,
+              isBanned: false,
+              ...(overrides.user?.state?.user ?? {}),
+            },
+          },
+          getters: {
+            ...(overrides.user?.getters ?? {}),
+          },
+        },
+        volunteer: {
+          getters: {
+            isReadyToTutor: () => true,
+          },
+        },
+        featureFlags: {
+          getters: {
+            ...(overrides.featureFlags?.getters ?? {}),
+          },
+        },
+        subjects: {
+          getters: {
+            isComputedUnlockSubject: () => () => false,
+            ...(overrides.subjects?.getters ?? {}),
+          },
         },
       },
-      volunteer: {
-        ...storeOptions.modules.volunteer,
-        getters: {
-          ...storeOptions.modules.volunteer.getters,
-          isReadyToTutor: () => true,
-        },
-      },
-      featureFlags: {
-        ...storeOptions.modules.featureFlags,
-        getters: {
-          ...(overrides.featureFlags?.getters ?? {}),
-        },
-      },
-      subjects: {
-        ...storeOptions.modules.subjects,
-        getters: {
-          isComputedUnlockSubject: () => () => false,
-          ...(overrides.subjects?.getters ?? {}),
-        },
-      },
-    },
-  })
+    })
+  )
   const mockVueContext = {
     $router: {
       currentRoute: {
@@ -120,9 +121,11 @@ const getWrapper = async (overrides = {}) => {
     context: mockVueContext,
     sessions: overrides.sessions ?? sessions,
   })
+
   return mount(ListSessions, {
+    attachTo: window.document.body,
     global: {
-      plugins: [store, router],
+      plugins: [router, store],
     },
     propsData: {
       showLockedSessions: false,
@@ -134,7 +137,7 @@ const getWrapper = async (overrides = {}) => {
 describe('Dashboard with Muted Subjects', () => {
   const mutedSubjectAlerts = ['algebraOne']
   it('Should only show unmuted subject sessions', async () => {
-    const wrapper = await getWrapper({
+    wrapper = await getWrapper({
       user: {
         state: {
           user: {
@@ -159,7 +162,7 @@ describe('Dashboard with banned students', () => {
   it.each([true, false])(
     'Should only show shadow banned students to admin users',
     async (isAdmin) => {
-      const wrapper = await getWrapper({
+      wrapper = await getWrapper({
         user: {
           state: {
             user: {
@@ -179,7 +182,7 @@ describe('Dashboard with banned students', () => {
 
 describe('Empty state', () => {
   it('Should show a special message when there are no students waiting', async () => {
-    const wrapper = await getWrapper({
+    wrapper = await getWrapper({
       sessions: [],
       featureFlags: {
         getters: {
@@ -196,7 +199,7 @@ describe('Empty state', () => {
   })
 
   it('Should show the Become an Ambassador CTA when there are no students waiting', async () => {
-    const wrapper = await getWrapper({
+    wrapper = await getWrapper({
       user: {
         getters: {
           isVolunteer: () => true,
@@ -272,7 +275,7 @@ describe('Locked sessions', () => {
   ]
 
   it('Should show locked sessions at the bottom of the list', async () => {
-    const wrapper = await getWrapper({
+    wrapper = await getWrapper({
       props: {
         showLockedSessions: true,
       },
@@ -334,7 +337,7 @@ describe('Locked sessions', () => {
   })
 
   it('Hides locked sessions when the props.showLockedSessions is false', async () => {
-    const wrapper = await getWrapper({
+    wrapper = await getWrapper({
       props: {
         showLockedSessions: false,
       },
@@ -396,7 +399,7 @@ describe('Locked sessions', () => {
 
   it('Clicking on an integrated math session should take you to the Training page', async () => {
     const routerPushSpy = vi.spyOn(router, 'push')
-    const wrapper = await getWrapper({
+    wrapper = await getWrapper({
       props: {
         showLockedSessions: true,
       },

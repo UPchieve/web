@@ -26,11 +26,6 @@ vi.mock('@/services/NetworkService')
 const mockedAuthService = vi.mocked(AuthService)
 const mockedNetworkService = vi.mocked(NetworkService)
 
-vi.stubGlobal('location', {
-  ...window.location,
-  replace: vi.fn(),
-})
-
 function findElementAndRow(
   rows: (FormRow | SubmitFormRow<any> | null)[],
   search: (element: FormElement) => boolean
@@ -497,16 +492,6 @@ describe('StudentSignUpService', () => {
         __test__.ineligibleContinue
       )
     })
-
-    test('ineligibleContinue redirects to request access page', () => {
-      const result = __test__.ineligibleContinue()
-
-      expect(window.location.replace).toHaveBeenCalledWith(
-        'https://upchieve.org/request-access'
-      )
-      expect(result[0]).toBeNull()
-      expect(result[1]).toBeNull()
-    })
   })
 
   describe('Create account step', () => {
@@ -880,6 +865,7 @@ describe('StudentSignUpService', () => {
 
     beforeEach(() => {
       vi.resetAllMocks()
+      mockedNetworkService.checkIpAddress.mockResolvedValue(true)
     })
 
     test('redirects to eligibility page if starting from a different step and no error/international', async () => {

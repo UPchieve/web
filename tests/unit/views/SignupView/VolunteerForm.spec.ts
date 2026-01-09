@@ -1,11 +1,11 @@
 import { mount, flushPromises, VueWrapper } from '@vue/test-utils'
 import router from '@/router'
 import store from '@/store'
-import { vi, expect, describe, it, beforeEach } from 'vitest'
+import { vi, expect, describe, it, beforeEach, afterEach } from 'vitest'
 import VolunteerForm from '@/views/SignupView/VolunteerForm.vue'
 import AuthService from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
-import { nextTick } from 'vue'
+import { page } from '@vitest/browser/context'
 
 describe('VolunteerForm', () => {
   const SIGN_UP_SOURCES = {
@@ -34,13 +34,19 @@ describe('VolunteerForm', () => {
     referredByCode: null,
     inviteCode: null,
   }
-
-  beforeEach(() => {
+  let wrapper: VueWrapper
+  beforeEach(async () => {
     vi.resetAllMocks()
     NetworkService.getStudentSignupSources = vi
       .fn()
       .mockResolvedValue(SIGN_UP_SOURCES)
     AuthService.registerOpenVolunteer = vi.fn().mockResolvedValue({})
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper?.unmount()
+    }
   })
 
   const getPhoneInputs = (wrapper: VueWrapper) => {
@@ -102,14 +108,13 @@ describe('VolunteerForm', () => {
       }
     }
 
-    const signupButton = args.wrapper.find('[data-testid="signup-button"]')
-    await signupButton.trigger('submit')
-    await flushPromises()
-    await nextTick()
+    const signupButton = page.getByTestId('signup-button')
+    await signupButton.click()
   }
 
   const getWrapper = async (data: Record<string, any> = {}) => {
     const wrapper = mount(VolunteerForm, {
+      attachTo: window.document.body,
       global: {
         plugins: [store, router],
       },
@@ -136,9 +141,7 @@ describe('VolunteerForm', () => {
       signupSourcesOptions: SIGN_UP_SOURCES.data.signupSources,
     }
 
-    const wrapper = await getWrapper(data)
-    wrapper.vm.nextPage()
-    await flushPromises()
+    wrapper = await getWrapper(data)
 
     const formSelects = wrapper.findAllComponents({ name: 'FormSelect' })
     const signUpSources = formSelects.find(
@@ -159,7 +162,7 @@ describe('VolunteerForm', () => {
       step: 'step-2',
       signupSourcesOptions: SIGN_UP_SOURCES.data.signupSources,
     }
-    const wrapper = await getWrapper(data)
+    wrapper = await getWrapper(data)
     const signupButton = wrapper.find('[data-testid="signup-button"]')
 
     const checkWhetherSignupCallMade = async () => {
@@ -203,7 +206,7 @@ describe('VolunteerForm', () => {
       step: 'step-2',
       signupSourcesOptions: SIGN_UP_SOURCES.data.signupSources,
     }
-    const wrapper = await getWrapper(data)
+    wrapper = await getWrapper(data)
     await flushPromises()
     await fillOutFormStep2({
       wrapper,
@@ -219,7 +222,9 @@ describe('VolunteerForm', () => {
     await wrapper
       .find('[data-testid="otherSignupSource"]')
       .setValue('some signup source')
-    await wrapper.find('[data-testid="signup-button"]').trigger('submit')
+
+    const signupButton = page.getByTestId('signup-button')
+    await signupButton.click()
     expect(AuthService.registerOpenVolunteer).toHaveBeenCalled()
   })
 
@@ -240,15 +245,14 @@ describe('VolunteerForm', () => {
       signupSourceId: VOLUNTEER.signupSourceId,
     }
 
-    const wrapper = await getWrapper(data)
+    wrapper = await getWrapper(data)
     const routerPushSpy = vi.spyOn(router, 'push')
 
     await flushPromises()
 
-    const signupButton = wrapper.find('[data-testid="signup-button"]')
-    expect(signupButton.exists()).toBe(true)
+    const signupButton = page.getByTestId('signup-button')
+    await signupButton.click()
 
-    await signupButton.trigger('submit')
     await flushPromises()
 
     expect(AuthService.registerOpenVolunteer).toHaveBeenCalledWith(VOLUNTEER)

@@ -28,7 +28,7 @@ This repository is the frontend SPA only. It relies on the API server and worker
 1. The recommended tool for runtime version management is [`nvm`][nvm].
 
    ```shell
-      nvm install v22.20.0 && nvm use v22.20.0
+      nvm install v24.12.0 && nvm use v24.12.0
    ```
 
 2. Install dependencies
@@ -122,7 +122,7 @@ Test components in a real Chromium browser using Vitest Browser Mode:
 npm run test:browser
 ```
 
-Tests live in `tests/browser/` and use `vitest-browser-vue` to render components. The setup file at `tests/browser/setup.ts` loads global styles so components render with production styling. Extract mock data into fixture files for maintainability. 
+Tests live in `tests/browser/` and use `vitest-browser-vue` to render components. The setup file at `tests/browser/setup.ts` loads global styles so components render with production styling. Extract mock data into fixture files for maintainability.
 
 ### [Alternative] Testing Components with Storybook
 

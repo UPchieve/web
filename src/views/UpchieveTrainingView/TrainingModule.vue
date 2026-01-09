@@ -81,7 +81,15 @@ function goToResource(externalLink: string) {
           <iframe
             src="https://www.youtube.com/embed/zlxwGBg4fqU?si=Pf6jGYEU30TaipU8"
             title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+              web-share;
+            "
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen
           ></iframe>
@@ -106,7 +114,14 @@ function goToResource(externalLink: string) {
               src="https://player.vimeo.com/video/760386859?h=abee3e6389"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
-              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              allow="
+                autoplay;
+                fullscreen;
+                picture-in-picture;
+                clipboard-write;
+                encrypted-media;
+                web-share;
+              "
               allowfullscreen
             ></iframe>
             <button
@@ -312,7 +327,14 @@ function goToResource(externalLink: string) {
               src="https://player.vimeo.com/video/776267126?h=4b09b31c01"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
-              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              allow="
+                autoplay;
+                fullscreen;
+                picture-in-picture;
+                clipboard-write;
+                encrypted-media;
+                web-share;
+              "
               allowfullscreen
             ></iframe>
           </div>
@@ -458,7 +480,14 @@ function goToResource(externalLink: string) {
               src="https://player.vimeo.com/video/459021056?h=8b6ff78fa6"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
-              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              allow="
+                autoplay;
+                fullscreen;
+                picture-in-picture;
+                clipboard-write;
+                encrypted-media;
+                web-share;
+              "
               allowfullscreen
             ></iframe>
           </div>
@@ -644,7 +673,14 @@ function goToResource(externalLink: string) {
               src="https://player.vimeo.com/video/773599358?h=6edf900bfc"
               frameborder="0"
               referrerpolicy="strict-origin-when-cross-origin"
-              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              allow="
+                autoplay;
+                fullscreen;
+                picture-in-picture;
+                clipboard-write;
+                encrypted-media;
+                web-share;
+              "
               allowfullscreen
             ></iframe>
             <button

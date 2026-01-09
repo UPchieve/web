@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import svgLoader from 'vite-svg-loader'
 import path from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import { playwright } from '@vitest/browser-playwright'
 
 export default defineConfig({
   envPrefix: 'VUE_',
@@ -12,9 +13,6 @@ export default defineConfig({
       process.env.SUBWAY_CUSTOM_VOLUNTEER_PARTNER_ORGS
     ),
     global: {},
-  },
-  optimizeDeps: {
-    exclude: ['maz-ui'],
   },
   resolve: {
     alias: {
@@ -39,7 +37,7 @@ export default defineConfig({
         ],
       },
     }),
-    vueDevTools(),
+    ...(!process.env.VITEST ? [vueDevTools()] : []),
   ],
   preview: {
     port: 8080,
@@ -55,35 +53,27 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ['vue-select', 'vue-star-rating', 'vue-draggable-resizable'],
+  },
   test: {
     globals: true,
     exclude: ['**/tests/e2e/**', '**/node_modules/**'],
-    projects: [{
+    projects: [
+      {
         extends: true,
         test: {
           name: 'unit',
-          environment: 'jsdom',
-          setupFiles: ['tests/setup.js'],
-          include: ['tests/unit/**/*.{test,spec}.{js,ts}'],
-          server: {
-            deps: {
-              inline: [/maz-ui.*/],
-            },
-          },
-        },
-      },{
-        extends: true,
-        test: {
-          name: 'browser',
-          include: ['tests/browser/**/*.{test,spec}.{js,ts}'],
           setupFiles: ['tests/browser/setup.ts'],
+          include: [
+            'tests/unit/**/*.{test,spec}.{js,ts}',
+            'tests/browser/**/*.{test,spec}.{js,ts}',
+          ],
           browser: {
             enabled: true,
-            provider: 'playwright',
-            headless: false,
-            instances: [
-              { browser: 'chromium' },
-            ],
+            provider: playwright(),
+            headless: true,
+            instances: [{ browser: 'chromium' }],
           },
         },
       },

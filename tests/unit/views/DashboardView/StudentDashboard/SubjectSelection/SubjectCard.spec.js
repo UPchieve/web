@@ -15,6 +15,7 @@ const getWrapper = (mobileMode = false, props) => {
   )
 
   return mount(SubjectCard, {
+    attachTo: window.document.body,
     global: { plugins: [store] },
     slots: { default: props.buttonText },
     props,

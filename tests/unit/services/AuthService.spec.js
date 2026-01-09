@@ -1,18 +1,7 @@
 import { vi } from 'vitest'
 import NetworkService from '@/services/NetworkService'
 import AuthService from '@/services/AuthService'
-vi.mock('../../../services/NetworkService')
-vi.mock('axios', async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    defaults: {
-      headers: {
-        common: {},
-      },
-    },
-  }
-})
+
 describe('AuthService', () => {
   const testLoginCreds = {
     email: 'testemail@gmail.com',
