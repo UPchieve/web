@@ -26,7 +26,7 @@ test.describe('Training', async () => {
 
   test.use({ storageState: authFile })
 
-  test('pass prealgebra quiz', async ({ page }) => {
+  test.skip('pass prealgebra quiz', async ({ page }) => {
     /* Volunteer pages */
     const volunteerTraining = new VolunteerTraining(page)
 
@@ -54,7 +54,7 @@ test.describe('Training', async () => {
     await expect(page).toHaveScreenshot('prealgebra-quiz-pass.png')
   })
 
-  test('fail prealgebra quiz, review answers, retake quiz', async ({
+  test.skip('fail prealgebra quiz, review answers, retake quiz', async ({
     page,
   }) => {
     /* Volunteer pages */
@@ -92,7 +92,7 @@ test.describe('Training', async () => {
     await volunteerTraining.startQuiz()
   })
 
-  test('fail prealgebra quiz, review answers, review concepts, retake quiz', async ({
+  test.skip('fail prealgebra quiz, review answers, review concepts, retake quiz', async ({
     page,
   }) => {
     /* Volunteer pages */

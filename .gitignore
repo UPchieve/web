@@ -36,3 +36,6 @@ newrelic_agent.log
 
 # Personal files
 todo.local.md
+
+# Log file from e2e test in CI
+high-line.log

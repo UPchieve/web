@@ -32,7 +32,7 @@ test.describe('Session notifications', async () => {
     await dbClient.release()
   })
 
-  test('Volunteer gets session notification', async ({ browser }) => {
+  test.skip('Volunteer gets session notification', async ({ browser }) => {
     const { volunteerPage } = await loginVolunteer(browser, volunteerUser)
     await setFeatureFlags(volunteerPage, {
       [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: true,

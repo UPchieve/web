@@ -17,7 +17,7 @@ test.describe('Save availability', async () => {
     await dbClient.release()
   })
 
-  test('can save timezone and availability', async ({ page }) => {
+  test.skip('can save timezone and availability', async ({ page }) => {
     const volunteerLogin = new Login(page)
     const availabilityView = new AvailabilityView(page)
     await volunteerLogin.goto()

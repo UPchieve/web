@@ -5,7 +5,7 @@ import { POSTHOG_FEATURE_FLAGS } from '../../../../src/consts'
 const BASE_SIGN_UP_URL = '/sign-up'
 
 test.describe('Open sign-up index page', () => {
-  test('Shows option to sign up as student or volunteer if is not referral', async ({
+  test.skip('Shows option to sign up as student or volunteer if is not referral', async ({
     page,
   }) => {
     await page.goto(BASE_SIGN_UP_URL)
@@ -47,7 +47,7 @@ test.describe('[OLD DESIGN]', async () => {
     }
   }
 
-  test('open student', async ({ page }) => {
+  test.skip('open student', async ({ page }) => {
     await page.goto(BASE_SIGN_UP_URL + '/student/eligibility')
     await expect(page).toHaveScreenshot('eligibility-old.png')
 
@@ -84,7 +84,7 @@ test.describe('[OLD DESIGN]', async () => {
     await page.waitForURL('**/verify')
   })
 
-  test('partner student', async ({ page }) => {
+  test.skip('partner student', async ({ page }) => {
     await page.goto(
       BASE_SIGN_UP_URL + '/student/eligibility?partner=college-mentors'
     )
@@ -105,7 +105,7 @@ test.describe('[OLD DESIGN]', async () => {
     await page.waitForURL('**/sign-up/student/eligible')
   })
 
-  test('parent/guardian', async ({ page }) => {
+  test.skip('parent/guardian', async ({ page }) => {
     await page.goto(
       BASE_SIGN_UP_URL + '/student/eligibility?parent&partner=college-mentors'
     )

@@ -53,6 +53,7 @@ export default defineConfig({
       },
     },
   },
+  logLevel: 'error',
   optimizeDeps: {
     include: ['vue-select', 'vue-star-rating', 'vue-draggable-resizable'],
   },

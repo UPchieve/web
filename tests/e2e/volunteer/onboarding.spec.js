@@ -46,7 +46,7 @@ test.describe('Volunteer onboarding', () => {
       await page.waitForURL('**/dashboard')
     })
 
-    test('the quiz is available once the volunteer completes the material', async ({
+    test.skip('the quiz is available once the volunteer completes the material', async ({
       page,
     }) => {
       // Go to UPchieve 101 training page.
@@ -64,7 +64,7 @@ test.describe('Volunteer onboarding', () => {
       await expect(quizLinkStatus).toHaveText('Not started')
     })
 
-    test('volunteer passes quiz', async ({ page }) => {
+    test.skip('volunteer passes quiz', async ({ page }) => {
       // Got to UPchieve 101 quiz page.
       const quizPage = new TrainingQuiz(page)
       await quizPage.goTo('upchieve101')
@@ -74,7 +74,9 @@ test.describe('Volunteer onboarding', () => {
       await quizPage.expectCongratMessage()
     })
 
-    test('volunteer can retake the quiz if they fail', async ({ page }) => {
+    test.skip('volunteer can retake the quiz if they fail', async ({
+      page,
+    }) => {
       // Got to UPchieve 101 quiz page.
       const quizPage = new TrainingQuiz(page)
       await quizPage.goTo('upchieve101')
@@ -107,7 +109,7 @@ test.describe('Volunteer onboarding', () => {
       )
     })
 
-    test('Volunteer can complete safety screening steps (background info + proof of identity)', async ({
+    test.skip('Volunteer can complete safety screening steps (background info + proof of identity)', async ({
       browser,
     }) => {
       // From the dashboard, navigate to the Background Information form

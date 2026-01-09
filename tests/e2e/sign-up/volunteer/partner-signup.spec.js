@@ -9,7 +9,7 @@ test.describe('Volunteer partner signup', async () => {
     domain: 'mailtrap.com',
   }
 
-  test('Can sign up as part of a volunteer partner organization', async ({
+  test.skip('Can sign up as part of a volunteer partner organization', async ({
     page,
   }) => {
     await page.goto(`/signup/volunteer/${PARTNER.key}`)

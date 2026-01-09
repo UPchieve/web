@@ -171,7 +171,7 @@ e2e-test:
     - export SUBWAY_POSTGRES_ANALYTICS_HOST=$POSTGRES_HOST
     - export SUBWAY_REDIS_HOST=$REDIS_HOST
     - echo 'Start subway server...'
-    - npm run dev:backend > subway.log 2>&1 &
+    - npm run dev:backend > ../subway.log 2>&1 &
     - |
       for i in {1..30}; do
         if curl -f http://localhost:3000/healthz 2>/dev/null; then

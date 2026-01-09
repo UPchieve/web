@@ -6,11 +6,7 @@ const { defineConfig, devices } = require('@playwright/test')
  */
 module.exports = defineConfig({
   globalSetup: './tests/e2e/setup.ts',
-  /*
-  * TODO: This is just temporary for providing quick verification of whether test suite is running in CI.
-  * Once CI is setup (and we've skipped all failing tests) then set back to `./tests/e2e`.
-  */
-  testDir: './tests/e2e/hello-world',
+  testDir: './tests/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -37,9 +33,7 @@ module.exports = defineConfig({
     },
   },
   webServer: {
-    command: process.env.CI
-      ? 'npm run serve -- --port 8081 --mode test_e2e_ci'
-      : 'npm run serve -- --port 8081 --mode test_e2e',
+    command: 'npm run serve -- --port 8081 > high-line.log 2>&1',
     url: 'http://localhost:8081',
     reuseExistingServer: false,
     stdout: 'pipe',

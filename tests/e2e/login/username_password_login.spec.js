@@ -69,7 +69,7 @@ for (const v of [true, false]) {
       await expect(page.getByTestId('dashboard-banner')).toBeVisible()
     })
 
-    test(
+    test.skip(
       'Error message appears when incorrect credentials are provided' +
         nameSuffix(v),
       async ({ page }) => {

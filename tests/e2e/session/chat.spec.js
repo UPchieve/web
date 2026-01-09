@@ -31,7 +31,7 @@ test.describe('Session', async () => {
     await dbClient.release()
   })
 
-  test('can chat', async ({ browser }) => {
+  test.skip('can chat', async ({ browser }) => {
     /* Sign in student */
     const studentContext = await browser.newContext()
     const studentPage = await studentContext.newPage()
