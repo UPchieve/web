@@ -33,11 +33,11 @@ module.exports = defineConfig({
     },
   },
   webServer: {
-    command: 'npm run serve -- --port 8081 > high-line.log 2>&1',
+    command: `npm run serve -- --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}> high-line.log 2>&1`,
     url: 'http://localhost:8081',
     reuseExistingServer: false,
-    stdout: 'pipe',
-    stderr: 'pipe',
+    stdout: 'ignore',
+    stderr: 'ignore',
     timeout: 30000,
     env: {
       NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
