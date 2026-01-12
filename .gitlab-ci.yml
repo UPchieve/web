@@ -204,12 +204,9 @@ e2e-test:
   rules:
     - if: '$TEST_DISABLED'
       when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+    - if: $CI_PIPELINE_SOURCE == "schedule" # Scheduled pipeline.
     - when: manual
-    # TODO: Probably only want to run when merge to main?
-    # And also every, say, hour during work day? Since subway
-    # changes could affect. Is there a way instead to check
-    # that a MR has been merged in subway?
-    # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
 lint:
   stage: test
