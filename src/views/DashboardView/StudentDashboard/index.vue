@@ -247,7 +247,6 @@ export default {
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
       volunteerSubjectPresenceVariant:
         'featureFlags/volunteerSubjectPresenceVariant',
-      isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
     }),
     permanentlyDismissedSecondaryEmailModalKey() {
       return `${this.user.id}-permanently-dismissed-secondary-email-modal`
@@ -325,7 +324,7 @@ export default {
     },
     shouldSeeJourneyModal() {
       const hasSeen = localStorage.getItem('seenJourneyModal')
-      return this.isGuidedJourneysEnabled && !hasSeen
+      return !hasSeen
     },
   },
   methods: {

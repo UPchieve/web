@@ -21,6 +21,10 @@ const MY_CLASSES_LINK = {
   to: '/classes',
   text: 'My Classes',
 }
+const MY_JOURNEYS_LINK = {
+  to: '/journeys',
+  text: 'My Journeys',
+}
 const MY_CLASSES_LINK_TEACHERS = {
   to: '/dashboard',
   text: 'My Classes',
@@ -57,6 +61,7 @@ const links = {
       DASHBOARD_LINK,
       PROGRESS_REPORTS,
       MY_CLASSES_LINK,
+      MY_JOURNEYS_LINK,
       FAVORITE_COACHES_LINK,
       SESSION_HISTORY_LINK,
       CONTACT_LINK,

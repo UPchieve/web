@@ -3,7 +3,6 @@
     <h2 class="recent-subjects-title">Your recent subjects</h2>
     <div class="recent-subjects-cards">
       <recent-subject-card
-        v-if="isGuidedJourneysEnabled"
         @subject-clicked="goToCollegeJourney"
         :subject="journeySubject"
         :disabled="disabled"
@@ -23,7 +22,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import RecentSubjectCard from './RecentSubjectCard.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
@@ -50,9 +49,6 @@ export default {
     ...mapState({
       subjects: (state) => state.subjects.subjects,
       user: (state) => state.user.user,
-    }),
-    ...mapGetters({
-      isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
     }),
   },
   methods: {

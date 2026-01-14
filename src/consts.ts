@@ -916,7 +916,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   VOLUNTEER_FEEDBACK_FOR_STUDENT = 'volunteer-feedback-for-student',
   FORCE_SMS_VERIFICATION = 'force-sms-verification',
   DISABLE_STUDENT_CREATION = 'disable-student-creation',
-  GUIDED_JOURNEYS = 'guided-journeys',
   REFERRAL_MODAL_REDESIGN = 'referral-modal-redesign',
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
   PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',

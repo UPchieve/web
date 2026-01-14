@@ -48,7 +48,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_V3]: false,
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
-      [POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS]: false,
       [POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
@@ -233,8 +232,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
     isDisableStudentSignupsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION],
-    isGuidedJourneysEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.GUIDED_JOURNEYS],
     isReferralModalRedesignEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN],
     isUpdatedDocEditorImageStorageEnabled: (state: FeatureFlagState) =>

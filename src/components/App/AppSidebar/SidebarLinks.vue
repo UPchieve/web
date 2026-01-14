@@ -54,7 +54,7 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isStudent && isGuidedJourneysEnabled"
+          v-if="isStudent"
           to="/journeys"
           text="My Journeys"
           id="journeys-sidebar-link"
@@ -243,7 +243,6 @@ export default {
       userType: 'user/userType',
       isBecomeAnAmbassadorCtaEnabled:
         'featureFlags/isBecomeAnAmbassadorCtaEnabled',
-      isGuidedJourneysEnabled: 'featureFlags/isGuidedJourneysEnabled',
       isDisableStudentsJoinSlackCommunityEnabled:
         'featureFlags/isDisableStudentsJoinSlackCommunityEnabled',
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:

@@ -7,7 +7,7 @@ import { storeOptions } from '@/store'
 import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 
-const getWrapper = (overrides = {}) => {
+const getWrapper = () => {
   const store = createStore(
     merge({}, storeOptions, {
       modules: {
@@ -21,11 +21,6 @@ const getWrapper = (overrides = {}) => {
         },
         featureFlags: {
           ...storeOptions.modules.featureFlags,
-          getters: {
-            ...storeOptions.modules.featureFlags.getters,
-            isGuidedJourneysEnabled: () => false,
-            ...(overrides.featureFlags?.getters ?? {}),
-          },
         },
       },
     })
@@ -49,14 +44,8 @@ describe('StudentDashboard', () => {
     expect(selection.exists()).toBe(true)
   })
 
-  test('shows journey modal when guided journey flag is enabled and not seen before', async () => {
-    const wrapper = getWrapper({
-      featureFlags: {
-        getters: {
-          isGuidedJourneysEnabled: () => true,
-        },
-      },
-    })
+  test('shows journey modal when not seen before', async () => {
+    const wrapper = getWrapper()
 
     await wrapper.vm.$nextTick()
 
@@ -67,27 +56,11 @@ describe('StudentDashboard', () => {
   test('does not show journey modal when already seen', async () => {
     localStorage.setItem('seenJourneyModal', 'true')
 
-    const wrapper = getWrapper({
-      featureFlags: {
-        getters: {
-          isGuidedJourneysEnabled: () => true,
-        },
-      },
-    })
-
-    await wrapper.vm.$nextTick()
-
-    const journeyModal = wrapper.findComponent(JourneyModal)
-    expect(journeyModal.exists()).toBe(false)
-  })
-
-  test('does not show journey modal when guided journeys disabled', async () => {
     const wrapper = getWrapper()
 
     await wrapper.vm.$nextTick()
 
     const journeyModal = wrapper.findComponent(JourneyModal)
-
     expect(journeyModal.exists()).toBe(false)
   })
 })
