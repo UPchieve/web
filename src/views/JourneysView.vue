@@ -148,6 +148,7 @@ onMounted(() => {
             @click="() => startSession(step, index + 1)"
             variant="primary-blue"
             :show-arrow="false"
+            data-testid="start-session-btn"
             >Start session</large-button
           >
         </div>
