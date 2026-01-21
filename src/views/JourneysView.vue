@@ -170,7 +170,7 @@ onMounted(() => {
 
   &__subtitle {
     color: $c-secondary-grey;
-    margin: 0 0 1rrem;
+    margin: 0 0 1rem;
     max-width: 60ch;
   }
 }
@@ -179,12 +179,15 @@ onMounted(() => {
   background-color: $upchieve-white;
   padding: 2rem;
   border-radius: 2rem;
+
+  @include breakpoint-above('large') {
+    max-width: 800px;
+  }
 }
 
 .steps-container {
   display: grid;
   gap: 1.4rem;
-  padding: 0rem 1rem;
 }
 
 .steps-step {
@@ -194,9 +197,6 @@ onMounted(() => {
   padding: 1.2rem;
   margin: 1rem 0;
   width: 100%;
-  @include breakpoint-above('large') {
-    width: 75%;
-  }
 
   &__title {
     margin-top: 0.6rem;
