@@ -170,13 +170,13 @@ watch(isExpanded, (value) => {
 <style lang="scss" scoped>
 .overall-progress-container {
   border-bottom: 1px solid $c-border-grey;
-  width: 100%;
   padding-left: 12px;
   padding-right: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 0 8px 0 0;
+  width: 100%;
 
   @media screen and (max-width: 1372px) {
     display: flex;

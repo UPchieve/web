@@ -321,64 +321,68 @@ function onClickGoToDashboard() {
     <div v-if="errorMessage" class="error-callout">
       {{ errorMessage }}
     </div>
-    <TrainingModule
-      v-if="simplifiedTrainingModule && currentStepType === 'viewMaterials'"
-      :module="simplifiedTrainingModule"
-      :hasPreviousModule="hasPreviousModule"
-      :onPrevious="goToPreviousStep"
-      :onNext="goToNextStep"
-    />
-    <TrainingQuiz
-      v-else-if="
-        ['takeQuiz', 'viewQuizResultsPassed', 'viewQuizResultsFailed'].includes(
-          currentStepType
-        )
-      "
-      :quizCategory="currentModule?.quizKey ?? ''"
-      @exitQuiz="onBackOutOfQuiz"
-      @resetQuiz="incrementQuizComponentKey"
-      @finishedQuiz="submitQuiz"
-      @error="handleError"
-      @passedQuizAndExit="onPassedQuiz"
-      @clickedNextOrPrevious="scrollToTop"
-      :key="quizComponentKey"
-    />
-    <TrainingPage
-      v-else-if="isTrainingComplete && currentStepType === 'finishedPage'"
-      class="congrats-page"
-    >
-      <template v-slot:main-content>
-        <NationallyCertifiedTutorBanner class="banner banner--congrats" />
-        <div class="congrats-content">
-          <span class="congrats-heading">
-            Congratulations on completing the Intro to UPchieve Course!
-          </span>
-          Welcome to the UPchieve Coach Community. You're now equipped with the
-          proven coaching tools and strategies to support learners from all
-          backgrounds.
-        </div>
-      </template>
-      <template v-slot:previous-button>
-        <LargeButton
-          class="previous-button"
-          variant="secondary"
-          :showArrow="true"
-          arrowDirection="left"
-          @click="onClickReviewTraining"
-          >Review Training</LargeButton
-        >
-      </template>
-      <template v-slot:next-button>
-        <LargeButton
-          variant="primary-blue"
-          :showArrow="false"
-          class="next-button"
-          @click="onClickGoToDashboard"
-          >Go to Dashboard</LargeButton
-        >
-      </template>
-    </TrainingPage>
-    <Loader id="loader" v-else />
+    <div class="main-content">
+      <TrainingModule
+        v-if="simplifiedTrainingModule && currentStepType === 'viewMaterials'"
+        :module="simplifiedTrainingModule"
+        :hasPreviousModule="hasPreviousModule"
+        :onPrevious="goToPreviousStep"
+        :onNext="goToNextStep"
+      />
+      <TrainingQuiz
+        v-else-if="
+          [
+            'takeQuiz',
+            'viewQuizResultsPassed',
+            'viewQuizResultsFailed',
+          ].includes(currentStepType)
+        "
+        :quizCategory="currentModule?.quizKey ?? ''"
+        @exitQuiz="onBackOutOfQuiz"
+        @resetQuiz="incrementQuizComponentKey"
+        @finishedQuiz="submitQuiz"
+        @error="handleError"
+        @passedQuizAndExit="onPassedQuiz"
+        @clickedNextOrPrevious="scrollToTop"
+        :key="quizComponentKey"
+      />
+      <TrainingPage
+        v-else-if="isTrainingComplete && currentStepType === 'finishedPage'"
+        class="congrats-page"
+      >
+        <template v-slot:main-content>
+          <NationallyCertifiedTutorBanner class="banner banner--congrats" />
+          <div class="congrats-content">
+            <span class="congrats-heading">
+              Congratulations on completing the Intro to UPchieve Course!
+            </span>
+            Welcome to the UPchieve Coach Community. You're now equipped with
+            the proven coaching tools and strategies to support learners from
+            all backgrounds.
+          </div>
+        </template>
+        <template v-slot:previous-button>
+          <LargeButton
+            class="previous-button"
+            variant="secondary"
+            :showArrow="true"
+            arrowDirection="left"
+            @click="onClickReviewTraining"
+            >Review Training</LargeButton
+          >
+        </template>
+        <template v-slot:next-button>
+          <LargeButton
+            variant="primary-blue"
+            :showArrow="false"
+            class="next-button"
+            @click="onClickGoToDashboard"
+            >Go to Dashboard</LargeButton
+          >
+        </template>
+      </TrainingPage>
+      <Loader id="loader" v-else />
+    </div>
   </div>
 </template>
 
@@ -402,12 +406,18 @@ function onClickGoToDashboard() {
     padding: 0;
   }
 
-  #loader {
+  .main-content {
     grid-row: main-content;
     grid-column: main;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    max-width: 833px;
+
+    #loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 30vh;
+    }
   }
 
   .banner {
@@ -441,16 +451,15 @@ function onClickGoToDashboard() {
     box-sizing: border-box;
 
     @media screen and (max-width: 1372px) {
-      display: flex;
-      flex-direction: column;
+      grid-row: stepper;
+      grid-column: main;
       bottom: 0;
       top: 0;
       width: 100%;
       height: auto;
-      grid-row: stepper;
-      grid-column: main;
-      max-width: inherit;
+      max-width: 833px;
       overflow-y: auto;
+      position: sticky;
     }
   }
 }

@@ -30,7 +30,7 @@
 
 .navigation-buttons {
   grid-column: main;
-  margin: 16px 5%;
+  margin: 16px 8px;
   max-height: 40px;
   justify-content: space-between;
   width: 100%;

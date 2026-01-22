@@ -82,11 +82,11 @@ const moduleBannerInfo = computed(() => {
   position: relative;
   border-radius: 8px 0 0 0;
   justify-content: end;
-  padding-right: 5%;
 
   @include breakpoint-above('medium') {
     height: 158px;
     max-width: 833px;
+    padding-right: 8px;
   }
   @include breakpoint-below('medium') {
     max-height: 280px;
@@ -110,20 +110,22 @@ const moduleBannerInfo = computed(() => {
 
 .titles {
   z-index: 0;
-  position: absolute;
+  position: sticky;
   display: flex;
   flex-direction: column;
   left: 5%;
   top: 20%;
-  word-break: break-word;
+  word-break: initial;
   margin: auto;
-
-  @media only screen and (orientation: landscape) {
-    width: 50%;
-  }
+  width: 70%;
+  padding-left: 32px;
 
   @include breakpoint-below('medium') {
     @include font-category('display-small');
+  }
+
+  @include breakpoint-below('small') {
+    padding-left: 8px;
   }
 
   .banner-subtitle {
@@ -134,7 +136,6 @@ const moduleBannerInfo = computed(() => {
   .banner-title {
     font-size: clamp(1vw, 2vw, 175%);
     text-wrap: normal;
-    max-height: 100%;
 
     @include breakpoint-below('medium') {
       @include font-category('display-small');
