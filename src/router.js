@@ -74,6 +74,7 @@ import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
 import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
 import JourneysView from './views/JourneysView.vue'
 import NTHSGroupsView from './views/NTHS/NTHSGroupsView.vue'
+import NTHSCreateGroupView from './views/NTHS/NTHSCreateGroupView.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -596,16 +597,44 @@ const routes = [
     meta: { protected: true },
   },
   {
+    path: '/groups/create',
+    name: 'NTHSCreateGroupView',
+    component: NTHSCreateGroupView,
+    meta: { protected: true },
+    beforeEnter: (_to, _from, next) => {
+      if (store.getters['featureFlags/isNTHSGroupsPageEnabled']) {
+        if (store.state.volunteer.NTHSGroups?.length === 0) {
+          next()
+        } else if (store.state.volunteer.NTHSGroups?.length > 0) {
+          next('/groups')
+        } else {
+          next('/dashboard')
+        }
+      } else {
+        next('/dashboard')
+      }
+    },
+  },
+
+  {
     path: '/groups',
     name: 'NTHSGroupsView',
     component: NTHSGroupsView,
     meta: { protected: true },
     beforeEnter: (_to, _from, next) => {
-      if (store.getters['featureFlags/isNTHSGroupsPageEnabled']) next()
-      else next('/dashboard')
+      if (store.getters['featureFlags/isNTHSGroupsPageEnabled']) {
+        if (store.state.volunteer.NTHSGroups?.length > 0) {
+          next()
+        } else if (store.getters['featureFlags/userIsApprovedNTHSPresident']) {
+          next('/groups/create')
+        } else {
+          next('/dashboard')
+        }
+      } else {
+        next('/dashboard')
+      }
     },
   },
-
   {
     path: '/:pathMatch(.*)*',
     name: 'Not Found',

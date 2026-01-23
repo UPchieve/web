@@ -127,9 +127,9 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer && isMemberOfNTHSGroup"
-          to="/groups"
-          text="Teams"
+          v-if="(isVolunteer && isMemberOfNTHSGroup) || showCreateNTHSGroupLink"
+          :to="showCreateNTHSGroupLink ? '/groups/create' : '/groups'"
+          text="My Team"
           id="nths-group-sidebar-link"
         >
           <groups-icon class="icon" />
@@ -248,10 +248,18 @@ export default {
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
       isNTHSGroupsPageEnabled: 'featureFlags/isNTHSGroupsPageEnabled',
+      userIsApprovedNTHSPresident: 'featureFlags/userIsApprovedNTHSPresident',
     }),
     isMemberOfNTHSGroup() {
       return (
         this.isNTHSGroupsPageEnabled && this.volunteersNTHSGroups.length > 0
+      )
+    },
+    showCreateNTHSGroupLink() {
+      return (
+        this.isNTHSGroupsPageEnabled &&
+        this.userIsApprovedNTHSPresident &&
+        this.volunteersNTHSGroups.length === 0
       )
     },
     isStandaloneAiEnabled() {

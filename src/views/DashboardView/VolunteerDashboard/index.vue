@@ -236,7 +236,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import TaskCard from '@/components/TaskCard.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
-import JoinedTeamModal from '../StudentDashboard/JoinedTeamModal.vue'
+import JoinedTeamModal from './JoinedTeamModal.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])

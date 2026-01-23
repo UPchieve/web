@@ -1391,4 +1391,10 @@ export default {
       inviteCode,
     }).then(this._successHandler, this._errorHandler)
   },
+  createNTHSGroup() {
+    return httpPost(`${API_ROOT}/nths-groups/new`, {}).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

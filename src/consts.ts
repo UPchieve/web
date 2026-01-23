@@ -925,6 +925,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS = 'disable-slack-button-for-unapproved-volunteers',
   NEW_VOLUNTEER_SIGN_UP_FLOW = 'new-volunteer-sign-up-flow',
   NTHS_GROUP_PAGE = 'nths-group-page',
+  USER_IS_APPROVED_NTHS_PRESIDENT = 'user-is-approved-nths-president',
 }
 
 export const ANALYTICS_REPORT_ROW = {

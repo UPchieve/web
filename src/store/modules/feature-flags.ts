@@ -57,6 +57,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.NTHS_GROUP_PAGE]: false,
+      [POSTHOG_FEATURE_FLAGS.USER_IS_APPROVED_NTHS_PRESIDENT]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -252,5 +253,7 @@ export default {
       ],
     isNewVolunteerSignUpFlowEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW],
+    userIsApprovedNTHSPresident: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.USER_IS_APPROVED_NTHS_PRESIDENT],
   },
 }
