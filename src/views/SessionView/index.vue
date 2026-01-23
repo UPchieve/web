@@ -141,6 +141,7 @@
           @toggleMuteSelf="toggleMuteSelf"
           @toggleMutePartner="toggleMutePartner"
           @audioUiLoaded="onAudioUiLoaded"
+          :isFavoriteVolunteer="isFavoriteVolunteer"
         />
       </div>
       <div
@@ -733,6 +734,9 @@ export default {
         aiWidgetHidden: this.aiWidgetHidden,
         messagesLength: this.currentTutorBotConversation?.messages?.length ?? 0,
       }
+    },
+    isFavoriteVolunteer() {
+      return this.user.favoriteVolunteers.includes(this.session?.volunteer?.id)
     },
   },
   watch: {

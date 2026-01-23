@@ -28,6 +28,7 @@ const props = defineProps<{
   isBanned: boolean
   unableToJoinAudio: boolean
   isSpeaking: boolean
+  isFavoriteVolunteer: boolean
   micState: 'prompt' | 'granted' | 'denied'
 }>()
 
@@ -65,6 +66,7 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
       :partnerPresence="props.partnerPresence"
       :partnerMicStatus="props.partnerMicStatus"
       :audioCallSupported="audioCallSupported"
+      :isFavoriteVolunteer="props.isFavoriteVolunteer"
     />
     <div class="session-buttons" :class="userType">
       <!--        There is no session header in mobile mode, in which case
