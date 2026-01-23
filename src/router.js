@@ -73,7 +73,7 @@ import SurveysView from './views/SurveysView.vue'
 import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
 import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
 import JourneysView from './views/JourneysView.vue'
-import NTHSGroupsView from './views/NTHSGroupsView.vue'
+import NTHSGroupsView from './views/NTHS/NTHSGroupsView.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')

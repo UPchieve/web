@@ -27,7 +27,9 @@ async function onAccept() {
   try {
     await NetworkService.deleteAccount()
   } catch {
-    $store.dispatch('app/modal/update', { showTemplateButtons: false })
+    $store.dispatch('app/modal/update', {
+      modalTemplateProps: { showTemplateButtons: false },
+    })
     error.value =
       'Something went wrong. Please reach out to support to finish deleting your account.'
     return

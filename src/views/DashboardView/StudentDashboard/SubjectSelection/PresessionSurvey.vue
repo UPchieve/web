@@ -150,7 +150,9 @@ export default {
      * which is uses the ModalTemplate. Hide the default template buttons when we
      * transition into this modal.
      */
-    this.$store.dispatch('app/modal/update', { showTemplateButtons: false })
+    this.$store.dispatch('app/modal/update', {
+      modalTemplateProps: { showTemplateButtons: false },
+    })
   },
 
   computed: {

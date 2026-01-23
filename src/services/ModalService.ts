@@ -1,6 +1,7 @@
 import type { Component } from 'vue'
 import store from '@/store'
 import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
+import type { ManageTeamModalProps } from '@/views/NTHS/ManageTeamModal.vue'
 
 type ModalTemplateProps = {
   acceptText?: string
@@ -10,6 +11,7 @@ type ModalTemplateProps = {
   alertModal?: boolean
   important?: boolean
   showTemplateButtons?: boolean
+  showSeparator?: boolean
   showAccept?: boolean
   modalComponentName?: string
 }
@@ -22,7 +24,11 @@ export type SessionErrorModalData = ModalTemplateProps & {
 type ModalData = ModalTemplateProps | SessionErrorModalData
 
 // TODO: Make `component` just a string.
-function show(component: Component | string, data: ModalData): void {
+function show(
+  component: Component | string,
+  data: ModalData,
+  componentProps = {}
+): void {
   const modalComponentName =
     typeof component === 'string' ? component : (component as Component).name
   store.dispatch('app/modal/show', {
@@ -31,6 +37,7 @@ function show(component: Component | string, data: ModalData): void {
       ...data,
       modalComponentName,
     },
+    componentProps,
   })
 }
 
@@ -49,5 +56,17 @@ export default {
       acceptText: 'Delete Account',
       acceptButtonVariant: 'danger',
     })
+  },
+
+  showNthsUserManagementModal(props: ManageTeamModalProps) {
+    show(
+      'ManageTeamModal',
+      {
+        backText: 'Close',
+        showAccept: false,
+        showSeparator: false,
+      },
+      props
+    )
   },
 }

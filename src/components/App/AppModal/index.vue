@@ -10,6 +10,7 @@
     :enable-accept="enableAccept"
     :important="modalData.important"
     :showTemplateButtons="modalData.showTemplateButtons"
+    :showSeparator="modalData.showSeparator"
     :show-accept="modalData.showAccept"
     :modalComponentName="modalComponent && modalComponent.name"
   >
@@ -18,6 +19,7 @@
       v-bind:is="modalComponent"
       v-on:enable-accept="onEnableAccept"
       :modal-data="modalData"
+      v-bind="modalComponentProps"
       ref="AppModalChild"
     />
   </modal-template>
@@ -42,6 +44,7 @@ import RemoveAssignmentConfirmationModal from '@/components/RemoveAssignmentConf
 import BecomeAVolunteerModal from '@/views/BecomeAVolunteerModal.vue'
 import VerificationAppModal from './VerificationAppModal.vue'
 import DeleteAccountConfirmationModal from '@/components/DeleteAccountConfirmationModal.vue'
+import ManageTeamModal from '@/views/NTHS/ManageTeamModal.vue'
 
 export default {
   components: {
@@ -62,6 +65,7 @@ export default {
     BecomeAVolunteerModal,
     VerificationAppModal,
     DeleteAccountConfirmationModal,
+    ManageTeamModal,
   },
   data() {
     return {
@@ -71,7 +75,8 @@ export default {
   computed: {
     ...mapState({
       modalComponent: (state) => state.app.modal.component,
-      modalData: (state) => state.app.modal.data,
+      modalData: (state) => state.app.modal.modalTemplateProps,
+      modalComponentProps: (state) => state.app.modal.componentProps,
     }),
   },
   mounted() {

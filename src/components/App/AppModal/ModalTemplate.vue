@@ -21,13 +21,13 @@
       <slot />
 
       <template v-if="!mobileMode && showTemplateButtons">
-        <div class="ModalTemplate-separator" />
+        <div class="ModalTemplate-separator" v-if="showSeparator" />
         <div class="ModalTemplate-buttons">
           <large-button
             v-if="!alertModal"
             @click="handleCancel"
             :showArrow="false"
-            >Cancel</large-button
+            >{{ backText }}</large-button
           >
           <!-- TODO: Also add an accept button on mobile. -->
           <large-button
@@ -64,6 +64,7 @@ export default {
     alertModal: Boolean,
     important: Boolean,
     showTemplateButtons: { type: Boolean, default: true },
+    showSeparator: { type: Boolean, default: true },
     showAccept: { type: Boolean, default: true },
     modalComponentName: String,
   },
@@ -157,7 +158,7 @@ $header-height: 80px;
 
   min-width: 100%;
   height: 100%;
-
+  max-width: 100%;
   position: fixed;
   top: 0;
   left: 0;

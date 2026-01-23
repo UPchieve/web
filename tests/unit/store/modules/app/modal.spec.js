@@ -7,7 +7,8 @@ describe('`app/modal` store module', () => {
   it('state', () => {
     expect(state).toEqual({
       component: null,
-      data: {},
+      modalTemplateProps: {},
+      componentProps: {},
       isShown: false,
     })
   })
@@ -21,12 +22,12 @@ describe('`app/modal` store module', () => {
       expect(state.component).toBe(expected)
     })
 
-    it('setData', () => {
-      expect(typeof mutations.setData).toBe('function')
-      const state = { data: null }
+    it('setModalTemplateProps', () => {
+      expect(typeof mutations.setModalTemplateProps).toBe('function')
+      const state = { modalTemplateProps: null }
       const expected = {}
-      mutations.setData(state, expected)
-      expect(state.data).toBe(expected)
+      mutations.setModalTemplateProps(state, expected)
+      expect(state.modalTemplateProps).toBe(expected)
     })
 
     it('setIsShown', () => {
@@ -35,13 +36,24 @@ describe('`app/modal` store module', () => {
       mutations.setIsShown(state, true)
       expect(state.isShown).toBe(true)
     })
+
+    it('setComponentProps', () => {
+      expect(typeof mutations.setComponentProps).toBe('function')
+      const state = { componentProps: {} }
+      mutations.setComponentProps(state, { someProp: 1 })
+      expect(state.componentProps).toEqual({ someProp: 1 })
+    })
   })
 
   describe('actions', () => {
     it('show', () => {
       expect(typeof actions.show).toBe('function')
       const commit = vi.fn()
-      const payload = { component: 'component', data: {} }
+      const payload = {
+        component: 'component',
+        data: {},
+        componentProps: { someProp: 1 },
+      }
       actions.show({ commit }, payload)
       expect(commit).toHaveBeenNthCalledWith(1, 'setIsShown', true)
       expect(commit).toHaveBeenNthCalledWith(
@@ -49,7 +61,16 @@ describe('`app/modal` store module', () => {
         'setComponent',
         payload.component
       )
-      expect(commit).toHaveBeenNthCalledWith(3, 'setData', payload.data)
+      expect(commit).toHaveBeenNthCalledWith(
+        3,
+        'setModalTemplateProps',
+        payload.data
+      )
+      expect(commit).toHaveBeenNthCalledWith(
+        4,
+        'setComponentProps',
+        payload.componentProps
+      )
     })
 
     it('hide', () => {
@@ -58,7 +79,8 @@ describe('`app/modal` store module', () => {
       actions.hide({ commit })
       expect(commit).toHaveBeenNthCalledWith(1, 'setIsShown', false)
       expect(commit).toHaveBeenNthCalledWith(2, 'setComponent', null)
-      expect(commit).toHaveBeenNthCalledWith(3, 'setData', {})
+      expect(commit).toHaveBeenNthCalledWith(3, 'setModalTemplateProps', {})
+      expect(commit).toHaveBeenNthCalledWith(4, 'setComponentProps', {})
     })
   })
 })

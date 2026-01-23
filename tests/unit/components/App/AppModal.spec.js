@@ -8,7 +8,7 @@ import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/Subjec
 import { afterEach } from 'vitest'
 
 const getWrapper = async (state = {}) => {
-  state = { component: null, data: {}, ...state }
+  state = { component: null, modalTemplateProps: {}, ...state }
 
   const store = createStore(
     merge({}, storeOptions, {
@@ -36,20 +36,24 @@ describe('AppModal', () => {
     }
   })
   it('renders ModalTemplate', async () => {
-    const state = { data: { backText: 'Back', acceptText: 'Okay' } }
+    const state = {
+      modalTemplateProps: { backText: 'Back', acceptText: 'Okay' },
+    }
     wrapper = await getWrapper(state)
     const modal = wrapper.findComponent(ModalTemplate)
     expect(modal.exists()).toBe(true)
-    expect(modal.props().backText).toEqual(state.data.backText)
-    expect(modal.props().acceptText).toEqual(state.data.acceptText)
+    expect(modal.props().backText).toEqual(state.modalTemplateProps.backText)
+    expect(modal.props().acceptText).toEqual(
+      state.modalTemplateProps.acceptText
+    )
   })
 
   it('renders SubjectSelectionModal', async () => {
-    const state = { component: 'SubjectSelectionModal', data: {} }
+    const state = { component: 'SubjectSelectionModal', modalTemplateProps: {} }
     wrapper = await getWrapper(state)
     wrapper.findComponent(ModalTemplate)
     const modal = wrapper.findComponent(SubjectSelectionModal)
     expect(modal.exists()).toBe(true)
-    expect(modal.props().modalData).toEqual(state.data)
+    expect(modal.props().modalData).toEqual(state.modalTemplateProps)
   })
 })

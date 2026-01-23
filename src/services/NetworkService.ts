@@ -1369,6 +1369,16 @@ export default {
       this._axiosErrorHandler
     )
   },
+  getNTHSGroupMembers(groupId: string) {
+    return httpGet(`${API_ROOT}/nths-groups/${groupId}/members`).catch(
+      this._axiosErrorHandler
+    )
+  },
+  updateNTHSGroupMemberRole(groupId: string, userId: string, role: string) {
+    return httpPut(`${API_ROOT}/nths-groups/${groupId}/members/${userId}`, {
+      role,
+    }).catch(this._axiosErrorHandler)
+  },
   joinVolunteerToNTHSGroup({
     email,
     inviteCode,

@@ -78,7 +78,9 @@ export default {
 
   mounted() {
     AnalyticsService.captureEvent(EVENTS.USER_SAW_TUTOR_CHOICE)
-    this.$store.dispatch('app/modal/update', { showTemplateButtons: false })
+    this.$store.dispatch('app/modal/update', {
+      modalTemplateProps: { showTemplateButtons: false },
+    })
     this.unsubscribe = this.$store.subscribeAction((action) => {
       if (action.type === 'app/modal/hide' && !this.exitMethod) {
         AnalyticsService.captureEvent(EVENTS.USER_CLOSED_TUTOR_CHOICE)
@@ -88,7 +90,9 @@ export default {
 
   beforeUnmount() {
     this.unsubscribe()
-    this.$store.dispatch('app/modal/update', { showTemplateButtons: true })
+    this.$store.dispatch('app/modal/update', {
+      modalTemplateProps: { showTemplateButtons: true },
+    })
   },
 
   emits: ['choose-human'],

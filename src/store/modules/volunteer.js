@@ -4,7 +4,6 @@ import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
 import NetworkService from '@/services/NetworkService'
-
 export default {
   namespaced: true,
   state: {
@@ -13,6 +12,7 @@ export default {
     tickIntervalId: null,
     ticks: 0,
     NTHSGroups: [],
+    NTHSGroupMembers: {},
   },
   mutations: {
     setNewWaitingStudentAudioElement: (state, element) =>
@@ -34,11 +34,29 @@ export default {
     setNTHSGroups: (state, groups) => {
       state.NTHSGroups = groups
     },
+    setNTHSGroupMembers: (state, data) => {
+      state.NTHSGroupMembers[data.groupId] = data.groupMembers
+    },
   },
   actions: {
     async fetchNTHSGroupsForUser({ commit }) {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
+    },
+    async fetchNTHSGroupMembers({ commit, rootState }, groupId) {
+      const response = await NetworkService.getNTHSGroupMembers(groupId)
+      const groupMembers = response.data?.members ?? []
+      // Put the current user first in the list
+      const currentUserId = rootState.user.user.id
+      const currentUserMemberData = groupMembers.find(
+        (member) => member.userId === currentUserId
+      )
+      const allOtherMembers = groupMembers.filter(
+        (member) => member.userId !== currentUserId
+      )
+      allOtherMembers.sort((a, b) => a.firstName > b.firstName)
+      allOtherMembers.unshift(currentUserMemberData)
+      commit('setNTHSGroupMembers', { groupId, groupMembers: allOtherMembers })
     },
 
     gotoSession({ dispatch }, { context, session }) {
