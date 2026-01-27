@@ -4,6 +4,7 @@ import { useStore } from 'vuex'
 import type { GroupMember } from '@/types/nths-types'
 import Loader from '@/components/Loader.vue'
 import InitialsAvatar from '@/components/InitialsAvatar.vue'
+import { ref } from 'vue'
 
 export type ManageTeamModalProps = {
   members: GroupMember[]
@@ -21,11 +22,19 @@ function getAvatarBackgroundColorByIndex(index: number): string {
   const COLORS = ['#16d2aa', '#1855d1', '#ff8c5f']
   return COLORS[index % COLORS.length]
 }
+
+const errorMessage = ref<string>('')
+function onUpdateError(user: string) {
+  errorMessage.value = `Something went wrong while updating settings for user ${user}. Please refresh the page and try again.`
+}
 </script>
 
 <template>
   <div>
     <h1>Manage team members</h1>
+    <div v-if="errorMessage" class="error-container">
+      {{ errorMessage }}
+    </div>
     <Loader v-if="props.isLoading" />
     <div class="member-grid" v-else>
       <div class="table-heading name-heading">Name</div>
@@ -42,9 +51,7 @@ function getAvatarBackgroundColorByIndex(index: number): string {
           }"
         >
           <InitialsAvatar
-            :initials="
-              `${member.firstName.charAt(0)}`.toUpperCase()
-            "
+            :initials="`${member.firstName.charAt(0)}`.toUpperCase()"
             :widthPx="40"
             :bgColor="getAvatarBackgroundColorByIndex(index)"
           />
@@ -57,6 +64,8 @@ function getAvatarBackgroundColorByIndex(index: number): string {
           :class="{
             'bottom-border': index !== props.members.length - 1,
           }"
+          @error="() => onUpdateError(member.firstName)"
+          @success="errorMessage = ''"
         />
       </div>
     </div>
@@ -123,5 +132,13 @@ h1 {
   .status {
     grid-column: status;
   }
+}
+
+.error-container {
+  border: 1px solid $c-error-red;
+  border-radius: 8px;
+  background-color: lighten($c-error-red, 30%);
+  padding: 16px;
+  margin-bottom: 32px;
 }
 </style>

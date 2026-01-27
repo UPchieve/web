@@ -26,6 +26,10 @@ const selectedRole = ref<DisplayRole>(startCase(props.groupMember.roleName))
 const placeholder = computed(() =>
   isLoading.value ? 'Updating...' : startCase(props.groupMember.roleName)
 )
+const emit = defineEmits<{
+  (e: 'error', error: any): void
+  (e: 'success'): void
+}>()
 
 async function onChangeRole(newRole: DisplayRole) {
   const role = newRole.toLowerCase() as Role
@@ -50,9 +54,10 @@ async function onChangeRole(newRole: DisplayRole) {
       groupId: props.groupMember.nthsGroupId,
       groupMembers: updatedMembers,
     })
+    emit('success')
   } catch (err) {
     LoggerService.noticeError(err)
-    // @TODO emit error event to parent to handle.
+    emit('error', err)
   } finally {
     isLoading.value = false
   }
