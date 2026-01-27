@@ -18,7 +18,6 @@ const props = defineProps<{
     nthsGroupId: string
     roleName: Role
   }
-  disabled: boolean
 }>()
 
 const isLoading = ref<boolean>(false)
@@ -37,10 +36,10 @@ async function onChangeRole(newRole: DisplayRole) {
 
   try {
     isLoading.value = true
-    await NetworkService.updateNTHSGroupMemberRole(
+    await NetworkService.updateNTHSGroupMember(
       props.groupMember.nthsGroupId,
       props.groupMember.userId,
-      role
+      { role }
     )
     selectedRole.value = newRole
     const updatedMembers: GroupMember[] = [
@@ -69,7 +68,6 @@ async function onChangeRole(newRole: DisplayRole) {
     class="dropdown"
     name="Role"
     :options="roleOptions"
-    :disabled="props.disabled"
     :placeholder="placeholder"
     :modelValue="selectedRole"
     @update:modelValue="onChangeRole"

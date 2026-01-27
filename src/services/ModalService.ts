@@ -2,6 +2,7 @@ import type { Component } from 'vue'
 import store from '@/store'
 import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
 import type { ManageTeamModalProps } from '@/views/NTHS/ManageTeamModal.vue'
+import type { RemoveMemberConfirmationProps } from '@/views/NTHS/RemoveMemberConfirmation.vue'
 
 type ModalTemplateProps = {
   acceptText?: string
@@ -62,9 +63,21 @@ export default {
     show(
       'ManageTeamModal',
       {
-        backText: 'Close',
         showAccept: false,
         showSeparator: false,
+        showTemplateButtons: false,
+      },
+      props
+    )
+  },
+
+  showLeaveTeamModal(props: RemoveMemberConfirmationProps) {
+    show(
+      'RemoveMemberConfirmation',
+      {
+        showAccept: false,
+        showSeparator: false,
+        showTemplateButtons: false,
       },
       props
     )

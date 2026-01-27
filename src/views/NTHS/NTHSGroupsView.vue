@@ -34,10 +34,22 @@ onBeforeMount(async () => {
 
 const userManagementModalProps = computed(
   (): ManageTeamModalProps => ({
-    members: groupMembers.value,
+    groupId: group.value?.groupId,
     isLoading: isFetchingGroupMembers.value,
   })
 )
+
+const currentGroupMember = computed(() =>
+  groupMembers.value?.find(
+    (member: any) => member.userId === store.state.user.user.id
+  )
+)
+function onLeaveTeam() {
+  ModalService.showLeaveTeamModal({
+    isRemovingSelf: true,
+    memberToRemove: currentGroupMember.value,
+  })
+}
 </script>
 
 <template>
@@ -53,10 +65,17 @@ const userManagementModalProps = computed(
           () =>
             ModalService.showNthsUserManagementModal(userManagementModalProps)
         "
-        class="manage-team-button"
+        class="team-action-button"
         variant="primary-blue"
         :showArrow="false"
         >Manage team</LargeButton
+      >
+      <LargeButton
+        variant="danger"
+        @click="onLeaveTeam"
+        :showArrow="false"
+        class="team-action-button"
+        >Leave team</LargeButton
       >
     </div>
     <div class="container">
@@ -122,7 +141,7 @@ const userManagementModalProps = computed(
     flex-direction: column;
   }
 }
-.manage-team-button {
+.team-action-button {
   margin-left: auto;
 }
 </style>

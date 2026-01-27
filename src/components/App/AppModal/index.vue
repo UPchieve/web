@@ -45,6 +45,7 @@ import BecomeAVolunteerModal from '@/views/BecomeAVolunteerModal.vue'
 import VerificationAppModal from './VerificationAppModal.vue'
 import DeleteAccountConfirmationModal from '@/components/DeleteAccountConfirmationModal.vue'
 import ManageTeamModal from '@/views/NTHS/ManageTeamModal.vue'
+import RemoveMemberConfirmation from '@/views/NTHS/RemoveMemberConfirmation.vue'
 
 export default {
   components: {
@@ -66,6 +67,7 @@ export default {
     VerificationAppModal,
     DeleteAccountConfirmationModal,
     ManageTeamModal,
+    RemoveMemberConfirmation,
   },
   data() {
     return {

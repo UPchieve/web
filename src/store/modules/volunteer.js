@@ -43,20 +43,10 @@ export default {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
     },
-    async fetchNTHSGroupMembers({ commit, rootState }, groupId) {
+    async fetchNTHSGroupMembers({ commit }, groupId) {
       const response = await NetworkService.getNTHSGroupMembers(groupId)
       const groupMembers = response.data?.members ?? []
-      // Put the current user first in the list
-      const currentUserId = rootState.user.user.id
-      const currentUserMemberData = groupMembers.find(
-        (member) => member.userId === currentUserId
-      )
-      const allOtherMembers = groupMembers.filter(
-        (member) => member.userId !== currentUserId
-      )
-      allOtherMembers.sort((a, b) => a.firstName > b.firstName)
-      allOtherMembers.unshift(currentUserMemberData)
-      commit('setNTHSGroupMembers', { groupId, groupMembers: allOtherMembers })
+      commit('setNTHSGroupMembers', { groupId, groupMembers })
     },
 
     gotoSession({ dispatch }, { context, session }) {

@@ -1374,10 +1374,16 @@ export default {
       this._axiosErrorHandler
     )
   },
-  updateNTHSGroupMemberRole(groupId: string, userId: string, role: string) {
-    return httpPut(`${API_ROOT}/nths-groups/${groupId}/members/${userId}`, {
-      role,
-    }).catch(this._axiosErrorHandler)
+  updateNTHSGroupMember(groupId: string, userId: string, data: any) {
+    return httpPut(
+      `${API_ROOT}/nths-groups/${groupId}/members/${userId}`,
+      data
+    ).catch(this._axiosErrorHandler)
+  },
+  leaveNthsChapter(groupId: string) {
+    return httpDelete(`${API_ROOT}/nths-groups/${groupId}/leave`, {}).catch(
+      this._axiosErrorHandler
+    )
   },
   joinVolunteerToNTHSGroup({
     email,

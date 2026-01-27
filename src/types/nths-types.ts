@@ -5,5 +5,5 @@ export type GroupMember = {
   title: string | null
   roleName: Role
   firstName: string
-  email: string
+  lastInitial: string
 }
