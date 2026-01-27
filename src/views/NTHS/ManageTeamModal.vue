@@ -3,6 +3,7 @@ import MemberRoleDropdown from '@/views/NTHS/MemberRoleDropdown.vue'
 import { useStore } from 'vuex'
 import type { GroupMember } from '@/types/nths-types'
 import Loader from '@/components/Loader.vue'
+import InitialsAvatar from '@/components/InitialsAvatar.vue'
 
 export type ManageTeamModalProps = {
   members: GroupMember[]
@@ -14,6 +15,11 @@ const store = useStore()
 
 function isCurrentUser(userId: string): boolean {
   return userId === store.state.user.user.id
+}
+function getAvatarBackgroundColorByIndex(index: number): string {
+  // Alternate colors from this set
+  const COLORS = ['#16d2aa', '#1855d1', '#ff8c5f']
+  return COLORS[index % COLORS.length]
 }
 </script>
 
@@ -35,6 +41,13 @@ function isCurrentUser(userId: string): boolean {
             'bottom-border': index !== props.members.length - 1,
           }"
         >
+          <InitialsAvatar
+            :initials="
+              `${member.firstName.charAt(0)}`.toUpperCase()
+            "
+            :widthPx="40"
+            :bgColor="getAvatarBackgroundColorByIndex(index)"
+          />
           {{ member.firstName }}
         </div>
         <MemberRoleDropdown
