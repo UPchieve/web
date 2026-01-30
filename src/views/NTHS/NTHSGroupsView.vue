@@ -7,6 +7,7 @@ import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import type { ManageTeamModalProps } from '@/views/NTHS/ManageTeamModal.vue'
 import ModalService from '@/services/ModalService'
+import EditableName from './EditableName.vue'
 
 const store = useStore()
 const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
@@ -56,7 +57,7 @@ function onLeaveTeam() {
   <div class="container">
     <div class="header">
       <div class="header-main-info">
-        <h2 v-if="group?.groupName">{{ group.groupName }}</h2>
+        <EditableName :groupName="group.groupName" :groupId="group.groupId" />
         <InviteLink v-if="code" :code="code" />
       </div>
       <LargeButton
@@ -136,6 +137,7 @@ function onLeaveTeam() {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
+  align-items: center;
 
   @include breakpoint-below('small') {
     flex-direction: column;

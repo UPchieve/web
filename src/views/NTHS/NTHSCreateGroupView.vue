@@ -3,11 +3,15 @@ import LargeButton from '@/components/LargeButton.vue'
 import NetworkService from '@/services/NetworkService'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import LoggerService from '@/services/LoggerService'
+import { isErrorWithResponse } from '@/utils/error-utils'
 
 const store = useStore()
 const router = useRouter()
 const hasGroup = computed(() => store.state.volunteer.NTHSGroups.length)
+const errorMessage = ref('')
+
 watch(
   () => hasGroup.value,
   (len) => {
@@ -15,25 +19,25 @@ watch(
   }
 )
 
-function isErrorWithResponse(
-  obj: unknown | { response: { data: { err: string } } }
-): obj is { response: { data: { err: string } } } {
-  return !!obj && Object.hasOwn(obj, 'response')
-}
-
 async function createTeam() {
   try {
+    errorMessage.value = ''
     const results = await NetworkService.createNTHSGroup()
     store.commit('volunteer/setNTHSGroups', [results.data.group])
   } catch (e) {
-    // The use shouldn't really be able to get to this
-    // unless they have multiple tabs open. let's redirect them to their
-    // group page right away if they are a member of a group
-    if (
-      isErrorWithResponse(e) &&
-      e.response.data.err === 'User already in a group'
-    ) {
-      router.replace('/groups')
+    if (isErrorWithResponse(e)) {
+      // The use shouldn't really be able to get to this
+      // unless they have multiple tabs open. let's redirect them to their
+      // group page right away if they are a member of a group
+      if (e.response.data.err === 'User already in a group') {
+        router.replace('/groups')
+      } else {
+        errorMessage.value = `Unknown error, please try again: ${e.response.data.err}`
+        LoggerService.noticeError(e.response.data.err)
+      }
+    } else {
+      errorMessage.value = 'Unknown error, please try again'
+      LoggerService.noticeError(e)
     }
   }
 }
@@ -42,21 +46,19 @@ async function createTeam() {
 <template>
   <div class="page">
     <div class="container">
-      <div class="content">
+      <form class="content" @submit.prevent="createTeam">
         <h1 class="title">National Tutoring Honors Society</h1>
-        <p>
+        <span>
           Create an NTHS Chapter to help more under-resourced students get free,
           on-demand academic and college support
-        </p>
+        </span>
+        <span class="error" v-if="errorMessage.length">{{ errorMessage }}</span>
         <div class="actions">
-          <LargeButton
-            variant="primary-blue"
-            :show-arrow="false"
-            @click="createTeam"
+          <LargeButton variant="primary-blue" :show-arrow="false" type="submit"
             >Create NTHS Chapter</LargeButton
           >
         </div>
-      </div>
+      </form>
       <div class="footer">
         <img class="image" src="@/assets/nths/create-team.png" aria-hidden />
       </div>
@@ -95,6 +97,9 @@ async function createTeam() {
 }
 .content {
   padding: 32px;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
 }
 .footer {
   display: flex;
@@ -118,5 +123,9 @@ async function createTeam() {
   @include breakpoint-below('large') {
     flex-direction: column;
   }
+}
+
+.error {
+  color: $c-error-red;
 }
 </style>

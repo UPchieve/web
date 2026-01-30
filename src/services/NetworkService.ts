@@ -1403,4 +1403,10 @@ export default {
       this._errorHandler
     )
   },
+  editNTHSGroup({ groupId, name }: { groupId: string; name: string }) {
+    return httpPut(`${API_ROOT}/nths-groups/${groupId}`, { name }).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

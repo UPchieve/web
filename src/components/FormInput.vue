@@ -29,6 +29,7 @@
       :max="maxValue"
       :min="minValue"
       :disabled="readOnly"
+      v-bind="$attrs"
     />
   </div>
 </template>

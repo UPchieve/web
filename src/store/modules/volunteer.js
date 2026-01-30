@@ -37,6 +37,13 @@ export default {
     setNTHSGroupMembers: (state, data) => {
       state.NTHSGroupMembers[data.groupId] = data.groupMembers
     },
+    setNTHSGroupName: (state, { groupId, groupName }) => {
+      const group = state.NTHSGroups.find((g) => g.groupId === groupId)
+      if (group) {
+        const updatedGroup = { ...group, groupName }
+        state.NTHSGroups = [updatedGroup]
+      }
+    },
   },
   actions: {
     async fetchNTHSGroupsForUser({ commit }) {
