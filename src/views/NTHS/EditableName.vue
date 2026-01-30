@@ -4,6 +4,7 @@ import NetworkService from '@/services/NetworkService'
 import { isErrorWithResponse } from '@/utils/error-utils'
 import { nextTick, ref } from 'vue'
 import { useStore } from 'vuex'
+import Pencil from '@/assets/pencil.svg'
 
 const store = useStore()
 const props = defineProps<{ groupName: string; groupId: string }>()
@@ -92,13 +93,15 @@ async function saveGroupName() {
     </form>
     <div class="name-container" v-else>
       <span class="name">{{ props.groupName }}</span>
-      <button class="name-button" @click="editGroupName">edit</button>
+      <button class="name-button" @click="editGroupName">
+        <Pencil class="pencil" />
+      </button>
     </div>
     <div class="error" v-if="errorMessage.length">{{ errorMessage }}</div>
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .container {
   display: flex;
   flex-direction: column;
@@ -144,5 +147,14 @@ async function saveGroupName() {
 }
 .error {
   color: $c-error-red;
+}
+.pencil {
+  height: 16px;
+  width: auto;
+  transform: scaleX(-1);
+}
+.pencil :deep(path) {
+  stroke-width: 2px;
+  stroke: black;
 }
 </style>
