@@ -68,7 +68,7 @@
           text="Favorite Coaches"
           id="favorite-coaches-sidebar-link"
         >
-          <heart-icon class="icon heart-icon" />
+          <star-icon class="icon star-icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -181,7 +181,7 @@ import ClockIcon from '@/assets/icons/clock_icon.svg'
 import FolderIcon from '@/assets/icons/folder_icon.svg'
 import GraduationCapIcon from '@/assets/icons/graduation_cap_icon.svg'
 import HandWaveIcon from '@/assets/icons/hand-wave.svg'
-import HeartIcon from '@/assets/icons/heart_icon.svg'
+import StarIcon from '@/assets/icons/star_icon.svg'
 import HomeIcon from '@/assets/icons/home_icon.svg'
 import ReferFriendIcon from '@/assets/icons/refer_friend_icon.svg'
 import GroupsIcon from '@/assets/icons/groups_icon.svg'
@@ -205,7 +205,7 @@ export default {
     FolderIcon,
     GraduationCapIcon,
     HandWaveIcon,
-    HeartIcon,
+    StarIcon,
     AiTutorButton,
     HomeIcon,
     ReferFriendIcon,
@@ -375,9 +375,8 @@ export default {
 }
 // Order here matters - we want to set fill to none for
 // the heart icon.
-:deep(.SidebarLink--active .heart-icon path) {
-  fill: none;
-  stroke: $c-success-green;
+:deep(.SidebarLink--active .star-icon path) {
+  fill: $c-success-green;
 }
 
 :deep(.SidebarLink--active .compass-icon path) {

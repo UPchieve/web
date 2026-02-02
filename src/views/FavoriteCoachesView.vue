@@ -42,7 +42,7 @@
         </li>
       </ul>
       <div v-else class="favorite-coaches__no-coaches">
-        <heart-icon class="heart-icon" />
+        <star-icon class="star-icon" />
         <h2 class="secondary-header">You can now favorite a coach!</h2>
         <p class="favorite-coaches__no-coaches-description">
           Favoriting a coach will increase your chances of matching with them in
@@ -93,7 +93,7 @@ import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import NetworkService from '@/services/NetworkService'
 import CaretIcon from '@/assets/caret.svg'
 import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
-import HeartIcon from '@/assets/icons/heart_icon.svg'
+import StarIcon from '@/assets/icons/star_icon.svg'
 
 export default {
   name: 'favorite-coaches-view',
@@ -101,7 +101,7 @@ export default {
     FavoritingToggle,
     CaretIcon,
     CoachIcon,
-    HeartIcon,
+    StarIcon,
   },
   data() {
     return {
@@ -368,7 +368,7 @@ ul {
   }
 }
 
-.heart-icon {
+.star-icon {
   width: 40px;
   height: 40px;
   margin: 1em 0;

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import HeartIcon from '@/assets/icons/heart_icon.svg'
+import StarIcon from '@/assets/icons/star_icon.svg'
 
 const store = useStore()
 const props = defineProps<{
@@ -17,7 +17,7 @@ const sessionPartner = computed(() => store.getters['user/sessionPartner'])
     <div>
       <div class="name">
         {{ sessionPartner.firstname }}
-        <HeartIcon class="heart-icon" v-if="props.isFavoriteVolunteer" />
+        <StarIcon class="star-icon" v-if="props.isFavoriteVolunteer" />
       </div>
       <div class="status">
         {{ props.partnerPresence }}
@@ -66,10 +66,13 @@ const sessionPartner = computed(() => store.getters['user/sessionPartner'])
   font-weight: 400;
 }
 
-.heart-icon {
-  stroke: $c-active-heart;
-  fill: $c-active-heart;
+.star-icon {
   width: 20px;
   height: 20px;
+}
+
+:deep(.star-icon path) {
+  fill: $c-success-green;
+  stroke: $c-success-green;
 }
 </style>

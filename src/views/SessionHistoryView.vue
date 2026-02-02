@@ -176,7 +176,6 @@
                   <div class="mobile-session-list__partner-name-container">
                     <favoriting-toggle
                       v-if="isStudent"
-                      class="heart"
                       :initialIsFavorite="session.isFavorited"
                       :volunteerName="session.volunteerFirstName"
                       :volunteerId="session.volunteerId"

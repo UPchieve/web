@@ -1,6 +1,6 @@
 <template>
   <div>
-    <heart-icon
+    <star-icon
       :class="favoritedStatus.class"
       v-on:click="toggleFavoritedStatus"
     />
@@ -18,14 +18,14 @@
 </template>
 
 <script>
-import HeartIcon from '@/assets/icons/heart_icon.svg'
+import StarIcon from '@/assets/icons/star_icon.svg'
 import VolunteerUnfavoritingModal from '@/views/VolunteerUnfavoritingModal.vue'
 import FavoritedListFullModal from '@/views/FavoritedListFullModal.vue'
 import NetworkService from '@/services/NetworkService'
 
 export default {
   name: 'favoriting-toggle',
-  components: { HeartIcon, VolunteerUnfavoritingModal, FavoritedListFullModal },
+  components: { StarIcon, VolunteerUnfavoritingModal, FavoritedListFullModal },
   props: {
     initialIsFavorite: {
       type: Boolean,
@@ -101,7 +101,7 @@ export default {
   computed: {
     favoritedStatus() {
       const status = {
-        class: 'heart-icon',
+        class: 'star-icon',
       }
 
       if (this.isFavorite) {
@@ -116,14 +116,15 @@ export default {
 </script>
 
 <style lang="scss">
-.heart-icon {
+.star-icon {
   &-favorited {
     cursor: pointer;
-    fill: $c-shadow-warn;
+    fill: $c-success-green;
     transition: all 0.3s ease-in-out;
 
     & path {
-      stroke: $c-shadow-warn;
+      stroke: $c-success-green;
+      fill: $c-success-green;
     }
 
     &:active {
@@ -131,8 +132,8 @@ export default {
     }
 
     &:hover path {
-      stroke: $c-active-heart;
-      fill: $c-active-heart;
+      stroke: $c-success-green;
+      fill: $c-success-green;
     }
   }
 
@@ -141,7 +142,7 @@ export default {
     transition: all 0.3s ease-in-out;
 
     &:hover path {
-      stroke: $c-active-heart;
+      stroke: $c-success-green;
     }
 
     &:active {
