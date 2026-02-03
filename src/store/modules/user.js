@@ -537,15 +537,17 @@ export default {
         !state.user.isOnboarded &&
         getters.isVolunteer &&
         !getters.hasASubjectCertification &&
-        !getters.userRoles.includes('student')
+        !getters.hasStudentRole
       )
     },
 
     isInStudentVolunteerVerifyFlow: (state, getters) => {
+      const hasNotVerifiedPhoneNumber =
+        !state.user.phone || !state.user.phoneVerified
       return (
-        getters.isVolunteer && // in volunteer mode
-        getters.userRoles.includes('student') && // but also a student account
-        (!state.user.phone || !state.user.phoneVerified) // unverified phone number
+        getters.isStudentVolunteer &&
+        getters.isVolunteer &&
+        hasNotVerifiedPhoneNumber
       )
     },
 

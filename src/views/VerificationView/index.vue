@@ -15,13 +15,8 @@
           <SwitchAccountModeButton />
         </div>
       </div>
-      <verification-method-selector
-        v-if="
-          step === 1 &&
-          (isSmsVerificationEnabled ||
-            isStudentVolunteerVerification ||
-            isForceSmsVerificationEnabled)
-        "
+      <VerificationMethodSelector
+        v-if="step === 1 && userCanChooseVerificationMethod"
         data-testid="verification-method-selector"
         :email="user.email"
         v-model="verificationInputs"
@@ -156,8 +151,15 @@ export default {
     }
   },
   computed: {
+    userCanChooseVerificationMethod() {
+      return (
+        this.isSmsVerificationEnabled ||
+        this.isStudentVolunteerVerification ||
+        this.isForceSmsVerificationEnabled
+      )
+    },
     isStudentVolunteerVerification() {
-      return this.isStudentVolunteer && this.isStudentsBecomeVolunteersEnabled
+      return this.isStudentVolunteer && this.isVolunteer
     },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
@@ -175,6 +177,7 @@ export default {
       isForceSmsVerificationEnabled:
         'featureFlags/isForceSmsVerificationEnabled',
       userType: 'user/userType',
+      isVolunteer: 'user/isVolunteer',
       isStudentVolunteer: 'user/isStudentVolunteer',
       mobileMode: 'app/mobileMode',
     }),
@@ -249,6 +252,7 @@ export default {
           const userUpdates = { verified: true }
           if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
             userUpdates.phoneVerified = true
+            userUpdates.phone = this.sendTo
             AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
             if (
               this.user.userType === 'student' &&
@@ -266,8 +270,10 @@ export default {
             userUpdates.emailVerified = true
             AnalyticsService.captureEvent(EVENTS.EMAIL_VERIFIED)
           }
-          if (!this.isStudentVolunteer)
+          if (!this.isStudentVolunteer) {
             await this.$store.dispatch('user/firstDashboardVisit', true)
+          }
+
           await this.$store.dispatch('user/addToUser', userUpdates)
 
           if (this.isAutoFlowUser) {

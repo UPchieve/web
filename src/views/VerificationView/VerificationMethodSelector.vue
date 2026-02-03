@@ -1,6 +1,9 @@
 <template>
   <div id="verification-method-selector__container">
-    <fieldset v-if="!forceSmsVerification">
+    <fieldset
+      v-if="!forceSmsVerification"
+      data-testid="fieldset-verification-options"
+    >
       <legend>How would you like to receive your verification code?</legend>
       <div class="radio-options">
         <div id="email-radio" class="radio-option">
