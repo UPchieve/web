@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import InviteLink from '@/components/NTHSGroup/InviteLink.vue'
+import InviteLink from '@/components/NTHS/InviteLink.vue'
 import Spinner from '@/components/Spinner.vue'
 import config from '@/config'
 import { computed, onBeforeMount, ref } from 'vue'
 import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
-import type { ManageTeamModalProps } from '@/views/NTHS/ManageTeamModal.vue'
+import type { ManageTeamModalProps } from '@/components/NTHS/ManageTeamModal.vue'
 import ModalService from '@/services/ModalService'
-import EditableName from './EditableName.vue'
+import EditableName from '@/components/NTHS/EditableName.vue'
+import Checklist from '@/components/NTHS/Checklist.vue'
 
 const store = useStore()
 const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
@@ -16,10 +17,11 @@ const groupMembers = computed(
 )
 const code = computed(() => group.value?.inviteCode)
 const isLoaded = ref(false)
-const isGroupAdmin = computed(() => {
-  return group.value?.roleName === 'admin'
-})
+const isGroupAdmin = computed(() => group.value?.roleName === 'admin')
 const isFetchingGroupMembers = ref<boolean>(true)
+const groupActions = computed(() => store.state.volunteer.NTHSGroupActions)
+const actions = computed(() => store.state.volunteer.NTHSActions ?? [])
+const checklist = computed(() => store.getters['volunteer/NTHSChecklist'])
 
 onBeforeMount(async () => {
   if (!group.value) {
@@ -31,6 +33,8 @@ onBeforeMount(async () => {
     await store.dispatch('volunteer/fetchNTHSGroupMembers', group.value.groupId)
   }
   isFetchingGroupMembers.value = false
+
+  await store.dispatch('volunteer/fetchNTHSGroupActions', group.value.groupId)
 })
 
 const userManagementModalProps = computed(
@@ -57,7 +61,11 @@ function onLeaveTeam() {
   <div class="container">
     <div class="header">
       <div class="header-main-info">
-        <EditableName :groupName="group.groupName" :groupId="group.groupId" />
+        <EditableName
+          :groupName="group.groupName"
+          :groupId="group.groupId"
+          :isGroupAdmin="isGroupAdmin"
+        />
         <InviteLink v-if="code" :code="code" />
       </div>
       <LargeButton
@@ -78,6 +86,15 @@ function onLeaveTeam() {
         class="team-action-button"
         >Leave team</LargeButton
       >
+    </div>
+
+    <div class="check-list-container" v-if="isGroupAdmin && checklist.length">
+      <Checklist
+        :groupId="group.groupId"
+        :actions="actions"
+        :groupActions="groupActions"
+        :checklist="checklist"
+      />
     </div>
     <div class="container">
       <iframe
@@ -119,6 +136,11 @@ function onLeaveTeam() {
   justify-content: center;
   align-items: start;
   gap: 12px;
+}
+.check-list-container {
+  padding: 0 20px;
+  display: grid;
+  gap: 8px;
 }
 .iframe {
   border: none;

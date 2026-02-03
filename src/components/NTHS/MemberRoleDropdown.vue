@@ -2,11 +2,10 @@
 import { computed, ref } from 'vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { startCase } from 'lodash-es'
-import type { Role } from '@/views/NTHS/NTHSGroupsView.vue'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import { useStore } from 'vuex'
-import type { GroupMember } from '@/types/nths-types'
+import type { GroupMember, Role } from '@/services/NTHSGroupService'
 
 type DisplayRole = 'Admin' | 'Member'
 const store = useStore()

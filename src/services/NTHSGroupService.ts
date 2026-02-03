@@ -1,0 +1,72 @@
+import store from '@/store'
+import NetworkService from './NetworkService'
+
+export type Role = 'admin' | 'member'
+export type GroupMember = {
+  userId: string
+  nthsGroupId: string
+  title: string | null
+  roleName: Role
+  firstName: string
+  lastInitial: string
+}
+
+export const actionsCtaMap = {
+  'NAMED YOUR TEAM': 'Name your team',
+  'REVIEWED RESOURCES': 'Review UPchieve resources',
+  'ATTENDED ORIENTATION': 'Attend orientation',
+}
+export type NTHSActionName =
+  | 'NAMED YOUR TEAM'
+  | 'REVIEWED RESOURCES'
+  | 'ATTENDED ORIENTATION'
+
+export enum CheckboxStatus {
+  Done = 'done',
+  NotDone = 'not-done',
+  Saving = 'saving',
+}
+
+export type GroupAction = {
+  id: number
+  groupId: string
+  actionId: number
+  createdAt: Date
+  actionName: NTHSActionName
+}
+
+export type ChecklistItem = {
+  text: string
+  status: CheckboxStatus
+  actionId: number
+  actionName: NTHSActionName
+}
+
+export async function toggleCheckbox({
+  checklist,
+  item,
+  groupActions,
+  groupId,
+}: {
+  checklist: ChecklistItem[]
+  item: ChecklistItem
+  groupActions: GroupAction[]
+  groupId: string
+}) {
+  const i = checklist.find(({ text }) => text === item.text)
+  if (i) {
+    try {
+      store.dispatch('volunteer/appendToChecksInFlight', i.actionId)
+      let result
+      if (!groupActions.some(({ actionId }) => actionId === i.actionId)) {
+        result = await NetworkService.createActionForNTHSGroup(
+          groupId,
+          i.actionName
+        )
+        store.dispatch('volunteer/addNTHSGroupAction', result.data.action)
+      }
+    } finally {
+      store.dispatch('volunteer/removeFromChecksInFlight', i.actionId)
+    }
+  }
+}

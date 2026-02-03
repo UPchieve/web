@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import store from '@/store'
 import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
-import type { ManageTeamModalProps } from '@/views/NTHS/ManageTeamModal.vue'
+import type { ManageTeamModalProps } from '@/components/NTHS/ManageTeamModal.vue'
 import type { RemoveMemberConfirmationProps } from '@/views/NTHS/RemoveMemberConfirmation.vue'
 
 type ModalTemplateProps = {

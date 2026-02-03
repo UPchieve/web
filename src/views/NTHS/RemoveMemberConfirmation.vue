@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { GroupMember } from '@/types/nths-types'
+import type { GroupMember } from '@/services/NTHSGroupService'
 import LargeButton from '@/components/LargeButton.vue'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'

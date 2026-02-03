@@ -5,6 +5,7 @@ import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
 import type { Session } from '@/services/SessionService'
+import type { NTHSActionName } from './NTHSGroupService'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -1408,5 +1409,15 @@ export default {
       this._successHandler,
       this._errorHandler
     )
+  },
+  getActionsForNTHSGroup(groupId: string) {
+    return httpGet(`${API_ROOT}/nths-groups/${groupId}/actions`).catch(
+      this._axiosErrorHandler
+    )
+  },
+  createActionForNTHSGroup(groupId: string, action: NTHSActionName) {
+    return httpPost(`${API_ROOT}/nths-groups/${groupId}/actions`, {
+      action,
+    }).then(this._successHandler, this._errorHandler)
   },
 }

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import MemberRoleDropdown from '@/views/NTHS/MemberRoleDropdown.vue'
+import MemberRoleDropdown from '@/components/NTHS/MemberRoleDropdown.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { useStore } from 'vuex'
-import type { GroupMember } from '@/types/nths-types'
+import type { GroupMember } from '@/services/NTHSGroupService'
 import Loader from '@/components/Loader.vue'
 import InitialsAvatar from '@/components/InitialsAvatar.vue'
 import { computed, ref } from 'vue'

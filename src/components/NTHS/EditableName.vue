@@ -7,7 +7,11 @@ import { useStore } from 'vuex'
 import Pencil from '@/assets/pencil.svg'
 
 const store = useStore()
-const props = defineProps<{ groupName: string; groupId: string }>()
+const props = defineProps<{
+  groupName: string
+  groupId: string
+  isGroupAdmin: boolean
+}>()
 
 const isEditingName = ref(false)
 const newGroupName = ref(props.groupName)
@@ -93,7 +97,7 @@ async function saveGroupName() {
     </form>
     <div class="name-container" v-else>
       <span class="name">{{ props.groupName }}</span>
-      <button class="name-button" @click="editGroupName">
+      <button v-if="isGroupAdmin" class="name-button" @click="editGroupName">
         <Pencil class="pencil" />
       </button>
     </div>
