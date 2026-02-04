@@ -183,16 +183,9 @@ export default {
         router.push('/')
       })
 
-      socket.on(
-        'session-change',
-        (sessionData: any, ack: ({ userId }: { userId: string }) => void) => {
-          if (ack) {
-            //acknowledge socket event was received
-            ack({ userId: rootState.user.user?.id })
-          }
-          dispatch('user/updateSession', sessionData, { root: true })
-        }
-      )
+      socket.on('session-change', (sessionData: any) => {
+        dispatch('user/updateSession', sessionData, { root: true })
+      })
 
       socket.on('sessions', async (sessions: any[]) => {
         if (rootGetters['user/isVolunteer']) {
