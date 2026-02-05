@@ -127,9 +127,9 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="(isVolunteer && isMemberOfNTHSGroup) || showCreateNTHSGroupLink"
+          v-if="isVolunteer && (isMemberOfNTHSGroup || showCreateNTHSGroupLink)"
           :to="showCreateNTHSGroupLink ? '/groups/create' : '/groups'"
-          text="My Team"
+          text="NTHS Team"
           id="nths-group-sidebar-link"
         >
           <groups-icon class="icon" />
