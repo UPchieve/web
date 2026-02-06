@@ -47,7 +47,7 @@ const INVITE_FRIEND_LINK = {
 }
 const COMMUNITY_LINK = {
   // This link changes. Just match the consistent portion.
-  to: 'https://upchieveaccommunity.slack.com/join/shared_invite/',
+  to: 'https://join.slack.com/t/upchieveaccommunity/shared_invite/',
   text: 'Community',
 }
 // Admin links

@@ -156,7 +156,7 @@
         </sidebar-link>
         <sidebar-link
           v-if="isVolunteer && showSlackButton"
-          to="https://upchieveaccommunity.slack.com/join/shared_invite/zt-3ddtu0s8n-0GTFhvj674v_BTXnc8tlmQ"
+          to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-3bll0cv7l-ch0bCD4nVqk7n34sq4KkIg"
           text="Community"
           :openNewTab="true"
           id="community-sidebar-link"
