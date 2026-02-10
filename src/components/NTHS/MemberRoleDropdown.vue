@@ -19,10 +19,14 @@ const props = defineProps<{
   }
 }>()
 
+function toDisplayRole(role: Role): DisplayRole {
+  return startCase(role) as DisplayRole
+}
+
 const isLoading = ref<boolean>(false)
-const selectedRole = ref<DisplayRole>(startCase(props.groupMember.roleName))
+const selectedRole = ref<DisplayRole>(toDisplayRole(props.groupMember.roleName))
 const placeholder = computed(() =>
-  isLoading.value ? 'Updating...' : startCase(props.groupMember.roleName)
+  isLoading.value ? 'Updating...' : toDisplayRole(props.groupMember.roleName)
 )
 const emit = defineEmits<{
   (e: 'error', error: any): void
@@ -68,8 +72,9 @@ async function onChangeRole(newRole: DisplayRole) {
     name="Role"
     :options="roleOptions"
     :placeholder="placeholder"
-    :modelValue="selectedRole"
+    :modelValue="isLoading ? placeholder : selectedRole"
     @update:modelValue="onChangeRole"
+    :disabled="isLoading"
   />
 </template>
 

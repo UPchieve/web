@@ -1,23 +1,33 @@
-<script lang="ts" setup>
-import MemberRoleDropdown from '@/components/NTHS/MemberRoleDropdown.vue'
-import LargeButton from '@/components/LargeButton.vue'
-import { useStore } from 'vuex'
-import type { GroupMember } from '@/services/NTHSGroupService'
-import Loader from '@/components/Loader.vue'
+<script setup lang="ts">
 import InitialsAvatar from '@/components/InitialsAvatar.vue'
-import { computed, ref } from 'vue'
-import RemoveMemberConfirmation from '@/views/NTHS/RemoveMemberConfirmation.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import MemberRoleDropdown from '@/components/NTHS/MemberRoleDropdown.vue'
+import type { GroupMember } from '@/services/NTHSGroupService'
+import { computed, onBeforeMount, ref } from 'vue'
+import { useStore } from 'vuex'
+import Loader from '@/components/Loader.vue'
+import ModalService from '@/services/ModalService'
 
-export type ManageTeamModalProps = {
-  groupId: string
-  isLoading: boolean
-}
-
-const props = defineProps<ManageTeamModalProps>()
 const store = useStore()
+const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
+const isFetchingGroupMembers = ref<boolean>(true)
+const groupMembers = computed(
+  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupId]
+)
+
+const groupId = computed(() => group.value?.groupId)
+const isLoading = computed(() => isFetchingGroupMembers.value)
+
+onBeforeMount(async () => {
+  isFetchingGroupMembers.value = true
+  if (!groupMembers.value && group.value) {
+    await store.dispatch('volunteer/fetchNTHSGroupMembers', group.value.groupId)
+  }
+  isFetchingGroupMembers.value = false
+})
 
 const membersExcludingCurrentUser = computed(() =>
-  store.state.volunteer.NTHSGroupMembers[props.groupId].filter(
+  store.state.volunteer.NTHSGroupMembers[groupId.value].filter(
     (member: any) => !isCurrentUser(member.userId)
   )
 )
@@ -36,26 +46,23 @@ function onUpdateError(user: string) {
   errorMessage.value = `Something went wrong while updating settings for user ${user}. Please refresh the page and try again.`
 }
 
-const page = ref<'remove-member' | 'view-team'>('view-team')
-const pageTitle = computed(() =>
-  page.value === 'remove-member' ? 'Remove team member' : 'Manage team members'
-)
 const memberToRemove = ref<GroupMember | null>(null)
+
 async function showRemoveTeamMemberConfirmation(member: GroupMember) {
   memberToRemove.value = member
-  page.value = 'remove-member'
+  ModalService.showNthsUserManagementModal({
+    isLoading: isLoading.value,
+    memberToRemove: memberToRemove.value,
+    onRemoved: onRemovedMember,
+    onCancel: onCancelRemoveMember,
+    isRemovingSelf: false,
+  })
 }
 function onCancelRemoveMember() {
   memberToRemove.value = null
-  page.value = 'view-team'
 }
 async function onRemovedMember() {
   memberToRemove.value = null
-  page.value = 'view-team'
-}
-
-function closeModal() {
-  store.dispatch('app/modal/hide')
 }
 
 const removeText = computed(() => {
@@ -65,15 +72,13 @@ const removeText = computed(() => {
   return 'Remove from team'
 })
 </script>
-
 <template>
-  <div class="main-container">
-    <h1>{{ pageTitle }}</h1>
+  <div class="container">
     <div v-if="errorMessage" class="error-container">
       {{ errorMessage }}
     </div>
-    <Loader v-if="props.isLoading" />
-    <div class="member-grid" v-else-if="page === 'view-team'">
+    <Loader v-if="isLoading" />
+    <div class="member-grid" v-else>
       <div class="table-heading name">Name</div>
       <div class="table-heading status">Status</div>
       <div class="table-heading remove"></div>
@@ -120,22 +125,13 @@ const removeText = computed(() => {
         </div>
       </div>
     </div>
-    <RemoveMemberConfirmation
-      v-else
-      :memberToRemove="memberToRemove!"
-      @removed="onRemovedMember"
-      @cancel="onCancelRemoveMember"
-      :isRemovingSelf="false"
-    />
-    <div class="buttons-container" v-if="page === 'view-team'">
-      <LargeButton variant="secondary" :showArrow="false" @click="closeModal"
-        >Close</LargeButton
-      >
-    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.container {
+  padding: 0 20px;
+}
 h1 {
   @include font-category('display-small');
   padding-bottom: 24px;
@@ -146,6 +142,8 @@ h1 {
   grid-template-columns: [name] 1fr [status] 1fr [remove];
   border: 1px solid $c-border-grey;
   border-radius: 8px;
+  width: 100%;
+  background-color: white;
 
   @include breakpoint-below('small') {
     grid-template-columns: [name] minmax(0, 0.5fr) [status] 1fr [remove] minmax(

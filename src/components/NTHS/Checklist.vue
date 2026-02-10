@@ -6,6 +6,7 @@ import {
   toggleCheckbox,
   CheckboxStatus,
 } from '@/services/NTHSGroupService'
+import Card from './Card.vue'
 
 const props = defineProps<{
   groupId: string
@@ -17,8 +18,8 @@ const checkboxDimensions = 20
 </script>
 
 <template>
-  <div class="checklist">
-    <h4 class="title">Onboarding Checklist</h4>
+  <Card>
+    <template v-slot:header>Onboarding Checklist</template>
     <div v-for="item in checklist" :key="item.text">
       <label class="row">
         <Spinner
@@ -48,25 +49,12 @@ const checkboxDimensions = 20
         {{ item.text }}</label
       >
     </div>
-  </div>
+  </Card>
 </template>
 
 <style scoped lang="scss">
 :deep() {
   --checkbox-dimensions: v-bind(`${checkboxDimensions}px`);
-}
-.title {
-  padding: 0.5em 1em;
-  border-bottom: rgb(224, 224, 224) 1px solid;
-  line-height: 1.11em;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.checklist {
-  background-color: white;
-  border-radius: 4px;
-  border: rgb(224, 224, 224) 1px solid;
 }
 .row {
   padding: 0.25em 1em;

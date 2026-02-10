@@ -1,121 +1,114 @@
 <script setup lang="ts">
 import InviteLink from '@/components/NTHS/InviteLink.vue'
-import Spinner from '@/components/Spinner.vue'
-import config from '@/config'
-import { computed, onBeforeMount, ref } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
-import LargeButton from '@/components/LargeButton.vue'
-import type { ManageTeamModalProps } from '@/components/NTHS/ManageTeamModal.vue'
-import ModalService from '@/services/ModalService'
-import EditableName from '@/components/NTHS/EditableName.vue'
 import Checklist from '@/components/NTHS/Checklist.vue'
+import { RouterLink, RouterView } from 'vue-router'
+import LargeButton from '@/components/LargeButton.vue'
 
 const store = useStore()
 const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
-const groupMembers = computed(
-  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupId]
-)
 const code = computed(() => group.value?.inviteCode)
-const isLoaded = ref(false)
 const isGroupAdmin = computed(() => group.value?.roleName === 'admin')
-const isFetchingGroupMembers = ref<boolean>(true)
 const groupActions = computed(() => store.state.volunteer.NTHSGroupActions)
 const actions = computed(() => store.state.volunteer.NTHSActions ?? [])
 const checklist = computed(() => store.getters['volunteer/NTHSChecklist'])
 
 onBeforeMount(async () => {
-  if (!group.value) {
-    // This is fetched in SidebarLinks, but if you refresh the page starting here, there's no guarantee that component
-    // gets rendered before this one.
-    await store.dispatch('volunteer/fetchNTHSGroupsForUser')
-  }
-  if (!groupMembers.value && group.value) {
-    await store.dispatch('volunteer/fetchNTHSGroupMembers', group.value.groupId)
-  }
-  isFetchingGroupMembers.value = false
-
   await store.dispatch('volunteer/fetchNTHSGroupActions', group.value.groupId)
 })
-
-const userManagementModalProps = computed(
-  (): ManageTeamModalProps => ({
-    groupId: group.value?.groupId,
-    isLoading: isFetchingGroupMembers.value,
-  })
-)
-
-const currentGroupMember = computed(() =>
-  groupMembers.value?.find(
-    (member: any) => member.userId === store.state.user.user.id
-  )
-)
-function onLeaveTeam() {
-  ModalService.showLeaveTeamModal({
-    isRemovingSelf: true,
-    memberToRemove: currentGroupMember.value,
-  })
-}
 </script>
 
 <template>
   <div class="container">
-    <div class="header">
+    <div class="header shrink center">
       <div class="header-main-info">
-        <EditableName
-          :groupName="group.groupName"
-          :groupId="group.groupId"
-          :isGroupAdmin="isGroupAdmin"
-        />
+        <span class="name">{{ group.groupName }}</span>
+      </div>
+      <div class="link">
         <InviteLink v-if="code" :code="code" />
       </div>
-      <LargeButton
-        v-if="isGroupAdmin"
-        @click="
-          () =>
-            ModalService.showNthsUserManagementModal(userManagementModalProps)
-        "
-        class="team-action-button"
-        variant="primary-blue"
-        :showArrow="false"
-        >Manage team</LargeButton
-      >
-      <LargeButton
-        variant="danger"
-        @click="onLeaveTeam"
-        :showArrow="false"
-        class="team-action-button"
-        >Leave team</LargeButton
-      >
     </div>
-
-    <div class="check-list-container" v-if="isGroupAdmin && checklist.length">
+    <div class="actions row shrink center">
       <Checklist
+        v-if="isGroupAdmin && checklist.length"
         :groupId="group.groupId"
         :actions="actions"
         :groupActions="groupActions"
         :checklist="checklist"
       />
+      <LargeButton
+        v-if="isGroupAdmin"
+        target="_blank"
+        rel="noopener noreferrer"
+        routeTo="https://drive.google.com/drive/folders/1ci0PfM_miToxUF1WNzmWK4r-EiJ8juCI?usp=sharing"
+        >Review NTHS Resources
+      </LargeButton>
     </div>
-    <div class="container">
-      <iframe
-        v-if="Boolean(group?.groupId)"
-        ref="iframe"
-        class="iframe"
-        :class="isLoaded ? '' : 'hide'"
-        :src="`${config.NTHSRetoolDashboardUrl}?groupId=${group.groupId}`"
-        width="100%"
-        height="100%"
-        loading="lazy"
-        :onload="() => (isLoaded = true)"
-      />
-      <div class="spinner-container" v-if="!isLoaded">
-        <Spinner />
-      </div>
+    <nav class="tabs shrink center">
+      <RouterLink class="tab" activeClass="active" to="/groups/dashboard">
+        Dashboard
+      </RouterLink>
+      <RouterLink
+        v-if="isGroupAdmin"
+        activeClass="active"
+        class="tab"
+        to="/groups/manage-team"
+      >
+        Manage Team
+      </RouterLink>
+      <RouterLink class="tab" activeClass="active" to="/groups/settings">
+        Settings
+      </RouterLink>
+    </nav>
+    <div class="grow tab-content center">
+      <RouterView />
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.container {
+  --spacing: 1em;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  gap: var(--spacing);
+  overflow: auto;
+}
+.center {
+  max-width: 1200px;
+  margin: auto;
+}
+.tabs {
+  flex-shrink: 1;
+  width: 100%;
+  z-index: 1;
+  border-bottom: 4px solid $border-grey;
+  gap: 1em;
+  display: flex;
+  padding-left: var(--spacing);
+  padding-right: var(--spacing);
+}
+.tab {
+  display: inline-block;
+  padding-bottom: 0.8em;
+  margin-bottom: -4px;
+  color: black;
+}
+.tab-content {
+  width: 100%;
+  padding: var(--spacing);
+}
+.active {
+  font-weight: 500;
+  border-bottom: 4px solid $c-success-green;
+}
+
 .spinner-container {
   flex-grow: 1;
   display: flex;
@@ -123,49 +116,60 @@ function onLeaveTeam() {
   align-items: center;
   justify-content: center;
 }
-.hide {
-  width: 0;
-  height: 0;
-  opacity: 0;
-}
-.container {
+
+.row {
   width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: start;
-  gap: 12px;
+  padding: 24px;
 }
+
+.actions {
+  flex-wrap: wrap-reverse;
+  gap: 24px;
+}
+
 .check-list-container {
-  padding: 0 20px;
   display: grid;
   gap: 8px;
 }
-.iframe {
-  border: none;
-}
 .header {
-  display: flex;
-  flex-direction: column;
   width: 100%;
   padding: 1em 1em 0 1em;
-  gap: 8px;
-  @include breakpoint-below('large') {
-    flex-direction: column;
-  }
+  gap: 24px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 .header-main-info {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
-
-  @include breakpoint-below('small') {
-    flex-direction: column;
-  }
+}
+.link {
+  flex-grow: 1;
 }
 .team-action-button {
   margin-left: auto;
+}
+.buttons {
+  display: flex;
+  justify-content: end;
+  gap: 12px;
+}
+
+.grow {
+  flex-grow: 1;
+}
+.shrink {
+  flex-shrink: 1;
+}
+.name {
+  font-size: 24px;
+  font-weight: 800;
+  padding: 0 0 0 4px;
+  margin-right: 8px;
 }
 </style>

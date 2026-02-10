@@ -75,6 +75,9 @@ import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashb
 import JourneysView from './views/JourneysView.vue'
 import NTHSGroupsView from './views/NTHS/NTHSGroupsView.vue'
 import NTHSCreateGroupView from './views/NTHS/NTHSCreateGroupView.vue'
+import NTHSGroupDashboardView from './views/NTHS/Tabs/NTHSGroupDashboardView.vue'
+import NTHSManageTeamView from './views/NTHS/Tabs/NTHSManageTeamView.vue'
+import NTHSSettingsView from './views/NTHS/Tabs/NTHSSettingsView.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -621,12 +624,17 @@ const routes = [
     name: 'NTHSGroupsView',
     component: NTHSGroupsView,
     meta: { protected: true },
-    beforeEnter: (_to, _from, next) => {
+    beforeEnter: async (_to, _from, next) => {
       if (store.getters['featureFlags/isNTHSGroupsPageEnabled']) {
         if (store.state.volunteer.NTHSGroups?.length > 0) {
           next()
         } else if (store.getters['featureFlags/userIsApprovedNTHSPresident']) {
-          next('/groups/create')
+          await store.dispatch('volunteer/fetchNTHSGroupsForUser')
+          if (store.state.volunteer.NTHSGroups?.length > 0) {
+            next()
+          } else {
+            next('/groups/create')
+          }
         } else {
           next('/dashboard')
         }
@@ -634,6 +642,24 @@ const routes = [
         next('/dashboard')
       }
     },
+    children: [
+      {
+        path: '/groups/dashboard',
+        name: 'NTHSGroupDashboardView',
+        component: NTHSGroupDashboardView,
+      },
+      {
+        path: '/groups/manage-team',
+        name: 'NTHSManageTeamView',
+        component: NTHSManageTeamView,
+      },
+      {
+        path: '/groups/settings',
+        name: 'NTHSSettingsView',
+        component: NTHSSettingsView,
+      },
+      { path: '', redirect: '/groups/dashboard' },
+    ],
   },
   {
     path: '/:pathMatch(.*)*',

@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import store from '@/store'
 import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
-import type { ManageTeamModalProps } from '@/components/NTHS/ManageTeamModal.vue'
+import type { RemoveTeamMemberModalProps } from '@/components/NTHS/RemoveTeamMemberModal.vue'
 import type { RemoveMemberConfirmationProps } from '@/views/NTHS/RemoveMemberConfirmation.vue'
 
 type ModalTemplateProps = {
@@ -59,9 +59,9 @@ export default {
     })
   },
 
-  showNthsUserManagementModal(props: ManageTeamModalProps) {
+  showNthsUserManagementModal(props: RemoveTeamMemberModalProps) {
     show(
-      'ManageTeamModal',
+      'RemoveTeamMemberModal',
       {
         showAccept: false,
         showSeparator: false,

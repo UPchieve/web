@@ -4,13 +4,12 @@ import NetworkService from '@/services/NetworkService'
 import { isErrorWithResponse } from '@/utils/error-utils'
 import { nextTick, ref } from 'vue'
 import { useStore } from 'vuex'
-import Pencil from '@/assets/pencil.svg'
+import LargeButton from '../LargeButton.vue'
 
 const store = useStore()
 const props = defineProps<{
   groupName: string
   groupId: string
-  isGroupAdmin: boolean
 }>()
 
 const isEditingName = ref(false)
@@ -65,100 +64,111 @@ async function saveGroupName() {
 </script>
 
 <template>
-  <div class="container">
+  <div class="editable-name">
+    <label class="label">Team name</label>
     <form
       class="name-form"
-      v-if="isEditingName"
       @keydown.esc="cancel"
       @submit.prevent="saveGroupName"
     >
       <input
         ref="nameInput"
-        :disabled="isSaving"
+        id="nths-group-name"
+        :disabled="isSaving || !isEditingName"
         class="name-input"
         v-model="newGroupName"
         @input="errorMessage = ''"
       />
-      <button
-        :disabled="isSaving"
-        class="name-button save-button"
-        type="submit"
-      >
-        save
-      </button>
-      <button
-        :disabled="isSaving"
-        class="name-button"
-        type="button"
-        @click="cancel"
-      >
-        cancel
-      </button>
+      <div class="buttons">
+        <LargeButton
+          v-if="isEditingName"
+          :disabled="isSaving"
+          type="button"
+          :show-arrow="false"
+          variant="text"
+          @click="cancel"
+        >
+          cancel
+        </LargeButton>
+        <LargeButton
+          v-if="isEditingName"
+          :disabled="isSaving"
+          type="submit"
+          variant="primary-blue"
+          :show-arrow="false"
+        >
+          save
+        </LargeButton>
+        <LargeButton
+          v-if="!isEditingName"
+          @click="editGroupName"
+          type="button"
+          variant="text"
+          :show-arrow="false"
+          class="edit-button"
+        >
+          edit
+        </LargeButton>
+      </div>
     </form>
-    <div class="name-container" v-else>
-      <span class="name">{{ props.groupName }}</span>
-      <button v-if="isGroupAdmin" class="name-button" @click="editGroupName">
-        <Pencil class="pencil" />
-      </button>
-    </div>
     <div class="error" v-if="errorMessage.length">{{ errorMessage }}</div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.container {
+.editable-name {
+  --size: 18px;
+  --weight: 500;
+  --spacing: 8px;
   display: flex;
   flex-direction: column;
   justify-content: start;
-  align-items: center;
+  align-items: start;
 }
 .name-container {
   display: flex;
   justify-content: start;
   align-items: center;
 }
+.label {
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-right: var(--spacing);
+}
 .name {
-  font-size: 24px;
-  font-weight: 800;
-  padding: 0 0 0 4px;
-  margin-right: 8px;
+  font-size: var(--size);
+  font-weight: var(--weight);
+  padding: 11px 18px;
+  margin-right: var(--spacing);
+  line-height: 1;
 }
 .name-form {
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+}
+.buttons {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+}
+.edit-button {
+  // keep from from jumping
+  border: 2px solid transparent;
 }
 .name-input {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: var(--size);
+  font-weight: var(--weight);
   border: none;
-  margin-right: 8px;
-  padding: 4px;
-}
-.name-button {
-  font-size: 14px;
-  display: inline-flex;
-  border-radius: 18px;
-  padding: 8px 12px;
-}
-.save-button {
-  background: $c-information-blue;
-  color: white;
-}
-.save-button:disabled {
-  background: $step-blue;
-  color: $c-background-grey;
+  padding: 9px 18px;
+  margin-right: var(--spacing);
+  field-sizing: content;
+  line-height: 1;
 }
 .error {
   color: $c-error-red;
-}
-.pencil {
-  height: 16px;
-  width: auto;
-  transform: scaleX(-1);
-}
-.pencil :deep(path) {
-  stroke-width: 2px;
-  stroke: black;
 }
 </style>

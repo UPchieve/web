@@ -12,7 +12,7 @@ export type GroupMember = {
 }
 
 export const actionsCtaMap = {
-  'NAMED YOUR TEAM': 'Name your team',
+  'NAMED YOUR TEAM': 'Name your team in "Settings" below',
   'REVIEWED RESOURCES': 'Review UPchieve resources',
   'ATTENDED ORIENTATION': 'Attend orientation',
 }

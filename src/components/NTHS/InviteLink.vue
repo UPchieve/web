@@ -8,7 +8,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import ReferFriendIcon from '@/assets/icons/refer_friend_icon.svg'
 
 const props = defineProps<{ code: string }>()
-const copyMessage = ref('Copy Link')
+const copyMessage = ref('Copy Invite Link')
 const link = computed(() => `${config.appRoot}/join-team/${props.code}`)
 
 function copyURL() {
@@ -21,7 +21,7 @@ function copyURL() {
   })
 
   setTimeout(() => {
-    copyMessage.value = 'Copy Link'
+    copyMessage.value = 'Copy Invite Link'
   }, 1000)
 }
 </script>
@@ -43,7 +43,7 @@ function copyURL() {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .icon {
   width: 32px;
   height: 32px;
@@ -52,21 +52,29 @@ function copyURL() {
   font-size: large;
   padding: 0.5em 1em;
   background-color: white;
-  field-sizing: content;
   border: 1px solid rgb(224, 224, 224);
   border-radius: 4px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  max-width: 100%;
 }
+
 .link-container {
   display: flex;
   gap: 8px;
+  justify-content: start;
   align-items: center;
+  width: 100%;
+  @include breakpoint-above('medium') {
+    justify-content: end;
+  }
 }
 .button-container {
   flex-shrink: 0;
+  flex-grow: 0;
 }
 .button-text {
   /* set width to keep form from jumping when text changes */
-  width: 128px;
   color: #1855d1;
 }
 </style>
