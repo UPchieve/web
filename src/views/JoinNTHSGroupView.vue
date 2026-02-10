@@ -39,6 +39,13 @@ onBeforeMount(async () => {
   FeatureFlagService.setPersonPropertiesForFlags({
     cohort: 'joining-nths-group',
   })
+
+  // Redirect to group page if user is already in a group
+  await $store.dispatch('volunteer/fetchNTHSGroupsForUser')
+  if ($store.state.volunteer.NTHSGroups.length) {
+    $router.replace('/groups')
+  }
+
   if (inviteCode.value) {
     try {
       const results = await NetworkService.getNTHSGroupByCode(inviteCode.value)
@@ -96,12 +103,11 @@ async function addVolunteerToTeam() {
       email: email.value,
       inviteCode: inviteCode.value,
     })
-
-    if (response.data.NTHSGroup) {
-      // TODO: Show modal once get to dashboard.
+    if (response.data.groups) {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_JOINED_TEAM, {
         inviteCode: inviteCode.value,
       })
+      await $store.commit('volunteer/setNTHSGroups', response.data.groups)
       return $router.push(`/dashboard?inviteCode=${inviteCode.value}`)
     }
 
