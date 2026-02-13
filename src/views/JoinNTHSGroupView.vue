@@ -40,8 +40,12 @@ onBeforeMount(async () => {
     cohort: 'joining-nths-group',
   })
 
-  // Redirect to group page if user is already in a group
-  await $store.dispatch('volunteer/fetchNTHSGroupsForUser')
+  // ensure we have a user before making this call,
+  // otherwise we get `Not Authorized` and are redirected to /login
+  if ($store.state.user.user.id) {
+    // Redirect to group page if user is already in a group
+    await $store.dispatch('volunteer/fetchNTHSGroupsForUser')
+  }
   if ($store.state.volunteer.NTHSGroups.length) {
     $router.replace('/groups')
   }
