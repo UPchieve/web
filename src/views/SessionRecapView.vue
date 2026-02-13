@@ -49,6 +49,27 @@
                 class="heart"
               />
             </div>
+            <template
+              v-if="isStudent && isSessionSummaryEnabled && sessionSummary"
+            >
+              <span
+                class="card-detail__title"
+                :class="{
+                  'card-detail__title--summary-shown': isSummaryShown,
+                }"
+                >Summary:</span
+              >
+              <div class="card-detail">
+                <span v-if="isSummaryShown">{{ sessionSummary }}</span>
+                <large-button
+                  v-else
+                  @click="handleShowSummary"
+                  :showArrow="false"
+                >
+                  Show summary
+                </large-button>
+              </div>
+            </template>
           </div>
         </div>
         <div v-if="showFeedbackFromStudent">
@@ -260,6 +281,7 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       mobileMode: 'app/mobileMode',
+      isSessionSummaryEnabled: 'featureFlags/isSessionSummaryEnabled',
     }),
     whiteboardDimensions() {
       return {
@@ -298,6 +320,8 @@ export default {
       isRecapDmsAvailable: false,
       reportSubmitted: false,
       progressReport: {},
+      sessionSummary: '',
+      isSummaryShown: false,
     }
   },
   async created() {
@@ -308,6 +332,7 @@ export default {
       )
       this.session = response.data.session
       this.isRecapDmsAvailable = response.data.isRecapDmsAvailable
+      this.sessionSummary = response.data.summary
       this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
 
       if (this.isStudent) await this.getProgressReportForSession()
@@ -457,6 +482,15 @@ export default {
           }
         )
     },
+    handleShowSummary() {
+      this.isSummaryShown = true
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_CLICKED_SHOW_SESSION_SUMMARY,
+        {
+          sessionId: this.session.id,
+        }
+      )
+    },
   },
   watch: {
     socketJoinedRoom(val) {
@@ -544,6 +578,7 @@ export default {
 .spacing--grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
+  align-items: center;
 }
 
 .card-detail {
@@ -556,6 +591,10 @@ export default {
     font-weight: 500;
     text-align: left;
     margin: 1em 0.5em 0.5em 0.5em;
+
+    &--summary-shown {
+      align-self: flex-start;
+    }
   }
 
   &__sub-container {
