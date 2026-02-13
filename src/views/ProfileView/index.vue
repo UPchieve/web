@@ -232,7 +232,7 @@
             </div>
           </div>
 
-          <div v-if="isSelectingPreferredLanguageEnabled">
+          <div>
             <div class="prompt">Select your preferred language</div>
             <preferred-language-select
               ref="preferredLanguageSelectRef"
@@ -424,8 +424,6 @@ export default {
       hasStudentOccupation: 'user/hasStudentOccupation',
       isSecondaryEmailOnProfilePageEnabled:
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
-      isSelectingPreferredLanguageEnabled:
-        'featureFlags/isSelectingPreferredLanguageEnabled',
       hasStudentRole: 'user/hasStudentRole',
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),
@@ -608,10 +606,7 @@ export default {
         }
       }
 
-      if (
-        this.isSelectingPreferredLanguageEnabled &&
-        !this.$refs.preferredLanguageSelectRef.isLanguageValid
-      ) {
+      if (!this.$refs.preferredLanguageSelectRef.isLanguageValid) {
         this.errors.push('Please enter a language name.')
         this.invalidInputs.push('preferredLanguage')
       }

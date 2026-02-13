@@ -70,11 +70,6 @@
       @permanentlyDismissed="onPermanentlyDismissedSecondaryEmailModal"
     />
 
-    <select-preferred-language-modal
-      v-if="showSelectPreferredLanguageModal"
-      :closeModal="toggleSelectPreferredLanguageModal"
-    />
-
     <subject-selection />
 
     <onboarding-modal
@@ -95,7 +90,6 @@ import JoinedClassModal from './JoinedClassModal.vue'
 import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
 import ImpactStudySurveyModal from './ImpactStudySurveyModal.vue'
 import UpdateSchoolModal from './UpdateSchoolModal.vue'
-import SelectPreferredLanguageModal from './SelectPreferredLanguageModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
@@ -130,7 +124,6 @@ export default {
     LargeButton,
     StudentAssignments,
     OnboardingModal,
-    SelectPreferredLanguageModal,
     JourneyModal,
   },
   beforeMount() {
@@ -189,12 +182,6 @@ export default {
     if (this.volunteerSubjectPresenceVariant)
       this.scheduleVolunteerPresenceNotification()
 
-    if (
-      !localStorage.getItem('seenSelectPreferredLanguageModal') &&
-      this.isSelectingPreferredLanguageEnabled
-    )
-      this.showSelectPreferredLanguageModal = true
-
     if (this.hadASession) {
       await this.processImpactStudySurvey()
       // TODO: Replace `hadASession` with a more reliable session check (e.g. comparing session IDs),
@@ -215,7 +202,6 @@ export default {
       showImpactStudySurveyModal: false,
       showJourneyModal: false,
       dismissedSecondaryEmailModal: false,
-      showSelectPreferredLanguageModal: false,
       impactStudySurveyCampaignId: '',
       hasDismissedSecondaryEmailModalForCurrentSession: false,
     }
@@ -239,8 +225,6 @@ export default {
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
-      isSelectingPreferredLanguageEnabled:
-        'featureFlags/isSelectingPreferredLanguageEnabled',
       getImpactStudySurveyPayload: 'featureFlags/getImpactStudySurveyPayload',
       isMobileMode: 'app/mobileMode',
       isSecondaryEmailOnProfilePageEnabled:
@@ -361,10 +345,6 @@ export default {
     },
     toggleJourneyModal() {
       this.showJourneyModal = !this.showJourneyModal
-    },
-    toggleSelectPreferredLanguageModal() {
-      this.showSelectPreferredLanguageModal =
-        !this.showSelectPreferredLanguageModal
     },
     triggerIncentiveEnrollmentModal() {
       if (this.showFallIncentiveEnrollmentModal) return

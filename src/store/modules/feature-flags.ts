@@ -37,7 +37,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE]: false,
-      [POSTHOG_FEATURE_FLAGS.STUDENT_PREFERRED_LANGUAGE]: false,
       [POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_NEW_INTERNATIONAL_MESSAGE]: false,
       [POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS]: false,
@@ -205,8 +204,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE],
     volunteerSubjectPresenceVariant: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE],
-    isSelectingPreferredLanguageEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENT_PREFERRED_LANGUAGE],
     isBecomeAnAmbassadorCtaEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA],
     showNewInternationalMessage: (state: FeatureFlagState) =>
