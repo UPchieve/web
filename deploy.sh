@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -e
 
 DATETIME=$(date '+%Y-%m-%d:%H-%M-%S')
 EMAIL=$(op account list --format json | jq -r '.[0].email')
@@ -17,10 +17,10 @@ if [ "$1" = 'dev' ]; then
     --app-name development-static-web-app \
     --env production ./dist
 else
-    doppler run --token $(op read op://private/doppler-high-line/password) -- npm run build && \
-    swa deploy \
-    --deployment-token $(op read op://private/swa-token-high-line/password) \
-    --resource-group $(op read op://private/doppler-high-line/resource-group) \
-    --app-name $(op read op://private/doppler-high-line/app-name) \
-    --env production ./dist
+  doppler run --token $(op read op://private/deploy-high-line/doppler-token) -- npm run build && \
+  swa deploy \
+  --deployment-token $(op read op://private/deploy-high-line/swa-deploy-token) \
+  --resource-group $(op read op://private/deploy-high-line/resource-group) \
+  --app-name $(op read op://private/deploy-high-line/app-name) \
+  --env production ./dist
 fi
