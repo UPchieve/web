@@ -921,6 +921,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   NTHS_GROUP_PAGE = 'nths-group-page',
   USER_IS_APPROVED_NTHS_PRESIDENT = 'user-is-approved-nths-president',
   GET_SESSION_SUMMARY = 'get-session-summary',
+  MODERATE_ZWIBBLER_TEXT_NODES = 'moderate-zwibbler-text-nodes',
 }
 
 export const ANALYTICS_REPORT_ROW = {

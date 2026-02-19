@@ -7,10 +7,11 @@ function _errHandler(/* err */) {
 }
 
 export default {
-  async checkIfMessageIsClean({ message, sessionId }) {
+  async checkIfMessageIsClean({ message, sessionId, source }) {
     return NetworkService.checkIfMessageIsClean({
       message,
       sessionId,
+      source,
     }).then(
       (res) => {
         if ('err' in res.data) {

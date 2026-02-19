@@ -493,6 +493,8 @@ import {
   getPartnerUploadFailedMsg,
 } from '@/composables/imageUploadState'
 
+const CENSORED_CONTENT_PLACEHOLDER = 'CONTENT CENSORED'
+
 const TOOLS = {
   BRUSH: 'brush',
   THIN_BRUSH: 'thin-brush',
@@ -641,6 +643,8 @@ export default {
       isBanned: 'user/banType',
       partnerImageUploadError: 'socket/partnerImageUploadError',
       partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
+      isModerateZwibblerTextNodesEnabled:
+        'featureFlags/isModerateZwibblerTextNodesEnabled',
     }),
     isLiveMediaBanned() {
       return this.isBanned
@@ -681,13 +685,65 @@ export default {
       return BYTES_PER_MEGABYTE * 10
     },
   },
-  beforeUnmount() {
-    this.$store.dispatch('socket/resetPartnerImageUploadStatus')
-  },
   async mounted() {
     this.loadZwibbler()
   },
   methods: {
+    async maybeHandleTextNodeInfraction(nodeIds) {
+      if (!this.isModerateZwibblerTextNodesEnabled) return
+      const moderationResults = await this.moderateTextNodes(nodeIds)
+      const failures = moderationResults.filter((result) => !!result)
+
+      if (failures.length) {
+        this.$store.commit('liveMedia/setModerationInfraction', {
+          infraction: Object.keys(failures[0]),
+          source: 'whiteboard_text_node',
+          isBanned: false,
+          occurredAt: new Date(),
+        })
+      }
+    },
+    async moderateTextNodes(nodeIds) {
+      const nodes = nodeIds.map((id) => this.zwibblerCtx.getNodeObject(id))
+      const textNodes = nodes.filter((node) => node.type === 'TextNode')
+      return await Promise.all(
+        textNodes.map((node) => this.moderateTextNode(node))
+      )
+    },
+    async moderateTextNode(node) {
+      const censorNode = (node) => {
+        this.zwibblerCtx.setNodeProperty(
+          node.id,
+          'text',
+          CENSORED_CONTENT_PLACEHOLDER
+        )
+      }
+      try {
+        const nodeText = node?.props?.text
+        if (nodeText === CENSORED_CONTENT_PLACEHOLDER)
+          // otherwise, we'll re-moderate everything on load.
+          return
+        if (!nodeText) {
+          throw new Error('Could not extract text from node')
+        }
+        const { failures } = await ModerationService.checkIfMessageIsClean({
+          message: nodeText,
+          sessionId: this.sessionId,
+          source: 'whiteboard-text-node',
+        })
+        const isClean = Object.keys(failures).length === 0
+        if (!isClean) {
+          censorNode(node)
+          return failures
+        }
+      } catch (err) {
+        LoggerService.noticeError(
+          err,
+          'Failed to moderate text node on Zwibbler'
+        )
+        censorNode(node)
+      }
+    },
     clearUploadImageTimeout() {
       if (this.uploadingImageTimeout) {
         clearTimeout(this.uploadingImageTimeout)
@@ -1364,6 +1420,24 @@ export default {
         }
       })
 
+      this.zwibblerCtx.on(
+        'nodes-added',
+        async (nodeIds, _unused, isRemoteChange) => {
+          if (!isRemoteChange) {
+            await this.maybeHandleTextNodeInfraction(nodeIds)
+          }
+        }
+      )
+
+      this.zwibblerCtx.on(
+        'nodes-changed',
+        async (nodeIds, _unused, isRemoteChange) => {
+          if (!isRemoteChange) {
+            await this.maybeHandleTextNodeInfraction(nodeIds)
+          }
+        }
+      )
+
       try {
         await this.joinSharedSessionWithRetry()
       } catch (err) {
@@ -1471,6 +1545,7 @@ export default {
     },
   },
   async beforeUnmount() {
+    await this.$store.dispatch('socket/resetPartnerImageUploadStatus')
     this.removeListeners()
     window.clearInterval(this.pingPongInterval)
     // Zwibbler cleanup.

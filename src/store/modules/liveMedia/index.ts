@@ -46,6 +46,9 @@ export default {
     moderationInfractionSource: (state): string => {
       let source = ''
       switch (state.moderationInfraction?.source) {
+        case 'whiteboard_text_node':
+          source = 'whiteboard text content'
+          break
         case 'audio_transcription':
           source = 'microphone use'
           break
