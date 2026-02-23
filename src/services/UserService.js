@@ -1,4 +1,3 @@
-import moment from 'moment'
 import AuthService from './AuthService'
 import NetworkService from './NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -19,16 +18,10 @@ export default {
       return Promise.resolve({})
     })
   },
-  validateBirthdate(birthdate) {
-    const m = moment(birthdate, 'MM/DD/YYYY')
-    if (!m.isValid()) {
-      return 'Birthdate is invalid'
-    }
-
-    return true // No validation errors
-  },
-  setProfile(data) {
-    return NetworkService.setProfile(data)
+  async setProfile(data, store) {
+    await NetworkService.setProfile(data)
+    await store.dispatch('user/addToUser', data)
+    AnalyticsService.captureEvent(EVENTS.PROFILE_UPDATED)
   },
 
   getVolunteers() {

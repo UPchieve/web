@@ -1,5 +1,15 @@
 <template>
   <div class="profile">
+    <IonToast
+      :isOpen="errorMessage.length"
+      :message="errorMessage"
+      header="Uh Oh!"
+      icon="alert-circle-outline"
+      duration="5000"
+      position="bottom"
+      @didDismiss="resetErrorMessage"
+      color="danger"
+    />
     <VerificationModal
       v-if="showSmsVerificationModal"
       data-testid="sms-verification-modal"
@@ -34,18 +44,7 @@
         <div v-if="saveFailed" class="errors">
           <h4 class="errors-heading">Could not save data</h4>
         </div>
-        <div class="subheader">
-          Personal Information
-
-          <button
-            type="button"
-            class="editBtn btn"
-            data-testid="edit-profile-btn"
-            @click="editProfile()"
-          >
-            {{ editBtnMsg }}
-          </button>
-        </div>
+        <div class="subheader">Personal Information</div>
         <div class="container-content">
           <div id="email" class="container-section">
             <div class="prompt">Your Email</div>
@@ -75,22 +74,38 @@
               </span>
             </div>
           </div>
+          <hr />
           <div>
             <div id="phone" class="container-section">
               <div id="phone-heading">
-                <div class="prompt">Your Phone Number</div>
-                <button
-                  v-if="user.phone && !hasVolunteerRole"
-                  class="remove-phone-btn"
-                  value="Remove"
-                  @click="toggleDeletePhoneConfirmationModal"
-                  data-testid="delete-phone-button"
-                  id="delete-phone-button"
-                  label="Remove"
-                >
-                  <TrashIcon id="delete-phone-icon" />
-                  Remove
-                </button>
+                <div class="prompt">Your Phone Information</div>
+                <div class="phone-crud-buttons">
+                  <div class="edit-phone-information-button">
+                    <button
+                      type="button"
+                      class="field-button"
+                      data-testid="edit-profile-btn"
+                      @click="editPhoneInformation()"
+                    >
+                      <PencilIcon class="delete-phone-icon" />
+                      {{ editPhoneInformationButtonLabel }}
+                    </button>
+                  </div>
+                  <div class="edit-phone-information-button">
+                    <button
+                      v-if="user.phone && !hasVolunteerRole"
+                      class="field-button"
+                      value="Remove"
+                      @click="toggleDeletePhoneConfirmationModal"
+                      data-testid="delete-phone-button"
+                      id="delete-phone-button"
+                      label="Remove"
+                    >
+                      <TrashIcon class="delete-phone-icon" />
+                      Remove
+                    </button>
+                  </div>
+                </div>
               </div>
               <RemovePhoneConfirmationModal
                 v-if="showDeletePhoneConfirmationModal"
@@ -137,9 +152,8 @@
                 <div class="checkbox-container">
                   <checkbox
                     id="sms-consent-checkbox"
-                    :disabled="!activeEdit ? true : null"
                     v-model="smsConsent"
-                    @change="emitSmsConsentCheckboxChangedEvent"
+                    @change="onChangeSmsConsent"
                     :checked="smsConsent"
                   />
                   <label for="sms-consent-input"
@@ -164,6 +178,7 @@
                   </span>
                 </div>
               </div>
+              <hr />
             </div>
           </div>
 
@@ -171,7 +186,6 @@
             <div class="prompt">Account status</div>
             <div class="answer">
               <toggle-button
-                :disabled="!activeEdit ? true : null"
                 :value="isAccountActive"
                 :labels="{ checked: 'Active', unchecked: 'Deactivated' }"
                 :width="95"
@@ -189,6 +203,7 @@
               Deactivate your account to stop receiving emails and text
               notifications. You can reactivate it at any time.
             </div>
+            <hr />
           </div>
 
           <div
@@ -218,6 +233,7 @@
               Browser alerts when a coach joins your session and when a coach
               sends a message while you're not looking.
             </div>
+            <hr />
           </div>
 
           <hr v-if="isPartnerTeacher || user.usesClever" />
@@ -230,6 +246,7 @@
               Last successful Clever sync:
               {{ new Date(user.lastSuccessfulCleverSync).toLocaleString() }}
             </div>
+            <hr />
           </div>
 
           <div>
@@ -237,11 +254,11 @@
             <preferred-language-select
               ref="preferredLanguageSelectRef"
               :userPreferredLanguage="user.preferredLanguage"
-              :disabled="!activeEdit ? true : null"
+              @error="onPreferredLanguageError"
             />
-          </div>
 
-          <hr />
+            <hr />
+          </div>
 
           <large-button
             class="button-width"
@@ -342,15 +359,18 @@ import Checkbox from '@/components/CheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import CleverLogo from '@/assets/clever_logo.svg'
 import TrashIcon from '@/assets/trash.svg'
+import PencilIcon from '@/assets/pencil.svg'
 import ToggleButton from '@/components/ToggleButton.vue'
 import PreferredLanguageSelect from '@/components/PreferredLanguageSelect.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import { IonToast } from '@ionic/vue'
 
 export default {
   name: 'profile-view',
   components: {
+    IonToast,
     SecondaryEmailModal,
     RemovePhoneConfirmationModal,
     Checkbox,
@@ -359,6 +379,7 @@ export default {
     Loader,
     VerificationModal,
     TrashIcon,
+    PencilIcon,
     CleverLogo,
     ToggleButton,
     PreferredLanguageSelect,
@@ -368,7 +389,7 @@ export default {
     return {
       ModalService,
       activeEdit: false,
-      editBtnMsg: 'Edit',
+      editPhoneInformationButtonLabel: 'Edit',
       errors: [],
       invalidInputs: [],
       saveFailed: false,
@@ -383,6 +404,7 @@ export default {
       smsConsent: false,
       newMutedSubjectAlerts: [],
       showSecondaryEmailModal: false,
+      errorMessage: '',
     }
   },
   async created() {
@@ -475,6 +497,26 @@ export default {
     },
   },
   methods: {
+    onPreferredLanguageError(err) {
+      this.errorMessage =
+        err?.message ??
+        'Something went wrong while updating your preferred language. Please refresh the page and try again.'
+    },
+    resetErrorMessage() {
+      this.errorMessage = ''
+    },
+    async setProfile(data, fieldName, revertFn) {
+      try {
+        await UserService.setProfile(data, this.$store)
+      } catch (err) {
+        this.errorMessage =
+          err?.message ??
+          `Something went wrong while updating your ${fieldName ?? 'information'}. Please refresh the page and try again.`
+        if (revertFn) {
+          revertFn()
+        }
+      }
+    },
     async updateSecondaryEmail(email) {
       await this.$store.dispatch('user/addToUser', {
         proxyEmail: email,
@@ -504,18 +546,28 @@ export default {
       this.smsConsent = false
     },
 
-    async emitSmsConsentCheckboxChangedEvent() {
+    async onChangeSmsConsent() {
+      const smsConsent = !this.smsConsent
+      const reqBody = this.createUpdateProfileRequestBody({
+        smsConsent,
+      })
+      await this.setProfile(reqBody, 'SMS consent', () => {
+        this.smsConsent = !smsConsent
+      })
       AnalyticsService.captureEvent(EVENTS.SMS_CONSENT_CHECKBOX_CHANGED, {
         event: EVENTS.SMS_CONSENT_CHECKBOX_CHANGED,
-        value: this.smsConsent ? 'checked' : 'unchecked',
+        value: smsConsent ? 'checked' : 'unchecked',
       })
     },
 
-    toggleAccountActive({ value }) {
+    async toggleAccountActive({ value }) {
       if (!value) {
         this.toggleDeactivatedAccountModal()
         return
       }
+      await this.setProfile({ isDeactivated: false }, 'account status', () => {
+        this.setIsAccountActive(false)
+      })
       this.setIsAccountActive(true)
     },
 
@@ -530,6 +582,7 @@ export default {
     },
 
     async togglemutedSubjectAlerts(subject, isNotMuted) {
+      const previousAlerts = [...this.newMutedSubjectAlerts]
       if (isNotMuted) {
         this.newMutedSubjectAlerts.push(subject)
       } else {
@@ -541,8 +594,12 @@ export default {
       // TODO handle failures (i.e. unset non-saved values)
       // maybe dont' reuse createUpdateProfileRequestBody.
       // how about a new endpoint?
-      const reqBody = this.createUpdateProfileRequestBody()
-      await UserService.setProfile(reqBody)
+      const reqBody = this.createUpdateProfileRequestBody({
+        mutedSubjectAlerts: this.newMutedSubjectAlerts,
+      })
+      await this.setProfile(reqBody, 'tutoring alerts', () => {
+        this.mutedSubjectAlerts = previousAlerts
+      })
     },
 
     subjectIsNotMuted(subject) {
@@ -573,15 +630,10 @@ export default {
       })
     },
 
-    /**
-     * Toggle editing state.
-     * {Case A} if activeEdit === false: enter the editing state by setting activeEdit to true
-     * {Case B} if activeEdit === true: save profile changes & exit the editing state by setting activeEdit to false
-     */
-    editProfile() {
+    editPhoneInformation() {
       // {Case A} Enter the editing state, then early exit
       if (!this.activeEdit) {
-        this.editBtnMsg = 'Save'
+        this.editPhoneInformationButtonLabel = 'Save'
         this.activeEdit = true
         return
       }
@@ -606,85 +658,27 @@ export default {
         }
       }
 
-      if (!this.$refs.preferredLanguageSelectRef.isLanguageValid) {
-        this.errors.push('Please enter a language name.')
-        this.invalidInputs.push('preferredLanguage')
-      }
-
       if (!this.errors.length) {
-        const isDeactivatedBeforeUpdate = this.user.isDeactivated
-        const reqBody = this.createUpdateProfileRequestBody()
-
-        // wait for save to succeed before coming out of edit mode
-        UserService.setProfile(reqBody).then(
-          () => {
-            this.editBtnMsg = 'Edit'
-            this.activeEdit = false
-            this.saveFailed = false
-
-            AnalyticsService.captureEvent(EVENTS.PROFILE_UPDATED, {
-              event: EVENTS.PROFILE_UPDATED,
-            })
-
-            if (
-              reqBody.isDeactivated &&
-              reqBody.isDeactivated !== isDeactivatedBeforeUpdate
-            )
-              AnalyticsService.captureEvent(EVENTS.ACCOUNT_DEACTIVATED, {
-                event: EVENTS.ACCOUNT_DEACTIVATED,
-              })
-
-            if ('smsConsent' in reqBody) {
-              const evt = reqBody.smsConsent
-                ? EVENTS.SMS_OPTED_IN
-                : EVENTS.SMS_OPTED_OUT
-              AnalyticsService.captureEvent(evt, {
-                event: evt,
-              })
-            }
-
-            // Update user state after successful API call
-            const addToUserData = {
-              isDeactivated: reqBody.isDeactivated ?? !this.isAccountActive,
-              smsConsent: reqBody.smsConsent ?? this.user.smsConsent,
-              preferredLanguage:
-                this.userPreferredLanguage?.name ?? this.user.preferredLanguage,
-            }
-            if (this.isVolunteer) {
-              addToUserData.mutedSubjectAlerts =
-                reqBody.mutedSubjectAlerts ?? this.user.mutedSubjectAlerts
-            }
-            this.$store.dispatch('user/addToUser', addToUserData).then(() => {
-              // Phone number verification flow
-              if (this.userNeedsToVerifyPhone) {
-                this.showSmsVerificationModal = true
-              }
-            })
-          },
-          () => {
-            this.saveFailed = true
-          }
-        )
+        // Phone number verification flow
+        if (this.userNeedsToVerifyPhone) {
+          this.showSmsVerificationModal = true
+        }
+        this.activeEdit = false
       }
     },
 
-    createUpdateProfileRequestBody() {
-      const reqBody = {}
-      reqBody.isDeactivated = !this.isAccountActive
-
-      if (this.userPreferredLanguage?.name) {
-        reqBody.preferredLanguage = this.userPreferredLanguage.name
+    /*
+     * @TODO: Get rid of this eventually.
+     * It's only here because the backend requires isDeactivated to be present in the request
+     * or else it will reactivate the user. We don't necessarily want that behavior, so we always
+     * send it up on the client.
+     * We should update subway and then clean this up.
+     */
+    createUpdateProfileRequestBody(data) {
+      return {
+        isDeactivated: !this.isAccountActive,
+        ...data,
       }
-
-      // Students get a checkbox to opt in/out of SMS
-      if (this.isStudent && this.smsConsent !== this.user.smsConsent) {
-        reqBody.smsConsent = this.smsConsent
-      }
-
-      if (this.isVolunteer) {
-        reqBody.mutedSubjectAlerts = this.newMutedSubjectAlerts
-      }
-      return reqBody
     },
 
     setFlagsForEditingPhoneNumber() {
@@ -695,6 +689,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+hr {
+  background-color: $border-grey;
+  border: none;
+  height: 1px;
+  width: 100%;
+  margin: 16px 0;
+}
 .profile {
   font-size: 16px;
   font-family: $font-family-default;
@@ -740,7 +741,9 @@ export default {
   display: flex;
   flex-direction: column;
   border-radius: 8px;
-  background: #fff;
+  background: white;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .container-content {
@@ -752,6 +755,7 @@ export default {
 
   @include breakpoint-above('large') {
     padding: 40px;
+    min-width: 600px;
   }
 }
 
@@ -802,8 +806,7 @@ export default {
 .container-section {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
-  gap: 4px;
+  gap: 8px;
 }
 
 ul {
@@ -887,22 +890,6 @@ button:hover {
   color: #fff;
 }
 
-.editBtn {
-  background-color: #16d2aa;
-  border-radius: 30px;
-  width: 120px;
-  align-items: center;
-  height: 40px;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-
-  &:hover {
-    color: #2c3e50;
-  }
-}
-
 .form-control {
   border: none;
   box-shadow: none;
@@ -924,7 +911,18 @@ button:hover {
   box-shadow: none;
 }
 
-.remove-phone-btn {
+.phone-crud-buttons {
+  display: flex;
+  flex-direction: row;
+}
+
+.edit-phone-information-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.field-button {
   color: $c-soft-black;
   border-radius: 0px;
   border: none;
@@ -944,11 +942,11 @@ button:hover {
     background: none;
     padding-left: 0px;
   }
+}
 
-  #delete-phone-icon {
-    height: 14px;
-    width: 14px;
-  }
+.delete-phone-icon {
+  height: 14px;
+  width: 14px;
 }
 
 .container-content.cert {

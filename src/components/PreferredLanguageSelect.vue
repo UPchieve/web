@@ -6,6 +6,14 @@ import FormInput from '@/components/FormInput.vue'
 import FormSelect from './FormInputs/FormSelect.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import type { Language } from '@/types/languages'
+import UserService from '@/services/UserService'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const emit = defineEmits<{
+  (e: 'error', err: any): void
+}>()
 
 const languages: Language[] = [
   { code: 'ar', name: 'Arabic' },
@@ -41,10 +49,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
 })
 
 const v$ = useVuelidate()
@@ -74,15 +78,30 @@ const selectedLanguage = computed<Language | undefined>(() => {
   return preferredLanguage.value
 })
 
-function onLanguageSelect(languageName: string) {
+async function onLanguageSelect(languageName: string) {
   const language = languages.find((lang) => lang.name === languageName)
   if (!language) return
 
+  const previousSelection = preferredLanguage.value
   otherLanguageInput.value = ''
   preferredLanguage.value = language
   AnalyticsService.captureEvent(EVENTS.USER_SELECTED_PREFERRED_LANGUAGE, {
     language,
   })
+  try {
+    await UserService.setProfile(
+      {
+        preferredLanguage: preferredLanguage.value.name,
+      },
+      store
+    )
+    await store.dispatch('user/addToUser', {
+      preferredLanguage: preferredLanguage.value.name,
+    })
+  } catch (err) {
+    preferredLanguage.value = previousSelection
+    emit('error', err)
+  }
 }
 
 function onOtherLanguage(languageName: string) {
@@ -120,7 +139,6 @@ defineExpose({
       name="preferred-language-select"
       :options="languages"
       placeholder="Select a language..."
-      :disabled="disabled"
       optionTextField="name"
       :reduce="(option: Language) => option.name"
     />
@@ -129,7 +147,6 @@ defineExpose({
       v-model="otherLanguageInput"
       placeholder="Enter your preferred language"
       @update:modelValue="onOtherLanguage"
-      :readOnly="disabled"
       :minLength="2"
       :customError="languageError"
     />

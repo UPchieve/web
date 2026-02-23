@@ -36,6 +36,9 @@
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
 import Separator from '@/components/Separator.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
+import UserService from '@/services/UserService'
 
 export default {
   name: 'DeactivateAccountModal',
@@ -45,7 +48,11 @@ export default {
     setIsAccountActive: { type: Function, required: true },
   },
   methods: {
-    deactivate() {
+    async deactivate() {
+      await UserService.setProfile({ isDeactivated: true }, this.$store)
+      AnalyticsService.captureEvent(EVENTS.ACCOUNT_DEACTIVATED, {
+        event: EVENTS.ACCOUNT_DEACTIVATED,
+      })
       this.setIsAccountActive(false)
       this.closeModal()
     },

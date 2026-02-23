@@ -80,10 +80,13 @@ const STEP_TO_SUCCESS_MESSAGES = {
 async function handleLastStep() {
   if (currentStep.value === 2) {
     try {
-      await UserService.setProfile({
-        userId: store.state.user.user.id,
-        schoolId: schoolId.value,
-      })
+      await UserService.setProfile(
+        {
+          userId: store.state.user.user.id,
+          schoolId: schoolId.value,
+        },
+        store
+      )
       AnalyticsService.captureEvent(EVENTS.UPDATE_SCHOOL_MODAL_CHANGED, {
         previousSchool: currentSchool.value,
         newSchoolId: schoolId.value,
