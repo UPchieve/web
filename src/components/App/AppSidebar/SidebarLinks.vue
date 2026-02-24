@@ -127,9 +127,20 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer && (isMemberOfNTHSGroup || showCreateNTHSGroupLink)"
-          :to="showCreateNTHSGroupLink ? '/groups/create' : '/groups'"
-          text="NTHS Team"
+          v-if="
+            isVolunteer &&
+            (isMemberOfNTHSGroup ||
+              showCreateNTHSGroupLink ||
+              showApplyForNTHSLink)
+          "
+          :to="
+            showCreateNTHSGroupLink
+              ? '/groups/create'
+              : showApplyForNTHSLink
+                ? '/groups/apply'
+                : '/groups'
+          "
+          :text="showApplyForNTHSLink ? 'Apply to NTHS' : 'NTHS Team'"
           id="nths-group-sidebar-link"
         >
           <groups-icon class="icon" />
@@ -224,7 +235,6 @@ export default {
   },
   props: {
     authenticated: Boolean,
-    isAdmin: Boolean,
     numberOfStudentClasses: Number,
   },
   computed: {
@@ -239,6 +249,7 @@ export default {
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
+      isAdmin: 'user/isAdmin',
       isAiTutorActive: 'featureFlags/aiTutor',
       userType: 'user/userType',
       isBecomeAnAmbassadorCtaEnabled:
@@ -249,6 +260,7 @@ export default {
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
       isNTHSGroupsPageEnabled: 'featureFlags/isNTHSGroupsPageEnabled',
       userIsApprovedNTHSPresident: 'featureFlags/userIsApprovedNTHSPresident',
+      isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
     }),
     isMemberOfNTHSGroup() {
       return (
@@ -259,6 +271,13 @@ export default {
       return (
         this.isNTHSGroupsPageEnabled &&
         this.userIsApprovedNTHSPresident &&
+        this.volunteersNTHSGroups.length === 0
+      )
+    },
+    showApplyForNTHSLink() {
+      return (
+        this.isNTHSApplicationPageEnabled &&
+        !this.userIsApprovedNTHSPresident &&
         this.volunteersNTHSGroups.length === 0
       )
     },

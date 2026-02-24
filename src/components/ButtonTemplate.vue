@@ -4,6 +4,7 @@
     v-if="isExternalLink"
     :href="routeTo"
     @click="$emit('click')"
+    :target="target"
   >
     <arrow-icon
       v-if="doShowArrow && isLeftArrow"
@@ -71,6 +72,7 @@ export default {
       default: 'secondary',
     },
     routeTo: String,
+    target: String,
     showArrow: Boolean,
     arrowDirection: String, // 'right' | 'left'
     buttonType: {

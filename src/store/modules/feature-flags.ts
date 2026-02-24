@@ -59,6 +59,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.USER_IS_APPROVED_NTHS_PRESIDENT]: false,
       [POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY]: false,
       [POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES]: false,
+      [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -258,5 +259,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY],
     isModerateZwibblerTextNodesEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES],
+    isNTHSApplicationPageEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE],
   },
 }

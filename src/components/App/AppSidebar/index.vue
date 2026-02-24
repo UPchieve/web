@@ -11,7 +11,6 @@
 
       <sidebar-links
         :authenticated="isAuthenticated"
-        :isAdmin="user.isAdmin"
         :numberOfStudentClasses="user.numberOfStudentClasses"
       />
     </div>

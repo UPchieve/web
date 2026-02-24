@@ -9,6 +9,7 @@
     :showArrow="showArrow"
     :arrowDirection="arrowDirection"
     :buttonType="buttonType"
+    :target="target"
     @click="(event) => $emit('click', event)"
   >
     <slot />
@@ -40,6 +41,10 @@ export default {
     buttonType: {
       type: String,
       default: 'button',
+    },
+    target: {
+      type: String,
+      default: '_self',
     },
   },
   computed: {

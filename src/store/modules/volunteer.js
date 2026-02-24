@@ -73,6 +73,7 @@ export default {
     async fetchNTHSGroupsForUser({ commit }) {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
+      return results.data.groups
     },
     async fetchNTHSGroupMembers({ commit }, groupId) {
       const response = await NetworkService.getNTHSGroupMembers(groupId)

@@ -78,6 +78,7 @@ import NTHSCreateGroupView from './views/NTHS/NTHSCreateGroupView.vue'
 import NTHSGroupDashboardView from './views/NTHS/Tabs/NTHSGroupDashboardView.vue'
 import NTHSManageTeamView from './views/NTHS/Tabs/NTHSManageTeamView.vue'
 import NTHSSettingsView from './views/NTHS/Tabs/NTHSSettingsView.vue'
+import NTHSApplicationView from '@/views/NTHS/NTHSApplicationView.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -598,6 +599,31 @@ const routes = [
     name: 'JourneysView',
     component: JourneysView,
     meta: { protected: true },
+  },
+  {
+    path: '/groups/apply',
+    name: 'NTHSApplicationView',
+    component: NTHSApplicationView,
+    meta: { protected: true },
+    beforeEnter: async (_to, _from, next) => {
+      const isApplicationPageFlagOn =
+        store.getters['featureFlags/isNTHSApplicationPageEnabled']
+      const isGroupsPageFlagOn =
+        store.getters['featureFlags/isNTHSGroupsPageEnabled']
+      const isApprovedPresident =
+        store.getters['featureFlags/userIsApprovedNTHSPresident']
+      const isInGroup =
+        store.state.volunteer.NTHSGroups.length > 0 ||
+        (await store.dispatch('volunteer/fetchNTHSGroupsForUser')).length > 0
+
+      if (isApprovedPresident && isGroupsPageFlagOn && !isInGroup)
+        return next('/groups/create')
+      if (isInGroup && isGroupsPageFlagOn) return next('/groups')
+      if (isApplicationPageFlagOn && !isInGroup && !isApprovedPresident)
+        return next()
+
+      return next('/dashboard')
+    },
   },
   {
     path: '/groups/create',
