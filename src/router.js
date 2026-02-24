@@ -83,6 +83,8 @@ const NTHSApplicationPending = () =>
   import('./views/NTHS/NTHSApplicationPending.vue')
 const StandaloneBotChatView = () =>
   import('./views/BotConversationsView/StandaloneBotChatView.vue')
+const Totp = () => import('./views/Totp/index.vue')
+const TotpEnroll = () => import('./views/Totp/Enroll.vue')
 
 import {
   shouldGoToApply,
@@ -861,6 +863,18 @@ const routes = [
     meta: { protected: true },
   },
   {
+    path: '/totp',
+    name: 'Totp',
+    component: Totp,
+    meta: { protected: true, requiresAdmin: true, hideNavigation: true },
+  },
+  {
+    path: '/totp-enroll',
+    name: 'TotpEnroll',
+    component: TotpEnroll,
+    meta: { protected: true, requiresAdmin: true, hideNavigation: true },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'Not Found',
     beforeEnter: async (_to, _from, next) => next('/'),
@@ -881,27 +895,40 @@ const router = createRouter({
 
 export default router
 
-// Router middleware to check authentication for protect routes
-router.beforeEach((to, from, next) => {
+// Router middleware to check authentication for protected routes.
+router.beforeEach(async (to, from, next) => {
   store.commit('app/setIsLoading', true)
-
   if (to.matched.some((route) => route.meta.requiresAdmin)) {
-    getAuthStatus(to, true)
-      .then(({ authenticated, isAdmin }) => {
-        if (!authenticated || !isAdmin) {
-          next({
-            path: '/login',
-            query: {
-              redirect: to.fullPath,
-            },
-          })
-        } else {
-          next()
-        }
-      })
-      .catch(() => {})
+    try {
+      const { authenticated, isAdmin, totpVerified } = await getAuthStatus(
+        to,
+        true
+      )
+      if (!authenticated) {
+        return next({
+          path: '/login',
+          query: {
+            redirect: to.fullPath,
+          },
+        })
+      }
+
+      if (!isAdmin) {
+        return next('/dashboard')
+      } else if (
+        !totpVerified &&
+        to.fullPath !== '/totp' &&
+        to.fullPath !== '/totp-enroll'
+      ) {
+        return next('/totp')
+      } else {
+        return next()
+      }
+    } catch {
+      return next('/login')
+    }
   } else if (to.matched.some((route) => route.meta.protected)) {
-    getAuthStatus(to)
+    return getAuthStatus(to)
       .then(({ authenticated }) => {
         if (!authenticated) {
           next({
@@ -923,9 +950,9 @@ router.beforeEach((to, from, next) => {
           next()
         }
       })
-      .catch(() => {})
+      .catch(() => next('/login'))
   } else if (to.matched.some((route) => route.meta.loggedOutOnly)) {
-    getAuthStatus(to).then(({ authenticated }) => {
+    return getAuthStatus(to).then(({ authenticated }) => {
       if (authenticated) {
         next('/dashboard')
       } else {
@@ -933,7 +960,7 @@ router.beforeEach((to, from, next) => {
       }
     })
   } else {
-    next()
+    return next()
   }
 })
 
@@ -1005,6 +1032,16 @@ axiosInstance.interceptors.response.use(
           )
         })
     }
+
+    const is403 = error.request.status === 403
+    const redirect = error.response.data.redirect
+    if (is403 && redirect) {
+      router.push({
+        path: redirect,
+        query: { redirect: router.currentRoute.value.fullPath },
+      })
+    }
+
     return Promise.reject(error)
   }
 )

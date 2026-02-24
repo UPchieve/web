@@ -331,7 +331,6 @@ watch(
           :subject="currentSubject?.name ?? ''"
           :isMobileMode="isMobileMode"
         />
-
       </div>
     </div>
   </div>

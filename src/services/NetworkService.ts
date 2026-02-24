@@ -1470,4 +1470,15 @@ export default {
       throw this._axiosErrorHandler(err as AxiosError)
     }
   },
+  totpEnroll() {
+    return httpPost<{ qrUrl: string }>(`${API_ROOT}/totp/enroll`, {}).then(
+      this._successHandler,
+      this._axiosErrorHandler
+    )
+  },
+  totpVerify(token: string) {
+    return httpPost<{ verified: boolean }>(`${API_ROOT}/totp/verify`, {
+      token,
+    }).then(this._successHandler, this._axiosErrorHandler)
+  },
 }
