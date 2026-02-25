@@ -89,8 +89,8 @@
           @clickedShareScreen="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
-          :isJoiningCall="isJoiningCall"
-          :unableToJoinCall="unableToJoinCall"
+          :isLoadingScreenShareControl="isLoadingScreenShareControl"
+          :unableToJoinMediaRoom="unableToJoinMediaRoom"
           :isZwibserveSession="isZwibserveSession"
         />
 
@@ -107,8 +107,8 @@
           @clickedShareScreen="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
-          :isJoiningCall="isJoiningCall"
-          :unableToJoinCall="unableToJoinCall"
+          :isLoadingScreenShareControl="isLoadingScreenShareControl"
+          :unableToJoinMediaRoom="unableToJoinMediaRoom"
         />
         <!--
         NOTE: this editor is used by the volunteer when the student is using the midtown app
@@ -132,9 +132,10 @@
           :partnerPresence="partnerPresence"
           :partnerMicStatus="partnerMicStatus"
           :partnerCanUseMic="partnerCanUseMic"
-          :unableToJoinCall="unableToJoinCall"
+          :unableToJoinMediaRoom="unableToJoinMediaRoom"
           :isBanned="isLiveMediaBanned"
-          :isJoiningCall="isJoiningCall"
+          :isLoadingMicControl="isLoadingMicControl"
+          :isLoadingSpeakerControl="isLoadingSpeakerControl"
           :unableToJoinAudio="unableToJoinAudio"
           :isSpeaking="isSpeaking"
           :micState="micState"
@@ -334,6 +335,7 @@ import {
   hasSeenScreenShareDisclaimerThisSession,
   setHasSeenScreenShareDisclaimerThisSession,
 } from '@/utils/session'
+//import { createBrowserInspector } from '@statelyai/inspect'
 
 const meetingActor = ref(null)
 export default {
@@ -374,16 +376,14 @@ export default {
     onBeforeUnmount(() => {
       meetingActor.value.actorRef.send({ type: 'meeting_ended' })
     })
-    /*
-      NOTE: to use xstate live machine inspector:
 
-      // import the inspector
-      import { createBrowserInspector } from '@statelyai/inspect'
+    // NOTE: to use xstate live machine inspector:
+    // remove comment from inspector import
 
-      // pass the inspector to the actor
-      const options = { inspect: createBrowserInspector().inspect }
-      meetingActor.value = useActor(MeetingMachine.create(), options)
-    */
+    // pass the inspector to the actor
+    // const options = { inspect: createBrowserInspector().inspect }
+    // meetingActor.value = useActor(MeetingMachine.create(), options)
+
     meetingActor.value = useActor(MeetingMachine.create())
   },
 
@@ -576,16 +576,14 @@ export default {
     micState() {
       if (
         this.meetingActor.snapshot.matches(
-          'JoinedMeeting.MicControl.MicPermissionsDenied'
+          'LiveMedia.MicControl.MicPermissionsDenied'
         )
       ) {
         return 'denied'
       }
       if (
-        this.meetingActor.snapshot.matches(
-          'JoinedMeeting.MicControl.MicUnmuted'
-        ) ||
-        this.meetingActor.snapshot.matches('JoinedMeeting.MicControl.MicMuted')
+        this.meetingActor.snapshot.matches('LiveMedia.MicControl.MicUnmuted') ||
+        this.meetingActor.snapshot.matches('LiveMedia.MicControl.MicMuted')
       ) {
         return 'granted'
       }
@@ -595,25 +593,28 @@ export default {
 
     isScreenSharing() {
       return this.meetingActor.snapshot.matches(
-        'JoinedMeeting.ScreenShareControl.SharingMyScreen'
+        'LiveMedia.ScreenShareControl.SharingMyScreen'
       )
     },
     isViewingPartnerScreenShare() {
       return this.meetingActor.snapshot.matches(
-        'JoinedMeeting.ScreenShareControl.ViewingPartnerScreenShare'
+        'LiveMedia.ScreenShareControl.ViewingPartnerScreenShare'
       )
     },
-    isJoiningCall() {
-      return (
-        this.meetingActor?.snapshot?.hasTag('loadingScreenShare') ||
-        this.meetingActor?.snapshot?.hasTag('loadingAudioCall')
-      )
+    isLoadingMicControl() {
+      return this.meetingActor?.snapshot?.hasTag('loadingAudioCall')
+    },
+    isLoadingScreenShareControl() {
+      return this.meetingActor?.snapshot?.hasTag('loadingScreenShare')
+    },
+    isLoadingSpeakerControl() {
+      return this.meetingActor?.snapshot?.hasTag('loadingSpeakerControl')
     },
     meetingHasNotEnded() {
       return !this.meetingActor?.snapshot?.matches('Ended')
     },
-    unableToJoinCall() {
-      return this.meetingActor?.snapshot?.hasTag('unableToJoinCall')
+    unableToJoinMediaRoom() {
+      return this.meetingActor?.snapshot?.hasTag('unableToJoinMediaRoom')
     },
     unableToJoinAudio() {
       return this.meetingActor?.snapshot?.hasTag('unableToJoinAudio')
@@ -621,10 +622,10 @@ export default {
     screenShareActive() {
       return (
         this.meetingActor.snapshot.matches(
-          'JoinedMeeting.ScreenShareControl.SharingMyScreen'
+          'LiveMedia.ScreenShareControl.SharingMyScreen'
         ) ||
         (this.meetingActor.snapshot.matches(
-          'JoinedMeeting.ScreenShareControl.ViewingPartnerScreenShare'
+          'LiveMedia.ScreenShareControl.ViewingPartnerScreenShare'
         ) &&
           this.meetingActor.snapshot.context.showPartnerScreenShare)
       )
@@ -633,12 +634,10 @@ export default {
       return meetingActor?.value.snapshot
     },
     isMyMicMuted() {
-      return !this.snapshot.matches('JoinedMeeting.MicControl.MicUnmuted')
+      return !this.snapshot.matches('LiveMedia.MicControl.MicUnmuted')
     },
     isSpeakerMuted() {
-      return !this.snapshot.matches(
-        'JoinedMeeting.SpeakerControl.SpeakerUnmuted'
-      )
+      return !this.snapshot.matches('LiveMedia.SpeakerControl.SpeakerUnmuted')
     },
     isPartnerSpeaking() {
       return this.snapshot.context.isPartnerSpeaking
@@ -664,19 +663,12 @@ export default {
           : 'is in session'
     },
     partnerCanUseMic() {
-      return (
-        !this.isPartnerLiveMediaBanned &&
-        this.snapshot.context.hasReceivedPartnerAudio
-      )
+      return !this.isPartnerLiveMediaBanned
     },
     partnerMicStatus() {
       const name = this.sessionPartner.firstname
       const isMuted = this.snapshot.context.isPartnerMicMuted
-      const hasReceivedAudioFromPartner =
-        this.snapshot.context.hasReceivedPartnerAudio
       if (this.isPartnerLiveMediaBanned) return `${name}'s mic is censored`
-      else if (!hasReceivedAudioFromPartner)
-        return `${name}'s mic is unavailable`
       else if (isMuted) return `${name} has muted their mic`
       else return ''
     },

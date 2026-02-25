@@ -1,5 +1,5 @@
 import { DefaultMeetingSession } from 'amazon-chime-sdk-js'
-import { assign, setup } from 'xstate'
+import { assign, setup, raise } from 'xstate'
 import {
   fetchChimeMeeting,
   createMeetingSession,
@@ -16,6 +16,7 @@ import store from '@/store'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import { socket } from '@/socket'
 
 const MAX_RETRY_COUNT = 3
 const BASE_RETRY_DELAY = 1000
@@ -51,6 +52,7 @@ export type Context = {
   screenShareWidth: number | undefined
   screenShareHeight: number | undefined
   sessionRecordingStarted: boolean
+  isMeetingJoined: boolean
 }
 
 export type Events =
@@ -90,8 +92,8 @@ export type Events =
   | { type: 'not_banned' }
   | { type: 'transcription_status_changed'; status: 'started' | 'stopped' }
   | { type: 'stop_stream' }
-
-//TODO: Move checking live media ban before creating chime meeting
+  | { type: 'media_room_is_ready' }
+  | { type: 'fetch_media_room' }
 export function create() {
   return setup({
     types: {
@@ -99,8 +101,10 @@ export function create() {
         | 'loadingScreenShare'
         | 'error'
         | 'loadingAudioCall'
-        | 'unableToJoinCall'
-        | 'unableToJoinAudioCall',
+        | 'unableToJoinMediaRoom'
+        | 'unableToJoinAudio'
+        | 'loadingSpeakerControl',
+
       context: {} as Context,
       events: {} as Events,
       input: {} as { sessionId: string },
@@ -163,10 +167,21 @@ export function create() {
           },
         })
       },
+      fetchMediaRoom: raise({ type: 'fetch_media_room' }),
+      notifyMediaRoomReady: raise({ type: 'media_room_is_ready' }),
+      setMeetingJoined: assign({
+        isMeetingJoined: () => true,
+      }),
     },
     guards: {
       maxRetriesReached: ({ context }) => {
         return context.retryCount > context.maxRetries
+      },
+      hasJoinedMediaRoom: ({ context }) => {
+        return context?.isMeetingJoined
+      },
+      hasNotJoinedMediaRoom: ({ context }) => {
+        return !context?.isMeetingJoined
       },
     },
   }).createMachine({
@@ -192,6 +207,7 @@ export function create() {
       screenShareWidth: undefined,
       screenShareHeight: undefined,
       sessionRecordingStarted: false,
+      isMeetingJoined: false,
     }),
     initial: 'FetchingState',
     entry: { type: 'entry' },
@@ -235,10 +251,9 @@ export function create() {
     states: {
       // Parallel machine that exits when all the UI and data we need are loaded
       FetchingState: {
-        tags: ['loadingScreenShare', 'loadingAudioCall'],
         type: 'parallel',
         onDone: {
-          target: 'FetchingChimeMeeting',
+          target: 'LiveMedia',
         },
         states: {
           LoadingAudioUI: {
@@ -311,100 +326,7 @@ export function create() {
           },
         },
       },
-      FetchingChimeMeeting: {
-        initial: 'Loading',
-        tags: ['loadingScreenShare', 'loadingAudioCall'],
-        states: {
-          Loading: {
-            invoke: {
-              id: 'FetchingChimeMeeting.Loading:fetchChimeMeeting',
-              src: 'fetchChimeMeeting',
-              input: ({ context }) => ({ sessionId: context.sessionId }),
-              onDone: {
-                target: '#MeetingMachine.CreatingMeetingSession',
-                actions: assign({
-                  meeting: ({ event }) => event.output.meeting,
-                  attendee: ({ event }) => event.output.attendee,
-                  partnerAttendeeId: ({ event }) =>
-                    event.output.partnerAttendee?.AttendeeId ?? null,
-                  retryCount: 0,
-                }),
-              },
-              onError: {
-                target: 'RetryFetchingChimeMeeting',
-                actions: ({ event }) => {
-                  LoggerService.noticeError(
-                    `Error fetching chime meeting`,
-                    event.error
-                  )
-                },
-              },
-            },
-          },
-          RetryFetchingChimeMeeting: {
-            tags: ['loadingScreenShare', 'loadingAudioCall'],
-            after: {
-              timeout: [
-                {
-                  target: '#MeetingMachine.UnableToJoinMeeting',
-                  guard: {
-                    type: 'maxRetriesReached',
-                  },
-                },
-                {
-                  target: 'Loading',
-                  actions: {
-                    type: 'incrementRetryCount',
-                  },
-                },
-              ],
-            },
-          },
-        },
-      },
-      CreatingMeetingSession: {
-        tags: ['loadingScreenShare', 'loadingAudioCall'],
-        invoke: {
-          id: 'CreatingMeetingSession:createMeetingSession',
-          src: 'createMeetingSession',
-          input: ({ context }) => ({ context }),
-          onDone: {
-            target: 'JoiningMeeting',
-            actions: assign({
-              meetingSession: ({ event }) => event.output.meetingSession,
-            }),
-          },
-          onError: {
-            target: 'UnableToJoinMeeting',
-            actions: ({ event }) => {
-              LoggerService.noticeError(
-                `Error creating meeting session`,
-                event.error
-              )
-            },
-          },
-        },
-      },
-      JoiningMeeting: {
-        tags: ['loadingScreenShare', 'loadingAudioCall'],
-        invoke: {
-          id: 'JoiningMeeting:joinMeeting',
-          src: 'joinMeeting',
-          input: ({ context, self }) => ({
-            context,
-            parent: self,
-          }),
-        },
-        on: {
-          meeting_started: {
-            target: 'JoinedMeeting',
-          },
-        },
-        description: `This is where we add the chime observers and call audioVideo.start()
-        TODO: add retry for when we get an unhandled exception, and 'sendBack'
-        to retry when we get an error from AWS`,
-      },
-      JoinedMeeting: {
+      LiveMedia: {
         type: 'parallel',
         states: {
           ScreenShareControl: {
@@ -413,18 +335,36 @@ export function create() {
               Idle: {
                 on: {
                   share_screen: {
-                    target: 'StartingShareMyScreen',
+                    target: 'FetchMediaRoom',
                   },
-                  partner_shared_screen: {
-                    target: 'ViewingPartnerScreenShare',
-                    actions: [
-                      assign({ showPartnerScreenShare: () => true }),
-                      () => {
-                        AnalyticsService.captureEvent(
-                          EVENTS.SCREENSHARE_USER_VIEWED_SCREENSHARE
-                        )
-                      },
-                    ],
+                  partner_shared_screen: [
+                    {
+                      guard: 'hasNotJoinedMediaRoom',
+                      target: 'ViewingPartnerScreenShare',
+                      actions: [
+                        'fetchMediaRoom',
+                        assign({ showPartnerScreenShare: () => true }),
+                      ],
+                    },
+                    {
+                      target: 'ViewingPartnerScreenShare',
+                      actions: assign({ showPartnerScreenShare: () => true }),
+                    },
+                  ],
+                },
+              },
+              FetchMediaRoom: {
+                tags: ['loadingScreenShare'],
+                entry: 'fetchMediaRoom',
+                always: [
+                  {
+                    target: 'StartingShareMyScreen',
+                    guard: 'hasJoinedMediaRoom',
+                  },
+                ],
+                on: {
+                  media_room_is_ready: {
+                    target: 'StartingShareMyScreen',
                   },
                 },
               },
@@ -447,7 +387,6 @@ export function create() {
                 },
               },
               CheckingEligibility: {
-                tags: ['loadingScreenShare'],
                 on: {
                   banned: [
                     {
@@ -499,6 +438,11 @@ export function create() {
                           error: () => {
                             event.output.endScreenShareModeration()
                           },
+                        })
+                      },
+                      ({ context }) => {
+                        socket.emit('partner_joined_live_media', {
+                          sessionId: context.sessionId,
                         })
                       },
                     ],
@@ -565,7 +509,7 @@ export function create() {
             states: {
               AudioCallUnavailable: {
                 type: 'final',
-                tags: ['unableToJoinAudioCall'],
+                tags: ['unableToJoinAudio'],
               },
               ViewingEligibleOnly: {
                 on: {
@@ -575,7 +519,6 @@ export function create() {
                 },
               },
               CheckingEligibility: {
-                tags: ['loadingScreenShare'],
                 invoke: {
                   id: 'MicControl.CheckingEligibility:checkEligibility',
                   src: 'isBannedFromLiveMedia',
@@ -594,6 +537,21 @@ export function create() {
                 description: 'Waiting for the user to request to use their mic',
                 on: {
                   toggle_mute_self: {
+                    target: 'FetchMediaRoom',
+                  },
+                },
+              },
+              FetchMediaRoom: {
+                tags: ['loadingAudioCall'],
+                entry: 'fetchMediaRoom',
+                always: [
+                  {
+                    target: 'RequestingMicAccess',
+                    guard: 'hasJoinedMediaRoom',
+                  },
+                ],
+                on: {
+                  media_room_is_ready: {
                     target: 'RequestingMicAccess',
                   },
                 },
@@ -690,12 +648,27 @@ export function create() {
                 description: `Waiting for the user to attempt to interact with the speaker.`,
                 on: {
                   toggle_mute_partner: {
+                    target: 'FetchMediaRoom',
+                  },
+                },
+              },
+              FetchMediaRoom: {
+                tags: ['loadingSpeakerControl'],
+                entry: 'fetchMediaRoom',
+                always: [
+                  {
+                    target: 'RequestSpeakerAccess',
+                    guard: 'hasJoinedMediaRoom',
+                  },
+                ],
+                on: {
+                  media_room_is_ready: {
                     target: 'RequestSpeakerAccess',
                   },
                 },
               },
               RequestSpeakerAccess: {
-                tags: ['loadingAudioCall'],
+                tags: ['loadingSpeakerControl'],
                 invoke: {
                   id: 'SpeakerControl.RequestSpeakerAccess#requestSpeakerAccess',
                   src: 'requestSpeakerAccess',
@@ -740,40 +713,148 @@ export function create() {
               },
             },
           },
-        },
-        on: {
-          active_speakers_changed: {
-            actions: [
-              assign({
-                isPartnerSpeaking: (input) =>
-                  input.event.speakerIds.includes(
-                    input.context.partnerAttendeeId ?? ''
-                  ),
-                activeSpeakerIds: (input) => input.event.speakerIds,
-                isPartnerMicMuted: (input) =>
-                  // If the partner is speaking, they can't be muted.
-                  input.context.partnerAttendeeId &&
-                  input.event.speakerIds.includes(
-                    input.context.partnerAttendeeId
-                  )
-                    ? false
-                    : input.context.isPartnerMicMuted,
-              }),
-            ],
-          },
-          partner_mute_change: {
-            actions: [
-              assign({
-                isPartnerMicMuted: (input) => input.event.muted,
-              }),
-            ],
-          },
-          received_partner_audio_info: {
-            actions: [
-              assign({
-                hasReceivedPartnerAudio: () => true,
-              }),
-            ],
+          MediaRouter: {
+            initial: 'Idle',
+            states: {
+              Idle: {
+                on: {
+                  fetch_media_room: {
+                    target: 'FetchingChimeMeeting',
+                    guard: 'hasNotJoinedMediaRoom',
+                  },
+                },
+              },
+              FetchingChimeMeeting: {
+                initial: 'Loading',
+                states: {
+                  Loading: {
+                    invoke: {
+                      id: 'FetchingChimeMeeting.Loading:fetchChimeMeeting',
+                      src: 'fetchChimeMeeting',
+                      input: ({ context }) => ({
+                        sessionId: context.sessionId,
+                      }),
+                      onDone: {
+                        target:
+                          '#MeetingMachine.LiveMedia.MediaRouter.CreatingMeetingSession',
+                        actions: assign({
+                          meeting: ({ event }) => event.output.meeting,
+                          attendee: ({ event }) => event.output.attendee,
+                          partnerAttendeeId: ({ event }) =>
+                            event.output.partnerAttendee?.AttendeeId ?? null,
+                          retryCount: 0,
+                        }),
+                      },
+                      onError: {
+                        target: 'RetryFetchingChimeMeeting',
+                        actions: ({ event }) => {
+                          LoggerService.noticeError(
+                            `Error fetching chime meeting`,
+                            event.error
+                          )
+                        },
+                      },
+                    },
+                  },
+                  RetryFetchingChimeMeeting: {
+                    after: {
+                      timeout: [
+                        {
+                          target: '#MeetingMachine.UnableToJoinMeeting',
+                          guard: {
+                            type: 'maxRetriesReached',
+                          },
+                        },
+                        {
+                          target: 'Loading',
+                          actions: {
+                            type: 'incrementRetryCount',
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+              CreatingMeetingSession: {
+                invoke: {
+                  id: 'CreatingMeetingSession:createMeetingSession',
+                  src: 'createMeetingSession',
+                  input: ({ context }) => ({ context }),
+                  onDone: {
+                    target: 'JoiningMeeting',
+                    actions: assign({
+                      meetingSession: ({ event }) =>
+                        event.output.meetingSession,
+                    }),
+                  },
+                  onError: {
+                    target: '#MeetingMachine.UnableToJoinMeeting',
+                    actions: ({ event }) => {
+                      LoggerService.noticeError(
+                        `Error creating meeting session`,
+                        event.error
+                      )
+                    },
+                  },
+                },
+              },
+              JoiningMeeting: {
+                invoke: {
+                  id: 'JoiningMeeting:joinMeeting',
+                  src: 'joinMeeting',
+                  input: ({ context, self }) => ({
+                    context,
+                    parent: self,
+                  }),
+                },
+                on: {
+                  meeting_started: {
+                    actions: ['setMeetingJoined', 'notifyMediaRoomReady'],
+                    target: 'Ready',
+                  },
+                },
+                description: `This is where we add the chime observers and call audioVideo.start()
+        TODO: add retry for when we get an unhandled exception, and 'sendBack'
+        to retry when we get an error from AWS`,
+              },
+              Ready: {},
+            },
+            on: {
+              active_speakers_changed: {
+                actions: [
+                  assign({
+                    isPartnerSpeaking: (input) =>
+                      input.event.speakerIds.includes(
+                        input.context.partnerAttendeeId ?? ''
+                      ),
+                    activeSpeakerIds: (input) => input.event.speakerIds,
+                    isPartnerMicMuted: (input) =>
+                      // If the partner is speaking, they can't be muted.
+                      input.context.partnerAttendeeId &&
+                      input.event.speakerIds.includes(
+                        input.context.partnerAttendeeId
+                      )
+                        ? false
+                        : input.context.isPartnerMicMuted,
+                  }),
+                ],
+              },
+              partner_mute_change: {
+                actions: [
+                  assign({
+                    isPartnerMicMuted: (input) => input.event.muted,
+                  }),
+                ],
+              },
+              received_partner_audio_info: {
+                actions: [
+                  assign({
+                    hasReceivedPartnerAudio: () => true,
+                  }),
+                ],
+              },
+            },
           },
         },
       },
@@ -783,11 +864,11 @@ export function create() {
           src: 'stopShareMyScreenAndMic',
           input: ({ context }) => ({ context }),
           onDone: {
-            target: 'JoinedMeeting',
+            target: '#MeetingMachine.LiveMedia.MediaRouter.Ready',
           },
         },
       },
-      UnableToJoinMeeting: { type: 'final', tags: ['unableToJoinCall'] },
+      UnableToJoinMeeting: { type: 'final', tags: ['unableToJoinMediaRoom'] },
       Ended: { type: 'final' },
     },
   })

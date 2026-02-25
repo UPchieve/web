@@ -5,32 +5,31 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import SpeakerMutedIcon from '@/assets/voice_message_icons/speaker-muted.svg'
 import SpeakerFilledIcon from '@/assets/voice_message_icons/speaker-filled.svg'
+import Spinner from '@/components/Spinner.vue'
 
 const props = defineProps<{
   isPartnerSpeaking: boolean
   isSpeakerMuted: boolean
-  unableToJoinCall: boolean
+  hasConnectedToMediaRoom: boolean
   partnerMicStatus: string
   partnerCanUseMic: boolean
+  isLoading: boolean
 }>()
+
 const emit = defineEmits<{
   (e: 'toggleMuteSpeaker'): void
 }>()
 
 const disabled = computed(() => {
-  return props.unableToJoinCall || !props.partnerCanUseMic
+  return !props.hasConnectedToMediaRoom || !props.partnerCanUseMic
 })
 
 const tooltipText = computed(() => {
-  if (!props.partnerCanUseMic) {
-    return props.partnerMicStatus
-  }
-
-  if (props.unableToJoinCall) {
+  if (!props.hasConnectedToMediaRoom) {
     return 'Unable to join call'
-  }
-
-  if (props.isSpeakerMuted) {
+  } else if (!props.partnerCanUseMic) {
+    return props.partnerMicStatus
+  } else if (props.isSpeakerMuted) {
     return 'Click to listen'
   }
 
@@ -47,8 +46,23 @@ const onClickMute = () => {
 </script>
 <template>
   <div class="start-call-container" :class="{ muted: props.isSpeakerMuted }">
+    <Spinner
+      v-if="props.isLoading"
+      class="spinner"
+      :container-height="48"
+      :container-width="48"
+      :width="36"
+      :height="36"
+      :thickness="3"
+      v-tooltip="{
+        text: 'Connecting audio...',
+        color: 'black',
+        position: 'bottom',
+      }"
+    />
     <button
-      :disabled="props.unableToJoinCall || !props.partnerCanUseMic"
+      v-else
+      :disabled="disabled"
       class="speaker-button"
       :class="{
         muted: props.isSpeakerMuted,

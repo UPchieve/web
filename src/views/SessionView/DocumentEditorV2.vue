@@ -21,7 +21,7 @@
       </button>
       <div v-if="showScreenShareTool">
         <span
-          v-if="unableToJoinCall"
+          v-if="unableToJoinMediaRoom"
           @mouseenter="toggleScreenShareErrorTooltipOpen"
           @mouseleave="toggleScreenShareErrorTooltipOpen"
           @click="toggleScreenShareErrorTooltipOpen"
@@ -35,7 +35,7 @@
           <ErrorIcon class="screenshare-error" />
         </span>
         <Spinner
-          v-else-if="isJoiningCall"
+          v-else-if="isLoadingScreenShareControl"
           :height="20"
           :width="20"
           :container-height="20"
@@ -189,11 +189,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    isJoiningCall: {
+    isLoadingScreenShareControl: {
       type: Boolean,
       default: false,
     },
-    unableToJoinCall: {
+    unableToJoinMediaRoom: {
       type: Boolean,
       default: false,
     },

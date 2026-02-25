@@ -321,6 +321,12 @@ export default {
           PARTNER_IMAGE_UPLOAD_STATUS.SUCCESS
         )
       })
+
+      socket.on('partner_joined_live_media', () => {
+        rootGetters['liveMedia/screenShareActor']?.send({
+          type: 'partner_shared_screen',
+        })
+      })
     },
     connect() {
       socket.connect()

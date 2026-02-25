@@ -11,9 +11,8 @@ const props = defineProps<{
   isMicMuted: boolean
   micState: 'denied' | 'granted' | 'prompt'
   hasSpeakingPrivileges: boolean
-  audioCallSupported: boolean
-  isJoiningCall: boolean
-  unableToJoinCall: boolean
+  hasConnectedToMediaRoom: boolean
+  isLoading: boolean
 }>()
 const emit = defineEmits<{
   (e: 'toggleMuteMic'): void
@@ -22,33 +21,22 @@ const isDisabled = computed(() => {
   return (
     props.micState === 'denied' ||
     !props.hasSpeakingPrivileges ||
-    !props.audioCallSupported ||
-    props.isJoiningCall ||
-    props.unableToJoinCall
+    !props.hasConnectedToMediaRoom ||
+    props.isLoading
   )
 })
 const tooltipText = computed(() => {
-  if (props.unableToJoinCall) {
+  if (!props.hasConnectedToMediaRoom) {
     return 'Unable to join call'
-  }
-
-  if (props.micState === 'denied') {
+  } else if (props.micState === 'denied') {
     return 'Mic permission denied'
-  }
-
-  if (!props.hasSpeakingPrivileges) {
+  } else if (!props.hasSpeakingPrivileges) {
     return 'You have been banned from audio'
-  }
-
-  if (!props.audioCallSupported) {
-    return 'Audio call not supported'
-  }
-
-  if (props.isMicMuted) {
+  } else if (props.isMicMuted) {
     return 'Click to speak'
+  } else {
+    return 'Click to mute mic'
   }
-
-  return 'Click to mute mic'
 })
 
 const onClickMute = () => {
@@ -67,7 +55,7 @@ const onMouseEnterMicButton = () => {
 <template>
   <div class="start-call-container" :class="{ muted: props.isMicMuted }">
     <Spinner
-      v-if="props.isJoiningCall"
+      v-if="props.isLoading"
       class="spinner"
       :container-height="48"
       :container-width="48"

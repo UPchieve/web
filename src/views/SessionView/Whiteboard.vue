@@ -27,14 +27,20 @@
         :disabled="isViewingPartnerScreenShare ? true : false"
       >
         <Spinner
-          v-if="isJoiningCall"
+          v-if="isLoadingScreenShareControl"
+          class="spinner"
           :height="24"
           :width="24"
           :container-height="24"
           :container-width="24"
+          v-tooltip="{
+            text: 'Loading screenshare...',
+            color: 'black',
+            position: 'bottom',
+          }"
         />
         <span
-          v-else-if="unableToJoinCall"
+          v-else-if="unableToJoinMediaRoom"
           @mouseenter="toggleScreenShareErrorTooltip"
           @mouseleave="toggleScreenShareErrorTooltip"
           @click="toggleScreenShareErrorTooltip"
@@ -584,11 +590,11 @@ export default {
       type: Boolean,
       required: true,
     },
-    isJoiningCall: {
+    isLoadingScreenShareControl: {
       type: Boolean,
       required: true,
     },
-    unableToJoinCall: {
+    unableToJoinMediaRoom: {
       type: Boolean,
       required: true,
     },
@@ -1662,6 +1668,19 @@ export default {
 </script>
 
 <style lang="scss">
+.spinner::before {
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  padding-left: 8px;
+  padding-right: 8px;
+  left: -25%;
+  top: 100%;
+  transition-property: none;
+  max-width: 130px;
+}
+
 .zwib-wrapper {
   height: 100%;
   width: 100%;

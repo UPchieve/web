@@ -403,9 +403,14 @@ export const requestMicAccess = fromPromise(
           audio: true,
         })
     )
+
     const audioInputDevices =
       await meetingSession.audioVideo.listAudioInputDevices()
-    if (!audioInputDevices) throw new Error('No audio input devices available')
+
+    if (!audioInputDevices) {
+      throw new Error('No audio input devices available')
+    }
+
     await meetingSession.audioVideo.startAudioInput(audioInputDevices[0])
   }
 )

@@ -71,6 +71,9 @@ export default {
       }
       return source
     },
+    screenShareActor: (state) => {
+      return state.screenShareActor
+    },
   },
   actions: {
     reset({ commit, dispatch }, data) {

@@ -23,10 +23,10 @@ const props = defineProps<{
   partnerPresence: string
   partnerMicStatus: string
   partnerCanUseMic: boolean
-  unableToJoinCall: boolean
-  isJoiningCall: boolean
+  unableToJoinMediaRoom: boolean
+  isLoadingMicControl: boolean
+  isLoadingSpeakerControl: boolean
   isBanned: boolean
-  unableToJoinAudio: boolean
   isSpeaking: boolean
   isFavoriteVolunteer: boolean
   micState: 'prompt' | 'granted' | 'denied'
@@ -51,7 +51,7 @@ const toggleMuteMic = async () => {
   emit('toggleMuteSelf')
 }
 
-const audioCallSupported = computed(() => !props.unableToJoinCall)
+const hasConnectedToMediaRoom = computed(() => !props.unableToJoinMediaRoom)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 </script>
 
@@ -62,10 +62,7 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
     <StudentIcon class="avatar" v-else />
     <PartnerInfo
       class="grow"
-      :userType="userType"
       :partnerPresence="props.partnerPresence"
-      :partnerMicStatus="props.partnerMicStatus"
-      :audioCallSupported="audioCallSupported"
       :isFavoriteVolunteer="props.isFavoriteVolunteer"
     />
     <div class="session-buttons" :class="userType">
@@ -78,16 +75,16 @@ render the session control buttons in here-->
         :isSpeakerMuted="props.isSpeakerMuted"
         :partnerCanUseMic="partnerCanUseMic"
         @toggleMuteSpeaker="toggleMuteSpeaker"
-        :unableToJoinCall="unableToJoinCall || unableToJoinAudio"
+        :hasConnectedToMediaRoom="hasConnectedToMediaRoom"
+        :isLoading="isLoadingSpeakerControl"
       ></SpeakerButton>
       <TalkButton
         :isMicMuted="props.isMyMicMuted"
         :isSpeaking="props.isSpeaking"
         :micState="props.micState"
         :hasSpeakingPrivileges="!props.isBanned"
-        :audioCallSupported="audioCallSupported"
-        :isJoiningCall="props.isJoiningCall"
-        :unableToJoinCall="unableToJoinCall || unableToJoinAudio"
+        :hasConnectedToMediaRoom="hasConnectedToMediaRoom"
+        :isLoading="props.isLoadingMicControl"
         @toggleMuteMic="toggleMuteMic"
       />
       <Menu v-if="mobileMode" />
