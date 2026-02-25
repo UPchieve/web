@@ -9,14 +9,16 @@ import Card from '@/components/NTHS/Card.vue'
 const store = useStore()
 const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
 const groupMembers = computed(
-  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupId]
+  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupInfo?.id]
 )
 const currentGroupMember = computed(() =>
   groupMembers.value?.find(
     (member: any) => member.userId === store.state.user.user.id
   )
 )
-const isGroupAdmin = computed(() => group.value?.roleName === 'admin')
+const isGroupAdmin = computed(
+  () => group.value?.memberInfo?.roleName === 'admin'
+)
 function onLeaveTeam() {
   ModalService.showLeaveTeamModal({
     isRemovingSelf: true,
@@ -30,7 +32,10 @@ function onLeaveTeam() {
     <section class="section">
       <Card v-if="isGroupAdmin">
         <template v-slot:header>Edit</template>
-        <EditableName :groupName="group.groupName" :groupId="group.groupId" />
+        <EditableName
+          :groupName="group.groupInfo?.name"
+          :groupId="group.groupInfo.id"
+        />
       </Card>
     </section>
     <LargeButton

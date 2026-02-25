@@ -8,14 +8,19 @@ import LargeButton from '@/components/LargeButton.vue'
 
 const store = useStore()
 const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
-const code = computed(() => group.value?.inviteCode)
-const isGroupAdmin = computed(() => group.value?.roleName === 'admin')
+const code = computed(() => group.value?.groupInfo?.inviteCode)
+const isGroupAdmin = computed(
+  () => group.value?.memberInfo?.roleName === 'admin'
+)
 const groupActions = computed(() => store.state.volunteer.NTHSGroupActions)
 const actions = computed(() => store.state.volunteer.NTHSActions ?? [])
 const checklist = computed(() => store.getters['volunteer/NTHSChecklist'])
 
 onBeforeMount(async () => {
-  await store.dispatch('volunteer/fetchNTHSGroupActions', group.value.groupId)
+  await store.dispatch(
+    'volunteer/fetchNTHSGroupActions',
+    group.value.groupInfo.id
+  )
 })
 </script>
 
@@ -23,7 +28,7 @@ onBeforeMount(async () => {
   <div class="container">
     <div class="header shrink center">
       <div class="header-main-info">
-        <span class="name">{{ group.groupName }}</span>
+        <span class="name">{{ group.groupInfo?.name }}</span>
       </div>
       <div class="link">
         <InviteLink v-if="code" :code="code" />
@@ -32,7 +37,7 @@ onBeforeMount(async () => {
     <div class="actions row shrink center">
       <Checklist
         v-if="isGroupAdmin && checklist.length"
-        :groupId="group.groupId"
+        :groupId="group.groupInfo.id"
         :actions="actions"
         :groupActions="groupActions"
         :checklist="checklist"

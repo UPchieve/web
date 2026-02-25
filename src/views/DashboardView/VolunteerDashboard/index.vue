@@ -179,10 +179,10 @@
     </div>
 
     <joined-team-modal
-      v-if="joinedTeamCode && group?.groupName"
+      v-if="joinedTeamCode && group?.groupInfo?.name"
       @close-modal="() => (joinedTeamCode = '')"
       :teamCode="joinedTeamCode"
-      :teamName="group.groupName"
+      :teamName="group.groupInfo?.groupName"
     />
 
     <photo-upload-modal

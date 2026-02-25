@@ -12,10 +12,10 @@ const isLoaded = ref(false)
 <template>
   <div class="iframe-container">
     <iframe
-      v-if="Boolean(group?.groupId)"
+      v-if="Boolean(group?.groupInfo?.id)"
       class="iframe"
       :class="isLoaded ? '' : 'hide'"
-      :src="`${config.NTHSRetoolDashboardUrl}?groupId=${group.groupId}`"
+      :src="`${config.NTHSRetoolDashboardUrl}?groupId=${group.groupInfo.id}`"
       width="100%"
       height="100%"
       loading="lazy"

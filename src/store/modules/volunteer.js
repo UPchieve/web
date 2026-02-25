@@ -47,9 +47,13 @@ export default {
       state.NTHSActions = data.actions
     },
     setNTHSGroupName: (state, { groupId, groupName }) => {
-      const group = state.NTHSGroups.find((g) => g.groupId === groupId)
+      const group = state.NTHSGroups.find((g) => g.groupInfo.id === groupId)
       if (group) {
-        const updatedGroup = { ...group, groupName }
+        const updatedGroupInfo = {
+          ...group.groupInfo,
+          name: groupName,
+        }
+        const updatedGroup = { ...group, groupInfo: { ...updatedGroupInfo } }
         state.NTHSGroups = [updatedGroup]
       }
     },

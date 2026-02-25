@@ -12,16 +12,19 @@ const store = useStore()
 const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
 const isFetchingGroupMembers = ref<boolean>(true)
 const groupMembers = computed(
-  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupId]
+  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupInfo?.id]
 )
 
-const groupId = computed(() => group.value?.groupId)
+const groupId = computed(() => group.value?.groupInfo?.id)
 const isLoading = computed(() => isFetchingGroupMembers.value)
 
 onBeforeMount(async () => {
   isFetchingGroupMembers.value = true
   if (!groupMembers.value && group.value) {
-    await store.dispatch('volunteer/fetchNTHSGroupMembers', group.value.groupId)
+    await store.dispatch(
+      'volunteer/fetchNTHSGroupMembers',
+      group.value?.groupInfo?.id
+    )
   }
   isFetchingGroupMembers.value = false
 })
