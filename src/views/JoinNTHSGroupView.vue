@@ -107,6 +107,7 @@ async function addVolunteerToTeam() {
       email: email.value,
       inviteCode: inviteCode.value,
     })
+
     if (response.data.groups) {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_JOINED_TEAM, {
         inviteCode: inviteCode.value,

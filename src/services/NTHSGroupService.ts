@@ -16,10 +16,18 @@ export const actionsCtaMap = {
   'REVIEWED RESOURCES': 'Review UPchieve resources',
   'ATTENDED ORIENTATION': 'Attend orientation',
 }
+export type NTHSSchoolAffiliationActionName =
+  | 'MARKED SCHOOL AFFILIATION IN PROGRESS'
+  | 'SUBMITTED ADVISOR CONTACT INFO'
+  | 'ADVISOR VERIFIED'
+  | 'SCHOOL AFFILIATION DENIED'
+  | 'OPTED OUT'
+
 export type NTHSActionName =
   | 'NAMED YOUR TEAM'
   | 'REVIEWED RESOURCES'
   | 'ATTENDED ORIENTATION'
+  | NTHSSchoolAffiliationActionName
 
 export enum CheckboxStatus {
   Done = 'done',
@@ -34,6 +42,10 @@ export type GroupAction = {
   createdAt: Date
   actionName: NTHSActionName
 }
+
+export type SchoolAffiliationAction = {
+  actionName: NTHSSchoolAffiliationActionName
+} & Omit<GroupAction, 'actionName'>
 
 export type ChecklistItem = {
   text: string

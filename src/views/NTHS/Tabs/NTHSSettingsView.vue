@@ -5,9 +5,11 @@ import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import EditableName from '@/components/NTHS/EditableName.vue'
 import Card from '@/components/NTHS/Card.vue'
+import SchoolAffiliation from '@/components/NTHS/SchoolAffiliation.vue'
 
 const store = useStore()
 const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
+
 const groupMembers = computed(
   () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupInfo?.id]
 )
@@ -30,19 +32,24 @@ function onLeaveTeam() {
 <template>
   <div class="container">
     <section class="section">
-      <Card v-if="isGroupAdmin">
+      <Card v-if="isGroupAdmin" class="fit">
         <template v-slot:header>Edit</template>
         <EditableName
           :groupName="group.groupInfo?.name"
           :groupId="group.groupInfo.id"
         />
       </Card>
+      <SchoolAffiliation
+        v-if="isGroupAdmin && group.groupId"
+        :groupId="group.groupId"
+        :initialStatus="group.schoolAffiliationStatus"
+      />
     </section>
     <LargeButton
       variant="danger"
       @click="onLeaveTeam"
       :showArrow="false"
-      class="team-action-button"
+      class="shrink"
       >Leave team</LargeButton
     >
   </div>
@@ -56,10 +63,22 @@ function onLeaveTeam() {
   justify-content: space-between;
   align-items: start;
   flex-wrap: wrap;
+  height: fit-content;
+  overflow: visible;
 }
 .section {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 24px;
+  flex: 1;
+}
+.shrink {
+  flex-shrink: 1;
+  flex-grow: 0;
+}
+
+.fit {
+  width: fit-content;
+  height: fit-content;
 }
 </style>

@@ -63,6 +63,13 @@ export default {
     setChecksInFlight(state, checksInFlight) {
       state.checksInFlight = checksInFlight
     },
+    setNTHSGroupStatus: (state, { groupId, schoolAffiliationStatus }) => {
+      const group = state.NTHSGroups.find((g) => g.groupId === groupId)
+      if (group) {
+        const updatedGroup = { ...group, schoolAffiliationStatus }
+        state.NTHSGroups = [updatedGroup]
+      }
+    },
   },
   actions: {
     appendToChecksInFlight({ commit, state }, id) {
@@ -319,6 +326,9 @@ export default {
   },
 
   getters: {
+    NTHSSchoolAffiliationStatus: (state) => {
+      return state.NTHSGroups?.[0].schoolAffiliationStatus
+    },
     isReadyToTutor: (_state, _getters, rootState, rootGetters) => {
       return (
         rootGetters['user/isVolunteer'] &&

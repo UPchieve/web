@@ -6,6 +6,7 @@ import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
 import type { Session } from '@/services/SessionService'
 import type { NTHSActionName } from './NTHSGroupService'
+import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -1419,5 +1420,11 @@ export default {
     return httpPost(`${API_ROOT}/nths-groups/${groupId}/actions`, {
       action,
     }).then(this._successHandler, this._errorHandler)
+  },
+  submitSchoolAffiliation(groupId: string, advisorInfo: AdvisorInfo) {
+    return httpPost(
+      `${API_ROOT}/nths-groups/${groupId}/submit-school-affiliation`,
+      advisorInfo
+    ).then(this._successHandler, this._errorHandler)
   },
 }
