@@ -1,5 +1,6 @@
 import { assign, setup } from 'xstate'
 import { updateStatus, setInitialState, submitAdvisorInfo } from './actors'
+import axios from 'axios'
 
 export type AdvisorInfo = {
   schoolId: string
@@ -24,6 +25,7 @@ const config = setup({
       groupId: string
       schoolAffiliationStatus: AffiliationStatus | null
       advisorInfo: AdvisorInfo | null
+      submitError: string | null
     },
     input: {} as {
       groupId: string
@@ -52,6 +54,7 @@ export const SchoolAffiliationMachine = config.createMachine({
     groupId: input.groupId,
     schoolAffiliationStatus: input.schoolAffiliationStatus,
     advisorInfo: null,
+    submitError: null,
   }),
   id: 'SchoolAffiliation',
   initial: 'Initial',
@@ -121,7 +124,10 @@ export const SchoolAffiliationMachine = config.createMachine({
       on: {
         SUBMIT_ADVISOR_INFO: {
           target: 'SubmittingAdvisorInfo',
-          actions: assign({ advisorInfo: ({ event }) => event.advisorInfo }),
+          actions: assign({
+            advisorInfo: ({ event }) => event.advisorInfo,
+            submitError: null,
+          }),
         },
         WITHDRAW: {
           target: 'OptingOut',
@@ -141,6 +147,20 @@ export const SchoolAffiliationMachine = config.createMachine({
           target: 'AwaitingUPchieveVerification',
           actions: assign({
             advisorInfo: ({ event }) => event.output,
+          }),
+        },
+        onError: {
+          target: 'SeekingAffiliation',
+          actions: assign({
+            submitError: ({ event }) => {
+              let message = 'An unknown error has occured'
+              if (axios.isAxiosError(event.error)) {
+                message =
+                  event.error.response?.data?.err ??
+                  'An unknown error has occured'
+              }
+              return message
+            },
           }),
         },
       },

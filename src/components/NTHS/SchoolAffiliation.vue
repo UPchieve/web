@@ -75,6 +75,9 @@ const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
           Add your school and a faculty advisor who can verify your chapter's
           affiliation.
         </p>
+        <p v-if="snapshot.context.submitError" class="card-text error-text">
+          {{ snapshot.context.submitError }}
+        </p>
       </div>
       <Form
         class="form"
@@ -157,6 +160,9 @@ const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
 }
 .card-text {
   text-align: left;
+}
+.error-text {
+  color: $c-error-red;
 }
 .header {
   text-align: left;
