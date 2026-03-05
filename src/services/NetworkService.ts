@@ -224,17 +224,20 @@ export default {
       this._errorHandler
     )
   },
-  registerOpenVolunteer(data) {
-    return httpPost(`${AUTH_ROOT}/register/volunteer/open`, data).then(
+  async registerOpenVolunteer(data) {
+    const config = await getAdditionalConfig('registerVolunteer')
+    return httpPost(`${AUTH_ROOT}/register/volunteer/open`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  registerPartnerVolunteer(data) {
-    return httpPost(`${AUTH_ROOT}/register/volunteer/partner`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+  async registerPartnerVolunteer(data) {
+    const config = await getAdditionalConfig('registerVolunteer')
+    return httpPost(
+      `${AUTH_ROOT}/register/volunteer/partner`,
+      data,
+      config
+    ).then(this._successHandler, this._errorHandler)
   },
   registerStudent(data) {
     return httpPost(`${AUTH_ROOT}/register/student`, data).then(
