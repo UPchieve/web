@@ -209,17 +209,17 @@ export function create() {
       sessionRecordingStarted: false,
       isMeetingJoined: false,
     }),
-    initial: 'FetchingState',
+    initial: 'Initializing',
     entry: { type: 'entry' },
     on: {
       meeting_ended: {
         target: '#MeetingMachine.Ended',
       },
       ban_user_from_live_media: {
-        target: '#MeetingMachine.ViewingEligibleOnly',
+        target: '#MeetingMachine.ViewOnly',
       },
       stop_stream: {
-        target: '#MeetingMachine.ViewingEligibleOnly',
+        target: '#MeetingMachine.ViewOnly',
       },
       new_partner_attendee: {
         actions: assign({
@@ -249,11 +249,10 @@ export function create() {
       },
     },
     states: {
-      // Parallel machine that exits when all the UI and data we need are loaded
-      FetchingState: {
+      Initializing: {
         type: 'parallel',
         onDone: {
-          target: 'LiveMedia',
+          target: 'Active',
         },
         states: {
           LoadingAudioUI: {
@@ -326,7 +325,7 @@ export function create() {
           },
         },
       },
-      LiveMedia: {
+      Active: {
         type: 'parallel',
         states: {
           ScreenShareControl: {
@@ -368,7 +367,7 @@ export function create() {
                   },
                 },
               },
-              ViewingEligibleOnly: {
+              ViewOnly: {
                 on: {
                   partner_shared_screen: {
                     target: 'ViewingPartnerScreenShare',
@@ -394,7 +393,7 @@ export function create() {
                       guard: ({ context }) => context.showPartnerScreenShare,
                     },
                     {
-                      target: 'ViewingEligibleOnly',
+                      target: 'ViewOnly',
                     },
                   ],
                   not_banned: {
@@ -485,7 +484,7 @@ export function create() {
                     {
                       guard: () =>
                         store.getters['liveMedia/isBannedFromLiveMedia'],
-                      target: 'ViewingEligibleOnly',
+                      target: 'ViewOnly',
                     },
                     {
                       target: 'Idle',
@@ -511,7 +510,7 @@ export function create() {
                 type: 'final',
                 tags: ['unableToJoinAudio'],
               },
-              ViewingEligibleOnly: {
+              ViewOnly: {
                 on: {
                   not_banned: {
                     target: 'CheckingEligibility',
@@ -525,7 +524,7 @@ export function create() {
                 },
                 on: {
                   banned: {
-                    target: 'ViewingEligibleOnly',
+                    target: 'ViewOnly',
                   },
                   not_banned: {
                     target: 'Waiting',
@@ -736,7 +735,7 @@ export function create() {
                       }),
                       onDone: {
                         target:
-                          '#MeetingMachine.LiveMedia.MediaRouter.CreatingMeetingSession',
+                          '#MeetingMachine.Active.MediaRouter.CreatingMeetingSession',
                         actions: assign({
                           meeting: ({ event }) => event.output.meeting,
                           attendee: ({ event }) => event.output.attendee,
@@ -760,7 +759,7 @@ export function create() {
                     after: {
                       timeout: [
                         {
-                          target: '#MeetingMachine.UnableToJoinMeeting',
+                          target: '#MeetingMachine.FailedToConnect',
                           guard: {
                             type: 'maxRetriesReached',
                           },
@@ -789,7 +788,7 @@ export function create() {
                     }),
                   },
                   onError: {
-                    target: '#MeetingMachine.UnableToJoinMeeting',
+                    target: '#MeetingMachine.FailedToConnect',
                     actions: ({ event }) => {
                       LoggerService.noticeError(
                         `Error creating meeting session`,
@@ -858,17 +857,17 @@ export function create() {
           },
         },
       },
-      ViewingEligibleOnly: {
+      ViewOnly: {
         invoke: {
-          id: 'ViewingEligibleOnly:stopShareMyScreenAndMic',
+          id: 'ViewOnly:stopShareMyScreenAndMic',
           src: 'stopShareMyScreenAndMic',
           input: ({ context }) => ({ context }),
           onDone: {
-            target: '#MeetingMachine.LiveMedia.MediaRouter.Ready',
+            target: '#MeetingMachine.Active.MediaRouter.Ready',
           },
         },
       },
-      UnableToJoinMeeting: { type: 'final', tags: ['unableToJoinMediaRoom'] },
+      FailedToConnect: { type: 'final', tags: ['unableToJoinMediaRoom'] },
       Ended: { type: 'final' },
     },
   })

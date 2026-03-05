@@ -576,14 +576,14 @@ export default {
     micState() {
       if (
         this.meetingActor.snapshot.matches(
-          'LiveMedia.MicControl.MicPermissionsDenied'
+          'Active.MicControl.MicPermissionsDenied'
         )
       ) {
         return 'denied'
       }
       if (
-        this.meetingActor.snapshot.matches('LiveMedia.MicControl.MicUnmuted') ||
-        this.meetingActor.snapshot.matches('LiveMedia.MicControl.MicMuted')
+        this.meetingActor.snapshot.matches('Active.MicControl.MicUnmuted') ||
+        this.meetingActor.snapshot.matches('Active.MicControl.MicMuted')
       ) {
         return 'granted'
       }
@@ -593,12 +593,12 @@ export default {
 
     isScreenSharing() {
       return this.meetingActor.snapshot.matches(
-        'LiveMedia.ScreenShareControl.SharingMyScreen'
+        'Active.ScreenShareControl.SharingMyScreen'
       )
     },
     isViewingPartnerScreenShare() {
       return this.meetingActor.snapshot.matches(
-        'LiveMedia.ScreenShareControl.ViewingPartnerScreenShare'
+        'Active.ScreenShareControl.ViewingPartnerScreenShare'
       )
     },
     isLoadingMicControl() {
@@ -622,10 +622,10 @@ export default {
     screenShareActive() {
       return (
         this.meetingActor.snapshot.matches(
-          'LiveMedia.ScreenShareControl.SharingMyScreen'
+          'Active.ScreenShareControl.SharingMyScreen'
         ) ||
         (this.meetingActor.snapshot.matches(
-          'LiveMedia.ScreenShareControl.ViewingPartnerScreenShare'
+          'Active.ScreenShareControl.ViewingPartnerScreenShare'
         ) &&
           this.meetingActor.snapshot.context.showPartnerScreenShare)
       )
@@ -634,10 +634,10 @@ export default {
       return meetingActor?.value.snapshot
     },
     isMyMicMuted() {
-      return !this.snapshot.matches('LiveMedia.MicControl.MicUnmuted')
+      return !this.snapshot.matches('Active.MicControl.MicUnmuted')
     },
     isSpeakerMuted() {
-      return !this.snapshot.matches('LiveMedia.SpeakerControl.SpeakerUnmuted')
+      return !this.snapshot.matches('Active.SpeakerControl.SpeakerUnmuted')
     },
     isPartnerSpeaking() {
       return this.snapshot.context.isPartnerSpeaking
