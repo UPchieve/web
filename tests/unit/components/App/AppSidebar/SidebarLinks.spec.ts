@@ -329,7 +329,6 @@ describe('SidebarLinks', () => {
           },
           featureFlags: {
             getters: {
-              isNTHSGroupsPageEnabled: () => false,
               userIsApprovedNTHSPresident: () => false,
               isNTHSApplicationPageEnabled: () => true,
             },
@@ -367,7 +366,6 @@ describe('SidebarLinks', () => {
           },
           featureFlags: {
             getters: {
-              isNTHSGroupsPageEnabled: () => true,
               userIsApprovedNTHSPresident: () => true,
               isNTHSApplicationPageEnabled: () => false,
             },
@@ -402,7 +400,6 @@ describe('SidebarLinks', () => {
             },
             featureFlags: {
               getters: {
-                isNTHSGroupsPageEnabled: () => true,
                 userIsApprovedNTHSPresident: () => isApprovedPresident,
                 isNTHSApplicationPageEnabled: () => false,
               },

@@ -258,18 +258,14 @@ export default {
         'featureFlags/isDisableStudentsJoinSlackCommunityEnabled',
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
-      isNTHSGroupsPageEnabled: 'featureFlags/isNTHSGroupsPageEnabled',
       userIsApprovedNTHSPresident: 'featureFlags/userIsApprovedNTHSPresident',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
     }),
     isMemberOfNTHSGroup() {
-      return (
-        this.isNTHSGroupsPageEnabled && this.volunteersNTHSGroups.length > 0
-      )
+      return this.volunteersNTHSGroups.length > 0
     },
     showCreateNTHSGroupLink() {
       return (
-        this.isNTHSGroupsPageEnabled &&
         this.userIsApprovedNTHSPresident &&
         this.volunteersNTHSGroups.length === 0
       )

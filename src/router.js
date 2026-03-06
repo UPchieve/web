@@ -608,17 +608,14 @@ const routes = [
     beforeEnter: async (_to, _from, next) => {
       const isApplicationPageFlagOn =
         store.getters['featureFlags/isNTHSApplicationPageEnabled']
-      const isGroupsPageFlagOn =
-        store.getters['featureFlags/isNTHSGroupsPageEnabled']
       const isApprovedPresident =
         store.getters['featureFlags/userIsApprovedNTHSPresident']
       const isInGroup =
         store.state.volunteer.NTHSGroups.length > 0 ||
         (await store.dispatch('volunteer/fetchNTHSGroupsForUser')).length > 0
 
-      if (isApprovedPresident && isGroupsPageFlagOn && !isInGroup)
-        return next('/groups/create')
-      if (isInGroup && isGroupsPageFlagOn) return next('/groups')
+      if (isApprovedPresident && !isInGroup) return next('/groups/create')
+      if (isInGroup) return next('/groups')
       if (isApplicationPageFlagOn && !isInGroup && !isApprovedPresident)
         return next()
 
@@ -631,14 +628,10 @@ const routes = [
     component: NTHSCreateGroupView,
     meta: { protected: true },
     beforeEnter: (_to, _from, next) => {
-      if (store.getters['featureFlags/isNTHSGroupsPageEnabled']) {
-        if (store.state.volunteer.NTHSGroups?.length === 0) {
-          next()
-        } else if (store.state.volunteer.NTHSGroups?.length > 0) {
-          next('/groups')
-        } else {
-          next('/dashboard')
-        }
+      if (store.state.volunteer.NTHSGroups?.length === 0) {
+        next()
+      } else if (store.state.volunteer.NTHSGroups?.length > 0) {
+        next('/groups')
       } else {
         next('/dashboard')
       }
@@ -651,18 +644,14 @@ const routes = [
     component: NTHSGroupsView,
     meta: { protected: true },
     beforeEnter: async (_to, _from, next) => {
-      if (store.getters['featureFlags/isNTHSGroupsPageEnabled']) {
+      if (store.state.volunteer.NTHSGroups?.length > 0) {
+        next()
+      } else if (store.getters['featureFlags/userIsApprovedNTHSPresident']) {
+        await store.dispatch('volunteer/fetchNTHSGroupsForUser')
         if (store.state.volunteer.NTHSGroups?.length > 0) {
           next()
-        } else if (store.getters['featureFlags/userIsApprovedNTHSPresident']) {
-          await store.dispatch('volunteer/fetchNTHSGroupsForUser')
-          if (store.state.volunteer.NTHSGroups?.length > 0) {
-            next()
-          } else {
-            next('/groups/create')
-          }
         } else {
-          next('/dashboard')
+          next('/groups/create')
         }
       } else {
         next('/dashboard')

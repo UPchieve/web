@@ -55,7 +55,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.NTHS_GROUP_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.USER_IS_APPROVED_NTHS_PRESIDENT]: false,
       [POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY]: false,
       [POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES]: false,
@@ -114,8 +113,6 @@ export default {
   getters: {
     isNewSpeechToTextEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_SPEECH_TO_TEXT],
-    isNTHSGroupsPageEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.NTHS_GROUP_PAGE],
     isFilterActiveSubjectsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
     isPollingFlagsActive: (state: FeatureFlagState) =>
