@@ -53,6 +53,7 @@ export type Context = {
   screenShareHeight: number | undefined
   sessionRecordingStarted: boolean
   isMeetingJoined: boolean
+  micAudioStream: MediaStream | null
 }
 
 export type Events =
@@ -208,6 +209,7 @@ export function create() {
       screenShareHeight: undefined,
       sessionRecordingStarted: false,
       isMeetingJoined: false,
+      micAudioStream: null,
     }),
     initial: 'Initializing',
     entry: { type: 'entry' },
@@ -440,7 +442,7 @@ export function create() {
                         })
                       },
                       ({ context }) => {
-                        socket.emit('partner_joined_live_media', {
+                        socket.emit('joinedLiveMedia', {
                           sessionId: context.sessionId,
                         })
                       },
@@ -566,6 +568,10 @@ export function create() {
                     meetingSession: context.meetingSession!,
                   }),
                   onDone: {
+                    actions: assign({
+                      micAudioStream: ({ event }) =>
+                        event.output.micAudioStream,
+                    }),
                     target: 'WaitingForTranscription',
                   },
                   onError: {
@@ -611,10 +617,12 @@ export function create() {
                 invoke: {
                   id: 'MicControl.WaitingForTranscription:maybeStartTranscription',
                   src: 'maybeStartTranscription',
-                  input: ({ context }) => ({
+                  input: ({ context, self }) => ({
                     transcriptionStarted: context.transcriptionStarted,
                     sessionId: context.sessionId!,
                     sessionRecordingStarted: context.sessionRecordingStarted,
+                    micAudioStream: context.micAudioStream,
+                    parent: self,
                   }),
                   onDone: {
                     target: 'MicUnmuted',

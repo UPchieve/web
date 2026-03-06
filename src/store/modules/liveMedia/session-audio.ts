@@ -46,6 +46,52 @@ export default {
       commit('setEverShownDisplayCallStatus', false)
     },
 
+    setPartialAudioTranscript: (
+      { commit, rootState, rootGetters },
+      transcript: string
+    ) => {
+      const msgId = crypto.randomUUID()
+      const msgData = {
+        text: transcript,
+        msgId: crypto.randomUUID(),
+        userType: rootGetters['user/userType'],
+        user: rootState.user.user.id,
+        sessionId: rootState.user.session.id,
+      }
+      commit('setMyInProgressCaptionMessage', msgData)
+      commit('setCaptionsCurrentMessageId', msgId)
+    },
+    setFinalAudioTranscript: async (
+      { commit, rootState, dispatch },
+      transcript: string
+    ) => {
+      const msgId = crypto.randomUUID()
+      const userId = rootState.user.user.id
+
+      commit('setCaptionsCurrentMessageId', msgId)
+
+      await dispatch(
+        'user/addPendingMessage',
+        {
+          contents: transcript,
+          type: 'audio-transcription',
+          user: userId,
+          userType: rootState.user.user.userType,
+          msgId: msgId,
+        },
+        { root: true }
+      )
+      socket.emit('message', {
+        sessionId: rootState.user.session.id,
+        user: { id: userId, _id: userId },
+        message: transcript,
+        source: '',
+        type: 'audio-transcription',
+        saidAt: new Date().toISOString(),
+        msgId,
+      })
+      commit('setMyInProgressCaptionMessage', null)
+    },
     inProgressCaptionMessage: (
       { commit, rootState, rootGetters },
       payload: {

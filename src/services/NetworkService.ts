@@ -1430,4 +1430,10 @@ export default {
       advisorInfo
     ).then(this._successHandler, this._errorHandler)
   },
+  getAssemblyAiToken() {
+    return httpPost(`${API_ROOT}/live-media/transcription/token`, {}).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

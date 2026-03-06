@@ -25,6 +25,11 @@ const createMeetingSession = fromPromise(async ({ input }) => {
   return { meetingSession }
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const requestMicAccess = fromPromise(async ({ input }) => {
+  return { micAudioStream: {} }
+})
+
 let isBanned = false
 let mockMachine = null
 const isBannedFromLiveMedia = fromCallback(({ sendBack }) => {
@@ -42,7 +47,6 @@ const startingShareMyScreen = fromPromise(() => ({
 export const stopShareMyScreen = fromPromise(noop)
 export const stopShareMyScreenAndMic = fromPromise(noop)
 export const maybeStartTranscription = fromPromise(noop)
-export const requestMicAccess = fromPromise(noop)
 export const requestSpeakerAccess = fromPromise(noop)
 
 const defaultActors = {
@@ -168,7 +172,7 @@ describe('MeetingMachine', () => {
         .matches('Active.ScreenShareControl.StartingShareMyScreen')
     ).toBe(true)
     await new Promise((resolve) => setTimeout(resolve, 10))
-    expect(socketEmitSpy).toBeCalledWith('partner_joined_live_media', {
+    expect(socketEmitSpy).toBeCalledWith('joinedLiveMedia', {
       sessionId: mockMachine.getSnapshot().context.sessionId,
     })
     await new Promise((resolve) => setTimeout(resolve, 10))

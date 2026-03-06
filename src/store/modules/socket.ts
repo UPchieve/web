@@ -322,7 +322,7 @@ export default {
         )
       })
 
-      socket.on('partner_joined_live_media', () => {
+      socket.on('partnerJoinedLiveMedia', () => {
         rootGetters['liveMedia/screenShareActor']?.send({
           type: 'partner_shared_screen',
         })
