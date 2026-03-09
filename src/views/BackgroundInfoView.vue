@@ -84,6 +84,22 @@
                 {{ option }}
               </label>
             </div>
+            <template v-if="isInHighSchool">
+              <label class="uc-form-label occupations-label" for="school">
+                What high school do you currently attend?<span
+                  v-if="isInGroup"
+                  class="background-info__question-required"
+                  >*</span
+                >
+              </label>
+              <FormSchoolSearch
+                :isRequired="isInGroup"
+                startSearchEvent=""
+                cannotFindSchoolEvent=""
+                selectedEvent=""
+                v-model="highSchoolId"
+              />
+            </template>
             <template v-if="isCollegeEducated">
               <label class="uc-form-label occupations-label" for="college"
                 >What college/university do you currently attend?<span
@@ -374,15 +390,22 @@ import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { backOff } from 'exponential-backoff'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import _ from 'lodash'
+import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 
+const HIGH_SCHOOL_STUDENT_OPTION = 'A high school student'
 export default {
   name: 'background-info-view',
-  components: { LargeButton, FormSelect, MazPhoneNumberInput },
+  components: {
+    FormSchoolSearch,
+    LargeButton,
+    FormSelect,
+    MazPhoneNumberInput,
+  },
   data() {
     return {
       options: {
         occupations: [
-          'A high school student',
+          HIGH_SCHOOL_STUDENT_OPTION,
           'An undergraduate student',
           'A graduate student',
           'Working full-time',
@@ -407,6 +430,7 @@ export default {
       showInputErrors: false,
       formError: '',
       occupation: [],
+      highSchoolId: null,
       linkedInUrl: '',
       experience: {
         tutoring: '',
@@ -451,7 +475,11 @@ export default {
     }),
     ...mapGetters({
       isStudentVolunteer: 'user/isStudentVolunteer',
+      isInGroup: 'volunteer/isInGroup',
     }),
+    isInHighSchool() {
+      return this.occupation.includes(HIGH_SCHOOL_STUDENT_OPTION)
+    },
     hasCompletedBackgroundInfo() {
       return (
         Object.hasOwn(this.user, 'occupation') &&
@@ -569,6 +597,7 @@ export default {
         phoneNumber: this.phoneNumber,
         signupSourceId: this.signupSourceId,
         otherSignupSource: this.otherSignupSource,
+        highSchoolId: this.isInHighSchool ? this.highSchoolId : null,
       }
 
       if (this.languages.length > 0) {
@@ -593,14 +622,13 @@ export default {
             event: EVENTS.ACCOUNT_APPROVED,
           })
 
-        // mandatory fields: occupation, experience, country / state / city,
+        // mandatory fields: occupation, experience, country / state / city, and highSchoolId if high school is selected in the occupations
         // update is a subset of mandatory fields
         const update = {
           occupation: data.occupation,
           country: data.country,
         }
         await this.$store.dispatch('user/addToUser', update)
-        this.justSubmittedBackgroundForm = true
       } catch (error) {
         LoggerService.noticeError(error)
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_ERROR, {

@@ -376,5 +376,8 @@ export default {
         ? []
         : checklist
     },
+    isInGroup: (state) => {
+      return state.NTHSGroups.length > 0
+    },
   },
 }
