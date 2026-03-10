@@ -117,7 +117,7 @@ const getWrapper = (options = {}) => {
         isOnboarded: false,
       },
     },
-    volunteer: {
+    nths: {
       state: {
         NTHSGroups: [],
       },
@@ -149,11 +149,11 @@ const getWrapper = (options = {}) => {
       productFlags: {
         ...storeOptions.modules.productFlags,
       },
-      volunteer: {
-        ...storeOptions.modules.volunteer,
+      nths: {
+        ...storeOptions.modules.nths,
         state: {
-          ...DEFAULTS.volunteer.state,
-          ...(options.volunteer?.state ?? {}),
+          ...DEFAULTS.nths.state,
+          ...(options.nths?.state ?? {}),
         },
       },
     },
@@ -404,7 +404,7 @@ describe('SidebarLinks', () => {
                 isNTHSApplicationPageEnabled: () => false,
               },
             },
-            volunteer: {
+            nths: {
               state: {
                 NTHSGroups: [{ groupId: 123 }],
               },

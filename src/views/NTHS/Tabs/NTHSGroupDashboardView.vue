@@ -5,7 +5,7 @@ import config from '@/config'
 import Spinner from '@/components/Spinner.vue'
 
 const store = useStore()
-const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
+const group = computed(() => store.state.nths.NTHSGroups?.[0])
 const isLoaded = ref(false)
 </script>
 

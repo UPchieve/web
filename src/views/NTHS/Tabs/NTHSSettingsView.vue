@@ -8,10 +8,10 @@ import Card from '@/components/NTHS/Card.vue'
 import SchoolAffiliation from '@/components/NTHS/SchoolAffiliation.vue'
 
 const store = useStore()
-const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
+const group = computed(() => store.state.nths.NTHSGroups?.[0])
 
 const groupMembers = computed(
-  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupInfo?.id]
+  () => store.state.nths.NTHSGroupMembers?.[group.value?.groupInfo?.id]
 )
 const currentGroupMember = computed(() =>
   groupMembers.value?.find(

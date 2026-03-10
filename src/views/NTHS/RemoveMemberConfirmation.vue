@@ -33,11 +33,11 @@ async function removeTeamMember() {
     const groupId = props.memberToRemove.nthsGroupId
     if (props.isRemovingSelf) {
       await NetworkService.leaveNthsChapter(props.memberToRemove.nthsGroupId)
-      store.commit('volunteer/setNTHSGroupMembers', {
+      store.commit('nths/setNTHSGroupMembers', {
         groupId,
         groupMembers: [],
       })
-      await store.dispatch('volunteer/fetchNTHSGroupsForUser')
+      await store.dispatch('nths/fetchNTHSGroupsForUser')
       await router.push('/dashboard')
     } else {
       await NetworkService.updateNTHSGroupMember(
@@ -47,10 +47,10 @@ async function removeTeamMember() {
           isActive: false,
         }
       )
-      const updatedGroupMembers = store.state.volunteer.NTHSGroupMembers[
+      const updatedGroupMembers = store.state.nths.NTHSGroupMembers[
         groupId
       ].filter((member: any) => member.userId !== props.memberToRemove.userId)
-      store.commit('volunteer/setNTHSGroupMembers', {
+      store.commit('nths/setNTHSGroupMembers', {
         groupId,
         groupMembers: updatedGroupMembers,
       })

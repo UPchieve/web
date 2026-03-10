@@ -7,20 +7,17 @@ import { RouterLink, RouterView } from 'vue-router'
 import LargeButton from '@/components/LargeButton.vue'
 
 const store = useStore()
-const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
+const group = computed(() => store.state.nths.NTHSGroups?.[0])
 const code = computed(() => group.value?.groupInfo?.inviteCode)
 const isGroupAdmin = computed(
   () => group.value?.memberInfo?.roleName === 'admin'
 )
-const groupActions = computed(() => store.state.volunteer.NTHSGroupActions)
-const actions = computed(() => store.state.volunteer.NTHSActions ?? [])
-const checklist = computed(() => store.getters['volunteer/NTHSChecklist'])
+const groupActions = computed(() => store.state.nths.NTHSGroupActions)
+const actions = computed(() => store.state.nths.NTHSActions ?? [])
+const checklist = computed(() => store.getters['nths/NTHSChecklist'])
 
 onBeforeMount(async () => {
-  await store.dispatch(
-    'volunteer/fetchNTHSGroupActions',
-    group.value.groupInfo.id
-  )
+  await store.dispatch('nths/fetchNTHSGroupActions', group.value.groupInfo.id)
 })
 </script>
 

@@ -485,7 +485,7 @@ export default {
     }),
     ...mapGetters({
       isStudentVolunteer: 'user/isStudentVolunteer',
-      isInGroup: 'volunteer/isInGroup',
+      isInGroup: 'nths/isInGroup',
     }),
     showRemovedFromNTHSMessage() {
       return (

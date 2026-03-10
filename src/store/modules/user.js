@@ -660,8 +660,8 @@ export default {
       userProps.fallIncentiveEnrollmentAt =
         rootState.productFlags.flags.fallIncentiveEnrollmentAt ?? null
 
-      if (rootState.volunteer.NTHSGroups.length) {
-        userProps.NTHSGroupId = rootState.volunteer.NTHSGroups[0].groupInfo.id
+      if (rootState.nths.NTHSGroups.length) {
+        userProps.NTHSGroupId = rootState.nths.NTHSGroups[0].groupInfo.id
       }
 
       return userProps

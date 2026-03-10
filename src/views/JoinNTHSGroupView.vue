@@ -44,9 +44,9 @@ onBeforeMount(async () => {
   // otherwise we get `Not Authorized` and are redirected to /login
   if ($store.state.user.user.id) {
     // Redirect to group page if user is already in a group
-    await $store.dispatch('volunteer/fetchNTHSGroupsForUser')
+    await $store.dispatch('nths/fetchNTHSGroupsForUser')
   }
-  if ($store.state.volunteer.NTHSGroups.length) {
+  if ($store.state.nths.NTHSGroups.length) {
     $router.replace('/groups')
   }
 
@@ -112,7 +112,7 @@ async function addVolunteerToTeam() {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_JOINED_TEAM, {
         inviteCode: inviteCode.value,
       })
-      await $store.commit('volunteer/setNTHSGroups', response.data.groups)
+      await $store.commit('nths/setNTHSGroups', response.data.groups)
       return $router.push(`/dashboard?inviteCode=${inviteCode.value}`)
     }
 

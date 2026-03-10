@@ -68,17 +68,17 @@ export async function toggleCheckbox({
   const i = checklist.find(({ text }) => text === item.text)
   if (i) {
     try {
-      store.dispatch('volunteer/appendToChecksInFlight', i.actionId)
+      store.dispatch('nths/appendToChecksInFlight', i.actionId)
       let result
       if (!groupActions.some(({ actionId }) => actionId === i.actionId)) {
         result = await NetworkService.createActionForNTHSGroup(
           groupId,
           i.actionName
         )
-        store.dispatch('volunteer/addNTHSGroupAction', result.data.action)
+        store.dispatch('nths/addNTHSGroupAction', result.data.action)
       }
     } finally {
-      store.dispatch('volunteer/removeFromChecksInFlight', i.actionId)
+      store.dispatch('nths/removeFromChecksInFlight', i.actionId)
     }
   }
 }

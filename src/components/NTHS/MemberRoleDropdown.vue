@@ -46,13 +46,13 @@ async function onChangeRole(newRole: DisplayRole) {
     )
     selectedRole.value = newRole
     const updatedMembers: GroupMember[] = [
-      ...store.state.volunteer.NTHSGroupMembers[props.groupMember.nthsGroupId],
+      ...store.state.nths.NTHSGroupMembers[props.groupMember.nthsGroupId],
     ]
     const indexOfUpdated = updatedMembers.findIndex(
       (member) => member.userId === props.groupMember.userId
     )
     updatedMembers[indexOfUpdated].roleName = role
-    store.commit('volunteer/setNTHSGroupMembers', {
+    store.commit('nths/setNTHSGroupMembers', {
       groupId: props.groupMember.nthsGroupId,
       groupMembers: updatedMembers,
     })

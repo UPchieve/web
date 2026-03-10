@@ -230,7 +230,7 @@ export default {
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {
-      this.$store.dispatch('volunteer/fetchNTHSGroupsForUser')
+      this.$store.dispatch('nths/fetchNTHSGroupsForUser')
     }
   },
   props: {
@@ -241,7 +241,7 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       productFlags: (state) => state.productFlags.flags,
-      volunteersNTHSGroups: (state) => state.volunteer.NTHSGroups,
+      volunteersNTHSGroups: (state) => state.nths.NTHSGroups,
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',

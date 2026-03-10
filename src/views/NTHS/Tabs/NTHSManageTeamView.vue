@@ -9,10 +9,10 @@ import Loader from '@/components/Loader.vue'
 import ModalService from '@/services/ModalService'
 
 const store = useStore()
-const group = computed(() => store.state.volunteer.NTHSGroups?.[0])
+const group = computed(() => store.state.nths.NTHSGroups?.[0])
 const isFetchingGroupMembers = ref<boolean>(true)
 const groupMembers = computed(
-  () => store.state.volunteer.NTHSGroupMembers?.[group.value?.groupInfo?.id]
+  () => store.state.nths.NTHSGroupMembers?.[group.value?.groupInfo?.id]
 )
 
 const groupId = computed(() => group.value?.groupInfo?.id)
@@ -22,7 +22,7 @@ onBeforeMount(async () => {
   isFetchingGroupMembers.value = true
   if (!groupMembers.value && group.value) {
     await store.dispatch(
-      'volunteer/fetchNTHSGroupMembers',
+      'nths/fetchNTHSGroupMembers',
       group.value?.groupInfo?.id
     )
   }
@@ -30,7 +30,7 @@ onBeforeMount(async () => {
 })
 
 const membersExcludingCurrentUser = computed(() =>
-  store.state.volunteer.NTHSGroupMembers[groupId.value].filter(
+  store.state.nths.NTHSGroupMembers[groupId.value].filter(
     (member: any) => !isCurrentUser(member.userId)
   )
 )

@@ -40,7 +40,7 @@ async function saveGroupName() {
       name: newGroupName.value,
     })
 
-    store.commit('volunteer/setNTHSGroupName', {
+    store.commit('nths/setNTHSGroupName', {
       groupId: props.groupId,
       groupName: result.data.group.name,
     })

@@ -9,7 +9,7 @@ import { isErrorWithResponse } from '@/utils/error-utils'
 
 const store = useStore()
 const router = useRouter()
-const hasGroup = computed(() => store.state.volunteer.NTHSGroups.length)
+const hasGroup = computed(() => store.state.nths.NTHSGroups.length)
 const errorMessage = ref('')
 
 watch(
@@ -23,7 +23,7 @@ async function createTeam() {
   try {
     errorMessage.value = ''
     const results = await NetworkService.createNTHSGroup()
-    store.commit('volunteer/setNTHSGroups', [results.data.group])
+    store.commit('nths/setNTHSGroups', [results.data.group])
   } catch (e) {
     if (isErrorWithResponse(e)) {
       // The use shouldn't really be able to get to this

@@ -328,7 +328,7 @@ export default {
       hasSharedMilestone: (state) => state.user.hasSharedMilestone,
       availabilityLastModifiedAt: (state) =>
         state.user.user?.availabilityLastModifiedAt,
-      group: (state) => state.volunteer.NTHSGroups?.[0],
+      group: (state) => state.nths.NTHSGroups?.[0],
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
