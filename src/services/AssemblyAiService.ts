@@ -63,8 +63,19 @@ export async function startTranscription(
   }
 
   ws.onclose = (event) => {
+    AnalyticsService.captureEvent(EVENTS.ASSEMBLY_AI_TRANSCRIPTION_CLOSED, {
+      websocketEvent: {
+        reason: event.reason,
+        code: event.code,
+        wasClean: event.wasClean,
+      },
+    })
     LoggerService.info('AssemblyAi websocket closed', {
-      event,
+      websocketEvent: {
+        reason: event.reason,
+        code: event.code,
+        wasClean: event.wasClean,
+      },
     })
   }
 
