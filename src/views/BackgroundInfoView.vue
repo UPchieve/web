@@ -11,6 +11,14 @@
         <p data-testid="bg-info-complete">
           Thank you for submitting your background information!<br />
         </p>
+        <Callout v-if="showRemovedFromNTHSMessage" icon="information">
+          <template v-slot:content>
+            Your responses in this form indicate that you are not currently a
+            high school student. Don't worry— you can still volunteer! However,
+            we have removed you from your National Tutoring Honors Society
+            chapter since that program is for current high school students only.
+          </template>
+        </Callout>
         <LargeButton
           variant="primary"
           class="continue-onboarding-btn"
@@ -391,11 +399,13 @@ import { backOff } from 'exponential-backoff'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import _ from 'lodash'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
+import Callout from '@/components/Callout.vue'
 
 const HIGH_SCHOOL_STUDENT_OPTION = 'A high school student'
 export default {
   name: 'background-info-view',
   components: {
+    Callout,
     FormSchoolSearch,
     LargeButton,
     FormSelect,
@@ -477,6 +487,13 @@ export default {
       isStudentVolunteer: 'user/isStudentVolunteer',
       isInGroup: 'volunteer/isInGroup',
     }),
+    showRemovedFromNTHSMessage() {
+      return (
+        this.isInGroup &&
+        !this.occupation.includes(HIGH_SCHOOL_STUDENT_OPTION) &&
+        this.wasSubmitted
+      )
+    },
     isInHighSchool() {
       return this.occupation.includes(HIGH_SCHOOL_STUDENT_OPTION)
     },
@@ -608,7 +625,6 @@ export default {
 
       try {
         await NetworkService.addBackgroundInfo(data)
-        this.wasSubmitted = false
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_COMPLETED, {
           event: EVENTS.BACKGROUND_INFORMATION_COMPLETED,
         })
@@ -901,9 +917,11 @@ textarea {
   flex-direction: column;
   padding: 1em;
   align-items: center;
+  gap: 16px;
 
   .continue-onboarding-btn {
     width: fit-content;
+    margin-top: 16px;
   }
 }
 </style>
