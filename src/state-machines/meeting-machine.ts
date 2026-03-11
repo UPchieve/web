@@ -632,6 +632,16 @@ export function create() {
                   },
                   onError: {
                     target: 'MicMuted',
+                    actions: () =>
+                      AnalyticsService.captureEvent(
+                        EVENTS.GENERAL_TRANSCRIPTION_ERROR,
+                        {
+                          isFeatureFlagEnabled:
+                            store.getters[
+                              'featureFlags/isNewSpeechToTextEnabled'
+                            ],
+                        }
+                      ),
                   },
                 },
               },
@@ -754,12 +764,18 @@ export function create() {
                       },
                       onError: {
                         target: 'RetryFetchingChimeMeeting',
-                        actions: ({ event }) => {
-                          LoggerService.noticeError(
-                            `Error fetching chime meeting`,
-                            event.error
-                          )
-                        },
+                        actions: [
+                          ({ event }) => {
+                            LoggerService.noticeError(
+                              `Error fetching chime meeting`,
+                              event.error
+                            )
+                          },
+                          () =>
+                            AnalyticsService.captureEvent(
+                              EVENTS.CHIME_CONNECTION_ERROR
+                            ),
+                        ],
                       },
                     },
                   },
