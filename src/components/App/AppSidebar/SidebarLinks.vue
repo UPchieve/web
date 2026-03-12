@@ -145,6 +145,14 @@
         >
           <groups-icon class="icon" />
         </sidebar-link>
+        <sidebar-link
+          v-if="isVolunteer && showAppliedForNTHSLink"
+          to="/groups/application-pending"
+          text="NTHS application"
+          id="nths-group-sidebar-link"
+        >
+          <groups-icon class="icon" />
+        </sidebar-link>
 
         <sidebar-link
           v-if="isAdmin"
@@ -242,6 +250,8 @@ export default {
       user: (state) => state.user.user,
       productFlags: (state) => state.productFlags.flags,
       volunteersNTHSGroups: (state) => state.nths.NTHSGroups,
+      nthsCandidateApplicationStatus: (state) =>
+        state.nths.NTHSCandidateApplicationStatus,
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
@@ -266,7 +276,14 @@ export default {
     },
     showCreateNTHSGroupLink() {
       return (
-        this.userIsApprovedNTHSPresident &&
+        (this.userIsApprovedNTHSPresident ||
+          this.nthsCandidateApplicationStatus === 'approved') &&
+        this.volunteersNTHSGroups.length === 0
+      )
+    },
+    showAppliedForNTHSLink() {
+      return (
+        this.nthsCandidateApplicationStatus === 'applied' &&
         this.volunteersNTHSGroups.length === 0
       )
     },
@@ -274,7 +291,8 @@ export default {
       return (
         this.isNTHSApplicationPageEnabled &&
         !this.userIsApprovedNTHSPresident &&
-        this.volunteersNTHSGroups.length === 0
+        this.volunteersNTHSGroups.length === 0 &&
+        this.nthsCandidateApplicationStatus === undefined
       )
     },
     isStandaloneAiEnabled() {

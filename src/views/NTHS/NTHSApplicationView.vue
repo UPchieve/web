@@ -10,8 +10,11 @@ const store = useStore()
 
 const learnMoreLink =
   'https://docs.google.com/document/d/1UDxRRJZ4b_Pt3PfjzN_7hxb-ffaF-hGdn_e_q1RCqqs/edit?tab=t.0'
-const applicationLink =
-  'https://docs.google.com/forms/d/e/1FAIpQLSegNVaO1TGij0IZQyTop_735x0aAflc1jkKQPXlCl_Gmu__hA/viewform?usp=header'
+
+const applicationLink = computed(() => {
+  const user = store.state.user.user
+  return `https://docs.google.com/forms/d/e/1FAIpQLSegNVaO1TGij0IZQyTop_735x0aAflc1jkKQPXlCl_Gmu__hA/viewform?usp=pp_url&entry.957447382=${user.email}&entry.1842912509=${user.firstName}&entry.1081738463=${user.lastName}&entry.173493422=${user.phone}&entry.1706782819=${user.id}`
+})
 
 function onClickedLearnMore() {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_CLICKED_LEARN_MORE)

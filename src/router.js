@@ -79,6 +79,13 @@ import NTHSGroupDashboardView from './views/NTHS/Tabs/NTHSGroupDashboardView.vue
 import NTHSManageTeamView from './views/NTHS/Tabs/NTHSManageTeamView.vue'
 import NTHSSettingsView from './views/NTHS/Tabs/NTHSSettingsView.vue'
 import NTHSApplicationView from '@/views/NTHS/NTHSApplicationView.vue'
+import NTHSApplicationPending from './views/NTHS/NTHSApplicationPending.vue'
+import {
+  shouldGoToApply,
+  shouldGoToCreate,
+  shouldGoToGroup,
+  shouldGoToPending,
+} from './views/NTHS/nths-route-helpers'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -606,18 +613,24 @@ const routes = [
     component: NTHSApplicationView,
     meta: { protected: true },
     beforeEnter: async (_to, _from, next) => {
-      const isApplicationPageFlagOn =
-        store.getters['featureFlags/isNTHSApplicationPageEnabled']
-      const isApprovedPresident =
-        store.getters['featureFlags/userIsApprovedNTHSPresident']
-      const isInGroup =
-        store.state.nths.NTHSGroups.length > 0 ||
-        (await store.dispatch('nths/fetchNTHSGroupsForUser')).length > 0
+      if (await shouldGoToGroup(store)) return next('/groups')
+      if (shouldGoToCreate(store)) return next('/groups/create')
+      if (shouldGoToPending(store)) return next('/groups/application-pending')
+      if (shouldGoToApply(store)) return next()
 
-      if (isApprovedPresident && !isInGroup) return next('/groups/create')
-      if (isInGroup) return next('/groups')
-      if (isApplicationPageFlagOn && !isInGroup && !isApprovedPresident)
-        return next()
+      return next('/dashboard')
+    },
+  },
+  {
+    path: '/groups/application-pending',
+    name: 'NTHSApplicationPending',
+    component: NTHSApplicationPending,
+    meta: { protected: true },
+    beforeEnter: async (_to, _from, next) => {
+      if (await shouldGoToGroup(store)) return next('/groups')
+      if (shouldGoToCreate(store)) return next('/groups/create')
+      if (shouldGoToApply(store)) return next('/groups/apply')
+      if (shouldGoToPending(store)) return next()
 
       return next('/dashboard')
     },
@@ -627,14 +640,13 @@ const routes = [
     name: 'NTHSCreateGroupView',
     component: NTHSCreateGroupView,
     meta: { protected: true },
-    beforeEnter: (_to, _from, next) => {
-      if (store.state.nths.NTHSGroups?.length === 0) {
-        next()
-      } else if (store.state.nths.NTHSGroups?.length > 0) {
-        next('/groups')
-      } else {
-        next('/dashboard')
-      }
+    beforeEnter: async (_to, _from, next) => {
+      if (await shouldGoToGroup(store)) return next('/groups')
+      if (shouldGoToApply(store)) return next('/groups/apply')
+      if (shouldGoToPending(store)) return next('/groups/application-pending')
+      if (shouldGoToCreate(store)) return next()
+
+      return next('/dashboard')
     },
   },
 
@@ -644,18 +656,12 @@ const routes = [
     component: NTHSGroupsView,
     meta: { protected: true },
     beforeEnter: async (_to, _from, next) => {
-      if (store.state.nths.NTHSGroups?.length > 0) {
-        next()
-      } else if (store.getters['featureFlags/userIsApprovedNTHSPresident']) {
-        await store.dispatch('nths/fetchNTHSGroupsForUser')
-        if (store.state.nths.NTHSGroups?.length > 0) {
-          next()
-        } else {
-          next('/groups/create')
-        }
-      } else {
-        next('/dashboard')
-      }
+      if (await shouldGoToGroup(store)) return next()
+      if (shouldGoToApply(store)) return next('/groups/apply')
+      if (shouldGoToPending(store)) return next('/groups/application-pending')
+      if (shouldGoToCreate(store)) return next('/groups/create')
+
+      return next('/dashboard')
     },
     children: [
       {

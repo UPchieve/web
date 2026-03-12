@@ -9,6 +9,7 @@ export default {
     NTHSGroupActions: [],
     NTHSActions: [],
     checksInFlight: [],
+    NTHSCandidateApplicationStatus: undefined,
   },
   mutations: {
     setNTHSGroups: (state, groups) => {
@@ -45,6 +46,9 @@ export default {
     setChecksInFlight(state, checksInFlight) {
       state.checksInFlight = checksInFlight
     },
+    setNTHSCandidateApplicationStatus: (state, status) => {
+      state.NTHSCandidateApplicationStatus = status
+    },
   },
   actions: {
     appendToChecksInFlight({ commit, state }, id) {
@@ -56,9 +60,16 @@ export default {
         state.checksInFlight.filter((c) => c !== id)
       )
     },
+    setNTHSCandidateApplicationStatus: (state, status) => {
+      state.NTHSCandidateApplicationStatus = status
+    },
     async fetchNTHSGroupsForUser({ commit }) {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
+      commit(
+        'setNTHSCandidateApplicationStatus',
+        results.data.candidateApplicationStatus
+      )
       return results.data.groups
     },
     async fetchNTHSGroupMembers({ commit }, groupId) {
