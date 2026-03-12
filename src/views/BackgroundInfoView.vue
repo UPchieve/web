@@ -11,7 +11,7 @@
         <p data-testid="bg-info-complete">
           Thank you for submitting your background information!<br />
         </p>
-        <Callout v-if="showRemovedFromNTHSMessage" icon="information">
+        <Callout v-if="showRemovedFromNTHSMessage" variant="information">
           <template v-slot:content>
             Your responses in this form indicate that you are not currently a
             high school student. Don't worry— you can still volunteer! However,
@@ -400,8 +400,8 @@ import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import _ from 'lodash'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import Callout from '@/components/Callout.vue'
+import { VolunteerOccupations } from '@/services/VolunteerService'
 
-const HIGH_SCHOOL_STUDENT_OPTION = 'A high school student'
 export default {
   name: 'background-info-view',
   components: {
@@ -414,16 +414,7 @@ export default {
   data() {
     return {
       options: {
-        occupations: [
-          HIGH_SCHOOL_STUDENT_OPTION,
-          'An undergraduate student',
-          'A graduate student',
-          'Working full-time',
-          'Working part-time',
-          'Unemployed',
-          'Caregiver',
-          'Retired',
-        ],
+        occupations: VolunteerOccupations,
         languages: [
           'Spanish',
           'Mandarin',
@@ -474,6 +465,7 @@ export default {
       invalidInputs: [],
       phoneInputInfo: {},
       phoneNumber: '',
+      showRemovedFromNTHSMessage: false,
     }
   },
   async beforeMount() {
@@ -487,15 +479,8 @@ export default {
       isStudentVolunteer: 'user/isStudentVolunteer',
       isInGroup: 'nths/isInGroup',
     }),
-    showRemovedFromNTHSMessage() {
-      return (
-        this.isInGroup &&
-        !this.occupation.includes(HIGH_SCHOOL_STUDENT_OPTION) &&
-        this.wasSubmitted
-      )
-    },
     isInHighSchool() {
-      return this.occupation.includes(HIGH_SCHOOL_STUDENT_OPTION)
+      return this.occupation.includes(VolunteerOccupations.HIGH_SCHOOL_STUDENT)
     },
     hasCompletedBackgroundInfo() {
       return (
@@ -624,7 +609,11 @@ export default {
       }
 
       try {
-        await NetworkService.addBackgroundInfo(data)
+        const response = await NetworkService.addBackgroundInfo(data)
+        if (response.data?.wasRemovedFromNTHS) {
+          this.showRemovedFromNTHSMessage = true
+          await this.$store.commit('nths/setNTHSGroups', [])
+        }
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_COMPLETED, {
           event: EVENTS.BACKGROUND_INFORMATION_COMPLETED,
         })
