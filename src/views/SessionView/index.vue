@@ -81,16 +81,12 @@
           :aiWidgetEnabled="aiWidgetEnabled"
           :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
           :aiWidgetMoving="aiWidgetDragging || aiWidgetResizing"
-          :screenShareAvailable="
-            isSessionInProgress &&
-            getDisplayMediaSupported &&
-            meetingHasNotEnded
-          "
           @clickedShareScreen="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isLoadingScreenShareControl="isLoadingScreenShareControl"
           :unableToJoinMediaRoom="unableToJoinMediaRoom"
+          :meetingHasNotEnded="meetingHasNotEnded"
           :isZwibserveSession="isZwibserveSession"
         />
 
@@ -103,12 +99,12 @@
           :isAiWidgetEnabled="aiWidgetEnabled"
           :onWidgetClicked="toggleAiWidget"
           :showHasAiMessageIndicator="hasUnreadAiTutorMessage"
-          :isScreenShareEnabled="isSessionInProgress && meetingHasNotEnded"
           @clickedShareScreen="toggleScreenShareWindow"
           :isScreenSharing="isScreenSharing"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
           :isLoadingScreenShareControl="isLoadingScreenShareControl"
           :unableToJoinMediaRoom="unableToJoinMediaRoom"
+          :hasMeetingEnded="meetingHasNotEnded"
         />
         <!--
         NOTE: this editor is used by the volunteer when the student is using the midtown app

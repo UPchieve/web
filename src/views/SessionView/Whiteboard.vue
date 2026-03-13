@@ -20,82 +20,18 @@
     ></div>
     <div id="partner-cursor" ref="partnerCursor"></div>
     <div id="toolbar" class="toolbar">
-      <div
-        v-if="screenShareAvailable"
-        class="toolbar-item"
-        tabindex="0"
-        :disabled="isViewingPartnerScreenShare ? true : false"
-      >
-        <Spinner
-          v-if="isLoadingScreenShareControl"
-          class="spinner"
-          :height="24"
-          :width="24"
-          :container-height="24"
-          :container-width="24"
-          v-tooltip="{
-            text: 'Loading screenshare...',
-            color: 'black',
-            position: 'bottom',
-          }"
+      <div class="toolbar-item" tabindex="0">
+        <ScreenShareToolbarButton
+          :hasMeetingEnded="!meetingHasNotEnded"
+          :onClick="toggleScreenShareWindow"
+          tooltipPosition="right"
+          :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
+          :isScreenSharing="isScreenSharing"
+          :isLoading="isLoadingScreenShareControl"
+          :spinnerSizing="{ height: 30, width: 30 }"
+          :isError="unableToJoinMediaRoom"
+          :isLiveMediaBanned="isBanned"
         />
-        <span
-          v-else-if="unableToJoinMediaRoom"
-          @mouseenter="toggleScreenShareErrorTooltip"
-          @mouseleave="toggleScreenShareErrorTooltip"
-          @click="toggleScreenShareErrorTooltip"
-          v-tooltip="{
-            text: 'Could not load the Screen Share tool. Please refresh and try again.',
-            position: 'right',
-            color: 'black',
-            open: screenShareErrorTooltipOpen,
-          }"
-        >
-          <ErrorIcon class="screenshare-error" />
-        </span>
-        <span
-          v-else-if="isLiveMediaBanned"
-          v-tooltip="{
-            text: 'Our automated moderation detected a potential policy issue with your shared content. For everyone’s safety, screen sharing has been temporarily disabled. We’ll manually review to confirm if this was a mistake. Thank you for your patience!',
-            position: 'top',
-            color: 'black',
-            open: screenShareErrorTooltipOpen,
-          }"
-        >
-          <ErrorIcon class="screenshare-error" />
-        </span>
-        <button
-          v-else-if="isViewingPartnerScreenShare"
-          class="toolbar-item"
-          :class="selectedTool === 'screen-share' ? 'selected-tool' : ''"
-          :disabled="isViewingPartnerScreenShare"
-          v-tooltip="{
-            text: `You can't share your screen while your partner is sharing.`,
-            position: 'top',
-            color: 'black',
-          }"
-        >
-          <EyeIcon class="toolbar-item__svg eye-icon" />
-        </button>
-        <button
-          v-else
-          class="toolbar-item"
-          @click="
-            () => {
-              if (!isViewingPartnerScreenShare) {
-                toggleScreenShareWindow()
-              }
-            }
-          "
-          :class="selectedTool === 'screen-share' ? 'selected-tool' : ''"
-          :disabled="isViewingPartnerScreenShare"
-        >
-          <StopScreenShareIcon
-            v-if="isScreenSharing"
-            class="toolbar-item__svg"
-          />
-          <StartScreenShareButton v-else class="toolbar-item__svg" />
-        </button>
       </div>
       <WhiteboardAiTutorButton
         v-if="aiWidgetEnabled"
@@ -447,7 +383,6 @@
 <script>
 import { socket } from '@/socket'
 import { mapGetters } from 'vuex'
-import { vTooltip } from 'maz-ui'
 import { markRaw } from 'vue'
 import { backOff } from 'exponential-backoff'
 import { toastController } from '@ionic/vue'
@@ -464,7 +399,6 @@ import RedoIcon from '@/assets/whiteboard_icons/redo.svg'
 import DeleteSelectionIcon from '@/assets/whiteboard_icons/delete_selection.png'
 import RotateIcon from '@/assets/whiteboard_icons/rotate.png'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
-import ErrorIcon from '@/assets/icons/exclamation.svg'
 import FileDialog from '@/components/FileDialog.vue'
 import ShapesIcon from '@/assets/whiteboard_icons/shapes.svg'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -473,7 +407,6 @@ import RectangleIcon from '@/assets/whiteboard_icons/rectangle.svg'
 import TriangleIcon from '@/assets/whiteboard_icons/triangle.svg'
 import LineIcon from '@/assets/whiteboard_icons/line.svg'
 import EraserIcon from '@/assets/whiteboard_icons/eraser.svg'
-import EyeIcon from '@/assets/eye.svg'
 import TextIcon from '@/assets/whiteboard_icons/text_tool.svg'
 import SmallTextIcon from '@/assets/whiteboard_icons/small_text_tool.svg'
 import LoadingMessage from '@/components/LoadingMessage.vue'
@@ -484,9 +417,6 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
 import { WhiteboardNullTool } from './WhiteboardNullTool'
 import WhiteboardAiTutorButton from './WhiteboardAiTutorButton.vue'
-import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
-import Spinner from '@/components/Spinner.vue'
-import StartScreenShareButton from './StartScreenShareButton.vue'
 import SessionService from '@/services/SessionService'
 import { processImage, getImageTooLargeMessage } from '@/utils/image-pipeline'
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
@@ -498,6 +428,7 @@ import {
   IMAGE_UPLOADING_STATE_MESSAGES,
   getPartnerUploadFailedMsg,
 } from '@/composables/imageUploadState'
+import ScreenShareToolbarButton from '@/components/ScreenShareToolbarButton.vue'
 
 const CENSORED_CONTENT_PLACEHOLDER = 'CONTENT CENSORED'
 
@@ -509,10 +440,8 @@ const TOOLS = {
 }
 
 export default {
-  directives: {
-    tooltip: vTooltip,
-  },
   components: {
+    ScreenShareToolbarButton,
     WhiteboardAiTutorButton,
     PickToolIcon,
     MoreIcon,
@@ -535,11 +464,6 @@ export default {
     TextIcon,
     SmallTextIcon,
     LoadingMessage,
-    StopScreenShareIcon,
-    Spinner,
-    ErrorIcon,
-    StartScreenShareButton,
-    EyeIcon,
   },
   props: {
     sessionId: {
@@ -568,11 +492,6 @@ export default {
       required: false,
       default: false,
     },
-    screenShareAvailable: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     showHasAiMessageIndicator: {
       type: Boolean,
       required: false,
@@ -583,6 +502,10 @@ export default {
       required: true,
     },
     isScreenSharing: {
+      type: Boolean,
+      required: true,
+    },
+    meetingHasNotEnded: {
       type: Boolean,
       required: true,
     },
@@ -614,7 +537,6 @@ export default {
       loadingText: 'Attempting to connect the whiteboard',
       isConnected: false,
       pingPongInterval: null,
-      screenShareErrorTooltipOpen: false,
       uploadingImageTimeout: null,
       // Tools.
       // one-of: ai-tutor, pick, brush, thin-brush (i.e. brush), eraser (i.e. brush), line, arrow, circle, polygon (used for triangle), rectangle, imagestamp (used for xy graph), text, small-text (i.e. text)
@@ -652,9 +574,6 @@ export default {
       isModerateZwibblerTextNodesEnabled:
         'featureFlags/isModerateZwibblerTextNodesEnabled',
     }),
-    isLiveMediaBanned() {
-      return this.isBanned
-    },
     isAiWidgetHidden() {
       return this.aiWidgetHidden
     },
@@ -784,18 +703,6 @@ export default {
       )
       this.usePickTool()
       this.$emit('clickedShareScreen')
-    },
-    toggleScreenShareErrorTooltip() {
-      this.screenShareErrorTooltipOpen = !this.screenShareErrorTooltipOpen
-      if (this.screenShareErrorTooltipOpen)
-        AnalyticsService.captureEvent(
-          EVENTS.SCREENSHARE_USER_SAW_ERROR_TOOLTIP,
-          {
-            tool: 'whiteboard',
-            userType: this.userType,
-            isZwibserveSession: this.isZwibserveSession,
-          }
-        )
     },
     isMobile() {
       return /iPhone|iPad|iPod/i.test(navigator.userAgent)
@@ -1668,19 +1575,6 @@ export default {
 </script>
 
 <style lang="scss">
-.spinner::before {
-  border-radius: 3px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  padding-left: 8px;
-  padding-right: 8px;
-  left: -25%;
-  top: 100%;
-  transition-property: none;
-  max-width: 130px;
-}
-
 .zwib-wrapper {
   height: 100%;
   width: 100%;
@@ -1878,43 +1772,6 @@ export default {
   display: none !important;
 }
 
-.whiteboard-error {
-  color: $c-error-red;
-  position: absolute;
-  bottom: 65px;
-}
-
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.whiteboard-transition-error {
-  width: 100%;
-  background-color: $c-error-red;
-  color: #fff;
-  font-weight: normal;
-  min-height: 40px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  padding: 12px;
-  z-index: 1;
-  transition: all 0.15s ease-in;
-
-  &-enter,
-  &-leave-to {
-    top: -64px;
-  }
-}
-
 .whiteboard-warning {
   width: 100%;
   background-color: $c-shadow-warn;
@@ -1941,16 +1798,6 @@ export default {
 #zwib-div:focus-visible,
 #zwib-div canvas:focus-visible {
   border: 1px solid #000;
-}
-
-.screenshare-error {
-  fill: $c-error-red;
-  height: 26px;
-  width: 26px;
-}
-
-.eye-icon {
-  color: $c-error-red;
 }
 
 #partner-cursor {

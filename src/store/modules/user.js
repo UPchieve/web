@@ -504,6 +504,10 @@ export default {
       return !state.session.volunteerJoinedAt
     },
 
+    isSessionMatched: (state) => {
+      return !!state.session?.volunteerJoinedAt
+    },
+
     isSessionEnding: (state) => {
       return state.session.isEnding
     },

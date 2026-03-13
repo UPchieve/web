@@ -11,53 +11,22 @@
       <select class="ql-background"></select>
       <button class="ql-list" value="ordered" />
       <button class="ql-list" value="bullet" />
-      <button
-        class="ql-aiWidget"
-        v-if="isAiWidgetEnabled"
-        @click="onWidgetClicked"
-      >
+      <button v-if="isAiWidgetEnabled" @click="onWidgetClicked">
         <ChatBotIcon class="chat-bot-icon" />
         <activity-dot v-if="showHasAiMessageIndicator" />
       </button>
-      <div v-if="showScreenShareTool">
-        <span
-          v-if="unableToJoinMediaRoom"
-          @mouseenter="toggleScreenShareErrorTooltipOpen"
-          @mouseleave="toggleScreenShareErrorTooltipOpen"
-          @click="toggleScreenShareErrorTooltipOpen"
-          v-tooltip="{
-            text: 'Could not load the Screen Share tool. Please refresh and try again.',
-            position: 'right',
-            color: 'black',
-            open: showScreenShareErrorTooltip,
-          }"
-        >
-          <ErrorIcon class="screenshare-error" />
-        </span>
-        <Spinner
-          v-else-if="isLoadingScreenShareControl"
-          :height="20"
-          :width="20"
-          :container-height="20"
-          :container-width="20"
+      <div class="ql-ss">
+        <ScreenShareToolbarButton
+          :hasMeetingEnded="hasLiveMediaMeetingEnded"
+          :isViewingPartnerScreenShare="isViewingPartnerScreenShare"
+          :isScreenSharing="isScreenSharing"
+          :onClick="toggleScreenShare"
+          tooltipPosition="bottom"
+          :isError="unableToJoinMediaRoom"
+          :isLoading="isLoadingScreenShareControl"
+          :spinnerSizing="{ height: 15, width: 15 }"
+          :isLiveMediaBanned="isBanned"
         />
-
-        <button
-          v-else-if="isViewingPartnerScreenShare"
-          @click="toggleScreenShare"
-          v-tooltip="{
-            text: `You can't share your screen while your partner is sharing.`,
-            position: 'bottom',
-            color: 'black',
-          }"
-        >
-          <EyeIcon class="toolbar-item__svg eye-icon" />
-        </button>
-
-        <button v-else @click="toggleScreenShare">
-          <StopScreenShareIcon v-if="isScreenSharing" />
-          <ScreenShareIcon v-else />
-        </button>
       </div>
 
       <word-count
@@ -95,7 +64,6 @@ import QuillCursors from 'quill-cursors'
 import { QuillBinding } from 'y-quill'
 import { applyUpdate, Doc } from 'yjs'
 import { socket } from '@/socket'
-import { vTooltip } from 'maz-ui'
 import { toastController } from '@ionic/vue'
 import { closeCircleOutline } from 'ionicons/icons'
 import LoadingMessage from '@/components/LoadingMessage.vue'
@@ -106,14 +74,9 @@ import SessionService from '@/services/SessionService'
 import { EVENTS } from '@/consts'
 import { file2b64 } from '@/utils/fileToBase64'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
-import ScreenShareIcon from '@/assets/screen-share.svg'
-import StopScreenShareIcon from '@/assets/stop-screen-share.svg'
-import ErrorIcon from '@/assets/icons/exclamation.svg'
 import LoggerService from '@/services/LoggerService'
 import ActivityDot from '@/components/ActivityDot.vue'
-import Spinner from '@/components/Spinner.vue'
 import WordCount from '@/components/WordCount.vue'
-import EyeIcon from '@/assets/eye.svg'
 import {
   processImage,
   getImageTooLargeMessage,
@@ -129,6 +92,7 @@ import {
   getPartnerUploadFailedMsg,
   PARTNER_IMAGE_UPLOAD_STATUS,
 } from '@/composables/imageUploadState'
+import ScreenShareToolbarButton from '@/components/ScreenShareToolbarButton.vue'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageDropPaste)
@@ -138,20 +102,13 @@ const decode = (str) => Uint8Array.from(str.split(',').map(Number))
 const DEFAULT_IMAGE_QUALITY = 0.8
 
 export default {
-  directives: {
-    tooltip: vTooltip,
-  },
   components: {
+    ScreenShareToolbarButton,
     FileDialog,
     LoadingMessage,
     ChatBotIcon,
-    ScreenShareIcon,
-    StopScreenShareIcon,
-    ErrorIcon,
     ActivityDot,
-    Spinner,
     WordCount,
-    EyeIcon,
   },
   props: {
     sessionId: {
@@ -177,9 +134,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    isScreenShareEnabled: {
+    hasLiveMediaMeetingEnded: {
       type: Boolean,
-      default: false,
+      required: true,
     },
     isScreenSharing: {
       type: Boolean,
@@ -205,7 +162,6 @@ export default {
       loadingText: 'Loading the document editor',
       incomingDeltas: [],
       retries: 0,
-      showScreenShareErrorTooltip: false,
       // For determining word counts.
       text: '',
       selectedText: '',
@@ -222,6 +178,7 @@ export default {
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      isBanned: 'user/banType',
       userType: 'user/userType',
       sessionPartner: 'user/sessionPartner',
       mobileMode: 'app/mobileMode',
@@ -230,11 +187,6 @@ export default {
       partnerImageUploadError: 'socket/partnerImageUploadError',
       partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
     }),
-    showScreenShareTool() {
-      // Show to students once a volunteer is sharing their screen
-      // and show to volunteers right away
-      return this.isScreenShareEnabled
-    },
     isSocketReadyToRequestForDoc() {
       return [this.isConnected, this.currentSession?.id]
     },
@@ -354,17 +306,6 @@ export default {
         ],
       })
       await toast.present()
-    },
-    toggleScreenShareErrorTooltipOpen() {
-      this.showScreenShareErrorTooltip = !this.showScreenShareErrorTooltip
-      if (this.showScreenShareErrorTooltip)
-        AnalyticsService.captureEvent(
-          EVENTS.SCREENSHARE_USER_SAW_ERROR_TOOLTIP,
-          {
-            tool: 'document-editor',
-            userType: this.userType,
-          }
-        )
     },
     toggleScreenShare() {
       AnalyticsService.captureEvent(
@@ -602,6 +543,14 @@ export default {
     display: flex;
   }
 
+  .ql-ss {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    padding-left: 3px;
+  }
+
   .ql-word-count {
     margin-left: auto;
     font-size: 14px;
@@ -644,27 +593,7 @@ export default {
   }
 }
 
-.screenshare-error {
-  fill: $c-error-red;
-  height: 20px;
-  width: 20px;
-  display: flex;
-}
-
-.m-tooltip--bottom::before {
-  @include breakpoint-below('large') {
-    left: -20px;
-  }
-  @include breakpoint-below('small') {
-    left: -100px;
-  }
-}
-
 .ql-picker-label svg {
   pointer-events: none;
-}
-
-.eye-icon {
-  color: $c-error-red;
 }
 </style>
