@@ -55,12 +55,12 @@ onBeforeMount(async () => {
       const results = await NetworkService.getNTHSGroupByCode(inviteCode.value)
       team.value = results.data.NTHSGroup
     } catch (err) {
-      const INPUT_ERROR_STATUS_CODE = 422
-      if (err.response?.status === INPUT_ERROR_STATUS_CODE) {
-        errorMessage.value = `Invalid team invite code ${inviteCode.value}. Please double check the team code you have entered.`
+      const is4xxError =
+        err?.response.status >= 400 && err?.response.status < 500
+      if (is4xxError && err.response?.data?.err) {
+        errorMessage.value = err.response?.data?.err
       } else {
         errorMessage.value =
-          err.response?.data?.err ??
           'Something went wrong. Please refresh the page and try again.'
       }
     } finally {
@@ -150,12 +150,11 @@ async function addVolunteerToTeam() {
       })
     }
   } catch (err) {
-    const INPUT_ERROR_STATUS_CODE = 422
-    if (err.response?.status === INPUT_ERROR_STATUS_CODE) {
-      errorMessage.value = `Invalid team invite code ${inviteCode.value}. Please double check the team code you have entered.`
+    const is4xxError = err.response?.status >= 400 && err.response?.status < 500
+    if (is4xxError && err.response?.data?.err) {
+      errorMessage.value = err.response?.data.err
     } else {
       errorMessage.value =
-        err.response?.data?.err ??
         'Something went wrong. Please refresh the page and try again.'
     }
   } finally {
