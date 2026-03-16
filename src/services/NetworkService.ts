@@ -1208,13 +1208,13 @@ export default {
     )
   },
   createAssignment(assignmentData, studentIds) {
-    return httpPost(`${API_ROOT}/assignment`, {
+    return httpPost(`${API_ROOT}/teachers/assignment`, {
       assignmentData,
       studentIds,
     }).then(this._successHandler, this._errorHandler)
   },
   editAssignment(assignmentData) {
-    return httpPost(`${API_ROOT}/assignment/edit`, {
+    return httpPost(`${API_ROOT}/teachers/assignment/edit`, {
       assignmentData,
     }).then(this._successHandler, this._errorHandler)
   },
