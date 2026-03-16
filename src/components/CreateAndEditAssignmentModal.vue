@@ -126,6 +126,7 @@
             <textarea
               type="text"
               id="description"
+              autocomplete="off"
               class="description-input"
               name="description"
               v-model="description"

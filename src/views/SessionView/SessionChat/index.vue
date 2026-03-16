@@ -186,6 +186,7 @@
       </transition>
       <div class="message-input">
         <textarea
+          autocomplete="off"
           class="message-textarea"
           :class="{ hidden: textMessageHidden }"
           data-testid="chat-textarea"

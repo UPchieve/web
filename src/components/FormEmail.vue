@@ -16,6 +16,7 @@
       :id="name"
       :data-testid="testid"
       :name="name"
+      autocomplete="off"
       class="uc-form-text-input"
       :class="{
         'uc-form-text-input-invalid': hasValidationError(),

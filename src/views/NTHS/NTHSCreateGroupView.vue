@@ -46,7 +46,7 @@ async function createTeam() {
 <template>
   <div class="page">
     <div class="container">
-      <form class="content" @submit.prevent="createTeam">
+      <form autocomplete="off" class="content" @submit.prevent="createTeam">
         <h1 class="title">National Tutoring Honors Society</h1>
         <span>
           Create an NTHS Chapter to help more under-resourced students get free,

@@ -165,7 +165,11 @@ const onPermanentlyDismissed = () => {
         <span class="sub-message" v-if="message?.sub">{{ message?.sub }}</span>
       </div>
 
-      <form v-if="formStep === 'enter_email'" @submit="sendVerificationCode">
+      <form
+        v-if="formStep === 'enter_email'"
+        autocomplete="off"
+        @submit="sendVerificationCode"
+      >
         <Spinner v-if="isLoading" />
         <FormEmail
           v-else
@@ -198,6 +202,7 @@ const onPermanentlyDismissed = () => {
       </form>
       <form
         v-else-if="formStep === 'enter_code'"
+        autocomplete="off"
         @submit="confirmVerificationCode"
       >
         We have sent a verification code to

@@ -70,7 +70,7 @@ function copyUserId() {
               <span>(You'll need this for your application!)</span>
             </label>
             <div class="copy-container">
-              <input type="text" disabled :value="userId" />
+              <input type="text" autocomplete="off" disabled :value="userId" />
               <button @click="copyUserId" class="copy-button">
                 {{ didCopyUserId ? 'Copied!' : 'Copy' }}
               </button>

@@ -75,6 +75,7 @@
 
     <form
       v-if="showBigFutureEmailFirstFlow"
+      autocomplete="off"
       class="uc-column"
       @submit.prevent="submitBigFutureEmail()"
     >
@@ -107,6 +108,7 @@
 
     <form
       v-else-if="eligibilitySubStep === 'primary'"
+      autocomplete="off"
       class="uc-column"
       @submit.prevent="
         isReferred ? submitReferralEligibilityForm() : submitEligibilityForm()
@@ -195,6 +197,7 @@
 
     <form
       v-else-if="eligibilitySubStep === 'secondary'"
+      autocomplete="off"
       class="uc-column"
       @submit.prevent="
         isReferred ? submitReferralEligibilityForm() : submitEligibilityForm()
@@ -219,6 +222,7 @@
         <input
           id="zipCode"
           data-testid="student-zipcode-input"
+          autocomplete="off"
           class="uc-form-text-input"
           type="text"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} zip code`"
@@ -247,6 +251,7 @@
     <form
       v-else
       id="form-eligibility"
+      autocomplete="off"
       class="uc-column"
       @submit.prevent="
         isReferred ? submitReferralEligibilityForm() : submitEligibilityForm()
@@ -276,7 +281,7 @@
           }"
           v-model="eligibility.studentFirstName"
           @blur="v$.eligibility.studentFirstName.$touch"
-          autocomplete="given-name"
+          autocomplete="off"
           required
         />
       </div>
@@ -305,7 +310,7 @@
           }"
           v-model="eligibility.studentLastName"
           @blur="v$.eligibility.studentLastName.$touch"
-          autocomplete="family-name"
+          autocomplete="off"
           required
         />
       </div>
@@ -395,6 +400,7 @@
         <input
           id="zipCode"
           data-testid="student-zipcode-input"
+          autocomplete="off"
           class="uc-form-text-input"
           type="text"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} zip code`"
@@ -432,6 +438,7 @@
         <input
           id="student-email"
           data-testid="student-email-input"
+          autocomplete="off"
           class="uc-form-text-input"
           type="email"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
@@ -473,6 +480,7 @@
           <input
             id="parent-guardian-email"
             data-testid="parent-guardian-email-input"
+            autocomplete="off"
             class="uc-form-text-input"
             type="email"
             placeholder="Enter your email address"
@@ -640,6 +648,7 @@
     </div>
 
     <form
+      autocomplete="off"
       aria-label="Create student account"
       @submit.prevent="submitAccountForm()"
     >
@@ -662,6 +671,7 @@
         <input
           id="firstName"
           data-testid="student-first-name-input"
+          autocomplete="off"
           class="uc-form-text-input"
           type="text"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} first name`"
@@ -696,6 +706,7 @@
         <input
           id="lastName"
           data-testid="student-last-name-input"
+          autocomplete="off"
           class="uc-form-text-input"
           type="text"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
@@ -729,6 +740,7 @@
         </div>
         <input
           id="email"
+          autocomplete="off"
           class="uc-form-text-input"
           type="email"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
@@ -763,6 +775,7 @@
         <input
           id="password"
           data-testid="student-password-input"
+          autocomplete="off"
           class="uc-form-text-input"
           type="password"
           placeholder="Create a password"

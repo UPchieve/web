@@ -27,7 +27,12 @@
           >Continue Onboarding</LargeButton
         >
       </div>
-      <form class="background-info__form" @submit="submitForm" v-else>
+      <form
+        class="background-info__form"
+        @submit="submitForm"
+        v-else
+        autocomplete="off"
+      >
         <p data-testid="background-information-explainer">
           Please provide some basic background information so that we can learn
           more about you! Don't worry: this information will be kept private
@@ -60,6 +65,7 @@
                     invalidInputs.indexOf('otherSignupSource') > -1,
                 }"
                 autofocus
+                autocomplete="off"
               />
               <p class="uc-form-subtext">Tell us where you heard about us!</p>
             </div>
@@ -144,6 +150,7 @@
                 v-model="occupation"
                 :id="option"
                 :data-testid="option"
+                autocomplete="off"
               />
               <label class="uc-form-label" :for="option">
                 {{ option }}
@@ -178,6 +185,7 @@
                 placeholder="Enter a college..."
                 class="uc-form-input occupations-input"
                 id="college"
+                autocomplete="off"
               />
             </template>
 
@@ -194,6 +202,7 @@
                 placeholder="Enter your company..."
                 class="uc-form-input occupations-input"
                 id="company"
+                autocomplete="off"
               />
             </template>
           </li>
@@ -213,6 +222,7 @@
               class="linkedin-input uc-form-input"
               id="linkedin"
               data-testid="linked-in-input"
+              autocomplete="off"
             />
             <p v-if="!isValidLinkedInUrl" class="error">
               Your url should be in this format:
@@ -292,6 +302,7 @@
                           type="radio"
                           :value="index"
                           :data-testid="`${subquestion}-${experienceRadioQuestion.columnTitle[index - 1]}`"
+                          autocomplete="off"
                         />
                       </td>
                     </tr>
@@ -322,7 +333,11 @@
                             .length"
                           v-bind:key="index"
                         >
-                          <input class="uc-form-input" type="radio" />
+                          <input
+                            class="uc-form-input"
+                            type="radio"
+                            autocomplete="off"
+                          />
                         </td>
                       </tr>
                     </div>
@@ -352,6 +367,7 @@
                 v-model="languages"
                 :id="option"
                 :data-testid="option"
+                autocomplete="off"
               />
               <label class="uc-form-label" :for="option">
                 {{ option }}
@@ -363,6 +379,7 @@
                 value="other"
                 id="other"
                 @change="toggleAddLanguages"
+                autocomplete="off"
               />
               <label for="other">Other</label>
             </div>
@@ -372,6 +389,7 @@
               class="uc-form-input"
               v-if="showAddLanguages"
               placeholder="Enter a language"
+              autocomplete="off"
             />
           </li>
         </ol>

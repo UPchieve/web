@@ -45,6 +45,7 @@
         >
           <div class="contact-form__label">Your email</div>
           <input
+            autocomplete="off"
             class="contact-form__text"
             type="text"
             v-model="contactFormData.userEmail"
@@ -63,6 +64,7 @@
         <div class="contact-form__section">
           <div class="contact-form__label">Message</div>
           <textarea
+            autocomplete="off"
             class="contact-form__textarea"
             v-model="contactFormData.message"
             rows="5"

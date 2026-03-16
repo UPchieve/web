@@ -2,6 +2,7 @@
   <div class="CheckBox">
     <input
       v-bind="$attrs"
+      autocomplete="off"
       class="CheckBox-input"
       type="checkbox"
       :id="id"

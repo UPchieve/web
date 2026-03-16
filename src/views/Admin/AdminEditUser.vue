@@ -3,18 +3,28 @@
     <button class="back-button" @click="goBack" type="button">← Back</button>
 
     <loader v-if="isLoading" />
-    <form v-else class="col" @submit="submitUpdate">
+    <form v-else autocomplete="off" class="col" @submit="submitUpdate">
       <div class="row">
         <label for="first-name" class="uc-form-label">First name</label>
-        <input id="first-name" type="text" v-model="firstName" />
+        <input
+          id="first-name"
+          type="text"
+          autocomplete="off"
+          v-model="firstName"
+        />
       </div>
       <div class="row">
         <label for="last-name" class="uc-form-label">Last name</label>
-        <input id="last-name" type="text" v-model="lastName" />
+        <input
+          id="last-name"
+          type="text"
+          autocomplete="off"
+          v-model="lastName"
+        />
       </div>
       <div class="row">
         <label for="email" class="uc-form-label">Email</label>
-        <input id="email" type="text" v-model="email" />
+        <input id="email" type="text" autocomplete="off" v-model="email" />
       </div>
       <div class="row" v-if="hasStudentRole || hasVolunteerRole">
         <FormSelect

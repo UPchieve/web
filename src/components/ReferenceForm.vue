@@ -26,6 +26,7 @@
           <input
             type="text"
             id="affiliation"
+            autocomplete="off"
             class="uc-form-input"
             v-model="affiliation"
             required
@@ -40,6 +41,7 @@
           <input
             type="text"
             id="relationship-length"
+            autocomplete="off"
             class="uc-form-input"
             v-model="relationshipLength"
             required
@@ -82,6 +84,7 @@
                           v-bind:key="index"
                         >
                           <input
+                            autocomplete="off"
                             class="uc-form-input"
                             v-model="
                               multipleRadioResponse[
@@ -129,7 +132,11 @@
                           v-for="index in question.tableTitle.length"
                           v-bind:key="index"
                         >
-                          <input class="uc-form-input" type="radio" />
+                          <input
+                            autocomplete="off"
+                            class="uc-form-input"
+                            type="radio"
+                          />
                         </td>
                       </tr>
                     </tbody>
@@ -197,6 +204,7 @@
           <textarea
             type="text"
             id="rejection-reason"
+            autocomplete="off"
             class="uc-form-input"
             v-model="rejectionReason"
             placeholder="Your answer"
@@ -211,6 +219,7 @@
           <textarea
             type="text"
             id="additionalInfo"
+            autocomplete="off"
             class="uc-form-input"
             v-model="additionalInfo"
             placeholder="Your answer"

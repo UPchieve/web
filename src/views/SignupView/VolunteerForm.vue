@@ -1,6 +1,7 @@
 <template>
   <form
     v-if="step == 'step-1'"
+    autocomplete="off"
     class="uc-form-body"
     aria-label="Volunteer signup"
     @submit.prevent="nextPage()"
@@ -33,7 +34,7 @@
         v-model="credentials.email"
         required
         autofocus
-        autocomplete="email"
+        autocomplete="off"
       />
       <p class="uc-form-subtext">
         We will only use your email to contact you about your account. See our
@@ -54,7 +55,7 @@
         }"
         v-model="credentials.password"
         required
-        autocomplete="new-password"
+        autocomplete="off"
       />
       <p class="uc-form-subtext">
         Keep your account safe by choosing a password with one number, one
@@ -90,6 +91,7 @@
 
   <form
     v-else-if="step == 'step-2'"
+    autocomplete="off"
     class="uc-form-body"
     aria-label="Volunteer information"
     @submit.prevent="checkInputs($event)"
@@ -121,7 +123,7 @@
         class="d-none"
         id="username"
         v-model="credentials.email"
-        autocomplete="username"
+        autocomplete="off"
       />
       <label for="password" class="d-none">Password</label>
       <input
@@ -129,7 +131,7 @@
         class="d-none"
         id="password"
         v-model="credentials.password"
-        autocomplete="new-password"
+        autocomplete="off"
       />
 
       <label for="firstName" class="uc-form-label">First Name</label>
@@ -144,7 +146,7 @@
         v-model="profile.firstName"
         required
         autofocus
-        autocomplete="given-name"
+        autocomplete="off"
       />
     </div>
 
@@ -160,7 +162,7 @@
         }"
         v-model="profile.lastName"
         required
-        autocomplete="family-name"
+        autocomplete="off"
       />
     </div>
 
@@ -199,6 +201,7 @@
       <input
         id="otherSignupSource"
         data-testid="otherSignupSource"
+        autocomplete="off"
         :required="true"
         type="text"
         class="uc-form-input"
@@ -216,6 +219,7 @@
       <input
         id="userAgreement"
         data-testid="userAgreementCheckbox"
+        autocomplete="off"
         v-model="credentials.terms"
         type="checkbox"
         required

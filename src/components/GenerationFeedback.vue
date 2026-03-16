@@ -180,7 +180,7 @@ const giveFeedback = (event: Event) => {
       v-if="modalState !== MODAL_STATE['can-open'] && feedbackArgs"
     >
       <div class="title">{{ feedbackArgs.title }}</div>
-      <form class="options" @submit="giveFeedback">
+      <form autocomplete="off" class="options" @submit="giveFeedback">
         <LargeButton
           :class="selectedOption === option ? 'active' : ''"
           v-bind:key="option"
@@ -194,6 +194,7 @@ const giveFeedback = (event: Event) => {
           }}</label>
           <textarea
             v-if="feedbackArgs.moreFeedbackTitle"
+            autocomplete="off"
             class="more-feedback"
             v-model="additionalFeedback"
             @keydown="

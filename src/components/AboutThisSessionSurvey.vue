@@ -35,6 +35,7 @@
           >What made you choose {{ ratingEmoji }}?</span
         >
         <textarea
+          autocomplete="off"
           class="comments-textarea"
           v-model="comments"
           ref="commentsTextArea"

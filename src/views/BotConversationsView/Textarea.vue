@@ -78,6 +78,7 @@ watch(() => message.value, resizeTextAreaToFitText)
 <template>
   <div class="chat" :class="props.disabled ? 'disabled' : ''">
     <textarea
+      autocomplete="off"
       autofocus
       ref="textareaRef"
       :disabled="props.disabled"

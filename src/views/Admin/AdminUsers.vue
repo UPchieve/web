@@ -4,19 +4,29 @@
       <div class="col">
         <div class="row">
           <label for="user-id" class="uc-form-label">User Id</label>
-          <input id="user-id" type="text" v-model="userId" />
+          <input id="user-id" type="text" autocomplete="off" v-model="userId" />
         </div>
         <div class="row">
           <label for="first-name" class="uc-form-label">First name</label>
-          <input id="first-name" type="text" v-model="firstName" />
+          <input
+            id="first-name"
+            type="text"
+            autocomplete="off"
+            v-model="firstName"
+          />
         </div>
         <div class="row">
           <label for="last-name" class="uc-form-label">Last name</label>
-          <input id="last-name" type="text" v-model="lastName" />
+          <input
+            id="last-name"
+            type="text"
+            autocomplete="off"
+            v-model="lastName"
+          />
         </div>
         <div class="row">
           <label for="email" class="uc-form-label">Email</label>
-          <input id="email" type="text" v-model="email" />
+          <input id="email" type="text" autocomplete="off" v-model="email" />
         </div>
       </div>
       <div class="row">
@@ -31,7 +41,7 @@
       </div>
       <div class="row">
         <label for="email" class="uc-form-label">School</label>
-        <input id="email" type="text" v-model="school" />
+        <input id="email" type="text" autocomplete="off" v-model="school" />
       </div>
 
       <div>

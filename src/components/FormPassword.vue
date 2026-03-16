@@ -17,6 +17,7 @@
       :data-testid="testid"
       :name="name"
       :placeholder="placeholder"
+      autocomplete="off"
       type="password"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"

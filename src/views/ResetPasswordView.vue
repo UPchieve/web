@@ -13,7 +13,7 @@
 
       <div v-if="msg" class="uc-form-text message">{{ msg }}</div>
 
-      <form v-else>
+      <form v-else autocomplete="off">
         <div class="uc-form-element">
           <label for="inputEmail" class="uc-form-label">Email</label>
           <input
@@ -24,6 +24,7 @@
             v-model="email"
             required
             autofocus
+            autocomplete="off"
           />
         </div>
 

@@ -29,7 +29,7 @@ function copyURL() {
 <template>
   <div class="link-container">
     <refer-friend-icon class="icon" />
-    <input type="text" class="link" :value="link" disabled />
+    <input type="text" autocomplete="off" class="link" :value="link" disabled />
     <div class="button-container">
       <LargeButton
         @click="copyURL"

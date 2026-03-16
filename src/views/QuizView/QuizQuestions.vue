@@ -51,8 +51,11 @@
           <img :src="imageSrc" class="question-image--expanded" />
         </div>
       </div>
-
-      <form class="possible-answers" data-testid="quiz-questions">
+      <form
+        autocomplete="off"
+        class="possible-answers"
+        data-testid="quiz-questions"
+      >
         <div v-for="(item, index) in items" :key="`item-${index}`">
           <div class="options answer-option" @click="selectAnswer(item.val)">
             <input
@@ -62,6 +65,7 @@
               :data-testid="item.val"
               :aria-label="`${item.val}. ${item.txt}`"
               type="radio"
+              autocomplete="off"
               class="answer-option--input"
             />
             <label

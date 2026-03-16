@@ -33,6 +33,7 @@
             type="text"
             placeholder="XXXXXX"
             maxlength="6"
+            autocomplete="off"
           />
         </div>
         <p class="uc-form-subtext">

@@ -18,6 +18,7 @@
     <div class="report-modal__section">
       <div class="report-modal__label">Tell us what happened</div>
       <textarea
+        autocomplete="off"
         class="report-modal__message"
         v-model="reportMessage"
         placeholder="(Optional) Write a 1-2 sentence summary of what happened"

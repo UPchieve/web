@@ -17,7 +17,7 @@
       >
         {{ error ?? message }}
       </div>
-      <form>
+      <form autocomplete="off">
         <!-- TODO: Do we want autofocus? -->
         <FormEmail
           v-model="credentials.email"

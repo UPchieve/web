@@ -2,15 +2,15 @@
   <div class="edit-school">
     <button class="back-button" @click="goBack" type="button">← Back</button>
 
-    <form @submit="submitUpdate">
+    <form autocomplete="off" @submit="submitUpdate">
       <div class="edit-school__input-row">
         <label for="name" class="uc-form-label">School name</label>
-        <input id="name" type="text" v-model="name" />
+        <input id="name" type="text" autocomplete="off" v-model="name" />
       </div>
 
       <div class="edit-school__input-row">
         <label for="city" class="uc-form-label">School city</label>
-        <input id="city" type="text" v-model="city" />
+        <input id="city" type="text" autocomplete="off" v-model="city" />
       </div>
 
       <div class="edit-school__input-row">
@@ -27,12 +27,17 @@
       </div>
       <div class="edit-school__input-row">
         <label for="zip" class="uc-form-label">School ZIP code</label>
-        <input id="zip" type="text" v-model="zip" />
+        <input id="zip" type="text" autocomplete="off" v-model="zip" />
       </div>
 
       <div class="edit-school__input-row">
         <label for="is-approved" class="uc-form-label">Admin Approved</label>
-        <select name="is-approved" id="is-approved" v-model="isAdminApproved">
+        <select
+          name="is-approved"
+          id="is-approved"
+          autocomplete="off"
+          v-model="isAdminApproved"
+        >
           <option value="true">True</option>
           <option value="false">False</option>
         </select>

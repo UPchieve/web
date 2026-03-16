@@ -9,6 +9,7 @@
 
     <select
       :id="id"
+      autocomplete="off"
       data-testid="dropdown-select"
       class="DropdownList-select"
       :disabled="disabled ? true : null"

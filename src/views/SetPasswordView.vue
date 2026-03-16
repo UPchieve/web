@@ -6,7 +6,7 @@
         {{ msg }}
       </div>
 
-      <form v-if="!showSuccess">
+      <form v-if="!showSuccess" autocomplete="off">
         <div class="uc-form-element">
           <label for="email">Email</label>
           <input
@@ -17,6 +17,7 @@
             v-model="credentials.email"
             required
             autofocus
+            autocomplete="off"
           />
         </div>
 
@@ -29,6 +30,7 @@
             placeholder="Create a new password"
             v-model="credentials.password"
             required
+            autocomplete="off"
           />
           <div class="metadata">
             Must have at least one number, one uppercase letter, one lowercase
@@ -45,6 +47,7 @@
             placeholder="Re-enter your new password"
             v-model="credentials.newpassword"
             required
+            autocomplete="off"
           />
         </div>
 

@@ -10,6 +10,7 @@
 
       <form
         v-if="formStep === 'step-1'"
+        autocomplete="off"
         class="uc-form-body"
         @submit.prevent="formStepTwo()"
       >
@@ -45,7 +46,7 @@
             v-model="formData.email"
             required
             autofocus
-            autocomplete="email"
+            autocomplete="off"
             data-testid="vp-signup-email"
           />
         </div>
@@ -64,7 +65,7 @@
             }"
             v-model="formData.password"
             required
-            autocomplete="new-password"
+            autocomplete="off"
             data-testid="vp-signup-password"
           />
           <p class="uc-form-subtext">
@@ -86,6 +87,7 @@
       </form>
       <form
         v-if="formStep === 'step-2'"
+        autocomplete="off"
         class="uc-form-body"
         @submit.prevent="submitSignupForm()"
       >
@@ -114,7 +116,7 @@
             class="d-none"
             id="username"
             v-model="formData.email"
-            autocomplete="username"
+            autocomplete="off"
           />
           <label for="password" class="d-none">Password</label>
           <input
@@ -122,7 +124,7 @@
             class="d-none"
             id="password"
             v-model="formData.password"
-            autocomplete="new-password"
+            autocomplete="off"
           />
 
           <div class="uc-column">
@@ -142,7 +144,7 @@
                   v-model="formData.firstName"
                   required
                   autofocus
-                  autocomplete="given-name"
+                  autocomplete="off"
                   data-testid="vp-signup-first-name"
                 />
                 <p class="uc-form-subtext">First Name</p>
@@ -158,7 +160,7 @@
                   }"
                   v-model="formData.lastName"
                   required
-                  autocomplete="family-name"
+                  autocomplete="off"
                   data-testid="vp-signup-last-name"
                 />
                 <p class="uc-form-subtext">Last Name</p>
@@ -188,6 +190,7 @@
         <div class="uc-form-checkbox">
           <input
             id="userAgreement"
+            autocomplete="off"
             v-model="formData.terms"
             type="checkbox"
             required

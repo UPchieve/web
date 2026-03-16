@@ -4,7 +4,7 @@
       <div class="col">
         <div class="row">
           <label for="zip-code" class="uc-form-label">Zip Code</label>
-          <input id="zip-code" type="text" v-model="query" />
+          <input id="zip-code" type="text" autocomplete="off" v-model="query" />
           <p v-if="error" class="error">{{ error }}</p>
         </div>
 

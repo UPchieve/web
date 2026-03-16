@@ -8,7 +8,7 @@
       <div class="col">
         <div class="row">
           <label for="user-id" class="uc-form-label">User Email</label>
-          <input id="user-id" type="text" v-model="query" />
+          <input id="user-id" type="text" autocomplete="off" v-model="query" />
           <p v-if="error" class="error">{{ error }}</p>
         </div>
         <button

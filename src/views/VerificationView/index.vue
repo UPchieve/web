@@ -44,6 +44,7 @@
             type="text"
             placeholder="XXXXXX"
             required
+            autocomplete="off"
           />
         </div>
 

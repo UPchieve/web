@@ -1,5 +1,6 @@
 <template>
   <textarea
+    autocomplete="off"
     class="feedback__textarea"
     @input="$emit('input', $event.target.value)"
   ></textarea>

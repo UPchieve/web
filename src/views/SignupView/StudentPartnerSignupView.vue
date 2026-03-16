@@ -77,7 +77,7 @@
         </p>
       </div>
 
-      <form v-else @submit.prevent="registerPartnerStudent">
+      <form v-else autocomplete="off" @submit.prevent="registerPartnerStudent">
         <div v-if="requirePartnerSite" class="uc-form-element">
           <label
             for="site"
@@ -130,7 +130,7 @@
             }"
             v-model="formData.firstName"
             @blur="v$.formData.firstName.$touch"
-            autocomplete="given-name"
+            autocomplete="off"
             required
           />
         </div>
@@ -157,7 +157,7 @@
             }"
             v-model="formData.lastName"
             @blur="v$.formData.lastName.$touch"
-            autocomplete="family-name"
+            autocomplete="off"
             required
           />
         </div>
@@ -165,6 +165,7 @@
         <div v-if="showHighSchoolCheckbox" class="uc-form-checkbox">
           <input
             id="highSchoolCheckbox"
+            autocomplete="off"
             v-model="isHighSchoolStudent"
             type="checkbox"
           />
@@ -222,6 +223,7 @@
         <div v-if="showCollegeCheckbox" class="uc-form-checkbox">
           <input
             id="collegeCheckbox"
+            autocomplete="off"
             v-model="isCollegeStudent"
             type="checkbox"
           />
@@ -243,6 +245,7 @@
           >
           <input
             id="college"
+            autocomplete="off"
             class="uc-form-text-input"
             :placeholder="`Enter ${getFormLabelIdentifierPossessive} college`"
             type="text"
@@ -276,6 +279,7 @@
           </div>
           <input
             id="email"
+            autocomplete="off"
             class="uc-form-text-input"
             type="email"
             :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
@@ -308,6 +312,7 @@
           </div>
           <input
             id="parent-email"
+            autocomplete="off"
             class="uc-form-text-input"
             type="email"
             placeholder="Enter your email address"
@@ -340,6 +345,7 @@
           </div>
           <input
             id="password"
+            autocomplete="off"
             class="uc-form-text-input"
             type="password"
             placeholder="Create a password"
@@ -380,6 +386,7 @@
           <input
             id="other-signup-source"
             type="text"
+            autocomplete="off"
             class="uc-form-text-input"
             v-model="formData.otherSignupSource"
             autofocus
