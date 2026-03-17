@@ -64,6 +64,63 @@
               <p class="uc-form-subtext">Tell us where you heard about us!</p>
             </div>
           </li>
+
+          <li class="uc-form-col">
+            <p data-testid="question-where-do-you-live">
+              Where do you currently live?<span
+                class="background-info__question-required"
+                >*</span
+              >
+            </p>
+
+            <label class="uc-form-label location-label"
+              >Country<span class="background-info__question-required"
+                >*</span
+              ></label
+            >
+            <FormSearchableSelect
+              name="country-select"
+              class="location-input"
+              v-model="country"
+              :options="countries"
+              data-testid="location-input"
+            />
+            <template v-if="isUnitedStatesSelected">
+              <label class="uc-form-label location-label"
+                >State<span class="background-info__question-required"
+                  >*</span
+                ></label
+              >
+              <FormSearchableSelect
+                class="location-input"
+                name="state-select"
+                id="state"
+                v-model="state"
+                :options="states"
+                :searchable="true"
+                data-testid="state-select"
+              />
+            </template>
+            <template v-if="country">
+              <label class="uc-form-label location-label" for="city"
+                >City<span class="background-info__question-required"
+                  >*</span
+                ></label
+              >
+              <input
+                type="text"
+                v-model="city"
+                placeholder="Enter a city..."
+                class="uc-form-input location-input"
+                id="city"
+                data-testid="city-input"
+              />
+            </template>
+            <p v-if="showInputErrors && !experience" class="error">
+              Please fill out these fields.
+            </p>
+          </li>
+
           <li class="uc-form-col">
             <p data-testid="question-i-am-currently">
               I am currently...<span class="background-info__question-required"
@@ -92,7 +149,7 @@
                 {{ option }}
               </label>
             </div>
-            <template v-if="isInHighSchool">
+            <template v-if="isInHighSchool && isInUnitedStates">
               <label class="uc-form-label occupations-label" for="school">
                 What high school do you currently attend?<span
                   v-if="isInGroup"
@@ -181,61 +238,6 @@
             <p class="uc-form-subtext">
               UPchieve notifies volunteers of incoming student requests via
               text. You can customize when you receive requests.
-            </p>
-          </li>
-
-          <li class="uc-form-col">
-            <p data-testid="question-where-do-you-live">
-              Where do you currently live?<span
-                class="background-info__question-required"
-                >*</span
-              >
-            </p>
-
-            <label class="uc-form-label location-label"
-              >Country<span class="background-info__question-required"
-                >*</span
-              ></label
-            >
-            <v-select
-              class="location-input"
-              v-model="country"
-              :options="countries"
-              :searchable="true"
-              data-testid="location-input"
-            />
-            <template v-if="country === 'United States of America'">
-              <label class="uc-form-label location-label"
-                >State<span class="background-info__question-required"
-                  >*</span
-                ></label
-              >
-              <v-select
-                class="location-input"
-                id="state"
-                v-model="state"
-                :options="states"
-                :searchable="true"
-                data-testid="state-select"
-              />
-            </template>
-            <template v-if="country">
-              <label class="uc-form-label location-label" for="city"
-                >City<span class="background-info__question-required"
-                  >*</span
-                ></label
-              >
-              <input
-                type="text"
-                v-model="city"
-                placeholder="Enter a city..."
-                class="uc-form-input location-input"
-                id="city"
-                data-testid="city-input"
-              />
-            </template>
-            <p v-if="showInputErrors && !experience" class="error">
-              Please fill out these fields.
             </p>
           </li>
 
@@ -394,21 +396,21 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { COUNTRIES, STATES, EVENTS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
 import LargeButton from '@/components/LargeButton.vue'
-import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { backOff } from 'exponential-backoff'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import _ from 'lodash'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import Callout from '@/components/Callout.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
+import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 
 export default {
   name: 'background-info-view',
   components: {
+    FormSearchableSelect,
     Callout,
     FormSchoolSearch,
     LargeButton,
-    FormSelect,
     MazPhoneNumberInput,
   },
   data() {
@@ -479,6 +481,9 @@ export default {
       isStudentVolunteer: 'user/isStudentVolunteer',
       isInGroup: 'nths/isInGroup',
     }),
+    isInUnitedStates() {
+      return this.country === 'United States of America'
+    },
     isInHighSchool() {
       return this.occupation.includes(VolunteerOccupations.HIGH_SCHOOL_STUDENT)
     },
@@ -648,7 +653,8 @@ export default {
     },
     invalidForm() {
       const { tutoring, collegeCounseling, mentoring } = this.experience
-
+      const isHighSchoolRequired =
+        this.isInGroup && this.isInHighSchool && this.isUnitedStatesSelected
       return (
         this.occupation.length === 0 ||
         (this.signedUpWithGoogle && !this.phoneNumber) ||
@@ -660,7 +666,8 @@ export default {
         (this.isUnitedStatesSelected && !this.state) ||
         !this.isValidLinkedInUrl ||
         (this.isCollegeEducated && !this.college) ||
-        (this.isWorkingFullTime && !this.company)
+        (this.isWorkingFullTime && !this.company) ||
+        (isHighSchoolRequired && !this.highSchoolId)
       )
     },
   },
