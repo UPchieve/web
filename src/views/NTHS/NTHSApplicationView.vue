@@ -13,7 +13,7 @@ const learnMoreLink =
 
 const applicationLink = computed(() => {
   const user = store.state.user.user
-  return `https://docs.google.com/forms/d/e/1FAIpQLSegNVaO1TGij0IZQyTop_735x0aAflc1jkKQPXlCl_Gmu__hA/viewform?usp=pp_url&entry.957447382=${user.email}&entry.1842912509=${user.firstName}&entry.1081738463=${user.lastName}&entry.173493422=${user.phone}&entry.1706782819=${user.id}`
+  return `https://docs.google.com/forms/d/e/1FAIpQLSegNVaO1TGij0IZQyTop_735x0aAflc1jkKQPXlCl_Gmu__hA/viewform?usp=pp_url&entry.1706782819=${user.id}`
 })
 
 function onClickedLearnMore() {
