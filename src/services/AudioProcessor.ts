@@ -4,18 +4,17 @@ export default class AudioProcessor {
   private sourceNode: MediaStreamAudioSourceNode | null = null
   private samplesBuffer: ArrayBuffer[] = []
   private totalSamples = 0
-  private SAMPLE_RATE = 16000
-  private TARGET_SAMPLES = Math.floor(this.SAMPLE_RATE * 0.1) // 100ms
+  private preferredSampleRate = 16000
+  private onAudioFrame: ((frame: ArrayBuffer) => void) | null = null
 
-  async start(
-    mediaStream: MediaStream,
-    onPCMFrame: (frame: ArrayBuffer) => void
-  ): Promise<void> {
+  async start(mediaStream: MediaStream): Promise<void> {
     if (this.audioContext) return
 
     this.audioContext = new AudioContext({
-      sampleRate: this.SAMPLE_RATE,
+      sampleRate: this.preferredSampleRate,
     })
+
+    const targetTotalSamples = Math.floor(this.audioContext.sampleRate * 0.1) // 100ms
 
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume()
@@ -42,7 +41,7 @@ export default class AudioProcessor {
       const samples = frame.byteLength / 2
       this.totalSamples += samples
 
-      if (this.totalSamples >= this.TARGET_SAMPLES) {
+      if (this.totalSamples >= targetTotalSamples) {
         const merged = new Int16Array(this.totalSamples)
 
         let offset = 0
@@ -59,12 +58,16 @@ export default class AudioProcessor {
         // const avg = merged.reduce((a, b) => a + Math.abs(b), 0) / merged.length
         // console.log('avg amplitude:', avg)
 
-        onPCMFrame(merged.buffer)
+        this.onAudioFrame?.(merged.buffer)
 
         this.samplesBuffer = []
         this.totalSamples = 0
       }
     }
+  }
+
+  setOnAudioFrameHandler(handler: (frame: ArrayBuffer) => void) {
+    this.onAudioFrame = handler
   }
 
   async stop(): Promise<void> {
@@ -78,5 +81,9 @@ export default class AudioProcessor {
     this.audioContext = null
     this.workletNode = null
     this.sourceNode = null
+  }
+
+  getSampleRate() {
+    return this.audioContext?.sampleRate
   }
 }

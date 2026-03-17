@@ -15,9 +15,11 @@ async function attemptStart(
 ): Promise<boolean> {
   const token = await getToken()
 
+  await audioController.start(mediaStream)
+
   return new Promise((resolve) => {
     const CONNECTION_PARAMS = {
-      sample_rate: 16000,
+      sample_rate: audioController.getSampleRate(),
       speech_model: 'universal-streaming-english',
       min_turn_silence: 300,
       max_turn_silence: 1500,
@@ -34,6 +36,7 @@ async function attemptStart(
       attempt,
       hasToken: !!token,
       tokenLength: token?.length,
+      sampleRate: audioController.getSampleRate(),
     })
 
     const socket = new WebSocket(
@@ -52,9 +55,9 @@ async function attemptStart(
     socket.onopen = async () => {
       LoggerService.info('AssemblyAi websocket is opened', { attempt })
 
-      await audioController.start(mediaStream, (pcmFrame) => {
+      audioController.setOnAudioFrameHandler((audioFrame) => {
         if (socket.readyState === WebSocket.OPEN) {
-          socket.send(pcmFrame)
+          socket.send(audioFrame)
         }
       })
 
@@ -146,6 +149,17 @@ export async function startTranscription(
   )
   LoggerService.noticeError(transcriptionNeverStartedError)
   throw transcriptionNeverStartedError
+}
+
+export async function stopTranscription() {
+  LoggerService.info('Stopping AssemblyAi after session ended')
+  await audioController.stop()
+
+  if (ws) {
+    ws.send(JSON.stringify({ terminate_session: true }))
+    ws.close()
+    ws = null
+  }
 }
 
 async function getToken() {
