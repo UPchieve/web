@@ -39,9 +39,7 @@ async function attemptStart(
       sampleRate: audioController.getSampleRate(),
     })
 
-    const socket = new WebSocket(
-      `wss://streaming.assemblyai.com/v3/ws?${params}`
-    )
+    const socket = new WebSocket(`wss://stt.upchieve.org/ws?${params}`)
     ws = socket
 
     let settled = false

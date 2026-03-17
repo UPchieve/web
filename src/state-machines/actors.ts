@@ -400,7 +400,7 @@ export const maybeStartTranscription = fromPromise(
         status: 'started',
       })
       if (store.getters['featureFlags/isNewSpeechToTextEnabled']) {
-        AssemblyAiService.startTranscription(
+        await AssemblyAiService.startTranscription(
           micAudioStream,
           (transcript, type) => {
             if (type == 'partial') {
