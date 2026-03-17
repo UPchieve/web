@@ -54,6 +54,10 @@ async function attemptStart(
       LoggerService.info('AssemblyAi websocket is opened', { attempt })
 
       audioController.setOnAudioFrameHandler((audioFrame) => {
+        LoggerService.info('Attempting to send audio', {
+          bytes: audioFrame.byteLength,
+          socketState: socket.readyState,
+        })
         if (socket.readyState === WebSocket.OPEN) {
           socket.send(audioFrame)
         }
