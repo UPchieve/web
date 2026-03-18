@@ -16,7 +16,9 @@
           }"
         >
           <attention-boxes v-if="showInAppSessionNotifications" />
-          <router-view />
+          <router-view v-slot="{ Component, route }">
+            <component :is="Component" :key="route.path" />
+          </router-view>
         </div>
       </ion-content>
     </ion-app>
