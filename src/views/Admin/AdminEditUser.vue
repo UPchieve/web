@@ -238,7 +238,7 @@ export default {
       this.email = this.user.email
       this.partnerSite = this.user.partnerSite || ''
       this.isVerified = this.user.verified
-      this.banType = this.user.banType
+      this.banType = this.user.banType ?? null
       this.isDeactivated = this.user.isDeactivated
       this.isApproved = this.user.isApproved
       this.partnerOrg = {}
