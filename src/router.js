@@ -302,7 +302,11 @@ const routes = [
     path: '/session/:topic/:subTopic/:sessionId?',
     name: 'SessionView',
     component: SessionView,
-    meta: { protected: true, hideNavigation: true },
+    meta: {
+      protected: true,
+      hideNavigation: true,
+      disableComponentReuse: true,
+    },
   },
   {
     path: '/resources',
