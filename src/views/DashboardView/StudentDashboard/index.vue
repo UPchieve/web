@@ -67,7 +67,7 @@
       :showPermanentDismissOption="true"
       @dismissed="onSecondaryEmailDismissed"
       @completed="updateSecondaryEmail"
-      @permanentlyDismissed="onPermanentlyDismissedSecondaryEmailModal"
+      @permanentlyDismissed="setPermanentlyDismissedSecondaryEmailModal"
     />
 
     <subject-selection />
@@ -109,6 +109,13 @@ import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import { isEmpty } from 'lodash-es'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import sendWebNotification from '@/utils/send-web-notification'
+import {
+  hasPermanentlyDismissedSecondaryEmailModal,
+  hasTemporarilyDismissedSecondaryEmailModal,
+  setTemporarilyDismissSecondaryEmailModal,
+  setPermanentlyDismissSecondaryEmailModal,
+  isTargetEmailDomain,
+} from '@/utils/secondary-email-modal-utils'
 
 export default {
   name: 'student-dashboard',
@@ -125,10 +132,6 @@ export default {
     StudentAssignments,
     OnboardingModal,
     JourneyModal,
-  },
-  beforeMount() {
-    this.hasDismissedSecondaryEmailModalForCurrentSession =
-      this.temporarilyDismissedSecondaryEmailModal
   },
   async created() {
     if (
@@ -203,7 +206,6 @@ export default {
       showJourneyModal: false,
       dismissedSecondaryEmailModal: false,
       impactStudySurveyCampaignId: '',
-      hasDismissedSecondaryEmailModalForCurrentSession: false,
     }
   },
   computed: {
@@ -232,36 +234,23 @@ export default {
       volunteerSubjectPresenceVariant:
         'featureFlags/volunteerSubjectPresenceVariant',
     }),
-    permanentlyDismissedSecondaryEmailModalKey() {
-      return `${this.user.id}-permanently-dismissed-secondary-email-modal`
+    hasPermanentlyDismissedSecondaryEmailModal() {
+      return hasPermanentlyDismissedSecondaryEmailModal(this.user.id)
     },
-    temporarilyDismissedSecondaryEmailModalKey() {
-      return `${this.user.id}-temporarily-dismissed-secondary-email-modal`
+    hasTemporarilyDismissedSecondaryEmailModal() {
+      return hasTemporarilyDismissedSecondaryEmailModal(this.user.id)
     },
-    permanentlyDismissedSecondaryEmailModal() {
-      return (
-        localStorage.getItem(
-          this.permanentlyDismissedSecondaryEmailModalKey
-        ) !== null
-      )
+    isTargetEmailDomainForSecondaryEmailModal() {
+      return isTargetEmailDomain(this.user.email)
     },
-    temporarilyDismissedSecondaryEmailModal() {
-      return (
-        sessionStorage.getItem(
-          this.temporarilyDismissedSecondaryEmailModalKey
-        ) !== null
-      )
-    },
-
     showSecondaryEmailModal() {
       return (
         this.isSecondaryEmailOnProfilePageEnabled &&
-        // always show for 12th graders while they do not have a proxy email, or until they permanently dismiss this
-        this.user?.gradeLevel === '12th' &&
         !this.dismissedSecondaryEmailModal &&
-        !this.permanentlyDismissedSecondaryEmailModal &&
         !this.user.proxyEmail &&
-        !this.hasDismissedSecondaryEmailModalForCurrentSession
+        !this.hasPermanentlyDismissedSecondaryEmailModal &&
+        !this.hasTemporarilyDismissedSecondaryEmailModal &&
+        this.isTargetEmailDomainForSecondaryEmailModal
       )
     },
 
@@ -312,21 +301,12 @@ export default {
     },
   },
   methods: {
-    onPermanentlyDismissedSecondaryEmailModal() {
-      localStorage.setItem(
-        this.permanentlyDismissedSecondaryEmailModalKey,
-        'true'
-      )
-    },
-    onTemporarilyDismissedSecondaryEmailModal() {
-      sessionStorage.setItem(
-        this.temporarilyDismissedSecondaryEmailModalKey,
-        'true'
-      )
+    setPermanentlyDismissedSecondaryEmailModal() {
+      setPermanentlyDismissSecondaryEmailModal(this.user.id, new Date())
     },
     onSecondaryEmailDismissed() {
       this.toggleSecondaryEmailModal()
-      this.onTemporarilyDismissedSecondaryEmailModal()
+      setTemporarilyDismissSecondaryEmailModal(this.user.id)
     },
     async updateSecondaryEmail(email) {
       await this.$store.dispatch('user/addToUser', {

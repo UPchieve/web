@@ -258,7 +258,7 @@ const onPermanentlyDismissed = () => {
     <RecaptchaCaption v-if="formStep !== 'complete'" />
     <button
       class="permanent-dismiss-button"
-      v-if="props.showPermanentDismissOption"
+      v-if="props.showPermanentDismissOption && formStep !== 'complete'"
       @click="onPermanentlyDismissed"
     >
       Don't show this again
