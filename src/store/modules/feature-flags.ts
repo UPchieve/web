@@ -59,7 +59,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY]: false,
       [POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES]: false,
       [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: false,
-      [POSTHOG_FEATURE_FLAGS.NEW_SPEECH_TO_TEXT]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -111,8 +110,6 @@ export default {
     },
   },
   getters: {
-    isNewSpeechToTextEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_SPEECH_TO_TEXT],
     isFilterActiveSubjectsActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS],
     isPollingFlagsActive: (state: FeatureFlagState) =>

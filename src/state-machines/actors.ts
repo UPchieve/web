@@ -15,9 +15,6 @@ import type { Context, Events, Attendee } from './meeting-machine'
 import { moderateScreenShare } from '@/services/LiveShareService/moderation-tools'
 import store from '@/store'
 import { CustomActiveSpeakerPolicy } from '@/utils/CustomActiveSpeakerPolicy'
-import * as AssemblyAiService from '@/services/AssemblyAiService'
-import { EVENTS } from '@/consts'
-import AnalyticsService from '@/services/AnalyticsService'
 
 export const fetchChimeMeeting = fromPromise(
   async ({ input }: { input: { sessionId: string | null } }) => {
@@ -326,7 +323,6 @@ async function unsubscribeAll(
   await context.meetingSession!.audioVideo.stopContentShare()
   await context.meetingSession!.audioVideo.stopAudioInput()
 
-  await AssemblyAiService.stopTranscription()
   store.dispatch('liveMedia/reset')
 }
 
@@ -378,19 +374,13 @@ export const stopShareMyScreenAndMic = fromPromise(
 
 export const maybeStartTranscription = fromPromise(
   async ({
-    input: {
-      transcriptionStarted,
-      sessionId,
-      sessionRecordingStarted,
-      micAudioStream,
-      parent,
-    },
+    input: { transcriptionStarted, sessionId, sessionRecordingStarted, parent },
   }: {
     input: {
       transcriptionStarted: boolean
       sessionId: string
       sessionRecordingStarted: boolean
-      micAudioStream: MediaStream
+
       parent: { send: (event: Events) => void }
     }
   }) => {
@@ -399,27 +389,8 @@ export const maybeStartTranscription = fromPromise(
         type: 'transcription_status_changed',
         status: 'started',
       })
-      if (store.getters['featureFlags/isNewSpeechToTextEnabled']) {
-        await AssemblyAiService.startTranscription(
-          micAudioStream,
-          (transcript, type) => {
-            if (type == 'partial') {
-              store.dispatch(
-                'liveMedia/audio/setPartialAudioTranscript',
-                transcript
-              )
-            } else {
-              store.dispatch(
-                'liveMedia/audio/setFinalAudioTranscript',
-                transcript
-              )
-            }
-          }
-        )
-        AnalyticsService.captureEvent(EVENTS.ASSEMBLY_AI_TRANSCRIPTION_STARTED)
-      } else {
-        await NetworkService.startSessionMeetingTranscription(sessionId)
-      }
+
+      await NetworkService.startSessionMeetingTranscription(sessionId)
     }
 
     if (!sessionRecordingStarted) {
@@ -450,12 +421,7 @@ export const requestMicAccess = fromPromise(
       throw new Error('No audio input devices available')
     }
 
-    const micAudioStream = await meetingSession.audioVideo.startAudioInput(
-      audioInputDevices[0]
-    )
-    return {
-      micAudioStream,
-    }
+    await meetingSession.audioVideo.startAudioInput(audioInputDevices[0])
   }
 )
 
