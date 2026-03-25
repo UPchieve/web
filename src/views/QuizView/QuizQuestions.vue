@@ -7,16 +7,19 @@
         :questionNumber="questionNumber"
       />
     </div>
+
     <div class="quiz-body">
       <div v-if="questionNumber" class="question-number">
         Question {{ questionNumber }}
       </div>
+
       <div class="questionText" data-testid="question-text">
         {{ questionText }}
       </div>
+
       <div
-        class="question-image-container"
         v-if="imageSrc"
+        class="question-image-container"
         data-testid="question-image-container"
       >
         <div
@@ -30,10 +33,11 @@
           data-testid="expand-image"
         />
       </div>
+
       <div
         v-if="isImageExpanded && imageSrc"
-        @click="handleImageExpansion"
         class="upc-modal question-image-modal"
+        @click="handleImageExpansion"
       >
         <div
           class="question-image-expanded-container"
@@ -47,16 +51,17 @@
           <img :src="imageSrc" class="question-image--expanded" />
         </div>
       </div>
+
       <form class="possible-answers" data-testid="quiz-questions">
-        <div v-for="(item, index) in answersWithLabels" :key="`item-${index}`">
+        <div v-for="(item, index) in items" :key="`item-${index}`">
           <div class="options answer-option" @click="selectAnswer(item.val)">
             <input
-              :value="item.val"
-              v-model="picked"
-              type="radio"
               :id="item.val"
+              v-model="picked"
+              :value="item.val"
               :data-testid="item.val"
-              :aria-label="item.label"
+              :aria-label="`${item.val}. ${item.txt}`"
+              type="radio"
               class="answer-option--input"
             />
             <label
@@ -65,13 +70,15 @@
               :data-testid="`$answer-${item.val}`"
               class="answer-option--label"
             >
-              {{ item.label }}
+              <span class="answer-option--prefix">{{ item.val }}.</span>
+              <span class="answer-option--text">{{ item.txt }}</span>
             </label>
           </div>
         </div>
         <p class="quiz-error">{{ errorMsg }}</p>
       </form>
     </div>
+
     <div class="btn-container">
       <large-button
         v-if="showPrevious"
@@ -84,8 +91,8 @@
       </large-button>
 
       <large-button
-        data-testid="btn-question-next"
         v-if="showNext"
+        data-testid="btn-question-next"
         variant="secondary"
         :showArrow="false"
         @click="next"
@@ -94,8 +101,8 @@
       </large-button>
 
       <large-button
-        data-testid="btn-submit-quiz"
         v-if="showSubmit"
+        data-testid="btn-submit-quiz"
         variant="primary"
         :showArrow="false"
         @click="submit"
@@ -107,17 +114,25 @@
 </template>
 
 <script>
+import { nextTick } from 'vue'
 import TrainingService from '@/services/TrainingService'
-
 import ProgressBar from './ProgressBar.vue'
 import ImageExpandIcon from '@/assets/image-expand.svg'
 import ImageCollapseIcon from '@/assets/image-collapse.svg'
 import LoggerService from '@/services/LoggerService'
 import LargeButton from '@/components/LargeButton.vue'
+import { renderKatexInElement } from '@/utils/katex'
 
 export default {
   props: {
     quizLength: { type: Number, required: true },
+  },
+  emits: ['submitQuiz'],
+  components: {
+    ProgressBar,
+    ImageExpandIcon,
+    ImageCollapseIcon,
+    LargeButton,
   },
   data() {
     return {
@@ -135,114 +150,47 @@ export default {
       isImageExpanded: false,
     }
   },
-  components: {
-    ProgressBar,
-    ImageExpandIcon,
-    ImageCollapseIcon,
-    LargeButton,
-  },
   computed: {
     answersWithLabels() {
-      return this.items.map((item) => ({
-        ...item,
-        label: `${item.val}. ${item.txt}`,
-      }))
+      return this.items
     },
   },
-  mounted() {
+  async mounted() {
     this.getFirstQuestion()
+    await this.renderMath()
   },
-  beforeUpdate() {
-    // manually set questionText since MathJax's generated DOM elements interfere
-    // with Vue's template engine when changing the text
-    const questionText = document.querySelector('.questionText')
-    if (questionText) questionText.innerHTML = this.questionText
-  },
-  updated() {
-    this.rerenderMathJaxElements()
-  },
-  emits: ['submitQuiz'],
   methods: {
-    clearMathJaxElements() {
-      const quizBody = document.querySelector('.quiz-body')
+    async renderMath() {
+      await nextTick()
+
+      const quizBody = this.$el?.querySelector('.quiz-body')
       if (!quizBody) {
-        LoggerService.noticeError(
-          'Missing quiz body - cannot clear MathJax elements'
-        )
+        LoggerService.noticeError('Missing quiz body - cannot render KaTeX')
         return
       }
 
-      // Remove any MathJax-rendered elements from the DOM.
-      // Do this before updating to avoid rendering artifacts being left behind
-      const mathJaxElements = Array.from(
-        quizBody.querySelectorAll('[class*=mjx],[class*=MathJax],[id*=MathJax]')
-      )
-
-      const mathJaxParentElements = Array.from(
-        quizBody.querySelectorAll('.MathJax_Preview')
-      ).map((e) => e.parentElement)
-
-      mathJaxElements.forEach((e) => e.remove())
-
-      // MathJax slices up the DOM nodes it renders as math formulas. We need to
-      // rejoin these under the first child's data attribute to avoid artifacts
-      // being left behind
-      mathJaxParentElements.forEach((parentEl) => {
-        if (!(parentEl && parentEl.firstChild)) return
-
-        parentEl.firstChild.data = parentEl.innerText
-
-        // Remove all child nodes but the first
-        Array.from(parentEl.childNodes)
-          .slice(1)
-          .forEach((e) => e.remove())
+      renderKatexInElement(quizBody, (msg, err) => {
+        LoggerService.noticeError('KaTeX auto-render error', {
+          message: msg,
+          error: err?.message,
+          questionNumber: this.questionNumber,
+        })
       })
     },
 
-    rerenderMathJaxElements() {
-      const quiz = document.querySelector('.quiz-body')
-      if (!quiz) {
-        LoggerService.noticeError(
-          'Missing quiz body - cannot rerender MathJax elements'
-        )
-        return
-      }
-      const questionText = quiz.querySelector('.questionText')
-      const answerChoices = quiz.querySelectorAll('.possible-answers div')
-
-      if (!questionText || !answerChoices || !answerChoices.length) {
-        return
-      }
-      window.MathJax.Hub.Queue([
-        'Typeset',
-        window.MathJax.Hub,
-        [
-          questionText,
-          ...Array.from(answerChoices).map((answerChoice) =>
-            answerChoice.querySelector('.options label')
-          ),
-        ],
-      ])
-    },
     updateProgressBar() {
-      // When switching to a new question, clear any mathjax elements so they
-      // can be re-rendered
-      this.clearMathJaxElements()
-
       const index = TrainingService.getIndex(this)
-      this.questionNumber = TrainingService.getIndex(this) + 1
+      this.questionNumber = index + 1
       this.barWidth = (100 / (this.quizLength - 1)) * index
+
       for (let i = 1; i < this.quizLength + 1; i++) {
         const element = document.getElementById(`circle-${i}`)
-        if (element) {
-          if (i < index + 2) {
-            element.style.background = '#16D2AA'
-          } else {
-            element.style.background = '#EEEEEE'
-          }
-        }
+        if (!element) continue
+
+        element.style.background = i < index + 2 ? '#16D2AA' : '#EEEEEE'
       }
     },
+
     styleImage(imageSrc) {
       if (imageSrc) {
         this.imageStyle = {
@@ -258,6 +206,7 @@ export default {
         this.imageStyle = {}
       }
     },
+
     getFirstQuestion() {
       const question = TrainingService.getFirstQuestion()
       this.questionText = question.questionText
@@ -265,6 +214,7 @@ export default {
       this.imageSrc = question.imageSrc
       this.items = question.possibleAnswers
       this.showNext = true
+
       if (!TrainingService.hasNext()) {
         this.showNext = false
         this.showSubmit = true
@@ -272,45 +222,64 @@ export default {
 
       this.questionNumber = TrainingService.getIndex(this) + 1
     },
-    previous() {
+
+    async previous() {
       TrainingService.saveAnswer(this.picked)
       this.picked = ''
+
       const data = TrainingService.getPreviousQuestion(this)
       const { question } = data
+
       this.picked = data.picked
       this.questionText = question.questionText
-      this.updateProgressBar()
       this.imageSrc = question.imageSrc
       this.styleImage(question.imageSrc)
       this.items = question.possibleAnswers
+
+      this.updateProgressBar()
+
       if (!TrainingService.hasPrevious(this)) {
         this.showPrevious = false
       }
+
       if (this.errorMsg) {
         this.errorMsg = ''
       }
+
       this.showSubmit = false
       this.showNext = true
+
+      await this.renderMath()
     },
-    next() {
+
+    async next() {
       TrainingService.saveAnswer(this.picked)
       this.picked = ''
+
       const data = TrainingService.getNextQuestion(this)
       const { question } = data
+
       this.picked = data.picked
       this.questionText = question.questionText
       this.imageSrc = question.imageSrc
-      this.updateProgressBar()
       this.styleImage(this.imageSrc)
       this.items = question.possibleAnswers
+
+      this.updateProgressBar()
+
       if (!TrainingService.hasNext(this)) {
         this.showNext = false
         this.showSubmit = true
       }
+
       this.showPrevious = true
+
+      await this.renderMath()
     },
+
     submit() {
       TrainingService.saveAnswer(this.picked)
+
       if (!TrainingService.hasCompleted()) {
         this.errorMsg =
           'You must answer all questions before submitting the quiz!'
@@ -318,19 +287,23 @@ export default {
         this.$emit('submitQuiz')
       }
     },
+
     handleImageExpansion(event) {
       event.stopImmediatePropagation()
       const { target } = event
+
       if (
         this.isImageExpanded &&
         target &&
         target.classList.contains('question-image--expanded')
       ) {
         return
-      } else this.isImageExpanded = !this.isImageExpanded
+      }
+
+      this.isImageExpanded = !this.isImageExpanded
     },
+
     selectAnswer(value) {
-      // Workaround for MathJax breaking label-input association
       this.picked = value
     },
   },
