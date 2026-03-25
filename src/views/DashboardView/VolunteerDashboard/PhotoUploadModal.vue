@@ -9,19 +9,63 @@
           data-testid="close-modal-btn"
         />
       </header>
+      <div class="content" v-if="user.photoIdStatus === 'APPROVED'">
+        Your photo ID has been verified by the UPchieve team!
+      </div>
       <div
-        v-if="user.photoIdStatus === 'SUBMITTED'"
+        class="content"
+        v-else-if="user.photoIdStatus === 'SUBMITTED'"
         data-testid="photo-submitted-content"
       >
-        <p class="subtitle">Your photo ID is under review.</p>
-      </div>
-      <div v-else>
-        <p class="subtitle">
-          To ensure the safety of our students, we need to confirm your identity
-          by reviewing a photo ID such as your driver's license, passport, or
-          student ID. Your full name, photo, and school name (if applicable)
-          should be clearly visible. Acceptable formats: jpeg, png.
+        <p>
+          We've received your photo ID. The UPchieve team will review your ID
+          within 1-2 business days.
         </p>
+        <span data-testid="help-text"
+          ><strong>Questions?</strong> Check out our
+          <LinkComponent
+            :url="photoIdFaqLink"
+            text="photo ID FAQs"
+            :showArrow="true"
+        /></span>
+      </div>
+      <div v-else class="content">
+        To ensure the safety of our students, we need to confirm your identity
+        by reviewing a photo ID:
+        <ul>
+          <li>
+            Acceptable forms of ID include a driver's license, passport, or
+            student ID
+            <ul>
+              <li>Selfies are <strong>not</strong> an acceptable form of ID</li>
+            </ul>
+          </li>
+          <li>
+            Your full name, photo, and school name (if uploading a student ID)
+            must be clearly visible
+          </li>
+          <li>Acceptable image formats: jpeg, png</li>
+        </ul>
+
+        <span v-if="user.photoIdStatus !== 'REJECTED'" data-testid="help-text">
+          <strong>Questions?</strong> Check out our
+          <LinkComponent
+            :url="photoIdFaqLink"
+            text="photo ID FAQs"
+            :showArrow="true"
+        /></span>
+        <span v-else data-testid="help-text">
+          <strong class="warning">Your last photo ID was rejected.</strong>
+          Check out our
+          <LinkComponent
+            :url="photoIdFaqLink"
+            text="photo ID FAQs"
+            :showArrow="true"
+            color="blue"
+          />
+          for tips on choosing an acceptable form of ID.
+        </span>
+
         <div v-if="photo" class="photo-id-container">
           <img
             :src="photo"
@@ -50,12 +94,10 @@
             type="button"
             data-testid="upload-photo-btn"
           >
-            Upload Photo
+            Upload Photo ID
           </button>
         </label>
         <p v-if="error" class="error">{{ error }}</p>
-
-        <separator v-if="!mobileMode" />
 
         <large-button
           @click="submitPhoto"
@@ -75,16 +117,22 @@ import axios from 'axios'
 import NetworkService from '@/services/NetworkService'
 import { mapState, mapGetters } from 'vuex'
 import Modal from '@/components/Modal.vue'
-import Separator from '@/components/Separator.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import TrashIcon from '@/assets/trash.svg'
 import CrossIcon from '@/assets/cross.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import Link from '@/components/Link.vue'
 
 export default {
   name: 'volunteer-dashboard',
-  components: { Modal, Separator, LargeButton, TrashIcon, CrossIcon },
+  components: {
+    LinkComponent: Link,
+    Modal,
+    LargeButton,
+    TrashIcon,
+    CrossIcon,
+  },
   props: {
     closeModal: { type: Function, required: true },
   },
@@ -93,7 +141,15 @@ export default {
       photo: '',
       file: undefined,
       error: '',
+      photoIdFaqLink:
+        'https://help.upchieve.org/en/articles/76-submitting-photo-id-to-volunteer-on-upchieve',
     }
+  },
+  mounted() {
+    AnalyticsService.captureEvent(EVENTS.PHOTO_ID_MODAL_OPENED)
+  },
+  unmounted() {
+    AnalyticsService.captureEvent(EVENTS.PHOTO_ID_MODAL_CLOSED)
   },
   computed: {
     ...mapState({
@@ -118,10 +174,12 @@ export default {
       this.error = ''
       this.file = file
       this.photo = URL.createObjectURL(file)
+      AnalyticsService.captureEvent(EVENTS.PHOTO_ID_SELECTED)
     },
     removePhoto() {
       event.stopPropagation()
       this.photo = ''
+      AnalyticsService.captureEvent(EVENTS.PHOTO_ID_REMOVED)
     },
     submitPhoto() {
       if (!this.photo) {
@@ -158,6 +216,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.warning {
+  color: $c-error-red;
+}
+
 h1,
 h2,
 p {
@@ -176,24 +238,36 @@ header {
   text-align: left;
 }
 
-.subtitle {
-  @include font-category('body');
-  text-align: left;
-  color: $c-secondary-grey;
-}
-
 .submit-btn {
   background-color: $c-success-green;
-  border-color: transparent;
   color: white;
-  margin-left: auto;
   margin-top: 20px;
-  border: none;
+  margin-left: auto;
+  display: flex;
 }
 
 .photo-id-container {
-  position: relative;
   margin: 2em 0;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .trash-icon-container {
+    @include flex-container(row, center, center);
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    padding: 0.5em;
+    border-radius: 40px;
+    background-color: rgba($color: $c-soft-black, $alpha: 0.8);
+    cursor: pointer;
+
+    .trash-icon {
+      fill: white;
+    }
+  }
 }
 
 .photo-id-img {
@@ -204,7 +278,6 @@ header {
 .photo-id-label {
   @include flex-container(row, center, center);
   border-radius: 8px;
-  margin: 2em 0;
   border: 3px dashed $c-border-grey;
   cursor: pointer;
 
@@ -223,7 +296,6 @@ header {
 }
 
 .upload-photo-btn {
-  width: 160px;
   border: 1px solid $c-border-grey;
   border-radius: 8px;
   color: white;
@@ -233,33 +305,15 @@ header {
   margin: 4em 0;
 }
 
-.trash-icon-container {
-  @include flex-container(row, center, center);
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 40px;
-  height: 40px;
-  padding: 0.5em;
-  border-radius: 40px;
-  background-color: rgba($color: $c-soft-black, $alpha: 0.8);
-  cursor: pointer;
-}
-
-.trash-icon {
-  fill: white;
-}
-
-.seperator {
-  border: 1px solid $c-border-grey;
-  width: 100%;
-  height: 1px;
-  margin-top: 2em;
-}
-
 .error {
   color: $c-error-red;
   text-align: left;
   margin-bottom: 1em;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 </style>
