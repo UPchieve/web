@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useStore } from 'vuex'
 import SessionService from '@/services/SessionService'
+import ModalService from '@/services/ModalService'
 import { computed } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 
@@ -32,15 +33,21 @@ function finish() {
   SessionService.postSessionRedirect(session.value)
 }
 
-function end() {
+async function end() {
   if (isSessionEnding.value) {
     return
   }
   store.commit('user/setSessionIsEnding', true)
 
   if (isSessionWaitingForVolunteer.value) {
-    const shouldEndSession = window.confirm(
-      "Are you sure you want to cancel this request? If you've been waiting less than 5 minutes, you won't be able to make another request right away."
+    const shouldEndSession = await ModalService.showConfirm(
+      'Cancel Request',
+      "Are you sure you want to cancel this request? If you've been waiting less than 5 minutes, you won't be able to make another request right away.",
+      {
+        acceptText: 'Yes, Cancel Session',
+        acceptButtonVariant: 'danger',
+        backText: 'No, Go Back',
+      }
     )
 
     if (!shouldEndSession) {
@@ -50,7 +57,15 @@ function end() {
   } else {
     // Only ask for confirmation if session hasn't been ended by other user.
     const shouldEndSession = isSessionAlive.value
-      ? window.confirm('Do you really want to end the session?')
+      ? await ModalService.showConfirm(
+          'End Session',
+          'Do you really want to end the session?',
+          {
+            acceptText: 'Yes, End Session',
+            acceptButtonVariant: 'danger',
+            backText: 'No, Go Back',
+          }
+        )
       : true
 
     // Early exit if user didn't confirm

@@ -22,7 +22,14 @@ export type SessionErrorModalData = ModalTemplateProps & {
   error: string
 }
 
-type ModalData = ModalTemplateProps | SessionErrorModalData
+export type ConfirmModalData = ModalTemplateProps & {
+  title: string
+  message: string
+  onConfirm?: () => void
+  onCancel?: () => void
+}
+
+type ModalData = ModalTemplateProps | SessionErrorModalData | ConfirmModalData
 
 // TODO: Make `component` just a string.
 function show(
@@ -81,5 +88,46 @@ export default {
       },
       props
     )
+  },
+
+  showConfirm(
+    title: string,
+    message: string,
+    options?: {
+      acceptText?: string
+      acceptButtonVariant?: string
+      backText?: string
+    }
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      show('ConfirmModal', {
+        title,
+        message,
+        acceptText: options?.acceptText ?? 'Confirm',
+        acceptButtonVariant: options?.acceptButtonVariant,
+        showTemplateButtons: false,
+        backText: options?.backText ?? 'Cancel',
+        onConfirm: () => resolve(true),
+        onCancel: () => resolve(false),
+      })
+    })
+  },
+
+  showAlert(
+    title: string,
+    message: string,
+    options?: { acceptText?: string; acceptButtonVariant?: string }
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      show('ConfirmModal', {
+        title,
+        message,
+        acceptText: options?.acceptText ?? 'OK',
+        acceptButtonVariant: options?.acceptButtonVariant,
+        showTemplateButtons: false,
+        onConfirm: () => resolve(),
+        onCancel: () => resolve(),
+      })
+    })
   },
 }

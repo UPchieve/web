@@ -29,6 +29,7 @@
 import { mapState } from 'vuex'
 import ModalTemplate from './ModalTemplate.vue'
 import RejoinSessionModal from './RejoinSessionModal.vue'
+import ConfirmModal from './ConfirmModal.vue'
 import UpgradeAppModal from './UpgradeAppModal.vue'
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 import NotificationsModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/NotificationsModal.vue'
@@ -51,6 +52,7 @@ export default {
   components: {
     ModalTemplate,
     RejoinSessionModal,
+    ConfirmModal,
     SubjectSelectionModal,
     NotificationsModal,
     ReferralModal,
@@ -83,8 +85,9 @@ export default {
   },
   mounted() {
     // Enable the accept button by default if this is
-    // an alert modal.
-    this.enableAccept = !!this.modalData.alertModal
+    // an alert modal or we have explicitly set to enable the button.
+    this.enableAccept =
+      this.modalData.enableAccept || !!this.modalData.alertModal
   },
   methods: {
     onCancel() {

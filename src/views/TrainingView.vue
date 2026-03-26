@@ -167,6 +167,7 @@ import Check from '@/assets/check.svg'
 import DisabledCertificateIcon from '@/assets/disabled_certificate_icon.svg'
 import { IonPopover } from '@ionic/vue'
 import NetworkService from '@/services/NetworkService'
+import ModalService from '@/services/ModalService'
 import moment from 'moment'
 import { isTrainingComplete } from '@/utils/get-training-progress'
 import { UpchieveTrainingCourseKeyEnum } from '@/views/TrainingCourseView/types'
@@ -358,7 +359,8 @@ export default {
       }
 
       certificateImg.onerror = () => {
-        alert(
+        void ModalService.showAlert(
+          'Error',
           'Could not load certificate background image. Please try again later.'
         )
       }

@@ -26,6 +26,7 @@
       />
     </div>
     <div class="report-modal__footer">
+      <div v-if="error" class="report-modal__error">{{ error }}</div>
       <div class="report-modal__buttons">
         <large-button @click="cancel">Cancel</large-button>
         <large-button
@@ -87,6 +88,7 @@ export default {
       reportReasonOptions: volunteerReportReasonOptions,
       reportReason: null,
       reportMessage: '',
+      error: '',
     }
   },
   mounted() {
@@ -129,6 +131,7 @@ export default {
   },
   methods: {
     async submit() {
+      this.error = ''
       try {
         await NetworkService.reportSession({
           sessionId: this.currentSession.id,
@@ -139,7 +142,8 @@ export default {
         if (this.modalData.toggleReportSubmitted)
           this.modalData.toggleReportSubmitted()
       } catch {
-        alert('Failed to submit')
+        this.error = 'Failed to submit report. Please try again.'
+        return
       }
 
       if (this.isInRecap)
@@ -201,6 +205,12 @@ export default {
     &:focus {
       outline: none;
     }
+  }
+
+  &__error {
+    color: $c-error-red;
+    font-size: 14px;
+    margin-bottom: 8px;
   }
 
   &__buttons {

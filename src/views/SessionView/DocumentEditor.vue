@@ -49,6 +49,7 @@ import FileDialog from '@/components/FileDialog.vue'
 import ModerationService from '@/services/ModerationService'
 import { file2b64 } from '@/utils/fileToBase64'
 import SessionService from '@/services/SessionService'
+import ModalService from '@/services/ModalService'
 import WordCount from '@/components/WordCount.vue'
 import {
   processImage,
@@ -298,7 +299,8 @@ export default {
           this.quillEditor.insertEmbed(range.index, 'image', b64, 'user')
         }
       } catch {
-        alert(
+        void ModalService.showAlert(
+          'Image Error',
           'There was an issue analyzing the image. Please try a different image, or reach out to support@upchieve.org for assistance.'
         )
       } finally {

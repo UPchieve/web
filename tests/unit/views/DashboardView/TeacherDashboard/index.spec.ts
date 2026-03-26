@@ -1,4 +1,3 @@
-import TeacherDashboard from '@/views/DashboardView/TeacherDashboard/index.vue'
 import router from '@/router'
 import { createStore } from 'vuex'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
@@ -6,6 +5,7 @@ import { mount } from '@vue/test-utils'
 import userModule from '@/store/modules/user'
 import subjectsModule from '@/store/modules/subjects'
 import NetworkService from '@/services/NetworkService'
+import TeacherDashboard from '@/views/DashboardView/TeacherDashboard/index.vue'
 
 const topics = [
   {

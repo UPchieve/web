@@ -162,6 +162,7 @@ import Modal from '@/components/Modal.vue'
 import FileDialog from '@/components/FileDialog.vue'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import AnalyticsService from '@/services/AnalyticsService'
+import ModalService from '@/services/ModalService'
 import { BYTES_PER_MEGABYTE, formatBytes } from '@/utils/bytes'
 
 export default {
@@ -296,7 +297,8 @@ export default {
     handleFileTooLarge(files) {
       const fileNames = files.map((file) => file.name).join(', ')
       const maxLabel = formatBytes(this.MAX_UPLOAD_SIZE_BYTES)
-      alert(
+      void ModalService.showAlert(
+        'File Too Large',
         `${fileNames} ${files.length > 1 ? 'are' : 'is'} too large! Max size allowed is ${maxLabel}. Please try again.`
       )
     },

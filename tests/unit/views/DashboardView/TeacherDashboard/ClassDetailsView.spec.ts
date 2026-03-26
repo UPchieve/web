@@ -1,4 +1,3 @@
-import ClassDetailsView from '@/views/DashboardView/TeacherDashboard/ClassDetailsView.vue'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import moment from 'moment'
 import { mount } from '@vue/test-utils'
@@ -8,6 +7,7 @@ import { createStore } from 'vuex'
 import userModule from '@/store/modules/user'
 import subjectsModule from '@/store/modules/subjects'
 import featureFlagsModule from '@/store/modules/feature-flags'
+import ClassDetailsView from '@/views/DashboardView/TeacherDashboard/ClassDetailsView.vue'
 
 type Overrides = {
   data?: Record<string, any>

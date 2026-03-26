@@ -45,6 +45,7 @@ import Modal from '@/components/Modal.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import config from '@/config'
 import AnalyticsService from '@/services/AnalyticsService'
+import ModalService from '@/services/ModalService'
 import { EVENTS } from '@/consts'
 import HeavyCrossIcon from '@/assets/heavy-cross.svg'
 import _ from 'lodash'
@@ -134,7 +135,10 @@ async function shareVia() {
           title: message,
         })
       } else {
-        alert('Sharing is not supported on this device.')
+        await ModalService.showAlert(
+          'Sharing Unavailable',
+          'Sharing is not supported on this device.'
+        )
       }
       handleCloseModal(EVENTS.STUDY_SHARING_TEXT)
       break

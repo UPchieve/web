@@ -1,6 +1,7 @@
 import SessionService from '@/services/SessionService'
 import Case from 'case'
 import UserService from '@/services/UserService'
+import ModalService from '@/services/ModalService'
 
 /**
  * Starts a new session for the specified topic and subtopic.
@@ -50,7 +51,7 @@ export const endSession = (context) => {
       context.$store.dispatch('user/fetch', context)
       context.$store.dispatch('app/modal/hide')
     })
-    .catch(() => window.alert('Could not end session'))
+    .catch(() => void ModalService.showAlert('Error', 'Could not end session'))
 }
 
 function getScreenShareDisclaimerLocalStorageKey() {

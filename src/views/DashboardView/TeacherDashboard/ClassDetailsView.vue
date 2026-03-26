@@ -303,6 +303,7 @@ import { mapState, mapGetters } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import ModalService from '@/services/ModalService'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
 import Check from '@/assets/check.svg'
@@ -889,7 +890,10 @@ export default {
           classId: this.classData.id,
         })
         if (!removedId) {
-          alert('This student was unable to be removed from class.')
+          ModalService.showAlert(
+            'Error',
+            'This student was unable to be removed from class.'
+          )
         }
         this.toggledStudentMenuId = ''
         this.students = this.students.filter(
