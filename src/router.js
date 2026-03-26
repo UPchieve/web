@@ -49,6 +49,7 @@ import StudentClassesView from './views/StudentClassesView.vue'
 const StudentPartnerSignupView = () =>
   import('./views/SignupView/StudentPartnerSignupView.vue')
 import TrainingView from './views/TrainingView.vue'
+import TrainingCourseView from '@/views/TrainingCourseView/index.vue'
 const VerificationView = () => import('./views/VerificationView/index.vue')
 import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView.vue'
 import SessionHistoryView from './views/SessionHistoryView.vue'
@@ -70,7 +71,6 @@ import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/Vo
 import Case from 'case'
 import RewardsView from './views/RewardsView.vue'
 import SurveysView from './views/SurveysView.vue'
-import TrainingViewWrapper from '@/views/Training/TrainingViewWrapper.vue'
 import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
 import JourneysView from './views/JourneysView.vue'
 import NTHSGroupsView from './views/NTHS/NTHSGroupsView.vue'
@@ -373,7 +373,7 @@ const routes = [
   {
     path: '/training/course/:courseKey',
     name: 'TrainingCourseView',
-    component: TrainingViewWrapper,
+    component: TrainingCourseView,
     meta: { protected: true },
   },
   {

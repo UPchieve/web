@@ -1,5 +1,10 @@
 import type { AnswerMap, LetterChoice } from '@/services/TrainingService'
 
+export enum UpchieveTrainingCourseKeyEnum {
+  CURRENT = 'upchieveTraining',
+  LEGACY = 'upchieve101',
+}
+
 export type UpchieveTrainingCourse = {
   isComplete: boolean
   progress: number
