@@ -19,7 +19,7 @@
             <div v-if="isVerifyHoursButtonEnabled" class="verify-hours">
               <LargeButton
                 target="_blank"
-                routeTo="https://upchieve.org/verify-volunteer-hours"
+                routeTo="https://forms.gle/ocSvom8GcdudzuBJA"
                 @click="trackVerifyHoursClick"
               >
                 Verify hours
