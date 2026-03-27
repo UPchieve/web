@@ -44,6 +44,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: false,
+      [POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_V3]: false,
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
       [POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN]: false,
@@ -223,6 +224,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
     getIncentiveBannerPayload: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
+    isUpchieve101V3Enabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPCHIEVE_101_V3],
     isForceSmsVerificationEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
     isDisableStudentSignupsEnabled: (state: FeatureFlagState) =>

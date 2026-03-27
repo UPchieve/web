@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { AnswerChoice } from '@/views/TrainingCourseView/types'
+import type { AnswerChoice } from '@/views/UpchieveTrainingView/types'
 import type { LetterChoice } from '@/services/TrainingService'
 
 const {

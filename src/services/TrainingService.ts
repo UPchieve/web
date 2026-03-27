@@ -17,6 +17,20 @@ export type TrainingMaterial = {
     url: string
   }[]
 }
+export type TrainingModule = {
+  name: string
+  materials: TrainingMaterial[]
+}
+export type TrainingCourse = {
+  name: string
+  courseKey: string
+  description: string
+  quizKey: string
+  quizName: string
+  isComplete: boolean
+  progress: number
+  modules: TrainingModule[]
+}
 
 export type QuizQuestion = {
   id: number

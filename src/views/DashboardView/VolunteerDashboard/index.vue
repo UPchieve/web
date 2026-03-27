@@ -237,7 +237,6 @@ import TaskCard from '@/components/TaskCard.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
 import JoinedTeamModal from './JoinedTeamModal.vue'
-import { UpchieveTrainingCourseKeyEnum } from '@/views/TrainingCourseView/types'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -400,8 +399,7 @@ export default {
     certificationAction() {
       for (const cert in this.user.certifications) {
         // skip certification for check for required training
-        if (Object.values(UpchieveTrainingCourseKeyEnum).includes(cert))
-          continue
+        if (cert === 'upchieve101') continue
         if (this.user.certifications[cert].passed)
           return {
             subtitle: 'Completed',
