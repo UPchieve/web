@@ -15,8 +15,6 @@
 /* Core CSS required for Ionic components to work properly */
 @import '~/@ionic/vue/css/core.css';
 
-@import '~/katex/dist/katex.min.css';
-
 @include meta.load-css('layout/utils');
 @include meta.load-css('layout/form');
 @include meta.load-css('layout/modal');
@@ -74,4 +72,3 @@ textarea {
 .grecaptcha-badge {
   visibility: hidden;
 }
-

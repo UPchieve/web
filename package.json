@@ -45,7 +45,6 @@
     "exponential-backoff": "^3.1.0",
     "gleap": "^14.6.7",
     "heic-convert": "^2.1.0",
-    "katex": "^0.16.41",
     "langfuse": "^3.25.0",
     "libphonenumber-js": "^1.12.33",
     "lodash-es": "^4.17.21",

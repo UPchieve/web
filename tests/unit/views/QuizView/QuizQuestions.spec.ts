@@ -22,6 +22,12 @@ describe('QuizQuestions component', () => {
     vi.resetAllMocks()
   })
 
+  vi.stubGlobal('MathJax', {
+    Hub: {
+      Queue: vi.fn(),
+    },
+  })
+
   const getWrapper = () => {
     return mount(QuizQuestions, {
       propsData: {

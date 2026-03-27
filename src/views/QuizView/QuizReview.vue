@@ -14,10 +14,8 @@
           v-for="(answer, index) in question.possibleAnswers"
           :key="`answer-${index}`"
           :id="'question-' + qIndex + '-answer-' + answer.val"
-          class="possible-answer"
         >
-          <span class="possible-answer-prefix">{{ answer.val }}.</span>
-          <span class="possible-answer-text">{{ answer.txt }}</span>
+          {{ answer.val }}. {{ answer.txt }}
         </div>
       </div>
       <div class="userAnswer">Your answer: {{ question.userAnswer }}</div>
@@ -29,9 +27,7 @@
 </template>
 
 <script>
-import { nextTick } from 'vue'
 import TrainingService from '@/services/TrainingService'
-import { renderKatexInElement } from '@/utils/katex'
 
 export default {
   data() {
@@ -39,9 +35,8 @@ export default {
       questionsReview: [],
     }
   },
-  async mounted() {
+  mounted() {
     this.questionsReview = TrainingService.reviewQuiz(this)
-
     this.questionsReview.forEach((question) => {
       if (question.imageSrc) {
         question.imageStyle = {
@@ -56,13 +51,27 @@ export default {
         question.imageStyle = {}
       }
     })
-
-    await this.renderMath()
+  },
+  updated() {
+    this.rerenderMathJaxElements()
   },
   methods: {
-    async renderMath() {
-      await nextTick()
-      renderKatexInElement(this.$el)
+    rerenderMathJaxElements() {
+      // Re-render MathJax in all question text and answers in quiz review
+      const questions = document.querySelectorAll('.review .question')
+
+      if (!questions || !questions.length) {
+        return
+      }
+
+      window.MathJax.Hub.Queue([
+        'Typeset',
+        window.MathJax.Hub,
+        Array.from(questions).flatMap((question) => [
+          question.querySelector('.question-text'),
+          ...Array.from(question.querySelectorAll('.possible-answers div')),
+        ]),
+      ])
     },
   },
 }

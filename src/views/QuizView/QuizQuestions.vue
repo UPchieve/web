@@ -13,7 +13,11 @@
         Question {{ questionNumber }}
       </div>
 
-      <div class="questionText" data-testid="question-text">
+      <div
+        :key="`question-text-${questionNumber}`"
+        class="questionText"
+        data-testid="question-text"
+      >
         {{ questionText }}
       </div>
 
@@ -51,20 +55,24 @@
           <img :src="imageSrc" class="question-image--expanded" />
         </div>
       </div>
+
       <form
         autocomplete="off"
         class="possible-answers"
         data-testid="quiz-questions"
       >
-        <div v-for="(item, index) in items" :key="`item-${index}`">
+        <div
+          v-for="(item, index) in answersWithLabels"
+          :key="`item-${questionNumber}-${item.val}-${index}`"
+        >
           <div class="options answer-option" @click="selectAnswer(item.val)">
             <input
-              :id="item.val"
-              v-model="picked"
               :value="item.val"
-              :data-testid="item.val"
-              :aria-label="`${item.val}. ${item.txt}`"
+              v-model="picked"
               type="radio"
+              :id="item.val"
+              :data-testid="item.val"
+              :aria-label="item.label"
               autocomplete="off"
               class="answer-option--input"
             />
@@ -74,8 +82,7 @@
               :data-testid="`$answer-${item.val}`"
               class="answer-option--label"
             >
-              <span class="answer-option--prefix">{{ item.val }}.</span>
-              <span class="answer-option--text">{{ item.txt }}</span>
+              {{ item.label }}
             </label>
           </div>
         </div>
@@ -118,14 +125,12 @@
 </template>
 
 <script>
-import { nextTick } from 'vue'
 import TrainingService from '@/services/TrainingService'
 import ProgressBar from './ProgressBar.vue'
 import ImageExpandIcon from '@/assets/image-expand.svg'
 import ImageCollapseIcon from '@/assets/image-collapse.svg'
 import LoggerService from '@/services/LoggerService'
 import LargeButton from '@/components/LargeButton.vue'
-import { renderKatexInElement } from '@/utils/katex'
 
 export default {
   props: {
@@ -156,30 +161,65 @@ export default {
   },
   computed: {
     answersWithLabels() {
-      return this.items
+      return this.items.map((item) => ({
+        ...item,
+        label: `${item.val}. ${item.txt}`,
+      }))
     },
   },
-  async mounted() {
+  mounted() {
     this.getFirstQuestion()
-    await this.renderMath()
+    this.$nextTick(() => {
+      this.rerenderMathJaxElements()
+    })
   },
-  methods: {
-    async renderMath() {
-      await nextTick()
 
+  methods: {
+    clearMathJaxElements() {
       const quizBody = this.$el?.querySelector('.quiz-body')
       if (!quizBody) {
-        LoggerService.noticeError('Missing quiz body - cannot render KaTeX')
+        LoggerService.noticeError(
+          'Missing quiz body - cannot clear MathJax elements'
+        )
         return
       }
 
-      renderKatexInElement(quizBody, (msg, err) => {
-        LoggerService.noticeError('KaTeX auto-render error', {
-          message: msg,
-          error: err?.message,
-          questionNumber: this.questionNumber,
-        })
+      const mathJaxElements = Array.from(
+        quizBody.querySelectorAll('[class*=mjx],[class*=MathJax],[id*=MathJax]')
+      )
+
+      const mathJaxParentElements = Array.from(
+        quizBody.querySelectorAll('.MathJax_Preview')
+      ).map((e) => e.parentElement)
+
+      mathJaxElements.forEach((e) => e.remove())
+
+      mathJaxParentElements.forEach((parentEl) => {
+        if (!(parentEl && parentEl.firstChild)) return
+
+        parentEl.firstChild.data = parentEl.innerText
+
+        Array.from(parentEl.childNodes)
+          .slice(1)
+          .forEach((e) => e.remove())
       })
+    },
+
+    rerenderMathJaxElements() {
+      const quiz = this.$el?.querySelector('.quiz-body')
+      if (!quiz) {
+        LoggerService.noticeError(
+          'Missing quiz body - cannot rerender MathJax elements'
+        )
+        return
+      }
+
+      if (!window.MathJax?.Hub) {
+        LoggerService.noticeError('MathJax Hub is not available')
+        return
+      }
+
+      window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, quiz])
     },
 
     updateProgressBar() {
@@ -227,7 +267,9 @@ export default {
       this.questionNumber = TrainingService.getIndex(this) + 1
     },
 
-    async previous() {
+    previous() {
+      this.clearMathJaxElements()
+
       TrainingService.saveAnswer(this.picked)
       this.picked = ''
 
@@ -253,10 +295,14 @@ export default {
       this.showSubmit = false
       this.showNext = true
 
-      await this.renderMath()
+      this.$nextTick(() => {
+        this.rerenderMathJaxElements()
+      })
     },
 
-    async next() {
+    next() {
+      this.clearMathJaxElements()
+
       TrainingService.saveAnswer(this.picked)
       this.picked = ''
 
@@ -278,7 +324,9 @@ export default {
 
       this.showPrevious = true
 
-      await this.renderMath()
+      this.$nextTick(() => {
+        this.rerenderMathJaxElements()
+      })
     },
 
     submit() {
@@ -313,7 +361,6 @@ export default {
   },
 }
 </script>
-
 <style lang="scss" scoped>
 .container {
   width: 100%;
