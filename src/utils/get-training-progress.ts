@@ -1,26 +1,12 @@
-import type { UpchieveTrainingCourse } from '@/views/UpchieveTrainingView/types'
+import type { UpchieveTrainingCourse } from '@/views/TrainingCourseView/types'
 
 import store from '@/store'
 
 export function isTrainingComplete(): boolean {
   return (
     store.getters['user/hasCompletedVolunteerTraining'] ||
-    store.getters['user/hasCertification']('upchieve101')
+    store.getters['user/hasCertification']()
   )
-}
-
-export function getLegacyTrainingProgress(
-  trainingCourseDefinition: UpchieveTrainingCourse | null
-): number {
-  if (!trainingCourseDefinition) return 0
-  const progress = trainingCourseDefinition.progress
-  if (
-    !store.getters['user/hasCertification']('upchieve101') &&
-    progress === 100
-  ) {
-    return 99
-  }
-  return progress
 }
 
 export function getTrainingProgress(

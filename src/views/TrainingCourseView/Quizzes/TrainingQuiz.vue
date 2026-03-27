@@ -6,10 +6,10 @@ import NetworkService from '@/services/NetworkService'
 import type {
   QuizQuestion as QuizQuestionType,
   QuizResults,
-} from '@/views/UpchieveTrainingView/types'
-import TrainingPage from '@/views/UpchieveTrainingView/Quizzes/TrainingPage.vue'
+} from '@/views/TrainingCourseView/types'
+import TrainingPage from '@/views/TrainingCourseView/Quizzes/TrainingPage.vue'
 import LargeButton from '@/components/LargeButton.vue'
-import QuizQuestionView from '@/views/UpchieveTrainingView/Quizzes/QuizQuestion.vue'
+import QuizQuestionView from '@/views/TrainingCourseView/Quizzes/QuizQuestion.vue'
 import { useStore } from 'vuex'
 import CrossMark from '@/assets/cross.svg'
 import CheckMark from '@/assets/check.svg'

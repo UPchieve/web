@@ -96,7 +96,6 @@
           <training-drop-down
             :headers="['Training', 'Progress', 'Actions']"
             :trainingCourseData="trainingCourseData"
-            :isLegacyTrainingCourse="trainingCourseData.isLegacyTraining"
           />
         </accordion-item>
 
@@ -170,6 +169,7 @@ import { IonPopover } from '@ionic/vue'
 import NetworkService from '@/services/NetworkService'
 import moment from 'moment'
 import { isTrainingComplete } from '@/utils/get-training-progress'
+import { UpchieveTrainingCourseKeyEnum } from '@/views/TrainingCourseView/types'
 
 export default {
   name: 'Training',
@@ -214,7 +214,6 @@ export default {
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       training: 'subjects/activeTraining',
-      isUpchieve101V3Enabled: 'featureFlags/isUpchieve101V3Enabled',
       hasCompletedVolunteerTraining: 'user/hasCompletedVolunteerTraining',
       hasASubjectCertification: 'user/hasASubjectCertification',
     }),
@@ -292,15 +291,12 @@ export default {
   },
   methods: {
     async getTrainingCourseData() {
-      const courseKey = this.isUpchieve101V3Enabled
-        ? 'upchieveTraining'
-        : 'upchieve101'
-      const trainingCourseResponse =
-        await NetworkService.getTrainingCourse(courseKey)
+      const trainingCourseResponse = await NetworkService.getTrainingCourse(
+        UpchieveTrainingCourseKeyEnum.CURRENT
+      )
       this.trainingCourseData = {
         ...trainingCourseResponse.data.course,
         isComplete: isTrainingComplete(),
-        isLegacyTraining: courseKey === 'upchieve101',
       }
     },
     initiallyOpenAccordion(certifications) {
@@ -324,7 +320,7 @@ export default {
             'academicIntegrity',
             'dei',
             'communitySafety',
-            'upchieve101',
+            UpchieveTrainingCourseKeyEnum.LEGACY,
           ].includes(name)
         }
       )

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { QuizQuestion } from '@/views/UpchieveTrainingView/types'
+import type { QuizQuestion } from '@/views/TrainingCourseView/types'
 import type { LetterChoice } from '@/services/TrainingService'
-import QuizAnswerChoice from '@/views/UpchieveTrainingView/Quizzes/QuizAnswerChoice.vue'
+import QuizAnswerChoice from '@/views/TrainingCourseView/Quizzes/QuizAnswerChoice.vue'
 
 const {
   questionWithAnswers,

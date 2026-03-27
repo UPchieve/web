@@ -69,10 +69,7 @@
 import { mapState } from 'vuex'
 import CheckMark from '@/components/CheckMark.vue'
 import LargeButton from '@/components/LargeButton.vue'
-import {
-  getLegacyTrainingProgress,
-  getTrainingProgress,
-} from '@/utils/get-training-progress'
+import { getTrainingProgress } from '@/utils/get-training-progress'
 
 export default {
   name: 'TrainingDropDown',
@@ -89,10 +86,6 @@ export default {
       type: Object,
       required: true,
     },
-    isLegacyTrainingCourse: {
-      type: Boolean,
-      required: true,
-    },
   },
 
   computed: {
@@ -101,23 +94,19 @@ export default {
       windowWidth: (state) => state.app.windowWidth,
     }),
     progressStatus() {
-      const progress = this.isLegacyTrainingCourse
-        ? getLegacyTrainingProgress(this.trainingCourseData)
-        : getTrainingProgress(
-            this.trainingCourseData,
-            this.trainingCourseData.completedMaterials ?? []
-          )
+      const progress = getTrainingProgress(
+        this.trainingCourseData,
+        this.trainingCourseData.completedMaterials ?? []
+      )
       if (progress === 0) return 'Not started'
       if (this.isComplete) return 'Completed'
       return 'In progress'
     },
     progressBarNumber() {
-      return this.isLegacyTrainingCourse
-        ? getLegacyTrainingProgress(this.trainingCourseData)
-        : getTrainingProgress(
-            this.trainingCourseData,
-            this.trainingCourseData.completedMaterials
-          )
+      return getTrainingProgress(
+        this.trainingCourseData,
+        this.trainingCourseData.completedMaterials
+      )
     },
     isComplete() {
       return this.trainingCourseData.isComplete

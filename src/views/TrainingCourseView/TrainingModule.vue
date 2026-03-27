@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import type { SimplifiedUpchieveTrainingModule } from '@/views/UpchieveTrainingView/types'
+import type { SimplifiedUpchieveTrainingModule } from '@/views/TrainingCourseView/types'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { defineAsyncComponent } from 'vue'
-import TrainingPage from '@/views/UpchieveTrainingView/Quizzes/TrainingPage.vue'
+import TrainingPage from '@/views/TrainingCourseView/Quizzes/TrainingPage.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
-import ExternalResourceLink from '@/views/UpchieveTrainingView/ExternalResourceLink.vue'
+import ExternalResourceLink from '@/views/TrainingCourseView/ExternalResourceLink.vue'
 
 function load(name: string) {
   return defineAsyncComponent(() => import(`@/assets/Training/${name}.svg`))
