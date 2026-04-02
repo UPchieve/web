@@ -111,7 +111,7 @@ describe('ProfileView', () => {
             },
           },
         })
-        expect(wrapper.find('.description').exists()).toEqual(
+        expect(wrapper.find('.sms-consent .description').exists()).toEqual(
           userType === 'volunteer'
         )
       }

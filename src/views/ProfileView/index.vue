@@ -46,12 +46,20 @@
         </div>
         <div class="subheader">Personal Information</div>
         <div class="container-content">
-          <div id="email" class="container-section">
+          <div
+            v-if="showSection(ProfileSections.EMAIL)"
+            id="email"
+            class="container-section"
+          >
             <div class="prompt">Your Email</div>
             <div id="ph-no-capture" class="answer">{{ user.email }}</div>
           </div>
+
           <div
-            v-if="isSecondaryEmailOnProfilePageEnabled"
+            v-if="
+              showSection(ProfileSections.SECONDARY_EMAIL) &&
+              isSecondaryEmailOnProfilePageEnabled
+            "
             id="secondary-email"
             class="container-section"
           >
@@ -74,116 +82,122 @@
               </span>
             </div>
           </div>
-          <hr />
-          <div>
-            <div id="phone" class="container-section">
-              <div id="phone-heading">
-                <div class="prompt">Your Phone Information</div>
-                <div class="phone-crud-buttons">
-                  <div class="edit-phone-information-button">
-                    <button
-                      type="button"
-                      class="field-button"
-                      data-testid="edit-profile-btn"
-                      @click="editPhoneInformation()"
-                    >
-                      <PencilIcon class="delete-phone-icon" />
-                      {{ editPhoneInformationButtonLabel }}
-                    </button>
-                  </div>
-                  <div class="edit-phone-information-button">
-                    <button
-                      type="button"
-                      v-if="user.phone && !hasVolunteerRole"
-                      class="field-button"
-                      value="Remove"
-                      @click="toggleDeletePhoneConfirmationModal"
-                      data-testid="delete-phone-button"
-                      id="delete-phone-button"
-                      label="Remove"
-                    >
-                      <TrashIcon class="delete-phone-icon" />
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <RemovePhoneConfirmationModal
-                v-if="showDeletePhoneConfirmationModal"
-                :onCancel="toggleDeletePhoneConfirmationModal"
-                :onAccept="handleDeleteNumber"
-              />
-              <div
-                id="ph-no-capture"
-                v-show="!activeEdit && user.phone"
-                class="answer phone-answer"
-              >
-                {{ phoneInputInfo.e164 }}
 
-                <!-- Unverified phone number: Show alert with CTA to verify phone number -->
-                <div
-                  v-if="!this.user.phoneVerified"
-                  class="alert alert-warning unverified w-full"
-                >
-                  Your phone number has not been verified.<br />
-                  <span
-                    class="uc-link secondary-btn bold"
-                    @click.prevent="toggleShowSmsVerificationModal"
-                    >Verify now
-                  </span>
-                </div>
-              </div>
-
-              <div v-show="!activeEdit && !user.phone" class="answer">
-                No phone number provided
-              </div>
-              <maz-phone-number-input
-                class="phone-input"
-                required="true"
-                v-show="activeEdit"
-                v-model="phone"
-                show-code-on-list
-                @update="onPhoneInputUpdate"
-                :country-code="showNationalPhoneNumbersOnly ? 'US' : null"
-                :only-countries="showNationalPhoneNumbersOnly ? ['US'] : null"
-                :no-search="showNationalPhoneNumbersOnly ? true : false"
-              />
-
-              <div class="sms-consent" v-if="shouldSeeSmsConsentCheckbox">
-                <div class="checkbox-container">
-                  <checkbox
-                    id="sms-consent-checkbox"
-                    v-model="smsConsent"
-                    @change="onChangeSmsConsent"
-                    :checked="smsConsent"
-                  />
-                  <label for="sms-consent-input"
-                    >By checking this box, I consent to receiving SMS messages
-                    from UPchieve at the phone number provided above.</label
+          <div
+            v-if="showSection(ProfileSections.PHONE_INFORMATION)"
+            id="phone"
+            class="container-section"
+          >
+            <hr />
+            <div id="phone-heading">
+              <div class="prompt">Your Phone Information</div>
+              <div class="phone-crud-buttons">
+                <div class="edit-phone-information-button">
+                  <button
+                    type="button"
+                    class="field-button"
+                    data-testid="edit-profile-btn"
+                    @click="editPhoneInformation()"
                   >
+                    <PencilIcon class="delete-phone-icon" />
+                    {{ editPhoneInformationButtonLabel }}
+                  </button>
                 </div>
-                <div class="description" v-if="hasVolunteerRole">
-                  <span v-if="smsConsent">
-                    <strong class="sms-consent-true"
-                      >We will text you when a student needs your help.</strong
-                    >
-                    You will only be notified during the periods that you select
-                    in your schedule.
-                  </span>
-                  <span v-else>
-                    <span class="sms-consent-false"
-                      >You will not receive text messages when a student needs
-                      your help</span
-                    >
-                    unless you check the above checkbox.
-                  </span>
+                <div class="edit-phone-information-button">
+                  <button
+                    v-if="user.phone && !hasVolunteerRole"
+                    type="button"
+                    class="field-button"
+                    value="Remove"
+                    @click="toggleDeletePhoneConfirmationModal"
+                    data-testid="delete-phone-button"
+                    id="delete-phone-button"
+                    label="Remove"
+                  >
+                    <TrashIcon class="delete-phone-icon" />
+                    Remove
+                  </button>
                 </div>
               </div>
-              <hr />
+            </div>
+            <RemovePhoneConfirmationModal
+              v-if="showDeletePhoneConfirmationModal"
+              :onCancel="toggleDeletePhoneConfirmationModal"
+              :onAccept="handleDeleteNumber"
+            />
+            <div
+              id="ph-no-capture"
+              v-show="!activeEdit && user.phone"
+              class="answer phone-answer"
+            >
+              {{ phoneInputInfo.e164 }}
+
+              <!-- Unverified phone number: Show alert with CTA to verify phone number -->
+              <div
+                v-if="!user.phoneVerified"
+                class="alert alert-warning unverified w-full"
+              >
+                Your phone number has not been verified.<br />
+                <span
+                  class="uc-link secondary-btn bold"
+                  @click.prevent="toggleShowSmsVerificationModal"
+                  >Verify now
+                </span>
+              </div>
+            </div>
+
+            <div v-show="!activeEdit && !user.phone" class="answer">
+              No phone number provided
+            </div>
+            <maz-phone-number-input
+              class="phone-input"
+              required="true"
+              v-show="activeEdit"
+              v-model="phone"
+              show-code-on-list
+              @update="onPhoneInputUpdate"
+              :country-code="showNationalPhoneNumbersOnly ? 'US' : null"
+              :only-countries="showNationalPhoneNumbersOnly ? ['US'] : null"
+              :no-search="showNationalPhoneNumbersOnly ? true : false"
+            />
+
+            <div class="sms-consent" v-if="shouldSeeSmsConsentCheckbox">
+              <div class="checkbox-container">
+                <checkbox
+                  id="sms-consent-checkbox"
+                  v-model="smsConsent"
+                  @change="onChangeSmsConsent"
+                  :checked="smsConsent"
+                />
+                <label for="sms-consent-input"
+                  >By checking this box, I consent to receiving SMS messages
+                  from UPchieve at the phone number provided above.</label
+                >
+              </div>
+              <div class="description" v-if="hasVolunteerRole">
+                <span v-if="smsConsent">
+                  <strong class="sms-consent-true"
+                    >We will text you when a student needs your help.</strong
+                  >
+                  You will only be notified during the periods that you select
+                  in your schedule.
+                </span>
+                <span v-else>
+                  <span class="sms-consent-false"
+                    >You will not receive text messages when a student needs
+                    your help</span
+                  >
+                  unless you check the above checkbox.
+                </span>
+              </div>
             </div>
           </div>
 
-          <div v-if="isVolunteer" class="container-section">
+          <div
+            v-if="showSection(ProfileSections.ACCOUNT_STATUS)"
+            class="container-section"
+          >
+            <hr />
             <div class="prompt">Account status</div>
             <div class="answer">
               <toggle-button
@@ -204,41 +218,53 @@
               Deactivate your account to stop receiving emails and text
               notifications. You can reactivate it at any time.
             </div>
-            <hr />
           </div>
 
           <div
-            v-if="isNotificationPermissionGranted && !isTeacher"
+            v-if="showSection(ProfileSections.BROWSER_NOTIFICATIONS)"
             class="container-section"
           >
-            <div class="prompt">Browser Notifications</div>
-            <div class="answer">
-              <toggle-button
-                :value="isAllowingNotifications"
-                :labels="{ checked: 'On', unchecked: 'Off' }"
-                :width="95"
-                :color="{
-                  checked: '#16D2AA',
-                  unchecked: '#F44747',
-                  disabled: '#AAAAAA',
-                }"
-                @change="toggleWebNotifications"
-                :sync="true"
-              />
-            </div>
-            <div v-if="isVolunteer" class="description">
-              Browser alerts when a student appears on the dashboard waitlist
-              and when a student sends a message while you're not looking.
-            </div>
-            <div v-else-if="isStudent" class="description">
-              Browser alerts when a coach joins your session and when a coach
-              sends a message while you're not looking.
-            </div>
             <hr />
+            <div class="prompt">Browser Notifications</div>
+            <template v-if="isNotificationPermissionGranted">
+              <div class="answer">
+                <toggle-button
+                  :value="isAllowingNotifications"
+                  :labels="{ checked: 'On', unchecked: 'Off' }"
+                  :width="95"
+                  :color="{
+                    checked: '#16D2AA',
+                    unchecked: '#F44747',
+                    disabled: '#AAAAAA',
+                  }"
+                  @change="toggleWebNotifications"
+                  :sync="true"
+                />
+              </div>
+              <div v-if="isVolunteer" class="description">
+                Browser alerts when a student appears on the dashboard waitlist
+                and when a student sends a message while you're not looking.
+              </div>
+              <div v-else-if="isStudent" class="description">
+                Browser alerts when a coach joins your session and when a coach
+                sends a message while you're not looking.
+              </div>
+            </template>
+            <div v-else class="description">
+              Browser notifications are currently blocked. To receive
+              notifications, please update your browser settings to allow
+              notifications for this site.
+            </div>
           </div>
 
-          <hr v-if="isPartnerTeacher || user.usesClever" />
-          <div v-if="isPartnerTeacher || user.usesClever" class="uc-column">
+          <div
+            v-if="
+              showSection(ProfileSections.CLEVER_SYNC) &&
+              (user.usesClever || isPartnerTeacher)
+            "
+            class="container-section"
+          >
+            <hr />
             <button type="button" class="sync-clever-btn" @click="syncClever">
               <clever-logo class="mr-2" />
               {{ user.lastSuccessfulCleverSync ? 'Resync' : 'Sync' }} Clever
@@ -247,43 +273,58 @@
               Last successful Clever sync:
               {{ new Date(user.lastSuccessfulCleverSync).toLocaleString() }}
             </div>
-            <hr />
           </div>
 
-          <div>
+          <div
+            v-if="showSection(ProfileSections.PREFERRED_LANGUAGE)"
+            class="container-section"
+          >
+            <hr />
             <div class="prompt">Select your preferred language</div>
             <preferred-language-select
               ref="preferredLanguageSelectRef"
               :userPreferredLanguage="user.preferredLanguage"
               @error="onPreferredLanguageError"
             />
-
-            <hr />
           </div>
 
-          <large-button
-            class="button-width"
-            variant="outlined"
-            route-to="/resetpassword"
-            :show-arrow="false"
+          <div
+            v-if="showSection(ProfileSections.RESET_PASSWORD)"
+            class="container-section"
           >
-            Reset Password
-          </large-button>
+            <hr />
 
-          <hr />
+            <large-button
+              class="button-width"
+              variant="outlined"
+              route-to="/resetpassword"
+              :show-arrow="false"
+            >
+              Reset Password
+            </large-button>
+          </div>
 
-          <large-button
-            class="button-width"
-            variant="danger"
-            :show-arrow="false"
-            @click="ModalService.showDeleteAccountConfirmation"
+          <div
+            v-if="showSection(ProfileSections.DELETE_ACCOUNT)"
+            class="container-section"
           >
-            Delete Account
-          </large-button>
+            <hr />
+            <large-button
+              class="button-width"
+              variant="danger"
+              :show-arrow="false"
+              @click="ModalService.showDeleteAccountConfirmation"
+            >
+              Delete Account
+            </large-button>
+          </div>
         </div>
       </div>
 
-      <div v-if="isVolunteer" class="cert-info contain">
+      <div
+        v-if="showSection(ProfileSections.UNLOCKED_SUBJECTS)"
+        class="cert-info contain"
+      >
         <div class="subheader-subjects">
           <div class="subheader-subjects--left">Unlocked Subjects</div>
           <div class="subheader-subjects--right" data-testid="tutoring-alerts">
@@ -368,6 +409,47 @@ import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { IonToast } from '@ionic/vue'
 
+const ProfileSections = {
+  EMAIL: 'email',
+  SECONDARY_EMAIL: 'secondaryEmail',
+  PHONE_INFORMATION: 'phoneInformation',
+  ACCOUNT_STATUS: 'accountStatus',
+  BROWSER_NOTIFICATIONS: 'browserNotifications',
+  CLEVER_SYNC: 'cleverSync',
+  PREFERRED_LANGUAGE: 'preferredLanguage',
+  RESET_PASSWORD: 'resetPassword',
+  DELETE_ACCOUNT: 'deleteAccount',
+  UNLOCKED_SUBJECTS: 'unlockedSubjects',
+}
+
+const RoleSections = {
+  volunteer: [
+    ProfileSections.EMAIL,
+    ProfileSections.PHONE_INFORMATION,
+    ProfileSections.ACCOUNT_STATUS,
+    ProfileSections.BROWSER_NOTIFICATIONS,
+    ProfileSections.PREFERRED_LANGUAGE,
+    ProfileSections.RESET_PASSWORD,
+    ProfileSections.DELETE_ACCOUNT,
+    ProfileSections.UNLOCKED_SUBJECTS,
+  ],
+  student: [
+    ProfileSections.EMAIL,
+    ProfileSections.SECONDARY_EMAIL,
+    ProfileSections.PHONE_INFORMATION,
+    ProfileSections.BROWSER_NOTIFICATIONS,
+    ProfileSections.PREFERRED_LANGUAGE,
+    ProfileSections.RESET_PASSWORD,
+    ProfileSections.DELETE_ACCOUNT,
+  ],
+  teacher: [
+    ProfileSections.EMAIL,
+    ProfileSections.CLEVER_SYNC,
+    ProfileSections.RESET_PASSWORD,
+    ProfileSections.DELETE_ACCOUNT,
+  ],
+}
+
 export default {
   name: 'profile-view',
   components: {
@@ -388,6 +470,7 @@ export default {
   },
   data() {
     return {
+      ProfileSections,
       ModalService,
       activeEdit: false,
       editPhoneInformationButtonLabel: 'Edit',
@@ -418,7 +501,7 @@ export default {
     if (this.isVolunteer) {
       this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
     }
-    this.setFlagsForEditingPhoneNumber()
+    this.updateVerifiedPhoneInfo()
 
     if (this.$route?.query?.error) {
       const toast = await toastController.create({
@@ -498,6 +581,12 @@ export default {
     },
   },
   methods: {
+    showSection(sectionName) {
+      if (this.isVolunteer) return RoleSections.volunteer.includes(sectionName)
+      if (this.isStudent) return RoleSections.student.includes(sectionName)
+      if (this.isTeacher) return RoleSections.teacher.includes(sectionName)
+      return false
+    },
     onPreferredLanguageError(err) {
       this.errorMessage =
         err?.message ??
@@ -619,7 +708,7 @@ export default {
     },
 
     async updateVerifiedPhoneInfo() {
-      this.shouldSeeSmsConsentCheckbox = this.isStudent
+      this.shouldSeeSmsConsentCheckbox = this.user.phone
     },
 
     syncClever() {
@@ -680,10 +769,6 @@ export default {
         isDeactivated: !this.isAccountActive,
         ...data,
       }
-    },
-
-    setFlagsForEditingPhoneNumber() {
-      this.shouldSeeSmsConsentCheckbox = this.user.phone
     },
   },
 }
