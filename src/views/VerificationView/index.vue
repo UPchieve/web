@@ -88,7 +88,9 @@
         >
           Verify my account
         </button>
-        <button class="uc-form-button-secondary" @click="logout" type="button">Logout</button>
+        <button class="uc-form-button-secondary" @click="logout" type="button">
+          Logout
+        </button>
       </div>
 
       <RecaptchaCaption />

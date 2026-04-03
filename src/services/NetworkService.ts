@@ -40,8 +40,8 @@ const axiosFetchInstance = axios.create({
   baseURL: config.serverRoot,
 })
 
-async function getRecaptchaToken(action: string) {
-  return new Promise((resolve, reject) => {
+async function getRecaptchaToken(action: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
     grecaptcha.ready(() => {
       grecaptcha.execute(config.googleRecaptchaKey, { action }).then(
         (token: string) => resolve(token),
@@ -225,14 +225,14 @@ export default {
       this._errorHandler
     )
   },
-  async registerOpenVolunteer(data) {
+  async registerOpenVolunteer(data: any) {
     const config = await getAdditionalConfig('registerVolunteer')
     return httpPost(`${AUTH_ROOT}/register/volunteer/open`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  async registerPartnerVolunteer(data) {
+  async registerPartnerVolunteer(data: any) {
     const config = await getAdditionalConfig('registerVolunteer')
     return httpPost(
       `${AUTH_ROOT}/register/volunteer/partner`,
@@ -240,20 +240,23 @@ export default {
       config
     ).then(this._successHandler, this._errorHandler)
   },
-  registerStudent(data) {
-    return httpPost(`${AUTH_ROOT}/register/student`, data).then(
+  async registerStudent(data: any) {
+    const config = await getAdditionalConfig('registerStudent')
+    return httpPost(`${AUTH_ROOT}/register/student`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  registerTeacher(data) {
-    return httpPost(`${AUTH_ROOT}/register/teacher`, data).then(
+  async registerTeacher(data: any) {
+    const config = await getAdditionalConfig('registerTeacher')
+    return httpPost(`${AUTH_ROOT}/register/teacher`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  sendReset(data) {
-    return httpPost(`${AUTH_ROOT}/reset/send`, data).then(
+  async sendReset(data: any) {
+    const config = await getAdditionalConfig('sendReset')
+    return httpPost(`${AUTH_ROOT}/reset/send`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
