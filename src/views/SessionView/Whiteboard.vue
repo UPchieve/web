@@ -561,6 +561,16 @@ export default {
     }
   },
   emits: ['toggleAiWidget', 'clickedShareScreen'],
+  watch: {
+    selectedTool(newTool) {
+      if (newTool) {
+        AnalyticsService.captureEvent(EVENTS.WHITEBOARD_TOOL_SELECTED, {
+          tool: newTool,
+          sessionId: this.sessionId,
+        })
+      }
+    },
+  },
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -713,8 +723,8 @@ export default {
     moveMouseEvent(event) {
       const now = Date.now()
       if (now - this.lastCursorBroadcastAt < 100) return
-
       this.lastCursorBroadcastAt = now
+
       // Get the x,y coordinates of the cursor within the _Zwibbler_ canvas,
       // instead of the coordinates of the mouse on the HTML window.
       const point = this.zwibblerCtx.getDocumentCoordinates(
