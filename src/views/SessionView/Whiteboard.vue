@@ -732,6 +732,12 @@ export default {
         false
       )
     },
+    handlePointerLeave() {
+      this.setSessionKey('isCursorOnCanvas', false, false)
+    },
+    handlePointerEnter() {
+      this.setSessionKey('isCursorOnCanvas', false, false)
+    },
     setSessionKey(key, value, persist) {
       this.zwibblerCtx.setSessionKey(key, value, persist)
     },
@@ -740,14 +746,14 @@ export default {
       window.addEventListener('resize', this.handleWindowResize)
 
       const zwibDiv = this.$refs.zwibDiv
-      zwibDiv.addEventListener('mousemove', this.moveMouseEvent)
+      zwibDiv.addEventListener('pointermove', this.moveMouseEvent)
       zwibDiv.addEventListener(
-        'mouseleave',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+        'pointerleave',
+        this.handlePointerLeave
       )
       zwibDiv.addEventListener(
-        'mouseenter',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+        'pointerenter',
+        this.handlePointerEnter
       )
     },
     removeListeners() {
@@ -758,14 +764,14 @@ export default {
       window.removeEventListener('resize', this.handleWindowResize)
 
       const zwibDiv = this.$refs.zwibDiv
-      zwibDiv.removeEventListener('mousemove', this.moveMouseEvent)
+      zwibDiv.removeEventListener('pointermove', this.moveMouseEvent)
       zwibDiv.removeEventListener(
-        'mouseleave',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+        'pointerleave',
+        this.handlePointerLeave
       )
       zwibDiv.removeEventListener(
-        'mouseenter',
-        this.setSessionKey.bind(null, 'isCursorOnCanvas', false, false)
+        'pointerenter',
+        this.handlePointerEnter
       )
     },
     handleOrientationChange() {
