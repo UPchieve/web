@@ -60,6 +60,10 @@
           id="journeys-sidebar-link"
         >
           <compass-icon class="icon compass-icon" />
+          <activity-dot
+            v-if="!hasSeenCalculator"
+            class="SidebarLinks__notification"
+          />
         </sidebar-link>
 
         <sidebar-link
@@ -270,7 +274,19 @@ export default {
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
       userIsApprovedNTHSPresident: 'featureFlags/userIsApprovedNTHSPresident',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
+      shouldShowVolunteerHoursCalculator:
+        'featureFlags/shouldShowVolunteerHoursCalculator',
     }),
+    hasSeenCalculator() {
+      if (this.shouldShowVolunteerHoursCalculator) {
+        void this.$route.path // run this each time the route changes
+        const userIds = JSON.parse(
+          localStorage.getItem('has-seen-volunteer-calculator') ?? '[]'
+        )
+        return userIds.includes(this.user.id)
+      }
+      return true
+    },
     isMemberOfNTHSGroup() {
       return this.volunteersNTHSGroups.length > 0
     },

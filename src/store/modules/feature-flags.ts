@@ -58,6 +58,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY]: false,
       [POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES]: false,
       [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -79,6 +80,9 @@ export default {
         'Interested in becoming a volunteer tutor on UPchieve?',
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
+
+      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR]:
+        'Boost Your College Apps',
     },
     eligibleForChooseTutorType: false,
   },
@@ -255,5 +259,9 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES],
     isNTHSApplicationPageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE],
+    shouldShowVolunteerHoursCalculator: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR],
+    volunteerHoursCalculatorCopy: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR],
   },
 }
