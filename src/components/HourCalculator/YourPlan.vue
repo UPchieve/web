@@ -103,7 +103,7 @@ function openBecomeVolunteerModal() {
 }
 
 watch(
-  () => [goalAlreadyMet, sessionsNeeded],
+  () => [goalAlreadyMet.value, sessionsNeeded.value],
   () => {
     if (goalAlreadyMet.value) {
       AnalyticsService.captureEvent(
