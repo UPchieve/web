@@ -24,7 +24,8 @@
     "scan:add": "./scripts/wrap-detect-secrets.sh scan",
     "scan:diff": "./scripts/wrap-detect-secrets.sh hook",
     "scan:audit": "./scripts/wrap-detect-secrets.sh audit",
-    "type-check": "vue-tsc --build --force"
+    "type-check": "vue-tsc --build --force",
+    "bundle:analyze": "BUNDLE_ANALYZE=true npm run build"
   },
   "dependencies": {
     "@ionic/vue": "^8.0.1",
@@ -103,6 +104,7 @@
     "prettier": "^3.2.4",
     "typescript": "^5.5.4",
     "vite": "^7.3.2",
+    "vite-bundle-analyzer": "^1.3.7",
     "vite-plugin-vue-devtools": "^8.1.1",
     "vite-svg-loader": "^5.1.0",
     "vitest": "^4.0.16",

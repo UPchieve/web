@@ -4,6 +4,7 @@ import svgLoader from 'vite-svg-loader'
 import path from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { playwright } from '@vitest/browser-playwright'
+import { analyzer } from 'vite-bundle-analyzer'
 
 export default defineConfig({
   envPrefix: 'VUE_',
@@ -38,6 +39,11 @@ export default defineConfig({
       },
     }),
     ...(!process.env.VITEST ? [vueDevTools()] : []),
+    process.env.BUNDLE_ANALYZE
+      ? analyzer({
+          analyzerPort: 8181,
+        })
+      : {},
   ],
   preview: {
     port: 8080,
