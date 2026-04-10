@@ -4,9 +4,10 @@ import config from '../config'
 import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
-import type { Session } from '@/services/SessionService'
 import type { NTHSActionName } from './NTHSGroupService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
+import type { CurrentSessionPublic } from '@/types/sessions'
+import type { Uuid } from '@/types/shared'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -337,7 +338,7 @@ export default {
       this._errorHandler
     )
   },
-  newSession(data: {
+  async newSession(data: {
     sessionType: string // topic
     sessionSubTopic: string // subject
     docEditorVersion: number
@@ -352,22 +353,35 @@ export default {
       }>
     }
   }) {
-    return httpPost<{ session: Session }>(`${API_ROOT}/session/new`, data).then(
-      this._successHandler,
-      this._axiosErrorHandler
-    )
+    try {
+      return await httpPost<{
+        sessionId: Uuid
+        session: CurrentSessionPublic
+        isZwibserveSession: boolean
+      }>(`${API_ROOT}/session/new`, data)
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
-  joinSession(data: { sessionId: string; joinedFrom?: string }) {
-    return httpPost<{ session: Session }>(
-      `${API_ROOT}/session/join`,
-      data
-    ).then(this._successHandler, this._axiosErrorHandler)
+  async joinSession(data: { sessionId: string; joinedFrom?: string }) {
+    try {
+      return await httpPost<{
+        session: CurrentSessionPublic
+        isZwibserveSession: boolean
+      }>(`${API_ROOT}/session/join`, data)
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
-  endSession(data) {
-    return httpPost(`${API_ROOT}/session/end`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+  async endSession(data) {
+    try {
+      return await httpPost<{
+        sessionId: Uuid
+        session: CurrentSessionPublic
+      }>(`${API_ROOT}/session/end`, data)
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
   checkSession(data, onRetry) {
     return this._faultTolerantHttp(
@@ -377,11 +391,15 @@ export default {
       data
     )
   },
-  currentSession(data) {
-    return httpPost(`${API_ROOT}/session/current`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+  async currentSession() {
+    try {
+      return await httpPost<{
+        sessionId: Uuid
+        data: CurrentSessionPublic
+      }>(`${API_ROOT}/session/current`, {})
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
   getRecapSessionForDms(data) {
     return httpPost(`${API_ROOT}/session/recap-dms`, data).then(
