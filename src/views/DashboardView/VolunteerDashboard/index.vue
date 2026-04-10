@@ -110,14 +110,12 @@
                 </div>
               </div>
               <div class="dashboard-card-link">
-                <a
-                  class="track-hours-link"
-                  :href="hourTrackingGuide"
-                  target="_blank"
+                <HyperlinkButton
+                  bold
+                  :routeTo="hourTrackingGuide"
                   rel="noopener noreferrer"
-                  ><strong>How to track your volunteer hours</strong>
-                  <arrow-icon class="arrow-icon" />
-                </a>
+                  >How to track your volunteer hours</HyperlinkButton
+                >
               </div>
             </div>
           </template>
@@ -218,7 +216,6 @@ import OnboardingIcon from '@/assets/onboarding.svg'
 import TrainingIcon from '@/assets/training_icon.svg'
 import RingingNotificationBellIcon from '@/assets/icons/ringing-notification-bell.svg'
 import SimpleRingingBellIcon from '@/assets/icons/simple-ringing-notification-bell.svg'
-import ArrowIcon from '@/assets/arrow.svg'
 import NetworkService from '../../../services/NetworkService'
 import config from '../../../config'
 import Loader from '@/components/Loader.vue'
@@ -238,6 +235,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
 import JoinedTeamModal from './JoinedTeamModal.vue'
 import { UpchieveTrainingCourseKeyEnum } from '@/views/TrainingCourseView/types'
+import HyperlinkButton from '@/components/HyperlinkButton.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -245,6 +243,7 @@ const userHasSchedule = flow([get, isBoolean])
 export default {
   name: 'volunteer-dashboard',
   components: {
+    HyperlinkButton,
     ListSessionsCard,
     TaskCard,
     DashboardBanner,
@@ -257,7 +256,6 @@ export default {
     SimpleRingingBellIcon,
     OnboardingIcon,
     VolunteerWelcomeModal,
-    ArrowIcon,
     Loader,
     InformationIcon,
     ShareMilestoneModal,
@@ -923,20 +921,6 @@ export default {
   text-align: center;
 }
 
-.track-hours-link {
-  @include font-category('button');
-  display: inline-flex;
-  align-items: center;
-  margin: 0 auto;
-  padding: 0;
-  color: $c-success-green;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: none;
-  }
-}
-
 .dashboard-notice {
   background: $c-warning-orange;
   border-radius: 8px;
@@ -954,21 +938,6 @@ export default {
       color: #f3f3f3;
       text-decoration: none;
     }
-  }
-}
-
-.arrow-icon {
-  fill: $c-success-green;
-  height: 16px;
-  width: 16px;
-  margin-top: 2px;
-  margin-left: 8px;
-
-  &--banner {
-    height: 16px;
-    width: 16px;
-    fill: $upchieve-white;
-    margin-left: 0.5em;
   }
 }
 

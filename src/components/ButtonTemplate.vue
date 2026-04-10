@@ -5,6 +5,7 @@
     :href="routeTo"
     @click="$emit('click')"
     :target="target"
+    :class="{ bold: this.bold }"
   >
     <arrow-icon
       v-if="doShowArrow && isLeftArrow"
@@ -23,6 +24,7 @@
     tag="button"
     :to="routeTo"
     class="ButtonTemplate"
+    :class="{ bold: this.bold }"
     @click="$emit('click')"
   >
     <arrow-icon
@@ -43,6 +45,7 @@
     @click="(event) => $emit('click', event)"
     :type="buttonType"
     class="ButtonTemplate"
+    :class="{ bold: this.bold }"
   >
     <arrow-icon
       v-if="doShowArrow && isLeftArrow"
@@ -78,6 +81,10 @@ export default {
     buttonType: {
       type: String,
       default: 'button',
+    },
+    bold: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -129,5 +136,9 @@ export default {
   transform: scaleX(-1);
   margin: 0;
   margin-right: 8px;
+}
+
+.bold {
+  font-weight: 500;
 }
 </style>

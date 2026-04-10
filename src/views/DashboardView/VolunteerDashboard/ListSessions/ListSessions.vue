@@ -56,14 +56,12 @@
           data-testid="no-students-ambassador-message"
         >
           While you wait, you can still earn volunteer hours by
-          <button
-            type="button"
+          <HyperlinkButton
             class="ambassador-button"
             @click="openAmbassadorReferralModal"
+            bold
+            >becoming an UPchieve Ambassador!</HyperlinkButton
           >
-            <strong>becoming an UPchieve Ambassador!</strong>
-            <ArrowIcon class="arrow-icon" />
-          </button>
         </div>
       </div>
     </div>
@@ -79,9 +77,9 @@ import { useStore } from 'vuex'
 import Case, { kebab } from 'case'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
-import ArrowIcon from '@/assets/arrow.svg'
 import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import HyperlinkButton from '@/components/HyperlinkButton.vue'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
@@ -251,7 +249,6 @@ function waitTime(args: { createdAt: any }) {
   gap: 8px;
 
   .ambassador-button {
-    color: $c-information-blue;
     display: inline-flex;
     align-items: center;
   }
@@ -262,13 +259,5 @@ function waitTime(args: { createdAt: any }) {
     line-height: 2;
     color: $c-success-green;
   }
-}
-
-.arrow-icon {
-  fill: $c-success-green;
-  height: 16px;
-  width: 16px;
-  margin-top: 2px;
-  margin-left: 8px;
 }
 </style>

@@ -5,6 +5,8 @@
     :class="buttonClasses"
     :showArrow="showArrow"
     :buttonType="buttonType"
+    :bold="bold"
+    :target="target"
     @click="$emit('click')"
   >
     <slot />
@@ -21,10 +23,15 @@ export default {
     dark: Boolean,
     reverse: Boolean,
     routeTo: String,
+    bold: { type: Boolean, default: false },
     showArrow: { type: Boolean, default: true },
     buttonType: {
       type: String,
       default: 'button',
+    },
+    target: {
+      type: String,
+      default: '_blank',
     },
   },
   computed: {
