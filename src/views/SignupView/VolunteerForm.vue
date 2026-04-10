@@ -250,7 +250,7 @@
 </template>
 
 <script>
-import validator from 'validator'
+import isEmail from 'validator/lib/isEmail'
 import LoggerService from '@/services/LoggerService'
 import AuthService from '@/services/AuthService'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
@@ -319,7 +319,7 @@ export default {
       if (!this.credentials.email) {
         this.validationErrors.push('An email address is required.')
         this.invalidInputs.push('inputEmail')
-      } else if (!validator.isEmail(this.credentials.email)) {
+      } else if (!isEmail(this.credentials.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
         // user actually tries to submit the form, which does not occur until step 2
         this.validationErrors.push(

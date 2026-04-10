@@ -48,7 +48,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ModalService from '@/services/ModalService'
 import { EVENTS } from '@/consts'
 import HeavyCrossIcon from '@/assets/heavy-cross.svg'
-import _ from 'lodash'
+import { shuffle } from 'lodash-es'
 
 const props = defineProps<{
   closeModal: () => void
@@ -69,7 +69,7 @@ const baseSharingOptions = [
   { text: 'Snapchat', value: 'snapchat' },
 ]
 
-const sharingOptions = _.shuffle(baseSharingOptions)
+const sharingOptions = shuffle(baseSharingOptions)
 
 const selectedOption = ref<string>('')
 

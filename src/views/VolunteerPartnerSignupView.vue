@@ -231,7 +231,7 @@
 </template>
 
 <script>
-import validator from 'validator'
+import isEmail from 'validator/lib/isEmail'
 import LoggerService from '@/services/LoggerService'
 
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
@@ -341,7 +341,7 @@ export default {
       if (!this.formData.email) {
         this.errors.push('An email address is required.')
         this.invalidInputs.push('inputEmail')
-      } else if (!validator.isEmail(this.formData.email)) {
+      } else if (!isEmail(this.formData.email)) {
         // this is necessary because browsers ignore <input type="email"> until the
         // user actually tries to submit the form, which does not occur until step 2
         this.errors.push(this.formData.email + ' is not a valid email address.')

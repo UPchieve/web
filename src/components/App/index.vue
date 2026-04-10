@@ -38,7 +38,6 @@ import AppHeader from './AppHeader/index.vue'
 import AppSidebar from './AppSidebar/index.vue'
 import AppModal from './AppModal/index.vue'
 import AppBanner from './AppBanner/index.vue'
-import PortalService from '@/services/PortalService'
 import getOperatingSystem from '@/utils/get-operating-system'
 import isOutdatedMobileAppVersion from '@/utils/is-outdated-mobile-app-version'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -80,13 +79,10 @@ export default {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
     await this.$store.dispatch('app/checkEnvironment', this)
-    PortalService.call('app.isLoaded')
 
     this.setVisibilityListener()
 
     if (this.isMobileApp) {
-      document.addEventListener('click', this.handleExternalURLs, false)
-
       if (isOutdatedMobileAppVersion()) {
         // show modal after children components have mounted
         setTimeout(() => {
@@ -125,8 +121,6 @@ export default {
     clearInterval(this.checkForUpdateIntervalId)
 
     if (this.isMobileApp) {
-      document.removeEventListener('click', this.handleExternalURLs)
-
       if (getOperatingSystem() === 'iOS') {
         document.addEventListener('click', this.iOSFocusElements, false)
       }
@@ -157,24 +151,6 @@ export default {
         width: window.innerWidth,
         height: window.innerHeight,
       })
-    },
-    handleExternalURLs(event) {
-      const isATag = event.target.tagName.toLowerCase() === 'a'
-      const isSameHost = window.location.hostname === event.target.hostname
-      const mailToLinkPattern = /^mailto:/i
-
-      // Open native mobile browser or email if the a tag has a different host or
-      // if the a tag has "mailto" in its href
-      if (
-        isATag &&
-        (!isSameHost || mailToLinkPattern.test(event.srcElement.href))
-      ) {
-        const { href } = event.target
-        PortalService.call('browser.openWindow', {
-          url: href,
-          target: '_system',
-        })
-      }
     },
     setVisibilityListener() {
       let visibilityChange

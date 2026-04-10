@@ -1,28 +1,4 @@
-@use "colors";
+@use 'colors';
 
 // vue-select overrides
 $vs-border-color: colors.$c-border-grey;
-
-.v-select {
-  .vs__dropdown-toggle {
-    padding: 5px 9px 9px 6px;
-  }
-}
-
-// maz-phone-number-input overrides
-.maz-border-success {
-  border-color: #16ba97;
-}
-
-.maz-text-success-600 {
-  color: #16ba97;
-}
-
-.profile #VuePhoneNumberInput_phone_number {
-  margin-left: -1px !important;
-}
-
-// Allow the Quill Doc to scroll.
-.ql-container {
-  overflow: auto;
-}

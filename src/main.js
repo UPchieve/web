@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import vSelect from 'vue-select'
 import VueStarRating from 'vue-star-rating'
 import App from './components/App/index.vue'
-import PortalService from './services/PortalService'
 import router from './router'
 import store from './store'
 import NetworkService, { axiosInstance } from './services/NetworkService'
@@ -19,24 +18,6 @@ LoggerService.init()
 // remove any existing listeners after HMR
 socket.off()
 store.dispatch('socket/bindEvents')
-
-// Set up PortalGun (connection to native app)
-PortalService.listen()
-
-const handlePortalData = (data) => {
-  // TODO: don't route immediately if push is received while app is open.
-  // can detect with `if (data._isPush && data._original?.additionalData?.foreground)`
-  // and show own UI for notification
-  if (data && data.path) {
-    router.push(data.path)
-  }
-}
-
-// Has data when app is opened w/ cold start from push notification
-PortalService.call('top.getData').then(handlePortalData)
-
-// Called any time app is running (warm start) & push notification is received
-PortalService.call('top.onData', handlePortalData)
 
 async function main() {
   try {

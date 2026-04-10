@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { isEmpty } from 'lodash'
+import { isEmpty } from 'lodash-es'
 import FormInput from '@/components/FormInput.vue'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'

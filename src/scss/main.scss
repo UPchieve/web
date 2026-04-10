@@ -1,5 +1,6 @@
 // This file is imported in App.vue.
 @use 'sass:meta';
+@use 'sass:color';
 
 // TODO: Figure out what styles we are relying on from bootstrap and remove.
 @use 'bootstrap/scss/bootstrap';
@@ -20,6 +21,13 @@
 @include meta.load-css('layout/modal');
 @include meta.load-css('layout/spacing');
 @include meta.load-css('layout/training');
+
+* {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
 
 *,
 ::before,
@@ -72,4 +80,47 @@ textarea {
 // See https://developers.google.com/recaptcha/docs/faq#id-like-to-hide-the-recaptcha-badge.-what-is-allowed
 .grecaptcha-badge {
   visibility: hidden;
+}
+
+// from _overrides.scss
+.v-select {
+  .vs__dropdown-toggle {
+    padding: 5px 9px 9px 6px;
+  }
+}
+
+// maz-phone-number-input overrides
+.maz-border-success {
+  border-color: #16ba97;
+}
+
+.maz-text-success-600 {
+  color: #16ba97;
+}
+
+.profile #VuePhoneNumberInput_phone_number {
+  margin-left: -1px !important;
+}
+
+// Allow the Quill Doc to scroll.
+.ql-container {
+  overflow: auto;
+}
+
+// _fonts.scss
+.light-bold {
+  font-weight: 500;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+// Override Ionic colors
+:root {
+  --ion-color-success: #{color.adjust($c-success-green, $lightness: 50%)};
+}
+
+.ion-color-sucess {
+  --ion-color-base: var(--ion-color-success);
 }

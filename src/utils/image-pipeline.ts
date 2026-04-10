@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { clamp } from 'lodash-es'
 import { formatBytes } from './bytes'
 
 type MimeType = 'image/jpeg' | 'image/png'
@@ -16,7 +16,7 @@ function fileNameWithExt(name: string, extension: string) {
 }
 
 function ensureQualityRange(number: number) {
-  return _.clamp(number, 0, 1)
+  return clamp(number, 0, 1)
 }
 
 export function isAllowedImageMime(mime: string) {

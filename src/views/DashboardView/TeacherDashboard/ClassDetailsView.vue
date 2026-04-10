@@ -317,7 +317,7 @@ import VerticalMenuButtonsIcon from '@/assets/VerticalMenuButtons.svg'
 import TrashIcon from '@/assets/trash.svg'
 import RemoveIcon from '@/assets/Remove.svg'
 import { toastController } from '@ionic/vue'
-import _ from 'lodash'
+import { isEmpty } from 'lodash-es'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import {
@@ -393,7 +393,7 @@ export default {
   },
 
   async created() {
-    this.classData = _.isEmpty(this.initialClassData)
+    this.classData = isEmpty(this.initialClassData)
       ? await this.getClassInfo(this.$route.params.classId)
       : this.initialClassData
     this.className = this.classData.name

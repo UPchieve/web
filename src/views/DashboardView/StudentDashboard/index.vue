@@ -87,8 +87,6 @@ import { mapGetters, mapState } from 'vuex'
 import DashboardBanner from '../DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
-import FallIncentiveEnrollmentModal from './FallIncentiveEnrollmentModal.vue'
-import ImpactStudySurveyModal from './ImpactStudySurveyModal.vue'
 import UpdateSchoolModal from './UpdateSchoolModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
@@ -100,10 +98,14 @@ import LargeButton from '@/components/LargeButton.vue'
 import StudentAssignments from '@/components/StudentAssignments.vue'
 import OnboardingModal from '@/components/OnboardingModal.vue'
 import JourneyModal from './JourneyModal.vue'
-import Student_Onboarding_Frame1 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame1.svg?url'
-import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.svg?url'
-import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.svg?url'
-import Student_Onboarding_Frame4 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.svg?url'
+import Student_Onboarding_Frame1 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame1.avif?url'
+import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.avif?url'
+import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.avif?url'
+import Student_Onboarding_Frame4 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.avif?url'
+import Student_Onboarding_Frame1Fallback from '@/assets/student_onboarding_frames/Student_Onboarding_Frame1.png?url'
+import Student_Onboarding_Frame2Fallback from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.png?url'
+import Student_Onboarding_Frame3Fallback from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.png?url'
+import Student_Onboarding_Frame4Fallback from '@/assets/student_onboarding_frames/Student_Onboarding_Frame4.png?url'
 import { getImpactStudyCacheKey } from '@/utils/cache-keys'
 import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import { isEmpty } from 'lodash-es'
@@ -116,7 +118,13 @@ import {
   setPermanentlyDismissSecondaryEmailModal,
   isTargetEmailDomain,
 } from '@/utils/secondary-email-modal-utils'
-
+import { defineAsyncComponent } from 'vue'
+const ImpactStudySurveyModal = defineAsyncComponent(
+  () => import('./ImpactStudySurveyModal.vue')
+)
+const FallIncentiveEnrollmentModal = defineAsyncComponent(
+  () => import('./FallIncentiveEnrollmentModal.vue')
+)
 export default {
   name: 'student-dashboard',
   components: {
@@ -160,25 +168,53 @@ export default {
         step: 1,
         heading: 'Welcome to UPchieve!',
         text: "You're almost ready to get started! We just need to lay down some ground rules.",
-        image: Student_Onboarding_Frame1,
+        image: {
+          url: Student_Onboarding_Frame1,
+          type: 'image/avif',
+          fallback: {
+            url: Student_Onboarding_Frame1Fallback,
+            type: 'image/png',
+          },
+        },
       },
       {
         step: 2,
         heading: 'Rule #1: Play Nice with Your Coach',
         text: "All UPchieve coaches are unpaid volunteers who want to help you succeed. Make sure to be friendly and respectful, and don't forget to say thank you and goodbye before ending your session!",
-        image: Student_Onboarding_Frame2,
+        image: {
+          url: Student_Onboarding_Frame2,
+          type: 'image/avif',
+          fallback: {
+            url: Student_Onboarding_Frame2Fallback,
+            type: 'image/png',
+          },
+        },
       },
       {
         step: 3,
         heading: 'Rule #2: Engage in Learning',
         text: "You're on UPchieve to learn! Our coaches are only there to guide you, so be sure to actively participate in your session. Coaches are not allowed to give you the answers or do the work for you.",
-        image: Student_Onboarding_Frame3,
+        image: {
+          url: Student_Onboarding_Frame3,
+          type: 'image/avif',
+          fallback: {
+            url: Student_Onboarding_Frame3Fallback,
+            type: 'image/png',
+          },
+        },
       },
       {
         step: 4,
         heading: 'Rule #3: Stay Safe Out There',
         text: "You came to UPchieve for homework help, not the tea. Keep conversations on-topic and don't share personal information like your phone number, IG handle, or email. Never connect with a coach offline.",
-        image: Student_Onboarding_Frame4,
+        image: {
+          url: Student_Onboarding_Frame4,
+          type: 'image/avif',
+          fallback: {
+            url: Student_Onboarding_Frame4Fallback,
+            type: 'image/png',
+          },
+        },
       },
     ]
 

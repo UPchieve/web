@@ -24,44 +24,69 @@ const AdminZipCodes = () => import('./views/Admin/AdminZipCodes.vue')
 const AdminRosterStudents = () =>
   import('./views/Admin/AdminRosterStudents.vue')
 const VolunteerCoverage = () => import('./views/Admin/VolunteerCoverage.vue')
-import BackgroundInfoView from './views/BackgroundInfoView.vue'
-import CalendarView from './views/CalendarView.vue'
-import ContactView from './views/ContactView.vue'
-import DashboardView from './views/DashboardView/index.vue'
-import FavoriteCoachesView from './views/FavoriteCoachesView.vue'
-import FeedbackView from './views/FeedbackView.vue'
-import JoinClassView from './views/JoinClassView.vue'
-import JoinNTHSGroupView from './views/JoinNTHSGroupView.vue'
-import LoginView from './views/LoginView.vue'
-import LogoutView from './views/LogoutView.vue'
-import ProfileView from './views/ProfileView/index.vue'
-import QuizView from './views/QuizView/index.vue'
-import ReferenceView from './views/ReferenceView.vue'
-import ReferFriendsView from './views/ReferFriendsView.vue'
-import ResetPasswordView from './views/ResetPasswordView.vue'
-import ResourcesView from './views/ResourcesView.vue'
-import ReviewMaterialsView from './views/ReviewMaterialsView.vue'
+const BackgroundInfoView = () => import('./views/BackgroundInfoView.vue')
+const CalendarView = () => import('./views/CalendarView.vue')
+const ContactView = () => import('./views/ContactView.vue')
+const DashboardView = () => import('./views/DashboardView/index.vue')
+const FavoriteCoachesView = () => import('./views/FavoriteCoachesView.vue')
+const FeedbackView = () => import('./views/FeedbackView.vue')
+const JoinClassView = () => import('./views/JoinClassView.vue')
+const JoinNTHSGroupView = () => import('./views/JoinNTHSGroupView.vue')
+const LoginView = () => import('./views/LoginView.vue')
+const LogoutView = () => import('./views/LogoutView.vue')
+const ProfileView = () => import('./views/ProfileView/index.vue')
+const QuizView = () => import('./views/QuizView/index.vue')
+const ReferenceView = () => import('./views/ReferenceView.vue')
+const ReferFriendsView = () => import('./views/ReferFriendsView.vue')
+const ResetPasswordView = () => import('./views/ResetPasswordView.vue')
+const ResourcesView = () => import('./views/ResourcesView.vue')
+const ReviewMaterialsView = () => import('./views/ReviewMaterialsView.vue')
 const SessionView = () => import('./views/SessionView/index.vue')
-import SetPasswordView from './views/SetPasswordView.vue'
+const SetPasswordView = () => import('./views/SetPasswordView.vue')
 const SignupView = () => import('./views/SignupView/index.vue')
-import StudentAssignmentView from './views/StudentAssignmentView.vue'
-import StudentClassesView from './views/StudentClassesView.vue'
+const StudentAssignmentView = () => import('./views/StudentAssignmentView.vue')
+const StudentClassesView = () => import('./views/StudentClassesView.vue')
 const StudentPartnerSignupView = () =>
   import('./views/SignupView/StudentPartnerSignupView.vue')
-import TrainingView from './views/TrainingView.vue'
-import TrainingCourseView from '@/views/TrainingCourseView/index.vue'
+const TrainingView = () => import('./views/TrainingView.vue')
+const TrainingCourseView = () => import('@/views/TrainingCourseView/index.vue')
 const VerificationView = () => import('./views/VerificationView/index.vue')
-import VolunteerPartnerSignupView from './views/VolunteerPartnerSignupView.vue'
-import SessionHistoryView from './views/SessionHistoryView.vue'
-import SessionRecapView from './views/SessionRecapView.vue'
+const VolunteerPartnerSignupView = () =>
+  import('./views/VolunteerPartnerSignupView.vue')
+const SessionHistoryView = () => import('./views/SessionHistoryView.vue')
+const SessionRecapView = () => import('./views/SessionRecapView.vue')
 const AdminTestAudience = () => import('./views/Admin/AdminTestAudience.vue')
-import WelcomePage from './views/WelcomePage.vue'
+const WelcomePage = () => import('./views/WelcomePage.vue')
 const ProgressReportsOverviewView = () =>
   import('./views/ProgressReportsOverviewView.vue')
 const ProgressReportsOverviewSubjectView = () =>
   import('./views/ProgressReportsOverviewSubjectView.vue')
-import TeacherDashboardView from './views/DashboardView/TeacherDashboard/index.vue'
-import CleverSigninInstructions from './views/SignupView/CleverSigninInstructions.vue'
+const TeacherDashboardView = () =>
+  import('./views/DashboardView/TeacherDashboard/index.vue')
+const CleverSigninInstructions = () =>
+  import('./views/SignupView/CleverSigninInstructions.vue')
+const RewardsView = () => import('./views/RewardsView.vue')
+const SurveysView = () => import('./views/SurveysView.vue')
+const SocialMediaSharingInstructions = () =>
+  import('@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue')
+const JourneysView = () => import('./views/JourneysView.vue')
+const NTHSGroupsView = () => import('./views/NTHS/NTHSGroupsView.vue')
+const NTHSCreateGroupView = () => import('./views/NTHS/NTHSCreateGroupView.vue')
+const NTHSGroupDashboardView = () =>
+  import('./views/NTHS/Tabs/NTHSGroupDashboardView.vue')
+const NTHSManageTeamView = () =>
+  import('./views/NTHS/Tabs/NTHSManageTeamView.vue')
+const NTHSSettingsView = () => import('./views/NTHS/Tabs/NTHSSettingsView.vue')
+const NTHSApplicationView = () => import('@/views/NTHS/NTHSApplicationView.vue')
+const NTHSApplicationPending = () =>
+  import('./views/NTHS/NTHSApplicationPending.vue')
+
+import {
+  shouldGoToApply,
+  shouldGoToCreate,
+  shouldGoToGroup,
+  shouldGoToPending,
+} from './views/NTHS/nths-route-helpers'
 import Gleap from 'gleap'
 import NetworkService, { axiosInstance } from './services/NetworkService'
 import { UserType } from '@/services/SignUpService'
@@ -69,23 +94,6 @@ import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/Stud
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/VolunteerSignUpService'
 import Case from 'case'
-import RewardsView from './views/RewardsView.vue'
-import SurveysView from './views/SurveysView.vue'
-import SocialMediaSharingInstructions from '@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue'
-import JourneysView from './views/JourneysView.vue'
-import NTHSGroupsView from './views/NTHS/NTHSGroupsView.vue'
-import NTHSCreateGroupView from './views/NTHS/NTHSCreateGroupView.vue'
-import NTHSGroupDashboardView from './views/NTHS/Tabs/NTHSGroupDashboardView.vue'
-import NTHSManageTeamView from './views/NTHS/Tabs/NTHSManageTeamView.vue'
-import NTHSSettingsView from './views/NTHS/Tabs/NTHSSettingsView.vue'
-import NTHSApplicationView from '@/views/NTHS/NTHSApplicationView.vue'
-import NTHSApplicationPending from './views/NTHS/NTHSApplicationPending.vue'
-import {
-  shouldGoToApply,
-  shouldGoToCreate,
-  shouldGoToGroup,
-  shouldGoToPending,
-} from './views/NTHS/nths-route-helpers'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')

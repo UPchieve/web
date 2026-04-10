@@ -1,4 +1,4 @@
-import Validator from 'validator'
+import isEmail from 'validator/lib/isEmail'
 import errorFromHttpResponse from '../utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
@@ -28,12 +28,7 @@ function resetServices() {
 export default {
   async login(creds) {
     const { email, password } = creds
-    if (
-      !email ||
-      !password ||
-      !Validator.isEmail(email) ||
-      password.length < 1
-    ) {
+    if (!email || !password || !isEmail(email) || password.length < 1) {
       return Promise.reject('Invalid login form submission')
     }
 

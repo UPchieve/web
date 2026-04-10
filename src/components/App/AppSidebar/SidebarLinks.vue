@@ -217,7 +217,10 @@ import ActivityDot from '@/components/ActivityDot.vue'
 import { EVENTS } from '@/consts'
 import AiTutorButton from '../AiTutorButton.vue'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
-import AmbassadorReferralModal from '@/views/AmbassadorReferralModal.vue'
+import { defineAsyncComponent } from 'vue'
+const AmbassadorReferralModal = defineAsyncComponent(
+  () => import('@/views/AmbassadorReferralModal.vue')
+)
 
 export default {
   components: {

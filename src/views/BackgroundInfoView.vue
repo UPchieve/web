@@ -400,7 +400,7 @@ import LoggerService from '@/services/LoggerService'
 import LargeButton from '@/components/LargeButton.vue'
 import { backOff } from 'exponential-backoff'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
-import _ from 'lodash'
+import { isEmpty } from 'lodash-es'
 import Callout from '@/components/Callout.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
@@ -525,7 +525,7 @@ export default {
       return otherOption && otherOption.id === this.signupSourceId
     },
     signedUpWithGoogle() {
-      return !_.isEmpty(this.user.issuers)
+      return !isEmpty(this.user.issuers)
     },
   },
   methods: {

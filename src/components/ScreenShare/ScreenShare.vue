@@ -8,7 +8,7 @@ import { useActor } from '@xstate/vue'
 import { machine } from './screen-share-component-machine'
 import { create } from '@/state-machines/meeting-machine'
 import { onUnmounted } from 'vue'
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 
 const DEFAULT_WIDTH = 300
 const DEFAULT_HEIGHT = 300

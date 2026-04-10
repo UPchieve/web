@@ -1,5 +1,5 @@
-@use "sass:color";
-@use "sass:map";
+@use 'sass:color';
+@use 'sass:map';
 /// Used for primary text.
 $c-soft-black: #343440;
 
@@ -91,12 +91,3 @@ $c-volunteer: #fedf85;
 $c-teacher: #76e5fd;
 
 $c-hover-green: #0d8269;
-
-// Override Ionic colors
-:root {
-  --ion-color-success: #{color.adjust($c-success-green, $lightness: 50%)};
-}
-
-.ion-color-sucess {
-  --ion-color-base: var(--ion-color-success);
-}

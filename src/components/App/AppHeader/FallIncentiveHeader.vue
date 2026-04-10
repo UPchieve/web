@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import ArrowIcon from '@/assets/arrow.svg'
-import FallIncentiveEnrollmentModal from '@/views/DashboardView/StudentDashboard/FallIncentiveEnrollmentModal.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 
+const FallIncentiveEnrollmentModal = defineAsyncComponent(
+  () =>
+    import('@/views/DashboardView/StudentDashboard/FallIncentiveEnrollmentModal.vue')
+)
 const store = useStore()
 const showFallIncentiveEnrollmentModal = ref(false)
 const user = computed(() => store.state.user.user)

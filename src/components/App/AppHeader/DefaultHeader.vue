@@ -8,7 +8,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import LogoImageUrl from '@/assets/header_logo.png'
+import LogoImageUrl from '@/assets/header-logo-teal.svg?url'
 
 export default {
   name: 'default-header',

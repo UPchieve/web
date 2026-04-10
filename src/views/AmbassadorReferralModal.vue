@@ -306,8 +306,8 @@ onMounted(() => {
   &__right {
     @include flex-container(column, center, center);
     background-color: $c-success-green;
-    background-image: url('@/assets/referral_qr_code_background.svg');
-    background-size: contain;
+    background-image: url('@/assets/referral_qr_code_background.avif');
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     min-width: 490px;

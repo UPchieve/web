@@ -32,7 +32,10 @@
             >Demo Video: How UPchieve Works for Students</a
           >
         </div>
-        <ClassImg class="dashboard-img" />
+        <picture>
+          <source :srcset="ClassImgPreferred" type="image/avif" />
+          <img class="dashboard-img" :src="ClassImgFallback" type="image/svg" />
+        </picture>
       </div>
       <!-- TODO: Make notices into a reusable component. -->
       <div class="dashboard-notices">
@@ -143,21 +146,26 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ClassDetails from './ClassDetailsView.vue'
 import StudentDetails from './StudentDetailsView.vue'
 import Assignment from './AssignmentView.vue'
-import ClassImg from '@/assets/class.svg'
+import ClassImgPreferred from '@/assets/class.avif?url'
+import ClassImgFallback from '@/assets/class.svg?url'
 import Checklist from '@/assets/Checklist.svg'
 import CleverLogo from '@/assets/clever_logo.svg'
 import ExternalPage from '@/assets/ExternalPage.svg'
 import TaskBadge from '@/assets/task-badge.svg'
 import ArrowIcon from '@/assets/arrow.svg'
 import OnboardingModal from '@/components/OnboardingModal.vue'
-import TeacherOnboarding_Frame1 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame1.svg?url'
-import TeacherOnboarding_Frame2 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame2.svg?url'
-import TeacherOnboarding_Frame3 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame3.svg?url'
-import TeacherOnboarding_Frame4 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame4.svg?url'
+import TeacherOnboarding_Frame1 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame1.avif?url'
+import TeacherOnboarding_Frame1Fallback from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame1.png?url'
+import TeacherOnboarding_Frame2 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame2.avif?url'
+import TeacherOnboarding_Frame2Fallback from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame2.png?url'
+import TeacherOnboarding_Frame3 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame3.avif?url'
+import TeacherOnboarding_Frame3Fallback from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame3.png?url'
+import TeacherOnboarding_Frame4 from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame4.avif?url'
+import TeacherOnboarding_Frame4Fallback from '@/assets/teacher_onboarding_frames/TeacherOnboarding_Frame4.png?url'
 import { mapState, mapGetters } from 'vuex'
 import { toastController } from '@ionic/vue'
 import { EVENTS } from '@/consts'
-import _ from 'lodash'
+import { isEmpty } from 'lodash-es'
 
 export default {
   name: 'teacher-dashboard',
@@ -166,7 +174,6 @@ export default {
     ClassDetails,
     StudentDetails,
     Assignment,
-    ClassImg,
     Checklist,
     CleverLogo,
     ExternalPage,
@@ -200,6 +207,8 @@ export default {
       currentClassInfo: {},
       showOnboardingModal: false,
       pages: [],
+      ClassImgPreferred,
+      ClassImgFallback,
     }
   },
   watch: {
@@ -229,25 +238,53 @@ export default {
         heading:
           'Give your students unlimited access to live tutors & college counselors',
         text: 'Caring human beings are standing by, ready to help your students 24/7—especially when they need it most: late at night and in their homes',
-        image: TeacherOnboarding_Frame1,
+        image: {
+          url: TeacherOnboarding_Frame1,
+          type: 'image/avif',
+          fallback: {
+            url: TeacherOnboarding_Frame1Fallback,
+            type: 'image/png',
+          },
+        },
       },
       {
         step: 2,
         heading: 'Academic help in 30+ subjects',
         text: 'In under 5-10 mins your students get expert help completing assignments, filling learning gaps, and building confidence',
-        image: TeacherOnboarding_Frame2,
+        image: {
+          url: TeacherOnboarding_Frame2,
+          type: 'image/avif',
+          fallback: {
+            url: TeacherOnboarding_Frame2Fallback,
+            type: 'image/png',
+          },
+        },
       },
       {
         step: 3,
         heading: 'Connect tutoring to classwork',
         text: 'Assign tutoring sessions, complete with links and instructions, to tell students (and their tutors) exactly what to get help with',
-        image: TeacherOnboarding_Frame3,
+        image: {
+          url: TeacherOnboarding_Frame3,
+          type: 'image/avif',
+          fallback: {
+            url: TeacherOnboarding_Frame3Fallback,
+            type: 'image/png',
+          },
+        },
       },
       {
         step: 4,
         heading: 'Track & report on student usage',
         text: `See how your students are using the platform with "Class Details" and "Student Details"`,
-        image: TeacherOnboarding_Frame4,
+        image: {
+          url: TeacherOnboarding_Frame4,
+          type: 'image/avif',
+          fallback: {
+            url: TeacherOnboarding_Frame4Fallback,
+            type: 'image/png',
+          },
+        },
       },
     ]
     // TODO: Clean-up routing.
@@ -256,7 +293,7 @@ export default {
     if (classId) {
       this.classId = classId
 
-      if (_.isEmpty(this.currentClassInfo)) {
+      if (isEmpty(this.currentClassInfo)) {
         this.currentClassInfo = await this.getClassInfo(this.classId)
       }
     }
@@ -461,6 +498,8 @@ export default {
 
   .dashboard-img {
     height: 100%;
+    object-fit: contain;
+    width: 100%;
 
     @include breakpoint-below('small') {
       margin-top: 24px;

@@ -53,8 +53,17 @@ const hasPreviousPage = () => {
   <Modal class="modal" :close-modal="closeModal">
     <div class="OnboardingModal">
       <div class="OnboardingModal-container">
-        <div v-if="pages[currentPage].image" class="OnboardingModal-image">
-          <img :src="pages[currentPage].image" />
+        <div v-if="pages[currentPage].image.url" class="OnboardingModal-image">
+          <picture>
+            <source
+              :srcset="pages[currentPage].image.url"
+              :type="pages[currentPage].image.type"
+            />
+            <img
+              :src="pages[currentPage].image.fallback.url"
+              :type="pages[currentPage].image.fallback.type"
+            />
+          </picture>
         </div>
         <div class="OnboardingModal-text">
           <h1 class="OnboardingModal-title">
@@ -131,6 +140,7 @@ const hasPreviousPage = () => {
     img {
       width: 100%;
       max-height: 300px;
+      object-fit: contain;
     }
   }
 

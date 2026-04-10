@@ -1,5 +1,5 @@
-@use "sass:list";
-@use "helpers";
+@use 'sass:list';
+@use 'helpers';
 
 /// Default font family.
 $font-family-default: 'Work Sans', Helvetica, Arial, sans-serif;
@@ -12,7 +12,8 @@ $font-weight-bold: 600;
 /// @requires {function} $validate-map-key
 /// @param {string} $category - Scale category
 @mixin font-category($category) {
-  $categories: ( // category-name: (font-size, font-weight, line-height)
+  $categories: (
+    // category-name: (font-size, font-weight, line-height)
     'display-large': (40px, $font-weight-medium, 1.25),
     'display-small': (24px, $font-weight-medium, 1.25),
     'heading': (18px, $font-weight-regular, 1.25),
@@ -20,7 +21,8 @@ $font-weight-bold: 600;
     'body': (16px, $font-weight-regular, 1.5),
     'helper-text': (14px, $font-weight-regular, 1.5),
     'button': (16px, $font-weight-medium, 1.25),
-    'caption': (12px, $font-weight-medium, 1.25));
+    'caption': (12px, $font-weight-medium, 1.25)
+  );
 
   // Validate category and get list
   $list: helpers.validate-map-key($categories, $category);
@@ -30,12 +32,4 @@ $font-weight-bold: 600;
   font-size: list.nth($list, 1);
   font-weight: list.nth($list, 2);
   line-height: list.nth($list, 3);
-}
-
-.light-bold {
-  font-weight: 500;
-}
-
-.bold {
-  font-weight: 600;
 }

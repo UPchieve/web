@@ -79,9 +79,11 @@ import Case, { kebab } from 'case'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import ArrowIcon from '@/assets/arrow.svg'
-import AmbassadorReferralModal from '@/views/AmbassadorReferralModal.vue'
-import { computed, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
+const AmbassadorReferralModal = defineAsyncComponent(
+  () => import('@/views/AmbassadorReferralModal.vue')
+)
 
 const hasError = ref<boolean>(false)
 const ambassadorReferralModalIsOpen = ref<boolean>(false)

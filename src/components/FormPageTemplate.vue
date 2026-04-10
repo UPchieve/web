@@ -14,12 +14,17 @@
       }"
     >
       <div v-if="layout.includes('panel')" class="img-content">
-        <img
-          v-if="panelImageUrl"
-          :src="panelImageUrl"
-          class="img"
-          :style="customPanelImgStyle"
-        />
+        <picture v-if="panelImageUrl">
+          <source
+            :srcset="panelImageUrl.preferred.url"
+            :type="panelImageUrl.preferred.type"
+          />
+          <img
+            :src="panelImageUrl.fallback.url"
+            class="img"
+            :style="customPanelImgStyle"
+          />
+        </picture>
         <div v-if="imageText" class="img-text">
           <h1>{{ imageText }}</h1>
         </div>
@@ -28,13 +33,17 @@
         <img
           v-if="!hideLogo"
           class="logo teal"
-          src="@/assets/header_logo.png"
+          src="@/assets/header-logo-teal.svg?url"
           aria-hidden
         />
         <slot></slot>
       </div>
     </div>
-    <img class="logo white" src="@/assets/p_logo_white.png" aria-hidden />
+    <img
+      class="logo white"
+      src="@/assets/header-logo-teal.svg?url"
+      aria-hidden
+    />
 
     <nav class="footer" aria-label="More information">
       <div>
@@ -51,13 +60,18 @@
 </template>
 
 <script>
-import ChatOneOnOne from '@/assets/marketing_images/chat-1-on-1.svg?url'
-import ConnectYourStudents from '@/assets/marketing_images/connect-your-students.svg?url'
-import TrustedByStudents from '@/assets/marketing_images/trusted_by_students.svg?url'
-import UpdogSubjects from '@/assets/updog-subjects.svg?url'
-import WeCanHelpSubjects from '@/assets/marketing_images/we_can_help_in_any_core_subject.svg?url'
+import ChatOneOnOneFallback from '@/assets/marketing_images/chat-1-on-1.png?url'
+import ChatOneOnOnePreferred from '@/assets/marketing_images/chat-1-on-1.avif?url'
+import ConnectYourStudentsFallback from '@/assets/marketing_images/connect-your-students.png?url'
+import ConnectYourStudentsPreferred from '@/assets/marketing_images/connect-your-students.avif?url'
+import TrustedByStudentsPreferred from '@/assets/marketing_images/trusted_by_students.avif?url'
+import TrustedByStudentsFallback from '@/assets/marketing_images/trusted_by_students.png?url'
+import UpdogSubjects from '@/assets/updog-subjects.png?url'
+import WeCanHelpSubjectsPreferred from '@/assets/marketing_images/we_can_help_in_any_core_subject.avif?url'
+import WeCanHelpSubjectsFallback from '@/assets/marketing_images/we_can_help_in_any_core_subject.png?url'
 import UpdogCrying from '@/assets/updog-crying.svg?url'
-import VolunteerSignUpIllustration from '@/assets/volunteer-signup-illustration.svg?url'
+import VolunteerSignUpIllustrationPreferred from '@/assets/volunteer-signup-illustration.avif?url'
+import VolunteerSignUpIllustrationFallback from '@/assets/volunteer-signup-illustration.png?url'
 
 export default {
   props: {
@@ -85,12 +99,16 @@ export default {
       if (this.panelImg === 'chat-one-on-one') {
         return {
           'padding-left': '0px',
+          'object-fit': 'contain',
+          'max-height': 'calc(100vh - 50px)',
         }
       }
 
       if (this.panelImg === 'we-can-help-subjects') {
         return {
           padding: '45px',
+          'object-fit': 'contain',
+          'max-height': 'calc(100vh - 50px)',
         }
       }
 
@@ -102,24 +120,71 @@ export default {
         }
       }
 
-      if (this.panelImg === 'trusted-by-students') {
+      if (this.panelImg === 'updog-subjects') {
         return {
-          'padding-top': '25px',
+          'padding-top': '0',
+          'object-fit': 'contain',
+          'max-height': 'calc(100vh - 50px)',
         }
       }
 
+      if (this.panelImg === 'trusted-by-students') {
+        return {
+          'object-fit': 'contain',
+          'max-height': 'calc(100vh - 50px)',
+        }
+      }
+      if (this.panelImg === 'connect-your-students') {
+        return {
+          'object-fit': 'contain',
+          'max-height': 'calc(100vh - 50px)',
+        }
+      }
+
+      if (this.panelImg === 'volunteer-signup-illustration') {
+        return {
+          'object-fit': 'contain',
+        }
+      }
       return {}
     },
 
     panelImageUrl() {
       const imageMap = {
-        'chat-one-on-one': ChatOneOnOne,
-        'connect-your-students': ConnectYourStudents,
-        'trusted-by-students': TrustedByStudents,
-        'updog-subjects': UpdogSubjects,
-        'we-can-help-subjects': WeCanHelpSubjects,
-        'updog-crying': UpdogCrying,
-        'volunteer-signup-illustration': VolunteerSignUpIllustration,
+        'chat-one-on-one': {
+          preferred: { url: ChatOneOnOnePreferred, type: 'image/avif' },
+          fallback: { url: ChatOneOnOneFallback, type: 'image/png' },
+        },
+        'connect-your-students': {
+          preferred: { url: ConnectYourStudentsPreferred, type: 'image/avif' },
+          fallback: { url: ConnectYourStudentsFallback, type: 'image/png' },
+        },
+        'trusted-by-students': {
+          preferred: { url: TrustedByStudentsPreferred, type: 'image/avif' },
+          fallback: { url: TrustedByStudentsFallback, type: 'image/png' },
+        },
+        'updog-subjects': {
+          preferred: { url: UpdogSubjects, type: 'image/png' },
+          fallback: { url: UpdogSubjects, type: 'image/png' },
+        },
+        'we-can-help-subjects': {
+          preferred: { url: WeCanHelpSubjectsPreferred, type: 'image/avif' },
+          fallback: { url: WeCanHelpSubjectsFallback, type: 'image/png' },
+        },
+        'updog-crying': {
+          preferred: { url: UpdogCrying, type: 'image/svg' },
+          fallback: { url: UpdogCrying, type: 'image/svg' },
+        },
+        'volunteer-signup-illustration': {
+          preferred: {
+            url: VolunteerSignUpIllustrationPreferred,
+            type: 'image/avif',
+          },
+          fallback: {
+            url: VolunteerSignUpIllustrationFallback,
+            type: 'image/png',
+          },
+        },
       }
       return imageMap[this.panelImg] || null
     },
@@ -266,6 +331,8 @@ $footer-height-tiny: 100px;
     width: 155px;
     order: -1;
     padding-bottom: 18px;
+    // make the image white
+    filter: brightness(0) invert(1);
   }
 
   &.teal {

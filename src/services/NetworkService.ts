@@ -834,12 +834,6 @@ export default {
       this._errorHandler
     )
   },
-  savePushToken(data) {
-    return httpPost(`${API_ROOT}/push-token/save`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
   addReference({ referenceFirstName, referenceLastName, referenceEmail }) {
     return httpPost(`${API_ROOT}/user/volunteer-approval/reference`, {
       referenceFirstName,

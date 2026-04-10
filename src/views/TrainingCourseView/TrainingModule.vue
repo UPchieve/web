@@ -8,39 +8,37 @@ import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import ExternalResourceLink from '@/views/TrainingCourseView/ExternalResourceLink.vue'
+import SafetyCommunicationScreenUrl from '@/assets/Training/safety_communication_screen.avif?url'
+import SafetyCommunicationScreenFallbackUrl from '@/assets/Training/safety_communication_screen.png?url'
+import CoachLaptopUrl from '@/assets/Training/coach_laptop.avif?url'
+import CoachLaptopFallbackUrl from '@/assets/Training/coach_laptop.png?url'
+import ProbingQuestionsUrl from '@/assets/Training/probing_questions.avif?url'
+import ProbingQuestionsFallbackUrl from '@/assets/Training/probing_questions.png?url'
+import BreakDownConceptsUrl from '@/assets/Training/break_down_concepts.png?url'
+import EncourageStudentsUrl from '@/assets/Training/encourage_students.avif?url'
+import EncourageStudentsFallbackUrl from '@/assets/Training/encourage_students.png?url'
+import GiveSpecificPraiseUrl from '@/assets/Training/give_specific_praise.avif?url'
+import GiveSpecificPraiseFallbackUrl from '@/assets/Training/give_specific_praise.png?url'
+import BeYourselfUrl from '@/assets/Training/be_yourself.avif?url'
+import BeYourselfFallbackUrl from '@/assets/Training/be_yourself.png?url'
+import UnderstandAssignmentChatMsgGreenUrl from '@/assets/Training/understand_assignment_chat_ coach_green.png?url'
+import UnderstandAssignmentChatMsgWhiteUrl from '@/assets/Training/understand_assignment_chat_ coach_white.png?url'
+import WhatLearnersKnowLeftUrl from '@/assets/Training/what_learners_know_left.png?url'
+import WhatLearnersKnowRightUrl from '@/assets/Training/what_learners_know_right.png?url'
+import InformationBubbleUrl from '@/assets/Training/information_bubble.png?url'
+import DeiActiveIlloUrl from '@/assets/Training/dei_active_illo.png?url'
+import DeiClassIlloUrl from '@/assets/Training/dei_class_illo.avif?url'
+import DeiClassIlloFallbackUrl from '@/assets/Training/dei_class_illo.png?url'
+import DeiExpectationsIlloUrl from '@/assets/Training/dei_expectations_illo.avif?url'
+import DeiExpectationsIlloFallbackUrl from '@/assets/Training/dei_expectations_illo.png?url'
+import DeiLaptopIlloUrl from '@/assets/Training/dei_laptop_illo.avif?url'
+import DeiLaptopIlloFallbackUrl from '@/assets/Training/dei_laptop_illo.png?url'
+import DeiPlantIlloUrl from '@/assets/Training/dei_plant_illo.png?url'
+import SafetyReportChatBoxesUrl from '@/assets/Training/safety_report_chat_boxes.png?url'
 
-function load(name: string) {
-  return defineAsyncComponent(() => import(`@/assets/Training/${name}.svg`))
-}
-
-const CoachLaptop = load('coach_laptop')
-const RightArrowGreen = load('right_arrow_green')
-
-const ProbingQuestions = load('probing_questions')
-const BreakDownConcepts = load('break_down_concepts')
-const EncourageStudents = load('encourage_students')
-const GiveSpecificPraise = load('give_specific_praise')
-const BeYourself = load('be_yourself')
-
-const UnderstandAssignmentChatMsgGreen = load(
-  'understand_assignment_chat_ coach_green'
+const RightArrowGreen = defineAsyncComponent(
+  () => import(`@/assets/Training/right_arrow_green.svg`)
 )
-const UnderstandAssignmentChatMsgWhite = load(
-  'understand_assignment_chat_ coach_white'
-)
-
-const WhatLearnersKnowLeft = load('what_learners_know_left')
-const WhatLearnersKnowRight = load('what_learners_know_right')
-
-const InformationBubble = load('information_bubble')
-const DeiActiveIllo = load('dei_active_illo')
-const DeiClassIllo = load('dei_class_illo')
-const DeiExpectationsIllo = load('dei_expectations_illo')
-const DeiLaptopIllo = load('dei_laptop_illo')
-const DeiPlantIllo = load('dei_plant_illo')
-
-const SafetyCommunicationScreen = load('safety_communication_screen')
-const SafetyReportChatBoxes = load('safety_report_chat_boxes')
 
 const store = useStore()
 const props = defineProps<{
@@ -158,7 +156,14 @@ function goToResource(externalLink: string) {
                 </p>
               </div>
               <div class="mobile-center">
-                <coach-laptop class="img" />
+                <picture>
+                  <source :srcset="CoachLaptopUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="CoachLaptopFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
             </div>
 
@@ -172,8 +177,20 @@ function goToResource(externalLink: string) {
                 </p>
               </div>
               <div>
-                <understand-assignment-chat-msg-green class="img" />
-                <understand-assignment-chat-msg-white class="img" />
+                <div>
+                  <img
+                    class="img"
+                    :src="UnderstandAssignmentChatMsgGreenUrl"
+                    type="image/png"
+                  />
+                </div>
+                <div>
+                  <img
+                    class="img"
+                    :src="UnderstandAssignmentChatMsgWhiteUrl"
+                    type="image/png"
+                  />
+                </div>
               </div>
             </div>
 
@@ -187,8 +204,20 @@ function goToResource(externalLink: string) {
             </div>
 
             <div class="what-learners-know">
-              <what-learners-know-left class="img" />
-              <what-learners-know-right class="img" />
+              <div>
+                <img
+                  class="img"
+                  :src="WhatLearnersKnowLeftUrl"
+                  type="image/png"
+                />
+              </div>
+              <div>
+                <img
+                  class="img"
+                  :src="WhatLearnersKnowRightUrl"
+                  type="image/png"
+                />
+              </div>
             </div>
 
             <div class="coaching-strategies-item full">
@@ -201,7 +230,14 @@ function goToResource(externalLink: string) {
 
             <div class="coaching-strategies-item two-col">
               <div>
-                <probing-questions class="img" />
+                <picture>
+                  <source :srcset="ProbingQuestionsUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="ProbingQuestionsFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
               <div>
                 <h3>4. Ask Probing Questions</h3>
@@ -222,7 +258,7 @@ function goToResource(externalLink: string) {
 
             <div class="coaching-strategies-item two-col">
               <div>
-                <break-down-concepts class="img" />
+                <img class="img" :src="BreakDownConceptsUrl" type="image/png" />
               </div>
               <div>
                 <h3>5. Break Down Concepts</h3>
@@ -253,7 +289,14 @@ function goToResource(externalLink: string) {
             </div>
 
             <div class="coaching-strategies-item full">
-              <encourage-students class="img" />
+              <picture>
+                <source :srcset="EncourageStudentsUrl" type="image/avif" />
+                <img
+                  class="img"
+                  :src="EncourageStudentsFallbackUrl"
+                  type="image/png"
+                />
+              </picture>
             </div>
 
             <div class="coaching-strategies-item two-col">
@@ -271,7 +314,14 @@ function goToResource(externalLink: string) {
                 </p>
               </div>
               <div>
-                <give-specific-praise class="img" />
+                <picture>
+                  <source :srcset="GiveSpecificPraiseUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="GiveSpecificPraiseFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
             </div>
 
@@ -289,7 +339,14 @@ function goToResource(externalLink: string) {
                 </p>
               </div>
               <div>
-                <be-yourself class="img" />
+                <picture>
+                  <source :srcset="BeYourselfUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="BeYourselfFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
             </div>
           </div>
@@ -425,7 +482,7 @@ function goToResource(externalLink: string) {
 
           <div class="blue-information-box do-donts-information">
             <div class="information-bubble">
-              <information-bubble />
+              <img class="img" :src="InformationBubbleUrl" type="image/png" />
             </div>
             <div class="text-box">
               <p>
@@ -497,7 +554,7 @@ function goToResource(externalLink: string) {
           <div class="dei-grid">
             <div class="dei-item two-col">
               <div class="dei-image">
-                <dei-plant-illo></dei-plant-illo>
+                <img class="img" :src="DeiPlantIlloUrl" type="image/png" />
               </div>
               <div class="main-text">
                 <p><strong>Treat each student as an individual</strong></p>
@@ -511,7 +568,14 @@ function goToResource(externalLink: string) {
 
             <div class="dei-item two-col">
               <div class="dei-image">
-                <dei-class-illo></dei-class-illo>
+                <picture>
+                  <source :srcset="DeiClassIlloUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="DeiClassIlloFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
               <div class="main-text">
                 <p>
@@ -533,7 +597,14 @@ function goToResource(externalLink: string) {
 
             <div class="dei-item two-col">
               <div class="dei-image">
-                <dei-expectations-illo></dei-expectations-illo>
+                <picture>
+                  <source :srcset="DeiExpectationsIlloUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="DeiExpectationsIlloFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
               <div class="main-text">
                 <p><strong>Hold high expectations for every student</strong></p>
@@ -554,7 +625,14 @@ function goToResource(externalLink: string) {
 
             <div class="dei-item two-col">
               <div class="dei-image">
-                <dei-laptop-illo></dei-laptop-illo>
+                <picture>
+                  <source :srcset="DeiLaptopIlloUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="DeiLaptopIlloFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
               <div class="main-text">
                 <p><strong>Be mindful of the impact of your words</strong></p>
@@ -571,7 +649,14 @@ function goToResource(externalLink: string) {
 
             <div class="dei-item two-col">
               <div class="dei-image">
-                <dei-active-illo></dei-active-illo>
+                <picture>
+                  <source :srcset="DeiActiveIlloUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="DeiClassIlloFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
               <div class="main-text">
                 <p><strong>Actively work on eliminating your biases</strong></p>
@@ -618,7 +703,7 @@ function goToResource(externalLink: string) {
 
           <div class="blue-information-box">
             <div class="information-bubble">
-              <information-bubble />
+              <img class="img" :src="InformationBubbleUrl" type="image/png" />
             </div>
             <div class="text-box">
               We take these principles seriously. Violating the DEI policy could
@@ -724,14 +809,28 @@ function goToResource(externalLink: string) {
                 </div>
               </div>
               <div class="image-center">
-                <safety-communication-screen class="img" />
+                <picture>
+                  <source
+                    :srcset="SafetyCommunicationScreenUrl"
+                    type="image/avif"
+                  />
+                  <img
+                    class="img"
+                    :src="SafetyCommunicationScreenFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
             </div>
 
             <div class="safety-item full">
               <div class="blue-information-box">
                 <div class="information-bubble">
-                  <information-bubble></information-bubble>
+                  <img
+                    class="img"
+                    :src="InformationBubbleUrl"
+                    type="image/png"
+                  />
                 </div>
                 <div class="text-box">
                   <p>
@@ -800,7 +899,13 @@ function goToResource(externalLink: string) {
 
             <div class="safety-item full">
               <div class="blue-information-box">
-                <div class="information-bubble"><information-bubble /></div>
+                <div class="information-bubble">
+                  <img
+                    class="img"
+                    :src="InformationBubbleUrl"
+                    type="image/png"
+                  />
+                </div>
                 <div class="text-box">
                   <p><strong>College Counseling</strong></p>
                   <p>
@@ -825,7 +930,14 @@ function goToResource(externalLink: string) {
                 <p>Do not use profane, offensive, or derogatory language.</p>
               </div>
               <div class="image-center">
-                <coach-laptop class="img" />
+                <picture>
+                  <source :srcset="CoachLaptopUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="CoachLaptopFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
             </div>
 
@@ -841,7 +953,14 @@ function goToResource(externalLink: string) {
 
             <div class="safety-item two-col">
               <div class="image-center">
-                <probing-questions class="img" />
+                <picture>
+                  <source :srcset="ProbingQuestionsUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="ProbingQuestionsFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
               <div>
                 <h3>4. Keep Chats Private</h3>
@@ -878,7 +997,14 @@ function goToResource(externalLink: string) {
             </div>
 
             <div class="safety-item full">
-              <encourage-students class="img" />
+              <picture>
+                <source :srcset="EncourageStudentsUrl" type="image/avif" />
+                <img
+                  class="img"
+                  :src="EncourageStudentsFallbackUrl"
+                  type="image/png"
+                />
+              </picture>
             </div>
 
             <div class="safety-item two-col">
@@ -901,7 +1027,11 @@ function goToResource(externalLink: string) {
                 </ul>
               </div>
               <div class="image-center">
-                <safety-report-chat-boxes class="img" />
+                <img
+                  class="img"
+                  :src="SafetyReportChatBoxesUrl"
+                  type="image/png"
+                />
               </div>
             </div>
 
@@ -964,7 +1094,14 @@ function goToResource(externalLink: string) {
                 </ul>
               </div>
               <div class="image-center">
-                <be-yourself class="img"></be-yourself>
+                <picture>
+                  <source :srcset="BeYourselfUrl" type="image/avif" />
+                  <img
+                    class="img"
+                    :src="BeYourselfFallbackUrl"
+                    type="image/png"
+                  />
+                </picture>
               </div>
             </div>
           </div>
@@ -1124,6 +1261,13 @@ h4 {
 .img {
   margin-top: 16px;
   width: 100%;
+  object-fit: contain;
+  @media (min-width: 500px) {
+    width: 60%;
+  }
+  @media (min-width: 1024px) {
+    width: 100%;
+  }
 }
 
 .all-caps-heading {
