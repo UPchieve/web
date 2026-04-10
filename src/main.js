@@ -12,6 +12,7 @@ import { socket } from './socket'
 import { IonicVue } from '@ionic/vue'
 import VueDraggableResizable from 'vue-draggable-resizable'
 import { initActivityTracking } from './services/PresenceService'
+import vuetify from './plugins/vuetify'
 
 LoggerService.init()
 
@@ -41,8 +42,9 @@ async function main() {
     app.use(store)
     app.use(IonicVue)
     app.use(router)
+    app.use(vuetify)
     // Set up vue-select
-    app.component('v-select', vSelect)
+    app.component('v-select-legacy', vSelect)
     // Set up vue-star-rating
     app.component('vue-star-rating', VueStarRating)
     // Set up vue-draggable-resizable

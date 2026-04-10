@@ -1,0 +1,46 @@
+*, *::before, *::after {
+  box-sizing: border-box !important;
+}
+
+//custom overrides for vuetify form inputs
+.v-field__outline__start,
+.v-field__outline__end {
+  border-color: $border-grey !important;
+}
+
+.v-field__outline__notch::before,
+.v-field__outline__notch::after {
+  border-color: $border-grey !important;
+}
+
+.v-field__outline__notch {
+  border-top-color: transparent !important;
+}
+
+.v-field--focused .v-field__outline__start,
+.v-field--focused .v-field__outline__end {
+  border-color: $c-information-blue !important;
+}
+
+.v-field--focused .v-field__outline__notch::before,
+.v-field--focused .v-field__outline__notch::after {
+  border-color: $c-information-blue !important;
+}
+
+.v-field--error .v-field__outline__start,
+.v-field--error .v-field__outline__end {
+  border-color: $c-error-red !important;
+}
+
+.v-field--error .v-field__outline__notch::before,
+.v-field--error .v-field__outline__notch::after {
+  border-color: $c-error-red !important;
+}
+
+.v-messages {
+  flex: 0 1 auto;
+}
+
+.v-input__details {
+  padding-inline: 8px !important;
+} 

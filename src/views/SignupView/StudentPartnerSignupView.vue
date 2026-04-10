@@ -89,7 +89,7 @@
             {{ getFormLabelIdentifierPossessive }}
             site?
           </label>
-          <v-select
+          <v-select-legacy
             id="site"
             data-testid="site-select"
             class="uc-form-select-input"
@@ -105,7 +105,7 @@
             :clearable="false"
             @close="() => v$.formData.partnerSite.$touch()"
             required
-          ></v-select>
+          ></v-select-legacy>
         </div>
 
         <div class="uc-form-element">

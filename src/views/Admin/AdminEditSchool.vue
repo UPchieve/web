@@ -15,7 +15,7 @@
 
       <div class="edit-school__input-row">
         <label class="uc-form-label">School state</label>
-        <v-select
+        <v-select-legacy
           class="edit-school__state-select"
           id="state"
           v-model="state"

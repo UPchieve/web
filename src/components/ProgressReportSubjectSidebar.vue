@@ -1,7 +1,7 @@
 <template>
   <div class="pr-sidebar">
     <h1 class="pr-sidebar__header">Subjects</h1>
-    <v-select
+    <v-select-legacy
       v-if="isDropdownMode"
       :options="subjectsMapped"
       :modelValue="getSelectedSubjectValue"
@@ -29,7 +29,7 @@
           >
         </div>
       </template>
-    </v-select>
+    </v-select-legacy>
 
     <template v-else-if="subjectsMapped.length">
       <div
