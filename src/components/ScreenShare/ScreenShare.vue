@@ -297,6 +297,7 @@ watch(
       {{ props.firstName }}'s screen
       <div class="resize-buttons">
         <button
+          type="button"
           @click="() => windowMachine.send({ type: 'toggleMaximize' })"
           class="resize-button"
         >
@@ -306,6 +307,7 @@ watch(
           <ImageExpand v-else />
         </button>
         <button
+          type="button"
           @click="() => windowMachine.send({ type: 'toggleMinimize' })"
           class="resize-button"
           :class="

@@ -120,6 +120,7 @@
                 class="uc-form-input location-input"
                 id="city"
                 data-testid="city-input"
+                autocomplete="off"
               />
             </template>
             <p v-if="showInputErrors && !experience" class="error">
@@ -150,7 +151,6 @@
                 v-model="occupation"
                 :id="option"
                 :data-testid="option"
-                autocomplete="off"
               />
               <label class="uc-form-label" :for="option">
                 {{ option }}
@@ -286,7 +286,6 @@
                           type="radio"
                           :value="index"
                           :data-testid="`${subquestion}-${experienceRadioQuestion.columnTitle[index - 1]}`"
-                          autocomplete="off"
                         />
                       </td>
                     </tr>
@@ -317,11 +316,7 @@
                             .length"
                           v-bind:key="index"
                         >
-                          <input
-                            class="uc-form-input"
-                            type="radio"
-                            autocomplete="off"
-                          />
+                          <input class="uc-form-input" type="radio" />
                         </td>
                       </tr>
                     </div>
@@ -351,7 +346,6 @@
                 v-model="languages"
                 :id="option"
                 :data-testid="option"
-                autocomplete="off"
               />
               <label class="uc-form-label" :for="option">
                 {{ option }}
@@ -363,7 +357,6 @@
                 value="other"
                 id="other"
                 @change="toggleAddLanguages"
-                autocomplete="off"
               />
               <label for="other">Other</label>
             </div>

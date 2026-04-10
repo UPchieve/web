@@ -1,5 +1,9 @@
 <template>
-  <button class="uc-form-button sso" @click.prevent="$emit('click')">
+  <button
+    type="button"
+    class="uc-form-button sso"
+    @click.prevent="$emit('click')"
+  >
     <google-logo v-if="useGoogle" class="logo" />
     <clever-logo v-if="useClever" class="logo" />
     <img

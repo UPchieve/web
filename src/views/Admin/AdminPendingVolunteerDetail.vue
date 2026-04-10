@@ -13,6 +13,7 @@
             name="photo-id-status"
             v-model="photoIdStatus"
             class="user-detail__photo-id-select"
+            autocomplete="off"
           >
             <option selected disabled value="SUBMITTED">
               Review required...

@@ -10,9 +10,11 @@ const isLoaded = ref(false)
 </script>
 
 <template>
+  <!-- html-validate-disable attribute-allowed-values -- 100% for width and height is not recognized -->
   <div class="iframe-container">
     <iframe
       v-if="Boolean(group?.groupInfo?.id)"
+      title="NTHS Group Dashboard"
       class="iframe"
       :class="isLoaded ? '' : 'hide'"
       :src="`${config.NTHSRetoolDashboardUrl}?groupId=${group.groupInfo.id}`"

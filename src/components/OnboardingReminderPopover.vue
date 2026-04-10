@@ -78,7 +78,11 @@ const finishOnboarding = () => {
           color="primary"
         />
         <span class="heading-text">You're almost ready to tutor!</span>
-        <button @click="temporarilyDismiss" class="dismiss-button">
+        <button
+          type="button"
+          @click="temporarilyDismiss"
+          class="dismiss-button"
+        >
           <CrossIcon class="dismiss-icon" />
         </button>
       </div>

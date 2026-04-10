@@ -8,7 +8,6 @@
     <input
       data-testid="toggle-input"
       type="checkbox"
-      autocomplete="off"
       class="v-switch-input"
       :name="name"
       :checked="value"

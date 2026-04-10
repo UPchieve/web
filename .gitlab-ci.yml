@@ -224,7 +224,6 @@ lint:
 html_validate:
   stage: test
   image: node:24.13.0-bullseye
-  allow_failure: true
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:

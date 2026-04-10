@@ -8,6 +8,7 @@
         name="reference-form"
         @change="updateReferenceStatus"
         :value="referenceStatusText"
+        autocomplete="off"
       >
         <option selected disabled value="SUBMITTED">Review required...</option>
         <option value="REJECTED">Reject</option>

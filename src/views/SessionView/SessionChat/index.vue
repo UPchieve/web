@@ -199,6 +199,7 @@
         />
         <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
         <button
+          type="button"
           :disabled="isSendMessageDisabled"
           class="send-button"
           :class="{ hidden: textMessageHidden }"

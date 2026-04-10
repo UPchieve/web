@@ -213,7 +213,11 @@ onMounted(() => {
               :readOnly="true"
               :modelValue="referralLink()"
             />
-            <button class="send-btns" @click="onCopiedReferralLink">
+            <button
+              type="button"
+              class="send-btns"
+              @click="onCopiedReferralLink"
+            >
               {{ copyText }}
             </button>
           </div>
@@ -226,7 +230,11 @@ onMounted(() => {
               class="phone-number-input"
               v-model="phoneNumber"
             />
-            <button class="send-btns" @click="sendTextMessage(phoneNumber)">
+            <button
+              type="button"
+              class="send-btns"
+              @click="sendTextMessage(phoneNumber)"
+            >
               {{ sendText }}
             </button>
           </div>
@@ -237,12 +245,22 @@ onMounted(() => {
         >
           <p class="send-text"><strong>Share via</strong></p>
           <div class="share-via-input-container">
-            <button v-if="isMac() || isMobile" @click="shareVia('text')">
+            <button
+              type="button"
+              v-if="isMac() || isMobile"
+              @click="shareVia('text')"
+            >
               <text-icon />
             </button>
-            <button @click="shareVia('email')"><email-icon /></button>
-            <button @click="shareVia('linkedin')"><linkedin-icon /></button>
-            <button @click="shareVia('facebook')"><facebook-icon /></button>
+            <button type="button" @click="shareVia('email')">
+              <email-icon />
+            </button>
+            <button type="button" @click="shareVia('linkedin')">
+              <linkedin-icon />
+            </button>
+            <button type="button" @click="shareVia('facebook')">
+              <facebook-icon />
+            </button>
           </div>
         </div>
       </div>

@@ -93,7 +93,7 @@ function disableSchoolSubmit() {
         Compatibility section). If any of the required fields are missing, those
         records will be skipped and will be marked as such in the output report.
       </p>
-      <form @submit.prevent="onSubmitRoster">
+      <form @submit.prevent="onSubmitRoster" autocomplete="off">
         <form-input
           label="Clever District ID"
           name="clever-district-id"
@@ -118,7 +118,7 @@ function disableSchoolSubmit() {
         this explicit mapping, even if they have an NCES ID, will NOT roster.
       </p>
       <p>Simply enter the Clever and UPchieve school IDs below.</p>
-      <form @submit.prevent="onSubmitSchool">
+      <form @submit.prevent="onSubmitSchool" autocomplete="off">
         <form-input
           label="Clever School ID"
           name="clever-school-id"

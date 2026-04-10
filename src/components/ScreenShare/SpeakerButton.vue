@@ -74,6 +74,7 @@ const onClickMute = () => {
         color: 'black',
         position: 'bottom',
       }"
+      type="button"
     >
       <SpeakerMutedIcon v-if="props.isSpeakerMuted" :class="{ disabled }" />
       <SpeakerFilledIcon v-else />

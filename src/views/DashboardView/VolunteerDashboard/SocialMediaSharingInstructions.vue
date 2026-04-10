@@ -72,7 +72,7 @@ async function copyCaption() {
           alt="Shareable UPchieve milestone image"
           class="share-image"
         />
-        <button class="uc-form-button btn" @click="downloadImage">
+        <button type="button" class="uc-form-button btn" @click="downloadImage">
           Download Image
         </button>
       </div>
@@ -86,7 +86,7 @@ async function copyCaption() {
             {{ studentMilestoneCaption }}
           </p>
         </div>
-        <button class="uc-form-button btn" @click="copyCaption">
+        <button type="button" class="uc-form-button btn" @click="copyCaption">
           {{ copyMessage }}
         </button>
       </div>

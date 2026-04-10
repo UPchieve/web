@@ -57,6 +57,7 @@ const selectSubject = (subject: PartialSubject) => {
     <div class="row subjects">
       <p>Select the subject you want help with today</p>
       <button
+        type="button"
         class="subject-button"
         :class="{
           'subject-button': true,
@@ -75,6 +76,7 @@ const selectSubject = (subject: PartialSubject) => {
         on?
       </p>
       <button
+        type="button"
         :class="{ 'subject-button': true }"
         v-for="subject in sortedSubjects"
         v-bind:key="subject.id"

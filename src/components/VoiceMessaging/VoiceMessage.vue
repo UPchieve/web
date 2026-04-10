@@ -43,7 +43,7 @@ function trackPlay() {
       />
     </audio>
     <div class="speed">
-      <select v-model="playbackRate">
+      <select v-model="playbackRate" autocomplete="off">
         <option
           v-for="option in playbackRateOptions"
           :value="option"
@@ -55,6 +55,7 @@ function trackPlay() {
     </div>
     <div class="transcript-container">
       <button
+        type="button"
         v-if="props.message.transcript && !shouldShowTranscript"
         :onClick="toggleShowTranscript"
       >
@@ -63,7 +64,11 @@ function trackPlay() {
       <div class="transcript" v-if="shouldShowTranscript">
         {{ props.message.transcript }}
       </div>
-      <button v-if="shouldShowTranscript" :onClick="toggleShowTranscript">
+      <button
+        type="button"
+        v-if="shouldShowTranscript"
+        :onClick="toggleShowTranscript"
+      >
         See Less
       </button>
     </div>

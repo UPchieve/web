@@ -262,7 +262,7 @@ async function submitQuiz() {
               class="quiz-results-callout--passed"
             >
               Great job! You passed the quiz and completed the module!
-              <button class="quick-next-button" @click="next">
+              <button type="button" class="quick-next-button" @click="next">
                 {{ nextButtonLabel }}
                 <ArrowIcon class="arrow-icon" />
               </button>

@@ -3,7 +3,11 @@
     <div class="main">
       <div class="class-header">
         <div class="breadcrumbs">
-          <button class="back-to-classes" @click="backToClasses()">
+          <button
+            type="button"
+            class="back-to-classes"
+            @click="backToClasses()"
+          >
             Classes
           </button>
           <span class="class-details"> > Class Details</span>
@@ -25,6 +29,7 @@
               {{ classData.totalStudents == 1 ? 'student' : 'students' }}</span
             >
             <button
+              type="button"
               v-if="!classData.cleverId"
               class="open-teacher-code-modal"
               @click="openTeacherCodeModal"
@@ -33,10 +38,15 @@
             </button>
           </div>
           <div class="end-col">
-            <button class="edit-class-btn" @click="openEditClassModal()">
+            <button
+              type="button"
+              class="edit-class-btn"
+              @click="openEditClassModal()"
+            >
               <Pencil class="pencil" /> Edit Class
             </button>
             <button
+              type="button"
               class="create-assignment-btn"
               @click="openCreateAssignmentModal()"
             >
@@ -80,6 +90,7 @@
               share the code with your students!
             </p>
             <button
+              type="button"
               v-if="!classData.cleverId"
               class="uc-form-button"
               @click="openTeacherCodeModal"
@@ -143,6 +154,7 @@
               <td>{{ student.lastSession }}</td>
               <td>
                 <button
+                  type="button"
                   class="view-details-btn"
                   @click="viewStudentDetails(student)"
                   :data-testid="`view-details-btn-${student.id}`"
@@ -153,6 +165,7 @@
               <td v-if="!classData.cleverId">
                 <div class="menu-button">
                   <button
+                    type="button"
                     @click="openStudentMenu(student)"
                     class="student-menu-btns"
                   >
@@ -163,7 +176,7 @@
                   class="student-menu"
                   v-if="toggledStudentMenuId === student.id"
                 >
-                  <button @click="removeStudent(student.id)">
+                  <button type="button" @click="removeStudent(student.id)">
                     <p><RemoveIcon /> Remove from class</p>
                   </button>
                 </div>
@@ -190,6 +203,7 @@
             Create an assignment to kickstart your students' learning journey.
           </p>
           <button
+            type="button"
             class="create-assignment-btn"
             @click="openCreateAssignmentModal()"
           >
@@ -209,6 +223,7 @@
               <div class="assignment-info">
                 <div class="assignment-heading">
                   <button
+                    type="button"
                     class="assignment-info-btn"
                     @click="viewAssignment(assignment.id)"
                   >
@@ -217,6 +232,7 @@
                     </h1>
                   </button>
                   <button
+                    type="button"
                     class="assignment-menu-btns"
                     @click="toggleAssignmentMenu(assignment.id)"
                   >
@@ -227,6 +243,7 @@
                     class="assignment-menu"
                   >
                     <button
+                      type="button"
                       @click="
                         openRemoveAssignmentConfirmationModal(assignment.id)
                       "
@@ -236,7 +253,10 @@
                         <span class="delete-btn">Delete</span>
                       </div>
                     </button>
-                    <button @click="openEditAssignmentModal(assignment)">
+                    <button
+                      type="button"
+                      @click="openEditAssignmentModal(assignment)"
+                    >
                       <div class="assignment-menu-item">
                         <Pencil class="pencil-icon" />
                         <span>Edit</span>
@@ -259,6 +279,7 @@
                   </p>
                 </div>
                 <button
+                  type="button"
                   v-else
                   class="student-completion"
                   @click="toggleStudentCompletion(assignment.id)"

@@ -449,6 +449,7 @@ onMounted(() => {
               v-model="verificationCode"
               type="text"
               placeholder="XXXXXX"
+              autocomplete="off"
               required
             />
           </div>

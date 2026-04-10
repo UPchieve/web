@@ -1,4 +1,5 @@
 <template>
+  <!-- html-validate-disable-next attr-case -->
   <modal :closeModal="closeModal" :style{padding: 0}>
     <div>
       <header>

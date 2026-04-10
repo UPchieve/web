@@ -95,6 +95,7 @@
               data-testid="studentCard"
               class="btn-card student"
               @click.prevent="selectStudent"
+              type="button"
             >
               <div class="img-container">
                 <student-avatar class="img"></student-avatar>
@@ -105,6 +106,7 @@
               data-testid="volunteerCard"
               class="btn-card volunteer"
               @click.prevent="selectVolunteer"
+              type="button"
             >
               <div class="img-container">
                 <volunteer-avatar class="img"></volunteer-avatar>
@@ -115,6 +117,7 @@
               data-testid="teacherCard"
               class="btn-card teacher"
               @click.prevent="selectTeacher"
+              type="button"
             >
               <div class="img-container">
                 <teacher-avatar class="img"></teacher-avatar>

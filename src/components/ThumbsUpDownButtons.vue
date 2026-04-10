@@ -1,6 +1,7 @@
 <template>
   <div class="thumbs-up-down-container">
     <button
+      type="button"
       @click="onClick('up')"
       class="thumbs-btn up"
       :class="{ selected: isThumbsUpSelected }"
@@ -9,6 +10,7 @@
       <ThumbsUpIcon />
     </button>
     <button
+      type="button"
       @click="onClick('down')"
       class="thumbs-btn down"
       :class="{ selected: isThumbsDownSelected }"

@@ -19,6 +19,7 @@
       </p>
       <div class="remove-phone-modal-buttons-container">
         <button
+          type="button"
           class="uc-form-button-secondary"
           data-testid="remove-phone-cancel-btn"
           @click="onCancel"
@@ -26,6 +27,7 @@
           Cancel
         </button>
         <button
+          type="button"
           class="uc-form-button"
           data-testid="remove-phone-accept-btn"
           @click="deletePhoneInfo"

@@ -40,8 +40,7 @@
         <div class="school-detail__section">
           <div class="school-detail__section-title">Status</div>
           <div class="uc-row">
-            <label for="toggleSchoolApproved"
-              >Admin Approved:
+            <label>Admin Approved:
               <input
                 type="checkbox"
                 id="toggleSchoolApproved"
@@ -53,8 +52,7 @@
             </label>
           </div>
           <div class="uc-row">
-            <label for="togglePartnerSchool"
-              >Partner School:
+            <label>Partner School:
               <input
                 type="checkbox"
                 id="togglePartnerSchool"

@@ -35,7 +35,9 @@
           option-text-field="displayName"
         />
         <div class="clear-button-container">
-          <button class="clear-button" @click="clearPartnerOrg">Clear</button>
+          <button type="button" class="clear-button" @click="clearPartnerOrg">
+            Clear
+          </button>
         </div>
       </div>
       <div class="row" v-if="hasStudentRole && partnerOrg && partnerOrg.sites">

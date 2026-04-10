@@ -129,6 +129,7 @@ function goToResource(externalLink: string) {
                   'https://cdn.upchieve.org/training-courses/upchieve101/video-decks/implementing-effective-coaching-strategies-deck.pdf'
                 )
               "
+              type="button"
             >
               <span>Video Transcript & Slides</span><right-arrow-green />
             </button>
@@ -360,6 +361,7 @@ function goToResource(externalLink: string) {
                 'https://cdn.upchieve.org/training-courses/upchieve101/upchieve-coaching-strategies-v2.pdf'
               )
             "
+            type="button"
           >
             UPchieve Coaching Strategies & Questions
             <right-arrow-green class="arrow" />
@@ -507,6 +509,7 @@ function goToResource(externalLink: string) {
                   'https://cdn.upchieve.org/training-courses/upchieve101/academic-integrity-v2.pdf'
                 )
               "
+              type="button"
             >
               Read our Academic Integrity Policy<right-arrow-green
                 class="arrow"
@@ -721,6 +724,7 @@ function goToResource(externalLink: string) {
                   'https://cdn.upchieve.org/training-courses/upchieve101/volunteer-dei-policy-v2.pdf'
                 )
               "
+              type="button"
             >
               Read our DEI Policy<right-arrow-green class="arrow" />
             </button>
@@ -731,6 +735,7 @@ function goToResource(externalLink: string) {
                   'https://implicit.harvard.edu/implicit/takeatest.html'
                 )
               "
+              type="button"
             >
               Harvard Implicit Bias Association Test<right-arrow-green
                 class="arrow"
@@ -775,6 +780,7 @@ function goToResource(externalLink: string) {
                   'https://cdn.upchieve.org/training-courses/upchieve101/video-decks/community-safety-&-success-deck.pdf'
                 )
               "
+              type="button"
             >
               <span>Video Transcript & Slides</span><right-arrow-green />
             </button>
@@ -1116,6 +1122,7 @@ function goToResource(externalLink: string) {
                   'https://cdn.upchieve.org/training-courses/upchieve101/upchieve-student-safety-policy.pdf'
                 )
               "
+              type="button"
             >
               Read our Safety Policy<right-arrow-green class="arrow" />
             </button>

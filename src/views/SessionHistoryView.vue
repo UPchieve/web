@@ -21,7 +21,7 @@
       </p>
     </div>
     <div v-if="!isFilteredFromSession" class="filters">
-      <form @submit.prevent="filter" class="filters-form">
+      <form @submit.prevent="filter" class="filters-form" autocomplete="off">
         <FormSearchableSelect
           v-model="filters.firstName"
           name="firstName"
@@ -45,7 +45,9 @@
           :reduce="(option) => option.displayName"
           @update:modelValue="filter"
         />
-        <button class="clear-filters" @click="clearFilters">Clear all</button>
+        <button type="button" class="clear-filters" @click="clearFilters">
+          Clear all
+        </button>
       </form>
     </div>
 
@@ -117,6 +119,7 @@
         <footer class="page-actions-container">
           <div class="page-actions">
             <button
+              type="button"
               @click="goToPreviousPage"
               :class="{ 'page-actions__stepper--disabled': isFirstPage }"
               class="page-actions__stepper"
@@ -130,6 +133,7 @@
               </span>
             </div>
             <button
+              type="button"
               @click="goToNextPage"
               :class="{ 'page-actions__stepper--disabled': isLastPage }"
               class="page-actions__stepper"
@@ -204,6 +208,7 @@
           <footer class="page-actions-container">
             <div class="page-actions">
               <button
+                type="button"
                 @click="goToPreviousPage"
                 :class="isFirstPage && 'page-actions__stepper--disabled'"
                 class="page-actions__stepper"
@@ -217,6 +222,7 @@
                 </span>
               </div>
               <button
+                type="button"
                 @click="goToNextPage"
                 :class="isLastPage && 'page-actions__stepper--disabled'"
                 class="page-actions__stepper"

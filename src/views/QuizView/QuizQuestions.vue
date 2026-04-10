@@ -73,7 +73,6 @@
               :id="item.val"
               :data-testid="item.val"
               :aria-label="item.label"
-              autocomplete="off"
               class="answer-option--input"
             />
             <label

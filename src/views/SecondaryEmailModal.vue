@@ -225,6 +225,7 @@ const onPermanentlyDismissed = () => {
         />
         <div class="buttons-container" v-if="!isLoading">
           <button
+            type="button"
             class="uc-form-button-secondary w-full form-button"
             @click="onClickSendVerificationCode"
             :disabled="isLoading"
@@ -248,6 +249,7 @@ const onPermanentlyDismissed = () => {
         <Spinner v-else />
       </form>
       <button
+        type="button"
         v-else
         class="uc-form-button"
         @click="
@@ -262,6 +264,7 @@ const onPermanentlyDismissed = () => {
     </div>
     <RecaptchaCaption v-if="formStep !== 'complete'" />
     <button
+      type="button"
       class="permanent-dismiss-button"
       v-if="props.showPermanentDismissOption && formStep !== 'complete'"
       @click="onPermanentlyDismissed"

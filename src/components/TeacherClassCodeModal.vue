@@ -21,7 +21,7 @@
         <div class="copy-link">
           https://app.upchieve.org/join-class/{{ this.code }}
         </div>
-        <button @click="copyURL" class="link-text">
+        <button type="button" @click="copyURL" class="link-text">
           <LinkUnion /><span>{{ copyMessage }}</span>
         </button>
       </div>

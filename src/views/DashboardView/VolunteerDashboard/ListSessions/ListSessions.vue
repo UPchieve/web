@@ -57,6 +57,7 @@
         >
           While you wait, you can still earn volunteer hours by
           <button
+            type="button"
             class="ambassador-button"
             @click="openAmbassadorReferralModal"
           >

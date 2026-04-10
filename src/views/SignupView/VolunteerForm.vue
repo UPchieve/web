@@ -55,7 +55,7 @@
         }"
         v-model="credentials.password"
         required
-        autocomplete="off"
+        autocomplete="new-password"
       />
       <p class="uc-form-subtext">
         Keep your account safe by choosing a password with one number, one
@@ -131,7 +131,7 @@
         class="d-none"
         id="password"
         v-model="credentials.password"
-        autocomplete="off"
+        autocomplete="new-password"
       />
 
       <label for="firstName" class="uc-form-label">First Name</label>
@@ -219,7 +219,6 @@
       <input
         id="userAgreement"
         data-testid="userAgreementCheckbox"
-        autocomplete="off"
         v-model="credentials.terms"
         type="checkbox"
         required

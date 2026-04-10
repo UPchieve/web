@@ -2,7 +2,7 @@
   <div class="student-assignments">
     <div class="student-assignments--header">
       <h1>Your Assignments</h1>
-      <button @click="goToClasses">See all</button>
+      <button type="button" @click="goToClasses">See all</button>
     </div>
     <div class="student-assignments--assignments">
       <div
@@ -10,6 +10,7 @@
         v-bind:key="assignment.id"
       >
         <button
+          type="button"
           class="assignment-card"
           @click="goToAssignment(assignment.classId, assignment.id)"
         >

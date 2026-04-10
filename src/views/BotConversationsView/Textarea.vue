@@ -96,6 +96,7 @@ watch(() => message.value, resizeTextAreaToFitText)
       "
     />
     <button
+      type="button"
       :disabled="props.disabled || messageIsEmpty"
       class="send-button"
       @click="send"

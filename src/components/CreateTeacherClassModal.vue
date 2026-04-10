@@ -20,10 +20,19 @@
       :options="sortedTopics"
     />
     <div class="buttons">
-      <button class="uc-form-button cancel-button" @click="close()">
+      <button
+        type="button"
+        class="uc-form-button cancel-button"
+        @click="close()"
+      >
         Cancel
       </button>
-      <button class="uc-form-button" @click="accept()" :disabled="!isFormValid">
+      <button
+        type="button"
+        class="uc-form-button"
+        @click="accept()"
+        :disabled="!isFormValid"
+      >
         Create Class
       </button>
     </div>

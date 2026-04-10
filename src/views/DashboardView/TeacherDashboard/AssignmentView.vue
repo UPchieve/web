@@ -1,7 +1,7 @@
 <template>
   <div class="assignment-container">
     <div class="breadcrumbs-container">
-      <button class="back-btn" @click="backToAssignments()">
+      <button type="button" class="back-btn" @click="backToAssignments()">
         ← Back to assignments
       </button>
     </div>
@@ -16,6 +16,7 @@
       </h1>
       <div class="assignment-info">
         <button
+          type="button"
           class="student-completion-btn"
           @click="openStudentCompletionModal"
           data-testid="student-completion"
@@ -78,7 +79,11 @@
           <ul>
             <li>
               <b>Review the demo video: </b
-              ><button @click="goToYoutubeVideo" class="link-text">
+              ><button
+                type="button"
+                @click="goToYoutubeVideo"
+                class="link-text"
+              >
                 This video
               </button>
               explains how and why to use UPchieve to your students.
@@ -92,7 +97,7 @@
             <li>
               <b>Share your class: </b>
               Post your
-              <button @click="copyURL" class="link-text">
+              <button type="button" @click="copyURL" class="link-text">
                 <span class="class-link">unique class link </span
                 ><CopyIcon class="copy-icon" />
               </button>

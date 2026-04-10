@@ -520,7 +520,9 @@
     <verification-badge />
     <h1 class="uc-form-header center">Woohoo, you're eligible!</h1>
     <p class="uc-form-text center">Finish setting up your free account</p>
-    <button class="uc-form-button" @click="accountPage">Continue</button>
+    <button class="uc-form-button" @click="accountPage" type="button">
+      Continue
+    </button>
   </div>
 
   <div
@@ -630,6 +632,7 @@
         class="uc-form-button google"
         @click.prevent="signUpWithGoogle"
         :disabled="isSubmittingAccountForm ? true : null"
+        type="button"
       >
         <google-logo />
         Sign Up with Google
@@ -775,9 +778,9 @@
         <input
           id="password"
           data-testid="student-password-input"
-          autocomplete="off"
           class="uc-form-text-input"
           type="password"
+          autocomplete="new-password"
           placeholder="Create a password"
           aria-label="Create a password"
           v-model="credentials.password"

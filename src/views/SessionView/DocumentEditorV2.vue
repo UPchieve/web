@@ -1,17 +1,17 @@
 <template>
   <div class="document-editor" data-document-editor-version="2">
     <div id="ql-toolbar">
-      <select class="ql-size"></select>
-      <button class="ql-bold" />
-      <button class="ql-italic" />
-      <button class="ql-underline" />
-      <button class="ql-strike" />
-      <button class="ql-image" />
-      <select class="ql-color"></select>
-      <select class="ql-background"></select>
-      <button class="ql-list" value="ordered" />
-      <button class="ql-list" value="bullet" />
-      <button v-if="isAiWidgetEnabled" @click="onWidgetClicked">
+      <select class="ql-size" autocomplete="off"></select>
+      <button type="button" class="ql-bold" />
+      <button type="button" class="ql-italic" />
+      <button type="button" class="ql-underline" />
+      <button type="button" class="ql-strike" />
+      <button type="button" class="ql-image" />
+      <select class="ql-color" autocomplete="off"></select>
+      <select class="ql-background" autocomplete="off"></select>
+      <button type="button" class="ql-list" value="ordered" />
+      <button type="button" class="ql-list" value="bullet" />
+      <button type="button" v-if="isAiWidgetEnabled" @click="onWidgetClicked">
         <ChatBotIcon class="chat-bot-icon" />
         <activity-dot v-if="showHasAiMessageIndicator" />
       </button>

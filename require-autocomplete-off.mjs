@@ -6,7 +6,7 @@ class RequireAutocompleteOff extends Rule {
   documentation() {
     return {
       description:
-        'All form, input, select, and textarea elements must have autocomplete="off" to prevent browser autofill.',
+        'All form, input (text or numeric), select, and textarea elements must have autocomplete="off" to prevent browser autofill.',
     }
   }
 
@@ -18,8 +18,17 @@ class RequireAutocompleteOff extends Rule {
 
       for (const element of elements) {
         const tagName = element.tagName.toLowerCase()
-        const autocomplete = element.getAttribute('autocomplete')
+        const type = element.getAttribute('type')
 
+        // Input elements with non text or numeric types (e.g. radio, checkbox, etc.) should
+        // not have `autocomplete` attribute.
+        // Input elements with type="password" should receive `autocomplete="new-password"`
+        // instead, which is covered by an existing rule.
+        if (tagName === 'input' && ['radio', 'checkbox', 'file', 'password'].includes(type?.value)) {
+          continue
+        }
+
+        const autocomplete = element.getAttribute('autocomplete')
         if (!autocomplete) {
           this.report(
             element,

@@ -62,7 +62,7 @@ function close() {
     <div class="header">
       <div class="top">
         <span class="beta">New Beta Feature</span>
-        <button class="close" @click="close">+</button>
+        <button type="button" class="close" @click="close">+</button>
       </div>
       <span class="title"> {{ title }} ⭐ </span>
     </div>

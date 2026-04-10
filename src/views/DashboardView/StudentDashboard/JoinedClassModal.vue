@@ -27,7 +27,9 @@ function closeModal() {
       <certdog class="img" />
       <h1>Woohoo!</h1>
       <h2>You've joined class {{ props.classCode }}</h2>
-      <button class="uc-form-button" @click="closeModal">Great!</button>
+      <button type="button" class="uc-form-button" @click="closeModal">
+        Great!
+      </button>
     </div>
   </modal>
 </template>

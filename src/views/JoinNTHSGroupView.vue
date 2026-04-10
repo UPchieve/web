@@ -180,7 +180,9 @@ async function addVolunteerToTeam() {
           >I don't recognize this account.</a
         >
       </p>
-      <button class="uc-form-button" @click="confirmUser">Continue</button>
+      <button type="button" class="uc-form-button" @click="confirmUser">
+        Continue
+      </button>
     </div>
 
     <div v-else-if="!isLoading">

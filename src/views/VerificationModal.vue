@@ -62,6 +62,7 @@
             class="uc-form-button-secondary"
             id="cancel-btn"
             @click="() => closeModal(verificationComplete)"
+            type="button"
           >
             Cancel
           </button>
@@ -73,6 +74,7 @@
         class="uc-form-button-secondary"
         id="cancel-btn"
         @click="() => closeModal(verificationComplete)"
+        type="button"
       >
         Go Back
       </button>
@@ -83,7 +85,9 @@
       <p class="uc-form-text">
         Your {{ verificationMethodText }} has been verified!
       </p>
-      <button class="uc-form-button" @click="completeModal">Close</button>
+      <button class="uc-form-button" @click="completeModal" type="button">
+        Close
+      </button>
     </div>
   </Modal>
 </template>

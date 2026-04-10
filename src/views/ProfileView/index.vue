@@ -93,6 +93,7 @@
                   </div>
                   <div class="edit-phone-information-button">
                     <button
+                      type="button"
                       v-if="user.phone && !hasVolunteerRole"
                       class="field-button"
                       value="Remove"
@@ -238,7 +239,7 @@
 
           <hr v-if="isPartnerTeacher || user.usesClever" />
           <div v-if="isPartnerTeacher || user.usesClever" class="uc-column">
-            <button class="sync-clever-btn" @click="syncClever">
+            <button type="button" class="sync-clever-btn" @click="syncClever">
               <clever-logo class="mr-2" />
               {{ user.lastSuccessfulCleverSync ? 'Resync' : 'Sync' }} Clever
             </button>

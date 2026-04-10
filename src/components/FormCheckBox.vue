@@ -3,7 +3,6 @@
     <input
       :id="name"
       :name="name"
-      autocomplete="off"
       class="checkbox-input"
       type="checkbox"
       :checked="modelValue"

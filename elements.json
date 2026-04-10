@@ -1,7 +1,4 @@
 {
-  "btn": {
-    "inherit": "button"
-  },
   "button-template": {
      "flow": true,
      "permittedContent": [ "@phrasing" ],

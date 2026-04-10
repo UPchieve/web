@@ -11,6 +11,7 @@
       class="h-full form"
       :class="pageDetails.classes"
       @submit.prevent="submitWithValidation.bind(pageDetails.submitAction)"
+      autocomplete="off"
     >
       <div
         class="uc-row el-gap"

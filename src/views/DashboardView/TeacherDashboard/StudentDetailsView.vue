@@ -2,8 +2,10 @@
   <div>
     <div class="main">
       <div class="student-header">
-        <button class="back-btn" @click="backToClasses()">Classes</button>
-        <button class="back-btn" @click="backToClassDetails()">
+        <button type="button" class="back-btn" @click="backToClasses()">
+          Classes
+        </button>
+        <button type="button" class="back-btn" @click="backToClassDetails()">
           > Class Details
         </button>
         <span class="student-details"> > Student Details</span>

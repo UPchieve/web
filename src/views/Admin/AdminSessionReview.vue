@@ -7,8 +7,11 @@
         type="text"
         class="ml-1"
         v-model="studentFirstName"
+        autocomplete="off"
       />
-      <button class="uc-form-button" @click="submitFilters">Filter</button>
+      <button type="button" class="uc-form-button" @click="submitFilters">
+        Filter
+      </button>
     </div>
     <page-control
       :page="page"

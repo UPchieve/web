@@ -259,7 +259,9 @@ onUnmounted(() => {
         <ChatBotIcon class="header-icon"></ChatBotIcon>
         UPBot</span
       >
-      <button @click="() => emit('minimize')" class="minimize">-</button>
+      <button type="button" @click="() => emit('minimize')" class="minimize">
+        -
+      </button>
     </div>
     <div class="body">
       <Errors></Errors>

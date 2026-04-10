@@ -16,7 +16,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <button @click="emit('click')">
+  <button type="button" @click="emit('click')">
     <activity-dot v-if="showHasAiMessageIndicator" class="unread-indicator" />
     <ChatBotIcon class="toolbar-icon" />
   </button>

@@ -65,7 +65,7 @@
             }"
             v-model="formData.password"
             required
-            autocomplete="off"
+            autocomplete="new-password"
             data-testid="vp-signup-password"
           />
           <p class="uc-form-subtext">
@@ -124,7 +124,7 @@
             class="d-none"
             id="password"
             v-model="formData.password"
-            autocomplete="off"
+            autocomplete="new-password"
           />
 
           <div class="uc-column">
@@ -190,7 +190,6 @@
         <div class="uc-form-checkbox">
           <input
             id="userAgreement"
-            autocomplete="off"
             v-model="formData.terms"
             type="checkbox"
             required

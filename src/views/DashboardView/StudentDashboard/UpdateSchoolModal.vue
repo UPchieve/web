@@ -179,6 +179,7 @@ function handleModalClose(ignoredModal: boolean) {
           <back-button class="flex-1" @click="prevStep" />
 
           <button
+            type="button"
             class="uc-form-button flex-1"
             @click="handleLastStep"
             :disabled="vuelidate.$errors.length > 0 || !!!schoolId"

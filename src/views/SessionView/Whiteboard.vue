@@ -54,6 +54,7 @@
         "
       />
       <button
+        type="button"
         class="toolbar-item"
         title="Pick tool"
         v-bind:class="selectedTool === 'pick' ? 'selected-tool' : ''"
@@ -65,6 +66,7 @@
         <PickToolIcon class="toolbar-icon--pick" />
       </button>
       <button
+        type="button"
         class="toolbar-item"
         title="Brushes"
         tabindex="0"
@@ -100,6 +102,7 @@
         </div>
       </button>
       <button
+        type="button"
         class="toolbar-item"
         :class="selectedTool === 'eraser' ? 'selected-tool' : ''"
         title="Eraser"
@@ -111,6 +114,7 @@
         <EraserIcon class="toolbar-icon" />
       </button>
       <button
+        type="button"
         class="toolbar-item"
         title="Upload photo"
         tabindex="0"
@@ -130,6 +134,7 @@
         <PhotoUploadIcon class="toolbar-icon--photo" />
       </button>
       <button
+        type="button"
         class="toolbar-item"
         title="Shapes"
         tabindex="0"
@@ -201,6 +206,7 @@
         </div>
       </button>
       <button
+        type="button"
         class="toolbar-item"
         title="Text"
         tabindex="0"
@@ -238,6 +244,7 @@
         </div>
       </button>
       <button
+        type="button"
         class="toolbar-item"
         title="Color picker"
         tabindex="0"
@@ -338,6 +345,7 @@
         </div>
       </button>
       <button
+        type="button"
         class="toolbar-item"
         title="More"
         tabindex="0"
@@ -757,14 +765,8 @@ export default {
 
       const zwibDiv = this.$refs.zwibDiv
       zwibDiv.addEventListener('pointermove', this.moveMouseEvent)
-      zwibDiv.addEventListener(
-        'pointerleave',
-        this.handlePointerLeave
-      )
-      zwibDiv.addEventListener(
-        'pointerenter',
-        this.handlePointerEnter
-      )
+      zwibDiv.addEventListener('pointerleave', this.handlePointerLeave)
+      zwibDiv.addEventListener('pointerenter', this.handlePointerEnter)
     },
     removeListeners() {
       window.removeEventListener(
@@ -775,14 +777,8 @@ export default {
 
       const zwibDiv = this.$refs.zwibDiv
       zwibDiv.removeEventListener('pointermove', this.moveMouseEvent)
-      zwibDiv.removeEventListener(
-        'pointerleave',
-        this.handlePointerLeave
-      )
-      zwibDiv.removeEventListener(
-        'pointerenter',
-        this.handlePointerEnter
-      )
+      zwibDiv.removeEventListener('pointerleave', this.handlePointerLeave)
+      zwibDiv.removeEventListener('pointerenter', this.handlePointerEnter)
     },
     handleOrientationChange() {
       setTimeout(this.resizeViewRectangle, 100)

@@ -3,6 +3,7 @@
     <div class="uc-row justify-between mb-4">
       <h1>Edit Class</h1>
       <button
+        type="button"
         @click="deactivateClass()"
         class="uc-row items-center archive-btn"
       >
@@ -22,10 +23,19 @@
       :options="topics"
     />
     <div class="buttons-container">
-      <button class="uc-form-button cancel-button" @click="close()">
+      <button
+        type="button"
+        class="uc-form-button cancel-button"
+        @click="close()"
+      >
         Cancel
       </button>
-      <button class="uc-form-button" @click="accept()" :disabled="!isFormValid">
+      <button
+        type="button"
+        class="uc-form-button"
+        @click="accept()"
+        :disabled="!isFormValid"
+      >
         Save Changes
       </button>
     </div>

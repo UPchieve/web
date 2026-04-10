@@ -28,6 +28,7 @@ onMounted(() => {
       }"
     >
       <button
+        type="button"
         class="celebrate-button"
         :class="{ wiggle: celebrateButtonWiggle }"
         @click="emit('click')"

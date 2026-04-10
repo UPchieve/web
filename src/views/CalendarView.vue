@@ -42,6 +42,7 @@
             class="tz-selector"
             @change="tzChanged"
             data-testid="tz-selector"
+            autocomplete="off"
           >
             <option v-for="tz in tzList" :key="tz" :value="tz">
               {{ tz }}

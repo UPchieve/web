@@ -5,13 +5,14 @@
       <div class="container-metric">
         <div class="subheader-metric">
           # hours w/ less than
-          <form>
+          <form autocomplete="off">
             <input
               v-model.number="lessThan"
               placeholder="number"
               class="input"
               type="number"
               :style="{ '--rgb': lessThanColor }"
+              autocomplete="off"
             />
           </form>
           volunteers
@@ -33,6 +34,7 @@
             class="input"
             type="number"
             :style="{ '--rgb': greaterThanColor }"
+            autocomplete="off"
           />
           volunteers
         </div>

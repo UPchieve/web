@@ -37,6 +37,7 @@
             id="min-messages-sent"
             type="number"
             v-model.number="filters.minMessagesSent"
+            autocomplete="off"
           />
         </div>
 
@@ -49,6 +50,7 @@
             class="min-session-length"
             type="number"
             v-model.number="filters.minSessionLength"
+            autocomplete="off"
           />
         </div>
       </div>
@@ -78,6 +80,7 @@
             class="rating-input small-input"
             type="text"
             v-model="filters.studentRating"
+            autocomplete="off"
           />
         </div>
 
@@ -90,6 +93,7 @@
             class="rating-input small-input"
             type="text"
             v-model="filters.volunteerRating"
+            autocomplete="off"
           />
         </div>
       </div>

@@ -165,7 +165,6 @@
         <div v-if="showHighSchoolCheckbox" class="uc-form-checkbox">
           <input
             id="highSchoolCheckbox"
-            autocomplete="off"
             v-model="isHighSchoolStudent"
             type="checkbox"
           />
@@ -223,7 +222,6 @@
         <div v-if="showCollegeCheckbox" class="uc-form-checkbox">
           <input
             id="collegeCheckbox"
-            autocomplete="off"
             v-model="isCollegeStudent"
             type="checkbox"
           />
@@ -345,7 +343,7 @@
           </div>
           <input
             id="password"
-            autocomplete="off"
+            autocomplete="new-password"
             class="uc-form-text-input"
             type="password"
             placeholder="Create a password"

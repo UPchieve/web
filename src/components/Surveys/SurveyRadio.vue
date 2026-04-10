@@ -22,6 +22,7 @@
         :disabled="isOpenResponseDisabled || readOnly ? true : null"
         :value="openResponseValue"
         :placeholder="isOpenResponseDisabled || readOnly ? '' : placeholder"
+        autocomplete="off"
       />
     </label>
   </div>

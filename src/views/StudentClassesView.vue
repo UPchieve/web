@@ -235,6 +235,7 @@ function joinClass() {
           v-if="allStudentClasses.length"
           class="uc-form-button join-class-btn"
           @click="joinClass()"
+          type="button"
         >
           Join a class
         </button>
@@ -263,7 +264,11 @@ function joinClass() {
       >
         <p>You don't have any classes yet!</p>
         <p>Join a class with a class code from your teacher below.</p>
-        <button class="uc-form-button join-class-btn" @click="joinClass()">
+        <button
+          class="uc-form-button join-class-btn"
+          @click="joinClass()"
+          type="button"
+        >
           Join a class
         </button>
       </div>
@@ -330,6 +335,7 @@ function joinClass() {
                 class="outlined"
                 @click="startSession(assignment)"
                 data-testid="start-session-button"
+                type="button"
               >
                 Start Session <arrow-icon class="icon" />
               </button>

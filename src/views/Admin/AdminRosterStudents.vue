@@ -48,7 +48,7 @@
       </li>
     </ul>
 
-    <form @submit.prevent="submit()">
+    <form @submit.prevent="submit()" autocomplete="off">
       <div class="uc-form-element">
         <FormSelect
           id="partnerSchool"

@@ -20,7 +20,9 @@
         </div>
       </div>
       <div class="certificate-buttons">
-        <button @click="downloadCertificate"><download-icon /></button>
+        <button type="button" @click="downloadCertificate">
+          <download-icon />
+        </button>
       </div>
     </div>
     <div v-else class="certificate-container-disabled">

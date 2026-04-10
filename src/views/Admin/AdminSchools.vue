@@ -1,7 +1,7 @@
 <template>
   <div class="schools">
     <div class="schools__search-panel">
-      <form @submit.prevent="submitQuery">
+      <form @submit.prevent="submitQuery" autocomplete="off">
         <FormInput
           v-model="name"
           label="School Name"

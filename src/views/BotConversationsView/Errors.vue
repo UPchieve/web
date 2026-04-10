@@ -12,7 +12,7 @@ const dismiss = () => store.dispatch('botConversations/clearErrors')
   <div v-if="errors.length">
     <div class="errors" v-for="error in errors" v-bind:key="error">
       {{ error }}
-      <button class="close-button">
+      <button type="button" class="close-button">
         <cross-icon class="cross-icon-svg" @click="dismiss" />
       </button>
     </div>

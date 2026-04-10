@@ -80,6 +80,7 @@ const onMouseEnterMicButton = () => {
         color: 'black',
         position: 'bottom',
       }"
+      type="button"
     >
       <RecordIcon class="icon" />
     </button>

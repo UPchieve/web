@@ -30,7 +30,7 @@
             placeholder="Create a new password"
             v-model="credentials.password"
             required
-            autocomplete="off"
+            autocomplete="new-password"
           />
           <div class="metadata">
             Must have at least one number, one uppercase letter, one lowercase
@@ -47,7 +47,7 @@
             placeholder="Re-enter your new password"
             v-model="credentials.newpassword"
             required
-            autocomplete="off"
+            autocomplete="new-password"
           />
         </div>
 

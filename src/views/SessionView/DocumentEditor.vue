@@ -1,16 +1,16 @@
 <template>
   <div class="document-editor">
     <div id="ql-toolbar">
-      <select class="ql-size" />
-      <button class="ql-bold" />
-      <button class="ql-italic" />
-      <button class="ql-underline" />
-      <button class="ql-strike" />
-      <button class="ql-image" />
-      <select class="ql-color" />
-      <select class="ql-background" />
-      <button class="ql-list" value="ordered" />
-      <button class="ql-list" value="bullet" />
+      <select class="ql-size" autocomplete="off" />
+      <button type="button" class="ql-bold" />
+      <button type="button" class="ql-italic" />
+      <button type="button" class="ql-underline" />
+      <button type="button" class="ql-strike" />
+      <button type="button" class="ql-image" />
+      <select class="ql-color" autocomplete="off" />
+      <select class="ql-background" autocomplete="off" />
+      <button type="button" class="ql-list" value="ordered" />
+      <button type="button" class="ql-list" value="bullet" />
       <word-count class="ql-word-count" :text="text" selected-text="" />
     </div>
     <div id="quill-container"></div>

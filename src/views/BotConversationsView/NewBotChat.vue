@@ -184,6 +184,7 @@ const isMobilePortrait = computed(() => store.getters['app/isMobilePortrait'])
             :placeholder="`How can UPbot help you with ${currentSubject.displayName} today?`"
             :disabled="!currentSubject || fetchingConversation"
             :sendMessage="(message: string) => sendFirstMessage(message)"
+            autocomplete="off"
           ></Textarea>
           <div class="footer-content">
             <TransferToSessionView

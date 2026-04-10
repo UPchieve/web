@@ -90,6 +90,7 @@ watch(isExpanded, (value) => {
         v-if="drawerMode"
         @click="toggleExpand"
         class="expand-collapse-button"
+        type="button"
       >
         <CaretIcon
           class="expand-icon"
@@ -109,6 +110,7 @@ watch(isExpanded, (value) => {
         v-for="(step, index) in steps"
         :key="step.name"
         @click="clickStep(index)"
+        type="button"
       >
         <div class="step-name-container">
           {{ step.name }}

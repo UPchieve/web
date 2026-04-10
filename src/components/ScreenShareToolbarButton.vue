@@ -73,7 +73,7 @@ const tooltip = {
     <ErrorIcon class="error-icon" />
   </div>
   <div v-else-if="canShareYourScreen">
-    <button @click="onClick">
+    <button type="button" @click="onClick">
       <StopScreenShareIcon v-if="isScreenSharing" />
       <ScreenShareIcon v-else />
     </button>
@@ -85,7 +85,7 @@ const tooltip = {
       text: screenshareUnavailableTooltipText,
     }"
   >
-    <button :disabled="true">
+    <button type="button" :disabled="true">
       <ScreenShareIcon class="icon-disabled" />
     </button>
   </div>

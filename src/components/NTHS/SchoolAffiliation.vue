@@ -4,7 +4,7 @@ import {
   type AdvisorInfo,
   type AffiliationStatus,
 } from './SchoolAffiliation/school-affiliation-machine'
-import Form from './SchoolAffiliation/Form.vue'
+import SchoolForm from './SchoolAffiliation/Form.vue'
 import { useMachine } from '@xstate/vue'
 import LargeButton from '../LargeButton.vue'
 import Spinner from '../Spinner.vue'
@@ -79,7 +79,7 @@ const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
           {{ snapshot.context.submitError }}
         </p>
       </div>
-      <Form
+      <SchoolForm
         class="form"
         @submit="
           (advisorInfo: AdvisorInfo) =>

@@ -65,7 +65,11 @@
           Providing extra help is about to get easier. Click here to get
           started!
         </p>
-        <button class="uc-form-button" @click="openCreateTeacherClassModal">
+        <button
+          type="button"
+          class="uc-form-button"
+          @click="openCreateTeacherClassModal"
+        >
           Add Class
         </button>
       </div>
@@ -78,7 +82,9 @@
               students' progress.
             </p>
           </div>
-          <button @click="openCreateTeacherClassModal()">+ Add Class</button>
+          <button type="button" @click="openCreateTeacherClassModal()">
+            + Add Class
+          </button>
         </div>
         <div class="classes-container" data-testid="classes-container">
           <loader v-if="isLoading" />
@@ -123,7 +129,10 @@
                 }}
               </span>
             </div>
-            <button @click.stop="openCreateAssignmentModal(teacherClass)">
+            <button
+              type="button"
+              @click.stop="openCreateAssignmentModal(teacherClass)"
+            >
               Assign Tutoring
             </button>
           </div>

@@ -84,7 +84,6 @@
                           v-bind:key="index"
                         >
                           <input
-                            autocomplete="off"
                             class="uc-form-input"
                             v-model="
                               multipleRadioResponse[
@@ -132,11 +131,7 @@
                           v-for="index in question.tableTitle.length"
                           v-bind:key="index"
                         >
-                          <input
-                            autocomplete="off"
-                            class="uc-form-input"
-                            type="radio"
-                          />
+                          <input class="uc-form-input" type="radio" />
                         </td>
                       </tr>
                     </tbody>

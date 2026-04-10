@@ -67,6 +67,7 @@
       <div class="buttons-container">
         <button
           class="uc-form-button"
+          type="button"
           @click.prevent="sendCode"
           v-if="step === 1"
           :disabled="
@@ -87,7 +88,7 @@
         >
           Verify my account
         </button>
-        <button class="uc-form-button-secondary" @click="logout">Logout</button>
+        <button class="uc-form-button-secondary" @click="logout" type="button">Logout</button>
       </div>
 
       <RecaptchaCaption />

@@ -168,6 +168,7 @@ function getAssignmentTutoringDetails(assignment: Assignment) {
           class="uc-form-button mt-5"
           v-if="props.startSession"
           @click="props.startSession(currentAssignment)"
+          type="button"
         >
           Start your session
         </button>

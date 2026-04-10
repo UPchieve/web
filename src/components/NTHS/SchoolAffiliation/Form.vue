@@ -28,7 +28,7 @@ const isDisabled = computed(() => {
 </script>
 
 <template>
-  <form @submit.prevent="emit('submit', state)">
+  <form @submit.prevent="emit('submit', state)" autocomplete="off">
     <FormSchoolSearch
       :disabled="props.submitting"
       label="What school do you go to?"

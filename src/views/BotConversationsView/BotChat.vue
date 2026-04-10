@@ -120,6 +120,7 @@ watch(() => messages.value.length, scrollToBottom)
         class="text-area"
         :disabled="messageSending || fetchingConversation"
         :sendMessage="(message: string) => sendMessage(message)"
+        autocomplete="off"
       ></Textarea>
       <div class="footer-content">
         <TransferToSessionView

@@ -70,6 +70,7 @@ async function saveGroupName() {
       class="name-form"
       @keydown.esc="cancel"
       @submit.prevent="saveGroupName"
+      autocomplete="off"
     >
       <input
         ref="nameInput"
@@ -77,7 +78,9 @@ async function saveGroupName() {
         :disabled="isSaving || !isEditingName"
         class="name-input"
         v-model="newGroupName"
+        type="text"
         @input="errorMessage = ''"
+        autocomplete="off"
       />
       <div class="buttons">
         <LargeButton

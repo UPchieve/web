@@ -28,10 +28,12 @@ function accept() {
       undone.
     </p>
     <div class="buttons">
-      <button class="uc-form-button cancel-button" @click="close">
+      <button type="button" class="uc-form-button cancel-button" @click="close">
         Cancel
       </button>
-      <button class="uc-form-button" @click="accept">Delete Assignment</button>
+      <button type="button" class="uc-form-button" @click="accept">
+        Delete Assignment
+      </button>
     </div>
   </div>
 </template>

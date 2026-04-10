@@ -34,7 +34,9 @@ function closeModal() {
       <p>
         You can view your team dashboard by clicking "My Team" on the sidebar
       </p>
-      <button class="uc-form-button" @click="closeModal">Great!</button>
+      <button type="button" class="uc-form-button" @click="closeModal">
+        Great!
+      </button>
     </div>
   </modal>
 </template>

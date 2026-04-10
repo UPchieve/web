@@ -31,7 +31,9 @@
             optionTextField="text"
             :reduce="(option: any) => option.value"
           />
-          <button class="uc-form-button" @click="shareVia">Share!</button>
+          <button type="button" class="uc-form-button" @click="shareVia">
+            Share!
+          </button>
         </div>
       </div>
     </div>

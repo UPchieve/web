@@ -109,6 +109,7 @@
                 >
                   <span class="file-name">{{ file.name }}</span>
                   <button
+                    type="button"
                     class="delete-file"
                     @click="deleteFile(index)"
                     title="Remove file"
@@ -135,10 +136,15 @@
         </div>
       </div>
       <div class="right-btns">
-        <button class="uc-form-button cancel-button" @click="close()">
+        <button
+          type="button"
+          class="uc-form-button cancel-button"
+          @click="close()"
+        >
           Cancel
         </button>
         <button
+          type="button"
           class="uc-form-button save-button"
           data-testid="create-assignment-btn"
           :disabled="!isFormValid"

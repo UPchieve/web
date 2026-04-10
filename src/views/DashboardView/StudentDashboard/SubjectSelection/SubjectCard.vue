@@ -1,5 +1,6 @@
 <template>
   <button
+    type="button"
     v-if="showDashboardRedesign"
     :data-testid="`${topic}-subject-card`"
     class="subject-card uc-row justify-center"

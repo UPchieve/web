@@ -71,7 +71,7 @@ function copyUserId() {
             </label>
             <div class="copy-container">
               <input type="text" autocomplete="off" disabled :value="userId" />
-              <button @click="copyUserId" class="copy-button">
+              <button type="button" @click="copyUserId" class="copy-button">
                 {{ didCopyUserId ? 'Copied!' : 'Copy' }}
               </button>
             </div>

@@ -19,7 +19,11 @@ function clearDisplayCallStatusImmediately() {
         <component :is="displayCallStatus.icon" />
       </div>
       <div class="title">{{ displayCallStatus.main }}</div>
-      <button class="close" @click="clearDisplayCallStatusImmediately">
+      <button
+        type="button"
+        class="close"
+        @click="clearDisplayCallStatusImmediately"
+      >
         +
       </button>
     </div>
