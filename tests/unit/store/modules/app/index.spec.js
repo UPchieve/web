@@ -16,6 +16,7 @@ describe('`app` store module', () => {
 
   it('state', () => {
     expect(state).toEqual({
+      isLoading: true,
       windowWidth: 0,
       windowHeight: 0,
       isMobileApp: false,

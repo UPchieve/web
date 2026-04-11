@@ -19,6 +19,7 @@ export default {
     isWebPageHidden: false,
     version: '',
     prefersReducedMotion: false,
+    isLoading: true,
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
@@ -29,6 +30,7 @@ export default {
     setVersion: (state, version) => (state.version = version),
     isWebPageHidden: (state, isVisible) => (state.isWebPageHidden = isVisible),
     setPrefersReducedMotion: (state, val) => (state.prefersReducedMotion = val),
+    setIsLoading: (state, val) => (state.isLoading = val),
   },
   actions: {
     showNavigation: ({ commit, dispatch }) => {

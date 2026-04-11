@@ -4,6 +4,7 @@
     <ion-app>
       <ion-content>
         <refresh-app-alert v-if="doMountRefreshAppAlert" />
+        <route-loading-indicator />
         <app-header v-show="showHeader" />
         <app-sidebar v-if="showSidebar" />
         <app-modal v-if="showModal" />
@@ -50,6 +51,7 @@ import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
 import Celebration from '@/components/Celebration.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS } from '@/consts'
+import RouteLoadingIndicator from '../RouteLoadingIndicator.vue'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
@@ -65,6 +67,7 @@ export default {
     IonApp,
     IonContent,
     Celebration,
+    RouteLoadingIndicator,
   },
   data() {
     return {

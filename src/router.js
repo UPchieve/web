@@ -110,7 +110,35 @@ const getUser = () => {
     return store.dispatch('user/fetchUser')
   }
 }
+const VOLUNTEER_SIDEBAR_LINKED_VIEWS = [
+  ProfileView,
+  TrainingView,
+  CalendarView,
+  SessionHistoryView,
+  SessionView,
+]
+const STUDENT_SIDEBAR_LINKED_VIEWS = [
+  ProfileView,
+  SessionHistoryView,
+  ProgressReportsOverviewView,
+  SessionView,
+  FavoriteCoachesView,
+  StudentClassesView,
+  JourneysView,
+]
+const TEACHER_SIDEBAR_LINKED_VIEWS = [ProfileView, TeacherDashboardView]
 
+function preloadViews({ volunteer, student, teacher, admin }) {
+  const isVolunteer = store.getters['user/isVolunteer']
+  const isStudent = store.getters['user/isStudent']
+  const isTeacher = store.getters['user/isTeacher']
+  const isAdmin = store.getters['user/isAdmin']
+
+  if (isVolunteer && volunteer?.length) volunteer.forEach((fn) => fn())
+  if (isStudent && student?.length) student.forEach((fn) => fn())
+  if (isTeacher && teacher?.length) teacher.forEach((fn) => fn())
+  if (isAdmin && admin?.length) admin.forEach((fn) => fn())
+}
 const routes = [
   {
     path: '/',
@@ -134,7 +162,14 @@ const routes = [
     path: '/contact',
     name: 'ContactView',
     component: ContactView,
-    meta: { authOptional: true },
+    meta: {
+      authOptional: true,
+      preloadViews: {
+        student: STUDENT_SIDEBAR_LINKED_VIEWS,
+        volunteer: VOLUNTEER_SIDEBAR_LINKED_VIEWS,
+        teacher: TEACHER_SIDEBAR_LINKED_VIEWS,
+      },
+    },
     beforeEnter: (to, from, next) => {
       const instance = Gleap.getInstance()
       if (instance.initialized) {
@@ -161,7 +196,15 @@ const routes = [
     path: '/login',
     name: 'LoginView',
     component: LoginView,
-    meta: { loggedOutOnly: true, hideNavigation: true },
+    meta: {
+      loggedOutOnly: true,
+      hideNavigation: true,
+      preloadViews: {
+        student: STUDENT_SIDEBAR_LINKED_VIEWS,
+        teacher: TEACHER_SIDEBAR_LINKED_VIEWS,
+        volunteer: VOLUNTEER_SIDEBAR_LINKED_VIEWS,
+      },
+    },
   },
   {
     path: '/logout',
@@ -240,7 +283,13 @@ const routes = [
     path: '/sessions/history',
     name: 'SessionHistoryView',
     component: SessionHistoryView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        volunteer: [SessionRecapView, ...VOLUNTEER_SIDEBAR_LINKED_VIEWS],
+        student: [SessionRecapView, ...STUDENT_SIDEBAR_LINKED_VIEWS],
+      },
+    },
   },
   {
     path: '/referral/:referredByCode',
@@ -267,7 +316,15 @@ const routes = [
     path: '/dashboard',
     name: 'DashboardView',
     component: DashboardView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        volunteer: VOLUNTEER_SIDEBAR_LINKED_VIEWS,
+        student: STUDENT_SIDEBAR_LINKED_VIEWS,
+        teacher: TEACHER_SIDEBAR_LINKED_VIEWS,
+        admin: [AdminView],
+      },
+    },
     beforeEnter: async (to, from, next) => {
       if (to.query.inviteCode) {
         localStorage.setItem('joinedTeamCode', to.query.inviteCode)
@@ -289,7 +346,12 @@ const routes = [
     path: '/classes/:classId?',
     name: 'StudentClassesView',
     component: StudentClassesView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        student: [StudentAssignmentView, ...STUDENT_SIDEBAR_LINKED_VIEWS],
+      },
+    },
     props: true,
     beforeEnter: async (_to, _from, next) => {
       if (!store.getters['user/isStudent']) {
@@ -314,6 +376,10 @@ const routes = [
       protected: true,
       hideNavigation: true,
       disableComponentReuse: true,
+      preloadViews: {
+        student: [FeedbackView, ...STUDENT_SIDEBAR_LINKED_VIEWS],
+        volunteer: [FeedbackView, ...VOLUNTEER_SIDEBAR_LINKED_VIEWS],
+      },
     },
   },
   {
@@ -363,7 +429,17 @@ const routes = [
     path: '/training',
     name: 'TrainingView',
     component: TrainingView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        volunteer: [
+          ReviewMaterialsView,
+          TrainingCourseView,
+          QuizView,
+          ...VOLUNTEER_SIDEBAR_LINKED_VIEWS,
+        ],
+      },
+    },
     beforeEnter: autoflowRedirect,
   },
   {
@@ -388,20 +464,33 @@ const routes = [
     path: '/profile',
     name: 'ProfileView',
     component: ProfileView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        volunteer: [ResetPasswordView, ...VOLUNTEER_SIDEBAR_LINKED_VIEWS],
+        teacher: [ResetPasswordView, ...TEACHER_SIDEBAR_LINKED_VIEWS],
+        student: [ResetPasswordView, ...STUDENT_SIDEBAR_LINKED_VIEWS],
+      },
+    },
     beforeEnter: autoflowRedirect,
   },
   {
     path: '/favorite-coaches',
     name: 'FavoriteCoachesView',
     component: FavoriteCoachesView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: { student: STUDENT_SIDEBAR_LINKED_VIEWS },
+    },
   },
   {
     path: '/calendar',
     name: 'CalendarView',
     component: CalendarView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: { volunteer: VOLUNTEER_SIDEBAR_LINKED_VIEWS },
+    },
     beforeEnter: autoflowRedirect,
   },
   {
@@ -541,7 +630,15 @@ const routes = [
     path: '/sessions/progress',
     name: 'ProgressReportsOverview',
     component: ProgressReportsOverviewView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        student: [
+          ProgressReportsOverviewSubjectView,
+          ...STUDENT_SIDEBAR_LINKED_VIEWS,
+        ],
+      },
+    },
     beforeEnter: async (_to, _from, next) => {
       const response =
         await NetworkService.getLatestProgressReportOverviewSubject()
@@ -617,7 +714,12 @@ const routes = [
     path: '/journeys',
     name: 'JourneysView',
     component: JourneysView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        student: STUDENT_SIDEBAR_LINKED_VIEWS,
+      },
+    },
   },
   {
     path: '/groups/apply',
@@ -666,7 +768,20 @@ const routes = [
     path: '/groups',
     name: 'NTHSGroupsView',
     component: NTHSGroupsView,
-    meta: { protected: true },
+    meta: {
+      protected: true,
+      preloadViews: {
+        volunteer: [
+          NTHSGroupDashboardView,
+          NTHSManageTeamView,
+          NTHSSettingsView,
+          NTHSApplicationView,
+          NTHSCreateGroupView,
+          NTHSApplicationPending,
+          ...VOLUNTEER_SIDEBAR_LINKED_VIEWS,
+        ],
+      },
+    },
     beforeEnter: async (_to, _from, next) => {
       if (await shouldGoToGroup(store)) return next()
       if (shouldGoToApply(store)) return next('/groups/apply')
@@ -717,6 +832,8 @@ export default router
 
 // Router middleware to check authentication for protect routes
 router.beforeEach((to, from, next) => {
+  store.commit('app/setIsLoading', true)
+
   if (to.matched.some((route) => route.meta.requiresAdmin)) {
     getUser()
       .then(() => {
@@ -811,6 +928,8 @@ router.afterEach((to, from) => {
     // Send page view.
     window.gtag('event', 'page_view', gtagDimensions)
   }
+  store.commit('app/setIsLoading', false)
+  preloadViews(to.meta?.preloadViews ?? {})
 })
 
 // If endpoint returns 401, redirect to login (except for requests to get user or user's
