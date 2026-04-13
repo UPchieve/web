@@ -11,30 +11,18 @@ import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions/
 import { useStore } from 'vuex'
 import { computed, onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import Caret from '@/assets/right-caret.svg'
-import { IonModal } from '@ionic/vue'
 import MenuContent from '@/views/DashboardView/VolunteerDashboard/ListSessions/MenuContent.vue'
+import Menu from '@/components/Menu.vue'
 
 const store = useStore()
 const router = useRouter()
 const isSessionAlive = computed(() => store.getters['user/isSessionAlive'])
 const sessionPath = computed(() => store.getters['user/sessionPath'])
-const mobileMode = computed(() => store.getters['app/mobileMode'])
 
 const props = defineProps<{
   notificationsCardWasDismissed: false
 }>()
 
-// Menu logic
-const isMenuOpen = ref<boolean>(false)
-const listSessionsMenu = ref(null)
-function toggleIsMenuOpen() {
-  isMenuOpen.value = !isMenuOpen.value
-}
-function closeMenu() {
-  isMenuOpen.value = false
-}
-// Toggle logic
 const showLockedSessions = ref<boolean>(true)
 const showLockedSessionsKey = computed(() => {
   return getShowLockedSessionKey(store.state.user.user?.id)
@@ -77,40 +65,14 @@ function rejoinHelpSession() {
     >
       <template v-slot:heading-content>
         <div class="heading-content">
-          <Caret
-            role="button"
-            @click="toggleIsMenuOpen"
-            :class="{
-              caret: true,
-              'caret--open': isMenuOpen,
-            }"
-          />
-          <div
-            v-if="isMenuOpen && !mobileMode"
-            class="list-sessions-menu"
-            ref="listSessionsMenu"
-          >
-            <MenuContent
-              :showLockedSessions="showLockedSessions"
-              @toggleShowLockedSessions="toggleShowLockedSessions"
-            />
-          </div>
-          <div v-else-if="isMenuOpen">
-            <IonModal
-              :isOpen="isMenuOpen"
-              @didDismiss="closeMenu"
-              :initial-breakpoint="0.9"
-              :breakpoints="[0, 0.9]"
-              :backdrop-dismiss="true"
-              :can-dismiss="true"
-              presentation="sheet"
-            >
+          <Menu location="bottom start" class="settings-menu">
+            <template v-slot:content>
               <MenuContent
                 :showLockedSessions="showLockedSessions"
                 @toggleShowLockedSessions="toggleShowLockedSessions"
               />
-            </IonModal>
-          </div>
+            </template>
+          </Menu>
         </div>
         <div class="notifications-button-container">
           <WebNotificationsButton
@@ -143,6 +105,11 @@ function rejoinHelpSession() {
 </template>
 
 <style lang="scss" scoped>
+.settings-menu {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+}
 .waiting-students-content {
   width: 100%;
 }
@@ -151,31 +118,5 @@ function rejoinHelpSession() {
   display: flex;
   width: 100%;
   position: relative;
-
-  .caret {
-    margin-left: auto;
-    transform: rotate(90deg);
-    transition: 200ms linear;
-    width: 8px;
-
-    &--open {
-      transform: rotate(-90deg);
-    }
-  }
-}
-
-.list-sessions-menu {
-  right: 0;
-  transform: translateX(
-    calc(50% - 4px)
-  ); // 4px is the width of the 1/2 caret. This centers the menu on the caret.
-  top: 100%;
-  background: white;
-  border: 2px solid #f1f3f6;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-  padding: 10px 0;
-  position: absolute;
-  z-index: 1;
 }
 </style>
