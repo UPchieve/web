@@ -2,11 +2,8 @@
 import type { Component } from 'vue'
 import RightCaretIcon from '@/assets/right-caret.svg'
 import CheckIcon from '@/assets/check.svg'
-import CrossIcon from '@/assets/heavy-cross.svg'
-
-export type DismissOptions = {
-  onDismiss: () => void
-}
+import Card from '@/components/Card.vue'
+import type { CardProps } from '@/components/Card.vue'
 
 export type ActionListItem = {
   title: string
@@ -15,96 +12,59 @@ export type ActionListItem = {
   onClick: () => void
   icon: Component
 }
-const props = defineProps<{
-  title: string
-  subtitle: string
-  actions?: ActionListItem[]
-  dismissOptions?: DismissOptions
-}>()
+
+export type TaskCardProps = CardProps & {
+  actions: ActionListItem[]
+}
+const props = defineProps<TaskCardProps>()
 </script>
 
 <template>
-  <div class="card-main">
-    <div
-      v-if="props.dismissOptions"
-      class="dismiss-button"
-      type="button"
-      @click="props.dismissOptions.onDismiss"
-    >
-      <CrossIcon />
-    </div>
-    <slot name="icon" />
-    <div class="heading-container">
-      <slot name="heading-content" />
-      <div class="title">{{ props.title }}</div>
-      <div v-if="props.subtitle" class="subtitle">{{ props.subtitle }}</div>
-    </div>
-    <slot name="content" />
-    <div v-if="props.actions?.length" class="actions-list">
-      <div
-        v-for="action in props.actions"
-        :key="action.title"
-        class="action"
-        @click="action.onClick"
-        type="button"
-      >
+  <Card
+    :title="props.title"
+    :subtitle="props.subtitle"
+    :dismissOptions="props.dismissOptions"
+  >
+    <template #icon>
+      <slot name="icon" />
+    </template>
+    <template #content>
+      <slot name="content" />
+      <div class="actions-list">
         <div
-          class="icon-container"
-          :class="{
-            'in-progress': action.status === 'in-progress',
-            complete: action.status === 'complete',
-            error: action.status === 'error',
-          }"
+          v-for="action in props.actions"
+          :key="action.title"
+          class="action"
+          @click="action.onClick"
+          type="button"
         >
-          <component
-            v-if="action.status !== 'complete'"
-            :is="action.icon"
-            class="action-icon"
-          />
-          <CheckIcon v-else class="action-icon complete" />
+          <div
+            class="icon-container"
+            :class="{
+              'in-progress': action.status === 'in-progress',
+              complete: action.status === 'complete',
+              error: action.status === 'error',
+            }"
+          >
+            <component
+              v-if="action.status !== 'complete'"
+              :is="action.icon"
+              class="action-icon"
+            />
+            <CheckIcon v-else class="action-icon complete" />
+          </div>
+          <div class="action-content">
+            <div class="action-title">{{ action.title }}</div>
+            <div class="action-subtitle">{{ action.subtitle }}</div>
+          </div>
+          <RightCaretIcon class="caret-icon" />
         </div>
-        <div class="action-content">
-          <div class="action-title">{{ action.title }}</div>
-          <div class="action-subtitle">{{ action.subtitle }}</div>
-        </div>
-        <RightCaretIcon class="caret-icon" />
       </div>
-    </div>
-  </div>
+    </template>
+  </Card>
 </template>
 
 <style lang="scss" scoped>
-.card-main {
-  background: #fff;
-  border-radius: 8px;
-  padding: 4.5% 1%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.heading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 16px;
-  gap: 8px;
-  width: 90%;
-
-  .title {
-    @include font-category('display-small');
-    text-align: center;
-    width: 80%;
-  }
-
-  .subtitle {
-    @include font-category('body');
-    color: $c-secondary-grey;
-    text-align: center;
-  }
-}
-
 .actions-list {
   display: flex;
   flex-direction: column;
@@ -174,12 +134,5 @@ const props = defineProps<{
       margin-left: 5%;
     }
   }
-}
-
-.dismiss-button {
-  display: flex;
-  flex-direction: column;
-  margin-right: 3%;
-  align-self: flex-end;
 }
 </style>
