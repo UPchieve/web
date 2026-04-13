@@ -38,7 +38,6 @@ describe('User store module', () => {
           ...storeOptions.modules.featureFlags,
           getters: {
             showDashboardRedesign: vi.fn().mockReturnValue(false),
-            eligibleForChooseTutorType: vi.fn().mockReturnValue(false),
           },
         },
         user: {

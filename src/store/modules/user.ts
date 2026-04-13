@@ -762,11 +762,6 @@ export default {
         }
         if (getters.hasStudentRole) {
           userProps.gradeLevel = state.user.gradeLevel
-
-          if (rootState.featureFlags.eligibleForChooseTutorType) {
-            userProps.eligibleForChooseTutorType =
-              rootState.featureFlags.eligibleForChooseTutorType
-          }
         }
 
         if (getters.hasStudentRole || getters.hasTeacherRole) {

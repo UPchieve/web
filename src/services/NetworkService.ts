@@ -1142,33 +1142,6 @@ export default {
       `${API_ROOT}/session/${sessionId}/tutor-bot-conversation`
     ).then(this._successHandler, this._errorHandler)
   },
-  getAllBotConversationsForUser(userId) {
-    return httpGet(`${API_ROOT}/tutor-bot/conversations/users/${userId}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
-  createTutorBotSession({
-    userId,
-    sessionId,
-    message,
-    senderUserType,
-    subjectId,
-  }) {
-    return httpPost(`${API_ROOT}/tutor-bot/conversations`, {
-      userId,
-      sessionId,
-      senderUserType,
-      message,
-      subjectId,
-    }).then(this._successHandler, this._errorHandler)
-  },
-  updateTutorBotConversationWithSessionId(conversationId, data) {
-    return httpPatch(
-      `${API_ROOT}/tutor-bot/conversations/${conversationId}`,
-      data
-    ).then(this._successHandler, this._errorHandler)
-  },
   sendTutorBotMessage({
     userId,
     conversationId,

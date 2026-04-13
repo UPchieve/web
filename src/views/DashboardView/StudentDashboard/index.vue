@@ -19,13 +19,6 @@
           downtimeBannerMessage
         }}</a>
       </div>
-      <large-button
-        v-if="isStandaloneAiTutorEnabled && aiBotMessage"
-        class="dashboard-notice ai-bot"
-        :class="'dashboard-notice--info'"
-        routeTo="/ai-tutor-conversations"
-        >{{ aiBotMessage }}<arrow-icon></arrow-icon
-      ></large-button>
 
       <large-button
         v-if="impactStudySurveyCache"
@@ -258,7 +251,6 @@ export default {
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
-      aiTutor: 'featureFlags/aiTutor',
       showDashboardRedesign: 'user/showDashboardRedesign',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
@@ -288,16 +280,6 @@ export default {
         !this.hasTemporarilyDismissedSecondaryEmailModal &&
         this.isTargetEmailDomainForSecondaryEmailModal
       )
-    },
-
-    aiBotMessage() {
-      return this.isStandaloneAiTutorEnabled && this.isMobileMode
-        ? 'Try out our new AI Tutor'
-        : null
-    },
-
-    isStandaloneAiTutorEnabled() {
-      return this.aiTutor && this.aiTutor.includes('stand-alone')
     },
     shouldSeeIncentiveModalForFirstTime() {
       return (

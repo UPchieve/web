@@ -4,7 +4,6 @@ export type FeatureFlagState = {
   toggleFlags: Record<POSTHOG_FEATURE_FLAGS, boolean>
   multivariantFlags: Record<POSTHOG_FEATURE_FLAGS, boolean | string>
   payloadFlags: Record<POSTHOG_FEATURE_FLAGS, any>
-  eligibleForChooseTutorType: boolean
 }
 
 export default {
@@ -29,7 +28,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT]: false,
       [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
-      [POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
@@ -84,12 +82,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR]:
         'Boost Your College Apps',
     },
-    eligibleForChooseTutorType: false,
   },
   mutations: {
-    updateEligibleForChooseTutorType(state: FeatureFlagState, value: boolean) {
-      state.eligibleForChooseTutorType = value
-    },
     updateFlags(state: FeatureFlagState) {
       for (const flag of Object.keys(state.toggleFlags)) {
         state.toggleFlags[flag as POSTHOG_FEATURE_FLAGS] =
@@ -178,9 +172,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE],
     aiTutor: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
-    showChooseTutorType: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.CHOOSE_TUTOR_TYPE] ||
-      state.eligibleForChooseTutorType,
     videoModerationSampleInterval: (state: FeatureFlagState) =>
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL

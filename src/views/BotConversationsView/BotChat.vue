@@ -1,6 +1,5 @@
 <script module lang="ts">
 export enum DISPLAY_CONTEXT {
-  STAND_ALONE = 'stand-alone',
   SESSION = 'session',
 }
 </script>
@@ -11,8 +10,6 @@ import { onMounted, computed, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
 import ModerationService from '@/services/ModerationService'
-import TransferToSessionView from '@/views/BotConversationsView/TransferToSessionView/index.vue'
-import AiDisclaimer from '@/views/BotConversationsView/AiDisclaimer.vue'
 
 const { bgColor, displayContext } = defineProps<{
   displayContext: DISPLAY_CONTEXT
@@ -20,11 +17,6 @@ const { bgColor, displayContext } = defineProps<{
 }>()
 const store = useStore()
 const user = computed(() => store.state.user.user)
-const sessionId = computed(() => store.state.user.session.id)
-const isTransferToSessionEnabled = computed(() => {
-  const ff: boolean | string = store.getters['featureFlags/aiTutor']
-  return typeof ff === 'string' && ff.includes('handoff')
-})
 
 const chatContainer = ref()
 const scrollToBottom = async () => {
@@ -46,15 +38,6 @@ const fetchingConversation = computed(
 )
 const messages = computed(() => conversation.value.messages ?? [])
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
-const disclaimerMessage = computed(() => {
-  const baseMessage = 'AI may not always be accurate.'
-  // Show transfer message if there is not an ongoing session and if the transfer button is available
-  const transferMessage =
-    isTransferToSessionEnabled.value && !sessionId.value
-      ? ' For more help, transfer to a live tutor!'
-      : ''
-  return `${baseMessage}${transferMessage}`
-})
 
 const sendMessage = async (message: string) => {
   store.commit('botConversations/setMessageIsSending', true)
@@ -109,8 +92,6 @@ watch(() => messages.value.length, scrollToBottom)
     <div
       :class="{
         'text-area-container': true,
-        'text-area-container-mobile-standalone':
-          isMobileMode && displayContext === DISPLAY_CONTEXT.STAND_ALONE,
         'text-area-container-mobile-session':
           isMobileMode && displayContext === DISPLAY_CONTEXT.SESSION,
       }"
@@ -122,21 +103,6 @@ watch(() => messages.value.length, scrollToBottom)
         :sendMessage="(message: string) => sendMessage(message)"
         autocomplete="off"
       ></Textarea>
-      <div class="footer-content">
-        <TransferToSessionView
-          v-if="
-            isTransferToSessionEnabled && !sessionId && conversation.subject
-          "
-          :topic="conversation.subject.topicName"
-          :subject="conversation.subject.name"
-          :display-context="displayContext"
-          :is-mobile-mode="isMobileMode"
-        />
-        <AiDisclaimer
-          :message="disclaimerMessage"
-          v-if="displayContext === DISPLAY_CONTEXT.STAND_ALONE"
-        />
-      </div>
     </div>
   </div>
 </template>
@@ -163,13 +129,6 @@ watch(() => messages.value.length, scrollToBottom)
   gap: 16px;
 }
 
-.text-area-container-mobile-standalone {
-  bottom: 0;
-  position: fixed;
-  padding-bottom: 8px;
-  gap: 8px;
-}
-
 .text-area-container-mobile-session {
   padding-bottom: 8px;
   gap: 8px;
@@ -178,11 +137,5 @@ watch(() => messages.value.length, scrollToBottom)
 .text-area {
   width: 80%;
   max-width: 695px;
-}
-
-.footer-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 </style>

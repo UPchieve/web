@@ -1,15 +1,6 @@
 <template>
   <div class="SubjectSelectionModal">
-    <div v-if="showChooseTutorTypeModal">
-      <choose-tutor
-        v-on:choose-human="showChooseTutorTypeModal = false"
-        :subject="selectedSubtopic"
-      ></choose-tutor>
-    </div>
-    <div
-      v-else-if="showSurvey && !showChooseTutorTypeModal"
-      class="presession-survey-container"
-    >
+    <div v-if="showSurvey" class="presession-survey-container">
       <presession-survey
         v-on:survey-completed="onSurveyCompleted"
         :subject="selectedSubtopic"
@@ -65,7 +56,6 @@ import { mapState, mapGetters } from 'vuex'
 import { startSession } from '@/utils/session'
 import LargeButton from '@/components/LargeButton.vue'
 import PresessionSurvey from './PresessionSurvey.vue'
-import ChooseTutor from './ChooseTutor.vue'
 import getCookie from '@/utils/get-cookie'
 import Case from 'case'
 
@@ -78,17 +68,14 @@ import Case from 'case'
  *
  */
 export default {
-  components: { LargeButton, PresessionSurvey, ChooseTutor },
+  components: { LargeButton, PresessionSurvey },
   props: {
     modalData: { type: Object, required: true },
   },
   data() {
-    const showChooseTutorTypeModal =
-      this.$store.getters['featureFlags/showChooseTutorType']
     return {
       selectedSubtopic: this.modalData.preSelectedSubtopic || '',
       showSurvey: this.modalData.preSelectedSubtopic ? true : false,
-      showChooseTutorTypeModal,
     }
   },
   computed: {
