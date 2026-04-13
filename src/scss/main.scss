@@ -5,22 +5,25 @@
 // TODO: Figure out what styles we are relying on from bootstrap and remove.
 @use 'bootstrap/scss/bootstrap';
 
-@import '~/typeface-work-sans/index.css';
-@import '~/vue-select/dist/vue-select.css';
+@include meta.load-css('~/typeface-work-sans/index.css');
+@include meta.load-css('~/vue-select/dist/vue-select.css');
 
-@import 'maz-ui/css/main.css';
-@import '~/quill/dist/quill.core.css';
-@import '~/quill/dist/quill.snow.css';
-@import 'vue-draggable-resizable/style.css';
+@include meta.load-css('maz-ui/css/main.css');
+@include meta.load-css('~/quill/dist/quill.core.css');
+@include meta.load-css('~/quill/dist/quill.snow.css');
+@include meta.load-css('vue-draggable-resizable/style.css');
 
 /* Core CSS required for Ionic components to work properly */
-@import '~/@ionic/vue/css/core.css';
+@include meta.load-css('~/@ionic/vue/css/core.css');
+
+@include meta.load-css('vuetify/styles');
 
 @include meta.load-css('layout/utils');
 @include meta.load-css('layout/form');
 @include meta.load-css('layout/modal');
 @include meta.load-css('layout/spacing');
 @include meta.load-css('layout/training');
+@include meta.load-css('layout/vuetify-overrides');
 
 * {
   -webkit-user-select: auto;

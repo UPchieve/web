@@ -6,6 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import { playwright } from '@vitest/browser-playwright'
 import { analyzer } from 'vite-bundle-analyzer'
 import { visualizer } from 'rollup-plugin-visualizer'
+import vuetify from 'vite-plugin-vuetify'
 
 export default defineConfig({
   envPrefix: 'VUE_',
@@ -39,6 +40,7 @@ export default defineConfig({
         ],
       },
     }),
+    vuetify(),
     ...(!process.env.VITEST ? [vueDevTools()] : []),
     process.env.BUNDLE_ANALYZE
       ? visualizer({

@@ -1,7 +1,16 @@
-*, *::before, *::after {
+@import '../setup/colors';
+
+*,
+*::before,
+*::after {
   box-sizing: border-box !important;
 }
-
+button,
+input,
+select,
+textarea {
+  background-color: #fff;
+}
 //custom overrides for vuetify form inputs
 .v-field__outline__start,
 .v-field__outline__end {
@@ -43,4 +52,4 @@
 
 .v-input__details {
   padding-inline: 8px !important;
-} 
+}
