@@ -5,7 +5,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import router from '@/router'
 import { createStore } from 'vuex'
 import subjectsModule from '@/store/modules/subjects'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 const algebraClassInfo = {
   id: 'classId',
@@ -43,7 +43,7 @@ function getDates(daysAgo: number) {
 
 const twoDaysAgo = getDates(2)
 const tenDaysAgo = getDates(10)
-const tenDaysAgoFilter = moment().subtract(10, 'days').format('YYYY-MM-DD')
+const tenDaysAgoFilter = dayjs().subtract(10, 'days').format('YYYY-MM-DD')
 
 const sessionDetails = [
   {
@@ -183,7 +183,7 @@ describe('Student Details View', () => {
     const wrapper = await getWrapper({
       data: {
         filters: {
-          sessionActivityFrom: moment()
+          sessionActivityFrom: dayjs()
             .subtract(11, 'days')
             .format('YYYY-MM-DD'),
         },

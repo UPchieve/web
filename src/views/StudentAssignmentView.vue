@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { AxiosError } from 'axios'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 
@@ -59,7 +59,7 @@ onMounted(async () => {
 
 function formatDate(date?: Date) {
   if (date) {
-    return moment(date).format('MM/DD/YYYY')
+    return dayjs(date).format('MM/DD/YYYY')
   }
   return 'None'
 }

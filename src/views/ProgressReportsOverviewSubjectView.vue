@@ -385,9 +385,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import 'chartjs-adapter-moment'
 import Chart from 'chart.js/auto'
-import moment from 'moment'
+import 'chartjs-community-adapter-dayjs'
+import { dayjs } from '@/utils/time-utils'
 import LargeButton from '@/components/LargeButton.vue'
 import Separator from '@/components/Separator.vue'
 import Loader from '@/components/Loader.vue'
@@ -565,10 +565,10 @@ export default {
         'We were unable to load your analyzed sessions. Please try again later.'
     },
     getSessionTime(sessionCreatedAt) {
-      return moment(sessionCreatedAt).format('l @ h:mm A')
+      return dayjs(sessionCreatedAt).format('l @ h:mm A')
     },
     getSessionTimeForMobile(sessionCreatedAt) {
-      return moment(sessionCreatedAt).format('l h:mm A')
+      return dayjs(sessionCreatedAt).format('l h:mm A')
     },
     routeToSessionRecap(sessionId) {
       AnalyticsService.captureEvent(
@@ -610,7 +610,7 @@ export default {
           (a, b) => new Date(a.sessionCreatedAt) - new Date(b.sessionCreatedAt)
         ),
       ]
-      const currentDate = moment()
+      const currentDate = dayjs()
 
       // Get the previous three months and the next one month
       const months = []
@@ -623,7 +623,7 @@ export default {
       const labels = months
       const mobileMode = this.mobileMode
       const dataset = sortedData.map((entry) => ({
-        x: moment(entry.sessionCreatedAt).local(),
+        x: dayjs.utc(entry.sessionCreatedAt).local(),
         y: entry.overallGrade,
         label: this.gradeLabel(entry.overallGrade),
       }))

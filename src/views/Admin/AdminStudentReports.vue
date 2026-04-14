@@ -106,7 +106,7 @@
 import NetworkService from '@/services/NetworkService'
 import SchoolList from '@/components/SchoolList.vue'
 import Loader from '@/components/Loader.vue'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import exportToCsv from '@/utils/export-to-csv'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
@@ -213,10 +213,10 @@ export default {
       this.highSchool = highSchool
     },
     formatDate(date) {
-      return moment(date).utc().startOf('day').format('MM-DD-YYYY')
+      return dayjs(date).utc().startOf('day').format('MM-DD-YYYY')
     },
     isValidDateFormat(date) {
-      return moment(date, 'MM-DD-YYYY', true).isValid()
+      return dayjs(date, 'MM-DD-YYYY', undefined, true).isValid()
     },
     getQuery() {
       return {
@@ -266,7 +266,7 @@ export default {
   },
   computed: {
     todaysDate() {
-      return moment().format('MMMM_D')
+      return dayjs().format('MMMM_D')
     },
     fileTitle() {
       let title = ''

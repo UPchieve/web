@@ -1,4 +1,4 @@
-import moment from 'moment/moment'
+import { dayjs } from '@/utils/time-utils'
 
 const MONTHS_THRESHOLD = 12
 
@@ -24,10 +24,11 @@ export function hasPermanentlyDismissedSecondaryEmailModal(
 ): boolean {
   const lastPermanentlyDismissedAt = getPermanentlyDismissedValue(userId)
   if (!lastPermanentlyDismissedAt) return false
-  const elapsedMonths = moment().diff(
-    moment(lastPermanentlyDismissedAt),
+  const elapsedMonths = dayjs().diff(
+    dayjs(lastPermanentlyDismissedAt),
     'months'
   )
+
   return elapsedMonths < MONTHS_THRESHOLD
 }
 

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 export default {
   name: 'PendingVolunteerListItem',
@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     readyForReviewAt() {
-      return moment(this.volunteer.readyForReviewAt).format('l, h:mm a')
+      return dayjs(this.volunteer.readyForReviewAt).format('l, h:mm a')
     },
 
     fullName() {

@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import SessionFlags from './SessionFlags.vue'
 import { mapState } from 'vuex'
 
@@ -51,7 +51,7 @@ export default {
     }),
 
     createdAt() {
-      return moment(this.session.createdAt).format('l, h:mm a')
+      return dayjs(this.session.createdAt).format('l, h:mm a')
     },
 
     status() {

@@ -58,7 +58,7 @@
 <script>
 import NetworkService from '@/services/NetworkService'
 import Loader from '@/components/Loader.vue'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import exportToCsv from '@/utils/export-to-csv'
 import { ANALYTICS_REPORT_ROW, ANALYTICS_REPORT_SUMMARY } from '@/consts'
 import fileDownload from '@/utils/file-download'
@@ -133,11 +133,11 @@ export default {
     },
     getQuery() {
       return {
-        startDate: moment(this.startDate)
+        startDate: dayjs(this.startDate)
           .utc()
           .startOf('day')
           .format('MM-DD-YYYY'),
-        endDate: moment(this.endDate).utc().startOf('day').format('MM-DD-YYYY'),
+        endDate: dayjs(this.endDate).utc().startOf('day').format('MM-DD-YYYY'),
         partnerOrg: this.isValidVolunteerPartnerOrg
           ? this.volunteerPartnerOrg.key
           : '',
@@ -277,7 +277,7 @@ export default {
   },
   computed: {
     todaysDate() {
-      return moment().format('MMMM_D')
+      return dayjs().format('MMMM_D')
     },
     isValidVolunteerPartnerOrg() {
       return this.volunteerPartnerOrg && this.volunteerPartnerOrg.key

@@ -63,7 +63,7 @@
 import { mapState } from 'vuex'
 
 import { isEmpty, isEqual } from 'lodash-es'
-import moment from 'moment-timezone'
+import { dayjs } from '@/utils/time-utils'
 
 import AvailabilityGrid from '@/components/AvailabilityGrid/index.vue'
 import LargeButton from '@/components/LargeButton.vue'
@@ -86,7 +86,7 @@ export default {
     return {
       waitTimes: {},
       availability: {},
-      tzList: moment.tz.names(),
+      tzList: Intl.supportedValuesOf('timeZone'),
       selectedTz: '',
       saveState: saveStates.UNSAVED,
     }
@@ -115,9 +115,10 @@ export default {
       return !isEmpty(this.waitTimes)
     },
     hasChangedSchedule() {
-      const estUtcOffset = moment.tz.zone('America/New_York').parse(Date.now())
-      const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
+      const estUtcOffset = dayjs.tz(Date.now(), 'America/New_York').utcOffset()
+      const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
       const offset = (estUtcOffset - userUtcOffset) / 60
+
       return (
         !isEqual(
           this.availability,
@@ -142,7 +143,7 @@ export default {
     },
     async updateLocalWaitTimes() {
       const originalWaitTimes = await CalendarService.getWaitTimes()
-      const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
+      const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
       const offset = (-1 * userUtcOffset) / 60
       this.waitTimes = this.convertAvailability(originalWaitTimes, offset)
     },
@@ -152,18 +153,19 @@ export default {
     initScheduleData() {
       const userTimezone = this.user.timezone
       const hasValidTimezone = userTimezone && this.userTzInList(userTimezone)
-      this.selectedTz = hasValidTimezone ? userTimezone : moment.tz.guess()
+      this.selectedTz = hasValidTimezone ? userTimezone : dayjs.tz.guess()
 
       const originalAvailability = this.user.availability
-      const estUtcOffset = moment.tz.zone('America/New_York').parse(Date.now())
-      const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
+
+      const estUtcOffset = dayjs.tz(Date.now(), 'America/New_York').utcOffset()
+      const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
       const offset = (estUtcOffset - userUtcOffset) / 60
       this.availability = this.convertAvailability(originalAvailability, offset)
     },
     async initWaitTimeData() {
       const userTimezone = this.user.timezone
       const hasValidTimezone = userTimezone && this.userTzInList(userTimezone)
-      this.selectedTz = hasValidTimezone ? userTimezone : moment.tz.guess()
+      this.selectedTz = hasValidTimezone ? userTimezone : dayjs.tz.guess()
 
       await this.updateLocalWaitTimes()
     },
@@ -281,8 +283,8 @@ export default {
         this.saveState = saveStates.SAVED
         return
       }
-      const estUtcOffset = moment.tz.zone('America/New_York').parse(Date.now())
-      const userUtcOffset = moment.tz.zone(this.selectedTz).parse(Date.now())
+      const estUtcOffset = dayjs.tz(Date.now(), 'America/New_York').utcOffset()
+      const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
       // offsets returned by zone.utcOffset() are returned in minutes and inverted for POSIX compatibility
       const offset = (userUtcOffset - estUtcOffset) / 60
       CalendarService.updateSchedule(

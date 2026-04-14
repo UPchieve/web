@@ -242,7 +242,7 @@ import LoggerService from '@/services/LoggerService'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg?skipsvgo'
 import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import Quill from 'quill'
 import { mapGetters, mapState } from 'vuex'
 import config from '../config'
@@ -421,7 +421,7 @@ export default {
   },
   methods: {
     getSessionTime(sessionCreatedAt) {
-      return moment(sessionCreatedAt).format('l, h:mm A')
+      return dayjs(sessionCreatedAt).format('l, h:mm A')
     },
     resizeViewRectangle() {
       this.zwibblerCtx.setViewRectangle({

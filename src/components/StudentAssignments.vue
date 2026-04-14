@@ -47,7 +47,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 
@@ -77,7 +77,7 @@ export default {
   methods: {
     formatDate(date) {
       if (date) {
-        return moment(date).format('MM/DD/YYYY')
+        return dayjs(date).format('MM/DD/YYYY')
       }
       return 'None'
     },

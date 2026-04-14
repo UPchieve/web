@@ -130,7 +130,7 @@ import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 import NetworkService from '@/services/NetworkService'
 import { mapState } from 'vuex'
 import StudentAvatar from '@/assets/user_avatars/student-avatar.svg'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import BlueAlert from '@/assets/blue-alert.svg'
 import GenerationFeedback from '@/components/GenerationFeedback.vue'
@@ -162,7 +162,7 @@ export default {
         },
         sessionActivityFrom:
           getCurrentSchoolYearStartDate().format('YYYY-MM-DD'),
-        sessionActivityTo: moment().format('YYYY-MM-DD'),
+        sessionActivityTo: dayjs().format('YYYY-MM-DD'),
       },
       subjectPlaceholder: '',
       hasSessionSummary: false,
@@ -219,7 +219,7 @@ export default {
     },
 
     formatTimestamp(timestamp) {
-      const date = moment(timestamp)
+      const date = dayjs(timestamp)
       return date.format('MM/DD/YYYY')
     },
 

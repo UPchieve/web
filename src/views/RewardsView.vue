@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import RewardsIcon from '@/assets/rewards-icon.svg'
 import Caret from '@/assets/right-caret.svg'
@@ -173,7 +173,7 @@ onBeforeUnmount(() => {
           </div>
 
           <span class="reward-item__date">
-            {{ moment(reward.createdAt).format('MM/DD/YYYY') }}
+            {{ dayjs(reward.createdAt).format('MM/DD/YYYY') }}
           </span>
 
           <p class="reward-item__campaign">{{ reward.campaignName }}</p>

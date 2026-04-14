@@ -38,7 +38,7 @@ import getChatAvatar from '@/utils/get-chat-avatar'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg?skipsvgo'
 import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
 import { mapState, mapGetters } from 'vuex'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 
 const MESSAGE_ALIGNMENT = {
@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     formatTime(createdAt) {
-      return moment(createdAt).format('h:mm a')
+      return dayjs(createdAt).format('h:mm a')
     },
     messageAlignment(message) {
       return message.user === this.user.id

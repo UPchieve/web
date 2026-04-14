@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 
@@ -32,7 +32,7 @@ export default {
 
   computed: {
     timestamp() {
-      return moment(this.message.createdAt).format('h:mm a')
+      return dayjs(this.message.createdAt).format('h:mm a')
     },
     avatar() {
       return getChatAvatar(this.message.user, this.studentId, this.volunteerId)

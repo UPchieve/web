@@ -152,7 +152,7 @@ import { EVENTS } from '@/consts'
 import NetworkService from '@/services/NetworkService'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Calendar from '@/assets/calendar.svg'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import Loader from '@/components/Loader.vue'
 import { useClipboard } from '@vueuse/core'
 import { toastController } from '@ionic/vue'
@@ -188,8 +188,8 @@ export default {
   async created() {
     this.assignmentId = this.$route.params.assignmentId
     this.assignmentInfo = await this.getAssignmentDetails(this.assignmentId)
-    this.startDate = moment(this.assignmentInfo.startDate).format('MM/DD/YYYY')
-    this.dueDate = moment(this.assignmentInfo.dueDate).format('MM/DD/YYYY')
+    this.startDate = dayjs(this.assignmentInfo.startDate).format('MM/DD/YYYY')
+    this.dueDate = dayjs(this.assignmentInfo.dueDate).format('MM/DD/YYYY')
     this.classId = this.$route.params.classId
     this.studentCompletion = await this.getAssignmentCompletionInfo(
       this.assignmentId

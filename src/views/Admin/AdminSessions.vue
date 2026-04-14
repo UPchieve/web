@@ -162,7 +162,7 @@ import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 const getSessions = async (filters) => {
   const {
@@ -185,8 +185,8 @@ export default {
       filters: {
         showBannedUsers: '',
         showTestUsers: '',
-        sessionActivityFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-        sessionActivityTo: moment().format('YYYY-MM-DD'),
+        sessionActivityFrom: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
+        sessionActivityTo: dayjs().format('YYYY-MM-DD'),
         minMessagesSent: 0,
         minSessionLength: 1, // in minutes,
         studentRating: '',

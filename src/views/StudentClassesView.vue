@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { AxiosError } from 'axios'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
@@ -131,11 +131,15 @@ function getClassesWithAssignments(
 
 function isFutureAssignment(a: Assignment) {
   if (!a.startDate) return false
-  return moment(a.startDate).isAfter(moment())
+  return dayjs(a.startDate).isAfter(dayjs())
 }
 
 function isCurrentAssignment(a: Assignment) {
-  return moment(a.dueDate).isSameOrAfter(moment()) && !a.submittedAt
+  return (
+    (dayjs(a.dueDate).isSame(dayjs()) || dayjs(a.dueDate).isAfter(dayjs())) &&
+    !a.submittedAt
+  )
+  return
 }
 
 function sortByDueDate(
@@ -144,9 +148,9 @@ function sortByDueDate(
   direction?: 'asc' | 'desc'
 ) {
   if (direction === 'asc') {
-    return moment(a.dueDate).diff(moment(b.dueDate))
+    return dayjs(a.dueDate).diff(dayjs(b.dueDate))
   } else if (direction === 'desc') {
-    return moment(b.dueDate).diff(moment(a.dueDate))
+    return dayjs(b.dueDate).diff(dayjs(a.dueDate))
   }
   return 0
 }
@@ -180,7 +184,7 @@ function hasAnyAssignments(teacherClass?: TeacherClass) {
 
 function getAssignmentDueDate(assignment: Assignment) {
   return assignment.dueDate
-    ? moment(assignment.dueDate).format('MM/DD/YYYY')
+    ? dayjs(assignment.dueDate).format('MM/DD/YYYY')
     : 'None'
 }
 

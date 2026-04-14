@@ -169,7 +169,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList.vue'
 import AdminPendingVolunteerDetail from '@/views/Admin/AdminPendingVolunteerDetail.vue'
@@ -238,7 +238,7 @@ export default {
     },
 
     createdAt() {
-      return moment(this.user.createdAt).format('l, h:mm a')
+      return dayjs(this.user.createdAt).format('l, h:mm a')
     },
 
     partnerOrg() {

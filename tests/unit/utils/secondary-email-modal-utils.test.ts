@@ -6,7 +6,7 @@ import {
   setPermanentlyDismissSecondaryEmailModal,
   setTemporarilyDismissSecondaryEmailModal,
 } from '../../../src/utils/secondary-email-modal-utils'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 const userId = 'user123'
 describe('Secondary email modal utils', () => {
@@ -25,7 +25,7 @@ describe('Secondary email modal utils', () => {
     ])(
       'Returns %s if the modal was last dismissed %s months ago',
       (expected, monthsAgo) => {
-        const date = moment().subtract(monthsAgo, 'months').toDate()
+        const date = dayjs().subtract(monthsAgo, 'months').toDate()
         setPermanentlyDismissSecondaryEmailModal(userId, date)
         expect(hasPermanentlyDismissedSecondaryEmailModal(userId)).toEqual(
           expected

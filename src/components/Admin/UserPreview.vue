@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import {
@@ -51,7 +51,7 @@ export default {
       return ''
     },
     userSince() {
-      return moment(this.user.createdAt).fromNow()
+      return dayjs(this.user.createdAt).fromNow()
     },
     sessions() {
       const count = this.user.pastSessions ? this.user.pastSessions.length : 0

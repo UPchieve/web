@@ -3,7 +3,7 @@ import router from '@/router'
 import { createStore } from 'vuex'
 import { mount } from '@vue/test-utils'
 import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessions.vue'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { it, describe, vi, expect, beforeEach } from 'vitest'
 import { merge } from 'lodash-es'
 
@@ -34,7 +34,7 @@ const sessions = [
     subTopic: 'algebraOne',
     subjectDisplayName: 'Algebra 1',
     type: 'math',
-    createdAt: moment().subtract(5, 'minutes'),
+    createdAt: dayjs().subtract(5, 'minutes'),
   },
   {
     id: 'session-2',
@@ -46,7 +46,7 @@ const sessions = [
     subTopic: 'algebraTwo',
     subjectDisplayName: 'Algebra 2',
     type: 'math',
-    createdAt: moment().subtract(3, 'minutes'),
+    createdAt: dayjs().subtract(3, 'minutes'),
   },
   {
     id: 'session-3',
@@ -59,7 +59,7 @@ const sessions = [
     subTopic: 'algebraTwo',
     subjectDisplayName: 'Algebra 2',
     type: 'math',
-    createdAt: moment().subtract(2, 'minutes'),
+    createdAt: dayjs().subtract(2, 'minutes'),
   },
 ]
 const getWrapper = async (overrides = {}) => {
@@ -234,7 +234,7 @@ describe('Locked sessions', () => {
       subTopic: 'prealgebra',
       subjectDisplayName: 'Prealgebra',
       type: 'math',
-      createdAt: moment().subtract(5, 'minutes').toDate(),
+      createdAt: dayjs().subtract(5, 'minutes').toDate(),
     },
     {
       id: 'session-2',
@@ -246,7 +246,7 @@ describe('Locked sessions', () => {
       subTopic: 'algebraOne',
       subjectDisplayName: 'Algebra 1',
       type: 'math',
-      createdAt: moment().subtract(3, 'minutes').toDate(),
+      createdAt: dayjs().subtract(3, 'minutes').toDate(),
     },
     {
       id: 'session-3',
@@ -258,7 +258,7 @@ describe('Locked sessions', () => {
       subTopic: 'calculusBc',
       subjectDisplayName: 'Calculus BC',
       type: 'math',
-      createdAt: moment().subtract(9, 'minutes').toDate(),
+      createdAt: dayjs().subtract(9, 'minutes').toDate(),
     },
     {
       id: 'session-4',
@@ -270,7 +270,7 @@ describe('Locked sessions', () => {
       subTopic: 'biology',
       subjectDisplayName: 'Biology',
       type: 'math',
-      createdAt: moment().subtract(10, 'minutes').toDate(),
+      createdAt: dayjs().subtract(10, 'minutes').toDate(),
     },
   ]
 
@@ -421,7 +421,7 @@ describe('Locked sessions', () => {
           subTopic: 'integratedMathOne',
           subjectDisplayName: 'Integrated Math One',
           type: 'math',
-          createdAt: moment().subtract(5, 'minutes').toDate(),
+          createdAt: dayjs().subtract(5, 'minutes').toDate(),
         },
       ],
       subjects: {

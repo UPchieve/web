@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 
@@ -353,14 +353,14 @@ describe('StudentClassesView', () => {
   test('shows the current assignments and the past assignments in different sections', async () => {
     const studentClass = buildStudentClass()
     const currentAssignment = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().endOf('day').toDate(),
+      dueDate: dayjs().endOf('day').toDate(),
       isCompleted: false,
-      startDate: moment().subtract('7', 'days').toDate(),
+      startDate: dayjs().subtract('7', 'days').toDate(),
     })
     const pastAssignment = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().subtract('1', 'day').toDate(),
+      dueDate: dayjs().subtract('1', 'day').toDate(),
       isCompleted: false,
-      startDate: moment().subtract('7', 'days').toDate(),
+      startDate: dayjs().subtract('7', 'days').toDate(),
     })
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
       data: {
@@ -392,13 +392,13 @@ describe('StudentClassesView', () => {
   test('shows the current assignments in ascending order of due date (i.e. soonest to being due first)', async () => {
     const studentClass = buildStudentClass()
     const assignmentFirst = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().add('1', 'day').toDate(),
+      dueDate: dayjs().add('1', 'day').toDate(),
     })
     const assignmentMiddle = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().add('2', 'day').toDate(),
+      dueDate: dayjs().add('2', 'day').toDate(),
     })
     const assignmentLast = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().add('3', 'day').toDate(),
+      dueDate: dayjs().add('3', 'day').toDate(),
     })
 
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
@@ -428,32 +428,32 @@ describe('StudentClassesView', () => {
       assignmentFirst.title
     )
     expect(currentAssignmentsDueDates[0].element.innerHTML).toContain(
-      moment(assignmentFirst.dueDate).format('MM/DD/YYYY')
+      dayjs(assignmentFirst.dueDate).format('MM/DD/YYYY')
     )
     expect(currentAssignmentsTitles[1].element.innerHTML).toContain(
       assignmentMiddle.title
     )
     expect(currentAssignmentsDueDates[1].element.innerHTML).toContain(
-      moment(assignmentMiddle.dueDate).format('MM/DD/YYYY')
+      dayjs(assignmentMiddle.dueDate).format('MM/DD/YYYY')
     )
     expect(currentAssignmentsTitles[2].element.innerHTML).toContain(
       assignmentLast.title
     )
     expect(currentAssignmentsDueDates[2].element.innerHTML).toContain(
-      moment(assignmentLast.dueDate).format('MM/DD/YYYY')
+      dayjs(assignmentLast.dueDate).format('MM/DD/YYYY')
     )
   })
 
   test('shows the past assignments in descending order of due date (i.e. most recently due first)', async () => {
     const studentClass = buildStudentClass()
     const assignmentFirst = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().subtract('1', 'day').toDate(),
+      dueDate: dayjs().subtract('1', 'day').toDate(),
     })
     const assignmentMiddle = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().subtract('2', 'day').toDate(),
+      dueDate: dayjs().subtract('2', 'day').toDate(),
     })
     const assignmentLast = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().subtract('3', 'day').toDate(),
+      dueDate: dayjs().subtract('3', 'day').toDate(),
     })
 
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
@@ -480,26 +480,26 @@ describe('StudentClassesView', () => {
       assignmentFirst.title
     )
     expect(pastAssignmentsDueDates[0].element.innerHTML).toContain(
-      moment(assignmentFirst.dueDate).format('MM/DD/YYYY')
+      dayjs(assignmentFirst.dueDate).format('MM/DD/YYYY')
     )
     expect(pastAssignmentsTitles[1].element.innerHTML).toContain(
       assignmentMiddle.title
     )
     expect(pastAssignmentsDueDates[1].element.innerHTML).toContain(
-      moment(assignmentMiddle.dueDate).format('MM/DD/YYYY')
+      dayjs(assignmentMiddle.dueDate).format('MM/DD/YYYY')
     )
     expect(pastAssignmentsTitles[2].element.innerHTML).toContain(
       assignmentLast.title
     )
     expect(pastAssignmentsDueDates[2].element.innerHTML).toContain(
-      moment(assignmentLast.dueDate).format('MM/DD/YYYY')
+      dayjs(assignmentLast.dueDate).format('MM/DD/YYYY')
     )
   })
 
   test('does not show assignments with start dates in the future', async () => {
     const studentClass = buildStudentClass()
     const assignmentInFuture = buildStudentAssignment(studentClass.id, {
-      startDate: moment().add('1', 'day').toDate(),
+      startDate: dayjs().add('1', 'day').toDate(),
     })
 
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
@@ -528,9 +528,9 @@ describe('StudentClassesView', () => {
     const studentClass = buildStudentClass()
     const completedAssignment = buildStudentAssignment(studentClass.id, {
       // Assignment isn't due for another 5 days.
-      dueDate: moment().add('5', 'days').toDate(),
+      dueDate: dayjs().add('5', 'days').toDate(),
       isCompleted: true,
-      startDate: moment().subtract('7', 'day').toDate(),
+      startDate: dayjs().subtract('7', 'day').toDate(),
     })
 
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
@@ -561,9 +561,9 @@ describe('StudentClassesView', () => {
   test('show a past assignment as completed if past the due date and was completed', async () => {
     const studentClass = buildStudentClass()
     const completedAssignment = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().subtract('2', 'days').toDate(),
+      dueDate: dayjs().subtract('2', 'days').toDate(),
       isCompleted: true,
-      startDate: moment().subtract('7', 'day').toDate(),
+      startDate: dayjs().subtract('7', 'day').toDate(),
     })
 
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
@@ -594,9 +594,9 @@ describe('StudentClassesView', () => {
   test('shows a past assignment as incomplete if past the due date and not completed', async () => {
     const studentClass = buildStudentClass()
     const incompleteAssignment = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().subtract('1', 'day').toDate(),
+      dueDate: dayjs().subtract('1', 'day').toDate(),
       isCompleted: false,
-      startDate: moment().subtract('7', 'day').toDate(),
+      startDate: dayjs().subtract('7', 'day').toDate(),
     })
 
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
@@ -628,7 +628,7 @@ describe('StudentClassesView', () => {
     const routerPushSpy = vi.spyOn(router, 'push')
     const studentClass = buildStudentClass()
     const assignment = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().add('3', 'day').toDate(),
+      dueDate: dayjs().add('3', 'day').toDate(),
       isCompleted: false,
     })
 
@@ -665,7 +665,7 @@ describe('StudentClassesView', () => {
 
     const studentClass = buildStudentClass()
     const assignment = buildStudentAssignment(studentClass.id, {
-      dueDate: moment().add('3', 'day').toDate(),
+      dueDate: dayjs().add('3', 'day').toDate(),
       isCompleted: false,
     })
 

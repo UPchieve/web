@@ -331,7 +331,7 @@ import Check from '@/assets/check.svg'
 import CleverLogo from '@/assets/clever_logo.svg'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Pencil from '@/assets/pencil.svg'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { EVENTS } from '@/consts'
 import MenuButtonsIcon from '@/assets/Menu.svg'
 import VerticalMenuButtonsIcon from '@/assets/VerticalMenuButtons.svg'
@@ -386,7 +386,7 @@ export default {
         },
         sessionActivityFrom:
           getCurrentSchoolYearStartDate().format('YYYY-MM-DD'),
-        sessionActivityTo: moment().format('YYYY-MM-DD'),
+        sessionActivityTo: dayjs().format('YYYY-MM-DD'),
       },
     }
   },
@@ -472,7 +472,7 @@ export default {
     },
 
     formatTimestamp(timestamp) {
-      const date = moment(timestamp)
+      const date = dayjs(timestamp)
       return date.format('MM/DD/YYYY')
     },
 
@@ -559,7 +559,7 @@ export default {
               (a, b) => b.endedAt - a.endedAt
             )[0]?.endedAt
             const lastSession = lastSessionDate
-              ? moment(lastSessionDate).format('MM/DD/YYYY')
+              ? dayjs(lastSessionDate).format('MM/DD/YYYY')
               : 'Has not completed a session.'
 
             return {
@@ -575,8 +575,8 @@ export default {
           if (a.lastSession === 'Has not completed a session') return 1
           if (b.lastsession === 'Has not completed a session') return -1
 
-          const dateA = moment(a.lastSession, 'MM/DD/YYYY')
-          const dateB = moment(b.lastSession, 'MM/DD/YYYY')
+          const dateA = dayjs(a.lastSession, 'MM/DD/YYYY')
+          const dateB = dayjs(b.lastSession, 'MM/DD/YYYY')
 
           return dateB.diff(dateA)
         })

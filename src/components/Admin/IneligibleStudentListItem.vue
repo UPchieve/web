@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 export default {
   name: 'IneligibleStudentListItem',
@@ -39,7 +39,7 @@ export default {
 
   computed: {
     createdAt() {
-      return moment(this.student.createdAt).format('l, h:mm a')
+      return dayjs(this.student.createdAt).format('l, h:mm a')
     },
     email() {
       return this.student.email || '--'

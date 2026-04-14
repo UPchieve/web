@@ -170,7 +170,7 @@ import DisabledCertificateIcon from '@/assets/disabled_certificate_icon.svg'
 import { IonPopover } from '@ionic/vue'
 import NetworkService from '@/services/NetworkService'
 import ModalService from '@/services/ModalService'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { isTrainingComplete } from '@/utils/get-training-progress'
 import { UpchieveTrainingCourseKeyEnum } from '@/views/TrainingCourseView/types'
 
@@ -330,7 +330,7 @@ export default {
       earnedCerts.sort((certA, certB) => {
         return certA.lastAttemptedAt < certB.lastAttemptedAt
       })
-      const effectiveDate = moment(earnedCerts[0].lastAttemptedAt).format(
+      const effectiveDate = dayjs(earnedCerts[0].lastAttemptedAt).format(
         'MM/DD/YYYY'
       )
       const canvas = document.createElement('canvas')

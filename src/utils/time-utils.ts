@@ -1,4 +1,19 @@
-import moment, { type Moment } from 'moment'
+import D, { type Dayjs } from 'dayjs'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
+
+D.extend(localizedFormat)
+D.extend(relativeTime)
+D.extend(customParseFormat)
+D.extend(utc)
+D.extend(timezone)
+D.extend(advancedFormat)
+
+export const dayjs = D
 
 export function hoursToHoursAndMinutes(
   totalHours: number,
@@ -18,10 +33,11 @@ export function minutesToHoursAndMinutes(
   return formatFn ? formatFn({ hours, minutes }) : { hours, minutes }
 }
 
-export function getCurrentSchoolYearStartDate(): Moment {
-  const augustFirst = moment().month('August').date(1)
-  if (moment().isBefore(augustFirst, 'day')) {
-    augustFirst.subtract(1, 'year')
+const DAYJS_AUGUST_MONTH = 7
+export function getCurrentSchoolYearStartDate(): Dayjs {
+  const augustFirst = dayjs().month(DAYJS_AUGUST_MONTH).date(1)
+  if (dayjs().isBefore(augustFirst, 'day')) {
+    return augustFirst.subtract(1, 'year')
   }
   return augustFirst
 }

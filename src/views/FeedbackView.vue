@@ -239,7 +239,7 @@
 import { mapGetters, mapState } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton.vue'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import FeedbackTextarea from '@/components/FeedbackTextarea.vue'
 import Loader from '@/components/Loader.vue'
 import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
@@ -302,10 +302,10 @@ export default {
       return this.subjects[subject]?.displayName
     },
     sessionTime() {
-      return moment(this.session.createdAt).local().format('LT')
+      return dayjs(this.session.createdAt).format('LT')
     },
     sessionDate() {
-      return moment(this.session.createdAt).local().format('MMMM Do, YYYY')
+      return dayjs(this.session.createdAt).format('MMMM Do, YYYY')
     },
     questions() {
       return this.allQuestions.map((q) => q.question)

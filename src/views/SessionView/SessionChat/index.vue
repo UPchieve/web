@@ -215,7 +215,7 @@
 <script>
 import { isEmpty, startCase } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { socket } from '@/socket'
 
 import { EVENTS } from '@/consts'
@@ -427,7 +427,7 @@ export default {
     },
 
     formatTime(createdAt) {
-      return moment(createdAt).format('h:mm a')
+      return dayjs(createdAt).format('h:mm a')
     },
 
     toggleEligibleForSessionRecapChat() {

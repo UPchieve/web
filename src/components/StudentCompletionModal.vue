@@ -31,7 +31,7 @@
 <script>
 import Modal from '@/components/Modal.vue'
 import Check from '@/assets/check.svg'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 export default {
   components: { Modal, Check },
@@ -56,7 +56,7 @@ export default {
 
   methods: {
     formatTimestamp(timestamp) {
-      const date = moment(timestamp)
+      const date = dayjs(timestamp)
       return date.format('MM/DD/YYYY')
     },
 

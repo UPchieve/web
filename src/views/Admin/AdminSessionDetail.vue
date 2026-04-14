@@ -170,7 +170,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import NetworkService from '@/services/NetworkService'
 import UserPreview from '@/components/Admin/UserPreview.vue'
 import ChatLog from '@/components/Admin/ChatLog/index.vue'
@@ -207,14 +207,14 @@ export default {
 
   computed: {
     createdAt() {
-      return moment(this.session.createdAt).format('l, h:mm:ss a')
+      return dayjs(this.session.createdAt).format('l, h:mm:ss a')
     },
     volunteerJoinedAt() {
-      return moment(this.session.volunteerJoinedAt).format('l, h:mm:ss a')
+      return dayjs(this.session.volunteerJoinedAt).format('l, h:mm:ss a')
     },
     endedAt() {
       if (!this.session.endedAt) return null
-      return moment(this.session.endedAt).format('l, h:mm:ss a')
+      return dayjs(this.session.endedAt).format('l, h:mm:ss a')
     },
     endedBy() {
       if (this.session.endedBy === null) return 'worker'

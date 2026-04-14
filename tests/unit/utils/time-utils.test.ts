@@ -4,7 +4,7 @@ import {
   minutesToHoursAndMinutes,
   getCurrentSchoolYearStartDate,
 } from '../../../src/utils/time-utils'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 describe('hoursToHoursAndMinutes', () => {
   it.each([
@@ -44,7 +44,7 @@ describe('minutesToHoursAndMinutes', () => {
 
 describe('getCurrentSchoolYearStartDate', () => {
   it('returns August 1st of current year when before August 1st', () => {
-    const mockDate = moment('2025-07-15')
+    const mockDate = dayjs('2025-07-15')
     vi.setSystemTime(mockDate.toDate())
 
     const result = getCurrentSchoolYearStartDate()
@@ -52,7 +52,7 @@ describe('getCurrentSchoolYearStartDate', () => {
   })
 
   it('returns August 1st of current year when after August 1st', () => {
-    const mockDate = moment('2025-09-15')
+    const mockDate = dayjs('2025-09-15')
     vi.setSystemTime(mockDate.toDate())
 
     const result = getCurrentSchoolYearStartDate()
@@ -60,7 +60,7 @@ describe('getCurrentSchoolYearStartDate', () => {
   })
 
   it('returns August 1st of current year when exactly on August 1st', () => {
-    const mockDate = moment('2025-08-01')
+    const mockDate = dayjs('2025-08-01')
     vi.setSystemTime(mockDate.toDate())
 
     const result = getCurrentSchoolYearStartDate()

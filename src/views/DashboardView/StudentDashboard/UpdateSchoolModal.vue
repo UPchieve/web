@@ -4,7 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import { IonToast, toastController } from '@ionic/vue'
 import { checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons'
 import { useVuelidate } from '@vuelidate/core'
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import UserService from '@/services/UserService'
 import Modal from '@/components/Modal.vue'
 import BackButton from '@/components/BackButton.vue'
@@ -37,18 +37,16 @@ const userHadASession = computed(
 )
 
 const isValidPeriod = computed(() => {
-  const startDate = moment(updateSchoolConfig.value.startDate)
-  const endDate = moment(updateSchoolConfig.value.endDate)
-  const usersCurrentDateTime = moment()
+  const startDate = dayjs(updateSchoolConfig.value.startDate)
+  const endDate = dayjs(updateSchoolConfig.value.endDate)
+  const usersCurrentDateTime = dayjs()
 
   return usersCurrentDateTime >= startDate && usersCurrentDateTime <= endDate
 })
 
 const didStudentCreateAcctRecently = computed(() => {
-  const threshold = moment(
-    updateSchoolConfig.value.studentAcctCreationThreshold
-  )
-  const studentSignUpDate = moment(store.state.user.user.createdAt)
+  const threshold = dayjs(updateSchoolConfig.value.studentAcctCreationThreshold)
+  const studentSignUpDate = dayjs(store.state.user.user.createdAt)
 
   return studentSignUpDate >= threshold
 })

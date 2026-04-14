@@ -158,7 +158,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { mapGetters, mapState } from 'vuex'
 import { EVENTS } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
@@ -211,7 +211,7 @@ export default {
       return this.selectedClasses.length !== 1
     },
     minDueDate() {
-      return moment(this.startDate).add(1, 'day').endOf('day').toDate()
+      return dayjs(this.startDate).add(1, 'day').endOf('day').toDate()
     },
     MAX_UPLOAD_SIZE_BYTES() {
       return BYTES_PER_MEGABYTE * 5
@@ -221,8 +221,8 @@ export default {
   data() {
     return {
       assignmentName: '',
-      startDate: moment().format('YYYY-MM-DD'),
-      dueDate: moment().add(7, 'days').endOf('day').format('YYYY-MM-DD'),
+      startDate: dayjs().format('YYYY-MM-DD'),
+      dueDate: dayjs().add(7, 'days').endOf('day').format('YYYY-MM-DD'),
       classes: [],
       selectedClasses: [],
       allSubjects: [],
@@ -251,8 +251,8 @@ export default {
 
       this.assignmentId = assignment.id
       this.assignmentName = assignment.title
-      this.startDate = moment(assignment.startDate).format('YYYY-MM-DD')
-      this.dueDate = moment(assignment.dueDate).format('YYYY-MM-DD')
+      this.startDate = dayjs(assignment.startDate).format('YYYY-MM-DD')
+      this.dueDate = dayjs(assignment.dueDate).format('YYYY-MM-DD')
       this.numSessions = assignment.numberOfSessions
       this.numMinutes = assignment.minDurationInMinutes
       this.description = assignment.description || ''
@@ -367,8 +367,8 @@ export default {
         title: this.assignmentName,
         numberOfSessions: this.numSessions,
         minDurationInMinutes: this.numMinutes,
-        dueDate: moment(this.dueDate).endOf('day').toDate(),
-        startDate: moment(this.startDate).startOf('day').toDate(),
+        dueDate: dayjs(this.dueDate).endOf('day').toDate(),
+        startDate: dayjs(this.startDate).startOf('day').toDate(),
         isRequired: false,
         subjectId: this.selectedSessionToComplete.id,
       }

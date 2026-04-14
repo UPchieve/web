@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 export default {
   name: 'NotificationPreview',
@@ -37,7 +37,7 @@ export default {
     },
 
     sentAt() {
-      return moment(this.notification.sentAt).format('l, h:mm:ss a')
+      return dayjs(this.notification.sentAt).format('l, h:mm:ss a')
     },
 
     organization() {

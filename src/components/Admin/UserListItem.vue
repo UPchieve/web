@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 
 export default {
   name: 'UserListItem',
@@ -23,7 +23,7 @@ export default {
       return this.user.userType
     },
     createdAt() {
-      return moment(this.user.createdAt).format('l, h:mm a')
+      return dayjs(this.user.createdAt).format('l, h:mm a')
     },
   },
 }

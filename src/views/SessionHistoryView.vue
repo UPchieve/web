@@ -239,7 +239,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import { mapGetters } from 'vuex'
 import { EVENTS } from '@/consts'
 import CaretIcon from '@/assets/caret.svg'
@@ -417,10 +417,10 @@ export default {
       }
     },
     getSessionTime(sessionCreatedAt) {
-      return moment(sessionCreatedAt).format('l @ h:mm A')
+      return dayjs(sessionCreatedAt).format('l @ h:mm A')
     },
     getSessionTimeForMobile(sessionCreatedAt) {
-      return moment(sessionCreatedAt).format('l h:mm A')
+      return dayjs(sessionCreatedAt).format('l h:mm A')
     },
     getSessionDuration(timeTutored) {
       const duration = Math.ceil(timeTutored / (1000 * 60))

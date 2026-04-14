@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import { dayjs } from '@/utils/time-utils'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton.vue'
 import BackgroundInfo from '@/components/Admin/BackgroundInfo.vue'
@@ -105,7 +105,7 @@ export default {
   },
   computed: {
     createdAt() {
-      return moment(this.volunteer.createdAt).format('l, h:mm a')
+      return dayjs(this.volunteer.createdAt).format('l, h:mm a')
     },
     hasCompletedBackgroundInfo() {
       return (
