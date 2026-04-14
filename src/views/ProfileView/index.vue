@@ -399,7 +399,7 @@ import Loader from '@/components/Loader.vue'
 import VerificationModal from '../VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
-import CleverLogo from '@/assets/clever_logo.svg'
+import CleverLogo from '@/components/CleverLogo.vue'
 import TrashIcon from '@/assets/trash.svg'
 import PencilIcon from '@/assets/pencil.svg'
 import ToggleButton from '@/components/ToggleButton.vue'
@@ -1122,8 +1122,12 @@ button:hover {
 }
 
 .sync-clever-btn {
+  align-items: center;
+  display: flex;
+
   background-color: $upchieve-white;
   color: $c-information-blue;
+
   height: fit-content;
   padding: 10px 20px 10px 0;
   width: fit-content;
@@ -1132,6 +1136,10 @@ button:hover {
     background-color: $upchieve-white;
     color: $c-information-blue;
     text-decoration: underline;
+  }
+
+  .clever-logo {
+    width: 25px;
   }
 }
 
