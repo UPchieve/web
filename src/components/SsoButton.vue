@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import CleverLogo from '@/assets/clever_logo.svg?skipsvgo'
-import GoogleLogo from '@/assets/google_logo.svg?skipsvgo'
+import GoogleLogo from '@/assets/google_logo.svg'
+import CleverLogo from './CleverLogo.vue'
 
 export default {
   components: {
@@ -50,7 +50,7 @@ export default {
 <style lang="scss" scoped>
 .logo {
   margin-right: 0.4em;
-
+  max-height: 30px;
   &--img {
     height: 30px;
     width: 30px;
