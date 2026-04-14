@@ -217,12 +217,13 @@ export default {
       return dayjs(this.session.endedAt).format('l, h:mm:ss a')
     },
     endedBy() {
-      if (this.session.endedBy === null) return 'worker'
-      const endedBy =
-        this.session.endedBy === this.session.student._id
-          ? this.session.student
-          : this.session.volunteer
-      return endedBy ? endedBy.firstname : '?'
+      const isStudent = this.session.endedBy === this.session.student.id
+      const isVolunteer = this.session.endedBy === this.session.volunteer.id
+      if (!this.session.endedBy || (!isStudent && !isVolunteer))
+        return 'System or Admin'
+      return isStudent
+        ? `${this.session.student.firstName} (Student)`
+        : `${this.session.volunteer.firstName} (Volunteer)`
     },
     // pre-context sharing feedback
     legacyStudentFeedback() {
