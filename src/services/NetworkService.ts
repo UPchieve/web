@@ -8,6 +8,11 @@ import type { NTHSActionName } from './NTHSGroupService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
 import type { Uuid } from '@/types/shared'
+import type {
+  TutorBotAddMessagePayload,
+  TutorBotAddMessageResponsePublic,
+  TutorBotTranscriptPublic,
+} from '@/types/bot-conversations'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -1135,34 +1140,43 @@ export default {
       gradeLevel,
     }).then(this._successHandler, this._errorHandler)
   },
-  getAllMessagesForBotConversation(conversationId) {
-    return httpGet(
-      `${API_ROOT}/tutor-bot/conversations/${conversationId}`
-    ).then(this._successHandler, this._errorHandler)
+  async getAllMessagesForBotConversation(conversationId: Uuid) {
+    try {
+      return await httpGet<TutorBotTranscriptPublic>(
+        `${API_ROOT}/tutor-bot/conversations/${conversationId}`
+      )
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
-  getOrCreateTutorBotConversationWithMessagesBySessionId(sessionId) {
+  getOrCreateTutorBotConversationWithMessagesBySessionId(sessionId: Uuid) {
     return httpPut(
-      `${API_ROOT}/session/${sessionId}/tutor-bot-conversation`
+      `${API_ROOT}/session/${sessionId}/tutor-bot-conversation`,
+      {}
     ).then(this._successHandler, this._errorHandler)
   },
-  sendTutorBotMessage({
+  async sendTutorBotMessage({
     userId,
     conversationId,
     message,
     senderUserType,
     sessionId,
     subjectName,
-  }) {
-    return httpPost(
-      `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
-      {
-        userId,
-        message,
-        senderUserType,
-        sessionId,
-        subjectName,
-      }
-    ).then(this._successHandler, this._errorHandler)
+  }: TutorBotAddMessagePayload) {
+    try {
+      return await httpPost<TutorBotAddMessageResponsePublic>(
+        `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
+        {
+          userId,
+          message,
+          senderUserType,
+          sessionId,
+          subjectName,
+        }
+      )
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
   enrollStudentInIncentiveProgram(proxyEmail) {
     return httpPost(

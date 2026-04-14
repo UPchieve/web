@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import BotChat, {
-  DISPLAY_CONTEXT,
-} from '@/views/BotConversationsView/BotChat.vue'
+import BotChat from '@/views/BotConversationsView/BotChat.vue'
+import { DISPLAY_CONTEXT } from '@/constants/bot-conversations'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import Errors from '@/views/BotConversationsView/Errors.vue'

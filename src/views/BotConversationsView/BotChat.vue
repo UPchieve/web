@@ -1,21 +1,17 @@
-<script module lang="ts">
-export enum DISPLAY_CONTEXT {
-  SESSION = 'session',
-}
-</script>
-
 <script setup lang="ts">
 import { useStore } from 'vuex'
 import { onMounted, computed, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
 import ModerationService from '@/services/ModerationService'
+import type { RootState } from '@/store/index'
+import { DISPLAY_CONTEXT } from '@/constants/bot-conversations'
 
 const { bgColor, displayContext } = defineProps<{
   displayContext: DISPLAY_CONTEXT
   bgColor?: string
 }>()
-const store = useStore()
+const store = useStore<RootState>()
 const user = computed(() => store.state.user.user)
 
 const chatContainer = ref()

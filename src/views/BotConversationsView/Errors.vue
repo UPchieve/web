@@ -2,8 +2,9 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import CrossIcon from '@/assets/cross.svg'
+import type { RootState } from '@/store'
 
-const store = useStore()
+const store = useStore<RootState>()
 const errors = computed(() => store.state.botConversations.errors)
 const dismiss = () => store.dispatch('botConversations/clearErrors')
 </script>

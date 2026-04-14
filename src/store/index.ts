@@ -8,7 +8,9 @@ import volunteerModule from './modules/volunteer'
 import notificationsModule from './modules/notifications'
 import socketModule from './modules/socket'
 import sessionModule, { type SessionState } from './modules/session'
-import botConversationsModule from './modules/bot-conversations'
+import botConversationsModule, {
+  type TutorBotStoreState,
+} from './modules/bot-conversations'
 import liveMediaModule from './modules/liveMedia'
 import celebrationsModule from './modules/celebrations'
 import americaCountsVolunteerModule from './modules/america-counts-volunteer'
@@ -20,6 +22,7 @@ import nthsModule from './modules/nths'
 export type RootState = {
   user: UserStoreState
   session: SessionState
+  botConversations: TutorBotStoreState
 }
 export type RootGetters = any
 

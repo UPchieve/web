@@ -2,52 +2,90 @@ import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import type { ActionContext } from 'vuex'
+import type { Uuid } from '@/types/shared'
+import type {
+  TutorBotGeneratedMessagePublic,
+  TutorBotMessagePublic,
+  TutorBotSystemMessage,
+  TutorBotTranscriptPublic,
+} from '@/types/bot-conversations'
+import type { RootGetters, RootState } from '@/store/index'
 
-export type Subject = {
-  id: string
-  name: string
-  displayName: string
-  topicId: string
-  topicDisplayName: string
-  topicName: string
+type ConversationMessage =
+  | TutorBotGeneratedMessagePublic
+  | TutorBotMessagePublic
+  | TutorBotSystemMessage
+
+type CurrentConversationState =
+  | (Omit<TutorBotTranscriptPublic, 'messages'> & {
+      messages: ConversationMessage[]
+    })
+  | Record<string, never>
+
+export type TutorBotStoreState = {
+  currentConversation: CurrentConversationState
+  messageIsSending: boolean
+  isFetchingConversation: boolean
+  errors: string[]
+}
+
+type TutorBotActionContext = ActionContext<TutorBotStoreState, RootState> & {
+  rootGetters: RootGetters
 }
 
 export default {
   namespaced: true,
   state: {
-    currentConversation: {},
+    currentConversation: {} as Record<string, never>,
     messageIsSending: false,
     isFetchingConversation: false,
     errors: [],
-  },
+  } as TutorBotStoreState,
 
   mutations: {
-    setCurrentConversation: (state, conversation) =>
-      (state.currentConversation = conversation),
-    setMessageIsSending: (state, isSending) =>
+    setCurrentConversation: (
+      state: TutorBotStoreState,
+      conversation: CurrentConversationState
+    ) => (state.currentConversation = conversation),
+    setMessageIsSending: (state: TutorBotStoreState, isSending: boolean) =>
       (state.messageIsSending = isSending),
-    setIsFetchingConversation: (state, isFetchingConversation) =>
-      (state.isFetchingConversation = isFetchingConversation),
-    addToCurrentConversation: (state, message) => {
-      return (state.currentConversation.messages = [
+    setIsFetchingConversation: (
+      state: TutorBotStoreState,
+      isFetching: boolean
+    ) => (state.isFetchingConversation = isFetching),
+    addToCurrentConversation: (
+      state: TutorBotStoreState,
+      message: ConversationMessage
+    ) => {
+      if (!('messages' in state.currentConversation)) return
+      state.currentConversation.messages = [
         ...state.currentConversation.messages,
         message,
-      ])
+      ]
     },
-    setError: (state, error) => (state.errors = state.errors.concat([error])),
-    clearErrors: (state) => (state.errors = []),
+    setError: (state: TutorBotStoreState, error: string) =>
+      (state.errors = state.errors.concat([error])),
+    clearErrors: (state: TutorBotStoreState) => (state.errors = []),
   },
 
   actions: {
-    async setConversation({ commit, state }, conversationId: string) {
-      if (state.currentConversation.conversationId === conversationId) return
-      commit('setCurrentConversation', {})
+    async setConversation(
+      { commit, state }: TutorBotActionContext,
+      conversationId: Uuid
+    ) {
+      if (
+        'conversationId' in state.currentConversation &&
+        state.currentConversation.conversationId === conversationId
+      )
+        return
+      commit('setCurrentConversation', {} as Record<string, never>)
       commit('clearErrors')
       commit('setIsFetchingConversation', true)
       try {
-        const messageResults =
+        const response =
           await NetworkService.getAllMessagesForBotConversation(conversationId)
-        commit('setCurrentConversation', messageResults.data)
+        commit('setCurrentConversation', response.data)
       } catch (e) {
         LoggerService.noticeError(e)
         commit('setError', 'Can not set conversation')
@@ -56,22 +94,31 @@ export default {
       }
     },
     async sendMessage(
-      { commit, rootState, state, getters, rootGetters },
-      message
+      { commit, rootState, rootGetters, state }: TutorBotActionContext,
+      message: string
     ) {
       commit('clearErrors')
       commit('setMessageIsSending', true)
       try {
+        if (!('conversationId' in state.currentConversation)) {
+          commit('setError', 'No active conversation')
+          return
+        }
+
         const userId = rootState.user.user.id
         const senderUserType = rootGetters['user/userType']
-        await NetworkService.sendTutorBotMessage({
+        const conversationId = state.currentConversation.conversationId
+        const sessionId = state.currentConversation.sessionId
+        const subjectName = rootState.user.session.subTopic
+        const payload = {
           userId,
-          conversationId: state.currentConversation.conversationId,
+          conversationId,
           message,
           senderUserType,
-          sessionId: state.currentConversation.sessionId,
-          subjectName: getters.currentConversation.subject.name,
-        })
+          sessionId,
+          subjectName,
+        }
+        await NetworkService.sendTutorBotMessage(payload)
 
         AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SEND_MESSAGE)
       } catch (e) {
@@ -81,28 +128,15 @@ export default {
         commit('setMessageIsSending', false)
       }
     },
-    clearErrors({ commit }) {
+    clearErrors({ commit }: TutorBotActionContext) {
       commit('clearErrors')
     },
   },
 
   getters: {
-    currentConversation(state, getters, rootState) {
-      const getSubjectById = (subjectId: number): Subject | undefined => {
-        const subjects = state.subjects?.length
-          ? state.subjects
-          : Object.values(rootState.subjects.subjects)
-        return (subjects as Array).find(
-          (subject: any) => subject?.id === subjectId
-        )
-      }
-      const currentSubject =
-        state.currentConversation?.subject ??
-        getSubjectById(state.currentConversation?.subjectId)
+    currentConversation(state: TutorBotStoreState) {
       return {
         ...state.currentConversation,
-        messagePreview: state.currentConversation?.messages?.[0]?.message,
-        subject: currentSubject,
       }
     },
   },
