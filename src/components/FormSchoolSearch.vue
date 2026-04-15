@@ -32,15 +32,18 @@
           <div v-if="result.name" id="ph-no-capture" class="result">
             {{ result.name }} ({{ result.city }}, {{ result.state }})
           </div>
-          <a
-            v-if="result.cannotFindSchool"
-            target="_blank"
-            href="https://upchieve.org/cant-find-school"
-          >
-            <div class="result">
-              {{ CANNOT_FIND_SCHOOL_TEXT }}
-            </div>
-          </a>
+          <div v-if="result.cannotFindSchool">
+            <a
+              v-if="showCannotFindSchoolForm"
+              target="_blank"
+              href="https://upchieve.org/cant-find-school"
+            >
+              <div class="result">
+                {{ CANNOT_FIND_SCHOOL_TEXT }}
+              </div>
+            </a>
+            <slot name="cannotFindSchool" />
+          </div>
         </li>
       </template>
     </autocomplete>
@@ -84,6 +87,10 @@ export default {
     cannotFindSchoolEvent: {
       type: String,
       default: EVENTS.STUDENT_CLICKED_CANT_FIND_SCHOOL,
+    },
+    showCannotFindSchoolForm: {
+      type: Boolean,
+      default: true,
     },
     selectedEvent: {
       type: String,

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 import FormInput from '@/components/FormInput.vue'
 import useVuelidate from '@vuelidate/core'
@@ -11,8 +11,8 @@ const props = defineProps<{ submitting: boolean }>()
 
 const emit = defineEmits(['submit', 'cancel'])
 
-const state = reactive({
-  schoolId: '',
+const formInputs = reactive({
+  schoolId: null,
   firstName: '',
   lastName: '',
   email: '',
@@ -21,27 +21,57 @@ const state = reactive({
   title: '',
 })
 
+const showSchoolSearch = ref<boolean>(true)
+
 const v = useVuelidate()
 const isDisabled = computed(() => {
   return v.value.$error || !!v.value.$silentErrors?.length
 })
+
+function onCantFindSchool() {
+  formInputs.schoolId = null
+  showSchoolSearch.value = false
+}
 </script>
 
 <template>
-  <form @submit.prevent="emit('submit', state)" autocomplete="off">
+  <form @submit.prevent="emit('submit', formInputs)" autocomplete="off">
     <FormSchoolSearch
+      v-if="showSchoolSearch"
       :disabled="props.submitting"
       label="What school do you go to?"
-      v-model="state.schoolId"
+      v-model="formInputs.schoolId"
       :hasDefaultValue="false"
-      :isRequired="true"
+      :isRequired="false"
       startSearchEvent=""
       cannotFindSchoolEvent=""
       selectedEvent=""
-    />
+      :showCannotFindSchoolForm="false"
+    >
+      <template v-slot:cannotFindSchool>
+        <div class="cant-find-school-container">
+          <button
+            type="button"
+            class="school-search-button"
+            @click="onCantFindSchool"
+          >
+            (Skip) My school isn't listed
+          </button>
+        </div>
+      </template>
+    </FormSchoolSearch>
+    <button
+      class="school-search-button"
+      v-else
+      type="button"
+      @click="() => (showSchoolSearch = true)"
+      :showArrow="false"
+    >
+      (Optional) Search for my school
+    </button>
     <FormInput
       :disabled="props.submitting"
-      v-model="state.title"
+      v-model="formInputs.title"
       :isRequired="true"
       label="Advisor's Title"
       placeholder="teacher, counselor, librarian, etc..."
@@ -50,21 +80,21 @@ const isDisabled = computed(() => {
     <FormInput
       :disabled="props.submitting"
       :isRequired="true"
-      v-model="state.firstName"
+      v-model="formInputs.firstName"
       label="First Name"
       name="advisor-first-name"
     />
     <FormInput
       :disabled="props.submitting"
       :isRequired="true"
-      v-model="state.lastName"
+      v-model="formInputs.lastName"
       label="Last Name"
       name="advisor-first-name"
     />
     <FormEmail
       :disabled="props.submitting"
       :isRequired="true"
-      v-model="state.email"
+      v-model="formInputs.email"
       label="Email"
       placeholder="Advisor's school email"
       name="advisor-email"
@@ -72,14 +102,14 @@ const isDisabled = computed(() => {
     <FormPhoneInput
       :disabled="props.submitting"
       :isRequired="false"
-      v-model="state.phone"
+      v-model="formInputs.phone"
       label="Phone (optional)"
       name="advisor-phone"
     />
     <FormInput
       :disabled="props.submitting"
       :isRequired="false"
-      v-model="state.phoneExtension"
+      v-model="formInputs.phoneExtension"
       label="Phone extension (optional)"
       placeholder="x123"
       name="advisor-phone-ex"
@@ -112,5 +142,17 @@ const isDisabled = computed(() => {
   justify-content: end;
   align-items: center;
   gap: 12px;
+}
+
+.cant-find-school-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+}
+
+.school-search-button {
+  color: $c-information-blue;
+  display: flex;
 }
 </style>

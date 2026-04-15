@@ -186,4 +186,8 @@ const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
 .max-width {
   max-width: 400px;
 }
+
+ul {
+  padding-left: 16px;
+}
 </style>
