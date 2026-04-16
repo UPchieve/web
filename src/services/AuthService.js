@@ -14,10 +14,14 @@ export async function logout(context, logoutRoute) {
 }
 
 export async function handleLogout(context, logoutRoute) {
-  await context.$router.push(logoutRoute ?? '/logout')
   await context.$store.dispatch('user/clear')
   resetServices()
   socket.disconnect()
+  await context.$router.push(logoutRoute ?? '/logout')
+}
+
+export function getStatus() {
+  return NetworkService.authStatus()
 }
 
 function resetServices() {
@@ -134,35 +138,4 @@ export default {
   },
 
   logout,
-
-  getAuth() {
-    return NetworkService.user()
-      .then((res) => {
-        const data = { ...res.data }
-        if (!data) {
-          throw new Error('No user returned from auth service')
-        }
-
-        if (data.user) {
-          const auth = {
-            authenticated: true,
-            user: data.user,
-          }
-          auth.user.date = new Date(res.headers.get('Date'))
-          return auth
-        } else {
-          return {
-            authenticated: false,
-            user: null,
-          }
-        }
-      })
-      .catch((err) => {
-        return {
-          authenticated: false,
-          user: null,
-          err: err,
-        }
-      })
-  },
 }

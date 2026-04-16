@@ -187,6 +187,12 @@ export default {
       this._errorHandler
     )
   },
+  authStatus() {
+    return httpGet(`${AUTH_ROOT}/status`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   login(data) {
     return httpPost(`${AUTH_ROOT}/login`, data).then(
       this._successHandler,

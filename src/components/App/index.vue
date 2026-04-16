@@ -315,7 +315,9 @@ export default {
      */
     $route(to, from) {
       // Capture PostHog pageviews on route transitions
-      if (to.path !== from.path) posthog.capture('$pageview')
+      if (to.path !== from.path) {
+        posthog.capture('$pageview')
+      }
       if (to.path !== '/logout' && this.userAuthenticated) {
         if (!this.isTeacher) {
           this.$store.dispatch('user/fetchSession', this)

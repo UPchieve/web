@@ -94,20 +94,27 @@ import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/Stud
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/VolunteerSignUpService'
 import Case from 'case'
+import { getStatus } from '@/services/AuthService'
+import LoggerService from './services/LoggerService'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
   else next()
 }
 
-const getUser = () => {
-  if (store.getters['user/isAuthenticated']) {
-    return new Promise((resolve) => {
-      store.dispatch('user/fetchUser')
-      resolve()
-    })
-  } else {
-    return store.dispatch('user/fetchUser')
+async function getAuthStatus() {
+  try {
+    const { data } = await getStatus()
+
+    if (data.authenticated) {
+      await store.dispatch('user/fetchUser')
+    }
+
+    return data
+  } catch {
+    return {
+      authenticated: false,
+    }
   }
 }
 const VOLUNTEER_SIDEBAR_LINKED_VIEWS = [
@@ -144,9 +151,9 @@ const routes = [
     path: '/',
     name: 'Home',
     beforeEnter: (to, from, next) => {
-      getUser()
-        .then(() => {
-          if (store.getters['user/isAuthenticated']) {
+      getAuthStatus()
+        .then(({ authenticated }) => {
+          if (authenticated) {
             if (store.getters['user/isAutoFlowUser']) {
               return next('/welcome')
             }
@@ -410,9 +417,10 @@ const routes = [
     component: VerificationView,
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
-      getUser()
-        .then(() => {
+      getAuthStatus()
+        .then(({ authenticated }) => {
           if (
+            authenticated &&
             store.getters['user/isVerified'] &&
             !store.getters['user/isInStudentVolunteerVerifyFlow']
           ) {
@@ -835,9 +843,9 @@ router.beforeEach((to, from, next) => {
   store.commit('app/setIsLoading', true)
 
   if (to.matched.some((route) => route.meta.requiresAdmin)) {
-    getUser()
-      .then(() => {
-        if (!store.state.user.user.isAdmin) {
+    getAuthStatus()
+      .then(({ authenticated, isAdmin }) => {
+        if (!authenticated || !isAdmin) {
           next({
             path: '/login',
             query: {
@@ -850,13 +858,14 @@ router.beforeEach((to, from, next) => {
       })
       .catch(() => {})
   } else if (to.matched.some((route) => route.meta.protected)) {
-    getUser()
-      .then(() => {
-        if (!store.getters['user/isAuthenticated']) {
+    getAuthStatus()
+      .then(({ authenticated }) => {
+        if (!authenticated) {
           next({
             path: '/login',
             query: {
               redirect: to.fullPath,
+              401: true,
             },
           })
         } else if (
@@ -876,21 +885,13 @@ router.beforeEach((to, from, next) => {
       })
       .catch(() => {})
   } else if (to.matched.some((route) => route.meta.loggedOutOnly)) {
-    getUser()
-      .then(() => {
-        if (store.getters['user/isAuthenticated']) {
-          next('/dashboard')
-        } else {
-          next()
-        }
-      })
-      .catch(() => {})
-  } else if (to.matched.some((route) => route.meta.authOptional)) {
-    getUser()
-      .then(() => {
+    getAuthStatus().then(({ authenticated }) => {
+      if (authenticated) {
+        next('/dashboard')
+      } else {
         next()
-      })
-      .catch(() => {})
+      }
+    })
   } else {
     next()
   }
@@ -938,9 +939,13 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const is401 = error.request.status === 401
+    const isAuthenticatedRoute =
+      error.request.responseURL.indexOf('/api/') !== -1
+
     const isGetUserAttempt =
       error.request.responseURL.indexOf('/api/user') !== -1 &&
       error.response.config.method === 'get'
+
     const isGetSessionAttempt =
       error.request.responseURL.indexOf('/api/session/current') !== -1
     const isGetSubjectsAttempt =
@@ -948,9 +953,18 @@ axiosInstance.interceptors.response.use(
 
     if (
       is401 &&
-      !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt)
-    )
-      router.push('/login?401=true').catch(() => {})
+      !(isGetUserAttempt || isGetSessionAttempt || isGetSubjectsAttempt) &&
+      isAuthenticatedRoute
+    ) {
+      router
+        .push(`login/?401=true&redirect=${router.currentRoute.value.path}`)
+        .catch((err) => {
+          LoggerService.noticeError(
+            err,
+            'Could not navigate to login page after 401 error'
+          )
+        })
+    }
     return Promise.reject(error)
   }
 )

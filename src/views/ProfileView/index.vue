@@ -417,6 +417,7 @@ const ProfileSections = {
   BROWSER_NOTIFICATIONS: 'browserNotifications',
   CLEVER_SYNC: 'cleverSync',
   PREFERRED_LANGUAGE: 'preferredLanguage',
+  // pragma: allowlist nextline secret
   RESET_PASSWORD: 'resetPassword',
   DELETE_ACCOUNT: 'deleteAccount',
   UNLOCKED_SUBJECTS: 'unlockedSubjects',

@@ -1,22 +1,21 @@
-import AuthService from './AuthService'
 import NetworkService from './NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import Gleap from 'gleap'
+import LoggerService from './LoggerService'
 
 export default {
   getUser() {
-    return AuthService.getAuth().then((auth) => {
-      if (auth.authenticated) {
-        return auth.user
-      }
+    return NetworkService.user()
+      .then((res) => {
+        const { data } = res
 
-      if (auth.err) {
-        throw auth.err
-      }
-
-      return Promise.resolve({})
-    })
+        return data.user ?? {}
+      })
+      .catch((err) => {
+        LoggerService.noticeError(err, "Couldn't retrieve user")
+        return {}
+      })
   },
   async setProfile(data, store) {
     await NetworkService.setProfile(data)
