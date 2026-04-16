@@ -1616,7 +1616,7 @@ p.small-paragraph {
   flex-direction: row;
   :deep(svg) {
     margin-right: 0.4em;
-    max-height: 24px;
+    height: 100%;
   }
 }
 </style>

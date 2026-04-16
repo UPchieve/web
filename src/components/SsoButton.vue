@@ -50,7 +50,7 @@ export default {
 <style lang="scss" scoped>
 .logo {
   margin-right: 0.4em;
-  max-height: 30px;
+  height: 100%;
   &--img {
     height: 30px;
     width: 30px;
