@@ -1611,4 +1611,12 @@ p.small-paragraph {
   margin: 4px 0;
   text-align: center;
 }
+.google {
+  display: flex;
+  flex-direction: row;
+  :deep(svg) {
+    margin-right: 0.4em;
+    max-height: 24px;
+  }
+}
 </style>
