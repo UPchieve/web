@@ -57,6 +57,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES]: false,
       [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR]: false,
+      [POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -254,5 +255,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR],
     volunteerHoursCalculatorCopy: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR],
+    isPresessionFakeDoorQuestionEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION],
   },
 }

@@ -13,7 +13,7 @@
         This will give your coach the info they need to help you.
       </div>
       <stepper
-        :totalSteps="survey.length"
+        :totalSteps="surveySteps.length"
         :currentStep="currentStep"
         class="stepper"
       />
@@ -28,8 +28,34 @@
           }"
         >
           <template v-for="response in currentQuestion.responses">
+            <div
+              v-if="currentQuestion.questionId === fakeDoorQuestionId"
+              :key="`${response.responseId}-checkbox-container`"
+              class="fake-door-checkbox"
+            >
+              <check-box
+                class="question__response"
+                :id="`${currentQuestion.questionId}_${response.responseId}`"
+                :checked="
+                  userResponse[
+                    fakeDoorQuestionId
+                  ]?.selectedResponseIds?.includes(response.responseId)
+                "
+                :modelValue="
+                  userResponse[
+                    fakeDoorQuestionId
+                  ]?.selectedResponseIds?.includes(response.responseId)
+                "
+                @update:modelValue="
+                  updateFakeDoorResponse(response.responseId, $event)
+                "
+              >
+                {{ response.responseText }}
+              </check-box>
+            </div>
+
             <survey-image
-              v-if="isRowOfImages"
+              v-else-if="isRowOfImages"
               :data-testid="`survey-question-${response.responseText}`"
               class="question__response question__response-image"
               :key="`${response.responseId}-image`"
@@ -85,7 +111,7 @@
           primary
           @click="nextStep"
           data-testid="presession-next-button"
-          v-if="currentStep !== survey.length"
+          v-if="currentStep !== surveySteps.length"
           :disabled="isNextButtonDisabled ? true : null"
           >Next</large-button
         >
@@ -93,7 +119,7 @@
         <large-button
           primary
           data-testid="presession-submit"
-          v-if="currentStep === survey.length"
+          v-if="currentStep === surveySteps.length"
           @click="submitSurvey"
           :disabled="!isSurveyComplete ? true : null"
           >Start a chat</large-button
@@ -109,9 +135,11 @@ import LargeButton from '@/components/LargeButton.vue'
 import Stepper from '@/components/Stepper.vue'
 import NetworkService from '@/services/NetworkService'
 import CrossIcon from '@/assets/cross.svg'
-import { QUESTION_TYPES } from '@/consts'
+import { QUESTION_TYPES, EVENTS } from '@/consts'
 import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
 import SurveyImage from '@/components/Surveys/SurveyImage.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import CheckBox from '@/components/CheckBox.vue'
 
 export default {
   components: {
@@ -120,6 +148,7 @@ export default {
     CrossIcon,
     SurveyRadio,
     SurveyImage,
+    CheckBox,
   },
 
   props: {
@@ -136,6 +165,7 @@ export default {
       survey: [],
       surveyId: null,
       surveyTypeId: null,
+      fakeDoorQuestionId: 'fakeDoorQuestion',
     }
   },
 
@@ -158,12 +188,51 @@ export default {
   computed: {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      isPresessionFakeDoorQuestionEnabled:
+        'featureFlags/isPresessionFakeDoorQuestionEnabled',
     }),
+    fakeDoorQuestion() {
+      return {
+        questionId: this.fakeDoorQuestionId,
+        questionText: 'What helps you learn best?',
+        questionType: 'multiple choice',
+        responses: [
+          {
+            responseId: 'bePatient',
+            responseText: 'Be patient - this topic is hard for me',
+          },
+          {
+            responseId: 'rightTrack',
+            responseText: `Tell me when I'm on the right track`,
+          },
+          {
+            responseId: 'letMeTry',
+            responseText: 'Let me try before you explain',
+          },
+          {
+            responseId: 'stepByStep',
+            responseText: 'Break things down step by step for me',
+          },
+        ],
+      }
+    },
+
+    surveySteps() {
+      if (this.isPresessionFakeDoorQuestionEnabled)
+        return [this.fakeDoorQuestion, ...this.survey]
+      return this.survey
+    },
     isSurveyComplete() {
-      for (const question of this.survey) {
+      for (const question of this.surveySteps) {
         const questionId = question.questionId
         const userResponse = this.userResponse[questionId]
-        if (!userResponse.responseId) return false
+
+        if (questionId === this.fakeDoorQuestionId) {
+          if (!userResponse?.selectedResponseIds?.length) return false
+          continue
+        }
+
+        if (!userResponse?.responseId) return false
 
         // check if a response that should have an open response was entered
         const response = question.responses.find(
@@ -180,7 +249,7 @@ export default {
     },
     currentQuestion() {
       // In order to access the 0-based array of `this.survey` we must take one from the currentStep
-      return this.survey[this.currentStep - 1]
+      return this.surveySteps[this.currentStep - 1]
     },
     // checks if the current question has a row of responses that require to show a display image
     isRowOfImages() {
@@ -190,6 +259,13 @@ export default {
       return QUESTION_TYPES
     },
     isNextButtonDisabled() {
+      if (
+        this.currentQuestion &&
+        this.currentQuestion.questionId === this.fakeDoorQuestionId
+      )
+        return !this.userResponse[this.fakeDoorQuestionId]?.selectedResponseIds
+          ?.length
+
       return (
         this.currentQuestion &&
         this.userResponse[this.currentQuestion.questionId] &&
@@ -208,7 +284,9 @@ export default {
       if (!this.isSurveyComplete) return
 
       const submissions = []
-      for (const question of this.survey) {
+      for (const question of this.surveySteps) {
+        if (question.questionId === this.fakeDoorQuestionId) continue
+
         const questionId = question.questionId
         const response = this.userResponse[questionId]
         submissions.push({
@@ -230,6 +308,25 @@ export default {
       this.$store.dispatch('app/modal/hide')
     },
     nextStep() {
+      if (
+        this.currentQuestion.questionId === this.fakeDoorQuestionId &&
+        this.userResponse[this.fakeDoorQuestionId]?.selectedResponseIds?.length
+      ) {
+        const selectedResponseIds =
+          this.userResponse[this.fakeDoorQuestionId].selectedResponseIds
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_SELECTED_PRESESSION_FAKE_DOOR_OPTION,
+          {
+            subject: this.subject,
+            responses: this.fakeDoorQuestion.responses
+              .filter((response) =>
+                selectedResponseIds.includes(response.responseId)
+              )
+              .map((response) => response.responseText),
+          }
+        )
+      }
+
       this.currentStep++
     },
     prevStep() {
@@ -239,15 +336,42 @@ export default {
     buildUserResponse() {
       const userResponse = Object.assign({}, this.userResponse)
 
-      for (const question of this.survey) {
-        const questionResponse = {
-          responseId: null,
-          openResponse: '',
-        }
+      for (const question of this.surveySteps) {
+        const questionResponse =
+          question.questionId === this.fakeDoorQuestionId
+            ? {
+                selectedResponseIds: [],
+                openResponse: '',
+              }
+            : {
+                responseId: null,
+                openResponse: '',
+              }
         userResponse[question.questionId] = questionResponse
       }
 
       this.userResponse = userResponse
+    },
+    updateFakeDoorResponse(responseId, isChecked) {
+      const currentSelectedResponseIds = [
+        ...(this.userResponse[this.fakeDoorQuestionId]?.selectedResponseIds ||
+          []),
+      ]
+      const selectedResponseIds = isChecked
+        ? [...currentSelectedResponseIds, responseId]
+        : currentSelectedResponseIds.filter(
+            (selectedResponseId) => selectedResponseId !== responseId
+          )
+      const responseAnswer = {
+        [this.fakeDoorQuestionId]: Object.assign(
+          {},
+          this.userResponse[this.fakeDoorQuestionId],
+          {
+            selectedResponseIds,
+          }
+        ),
+      }
+      this.userResponse = Object.assign({}, this.userResponse, responseAnswer)
     },
     updateUserResponse(questionId, responseId, openResponseText = '') {
       // Vue cannot detect property addition or deletion on objects. A new object
@@ -338,6 +462,10 @@ export default {
       }
     }
   }
+}
+
+.fake-door-checkbox {
+  margin-bottom: 0.5em;
 }
 
 .stepper {
