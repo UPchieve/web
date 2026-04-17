@@ -225,10 +225,10 @@ export default {
         this.error = ''
       } catch (error) {
         this.handleRequestError(error)
+      } finally {
+        this.isSubmitting = false
+        this.loadingMessage = ''
       }
-
-      this.isSubmitting = false
-      this.loadingMessage = ''
     },
     async confirmVerificationCode() {
       this.error = ''
@@ -291,8 +291,10 @@ export default {
         }
       } catch (error) {
         this.handleRequestError(error)
+      } finally {
+        this.isSubmitting = false
+        this.loadingMessage = ''
       }
-      this.isSubmitting = false
     },
     handleRequestError(error) {
       this.error =
