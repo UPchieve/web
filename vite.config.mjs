@@ -8,6 +8,8 @@ import { analyzer } from 'vite-bundle-analyzer'
 import { visualizer } from 'rollup-plugin-visualizer'
 import vuetify from 'vite-plugin-vuetify'
 
+let svgoPrefixId = 0
+
 export default defineConfig({
   envPrefix: 'VUE_',
   define: {
@@ -35,6 +37,24 @@ export default defineConfig({
                 removeViewBox: false,
                 cleanupIds: true,
               },
+            },
+          },
+          /*
+           * when you have two svgs on a page and they are run through svgo,
+           * it's possible that they each get assigned id="a".
+           * this can break svgs in unexpected ways depending on the elements
+           * present in the svgs (e.g. `<g filter="url(#a)">)`).
+           *
+           * we saw this with google + clever svgs where both buttons would
+           * get the google logo. this plugin avoids those id collisions
+           * by prefixing the value of a monotonic counter to the id
+           * so that we get ids like "#1a" and "#2a", etc...
+           */
+          {
+            name: 'prefixIds',
+            params: {
+              delim: '',
+              prefix: () => svgoPrefixId++,
             },
           },
         ],
