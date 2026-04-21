@@ -183,6 +183,11 @@ export default {
     this.$store.dispatch('app/modal/update', {
       modalTemplateProps: { showTemplateButtons: false },
     })
+
+    if (this.isPresessionFakeDoorQuestionEnabled)
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_PRESESSION_FAKE_DOOR_QUESTION_SHOWN
+      )
   },
 
   computed: {
@@ -227,10 +232,7 @@ export default {
         const questionId = question.questionId
         const userResponse = this.userResponse[questionId]
 
-        if (questionId === this.fakeDoorQuestionId) {
-          if (!userResponse?.selectedResponseIds?.length) return false
-          continue
-        }
+        if (questionId === this.fakeDoorQuestionId) continue
 
         if (!userResponse?.responseId) return false
 
@@ -263,8 +265,7 @@ export default {
         this.currentQuestion &&
         this.currentQuestion.questionId === this.fakeDoorQuestionId
       )
-        return !this.userResponse[this.fakeDoorQuestionId]?.selectedResponseIds
-          ?.length
+        return false
 
       return (
         this.currentQuestion &&
