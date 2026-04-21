@@ -790,23 +790,13 @@ hr {
 
 .wrap-container {
   padding: 15px 15px 55px 15px;
-  @include flex-container(column);
-  align-items: stretch;
+  gap: 1em;
+  display: grid;
 
-  @include child-spacing(top, 16px);
-  @include child-spacing(right, 0);
-
-  @include breakpoint-above('large') {
+  @include breakpoint-above('huge') {
     padding: 40px;
-
-    @include child-spacing(top, 0);
-    @include child-spacing(right, 40px);
-
-    @include flex-container(row);
-
-    & > * {
-      flex-basis: 50%;
-    }
+    grid-auto-flow: column;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
 
@@ -842,7 +832,6 @@ hr {
 
   @include breakpoint-above('large') {
     padding: 40px;
-    min-width: 600px;
   }
 }
 
