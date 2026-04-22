@@ -7,13 +7,6 @@
 
       <div v-if="isStudentVolunteerVerification" class="student-volunteer-info">
         <span class="uc-form-header">Let's verify your phone number.</span>
-        <div
-          class="switch-account-mode"
-          :class="{ 'switch-account-mode-mobile': mobileMode }"
-        >
-          Want to set this up later?&nbsp;
-          <SwitchAccountModeButton />
-        </div>
       </div>
       <VerificationMethodSelector
         v-if="step === 1 && userCanChooseVerificationMethod"
@@ -88,12 +81,36 @@
         >
           Verify my account
         </button>
-        <button class="uc-form-button-secondary" @click="logout" type="button">
-          Logout
-        </button>
       </div>
-
-      <RecaptchaCaption />
+      <LineDivider />
+      <div v-if="isStudentVolunteerVerification" class="student-volunteer-info">
+        <div
+          class="switch-account-mode"
+          :class="{ 'switch-account-mode-mobile': mobileMode }"
+        >
+          <span>Want to set this up later?</span>
+          <SwitchAccountModeButton class="switch-button">
+            <template #button="{ switchRole }">
+              <LargeButton
+                variant="primary-blue"
+                @click="switchRole"
+                :show-arrow="false"
+              >
+                Back to Student Mode
+              </LargeButton>
+            </template>
+          </SwitchAccountModeButton>
+        </div>
+      </div>
+      <LargeButton
+        class="uc-form-button-secondary"
+        @click="logout"
+        type="button"
+        variant="text"
+        :show-arrow="false"
+      >
+        Logout
+      </LargeButton>
     </div>
 
     <loader v-if="isSubmitting" :message="loadingMessage" overlay />
@@ -109,18 +126,20 @@ import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
-import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
 import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import LineDivider from '@/components/LineDivider.vue'
 
 export default {
   name: 'VerificationView',
   components: {
     SwitchAccountModeButton,
-    RecaptchaCaption,
     FormPageTemplate,
     Loader,
     VerificationMethodSelector,
+    LargeButton,
+    LineDivider,
   },
   data() {
     return {
@@ -364,14 +383,23 @@ export default {
 .student-volunteer-info {
   padding-bottom: 16px;
   gap: 16px;
+}
+.switch-account-mode {
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .switch-account-mode {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .switch-account-mode-mobile {
-    display: inherit;
+.switch-account-mode-mobile {
+  display: inherit;
+}
+.switch-button {
+  width: 100%;
+  padding-top: 16px;
+  :deep(button) {
+    width: 100%;
+    height: 48px;
   }
 }
 </style>

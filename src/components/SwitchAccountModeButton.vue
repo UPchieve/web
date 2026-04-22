@@ -1,13 +1,15 @@
 <template>
   <div id="switch-account-mode-btn">
-    <div
-      class="switch-role-button"
-      id="switch-role-button"
-      role="button"
-      @click="switchRole"
-    >
-      {{ message }}
-    </div>
+    <slot name="button" :message="message" :switchRole="switchRole">
+      <div
+        class="switch-role-button"
+        id="switch-role-button"
+        role="button"
+        @click="switchRole"
+      >
+        {{ message }}
+      </div>
+    </slot>
     <Modal class="error-switching-modal" v-if="error">
       {{ error }}
       <LargeButton @click="closeErrorModal"> OK </LargeButton>
