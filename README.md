@@ -28,7 +28,7 @@ This repository is the frontend SPA only. It relies on the API server and worker
 1. The recommended tool for runtime version management is [`nvm`][nvm].
 
    ```shell
-      nvm install v24.13.0 && nvm use v24.13.0
+      nvm install v24.14.1 && nvm use v24.14.1
    ```
 
 2. Install dependencies
