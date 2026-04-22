@@ -105,10 +105,30 @@ export default {
           return
         }
 
+        const sessionId = state.currentConversation.sessionId
+        if (!sessionId) {
+          commit('setError', 'No active tutoring session')
+          return
+        }
+
+        let snapshotBlob
+        const toolType = rootState.user.session.toolType
+        const isUpbotSessionEditorContextEnabled =
+          rootGetters['featureFlags/isUpbotSessionEditorContextEnabled']
+        if (isUpbotSessionEditorContextEnabled && toolType === 'whiteboard') {
+          const zwibbler = rootState.session.zwibbler
+          if (zwibbler?.save) {
+            const snapshotDataUrl = zwibbler.save({
+              format: 'image/jpeg',
+            })
+            const response = await fetch(snapshotDataUrl)
+            snapshotBlob = await response.blob()
+          }
+        }
+
         const userId = rootState.user.user.id
         const senderUserType = rootGetters['user/userType']
         const conversationId = state.currentConversation.conversationId
-        const sessionId = state.currentConversation.sessionId
         const subjectName = rootState.user.session.subTopic
         const payload = {
           userId,
@@ -117,6 +137,7 @@ export default {
           senderUserType,
           sessionId,
           subjectName,
+          snapshotBlob,
         }
         await NetworkService.sendTutorBotMessage(payload)
 

@@ -18,6 +18,8 @@ export type SessionMessagePublic = {
   createdAt: Date
 }
 
+export type ToolTypes = 'whiteboard' | 'documenteditor'
+
 export type CurrentSessionPublic = {
   _id: Uuid
   id: Uuid
@@ -27,7 +29,7 @@ export type CurrentSessionPublic = {
   volunteer?: SessionUserInfoPublic
   volunteerJoinedAt?: Date
   messages: SessionMessagePublic[]
-  toolType: string
+  toolType: ToolTypes
   docEditorVersion?: number
   studentBannedFromLiveMedia?: boolean
   volunteerBannedFromLiveMedia?: boolean

@@ -34,8 +34,9 @@ export type TutorBotAddMessagePayload = {
   conversationId: Uuid
   message: string
   senderUserType: TutorBotHumanSenderType
-  sessionId?: Uuid
+  sessionId: Uuid
   subjectName: string
+  snapshotBlob?: Blob
 }
 
 export type TutorBotSystemMessage = {

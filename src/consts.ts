@@ -943,6 +943,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   PRESESSION_FAKE_DOOR_QUESTION = 'presession-fake-door-question',
   SHOW_BECOME_VOLUNTEER_AD = 'show-become-volunteer-ad',
   SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK = 'show-volunteer-hours-calculator-link',
+  UPBOT_SESSION_EDITOR_CONTEXT = 'upbot-session-editor-context',
 }
 
 export const ANALYTICS_REPORT_ROW = {

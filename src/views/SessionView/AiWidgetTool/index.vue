@@ -263,13 +263,9 @@ onUnmounted(() => {
       </button>
     </div>
     <div class="body">
-      <Errors></Errors>
-      <BotChat
-        class="overrides"
-        bg-color="#fff"
-        :displayContext="DISPLAY_CONTEXT.SESSION"
-      >
-      </BotChat>
+      <Errors />
+      <BotChat class="overrides" :displayContext="DISPLAY_CONTEXT.SESSION" />
+
       <div class="resize-handle-container">
         <div
           class="resize-handle"

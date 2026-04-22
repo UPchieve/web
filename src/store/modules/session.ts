@@ -18,6 +18,10 @@ type Session = {
   volunteerId?: string
 }
 
+type Zwibbler = {
+  save(data: { format: 'image/jpeg' | 'image/png' }): string
+}
+
 type JourneySessionData = {
   dropdownLabel: string
   key: string
@@ -31,6 +35,7 @@ export type SessionState = {
   latestSession?: Session
   cooldownMinutes: number
   journeySessionData?: JourneySessionData
+  zwibbler: Zwibbler | null
 }
 
 export default {
@@ -40,6 +45,7 @@ export default {
     latestSession: undefined,
     cooldownMinutes: 0,
     journeySessionData: undefined,
+    zwibbler: null,
   } as SessionState,
 
   getters: {
@@ -57,6 +63,8 @@ export default {
       (state.cooldownMinutes = cooldownMinutes),
     setJourneySessionData: (state: SessionState, data: JourneySessionData) =>
       (state.journeySessionData = data),
+    setZwibbler: (state: SessionState, zwibbler: Zwibbler | null) =>
+      (state.zwibbler = zwibbler),
   },
 
   actions: {
@@ -134,6 +142,12 @@ export default {
           `Could not set latest session in session store: ${errorFromHttpResponse(err)}`
         )
       }
+    },
+    setZwibbler(
+      { commit }: ActionContext<SessionState, RootState>,
+      zwibbler: Zwibbler | null
+    ) {
+      commit('setZwibbler', zwibbler)
     },
   },
 }

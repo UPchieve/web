@@ -7,21 +7,20 @@ import ModerationService from '@/services/ModerationService'
 import type { RootState } from '@/store/index'
 import { DISPLAY_CONTEXT } from '@/constants/bot-conversations'
 
-const { bgColor, displayContext } = defineProps<{
+const { displayContext } = defineProps<{
   displayContext: DISPLAY_CONTEXT
-  bgColor?: string
 }>()
 const store = useStore<RootState>()
 const user = computed(() => store.state.user.user)
 
-const chatContainer = ref()
-const scrollToBottom = async () => {
+const chatContainer = ref<HTMLElement | null>(null)
+
+async function scrollToBottom() {
   if (chatContainer?.value?.scrollHeight) {
     await nextTick()
     chatContainer.value.scrollTop = chatContainer.value.scrollHeight
   }
 }
-onMounted(() => scrollToBottom())
 
 const conversation = computed(
   () => store.getters['botConversations/currentConversation']
@@ -35,12 +34,14 @@ const fetchingConversation = computed(
 const messages = computed(() => conversation.value.messages ?? [])
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
 
-const sendMessage = async (message: string) => {
+async function sendMessage(message: string): Promise<boolean> {
   store.commit('botConversations/setMessageIsSending', true)
   store.commit('botConversations/clearErrors')
   const isClean = await ModerationService.checkIfMessageIsClean({
     message,
     sessionId: conversation.value.sessionId,
+    // TODO: Figure out the correct source value
+    source: '',
   })
   // When we have a sessionId, we get more granular moderation
   if (isClean.failures && Object.keys(isClean.failures).length) {
@@ -69,8 +70,11 @@ const sendMessage = async (message: string) => {
       'Messages cannot contain personal information, profanity, or links to third party video services'
     )
   }
+
   return isClean
 }
+
+onMounted(() => scrollToBottom())
 
 watch(() => messages.value.length, scrollToBottom)
 </script>
@@ -86,17 +90,16 @@ watch(() => messages.value.length, scrollToBottom)
       />
     </div>
     <div
+      class="chat-composer"
       :class="{
-        'text-area-container': true,
-        'text-area-container-mobile-session':
+        'chat-composer-mobile-session':
           isMobileMode && displayContext === DISPLAY_CONTEXT.SESSION,
       }"
-      :style="{ backgroundColor: bgColor ?? '#fbfbfc' }"
     >
       <Textarea
-        class="text-area"
+        class="chat-composer__input"
         :disabled="messageSending || fetchingConversation"
-        :sendMessage="(message: string) => sendMessage(message)"
+        :sendMessage="sendMessage"
         autocomplete="off"
       ></Textarea>
     </div>
@@ -105,33 +108,32 @@ watch(() => messages.value.length, scrollToBottom)
 
 <style lang="scss" scoped>
 .bot-chat-container {
-  overflow-y: scroll;
-}
-.chat-log {
-  padding-bottom: calc(64px + 72px);
-}
-
-.text-area-container {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 36px;
-  margin-left: auto;
-  margin-right: auto;
-  gap: 16px;
+  height: 100%;
+  min-height: 0;
 }
 
-.text-area-container-mobile-session {
-  padding-bottom: 8px;
-  gap: 8px;
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
-.text-area {
-  width: 80%;
-  max-width: 695px;
+.chat-composer {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  padding: 0.6em 1em;
+
+  &-mobile-session {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  &__input {
+    width: 100%;
+  }
 }
 </style>

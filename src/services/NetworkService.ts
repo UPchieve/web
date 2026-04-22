@@ -1168,17 +1168,20 @@ export default {
     senderUserType,
     sessionId,
     subjectName,
+    snapshotBlob,
   }: TutorBotAddMessagePayload) {
     try {
+      const form = new FormData()
+      form.append('userId', userId)
+      form.append('message', message)
+      form.append('senderUserType', senderUserType)
+      form.append('sessionId', sessionId)
+      form.append('subjectName', subjectName)
+      if (snapshotBlob) form.append('snapshot', snapshotBlob, 'whiteboard.jpg')
+
       return await httpPost<TutorBotAddMessageResponsePublic>(
         `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
-        {
-          userId,
-          message,
-          senderUserType,
-          sessionId,
-          subjectName,
-        }
+        form
       )
     } catch (err) {
       throw this._axiosErrorHandler(err as AxiosError)
