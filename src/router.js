@@ -70,6 +70,7 @@ const SurveysView = () => import('./views/SurveysView.vue')
 const SocialMediaSharingInstructions = () =>
   import('@/views/DashboardView/VolunteerDashboard/SocialMediaSharingInstructions.vue')
 const JourneysView = () => import('./views/JourneysView.vue')
+const HourCalculatorView = () => import('@/components/HourCalculator.vue')
 const NTHSGroupsView = () => import('./views/NTHS/NTHSGroupsView.vue')
 const NTHSCreateGroupView = () => import('./views/NTHS/NTHSCreateGroupView.vue')
 const NTHSGroupDashboardView = () =>
@@ -722,6 +723,17 @@ const routes = [
     path: '/journeys',
     name: 'JourneysView',
     component: JourneysView,
+    meta: {
+      protected: true,
+      preloadViews: {
+        student: STUDENT_SIDEBAR_LINKED_VIEWS,
+      },
+    },
+  },
+  {
+    path: '/hour-calculator',
+    name: 'HourCalculatorView',
+    component: HourCalculatorView,
     meta: {
       protected: true,
       preloadViews: {

@@ -34,10 +34,6 @@ const yearOptions = computed(() => {
   return [y, y + 1, y + 2, y + 3, y + 4]
 })
 
-const volunteerHoursCalculatorCopy = computed(
-  () => store.getters['featureFlags/volunteerHoursCalculatorCopy']
-)
-
 const userIds = new Set(
   JSON.parse(localStorage.getItem('has-seen-volunteer-calculator') ?? '[]')
 )
@@ -54,7 +50,7 @@ onMounted(() => {
 <template>
   <div class="hour-calculator">
     <div class="inputs">
-      <h2 class="headline">{{ volunteerHoursCalculatorCopy }}</h2>
+      <h2 class="headline">Earn Service Hours</h2>
       <p class="hook">
         Graduation requirements or college apps that stand out — whatever your
         goal, we'll help you get there. Enter your hours and deadline, and we'll

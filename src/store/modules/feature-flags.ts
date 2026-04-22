@@ -56,9 +56,9 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY]: false,
       [POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES]: false,
       [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR]: false,
       [POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_BECOME_VOLUNTEER_AD]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -81,8 +81,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
 
-      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR]:
-        'Boost Your College Apps',
+      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK]:
+        'Service Hours',
     },
   },
   mutations: {
@@ -252,10 +252,14 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES],
     isNTHSApplicationPageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE],
-    shouldShowVolunteerHoursCalculator: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR],
-    volunteerHoursCalculatorCopy: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR],
+    shouldShowVolunteerHoursCalculatorLink: (state: FeatureFlagState) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK
+      ],
+    volunteerHoursCalculatorLinkCopy: (state: FeatureFlagState) =>
+      state.payloadFlags[
+        POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK
+      ],
     isPresessionFakeDoorQuestionEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION],
     shouldShowBecomeVolunteer: (state: FeatureFlagState) =>

@@ -7,7 +7,6 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
 import TutorIcon from '@/assets/icons/graduation_cap_icon.svg'
 import BookIcon from '@/assets/icons/open_book_icon.svg'
-import HourCalculator from '@/components/HourCalculator.vue'
 
 type JourneyStep = {
   title: string
@@ -29,11 +28,6 @@ type Journey = {
 
 const $router = useRouter()
 const store = useStore()
-
-const shouldShowVolunteerHoursCalculator = computed(
-  () => store.getters['featureFlags/shouldShowVolunteerHoursCalculator']
-)
-
 const selectedJourney = ref<Journey | undefined>(undefined)
 
 const journeys = computed(() => [
@@ -117,11 +111,6 @@ onMounted(() => {
 
 <template>
   <section class="journey-page">
-    <div class="hours-container">
-      <HourCalculator
-        v-if="shouldShowVolunteerHoursCalculator"
-      ></HourCalculator>
-    </div>
     <div class="journey-container">
       <h2 class="journey-page__title">UPchieve College Journey</h2>
       <p class="journey-page__subtitle">
@@ -190,11 +179,6 @@ onMounted(() => {
   padding: 2rem;
   border-radius: 2rem;
 
-  @include breakpoint-above('large') {
-    max-width: 800px;
-  }
-}
-.hours-container {
   @include breakpoint-above('large') {
     max-width: 800px;
   }

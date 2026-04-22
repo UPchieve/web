@@ -7,6 +7,7 @@ import { EVENTS } from '@/consts'
 import { useRouter } from 'vue-router'
 import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
+import NetworkService from '@/services/NetworkService'
 
 const MS_PER_WEEK = 1000 * 60 * 60 * 24 * 7
 const AVG_WEEKS_PER_MONTH = 52 / 12
@@ -90,16 +91,21 @@ const goalAlreadyMet = computed(() => {
   return hoursRemaining.value !== null && hoursRemaining.value === 0
 })
 
-function openBecomeVolunteerModal() {
+const becomeAVolunteer = async () => {
   AnalyticsService.captureEvent(
     EVENTS.V_HOUR_CALCULATOR_BECOME_VOLUNTEER_CLICKED
   )
-  store.dispatch('app/modal/show', {
-    component: 'BecomeAVolunteerModal',
-    data: {
-      showTemplateButtons: false,
-    },
-  })
+  try {
+    await NetworkService.addVolunteerRoleForStudent()
+    await UserService.switchActiveRole({ $store: store }, 'volunteer')
+    if (router.currentRoute.value.path === '/dashboard') router.go(0)
+    else await router.replace('/dashboard')
+  } catch (e) {
+    LoggerService.noticeError(
+      e,
+      `Failed to add or switch active role for user: ${user.value.id}`
+    )
+  }
 }
 
 watch(
@@ -257,7 +263,7 @@ const switchRole = async () => {
         class="cta"
         variant="primary-blue"
         :show-arrow="false"
-        @click="openBecomeVolunteerModal"
+        @click="becomeAVolunteer"
       >
         Get Started
       </large-button>

@@ -940,9 +940,9 @@ export enum POSTHOG_FEATURE_FLAGS {
   GET_SESSION_SUMMARY = 'get-session-summary',
   MODERATE_ZWIBBLER_TEXT_NODES = 'moderate-zwibbler-text-nodes',
   NTHS_APPLICATION_PAGE = 'nths-application-page',
-  SHOW_VOLUNTEER_HOURS_CALCULATOR = 'show-volunteer-hours-calculator',
   PRESESSION_FAKE_DOOR_QUESTION = 'presession-fake-door-question',
   SHOW_BECOME_VOLUNTEER_AD = 'show-become-volunteer-ad',
+  SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK = 'show-volunteer-hours-calculator-link',
 }
 
 export const ANALYTICS_REPORT_ROW = {

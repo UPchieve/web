@@ -56,10 +56,6 @@
           id="journeys-sidebar-link"
         >
           <compass-icon class="icon compass-icon" />
-          <activity-dot
-            v-if="!hasSeenCalculator"
-            class="SidebarLinks__notification"
-          />
         </sidebar-link>
 
         <sidebar-link
@@ -162,6 +158,18 @@
         >
           <folder-icon class="icon" />
         </sidebar-link>
+        <sidebar-link
+          v-if="shouldShowVolunteerHoursCalculatorLink"
+          to="/hour-calculator"
+          :text="volunteerHoursCalculatorLinkCopy"
+          id="hour-calculator-modal-link"
+        >
+          <calculator-icon class="icon" />
+          <activity-dot
+            v-if="!hasSeenCalculator"
+            class="SidebarLinks__notification"
+          />
+        </sidebar-link>
       </div>
 
       <div class="bottom">
@@ -197,6 +205,7 @@ import SidebarLink from './SidebarLink.vue'
 import BookIcon from '@/assets/icons/open_book_icon.svg'
 import CalendarIcon from '@/assets/icons/calendar_icon.svg'
 import ClockIcon from '@/assets/icons/clock_icon.svg'
+import CalculatorIcon from '@/assets/icons/calculator.svg'
 import FolderIcon from '@/assets/icons/folder_icon.svg'
 import GraduationCapIcon from '@/assets/icons/graduation_cap_icon.svg'
 import HandWaveIcon from '@/assets/icons/hand-wave.svg'
@@ -236,6 +245,7 @@ export default {
     CompassIcon,
     AmbassadorReferralModal,
     GroupsIcon,
+    CalculatorIcon,
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {
@@ -270,11 +280,13 @@ export default {
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
       userIsApprovedNTHSPresident: 'featureFlags/userIsApprovedNTHSPresident',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
-      shouldShowVolunteerHoursCalculator:
-        'featureFlags/shouldShowVolunteerHoursCalculator',
+      shouldShowVolunteerHoursCalculatorLink:
+        'featureFlags/shouldShowVolunteerHoursCalculatorLink',
+      volunteerHoursCalculatorLinkCopy:
+        'featureFlags/volunteerHoursCalculatorLinkCopy',
     }),
     hasSeenCalculator() {
-      if (this.shouldShowVolunteerHoursCalculator) {
+      if (this.shouldShowVolunteerHoursCalculatorLink) {
         void this.$route.path // run this each time the route changes
         const userIds = JSON.parse(
           localStorage.getItem('has-seen-volunteer-calculator') ?? '[]'
