@@ -103,15 +103,35 @@ const autoflowRedirect = (to, from, next) => {
   else next()
 }
 
-async function getAuthStatus() {
+async function getAuthStatus(to) {
   try {
-    const { data } = await getStatus()
-
-    if (data.authenticated) {
-      await store.dispatch('user/fetchUser')
+    const isAuthenticated = store.getters['user/isAuthenticated']
+    // When we are already authenticated, let's re-fetch in the background
+    // that way we don't block the route transition
+    if (isAuthenticated) {
+      getStatus().then(async ({ data }) => {
+        if (data.authenticated) {
+          store.dispatch('user/fetchUser')
+        } else {
+          store.commit('user/setUser', {})
+          router.push({
+            path: '/login',
+            query: {
+              redirect: to.fullPath,
+              401: true,
+            },
+          })
+        }
+      })
+      return { authenticated: true }
+    } else {
+      // When we are not authenticated, block route transitions until we hear back
+      const { data } = await getStatus()
+      if (data.authenticated) {
+        await store.dispatch('user/fetchUser')
+      }
+      return data
     }
-
-    return data
   } catch {
     return {
       authenticated: false,
@@ -147,12 +167,13 @@ function preloadViews({ volunteer, student, teacher, admin }) {
   if (isTeacher && teacher?.length) teacher.forEach((fn) => fn())
   if (isAdmin && admin?.length) admin.forEach((fn) => fn())
 }
+
 const routes = [
   {
     path: '/',
     name: 'Home',
     beforeEnter: (to, from, next) => {
-      getAuthStatus()
+      getAuthStatus(to)
         .then(({ authenticated }) => {
           if (authenticated) {
             if (store.getters['user/isAutoFlowUser']) {
@@ -418,7 +439,7 @@ const routes = [
     component: VerificationView,
     meta: { protected: true },
     beforeEnter: (to, from, next) => {
-      getAuthStatus()
+      getAuthStatus(to)
         .then(({ authenticated }) => {
           if (
             authenticated &&
@@ -855,7 +876,7 @@ router.beforeEach((to, from, next) => {
   store.commit('app/setIsLoading', true)
 
   if (to.matched.some((route) => route.meta.requiresAdmin)) {
-    getAuthStatus()
+    getAuthStatus(to)
       .then(({ authenticated, isAdmin }) => {
         if (!authenticated || !isAdmin) {
           next({
@@ -870,7 +891,7 @@ router.beforeEach((to, from, next) => {
       })
       .catch(() => {})
   } else if (to.matched.some((route) => route.meta.protected)) {
-    getAuthStatus()
+    getAuthStatus(to)
       .then(({ authenticated }) => {
         if (!authenticated) {
           next({
@@ -897,7 +918,7 @@ router.beforeEach((to, from, next) => {
       })
       .catch(() => {})
   } else if (to.matched.some((route) => route.meta.loggedOutOnly)) {
-    getAuthStatus().then(({ authenticated }) => {
+    getAuthStatus(to).then(({ authenticated }) => {
       if (authenticated) {
         next('/dashboard')
       } else {
