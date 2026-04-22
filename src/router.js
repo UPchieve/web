@@ -103,12 +103,12 @@ const autoflowRedirect = (to, from, next) => {
   else next()
 }
 
-async function getAuthStatus(to) {
+async function getAuthStatus(to, isBlockingRoute) {
   try {
     const isAuthenticated = store.getters['user/isAuthenticated']
     // When we are already authenticated, let's re-fetch in the background
-    // that way we don't block the route transition
-    if (isAuthenticated) {
+    // that way we don't block the route transition.
+    if (isAuthenticated && !isBlockingRoute) {
       getStatus().then(async ({ data }) => {
         if (data.authenticated) {
           store.dispatch('user/fetchUser')
@@ -125,14 +125,17 @@ async function getAuthStatus(to) {
       })
       return { authenticated: true }
     } else {
-      // When we are not authenticated, block route transitions until we hear back
+      // When we are not authenticated or we definitely want to know the status of
+      //  the user before navigating to the page (like admin pages), block route
+      // transitions until we hear back.
       const { data } = await getStatus()
       if (data.authenticated) {
         await store.dispatch('user/fetchUser')
       }
       return data
     }
-  } catch {
+  } catch (e) {
+    LoggerService.noticeError(e)
     return {
       authenticated: false,
     }
@@ -876,7 +879,7 @@ router.beforeEach((to, from, next) => {
   store.commit('app/setIsLoading', true)
 
   if (to.matched.some((route) => route.meta.requiresAdmin)) {
-    getAuthStatus(to)
+    getAuthStatus(to, true)
       .then(({ authenticated, isAdmin }) => {
         if (!authenticated || !isAdmin) {
           next({
