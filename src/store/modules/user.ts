@@ -648,19 +648,6 @@ export default {
       )
     },
 
-    isInStudentVolunteerVerifyFlow: (
-      state: UserStoreState,
-      getters: RootGetters
-    ) => {
-      const hasNotVerifiedPhoneNumber =
-        !state.user.phone || !state.user.phoneVerified
-      return (
-        getters.isStudentVolunteer &&
-        getters.isVolunteer &&
-        hasNotVerifiedPhoneNumber
-      )
-    },
-
     isQuizStudyMaterialUser: (state: UserStoreState, getters: RootGetters) => {
       return (
         getters.isVolunteer &&

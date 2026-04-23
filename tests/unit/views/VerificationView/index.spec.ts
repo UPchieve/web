@@ -75,40 +75,5 @@ describe('VerificationView', () => {
         expect(wrapper.find(`[data-testid="${step}"]`).exists()).toBeTruthy()
       }
     )
-
-    it('Should force SMS verification for student-volunteers in volunteer mode', async () => {
-      const wrapper = getWrapper({
-        user: {
-          state: {
-            user: {
-              userRoles: ['student', 'volunteer'],
-              userType: 'volunteer',
-              phone: null,
-              phoneVerified: false,
-              verified: false,
-            },
-          },
-          getters: {
-            isVolunteer: () => true,
-            isStudentVolunteer: () => true,
-          },
-        },
-      })
-
-      const verificationMethodSelector = wrapper.find(
-        '[data-testid="verification-method-selector"]'
-      )
-      expect(verificationMethodSelector.isVisible()).toBe(true)
-      expect(
-        verificationMethodSelector
-          .find('[data-testid="phone-number-input-container"]')
-          .isVisible()
-      ).toBe(true)
-      expect(
-        verificationMethodSelector
-          .find('[data-testid="fieldset-verification-options"]')
-          .exists()
-      ).toBe(false)
-    })
   })
 })

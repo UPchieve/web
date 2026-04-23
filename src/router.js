@@ -444,11 +444,7 @@ const routes = [
     beforeEnter: (to, from, next) => {
       getAuthStatus(to)
         .then(({ authenticated }) => {
-          if (
-            authenticated &&
-            store.getters['user/isVerified'] &&
-            !store.getters['user/isInStudentVolunteerVerifyFlow']
-          ) {
+          if (authenticated && store.getters['user/isVerified']) {
             next('/dashboard')
           } else {
             next()
@@ -904,10 +900,7 @@ router.beforeEach((to, from, next) => {
               401: true,
             },
           })
-        } else if (
-          !store.getters['user/isVerified'] ||
-          store.getters['user/isInStudentVolunteerVerifyFlow']
-        ) {
+        } else if (!store.getters['user/isVerified']) {
           const route = '/verify'
           if (to.path.indexOf(route) !== -1) next()
           else

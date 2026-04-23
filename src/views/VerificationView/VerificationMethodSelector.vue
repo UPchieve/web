@@ -1,7 +1,7 @@
 <template>
   <div id="verification-method-selector__container">
     <fieldset
-      v-if="!forceSmsVerification"
+      v-if="!isForceSmsVerificationEnabled"
       data-testid="fieldset-verification-options"
     >
       <legend>How would you like to receive your verification code?</legend>
@@ -34,12 +34,13 @@
         </div>
       </div>
     </fieldset>
+    <!--    <legend v-else>Let's verify your phone number</legend>-->
     <div
       id="phone-number-input-container"
       data-testid="phone-number-input-container"
       v-if="
         verificationInputs.method === VERIFICATION_METHOD.SMS ||
-        forceSmsVerification
+        isForceSmsVerificationEnabled
       "
     >
       <label for="phone-number-input">Enter your phone number</label>
@@ -75,11 +76,6 @@ export default {
       type: Object,
       required: true,
     },
-    forceSmsVerification: {
-      type: Boolean,
-      default: false,
-      required: false,
-    },
   },
   emits: ['update:modelValue'],
   data() {
@@ -109,6 +105,8 @@ export default {
   computed: {
     ...mapGetters({
       showNationalPhoneNumbersOnly: 'user/showNationalPhoneNumbersOnly',
+      isForceSmsVerificationEnabled:
+        'featureFlags/isForceSmsVerificationEnabled',
     }),
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD

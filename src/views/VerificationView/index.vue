@@ -5,17 +5,11 @@
         {{ error }}
       </div>
 
-      <div v-if="isStudentVolunteerVerification" class="student-volunteer-info">
-        <span class="uc-form-header">Let's verify your phone number.</span>
-      </div>
       <VerificationMethodSelector
-        v-if="step === 1 && userCanChooseVerificationMethod"
+        v-if="step === 1 && userMustEnterVerificationDetails"
         data-testid="verification-method-selector"
         :email="user.email"
         v-model="verificationInputs"
-        :forceSmsVerification="
-          isStudentVolunteerVerification || isForceSmsVerificationEnabled
-        "
       />
 
       <!-- Verify code -->
@@ -81,36 +75,16 @@
         >
           Verify my account
         </button>
-      </div>
-      <LineDivider />
-      <div v-if="isStudentVolunteerVerification" class="student-volunteer-info">
-        <div
-          class="switch-account-mode"
-          :class="{ 'switch-account-mode-mobile': mobileMode }"
+        <LargeButton
+          class="uc-form-button-secondary"
+          @click="logout"
+          type="button"
+          variant="text"
+          :show-arrow="false"
         >
-          <span>Want to set this up later?</span>
-          <SwitchAccountModeButton class="switch-button">
-            <template #button="{ switchRole }">
-              <LargeButton
-                variant="primary-blue"
-                @click="switchRole"
-                :show-arrow="false"
-              >
-                Back to Student Mode
-              </LargeButton>
-            </template>
-          </SwitchAccountModeButton>
-        </div>
+          Logout
+        </LargeButton>
       </div>
-      <LargeButton
-        class="uc-form-button-secondary"
-        @click="logout"
-        type="button"
-        variant="text"
-        :show-arrow="false"
-      >
-        Logout
-      </LargeButton>
     </div>
 
     <loader v-if="isSubmitting" :message="loadingMessage" overlay />
@@ -127,19 +101,15 @@ import AnalyticsService from '@/services/AnalyticsService'
 import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
-import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
 import LargeButton from '@/components/LargeButton.vue'
-import LineDivider from '@/components/LineDivider.vue'
 
 export default {
   name: 'VerificationView',
   components: {
-    SwitchAccountModeButton,
     FormPageTemplate,
     Loader,
     VerificationMethodSelector,
     LargeButton,
-    LineDivider,
   },
   data() {
     return {
@@ -155,11 +125,7 @@ export default {
     }
   },
   beforeMount() {
-    if (
-      this.isSmsVerificationEnabled ||
-      this.isStudentVolunteer ||
-      this.isForceSmsVerificationEnabled
-    ) {
+    if (this.isSmsVerificationEnabled || this.isForceSmsVerificationEnabled) {
       this.step = 1
     } else {
       this.step = 2
@@ -169,20 +135,10 @@ export default {
   },
   mounted() {
     this.$store.dispatch('app/hideNavigation')
-    if (this.isStudentVolunteerVerification) {
-      this.verificationInputs.method = VERIFICATION_METHOD.SMS
-    }
   },
   computed: {
-    userCanChooseVerificationMethod() {
-      return (
-        this.isSmsVerificationEnabled ||
-        this.isStudentVolunteerVerification ||
-        this.isForceSmsVerificationEnabled
-      )
-    },
-    isStudentVolunteerVerification() {
-      return this.isStudentVolunteer && this.isVolunteer
+    userMustEnterVerificationDetails() {
+      return this.isSmsVerificationEnabled || this.isForceSmsVerificationEnabled
     },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
@@ -202,7 +158,6 @@ export default {
       userType: 'user/userType',
       isVolunteer: 'user/isVolunteer',
       isStudentVolunteer: 'user/isStudentVolunteer',
-      mobileMode: 'app/mobileMode',
     }),
     sendTo() {
       if (this.verificationInputs.method === VERIFICATION_METHOD.SMS) {
@@ -363,6 +318,7 @@ export default {
 .uc-form-button-secondary {
   margin-top: auto;
   width: 100%;
+  border: 1px solid $c-border-grey;
 }
 
 .buttons-container {
@@ -378,28 +334,5 @@ export default {
 
 .uc-form {
   justify-content: space-between;
-}
-
-.student-volunteer-info {
-  padding-bottom: 16px;
-  gap: 16px;
-}
-.switch-account-mode {
-  padding-top: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.switch-account-mode-mobile {
-  display: inherit;
-}
-.switch-button {
-  width: 100%;
-  padding-top: 16px;
-  :deep(button) {
-    width: 100%;
-    height: 48px;
-  }
 }
 </style>
