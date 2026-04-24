@@ -218,12 +218,12 @@ export default {
     },
     endedBy() {
       const isStudent = this.session.endedBy === this.session.student.id
-      const isVolunteer = this.session.endedBy === this.session.volunteer.id
+      const isVolunteer = this.session.endedBy === this.session.volunteer?.id
       if (!this.session.endedBy || (!isStudent && !isVolunteer))
         return 'System or Admin'
       return isStudent
         ? `${this.session.student.firstName} (Student)`
-        : `${this.session.volunteer.firstName} (Volunteer)`
+        : `${this.session.volunteer?.firstName} (Volunteer)`
     },
     // pre-context sharing feedback
     legacyStudentFeedback() {
