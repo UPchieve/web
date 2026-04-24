@@ -11,6 +11,8 @@ import type { Uuid } from '@/types/shared'
 import type {
   TutorBotAddMessagePayload,
   TutorBotAddMessageResponsePublic,
+  TutorBotCreateConvoPayload,
+  TutorBotNewConversationPublic,
   TutorBotTranscriptPublic,
 } from '@/types/bot-conversations'
 
@@ -1175,9 +1177,13 @@ export default {
       form.append('userId', userId)
       form.append('message', message)
       form.append('senderUserType', senderUserType)
-      form.append('sessionId', sessionId)
       form.append('subjectName', subjectName)
-      if (snapshotBlob) form.append('snapshot', snapshotBlob, 'whiteboard.jpg')
+      if (sessionId) {
+        form.append('sessionId', sessionId)
+      }
+      if (snapshotBlob) {
+        form.append('snapshot', snapshotBlob, 'whiteboard.jpg')
+      }
 
       return await httpPost<TutorBotAddMessageResponsePublic>(
         `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
@@ -1440,5 +1446,30 @@ export default {
       `${API_ROOT}/nths-groups/${groupId}/submit-school-affiliation`,
       advisorInfo
     ).then(this._successHandler, this._errorHandler)
+  },
+  async createTutorBotSession(data: TutorBotCreateConvoPayload) {
+    try {
+      return await httpPost<TutorBotNewConversationPublic>(
+        `${API_ROOT}/tutor-bot/conversations`,
+        data
+      )
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async updateTutorBotConversationWithSessionId(
+    conversationId: Uuid,
+    sessionId: Uuid
+  ) {
+    try {
+      await httpPatch<void>(
+        `${API_ROOT}/tutor-bot/conversations/${conversationId}`,
+        {
+          sessionId,
+        }
+      )
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
   },
 }

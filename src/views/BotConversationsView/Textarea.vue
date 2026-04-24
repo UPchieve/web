@@ -16,8 +16,8 @@ const messageIsEmpty = computed(() => message.value.trim().length === 0)
 async function send() {
   if (messageIsEmpty.value) return
 
-  const results = await props.sendMessage(message.value)
-  if (results) {
+  const messageSent = await props.sendMessage(message.value)
+  if (messageSent) {
     message.value = ''
     await nextTick()
     resizeTextAreaToFitText()

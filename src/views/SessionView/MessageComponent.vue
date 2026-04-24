@@ -59,8 +59,6 @@ const followupFeedbackEvent = EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK
   display: flex;
   width: 100%;
   gap: 27px;
-  padding-left: 36px;
-  padding-right: 36px;
 }
 .chat-bot-icon {
   flex-shrink: 0;

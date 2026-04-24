@@ -152,12 +152,25 @@ function updatePositionTouch(event) {
     })
   }
 }
-onMounted(async () => {
+
+async function handleSendMessage(message: string): Promise<boolean> {
+  return store.dispatch('botConversations/sendMessage', {
+    message,
+    displayContext: DISPLAY_CONTEXT.SESSION,
+    source: '',
+  })
+}
+
+onMounted(() => {
   addEventListener('mousemove', updatePosition)
+  const currentConversation =
+    store.getters['botConversations/currentConversation']
+
   // Only add this notice once.
   // This will need to be rewritten if we use `system` for anything else
   if (
-    !store.getters['botConversations/currentConversation'].messages.some(
+    'messages' in currentConversation &&
+    !currentConversation.messages.some(
       (m: { senderUserType: string }) => m.senderUserType === 'system'
     )
   ) {
@@ -173,6 +186,7 @@ onMounted(async () => {
   }
   AnalyticsService.captureEvent(EVENTS.AI_TUTOR_WIDGET_SEEN)
 })
+
 onUnmounted(() => {
   removeEventListener('mousemove', updatePosition)
 })
@@ -264,7 +278,11 @@ onUnmounted(() => {
     </div>
     <div class="body">
       <Errors />
-      <BotChat class="overrides" :displayContext="DISPLAY_CONTEXT.SESSION" />
+      <BotChat
+        class="overrides"
+        :displayContext="DISPLAY_CONTEXT.SESSION"
+        :sendMessage="handleSendMessage"
+      />
 
       <div class="resize-handle-container">
         <div
@@ -369,8 +387,10 @@ onUnmounted(() => {
   position: relative;
 }
 .overrides {
-  padding-top: 18px;
   height: 100%;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 1em;
 }
 .header {
   position: absolute;

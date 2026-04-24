@@ -29,12 +29,20 @@ export type TutorBotAddMessageResponsePublic = {
   botResponse: TutorBotGeneratedMessagePublic
 }
 
+export type TutorBotNewConversationPublic = {
+  conversationId: Uuid
+  userId: Uuid
+  sessionId?: Uuid
+  subjectId: number
+  messages: [TutorBotMessagePublic, TutorBotGeneratedMessagePublic]
+}
+
 export type TutorBotAddMessagePayload = {
   userId: Uuid
   conversationId: Uuid
   message: string
   senderUserType: TutorBotHumanSenderType
-  sessionId: Uuid
+  sessionId?: Uuid
   subjectName: string
   snapshotBlob?: Blob
 }
@@ -42,4 +50,12 @@ export type TutorBotAddMessagePayload = {
 export type TutorBotSystemMessage = {
   senderUserType: 'system'
   message: string
+}
+
+export type TutorBotCreateConvoPayload = {
+  userId: Uuid
+  sessionId?: Uuid
+  message: string
+  senderUserType: TutorBotHumanSenderType
+  subjectId: number
 }

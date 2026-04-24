@@ -81,6 +81,8 @@ const NTHSSettingsView = () => import('./views/NTHS/Tabs/NTHSSettingsView.vue')
 const NTHSApplicationView = () => import('@/views/NTHS/NTHSApplicationView.vue')
 const NTHSApplicationPending = () =>
   import('./views/NTHS/NTHSApplicationPending.vue')
+const StandaloneBotChatView = () =>
+  import('./views/BotConversationsView/StandaloneBotChatView.vue')
 
 import {
   shouldGoToApply,
@@ -848,6 +850,12 @@ const routes = [
       },
       { path: '', redirect: '/groups/dashboard' },
     ],
+  },
+  {
+    path: '/ai-tutor-conversations/:conversationId?',
+    name: 'StandaloneBotChat',
+    component: StandaloneBotChatView,
+    meta: { protected: true },
   },
   {
     path: '/:pathMatch(.*)*',

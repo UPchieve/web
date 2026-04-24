@@ -66,17 +66,14 @@ function messageAlignment(message: (typeof props.messages)[number]) {
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding-inline: 1rem;
 }
 
 .message-container {
   width: 100%;
-  max-width: 768px;
-  margin-left: auto;
-  margin-right: auto;
   display: flex;
   gap: 27px;
   padding-bottom: 24px;
+  padding-right: 1em;
 }
 
 .chat-bot-icon {

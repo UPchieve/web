@@ -402,6 +402,7 @@ export default {
 
       this.sessionId = session.id
       this.isZwibserveSession = isZwibserveSession
+      await this.linkTransferredTutorBotConversation(session.id)
 
       if (this.journeySessionData) {
         AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_SESSION_REQUESTED, {
@@ -674,6 +675,7 @@ export default {
           this.currentTutorBotConversation?.sessionId,
         aiWidgetEnabled: this.aiWidgetEnabled,
         sessionId: this.sessionId,
+        isFetchingConversation: this.isFetchingConversation,
       }
     },
     sessionToolTypes() {
@@ -1060,6 +1062,32 @@ export default {
     openHelp() {
       Gleap.open()
       AnalyticsService.captureEvent(EVENTS.USER_CLICKED_IN_SESSION_HELP)
+    },
+    async linkTransferredTutorBotConversation(sessionId) {
+      const tutorBotConversationId =
+        this.$store.state.botConversations.pendingTransferredConversationId
+      if (!tutorBotConversationId) return
+
+      try {
+        await NetworkService.updateTutorBotConversationWithSessionId(
+          tutorBotConversationId,
+          sessionId
+        )
+        await this.$store.dispatch(
+          'botConversations/setConversation',
+          tutorBotConversationId
+        )
+      } catch (err) {
+        LoggerService.noticeError(
+          `Failed to link tutor bot conversation ${tutorBotConversationId} to session ${sessionId}`,
+          err
+        )
+      } finally {
+        this.$store.commit(
+          'botConversations/setPendingTransferredConversationId',
+          null
+        )
+      }
     },
   },
 }

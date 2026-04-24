@@ -1,5 +1,6 @@
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
+import ModerationService from '@/services/ModerationService'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import type { ActionContext } from 'vuex'
@@ -11,6 +12,7 @@ import type {
   TutorBotTranscriptPublic,
 } from '@/types/bot-conversations'
 import type { RootGetters, RootState } from '@/store/index'
+import { DISPLAY_CONTEXT } from '@/constants/bot-conversations'
 
 type ConversationMessage =
   | TutorBotGeneratedMessagePublic
@@ -28,10 +30,33 @@ export type TutorBotStoreState = {
   messageIsSending: boolean
   isFetchingConversation: boolean
   errors: string[]
+  pendingTransferredConversationId: Uuid | null
 }
 
 type TutorBotActionContext = ActionContext<TutorBotStoreState, RootState> & {
   rootGetters: RootGetters
+}
+
+type SendMessagePayload = {
+  message: string
+  displayContext: DISPLAY_CONTEXT
+  subjectId?: number
+  source: string
+}
+
+function buildModerationError(
+  failures: Record<string, string>,
+  isVolunteer: boolean
+) {
+  return Object.entries(failures).reduce((message, [key, value], i) => {
+    message += i > 0 ? ',' : ''
+    if (key === 'profanity' && !isVolunteer) {
+      message += ` ${key}`
+    } else {
+      message += ` ${key} (${value})`
+    }
+    return message
+  }, 'Messages cannot contain personal information, profanity, or links to third party video services: ')
 }
 
 export default {
@@ -41,6 +66,7 @@ export default {
     messageIsSending: false,
     isFetchingConversation: false,
     errors: [],
+    pendingTransferredConversationId: null,
   } as TutorBotStoreState,
 
   mutations: {
@@ -67,6 +93,12 @@ export default {
     setError: (state: TutorBotStoreState, error: string) =>
       (state.errors = state.errors.concat([error])),
     clearErrors: (state: TutorBotStoreState) => (state.errors = []),
+    setPendingTransferredConversationId(
+      state: TutorBotStoreState,
+      conversationId: Uuid | null
+    ) {
+      state.pendingTransferredConversationId = conversationId
+    },
   },
 
   actions: {
@@ -93,12 +125,74 @@ export default {
         commit('setIsFetchingConversation', false)
       }
     },
+    resetCurrentConversation({ commit }: TutorBotActionContext) {
+      commit('setCurrentConversation', {})
+    },
     async sendMessage(
+      { commit, dispatch, rootState, state }: TutorBotActionContext,
+      { message, displayContext, subjectId, source }: SendMessagePayload
+    ) {
+      commit('clearErrors')
+      commit('setMessageIsSending', true)
+
+      try {
+        const sessionId =
+          'conversationId' in state.currentConversation
+            ? state.currentConversation.sessionId
+            : null
+        const isClean = await ModerationService.checkIfMessageIsClean({
+          message,
+          sessionId,
+          source,
+        })
+        // When we have a sessionId, we get more granular moderation
+        if (isClean.failures && Object.keys(isClean.failures).length) {
+          const errorMessage = buildModerationError(
+            isClean.failures,
+            rootState.user.user.isVolunteer
+          )
+          commit('setError', errorMessage)
+          return false
+        }
+
+        if (!isClean) {
+          commit(
+            'setError',
+            'Messages cannot contain personal information, profanity, or links to third party video services'
+          )
+          return false
+        }
+
+        if ('conversationId' in state.currentConversation) {
+          await dispatch('sendMessageToConversation', message)
+          return state.errors.length === 0
+        }
+
+        if (displayContext === DISPLAY_CONTEXT.STAND_ALONE) {
+          if (!subjectId) {
+            commit('setError', 'Please select a subject')
+            return false
+          }
+
+          await dispatch('startStandaloneConversation', {
+            message,
+            subjectId,
+          })
+          return state.errors.length === 0
+        }
+
+        commit('setError', 'No active conversation')
+        return false
+      } finally {
+        commit('setMessageIsSending', false)
+      }
+    },
+
+    async sendMessageToConversation(
       { commit, rootState, rootGetters, state }: TutorBotActionContext,
       message: string
     ) {
       commit('clearErrors')
-      commit('setMessageIsSending', true)
       try {
         if (!('conversationId' in state.currentConversation)) {
           commit('setError', 'No active conversation')
@@ -106,16 +200,20 @@ export default {
         }
 
         const sessionId = state.currentConversation.sessionId
-        if (!sessionId) {
-          commit('setError', 'No active tutoring session')
-          return
-        }
+        const currentSessionId = rootState.user.session?.id
+        const isStandAloneBotConversation =
+          !sessionId || currentSessionId !== sessionId
 
-        let snapshotBlob
-        const toolType = rootState.user.session.toolType
+        const toolType = rootState.user.session?.toolType
         const isUpbotSessionEditorContextEnabled =
           rootGetters['featureFlags/isUpbotSessionEditorContextEnabled']
-        if (isUpbotSessionEditorContextEnabled && toolType === 'whiteboard') {
+        let snapshotBlob
+
+        if (
+          sessionId &&
+          isUpbotSessionEditorContextEnabled &&
+          toolType === 'whiteboard'
+        ) {
           const zwibbler = rootState.session.zwibbler
           if (zwibbler?.save) {
             const snapshotDataUrl = zwibbler.save({
@@ -129,8 +227,23 @@ export default {
         const userId = rootState.user.user.id
         const senderUserType = rootGetters['user/userType']
         const conversationId = state.currentConversation.conversationId
-        const subjectName = rootState.user.session.subTopic
-        const payload = {
+        const subject =
+          rootGetters['subjects/subjectsById'][
+            state.currentConversation.subjectId
+          ]
+        const subjectName = rootState.user.session?.subTopic ?? subject?.name
+
+        if (isStandAloneBotConversation) {
+          const optimisticMessage = {
+            message,
+            senderUserType,
+            tutorBotConversationId: conversationId,
+            userId,
+          }
+          commit('addToCurrentConversation', optimisticMessage)
+        }
+
+        const results = await NetworkService.sendTutorBotMessage({
           userId,
           conversationId,
           message,
@@ -138,19 +251,51 @@ export default {
           sessionId,
           subjectName,
           snapshotBlob,
+        })
+
+        if (isStandAloneBotConversation) {
+          commit('addToCurrentConversation', results.data.botResponse)
         }
-        await NetworkService.sendTutorBotMessage(payload)
 
         AnalyticsService.captureEvent(EVENTS.AI_TUTOR_SEND_MESSAGE)
       } catch (e) {
         LoggerService.noticeError(e)
         commit('setError', 'Can not send message')
-      } finally {
-        commit('setMessageIsSending', false)
       }
     },
     clearErrors({ commit }: TutorBotActionContext) {
       commit('clearErrors')
+    },
+    async startStandaloneConversation(
+      { commit, rootState, rootGetters }: TutorBotActionContext,
+      {
+        message,
+        subjectId,
+        sessionId,
+      }: { message: string; subjectId: number; sessionId?: string }
+    ) {
+      commit('setCurrentConversation', {})
+      commit('clearErrors')
+      commit('setIsFetchingConversation', true)
+
+      try {
+        const userId = rootState.user.user.id
+        const senderUserType = rootGetters['user/userType']
+        const results = await NetworkService.createTutorBotSession({
+          userId,
+          sessionId,
+          message,
+          senderUserType,
+          subjectId,
+        })
+        commit('setCurrentConversation', results.data)
+        AnalyticsService.captureEvent(EVENTS.AI_TUTOR_CREATE_CONVERSATION)
+      } catch (e) {
+        LoggerService.noticeError(e)
+        commit('setError', 'Can not create conversation')
+      } finally {
+        commit('setIsFetchingConversation', false)
+      }
     },
   },
 

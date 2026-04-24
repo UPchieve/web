@@ -4,6 +4,9 @@
 
     <div v-else-if="authenticated" class="uc-column justify-between h-full">
       <div class="top">
+        <ai-tutor-button
+          v-if="isStudent && isStandaloneAiEnabled"
+        ></ai-tutor-button>
         <sidebar-link
           v-if="!isTeacher"
           to="/dashboard"
@@ -219,6 +222,7 @@ import RewardsSidebarIcon from '@/assets/icons/star_icon.svg'
 import CompassIcon from '@/assets/compass.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
+import AiTutorButton from '@/components/AiTutorButton.vue'
 import { EVENTS } from '@/consts'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 import { defineAsyncComponent } from 'vue'
@@ -246,6 +250,7 @@ export default {
     AmbassadorReferralModal,
     GroupsIcon,
     CalculatorIcon,
+    AiTutorButton,
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {
@@ -284,6 +289,7 @@ export default {
         'featureFlags/shouldShowVolunteerHoursCalculatorLink',
       volunteerHoursCalculatorLinkCopy:
         'featureFlags/volunteerHoursCalculatorLinkCopy',
+      aiTutor: 'featureFlags/aiTutor',
     }),
     hasSeenCalculator() {
       if (this.shouldShowVolunteerHoursCalculatorLink) {
@@ -318,6 +324,9 @@ export default {
         this.volunteersNTHSGroups.length === 0 &&
         this.nthsCandidateApplicationStatus === undefined
       )
+    },
+    isStandaloneAiEnabled() {
+      return this.aiTutor && this.aiTutor.includes('stand-alone')
     },
     hasIncompleteAssignments() {
       return !!getIncompleteAssignments(this.user.studentAssignments).length

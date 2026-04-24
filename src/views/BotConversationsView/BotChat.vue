@@ -3,12 +3,13 @@ import { useStore } from 'vuex'
 import { onMounted, computed, ref, watch, nextTick } from 'vue'
 import BotChatMessages from './BotChatMessages.vue'
 import Textarea from './Textarea.vue'
-import ModerationService from '@/services/ModerationService'
 import type { RootState } from '@/store/index'
 import { DISPLAY_CONTEXT } from '@/constants/bot-conversations'
 
-const { displayContext } = defineProps<{
+const props = defineProps<{
   displayContext: DISPLAY_CONTEXT
+  sendMessage: (message: string) => Promise<boolean>
+  disabled?: boolean
 }>()
 const store = useStore<RootState>()
 const user = computed(() => store.state.user.user)
@@ -34,46 +35,6 @@ const fetchingConversation = computed(
 const messages = computed(() => conversation.value.messages ?? [])
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
 
-async function sendMessage(message: string): Promise<boolean> {
-  store.commit('botConversations/setMessageIsSending', true)
-  store.commit('botConversations/clearErrors')
-  const isClean = await ModerationService.checkIfMessageIsClean({
-    message,
-    sessionId: conversation.value.sessionId,
-    // TODO: Figure out the correct source value
-    source: '',
-  })
-  // When we have a sessionId, we get more granular moderation
-  if (isClean.failures && Object.keys(isClean.failures).length) {
-    const message = Object.entries(isClean.failures).reduce(
-      (message, [key, value], i) => {
-        message += i > 0 ? ',' : ''
-        if (key === 'profanity' && !user.value.isVolunteer) {
-          message += ` ${key}`
-        } else {
-          message += ` ${key} (${value})`
-        }
-        return message
-      },
-      'Messages cannot contain personal information, profanity, or links to third party video services: '
-    )
-    store.commit('botConversations/setError', message)
-    store.commit('botConversations/setMessageIsSending', false)
-    return false
-  }
-
-  if (isClean) {
-    await store.dispatch('botConversations/sendMessage', message)
-  } else {
-    store.commit(
-      'botConversations/setError',
-      'Messages cannot contain personal information, profanity, or links to third party video services'
-    )
-  }
-
-  return isClean
-}
-
 onMounted(() => scrollToBottom())
 
 watch(() => messages.value.length, scrollToBottom)
@@ -86,7 +47,7 @@ watch(() => messages.value.length, scrollToBottom)
         :user="user"
         :messages="messages"
         :messageSending="messageSending"
-        :displayContext
+        :displayContext="displayContext"
       />
     </div>
     <div
@@ -98,8 +59,8 @@ watch(() => messages.value.length, scrollToBottom)
     >
       <Textarea
         class="chat-composer__input"
-        :disabled="messageSending || fetchingConversation"
-        :sendMessage="sendMessage"
+        :disabled="disabled || messageSending || fetchingConversation"
+        :sendMessage="props.sendMessage"
         autocomplete="off"
       ></Textarea>
     </div>
@@ -125,7 +86,7 @@ watch(() => messages.value.length, scrollToBottom)
   flex-direction: column;
   flex-shrink: 0;
   width: 100%;
-  padding: 0.6em 1em;
+  padding: 0.6em 0;
 
   &-mobile-session {
     padding: 8px;

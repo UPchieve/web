@@ -13,9 +13,6 @@ const props = defineProps<{ messageSending: boolean }>()
   display: flex;
   width: 100%;
   gap: 27px;
-  padding-left: 36px;
-  padding-right: 36px;
-  max-width: 768px;
   margin-left: auto;
   margin-right: auto;
 }
