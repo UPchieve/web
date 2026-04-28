@@ -13,6 +13,7 @@ import { IonicVue } from '@ionic/vue'
 import VueDraggableResizable from 'vue-draggable-resizable'
 import { initActivityTracking } from './services/PresenceService'
 import vuetify from './plugins/vuetify'
+import { loadThirdPartyScripts } from '@/utils/third-party-loader'
 
 LoggerService.init()
 
@@ -50,6 +51,8 @@ async function main() {
     // Set up vue-draggable-resizable
     app.component('vue-draggable-resizable', VueDraggableResizable)
     app.mount('#mount')
+
+    loadThirdPartyScripts()
   } catch (err) {
     LoggerService.noticeError(err)
   }
