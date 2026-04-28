@@ -30,8 +30,6 @@ const FAULT_TOLERANT_HTTP_TIMEOUT = 10000
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000
 const FAULT_TOLERANT_HTTP_MAX_RETRIES = 10
 
-const grecaptcha = window.grecaptcha
-
 export type NetworkError = {
   status: number
   message: string
@@ -49,8 +47,8 @@ const axiosFetchInstance = axios.create({
 
 async function getRecaptchaToken(action: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    grecaptcha.ready(() => {
-      grecaptcha.execute(config.googleRecaptchaKey, { action }).then(
+    window.grecaptcha.ready(() => {
+      window.grecaptcha.execute(config.googleRecaptchaKey, { action }).then(
         (token: string) => resolve(token),
         () => reject()
       )
