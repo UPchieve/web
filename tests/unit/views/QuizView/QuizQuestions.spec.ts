@@ -23,9 +23,8 @@ describe('QuizQuestions component', () => {
   })
 
   vi.stubGlobal('MathJax', {
-    Hub: {
-      Queue: vi.fn(),
-    },
+    typesetClear: vi.fn(),
+    typesetPromise: vi.fn().mockResolvedValue(undefined),
   })
 
   const getWrapper = () => {

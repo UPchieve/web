@@ -28,6 +28,7 @@
 
 <script>
 import TrainingService from '@/services/TrainingService'
+import LoggerService from '@/services/LoggerService'
 
 export default {
   data() {
@@ -51,12 +52,13 @@ export default {
         question.imageStyle = {}
       }
     })
-  },
-  updated() {
-    this.rerenderMathJaxElements()
+
+    this.$nextTick(() => {
+      void this.rerenderMathJaxElements()
+    })
   },
   methods: {
-    rerenderMathJaxElements() {
+    async rerenderMathJaxElements() {
       // Re-render MathJax in all question text and answers in quiz review
       const questions = document.querySelectorAll('.review .question')
 
@@ -64,14 +66,20 @@ export default {
         return
       }
 
-      window.MathJax.Hub.Queue([
-        'Typeset',
-        window.MathJax.Hub,
-        Array.from(questions).flatMap((question) => [
-          question.querySelector('.question-text'),
-          ...Array.from(question.querySelectorAll('.possible-answers div')),
-        ]),
-      ])
+      if (!window.MathJax?.typesetPromise) {
+        return
+      }
+
+      try {
+        await window.MathJax.typesetPromise(
+          Array.from(questions).flatMap((question) => [
+            question.querySelector('.question-text'),
+            ...Array.from(question.querySelectorAll('.possible-answers div')),
+          ])
+        )
+      } catch (error) {
+        LoggerService.noticeError(error)
+      }
     },
   },
 }

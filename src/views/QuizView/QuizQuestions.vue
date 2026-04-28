@@ -169,7 +169,7 @@ export default {
   mounted() {
     this.getFirstQuestion()
     this.$nextTick(() => {
-      this.rerenderMathJaxElements()
+      void this.rerenderMathJaxElements()
     })
   },
 
@@ -183,28 +183,15 @@ export default {
         return
       }
 
-      const mathJaxElements = Array.from(
-        quizBody.querySelectorAll('[class*=mjx],[class*=MathJax],[id*=MathJax]')
-      )
+      if (!window.MathJax?.typesetClear) {
+        LoggerService.noticeError('MathJax typesetClear is not available')
+        return
+      }
 
-      const mathJaxParentElements = Array.from(
-        quizBody.querySelectorAll('.MathJax_Preview')
-      ).map((e) => e.parentElement)
-
-      mathJaxElements.forEach((e) => e.remove())
-
-      mathJaxParentElements.forEach((parentEl) => {
-        if (!(parentEl && parentEl.firstChild)) return
-
-        parentEl.firstChild.data = parentEl.innerText
-
-        Array.from(parentEl.childNodes)
-          .slice(1)
-          .forEach((e) => e.remove())
-      })
+      window.MathJax.typesetClear([quizBody])
     },
 
-    rerenderMathJaxElements() {
+    async rerenderMathJaxElements() {
       const quiz = this.$el?.querySelector('.quiz-body')
       if (!quiz) {
         LoggerService.noticeError(
@@ -213,12 +200,16 @@ export default {
         return
       }
 
-      if (!window.MathJax?.Hub) {
-        LoggerService.noticeError('MathJax Hub is not available')
+      if (!window.MathJax?.typesetPromise) {
+        LoggerService.noticeError('MathJax typesetPromise is not available')
         return
       }
 
-      window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, quiz])
+      try {
+        await window.MathJax.typesetPromise([quiz])
+      } catch (error) {
+        LoggerService.noticeError(error)
+      }
     },
 
     updateProgressBar() {
@@ -295,7 +286,7 @@ export default {
       this.showNext = true
 
       this.$nextTick(() => {
-        this.rerenderMathJaxElements()
+        void this.rerenderMathJaxElements()
       })
     },
 
@@ -324,7 +315,7 @@ export default {
       this.showPrevious = true
 
       this.$nextTick(() => {
-        this.rerenderMathJaxElements()
+        void this.rerenderMathJaxElements()
       })
     },
 
