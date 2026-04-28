@@ -60,6 +60,38 @@ export default defineConfig({
         ],
       },
     }),
+    {
+      name: 'inject-asset-hints',
+      transformIndexHtml(html, ctx) {
+        let fontLinks
+
+        const fontWeights = ['400', '500', '600', '700']
+        if (ctx.bundle) {
+          //use hashed output filenames when building for prod
+          const keys = Object.keys(ctx.bundle)
+          fontLinks = keys
+            .filter((f) =>
+              fontWeights.some(
+                (w) =>
+                  f.includes(`work-sans-latin-${w}`) && f.endsWith('.woff2')
+              )
+            )
+
+            .map(
+              (f) =>
+                `<link rel="preload" href="/${f}" as="font" type="font/woff2" crossorigin>`
+            )
+        } else {
+          // use original source paths served by Vite dev server
+          fontLinks = fontWeights.map(
+            (w) =>
+              `<link rel="preload" href="/node_modules/typeface-work-sans/files/work-sans-latin-${w}.woff2" as="font" type="font/woff2" crossorigin>`
+          )
+        }
+        const tags = [...fontLinks].join('\n  ')
+        return html.replace('</head>', `\n ${tags}\n</head>`)
+      },
+    },
     vuetify(),
     ...(!process.env.VITEST ? [vueDevTools()] : []),
     process.env.BUNDLE_ANALYZE

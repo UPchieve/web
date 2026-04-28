@@ -92,6 +92,7 @@ const followupFeedbackEvent = EVENTS.AI_TUTOR_FOLLOWUP_FEEDBACK
   overflow-wrap: break-word;
   font-size: 16px;
   font-family: $font-family-default;
+  font-display: swap;
   white-space: pre-line;
   text-align: left;
   border-radius: 20px;

@@ -357,6 +357,7 @@ export default {
 ion-content {
   --background: transparent;
   font-family: $font-family-default;
+  font-display: swap;
 }
 
 .App {

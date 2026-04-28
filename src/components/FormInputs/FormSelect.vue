@@ -170,6 +170,7 @@ ion-select {
     text-align: left;
     font-size: 16px;
     font-family: $font-family-default;
+    font-display: swap;
 
     &:active {
       color: #000;

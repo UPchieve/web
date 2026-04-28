@@ -134,6 +134,7 @@ ion-button {
   --box-shadow: 0;
   --color: black;
   font-family: $font-family-default;
+  font-display: swap;
   font-size: 16px;
   font-weight: normal;
 }
