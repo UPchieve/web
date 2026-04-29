@@ -1,5 +1,3 @@
-import Gleap from 'gleap'
-import posthog from 'posthog-js'
 import config from '../config'
 import { EVENTS } from '@/consts'
 
@@ -16,9 +14,31 @@ type UserProperties = {
   partner?: string
 }
 
+let Gleap: typeof import('gleap').default | null = null
+let posthog: typeof import('posthog-js').default | null = null
+
+// shared promise so the dynamic imports only happen once
+let _loadPromise: Promise<void> | null = null
+
+function loadLibraries(): Promise<void> {
+  if (!_loadPromise) {
+    _loadPromise = Promise.all([
+      import('gleap').then((m) => {
+        Gleap = m.default
+      }),
+      import('posthog-js').then((m) => {
+        posthog = m.default
+      }),
+    ]).then(() => {})
+  }
+  return _loadPromise
+}
+
 class AnalyticsService {
   static async init() {
-    if (config.gleapSdkKey) {
+    await loadLibraries()
+
+    if (config.gleapSdkKey && Gleap) {
       Gleap.initialize(config.gleapSdkKey)
       Gleap.getInstance().softReInitialize()
       Gleap.on('close', () => {
@@ -40,25 +60,38 @@ class AnalyticsService {
           posthogFeatureFlags[`${keyPrefix}${key}`] =
             state.featureFlags.multivariantFlags[key]
         }
-        Gleap.identify(state.user.user.id, { customData: posthogFeatureFlags })
+        if (Gleap) {
+          Gleap.identify(state.user.user.id, {
+            customData: posthogFeatureFlags,
+          })
+        }
       }
     })
   }
 
-  static identify(userId, properties) {
-    posthog.identify(userId, properties)
-    Gleap.identify(userId, properties)
-    // Attaches custom data to the feedback submission
-    Gleap.setCustomData('userType', properties.userType)
+  static async identify(userId, properties) {
+    await loadLibraries()
+    if (posthog && Gleap) {
+      posthog.identify(userId, properties)
+      Gleap.identify(userId, properties)
+      // Attaches custom data to the feedback submission
+      Gleap.setCustomData('userType', properties.userType)
+    }
   }
 
-  static updateUser(update) {
-    posthog.setPersonProperties(update)
+  static async updateUser(update) {
+    await loadLibraries()
+    if (posthog) {
+      posthog.setPersonProperties(update)
+    }
   }
 
-  static captureEvent(name: string, properties = {}) {
-    posthog.capture(name, properties)
-    if (GLEAP_TRACK_EVENTS.has(name)) {
+  static async captureEvent(name: string, properties = {}) {
+    await loadLibraries()
+    if (posthog) {
+      posthog.capture(name, properties)
+    }
+    if (GLEAP_TRACK_EVENTS.has(name) && Gleap) {
       Gleap.trackEvent(name, properties)
     }
   }
@@ -70,19 +103,23 @@ class AnalyticsService {
   }
 
   // unset any of the user's distinctive ids
-  static reset() {
-    posthog.reset()
-    Gleap.clearIdentity()
+  static async reset() {
+    await loadLibraries()
+    if (posthog && Gleap) {
+      posthog.reset()
+      Gleap.clearIdentity()
+    }
   }
 
-  static registerVolunteer(volunteer) {
+  static async registerVolunteer(volunteer) {
+    await loadLibraries()
     const userProperties: UserProperties = {
       userType: 'volunteer',
     }
     if (volunteer.volunteerPartnerOrg)
       userProperties.partner = volunteer.volunteerPartnerOrg
-    this.updateUser(userProperties)
-    this.captureEvent(EVENTS.ACCOUNT_CREATED, {
+    await this.updateUser(userProperties)
+    await this.captureEvent(EVENTS.ACCOUNT_CREATED, {
       event: EVENTS.ACCOUNT_CREATED,
     })
   }

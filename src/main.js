@@ -21,22 +21,23 @@ LoggerService.init()
 socket.off()
 store.dispatch('socket/bindEvents')
 
+function afterMount() {
+  loadThirdPartyScripts()
+  initActivityTracking(store)
+  AnalyticsService.init()
+}
+
 async function main() {
   try {
     axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = crypto.randomUUID()
-
     const featureFlagsResult =
       await NetworkService.getBootstrappedFeatureFlags()
-
     await FeatureFlagService.init(
       featureFlagsResult?.data?.id,
       featureFlagsResult?.data?.featureFlags,
       featureFlagsResult?.data?.featureFlagPayloads,
       featureFlagsResult?.data?.personProperties
     )
-    await AnalyticsService.init()
-
-    initActivityTracking(store)
 
     // Create Vue instance
     const app = createApp(App)
@@ -52,7 +53,11 @@ async function main() {
     app.component('vue-draggable-resizable', VueDraggableResizable)
     app.mount('#mount')
 
-    loadThirdPartyScripts()
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(afterMount)
+    } else {
+      setTimeout(afterMount, 10)
+    }
   } catch (err) {
     LoggerService.noticeError(err)
   }
