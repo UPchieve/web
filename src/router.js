@@ -1042,8 +1042,11 @@ router.afterEach((to, from) => {
     window.gtag('event', 'page_view', gtagDimensions)
   }
   store.commit('app/setIsLoading', false)
-  preloadViews(to.meta?.preloadViews ?? {})
-
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => preloadViews(to.meta?.preloadViews ?? {}))
+  } else {
+    setTimeout(() => preloadViews(to.meta?.preloadViews ?? {}), 200)
+  }
   store.commit('app/setFromRoute', from.path)
 })
 
