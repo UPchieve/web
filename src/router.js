@@ -210,6 +210,7 @@ const routes = [
         try {
           Gleap.open()
           if (!Gleap.isOpened) throw new Error('Unable to open Gleap.')
+          store.commit('app/setIsLoading', false)
         } catch {
           next()
         }
