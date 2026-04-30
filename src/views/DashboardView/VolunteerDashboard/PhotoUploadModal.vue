@@ -19,7 +19,8 @@
       >
         <p>
           We've received your photo ID. The UPchieve team will review your ID
-          within 1-2 business days.
+          within 1-2 business days. Once reviewed, you'll be one step closer to
+          helping our students!
         </p>
         <span data-testid="help-text"
           ><strong>Questions?</strong> Check out our
@@ -31,7 +32,7 @@
       </div>
       <div v-else class="content">
         To ensure the safety of our students, we need to confirm your identity
-        by reviewing a photo ID:
+        by reviewing a photo ID before you can begin tutoring:
         <ul>
           <li>
             Acceptable forms of ID include a driver's license, passport, or

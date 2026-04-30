@@ -145,10 +145,16 @@ export default {
     ) {
       const user = this.state.user.user
 
+      /*
+       * EXPERIMENT: we have a new combined onboarding checklist that shows all available sessions
+       * as "locked" sessions.
+       */
+      const isNotReadyAndIsNotInExperiment =
+        !this.getters['volunteer/isReadyToTutor'] &&
+        !this.getters['featureFlags/isCombinedOnboardingChecklistEnabled']
+
       const cantJoinSessions =
-        !sessions ||
-        !Array.isArray(sessions) ||
-        !this.getters['volunteer/isReadyToTutor']
+        !sessions || !Array.isArray(sessions) || isNotReadyAndIsNotInExperiment
       if (cantJoinSessions) {
         commit('setAllOpenSessions', [])
         return
@@ -258,17 +264,25 @@ export default {
         rootState.user.user.banType !== 'complete'
       )
     },
-    unlockedOpenSessions: (state, _getters, rootState) => {
-      const unlockedSubjects = rootState.user.user.subjects ?? []
-      return state.allOpenSessions.filter((session) =>
-        unlockedSubjects.includes(session.subTopic)
-      )
+    unlockedOpenSessions: (state, getters, rootState) => {
+      if (getters['isReadyToTutor']) {
+        const unlockedSubjects = rootState.user.user.subjects ?? []
+        return state.allOpenSessions.filter((session) =>
+          unlockedSubjects.includes(session.subTopic)
+        )
+      } else {
+        return []
+      }
     },
-    lockedOpenSessions: (state, _getters, rootState) => {
-      const unlockedSubjects = rootState.user.user.subjects ?? []
-      return state.allOpenSessions.filter(
-        (session) => !unlockedSubjects.includes(session.subTopic)
-      )
+    lockedOpenSessions: (state, getters, rootState) => {
+      if (getters['isReadyToTutor']) {
+        const unlockedSubjects = rootState.user.user.subjects ?? []
+        return state.allOpenSessions.filter(
+          (session) => !unlockedSubjects.includes(session.subTopic)
+        )
+      } else {
+        return state.allOpenSessions
+      }
     },
   },
 }

@@ -21,6 +21,7 @@ const sessionPath = computed(() => store.getters['user/sessionPath'])
 
 const props = defineProps<{
   notificationsCardWasDismissed: false
+  sessionClickOverride?: (arg: any) => void
 }>()
 
 const showLockedSessions = ref<boolean>(true)
@@ -87,6 +88,7 @@ function rejoinHelpSession() {
             <ListSessions
               v-if="!isSessionAlive"
               :showLockedSessions="showLockedSessions"
+              :sessionClickOverride="props.sessionClickOverride"
             />
             <div v-else class="rejoin-session-container">
               <button

@@ -16,9 +16,7 @@
           :id="session.id"
           :data-testid="`session-row-${session.id}`"
           class="session-row"
-          @click="
-            session.isUnlocked ? gotoSession(session) : goToSubjectCert(session)
-          "
+          @click="sessionClicked(session)"
         >
           <td>
             <!--            Anonymize first name of student for locked sessions only-->
@@ -93,6 +91,7 @@ const router = useRouter()
 
 const props = defineProps<{
   showLockedSessions: boolean
+  sessionClickOverride?: (session: any) => void
 }>()
 
 const user = computed(() => store.state.user.user)
@@ -124,6 +123,22 @@ const sortedLockedSessions = computed(() => {
   sessions.sort(sortByCreatedAt)
   return sessions
 })
+const isReadyToTutor = computed(() => store.getters['volunteer/isReadyToTutor'])
+
+const sessionClicked = (session) => {
+  if (session.isUnlocked) {
+    gotoSession(session)
+  } else if (isReadyToTutor.value) {
+    goToSubjectCert(session)
+  } else if (props.sessionClickOverride) {
+    /*
+     * this is only reachable by users that also have a student role.
+     * it is part of an experiment to better contextualize what being
+     * volunteer will like by showing locked sessions while they onboard.
+     */
+    props.sessionClickOverride(session)
+  }
+}
 
 const sortedSessions = computed(() => {
   // There must be no more than MAX_AVAILABLE_SECTIONS unlocked sessions for us to display the locked ones,

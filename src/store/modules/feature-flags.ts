@@ -60,6 +60,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_BECOME_VOLUNTEER_AD]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK]: false,
       [POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT]: false,
+      [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -267,5 +268,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_BECOME_VOLUNTEER_AD],
     isUpbotSessionEditorContextEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT],
+    isCombinedOnboardingChecklistEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST],
   },
 }

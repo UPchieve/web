@@ -16,7 +16,7 @@
             'App-router-view-wrapper--sidebar': showSidebar,
           }"
         >
-          <attention-boxes v-if="showInAppSessionNotifications" />
+          <attention-boxes v-if="shouldShowInAppSessionNotifications" />
           <router-view v-slot="{ Component, route }">
             <component
               :is="Component"
@@ -234,7 +234,11 @@ export default {
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       showInAppSessionNotifications:
         'featureFlags/showInAppSessionNotifications',
+      isReadyToTutor: 'volunteer/isReadyToTutor',
     }),
+    shouldShowInAppSessionNotifications() {
+      return this.showInAppSessionNotifications && this.isReadyToTutor
+    },
     doMountRefreshAppAlert() {
       return this.$route.name !== 'SessionView'
     },

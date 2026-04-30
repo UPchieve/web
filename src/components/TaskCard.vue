@@ -11,10 +11,12 @@ export type ActionListItem = {
   status: 'not-started' | 'in-progress' | 'complete' | 'error'
   onClick: () => void
   icon: Component
+  estimatedTimeToCompleteInMinutes?: number
 }
 
 export type TaskCardProps = CardProps & {
   actions: ActionListItem[]
+  showEstimatedTime: boolean
 }
 const props = defineProps<TaskCardProps>()
 </script>
@@ -57,6 +59,15 @@ const props = defineProps<TaskCardProps>()
             <div class="action-title">{{ action.title }}</div>
             <div class="action-subtitle">{{ action.subtitle }}</div>
           </div>
+          <div
+            class="action-time"
+            v-if="
+              props.showEstimatedTime && action.estimatedTimeToCompleteInMinutes
+            "
+          >
+            {{ action.estimatedTimeToCompleteInMinutes }}
+            {{ action.estimatedTimeToCompleteInMinutes === 1 ? 'min' : 'mins' }}
+          </div>
           <RightCaretIcon class="caret-icon" />
         </div>
       </div>
@@ -75,7 +86,7 @@ const props = defineProps<TaskCardProps>()
 
   .action {
     display: grid;
-    grid-template-columns: [icon] 1fr [content] 4fr [caret-icon] 1fr;
+    grid-template-columns: [icon] 1fr [content] 4fr max-content [caret-icon];
     grid-template-rows: [main] 1fr;
     align-items: center;
     column-gap: 5%;
@@ -99,8 +110,8 @@ const props = defineProps<TaskCardProps>()
     .icon-container {
       grid-row: main;
       grid-column: icon;
-      height: 60px;
-      width: 60px;
+      height: 52px;
+      width: 52px;
       border: 2px solid $c-border-grey;
       border-radius: 50%;
       display: flex;
@@ -112,8 +123,8 @@ const props = defineProps<TaskCardProps>()
     }
 
     .action-icon {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
     }
 
     .complete {
@@ -126,6 +137,14 @@ const props = defineProps<TaskCardProps>()
 
     .error {
       border-color: $c-error-red;
+    }
+    .action-time {
+      grid-row: main;
+      font-size: 14px;
+      color: $upchieve-white;
+      background-color: $uc-primary-blue;
+      padding: 0 6px;
+      border-radius: 4px;
     }
 
     .caret-icon {

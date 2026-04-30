@@ -121,6 +121,23 @@
           </template>
         </TaskCard>
       </template>
+      <template v-else-if="isCombinedOnboardingChecklistEnabled">
+        <ListSessionsCard
+          :notificationsCardWasDismissed="notificationsCardWasDismissed"
+          :sessionClickOverride="sessionClickDialog"
+        />
+        <TaskCard
+          title="New Volunteer Checklist"
+          :show-estimated-time="true"
+          :subtitle="combinedCardSubheader"
+          :actions="combinedActions"
+        >
+          <template v-slot:icon>
+            <OnboardingIcon v-if="user.isApproved" />
+            <VerificationIcon v-else />
+          </template>
+        </TaskCard>
+      </template>
       <template v-else>
         <TaskCard
           v-if="!user.isApproved"
@@ -133,7 +150,7 @@
           </template>
         </TaskCard>
         <TaskCard
-          title="Onboarding Process"
+          title="New Volunteer Checklist"
           subtitle="While waiting for your safety screening to process, complete our quick onboarding so you're ready to start helping students as soon as possible"
           :actions="onboardingAccountActions"
         >
@@ -198,6 +215,11 @@
       :closeModal="handleMilestoneModalClose"
       :typeOfMilestone="typeOfMilestone"
     />
+    <next-task-modal
+      v-if="showNextTaskModal"
+      :closeModal="toggleNextTaskModal"
+      :nextTask="nextTask"
+    />
   </div>
 </template>
 
@@ -206,6 +228,7 @@ import { flow, reduce, get, isBoolean } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 import DashboardBanner from '../DashboardBanner.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
+import NextTaskModal from './NextTaskModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
 import SquareTextIcon from '@/assets/square-text-icon.svg'
 import PersonCardIcon from '@/assets/person-card.svg'
@@ -234,11 +257,18 @@ import TaskCard from '@/components/TaskCard.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
 import JoinedTeamModal from './JoinedTeamModal.vue'
-import { UpchieveTrainingCourseKeyEnum } from '@/views/TrainingCourseView/types'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
+import { kebab } from 'case'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
+
+const ETA = {
+  BACKGROUND_INFO: 1,
+  INTRO_TO_UPC: 20,
+  UNLOCK_SUBJECT: 20,
+  PROOF_OF_ID: 2,
+}
 
 export default {
   name: 'volunteer-dashboard',
@@ -264,6 +294,7 @@ export default {
     NotesIcon,
     LargeButton,
     JoinedTeamModal,
+    NextTaskModal,
   },
   directives: {
     tooltip: vTooltip,
@@ -312,12 +343,14 @@ export default {
     return {
       showPhotoUploadModal: false,
       showWelcomeModal: false,
+      showNextTaskModal: false,
       lastUpdated: '',
       isLoadingImpactSummary: true,
       hasSeenMilestoneModal: localStorage.getItem('hasSharedMilestone'),
       notificationPermission: 'default',
       notificationsCardWasDismissed: false,
       joinedTeamCode: '',
+      nextTask: {},
     }
   },
   computed: {
@@ -339,6 +372,10 @@ export default {
         'featureFlags/getVolunteerMilestoneSharingStudyVariant',
       isVerifyHoursButtonEnabled: 'featureFlags/isVerifyHoursButtonEnabled',
       hasCompletedVolunteerTraining: 'user/hasCompletedVolunteerTraining',
+      isComputedUnlockSubject: 'subjects/isComputedUnlockSubject',
+      isCombinedOnboardingChecklistEnabled:
+        'featureFlags/isCombinedOnboardingChecklistEnabled',
+      hasASubjectCertification: 'user/hasASubjectCertification',
     }),
     shouldShowNotificationsCard() {
       return (
@@ -396,20 +433,15 @@ export default {
     },
 
     certificationAction() {
-      for (const cert in this.user.certifications) {
-        // skip certification for check for required training
-        if (Object.values(UpchieveTrainingCourseKeyEnum).includes(cert))
-          continue
-        if (this.user.certifications[cert].passed)
-          return {
+      return this.hasASubjectCertification
+        ? {
             subtitle: 'Completed',
             status: 'complete',
           }
-      }
-      return {
-        subtitle: 'Pass at least one quiz',
-        status: 'not-started',
-      }
+        : {
+            subtitle: 'Pass at least one quiz',
+            status: 'not-started',
+          }
     },
 
     trainingAction() {
@@ -447,6 +479,53 @@ export default {
         return 'Just one step left to get approved to volunteer with UPchieve!'
 
       return 'Student safety is our top priority! Please complete our screening process before you can start working with students.'
+    },
+
+    combinedCardSubheader() {
+      return 'Please complete our screening process before you can start working with students.'
+    },
+
+    combinedActions() {
+      return [
+        {
+          title: 'Background information',
+          subtitle: this.hasCompletedBackgroundInfo
+            ? 'Completed'
+            : 'Fill out form',
+          status: this.hasCompletedBackgroundInfo ? 'complete' : 'not-started',
+          onClick: this.goToBackgroundInfo,
+          icon: PersonIcon,
+          priority: 0,
+          estimatedTimeToCompleteInMinutes: ETA.BACKGROUND_INFO,
+        },
+        {
+          title: 'Complete Intro to UPchieve',
+          subtitle: this.trainingAction.subtitle,
+          status: this.trainingAction.status,
+          onClick: this.clickUpchieve101Action,
+          icon: TrainingIcon,
+          priority: 1,
+          estimatedTimeToCompleteInMinutes: ETA.INTRO_TO_UPC,
+        },
+        {
+          title: 'Unlock a subject',
+          subtitle: this.certificationAction.subtitle,
+          status: this.certificationAction.status,
+          onClick: this.clickCertificationAction,
+          icon: CertificationIcon,
+          priority: 2,
+          estimatedTimeToCompleteInMinutes: ETA.UNLOCK_SUBJECT,
+        },
+        {
+          title: 'Proof of identity',
+          subtitle: this.photoIdAction.subtitle,
+          status: this.photoIdAction.status,
+          onClick: this.togglePhotoUploadModal,
+          icon: PersonCardIcon,
+          priority: 3,
+          estimatedTimeToCompleteInMinutes: ETA.PROOF_OF_ID,
+        },
+      ]
     },
 
     partnerKeysThatRequirePhotoId() {
@@ -562,6 +641,7 @@ export default {
           status: this.webNotificationsStatus,
           onClick: this.onClickBrowserNotifications,
           icon: SimpleRingingBellIcon,
+          estimatedTimeToCompleteInMinutes: 1,
         },
         {
           title: 'Sign Up for Texts',
@@ -569,6 +649,7 @@ export default {
           status: this.didSetAvailability,
           onClick: this.onClickSignupForTextNotifications,
           icon: SquareTextIcon,
+          estimatedTimeToCompleteInMinutes: 1,
         },
       ]
     },
@@ -638,6 +719,89 @@ export default {
     },
   },
   methods: {
+    sessionClickDialog(session) {
+      if (!this.hasCompletedBackgroundInfo) {
+        AnalyticsService.captureEvent(
+          EVENTS.LOCKED_SESSIONS_CLICKED_UNLOCK_SUBJECT,
+          {
+            subject: session.subTopic,
+            step: 'complete-background-info',
+          }
+        )
+        return this.toggleNextTaskModal({
+          title: 'Background Information',
+          action: () => this.goToBackgroundInfo(),
+          actionText: 'Fill out form',
+          actionTime: `Filling out your <b>Background Information</b> takes about <b>${ETA.BACKGROUND_INFO}
+          ${ETA.BACKGROUND_INFO === 1 ? 'minute' : 'minutes'}</b>.`,
+        })
+      }
+
+      if (!this.hasCompletedVolunteerTraining) {
+        AnalyticsService.captureEvent(
+          EVENTS.LOCKED_SESSIONS_CLICKED_UNLOCK_SUBJECT,
+          {
+            subject: session.subTopic,
+            step: 'complete-volunteer-training',
+          }
+        )
+        return this.toggleNextTaskModal({
+          title: 'Complete Intro to UPchieve',
+          action: () => this.clickUpchieve101Action(),
+          actionText: 'Go through our training',
+          actionTime: `Completeing <b>Intro to UPchieve</b> training takes about <b>${ETA.INTRO_TO_UPC} ${ETA.INTRO_TO_UPC === 1 ? 'minute' : 'minutes'}</b>.`,
+        })
+      }
+
+      if (!this.user.certifications[session.subTopic].passed) {
+        AnalyticsService.captureEvent(
+          EVENTS.LOCKED_SESSIONS_CLICKED_UNLOCK_SUBJECT,
+          {
+            subject: session.subTopic,
+            step: 'subject-certification',
+          }
+        )
+        return this.toggleNextTaskModal({
+          title: 'Unlock a Subject',
+          action: () => this.goToSubjectCert(session),
+          actionText: `Unlock ${session.subjectDisplayName}`,
+          actionTime: `Unlocking <b>${session.subjectDisplayName}</b> takes about <b>${ETA.UNLOCK_SUBJECT} ${ETA.UNLOCK_SUBJECT === 1 ? 'minute' : 'minutes'}</b>.`,
+        })
+      }
+
+      if (!this.user.photoIdStatus || this.user.photoIdStatus === 'EMPTY') {
+        AnalyticsService.captureEvent(
+          EVENTS.LOCKED_SESSIONS_CLICKED_UNLOCK_SUBJECT,
+          {
+            subject: session.subTopic,
+            step: `upload-photo-${this.user.photoIdStatus}`,
+          }
+        )
+        return this.togglePhotoUploadModal()
+      }
+
+      if (this.user.photoIdStatus !== 'APPROVED') {
+        AnalyticsService.captureEvent(
+          EVENTS.LOCKED_SESSIONS_CLICKED_UNLOCK_SUBJECT,
+          {
+            subject: session.subTopic,
+            step: `upload-photo-${this.user.photoIdStatus}`,
+          }
+        )
+        return this.togglePhotoUploadModal()
+      }
+    },
+    goToSubjectCert(session) {
+      if (this.isComputedUnlockSubject(session.subTopic)) {
+        // These subjects require you to take multiple quizzes to unlock them.
+        // Send the user to the Training page
+        const route = `/training?openTo=${session.subTopic}`
+        this.$router.push(route)
+      } else {
+        const route = `/training/${kebab(session.subTopic)}/quiz`
+        this.$router.push(route)
+      }
+    },
     trackVerifyHoursClick() {
       AnalyticsService.captureEvent(EVENTS.VERIFY_HOURS_BUTTON_CLICKED)
     },
@@ -665,6 +829,10 @@ export default {
     },
     togglePhotoUploadModal() {
       this.showPhotoUploadModal = !this.showPhotoUploadModal
+    },
+    toggleNextTaskModal(nextTask) {
+      this.nextTask = nextTask ? nextTask : {}
+      this.showNextTaskModal = !this.showNextTaskModal
     },
     clickCertificationAction() {
       this.$router.push('/training')
