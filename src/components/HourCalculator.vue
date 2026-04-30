@@ -6,6 +6,7 @@ import FormInput from '@/components/FormInput.vue'
 import AnalyticsService from '../services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { useStore } from 'vuex'
+import BecomeVolunteerAd from './BecomeVolunteerAd.vue'
 
 const store = useStore()
 const now = new Date()
@@ -49,6 +50,7 @@ onMounted(() => {
 
 <template>
   <div class="hour-calculator">
+    <BecomeVolunteerAd class="full" />
     <div class="inputs">
       <h2 class="headline">Earn Service Hours</h2>
       <p class="hook">
@@ -155,5 +157,8 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+.full {
+  grid-column: 1 / span 2;
 }
 </style>
