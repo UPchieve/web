@@ -706,13 +706,9 @@ export default {
     },
 
     async mapStudentAssignments(assignmentIds) {
-      return Object.assign(
-        ...(await this.getStudentAssignments(assignmentIds).then(
-          (assignments) =>
-            assignments.map((assignment) => ({
-              [assignment.assignmentId]: assignment.studentAssignments,
-            }))
-        ))
+      const assignments = await this.getStudentAssignments(assignmentIds)
+      return Object.fromEntries(
+        assignments.map((a) => [a.assignmentId, a.studentAssignments])
       )
     },
 
