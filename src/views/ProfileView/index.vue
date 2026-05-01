@@ -289,6 +289,49 @@
           </div>
 
           <div
+            v-if="showSection(ProfileSections.TUTORING_LANGUAGES)"
+            class="container-section"
+          >
+            <hr />
+            <div class="prompt">
+              Are there any other languages (besides English) that you would
+              feel comfortable tutoring a student in?
+            </div>
+            <TutoringLanguagesChecklist
+              @error="
+                () => {
+                  errorMessage =
+                    'Something went wrong while updating your tutoring languages'
+                }
+              "
+              @success="
+                () => {
+                  errorMessage = ''
+                }
+              "
+            />
+          </div>
+
+          <div
+            v-if="showSection(ProfileSections.TUTORING_EXPERIENCE)"
+            class="container-section"
+          >
+            <hr />
+            <div class="prompt">
+              How much prior experience do you have with the following
+              activities?
+            </div>
+            <TutoringExperienceQuestion
+              @success="() => (errorMessage = '')"
+              @error="
+                () =>
+                  (errorMessage =
+                    'Something went wrong while updating your experience information')
+              "
+            />
+          </div>
+
+          <div
             v-if="showSection(ProfileSections.RESET_PASSWORD)"
             class="container-section"
           >
@@ -399,6 +442,7 @@ import Loader from '@/components/Loader.vue'
 import VerificationModal from '../VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
+import TutoringLanguagesChecklist from '@/views/TutoringLanguagesChecklist.vue'
 import CleverLogo from '@/components/CleverLogo.vue'
 import TrashIcon from '@/assets/trash.svg'
 import PencilIcon from '@/assets/pencil.svg'
@@ -408,6 +452,7 @@ import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { IonToast } from '@ionic/vue'
+import TutoringExperienceQuestion from '@/views/TutoringExperienceQuestion.vue'
 
 const ProfileSections = {
   EMAIL: 'email',
@@ -417,10 +462,12 @@ const ProfileSections = {
   BROWSER_NOTIFICATIONS: 'browserNotifications',
   CLEVER_SYNC: 'cleverSync',
   PREFERRED_LANGUAGE: 'preferredLanguage',
+  TUTORING_LANGUAGES: 'tutoringLanguages',
   // pragma: allowlist nextline secret
   RESET_PASSWORD: 'resetPassword',
   DELETE_ACCOUNT: 'deleteAccount',
   UNLOCKED_SUBJECTS: 'unlockedSubjects',
+  TUTORING_EXPERIENCE: 'tutoringExperience',
 }
 
 const RoleSections = {
@@ -429,7 +476,8 @@ const RoleSections = {
     ProfileSections.PHONE_INFORMATION,
     ProfileSections.ACCOUNT_STATUS,
     ProfileSections.BROWSER_NOTIFICATIONS,
-    ProfileSections.PREFERRED_LANGUAGE,
+    ProfileSections.TUTORING_LANGUAGES,
+    ProfileSections.TUTORING_EXPERIENCE,
     ProfileSections.RESET_PASSWORD,
     ProfileSections.DELETE_ACCOUNT,
     ProfileSections.UNLOCKED_SUBJECTS,
@@ -454,9 +502,11 @@ const RoleSections = {
 export default {
   name: 'profile-view',
   components: {
+    TutoringExperienceQuestion,
     IonToast,
     SecondaryEmailModal,
     RemovePhoneConfirmationModal,
+    TutoringLanguagesChecklist,
     Checkbox,
     DeactivateAccountModal,
     MazPhoneNumberInput,
@@ -776,6 +826,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.prompt {
+  @include font-category('subheading');
+}
+
 hr {
   background-color: $border-grey;
   border: none;
@@ -792,6 +846,12 @@ hr {
   padding: 15px 15px 55px 15px;
   gap: 1em;
   display: grid;
+
+  @include breakpoint-below('medium') {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+  }
 
   @include breakpoint-above('huge') {
     padding: 40px;
@@ -1076,7 +1136,7 @@ button:hover {
 }
 
 .unverified {
-  display: inline-block;
+  display: flex;
   gap: 4px;
   font-weight: normal;
 }

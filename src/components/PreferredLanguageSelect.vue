@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import useVuelidate from '@vuelidate/core'
-import { EVENTS } from '@/consts'
+import { EVENTS, LANGUAGES } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
 import FormSelect from './FormInputs/FormSelect.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -14,32 +14,6 @@ const store = useStore()
 const emit = defineEmits<{
   (e: 'error', err: any): void
 }>()
-
-const languages: Language[] = [
-  { code: 'ar', name: 'Arabic' },
-  { code: 'bn', name: 'Bengali' },
-  { code: 'zh', name: 'Chinese' },
-  { code: 'en', name: 'English' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'ht', name: 'Haitian Creole' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'ja', name: 'Japanese' },
-  { code: 'ko', name: 'Korean' },
-  { code: 'pa', name: 'Punjabi' },
-  { code: 'pl', name: 'Polish' },
-  { code: 'pt', name: 'Portuguese' },
-  { code: 'fa', name: 'Persian (Farsi)' },
-  { code: 'fil', name: 'Filipino' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'sw', name: 'Swahili' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'th', name: 'Thai' },
-  { code: 'tr', name: 'Turkish' },
-  { code: 'uk', name: 'Ukrainian' },
-  { code: 'vi', name: 'Vietnamese' },
-  { code: 'other', name: 'Other' },
-]
 
 const preferredLanguage = ref<Language | undefined>(undefined)
 const otherLanguageInput = ref('')
@@ -79,7 +53,7 @@ const selectedLanguage = computed<Language | undefined>(() => {
 })
 
 async function onLanguageSelect(languageName: string) {
-  const language = languages.find((lang) => lang.name === languageName)
+  const language = LANGUAGES.find((lang) => lang.name === languageName)
   if (!language) return
 
   const previousSelection = preferredLanguage.value
@@ -91,12 +65,12 @@ async function onLanguageSelect(languageName: string) {
   try {
     await UserService.setProfile(
       {
-        preferredLanguage: preferredLanguage.value.name,
+        preferredLanguage: preferredLanguage.value?.name,
       },
       store
     )
     await store.dispatch('user/addToUser', {
-      preferredLanguage: preferredLanguage.value.name,
+      preferredLanguage: preferredLanguage.value?.name,
     })
   } catch (err) {
     preferredLanguage.value = previousSelection
@@ -110,7 +84,7 @@ function onOtherLanguage(languageName: string) {
 
 onMounted(() => {
   if (props.userPreferredLanguage) {
-    const language = languages.find(
+    const language = LANGUAGES.find(
       (language) => language.name === props.userPreferredLanguage
     )
 
@@ -137,7 +111,7 @@ defineExpose({
       @update:modelValue="onLanguageSelect"
       :modelValue="preferredLanguage?.name"
       name="preferred-language-select"
-      :options="languages"
+      :options="LANGUAGES"
       placeholder="Select a language..."
       optionTextField="name"
       :reduce="(option: Language) => option.name"

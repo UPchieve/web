@@ -123,7 +123,7 @@
                 autocomplete="off"
               />
             </template>
-            <p v-if="showInputErrors && !experience" class="error">
+            <p v-if="showInputErrors" class="error">
               Please fill out these fields.
             </p>
           </li>
@@ -234,141 +234,6 @@
               text. You can customize when you receive requests.
             </p>
           </li>
-
-          <li class="uc-form-col">
-            <p data-testid="question-experience">
-              How much prior experience do you have with the following
-              activities?<span class="background-info__question-required"
-                >*</span
-              >
-            </p>
-            <p v-if="showInputErrors && !experience" class="error">
-              Please fill out this field.
-            </p>
-
-            <table class="questions-table">
-              <tr class="question-row">
-                <div class="position-wrapper">
-                  <div class="question-scroll-container">
-                    <tr class="radio-question-row">
-                      <td class="mobile-remove"></td>
-                      <td
-                        class="radio-question-selection-title"
-                        v-for="title in experienceRadioQuestion.columnTitle"
-                        v-bind:key="title"
-                      >
-                        {{ title }}
-                      </td>
-                    </tr>
-                    <tr
-                      class="radio-question-row"
-                      v-for="(
-                        subquestion, subquestionIndex
-                      ) in experienceRadioQuestion.options"
-                      :key="subquestion"
-                    >
-                      <td class="radio-question-cell">{{ subquestion }}</td>
-                      <td
-                        class="radio-question-selection-cell"
-                        v-for="index in experienceRadioQuestion.columnTitle
-                          .length"
-                        :key="index"
-                      >
-                        <input
-                          class="uc-form-input"
-                          v-model="
-                            experience[
-                              experienceRadioQuestion.optionsAlias[
-                                subquestionIndex
-                              ]
-                            ]
-                          "
-                          type="radio"
-                          :value="index"
-                          :data-testid="`${subquestion}-${experienceRadioQuestion.columnTitle[index - 1]}`"
-                        />
-                      </td>
-                    </tr>
-                    <div class="mobile-pinned-questions-container">
-                      <tr class="radio-question-row">
-                        <td class="mobile-remove mobile-remove--shadow"></td>
-                        <td
-                          class="radio-question-selection-title radio-question-selection-title--hidden"
-                          v-for="title in experienceRadioQuestion.columnTitle"
-                          v-bind:key="title"
-                        >
-                          {{ title }}
-                        </td>
-                      </tr>
-                      <tr
-                        class="radio-question-row"
-                        v-for="subquestion in experienceRadioQuestion.options"
-                        v-bind:key="subquestion"
-                      >
-                        <td
-                          class="radio-question-cell radio-question-cell--shadow"
-                        >
-                          {{ subquestion }}
-                        </td>
-                        <td
-                          class="radio-question-selection-cell--hidden"
-                          v-for="index in experienceRadioQuestion.columnTitle
-                            .length"
-                          v-bind:key="index"
-                        >
-                          <input class="uc-form-input" type="radio" />
-                        </td>
-                      </tr>
-                    </div>
-                  </div>
-                </div>
-              </tr>
-            </table>
-          </li>
-
-          <li class="uc-form-col">
-            <p data-testid="question-languages">
-              Are there any other languages (besides English) that you would
-              feel comfortable tutoring a student in?
-            </p>
-            <p class="background-info__question-description">
-              Select all that apply. (optional)
-            </p>
-
-            <div
-              class="uc-form-checkbox"
-              v-for="option in options.languages"
-              :key="option"
-            >
-              <input
-                type="checkbox"
-                :value="option"
-                v-model="languages"
-                :id="option"
-                :data-testid="option"
-              />
-              <label class="uc-form-label" :for="option">
-                {{ option }}
-              </label>
-            </div>
-            <div class="uc-form-checkbox">
-              <input
-                type="checkbox"
-                value="other"
-                id="other"
-                @change="toggleAddLanguages"
-              />
-              <label for="other">Other</label>
-            </div>
-            <input
-              type="text"
-              v-model="addedLanguages"
-              class="uc-form-input"
-              v-if="showAddLanguages"
-              placeholder="Enter a language"
-              autocomplete="off"
-            />
-          </li>
         </ol>
         <p class="error form-error" v-if="formError">{{ formError }}</p>
         <button
@@ -410,48 +275,17 @@ export default {
     return {
       options: {
         occupations: VolunteerOccupations,
-        languages: [
-          'Spanish',
-          'Mandarin',
-          'Cantonese',
-          'Tagalog',
-          'Vietnamese',
-          'Arabic',
-          'French',
-          'Korean',
-          'Russian',
-          'German',
-        ],
       },
       showInputErrors: false,
       formError: '',
       occupation: [],
       linkedInUrl: '',
-      experience: {
-        tutoring: '',
-        collegeCounseling: '',
-        mentoring: '',
-      },
-      languages: [],
-      showAddLanguages: false,
-      addedLanguages: '',
       wasSubmitted: false,
       country: '',
       state: '',
       city: '',
       college: '',
       company: '',
-      experienceRadioQuestion: {
-        columnTitle: [
-          'No prior experience',
-          '0-1 years',
-          '1-2 years',
-          '2-5 years',
-          '5+ years',
-        ],
-        options: ['Tutoring', 'College Counseling', 'Mentoring'],
-        optionsAlias: ['tutoring', 'collegeCounseling', 'mentoring'],
-      },
       signupSourceId: '',
       signupSourcesOptions: [],
       otherSignupSource: '',
@@ -568,18 +402,8 @@ export default {
       }
       this.wasSubmitted = true
 
-      const { tutoring, collegeCounseling, mentoring } = this.experience
-      const { columnTitle } = this.experienceRadioQuestion
-      const experience = {
-        tutoring: columnTitle[tutoring - 1],
-        collegeCounseling: columnTitle[collegeCounseling - 1],
-        mentoring: columnTitle[mentoring - 1],
-      }
-
       const data = {
         occupation: this.occupation,
-        experience,
-        languages: this.languages,
         linkedInUrl: this.linkedInUrl,
         country: this.country,
         state: this.isUnitedStatesSelected ? this.state : '',
@@ -589,12 +413,6 @@ export default {
         phoneNumber: this.phoneNumber,
         signupSourceId: this.signupSourceId,
         otherSignupSource: this.otherSignupSource,
-      }
-
-      if (this.languages.length > 0) {
-        const languages = Array.from(this.languages)
-        if (this.addedLanguages) languages.push(this.addedLanguages)
-        data.languages = languages
       }
 
       try {
@@ -616,7 +434,7 @@ export default {
             event: EVENTS.ACCOUNT_APPROVED,
           })
 
-        // mandatory fields: occupation, experience, country / state / city
+        // mandatory fields: occupation, country / state / city
         // update is a subset of mandatory fields
         const update = {
           occupation: data.occupation,
@@ -632,17 +450,10 @@ export default {
         this.wasSubmitted = false
       }
     },
-    toggleAddLanguages() {
-      this.showAddLanguages = !this.showAddLanguages
-    },
     invalidForm() {
-      const { tutoring, collegeCounseling, mentoring } = this.experience
       return (
         this.occupation.length === 0 ||
         (this.signedUpWithGoogle && !this.phoneNumber) ||
-        !tutoring ||
-        !collegeCounseling ||
-        !mentoring ||
         !this.country ||
         !this.city ||
         (this.isUnitedStatesSelected && !this.state) ||

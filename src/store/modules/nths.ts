@@ -95,9 +95,6 @@ export default {
   },
 
   getters: {
-    NTHSSchoolAffiliationStatus: (state) => {
-      return state.NTHSGroups?.[0].schoolAffiliationStatus
-    },
     NTHSChecklist: (state) => {
       const checklist = state.NTHSActions.reduce((list, action) => {
         const text = actionsCtaMap[action.name]

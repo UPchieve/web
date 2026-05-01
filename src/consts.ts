@@ -1,3 +1,5 @@
+import type { Language } from '@/types/languages'
+
 /** Maximum width considered to still be in "mobile mode." */
 export const MAX_MOBILE_MODE_WIDTH = 768 - 1 // 768 = "medium" scss breakpoint
 
@@ -912,7 +914,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   IMPACT_STUDY_SURVEY = 'impact-study-survey',
   STUDENTS_BECOME_VOLUNTEERS = 'students-become-volunteers',
   TEACHER_GUIDANCE_EXPERIMENT = 'teacher-guidance-experiment',
-  COMBINED_ONBOARDING_QUIZ = 'combined-onboarding-quiz',
   DISPLAY_VOLUNTEER_LANGUAGES = 'display-volunteer-languages',
   SECONDARY_EMAIL_ON_PROFILE_PAGE = 'secondary-email-on-profile-page',
   CONFETTI_CELEBRATION = 'confetti-celebration',
@@ -921,14 +922,12 @@ export enum POSTHOG_FEATURE_FLAGS {
   BECOME_AN_AMBASSADOR_CTA = 'become-an-ambassador-cta',
   UPDATE_SCHOOL_MODAL = 'update-school-modal',
   SHOW_NEW_INTERNATIONAL_MESSAGE = 'show-new-international-message',
-  UPCHIEVE_101_LMS_FORMAT = 'upchieve-101-lms-format',
   TEXT_REFERRAL_LINKS = 'text-referral-links',
   PENDING_MESSAGES = 'pending-messages',
   CLASSLINK_SSO = 'classlink-sso',
   STUDENTS_INITIATE_DMS = 'students-initiate-dms',
   VOLUNTEER_MILESTONE_SHARING_STUDY = 'volunteer-milestone-sharing-study',
   INCENTIVE_BANNER = 'incentive-banner',
-  UPCHIEVE_101_V3 = 'upchieve-101-v3',
   VOLUNTEER_FEEDBACK_FOR_STUDENT = 'volunteer-feedback-for-student',
   FORCE_SMS_VERIFICATION = 'force-sms-verification',
   DISABLE_STUDENT_CREATION = 'disable-student-creation',
@@ -1020,3 +1019,29 @@ export enum VERIFICATION_TYPE {
 
 export const IMPACT_STUDY_SURVEY_RESPONSES_CACHE_KEY =
   'impact-study-survey-responses'
+
+export const LANGUAGES: Language[] = [
+  { code: 'ar', name: 'Arabic' },
+  { code: 'bn', name: 'Bengali' },
+  { code: 'zh', name: 'Chinese' },
+  { code: 'en', name: 'English' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'ht', name: 'Haitian Creole' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'pa', name: 'Punjabi' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'fa', name: 'Persian (Farsi)' },
+  { code: 'fil', name: 'Filipino' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'sw', name: 'Swahili' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'th', name: 'Thai' },
+  { code: 'tr', name: 'Turkish' },
+  { code: 'uk', name: 'Ukrainian' },
+  { code: 'vi', name: 'Vietnamese' },
+  { code: 'other', name: 'Other' },
+]

@@ -5,9 +5,11 @@ import { createStore } from 'vuex'
 import UserService from '@/services/UserService'
 import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
+import NetworkService from '@/services/NetworkService'
 import { vi } from 'vitest'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import { nextTick } from 'vue'
+import vuetify from '@/plugins/vuetify'
 
 describe('ProfileView', () => {
   let DEFAULT_FLAGS_GETTERS, DEFAULT_USER
@@ -17,6 +19,9 @@ describe('ProfileView', () => {
     UserService.setProfile = vi.fn().mockResolvedValue()
     AuthService.initiateVerification = vi.fn().mockResolvedValue()
     AnalyticsService.captureEvent = vi.fn().mockReturnValue()
+    NetworkService.addBackgroundInfo = vi
+      .fn()
+      .mockResolvedValue({ removedFromNTHS: false })
     storeOptions.modules.user.actions.addToUser = vi.fn().mockResolvedValue()
 
     DEFAULT_FLAGS_GETTERS = {
@@ -73,14 +78,9 @@ describe('ProfileView', () => {
         },
       },
     })
-    // Many tests rely on accessing the wrapper for the nested VuePhoneNumberInput component.
-    // Thus we must use mount() instead of shallowMount()
     return mount(ProfileView, {
       global: {
-        plugins: [store],
-        components: {
-          MazPhoneNumberInput,
-        },
+        plugins: [store, vuetify, MazPhoneNumberInput],
       },
     })
   }
