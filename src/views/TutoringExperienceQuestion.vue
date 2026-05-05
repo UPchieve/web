@@ -70,11 +70,9 @@ function updateScrollHint() {
       tableContainer.value?.scrollWidth > tableContainer.value?.clientWidth
   }
 }
-onMounted(() => {
-  window.addEventListener('resize', updateScrollHint)
-})
+onMounted(() => window.addEventListener('resize', updateScrollHint))
 
-onBeforeUnmount(window.removeEventListener('resize', updateScrollHint))
+onBeforeUnmount(() => window.removeEventListener('resize', updateScrollHint))
 </script>
 
 <template>
