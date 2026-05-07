@@ -90,7 +90,7 @@ import {
   shouldGoToGroup,
   shouldGoToPending,
 } from './views/NTHS/nths-route-helpers'
-import Gleap from 'gleap'
+//import Gleap from 'gleap'
 import NetworkService, { axiosInstance } from './services/NetworkService'
 import { UserType } from '@/services/SignUpService'
 import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/StudentSignUpService'
@@ -205,7 +205,7 @@ const routes = [
       },
     },
     beforeEnter: (to, from, next) => {
-      const instance = Gleap.getInstance()
+      /*  const instance = Gleap.getInstance()
       if (instance.initialized) {
         try {
           Gleap.open()
@@ -216,7 +216,9 @@ const routes = [
         }
       } else {
         next()
-      }
+      }*/
+      //prevent gleap ddos
+      next()
     },
   },
   {
