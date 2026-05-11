@@ -4,9 +4,14 @@
 
     <div v-else-if="authenticated" class="uc-column justify-between h-full">
       <div class="top">
-        <ai-tutor-button
+        <sidebar-link
           v-if="isStudent && isStandaloneAiEnabled"
-        ></ai-tutor-button>
+          to="/ai-tutor-conversations"
+          text="Request AI help"
+          emphasized
+        >
+          <chat-bot-icon class="icon" />
+        </sidebar-link>
         <sidebar-link
           v-if="!isTeacher"
           to="/dashboard"
@@ -222,7 +227,7 @@ import RewardsSidebarIcon from '@/assets/icons/star_icon.svg'
 import CompassIcon from '@/assets/compass.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
-import AiTutorButton from '@/components/AiTutorButton.vue'
+import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import { EVENTS } from '@/consts'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 import { defineAsyncComponent } from 'vue'
@@ -250,7 +255,7 @@ export default {
     AmbassadorReferralModal,
     GroupsIcon,
     CalculatorIcon,
-    AiTutorButton,
+    ChatBotIcon,
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {

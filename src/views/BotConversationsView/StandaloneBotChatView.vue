@@ -319,6 +319,12 @@ watch(
       </div>
 
       <div class="standalone__transfer">
+        <p class="standalone__disclaimer">
+          AI may not always be accurate.
+          <span v-if="isTransferSectionShown">
+            For more help, transfer to a live tutor!
+          </span>
+        </p>
         <TransferToSessionView
           v-if="isTransferSectionShown"
           :topic="currentTopic?.name ?? ''"
@@ -326,12 +332,6 @@ watch(
           :isMobileMode="isMobileMode"
         />
 
-        <p class="standalone__disclaimer">
-          AI may not always be accurate.
-          <span v-if="isTransferSectionShown">
-            For more help, transfer to a live tutor!
-          </span>
-        </p>
       </div>
     </div>
   </div>
@@ -343,7 +343,7 @@ watch(
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  padding: 1em;
+  padding: 1em 1em 2em;
 
   &__selection {
     width: 100%;
@@ -474,10 +474,16 @@ watch(
   }
 
   &__transfer {
+    // composer → disclaimer → button form a single grouped block. The
+    // composer's own bottom padding handles its visual gap above the
+    // disclaimer, so no padding-top here. Button gets a bit more
+    // breathing from the disclaimer than the disclaimer gets from the
+    // composer, so the eye reads disclaimer as belonging to the chat
+    // above and the button as the next step.
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding-top: 8px;
+    align-items: center;
+    row-gap: 1em;
   }
 
   &__disclaimer {

@@ -45,6 +45,12 @@ export default {
       type: Function,
       required: false,
     },
+    // When true, render the link with a prominent (blue pill) style — for
+    // hero CTAs that still belong in the nav.
+    emphasized: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     ...mapState({ isCollapsed: (state) => state.app.sidebar.isCollapsed }),
@@ -56,6 +62,7 @@ export default {
       return {
         SidebarLink: true,
         'SidebarLink--desktop': !this.mobileMode,
+        'SidebarLink--emphasized': this.emphasized,
       }
     },
     isActive() {
@@ -97,6 +104,21 @@ export default {
 
   &--desktop {
     @include font-category('button');
+  }
+
+  &--emphasized {
+    background-color: $c-information-blue;
+    border-radius: 12px;
+    padding: 0.5em 0.75em;
+
+    p {
+      color: $upchieve-white;
+      font-weight: 500;
+    }
+
+    &:hover {
+      background-color: darken($c-information-blue, 5%);
+    }
   }
 }
 

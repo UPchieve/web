@@ -12,6 +12,7 @@
     :target="target"
     @click="(event) => $emit('click', event)"
   >
+    <template v-if="$slots.icon" #icon><slot name="icon" /></template>
     <slot />
   </button-template>
 </template>

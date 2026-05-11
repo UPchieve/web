@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, ref, watch, computed } from 'vue'
 import SendMessage from '@/assets/voice_message_icons/send-message.svg'
 
 const props = defineProps<{
@@ -15,21 +15,8 @@ const messageIsEmpty = computed(() => message.value.trim().length === 0)
 
 async function send() {
   if (messageIsEmpty.value) return
-
   const messageSent = await props.sendMessage(message.value)
-  if (messageSent) {
-    message.value = ''
-    await nextTick()
-    resizeTextAreaToFitText()
-  }
-}
-
-function resizeTextAreaToFitText() {
-  const textareaElem = textareaRef.value
-  if (!textareaElem) return
-
-  textareaElem.style.height = 'auto'
-  textareaElem.style.height = `${Math.min(textareaElem.scrollHeight, 140)}px`
+  if (messageSent) message.value = ''
 }
 
 onMounted(() => textareaRef.value?.focus())
@@ -41,7 +28,6 @@ watch(
     }
   }
 )
-watch(() => message.value, resizeTextAreaToFitText)
 </script>
 
 <template>
@@ -54,7 +40,7 @@ watch(() => message.value, resizeTextAreaToFitText)
       :disabled="props.disabled"
       :placeholder="placeholder ?? 'Chat with UPbot'"
       v-model="message"
-      rows="1"
+      rows="3"
       @keydown.enter.prevent
       @keyup="
         (event) => {
@@ -90,6 +76,11 @@ watch(() => message.value, resizeTextAreaToFitText)
     line-height: 1.4;
     border-radius: inherit;
     border: none;
+    // Auto-grow to fit content. Supported in Chrome 123+, Safari 17.4+.
+    // As of today, Firefox ignores this and falls back to the HTML:
+    // `rows="3"` — fixed-height with internal scroll past 3 rows.
+    field-sizing: content;
+    max-height: min(40vh, 400px);
   }
 
   &__send-button {

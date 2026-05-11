@@ -135,57 +135,70 @@ export default {
       commit('clearErrors')
       commit('setMessageIsSending', true)
 
-      try {
-        const sessionId =
-          'conversationId' in state.currentConversation
-            ? state.currentConversation.sessionId
-            : null
-        const isClean = await ModerationService.checkIfMessageIsClean({
-          message,
-          sessionId,
-          source,
-        })
-        // When we have a sessionId, we get more granular moderation
-        if (isClean.failures && Object.keys(isClean.failures).length) {
-          const errorMessage = buildModerationError(
+      // 1. Moderate (input stays put while this runs).
+      const sessionId =
+        'conversationId' in state.currentConversation
+          ? state.currentConversation.sessionId
+          : null
+      const isClean = await ModerationService.checkIfMessageIsClean({
+        message,
+        sessionId,
+        source,
+      })
+      // When we have a sessionId, we get more granular moderation
+      if (isClean.failures && Object.keys(isClean.failures).length) {
+        commit(
+          'setError',
+          buildModerationError(
             isClean.failures,
             rootState.user.user.isVolunteer
           )
-          commit('setError', errorMessage)
-          return false
-        }
-
-        if (!isClean) {
-          commit(
-            'setError',
-            'Messages cannot contain personal information, profanity, or links to third party video services'
-          )
-          return false
-        }
-
-        if ('conversationId' in state.currentConversation) {
-          await dispatch('sendMessageToConversation', message)
-          return state.errors.length === 0
-        }
-
-        if (displayContext === DISPLAY_CONTEXT.STAND_ALONE) {
-          if (!subjectId) {
-            commit('setError', 'Please select a subject')
-            return false
-          }
-
-          await dispatch('startStandaloneConversation', {
-            message,
-            subjectId,
-          })
-          return state.errors.length === 0
-        }
-
-        commit('setError', 'No active conversation')
-        return false
-      } finally {
+        )
         commit('setMessageIsSending', false)
+        return false
       }
+
+      if (!isClean) {
+        commit(
+          'setError',
+          'Messages cannot contain personal information, profanity, or links to third party video services'
+        )
+        commit('setMessageIsSending', false)
+        return false
+      }
+
+      // 2. Moderation passed.
+      if ('conversationId' in state.currentConversation) {
+        // Fire-and-forget the send/receive so the textarea can clear right
+        // after moderation. messageIsSending stays true until the network call
+        // completes, so the typing indicator + disabled input both persist
+        // while the bot generates its reply.
+        dispatch('sendMessageToConversation', message).finally(() =>
+          commit('setMessageIsSending', false)
+        )
+        return true
+      }
+
+      if (displayContext === DISPLAY_CONTEXT.STAND_ALONE) {
+        if (!subjectId) {
+          commit('setError', 'Please select a subject')
+          commit('setMessageIsSending', false)
+          return false
+        }
+
+        // First message: await so callers (e.g. StandaloneBotChatView) can
+        // read the new conversationId out of the store and update the URL.
+        try {
+          await dispatch('startStandaloneConversation', { message, subjectId })
+          return state.errors.length === 0
+        } finally {
+          commit('setMessageIsSending', false)
+        }
+      }
+
+      commit('setError', 'No active conversation')
+      commit('setMessageIsSending', false)
+      return false
     },
 
     async sendMessageToConversation(
