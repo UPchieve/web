@@ -518,7 +518,7 @@ export default {
   @include flex-container(column);
   width: 60%;
 
-  @include breakpoint-below('medium') {
+  @include breakpoint-below('large') {
     width: 100%;
   }
 }
@@ -553,15 +553,12 @@ export default {
     @include flex-container(row, space-between, center);
 
     &-start-session {
-      @include breakpoint-between('300px', '560px') {
-        @include flex-container(column, space-between, flex-start);
-      }
-      @include breakpoint-between('992px', '1200px') {
-        @include flex-container(column, space-between, flex-start);
-      }
-      @include breakpoint-between('772px', '830px') {
-        @include flex-container(column, space-between, flex-start);
-      }
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      overflow: hidden;
     }
   }
 
