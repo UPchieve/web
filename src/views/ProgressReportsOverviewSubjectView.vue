@@ -506,10 +506,11 @@ export default {
     this.isLoadingPage = true
     await this.getProgressReportOverviewSubjectStats()
     await this.generatePage()
+    window.addEventListener('resize', this.handleResize)
   },
   beforeUnmount() {
     this.destroyChart()
-    window.removeEventListener('resize', this.reloadChart)
+    window.removeEventListener('resize', this.handleResize)
   },
   methods: {
     async getProgressReportsForSubject(page) {
@@ -709,11 +710,10 @@ export default {
       })
     },
     destroyChart() {
-      if (this.chart) this.chart.destroy()
-    },
-    reloadChart() {
-      this.destroyChart()
-      this.createChart()
+      if (this.chart) {
+        this.chart.destroy()
+        this.chart = null
+      }
     },
     async getProgressReportOverviewSubjectStats() {
       try {
@@ -746,14 +746,16 @@ export default {
         await this.$nextTick()
         this.createChart()
         this.sendReadReceiptsToUnreadReports()
-        window.addEventListener('resize', () => {
-          this.reloadChart()
-        })
       } catch (error) {
         LoggerService.noticeError(error)
         this.hasPageError = true
       } finally {
         this.isLoadingReportSection = false
+      }
+    },
+    handleResize() {
+      if (this.chart) {
+        this.chart.resize()
       }
     },
   },
