@@ -173,8 +173,10 @@ async function createAccount(
         })
       : await NetworkService.registerOpenVolunteer({
           ...options,
+          referredByCode: window.localStorage.getItem('upcReferredByCode'),
           [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
         })
+    window.localStorage.removeItem('upcReferredByCode')
     AnalyticsService.registerVolunteer(result.data.user)
     return getSubmitResponse(SignUpPage.verify)
   } catch (err) {
