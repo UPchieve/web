@@ -15,8 +15,8 @@ export type ActionListItem = {
 }
 
 export type TaskCardProps = CardProps & {
-  actions: ActionListItem[]
-  showEstimatedTime: boolean
+  actions?: ActionListItem[]
+  showEstimatedTime?: boolean
 }
 const props = defineProps<TaskCardProps>()
 </script>
@@ -29,6 +29,9 @@ const props = defineProps<TaskCardProps>()
   >
     <template #icon>
       <slot name="icon" />
+    </template>
+    <template #heading-content>
+      <slot name="heading-content" />
     </template>
     <template #content>
       <slot name="content" />

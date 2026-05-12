@@ -3,27 +3,20 @@ import CaretIcon from '@/assets/right-caret.svg'
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { IonModal } from '@ionic/vue'
+import type { Anchor } from 'vuetify'
+
 export type MenuProps = {
-  location: string // i.e. 'top center' see https://vuetifyjs.com/en/components/overlays/#location-strategies
+  location: Anchor // i.e. 'top center' see https://vuetifyjs.com/en/components/overlays/#location-strategies
 }
 const props = defineProps<MenuProps>()
 const store = useStore()
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
-
 const isMenuOpen = ref<boolean>(false)
-function toggleMenu() {
-  isMenuOpen.value = !isMenuOpen.value
-}
 </script>
 
 <template>
   <div>
-    <div
-      class="menu-toggle-container"
-      role="button"
-      @click="toggleMenu"
-      id="toggle"
-    >
+    <div class="menu-toggle-container" role="button" id="toggle">
       <CaretIcon
         class="caret"
         :class="{
@@ -33,28 +26,31 @@ function toggleMenu() {
     </div>
 
     <v-menu
-      v-if="isMenuOpen"
+      v-model="isMenuOpen"
+      v-on:update:model-value="(isOpen) => (isMenuOpen = isOpen)"
+      activator="#toggle"
       :location="props.location"
+      :close-on-content-click="false"
       origin="auto"
       locationStrategy="connected"
       :scrim="false"
+      :offset="[0, 275]"
     >
-      <div class="menu" v-if="isMenuOpen" activator="#toggle">
-        <!--      On Mobile Mode, open the menu in a bottom drawer-->
-        <IonModal
-          v-if="isMobileMode"
-          :isOpen="isMenuOpen"
-          :initial-breakpoint="0.9"
-          :breakpoints="[0, 0.9]"
-          :backdrop-dismiss="true"
-          :can-dismiss="true"
-          presentation="sheet"
-          @didDismiss="toggleMenu"
-        >
-          <slot name="content" />
-        </IonModal>
-        <!--      On non-mobile, the menu opens in a popover-->
-        <div v-else>
+      <!--      On Mobile Mode, open the menu in a bottom drawer-->
+      <IonModal
+        v-if="isMobileMode"
+        :is-open="isMenuOpen"
+        :initial-breakpoint="0.9"
+        :breakpoints="[0, 0.9]"
+        :backdrop-dismiss="true"
+        :can-dismiss="true"
+        presentation="sheet"
+      >
+        <slot name="content" />
+      </IonModal>
+      <!--      On non-mobile, the menu opens in a popover-->
+      <div v-else>
+        <div class="menu">
           <slot name="content" />
         </div>
       </div>
@@ -73,7 +69,6 @@ function toggleMenu() {
 }
 
 .caret {
-  transform: rotate(90deg);
   transition: 200ms linear;
   align-self: center;
 
@@ -82,7 +77,7 @@ function toggleMenu() {
   }
 
   &--open {
-    transform: rotate(-90deg);
+    transform: rotate(90deg);
   }
 }
 
