@@ -1049,6 +1049,7 @@ export default {
   flex-grow: 1;
   width: 100%;
   border-top: none;
+  column-gap: 0.75em;
 }
 .message-textarea {
   width: 100%;
