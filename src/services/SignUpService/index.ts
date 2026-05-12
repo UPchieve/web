@@ -234,6 +234,7 @@ function createAccountWithSso(
           ? `/sign-up/${userType}/account`
           : '/clever-signin-instructions',
       accountType: userType,
+      isLogin: 'false',
       ...data,
     })
     return [null, null]
