@@ -2,7 +2,7 @@
   <div class="zwib-wrapper" :class="toolClass">
     <transition name="whiteboard-warning">
       <div
-        v-if="!loadingText && !isConnected"
+        v-if="!loadingText && !isConnected && !isSessionOver"
         class="whiteboard-warning whiteboard-warning--failure"
       >
         Failed to connect to the whiteboard. Please refresh your page.
