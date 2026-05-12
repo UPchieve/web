@@ -160,17 +160,12 @@
       <transition name="fade">
         <CallStatusIndicator class="messages-overlay call-status-indicator" />
       </transition>
-      <transition name="fade">
-        <button
-          type="button"
-          v-show="numberOfUnreadChatMessages > 0"
-          class="messages-overlay unread-message-indicator"
-          @click="scrollToUnread"
-        >
-          {{ unreadMessageNote }}
-          <img src="@/assets/down_arrow.png" alt="down arrow" />
-        </button>
-      </transition>
+      <ScrollToLatestButton
+        :show="numberOfUnreadChatMessages > 0"
+        @click="scrollToUnread"
+      >
+        {{ unreadMessageNote }}
+      </ScrollToLatestButton>
     </div>
 
     <div class="chat-footer" :class="isInRecap && 'chat-footer--recap'">
@@ -230,6 +225,7 @@ import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
 import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import CallStatusIndicator from '@/components/ScreenShare/CallStatusIndicator.vue'
+import ScrollToLatestButton from '@/components/ScrollToLatestButton.vue'
 import TranscribedMessage from './TranscribedMessage.vue'
 import CelebrationButton from './CelebrationButton.vue'
 
@@ -261,6 +257,7 @@ export default {
     DocumentTitle,
     VoiceMessage,
     CallStatusIndicator,
+    ScrollToLatestButton,
     TranscribedMessage,
     CelebrationButton,
   },
@@ -887,20 +884,6 @@ export default {
   background-color: $upchieve-white;
   overflow: auto;
   padding-bottom: 1.25em;
-}
-
-.unread-message-indicator {
-  background-color: $c-information-blue;
-  border: 0;
-  border-radius: 12px;
-  padding: 0.4em 0.8em;
-  color: $upchieve-white;
-  position: absolute;
-  bottom: 4em;
-  transition: 0.25s;
-  left: 50%;
-  transform: translateX(-50%);
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.35);
 }
 
 .message {
