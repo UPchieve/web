@@ -11,7 +11,6 @@ type AppModalState = {
 
 type AppModalPayload = {
   component?: Component | string
-  data?: ModalTemplateProps
   modalTemplateProps?: ModalTemplateProps
   componentProps?: ComponentProps
 }
@@ -43,7 +42,7 @@ export default {
     ) => {
       commit('setIsShown', true)
       commit('setComponent', payload.component)
-      commit('setModalTemplateProps', payload.data)
+      commit('setModalTemplateProps', payload.modalTemplateProps)
       commit('setComponentProps', payload.componentProps)
     },
     update: (

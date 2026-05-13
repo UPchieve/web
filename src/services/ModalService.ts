@@ -11,7 +11,7 @@ type ModalTemplateProps = {
   backText?: string
   alertModal?: boolean
   important?: boolean
-  showTemplateButtons?: boolean
+  showTemplateButtons?: () => boolean
   showSeparator?: boolean
   showAccept?: boolean
   modalComponentName?: string
@@ -41,7 +41,7 @@ function show(
     typeof component === 'string' ? component : (component as Component).name
   store.dispatch('app/modal/show', {
     component,
-    data: {
+    modalTemplateProps: {
       ...data,
       modalComponentName,
     },
@@ -61,6 +61,7 @@ export default {
 
   showDeleteAccountConfirmation() {
     show('DeleteAccountConfirmationModal', {
+      showTemplateButtons: () => true,
       acceptText: 'Delete Account',
       acceptButtonVariant: 'danger',
     })
@@ -72,7 +73,6 @@ export default {
       {
         showAccept: false,
         showSeparator: false,
-        showTemplateButtons: false,
       },
       props
     )
@@ -84,7 +84,6 @@ export default {
       {
         showAccept: false,
         showSeparator: false,
-        showTemplateButtons: false,
       },
       props
     )
@@ -105,7 +104,7 @@ export default {
         message,
         acceptText: options?.acceptText ?? 'Confirm',
         acceptButtonVariant: options?.acceptButtonVariant,
-        showTemplateButtons: false,
+
         backText: options?.backText ?? 'Cancel',
         onConfirm: () => resolve(true),
         onCancel: () => resolve(false),
@@ -124,7 +123,6 @@ export default {
         message,
         acceptText: options?.acceptText ?? 'OK',
         acceptButtonVariant: options?.acceptButtonVariant,
-        showTemplateButtons: false,
         onConfirm: () => resolve(),
         onCancel: () => resolve(),
       })

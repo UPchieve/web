@@ -116,11 +116,12 @@ export default {
       ) {
         this.$store.dispatch('app/modal/show', {
           component: 'NotificationsModal',
-          data: {
+          modalTemplateProps: {
             backText: 'Dashboard',
             acceptText: 'Yes, please notify me!',
             selectedSubtopic: this.selectedSubtopic,
             topic: this.modalData.topic,
+            showTemplateButtons: () => !this.mobileMode,
           },
         })
       } else {

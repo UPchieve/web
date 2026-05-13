@@ -446,8 +446,7 @@ export default {
     reportSession() {
       this.$store.dispatch('app/modal/show', {
         component: 'ReportSessionModal',
-        data: {
-          showTemplateButtons: false,
+        modalTemplateProps: {
           currentSession: this.recapSession,
           source: 'recap',
           toggleReportSubmitted: this.toggleReportSubmitted,

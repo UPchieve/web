@@ -5,6 +5,7 @@
     :class="{ 'ModalTemplate--important': important }"
     @click="closeModal"
     @keydown="checkKeyEvent"
+    key="`${modalComponentName}-${mobileMode}`"
   >
     <div v-if="mobileMode" class="ModalTemplate-header">
       <div
@@ -20,16 +21,16 @@
     <div class="ModalTemplate-form">
       <slot />
 
-      <template v-if="!mobileMode && showTemplateButtons">
+      <template v-if="showTemplateButtons && showTemplateButtons()">
         <div class="ModalTemplate-separator" v-if="showSeparator" />
         <div class="ModalTemplate-buttons">
           <large-button
-            v-if="!alertModal"
+            v-if="!mobileMode && !alertModal"
             @click="handleCancel"
             :showArrow="false"
             >{{ backText }}</large-button
           >
-          <!-- TODO: Also add an accept button on mobile. -->
+
           <large-button
             :variant="acceptButtonVariant ?? 'primary-blue'"
             :showArrow="false"
@@ -63,7 +64,7 @@ export default {
     enableAccept: Boolean,
     alertModal: Boolean,
     important: Boolean,
-    showTemplateButtons: { type: Boolean, default: true },
+    showTemplateButtons: { type: Function },
     showSeparator: { type: Boolean, default: true },
     showAccept: { type: Boolean, default: true },
     modalComponentName: String,
@@ -209,6 +210,7 @@ $header-height: 80px;
   animation: slideUp 0.6s forwards;
   background: white;
   border-radius: 40px 40px 0 0;
+  @include child-spacing(top, 8px);
 
   width: 100%;
   height: calc(100% - #{$header-height});
@@ -225,7 +227,6 @@ $header-height: 80px;
 
   @include breakpoint-above('medium') {
     @include flex-container(column);
-    @include child-spacing(top, 16px);
 
     animation: none;
     border-radius: 8px;

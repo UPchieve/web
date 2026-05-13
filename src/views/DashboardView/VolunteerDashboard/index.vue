@@ -816,7 +816,7 @@ export default {
     showOnboardingModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'VolunteerOnboardingModal',
-        data: { alertModal: true, acceptText: 'Get started' },
+        modalTemplateProps: { alertModal: true, acceptText: 'Get started' },
       })
     },
     toggleWelcomeModal() {

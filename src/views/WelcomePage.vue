@@ -93,7 +93,7 @@ export default {
       const topicCard = this.topicCards.find((card) => card.topic === topicName)
       this.$store.dispatch('app/modal/show', {
         component: 'SubjectSelectionModal',
-        data: {
+        modalTemplateProps: {
           backText: 'Back',
           acceptText: 'Start quiz',
           topic: topicCard.topic,
