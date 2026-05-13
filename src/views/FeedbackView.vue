@@ -168,12 +168,23 @@
                   <div
                     v-else-if="questionInfo.questionType === 'free response'"
                     :key="`${response.responseId}-free-response`"
+                    class="question__free-response"
                   >
-                    <div class="question__subtext">
+                    <div
+                      v-if="isOpenFeedbackQuestion(questionInfo.question)"
+                      class="question__subtext"
+                    >
                       Tell us about your experience. This could be about the
                       app, the session you had, or anything else you want to
                       share. We read every comment and use your ideas to make
                       UPchieve better.
+                    </div>
+                    <div
+                      v-if="isHowFarInSchoolQuestion(questionInfo.question)"
+                      class="question__subtext"
+                    >
+                      There's no right or wrong answer. Just share what feels
+                      most true for you right now.
                     </div>
                     <feedback-textarea
                       :id="`${questionInfo.questionId}_${response.responseId}`"
@@ -284,6 +295,8 @@ export default {
       isStudent: 'user/isStudent',
       volunteerFeedbackForStudentFlag:
         'featureFlags/volunteerFeedbackForStudentFlag',
+      getStudentPostSessionSurveyNameVariant:
+        'featureFlags/getStudentPostSessionSurveyNameVariant',
     }),
     ...mapState({
       subjects: (state) => state.subjects.subjects,
@@ -385,6 +398,12 @@ export default {
 
     this.isLoading = false
   },
+  mounted() {
+    AnalyticsService.captureEvent(EVENTS.POST_SESSION_SURVEY_SHOWN, {
+      sessionId: this.session.id,
+      surveyNameVariant: this.getStudentPostSessionSurveyNameVariant,
+    })
+  },
   methods: {
     getQuestionDisplayType(question) {
       if (question.questionType === 'multiple choice') {
@@ -417,9 +436,14 @@ export default {
           return 'Your Concerns'
         } else if (this.isHowSupportiveQuestion(question)) {
           return 'Your Coach'
+        } else if (this.isConfidenceQuestion(question)) {
+          return 'Your Progress'
         }
-      } else if (question.questionType === 'free response') {
-        return 'Your Thoughts'
+      }
+      if (question.questionType === 'free response') {
+        if (this.isOpenFeedbackQuestion(question)) {
+          return 'Your Thoughts'
+        }
       }
       return undefined
     },
@@ -444,10 +468,39 @@ export default {
     isHowSupportiveQuestion(question) {
       return question.questionText.startsWith('Overall, how supportive')
     },
+    isOpenFeedbackQuestion(question) {
+      return (
+        question.questionText.startsWith(
+          'This can be about the web app, the student you helped, technical issues, etc.'
+        ) ||
+        question.questionText.startsWith(
+          'This can be about the web app, the Academic Coach who helped you, the services UPchieve offers, etc.'
+        )
+      )
+    },
+    isConfidenceQuestion(question) {
+      return question.questionText.startsWith(
+        'How confident are you right now that you can solve problems like the one you worked on today - on your own?'
+      )
+    },
+    isHowFarInSchoolQuestion(question) {
+      return question.questionText.startsWith(
+        'How far in school do you think you will get?'
+      )
+    },
     isNumericalRatingQuestion(question) {
       return (
         this.isHowSupportiveQuestion(question) ||
-        question.questionText.startsWith('Overall, how much did your coach')
+        question.questionText.startsWith('Overall, how much did your coach') ||
+        question.questionText.startsWith(
+          `During today's session, I felt like someone who can succeed in`
+        ) ||
+        question.questionText.startsWith(
+          `After this session, I want to keep working on`
+        ) ||
+        question.questionText.startsWith(
+          `How confident are you right now that you can solve problems like the one you worked on today - on your own?`
+        )
       )
     },
 
@@ -606,7 +659,10 @@ export default {
           this.error = rejectedSave.body.statusText
         }
       } else {
-        AnalyticsService.captureEvent(EVENTS.POST_SESSION_SURVEY_SUBMITTED)
+        AnalyticsService.captureEvent(EVENTS.POST_SESSION_SURVEY_SUBMITTED, {
+          sessionId: this.session.id,
+          surveyNameVariant: this.getStudentPostSessionSurveyNameVariant,
+        })
         localStorage.setItem('high-session-rating', hasGivenHighRating)
         this.$router.push('/dashboard')
       }
@@ -847,6 +903,10 @@ export default {
     color: $c-secondary-grey;
     margin-top: 10px;
     margin-bottom: 14px;
+  }
+
+  &__free-response {
+    width: 100%;
   }
 }
 

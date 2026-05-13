@@ -85,6 +85,7 @@ export default {
 
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK]:
         'Service Hours',
+      [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
     },
   },
   mutations: {
@@ -270,5 +271,9 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT],
     isCombinedOnboardingChecklistEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST],
+    getStudentPostSessionSurveyNameVariant: (state: FeatureFlagState) =>
+      state.payloadFlags[
+        POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT
+      ],
   },
 }
