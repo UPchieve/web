@@ -94,6 +94,8 @@ import {
 } from './views/NTHS/nths-route-helpers'
 import Gleap from 'gleap'
 import NetworkService, { axiosInstance } from './services/NetworkService'
+import AnalyticsService from './services/AnalyticsService'
+import UserService from './services/UserService'
 import { UserType } from '@/services/SignUpService/types'
 import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/StudentSignUpService'
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
@@ -101,6 +103,7 @@ import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/Vo
 import Case from 'case'
 import { getStatus } from '@/services/AuthService'
 import LoggerService from './services/LoggerService'
+import { EVENTS } from './consts'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -764,6 +767,40 @@ const routes = [
       preloadViews: {
         student: STUDENT_SIDEBAR_LINKED_VIEWS,
       },
+    },
+  },
+  {
+    path: '/add-volunteer-role',
+    meta: { protected: true },
+    name: 'AddVolunteerRole',
+    beforeEnter: async (to, from, next) => {
+      // We are using this route to add a volunteer role to students
+      // and switch to volunteer mode via gleap experiement CTAs
+
+      // abort route change when FF is disabled
+      if (
+        !store.getters['featureFlags/isVolunteerAskForCollegeInterestEnabled']
+      ) {
+        return next(from)
+      }
+
+      // this should never happen but if you get to this route as a volunteer, abort
+      if (store.getters['user/hasVolunteerRole']) return next(from)
+
+      AnalyticsService.captureEvent(EVENTS.BECOME_VOLUNTEER_FROM_ROUTE, {
+        params: to.query,
+      })
+      try {
+        await NetworkService.addVolunteerRoleForStudent()
+        await UserService.switchActiveRole({ $store: store }, 'volunteer')
+        return next('/dashboard')
+      } catch (e) {
+        LoggerService.noticeError(
+          e,
+          `Failed to add or switch active role for user: ${store.state.user.user.id}`
+        )
+        return next('/dashboard')
+      }
     },
   },
   {

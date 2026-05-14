@@ -61,6 +61,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK]: false,
       [POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST]: false,
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -274,6 +275,10 @@ export default {
     getStudentPostSessionSurveyNameVariant: (state: FeatureFlagState) =>
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT
+      ],
+    isVolunteerAskForCollegeInterestEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST
       ],
   },
 }
