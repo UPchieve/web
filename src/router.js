@@ -94,7 +94,7 @@ import {
 } from './views/NTHS/nths-route-helpers'
 import Gleap from 'gleap'
 import NetworkService, { axiosInstance } from './services/NetworkService'
-import { UserType } from '@/services/SignUpService'
+import { UserType } from '@/services/SignUpService/types'
 import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/StudentSignUpService'
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/VolunteerSignUpService'

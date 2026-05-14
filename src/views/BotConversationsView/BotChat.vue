@@ -51,11 +51,7 @@ watch(() => messages.value.length, scrollToBottom)
 <template>
   <div class="bot-chat-container">
     <div class="chat-area">
-      <div
-        class="chat-log"
-        ref="chatLogRef"
-        @scroll.passive="checkAtBottom"
-      >
+      <div class="chat-log" ref="chatLogRef" @scroll.passive="checkAtBottom">
         <BotChatMessages
           :user="user"
           :messages="messages"

@@ -9,8 +9,8 @@ import { GRADES, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
 import * as SignUpService from '@/services/SignUpService'
+import { SignUpPage, UserType } from '@/services/SignUpService/types'
 import {
-  SignUpPage,
   getFilteredPageDetails,
   getRow,
   getTextElement,
@@ -21,7 +21,6 @@ import {
   getSignUpSourceElement,
   getInputElement,
   getSubmitResponse,
-  UserType,
 } from '@/services/SignUpService'
 import type {
   PageDetail,

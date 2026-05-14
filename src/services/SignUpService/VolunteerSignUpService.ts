@@ -4,15 +4,14 @@ import type {
   RouteLocationNormalized,
 } from 'vue-router'
 import NetworkService from '@/services/NetworkService'
+import { SignUpPage, UserType } from '@/services/SignUpService/types'
 import {
-  SignUpPage,
   getRow,
   getTextElement,
   getButtonElement,
   getAlreadyHaveAccountElements,
   getSubmitResponse,
   getSignUpSourceElement,
-  UserType,
   getSsoButton,
 } from '@/services/SignUpService'
 import type {
@@ -44,6 +43,7 @@ export enum InputName {
   SIGNUP_SOURCE_ID = 'signupSourceId',
   TERMS = 'terms',
   INVITE_CODE = 'inviteCode',
+  REFERRED_BY_CODE = 'referredByCode',
 }
 
 export type VolunteerAccountFormData = {
@@ -152,7 +152,7 @@ async function getLogInDetails(
   }
 }
 
-async function createAccount(
+export async function createAccount( // exported for testing
   data: VolunteerAccountFormData
 ): Promise<SubmitActionResponse> {
   try {
@@ -164,6 +164,8 @@ async function createAccount(
       [InputName.LAST_NAME]: data.lastName,
       [InputName.PHONE]: data.phone,
       [InputName.TERMS]: true,
+      [InputName.REFERRED_BY_CODE]:
+        window.localStorage.getItem('upcReferredByCode'),
     }
 
     const result = partnerId
@@ -173,7 +175,6 @@ async function createAccount(
         })
       : await NetworkService.registerOpenVolunteer({
           ...options,
-          referredByCode: window.localStorage.getItem('upcReferredByCode'),
           [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
         })
     window.localStorage.removeItem('upcReferredByCode')

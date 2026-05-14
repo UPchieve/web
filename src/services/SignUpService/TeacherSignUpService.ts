@@ -9,8 +9,8 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import * as SignUpService from '@/services/SignUpService'
+import { SignUpPage, UserType } from '@/services/SignUpService/types'
 import {
-  SignUpPage,
   getRow,
   getTextElement,
   getInputElement,
@@ -18,7 +18,6 @@ import {
   getAlreadyHaveAccountElements,
   getSubmitResponse,
   getSsoButton,
-  UserType,
   getLinkElement,
   getRouterLinkElement,
 } from '@/services/SignUpService'

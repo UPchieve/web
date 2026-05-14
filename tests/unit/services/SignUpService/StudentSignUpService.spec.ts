@@ -19,6 +19,7 @@ import type {
   SubmitButtonFormElement,
   SubmitFormRow,
 } from '@/services/SignUpService'
+import { UserType } from '@/services/SignUpService/types'
 
 vi.mock('@/services/AnalyticsService')
 vi.mock('@/services/AuthService')
@@ -343,9 +344,7 @@ describe('StudentSignUpService', () => {
 
     describe('checkEligibility', () => {
       const INELIGIBILITY_KEY =
-        SignUpService.__test__.createEligibilityCheckKey(
-          SignUpService.UserType.student
-        )
+        SignUpService.__test__.createEligibilityCheckKey(UserType.student)
 
       beforeEach(() => {
         vi.resetAllMocks()
@@ -733,7 +732,7 @@ describe('StudentSignUpService', () => {
           firstName: 'MeowFirst',
           lastName: 'MeowLast',
           email: 'student@student.org',
-          password: 'Password123',
+          password: 'Password123', // pragma: allowlist secret
           gradeLevel: '10th',
           schoolId: 'school-id-000',
           zipCode: '00000',
@@ -796,7 +795,7 @@ describe('StudentSignUpService', () => {
           firstName: 'FriendsFirst',
           lastName: 'FriendsLast',
           email: 'referral@referral.com',
-          password: 'Password123',
+          password: 'Password123', // pragma: allowlist secret
         }
 
         await __test__.createAccount(data)
@@ -817,7 +816,7 @@ describe('StudentSignUpService', () => {
           firstName: 'ErrorFirst',
           lastName: 'ErrorLast',
           email: 'test@example.com',
-          password: 'Password123',
+          password: 'Password123', // pragma: allowlist secret
         }
 
         const result = await __test__.createAccount(data)
@@ -843,7 +842,7 @@ describe('StudentSignUpService', () => {
           firstName: 'Existing',
           lastName: 'Account',
           email: 'existing@account.com',
-          password: 'Password123',
+          password: 'Password123', // pragma: allowlist secret
         }
         const result = await __test__.createAccount(data)
 
@@ -871,7 +870,7 @@ describe('StudentSignUpService', () => {
     test('redirects to eligibility page if starting from a different step and no error/international', async () => {
       const to = {
         name: 'SignupView',
-        params: { step: 'account', userType: 'student' },
+        params: { step: 'account', userType: UserType.student },
         query: {},
       } as unknown as RouteLocationNormalized
       const from = {} as unknown as RouteLocationNormalized
@@ -880,7 +879,7 @@ describe('StudentSignUpService', () => {
 
       expect(next).toHaveBeenCalledWith({
         name: 'SignupView',
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
         query: {},
       })
     })
@@ -888,7 +887,7 @@ describe('StudentSignUpService', () => {
     test('allows access to eligibility page', async () => {
       const to = {
         name: 'SignupView',
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
         query: {},
       } as unknown as RouteLocationNormalized
       const from = {} as unknown as RouteLocationNormalized
@@ -901,7 +900,7 @@ describe('StudentSignUpService', () => {
     test('allows access to international page if redirected', async () => {
       const to = {
         name: 'SignupView',
-        params: { step: 'international', userType: 'student' },
+        params: { step: 'international', userType: UserType.student },
         redirectedFrom: { params: { step: 'eligibility' } },
         query: {},
       } as unknown as RouteLocationNormalized
@@ -915,7 +914,7 @@ describe('StudentSignUpService', () => {
     test('allows access to account page if error', async () => {
       const to = {
         name: 'SignupView',
-        params: { step: 'account', userType: 'student' },
+        params: { step: 'account', userType: UserType.student },
         query: { error: 'some-error' },
       } as unknown as RouteLocationNormalized
       const from = {} as unknown as RouteLocationNormalized
@@ -928,7 +927,7 @@ describe('StudentSignUpService', () => {
     test('processes query parameters from join-class', async () => {
       const to = {
         name: 'SignupView',
-        params: { step: 'account', userType: 'student' },
+        params: { step: 'account', userType: UserType.student },
         query: {
           classCode: 'ABC123',
           email: 'student@join-class.com',
@@ -954,7 +953,7 @@ describe('StudentSignUpService', () => {
     test('processes/sanitizes query parameter for parent/guardian flow', async () => {
       const to = {
         name: 'SignupView',
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
         query: { parent: 'true' },
       } as unknown as RouteLocationNormalized
       const from = {} as unknown as RouteLocationNormalized
@@ -981,7 +980,7 @@ describe('StudentSignUpService', () => {
 
       const to = {
         name: 'SignupView',
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
         query: { partner: 'test-partner' },
       } as unknown as RouteLocationNormalized
       const from = {} as unknown as RouteLocationNormalized
@@ -1010,7 +1009,7 @@ describe('StudentSignUpService', () => {
 
       const to = {
         name: 'SignupView',
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
         query: { partner: 'deactivated-partner' },
         path: '/sign-up/student/eligibility',
       } as unknown as RouteLocationNormalized
@@ -1022,7 +1021,7 @@ describe('StudentSignUpService', () => {
       expect(next).toHaveBeenCalledWith({
         path: '/sign-up/student/eligibility',
         query: {},
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
       })
     })
 
@@ -1032,7 +1031,7 @@ describe('StudentSignUpService', () => {
 
       const to = {
         name: 'SignupView',
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
         query: { partner: 'non-existent' },
         path: '/sign-up/student/eligibility',
       } as unknown as RouteLocationNormalized
@@ -1044,7 +1043,7 @@ describe('StudentSignUpService', () => {
       expect(next).toHaveBeenCalledWith({
         path: '/sign-up/student/eligibility',
         query: {},
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
       })
     })
 
@@ -1055,7 +1054,7 @@ describe('StudentSignUpService', () => {
 
       const to = {
         name: 'SignupView',
-        params: { step: 'eligibility', userType: 'student' },
+        params: { step: 'eligibility', userType: UserType.student },
         query: {},
       } as unknown as RouteLocationNormalized
       const from = {} as unknown as RouteLocationNormalized
@@ -1064,7 +1063,7 @@ describe('StudentSignUpService', () => {
 
       expect(next).toHaveBeenCalledWith({
         name: 'SignupView',
-        params: { step: 'international', userType: 'student' },
+        params: { step: 'international', userType: UserType.student },
       })
     })
   })

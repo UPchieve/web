@@ -1,3 +1,4 @@
+import { SignUpPage, UserType } from '@/services/SignUpService/types'
 import { EVENTS } from '@/consts'
 import router from '@/router'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -16,23 +17,7 @@ import type {
 } from './TeacherSignUpService'
 import type { VolunteerAccountFormData } from './VolunteerSignUpService'
 
-export enum SignUpPage {
-  account = 'account',
-  eligibility = 'eligibility',
-  ineligible = 'ineligible',
-  international = 'international',
-  parentGuardianConfirmation = 'confirmation',
-  partnerInfo = 'info',
-  verify = 'verify',
-  about = 'about',
-}
-
-export enum UserType {
-  student = 'student',
-  teacher = 'teacher',
-  volunteer = 'volunteer',
-}
-
+// TODO: Move more common types into types.ts
 export type SignUpFormData = StudentSignUpFormData | TeacherSignUpFormData
 export type EligibilityFormData =
   | StudentEligibilityFormData
