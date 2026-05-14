@@ -3,22 +3,22 @@
   <modal-template
     v-on:cancel="onCancel"
     v-on:accept="onAccept"
-    :back-text="modalTemplateProps.backText"
-    :accept-text="modalTemplateProps.acceptText"
-    :accept-button-variant="modalTemplateProps.acceptButtonVariant"
-    :alert-modal="modalTemplateProps.alertModal"
+    :back-text="modalData.backText"
+    :accept-text="modalData.acceptText"
+    :accept-button-variant="modalData.acceptButtonVariant"
+    :alert-modal="modalData.alertModal"
     :enable-accept="enableAccept"
-    :important="modalTemplateProps.important"
-    :showTemplateButtons="modalTemplateProps.showTemplateButtons"
-    :showSeparator="modalTemplateProps.showSeparator"
-    :show-accept="modalTemplateProps.showAccept"
+    :important="modalData.important"
+    :showTemplateButtons="modalData.showTemplateButtons"
+    :showSeparator="modalData.showSeparator"
+    :show-accept="modalData.showAccept"
     :modalComponentName="modalComponent && modalComponent.name"
   >
     <component
       v-if="modalComponent"
       v-bind:is="modalComponent"
       v-on:enable-accept="onEnableAccept"
-      :modal-data="modalTemplateProps"
+      :modal-data="modalData"
       v-bind="modalComponentProps"
       ref="AppModalChild"
     />
@@ -79,7 +79,7 @@ export default {
   computed: {
     ...mapState({
       modalComponent: (state) => state.app.modal.component,
-      modalTemplateProps: (state) => state.app.modal.modalTemplateProps,
+      modalData: (state) => state.app.modal.modalTemplateProps,
       modalComponentProps: (state) => state.app.modal.componentProps,
     }),
   },
@@ -87,8 +87,7 @@ export default {
     // Enable the accept button by default if this is
     // an alert modal or we have explicitly set to enable the button.
     this.enableAccept =
-      this.modalTemplateProps.enableAccept ||
-      !!this.modalTemplateProps.alertModal
+      this.modalData.enableAccept || !!this.modalData.alertModal
   },
   methods: {
     onCancel() {

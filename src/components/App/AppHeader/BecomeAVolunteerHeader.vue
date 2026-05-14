@@ -25,6 +25,9 @@ const store = useStore()
 const showBecomeVolunteerModal = () => {
   store.dispatch('app/modal/show', {
     component: 'BecomeAVolunteerModal',
+    data: {
+      showTemplateButtons: false,
+    },
   })
 }
 

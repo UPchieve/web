@@ -401,7 +401,7 @@ export default {
     openCreateTeacherClassModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'CreateTeacherClassModal',
-        modalTemplateProps: {
+        data: {
           createTeacherClass: this.createTeacherClass,
         },
       })
@@ -411,7 +411,7 @@ export default {
     openTeacherCodeModal(code) {
       this.$store.dispatch('app/modal/show', {
         component: 'TeacherClassCodeModal',
-        modalTemplateProps: {
+        data: {
           code,
         },
       })
@@ -421,7 +421,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_OPEN_CREATE_MODAL)
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAndEditAssignmentModal',
-        modalTemplateProps: {
+        data: {
           onAssignmentCreated: this.handleAssignmentCreated,
           classes: this.classes,
           currentClass: teacherClass,

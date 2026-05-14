@@ -181,7 +181,7 @@ export default {
      * transition into this modal.
      */
     this.$store.dispatch('app/modal/update', {
-      modalTemplateProps: { showTemplateButtons: () => false },
+      modalTemplateProps: { showTemplateButtons: false },
     })
 
     if (this.isPresessionFakeDoorQuestionEnabled)

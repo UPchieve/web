@@ -358,7 +358,7 @@ export default {
       )
       this.$store.dispatch('app/modal/show', {
         component: 'ReferralModal',
-        modalTemplateProps: {
+        data: {
           showAccept: false,
         },
       })
