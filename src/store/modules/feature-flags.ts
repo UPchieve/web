@@ -62,6 +62,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST]: false,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST]: false,
+      [POSTHOG_FEATURE_FLAGS.PRESESSION_NEAR_PEER_QUESTION]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -280,5 +281,7 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST
       ],
+    isPresessionNearPeerQuestionEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.PRESESSION_NEAR_PEER_QUESTION],
   },
 }

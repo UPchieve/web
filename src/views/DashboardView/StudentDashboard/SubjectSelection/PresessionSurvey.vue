@@ -21,6 +21,7 @@
         <div class="question__title">
           {{ currentQuestion.questionText }}
         </div>
+
         <div
           class="question__responses"
           :class="{
@@ -166,6 +167,7 @@ export default {
       surveyId: null,
       surveyTypeId: null,
       fakeDoorQuestionId: 'fakeDoorQuestion',
+      nearPeerQuestionId: 'nearPeerQuestion',
     }
   },
 
@@ -188,6 +190,11 @@ export default {
       AnalyticsService.captureEvent(
         EVENTS.STUDENT_PRESESSION_FAKE_DOOR_QUESTION_SHOWN
       )
+
+    if (this.isPresessionNearPeerQuestionEnabled)
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_PRESESSION_NEAR_PEER_QUESTION_SHOWN
+      )
   },
 
   computed: {
@@ -195,6 +202,8 @@ export default {
       mobileMode: 'app/mobileMode',
       isPresessionFakeDoorQuestionEnabled:
         'featureFlags/isPresessionFakeDoorQuestionEnabled',
+      isPresessionNearPeerQuestionEnabled:
+        'featureFlags/isPresessionNearPeerQuestionEnabled',
     }),
     fakeDoorQuestion() {
       return {
@@ -221,11 +230,46 @@ export default {
         ],
       }
     },
+    nearPeerQuestion() {
+      return {
+        questionId: this.nearPeerQuestionId,
+        questionText: 'Who would you prefer to work with today?',
+        questionType: 'multiple choice',
+        responses: [
+          {
+            responseId: 'noPreference',
+            responseText: 'No preference',
+          },
+          {
+            responseId: 'highSchoolTutor',
+            responseText: 'A high school tutor',
+          },
+          {
+            responseId: 'collegeTutor',
+            responseText: 'A college tutor',
+          },
+          {
+            responseId: 'adultTutor',
+            responseText: 'An adult tutor',
+          },
+        ],
+      }
+    },
 
     surveySteps() {
+      let steps = this.survey
+
+      //do not show step 2 if near peer question is enabled
+      if (this.isPresessionNearPeerQuestionEnabled) {
+        steps = steps.filter((_, i) => i !== 1)
+      }
+
       if (this.isPresessionFakeDoorQuestionEnabled)
-        return [this.fakeDoorQuestion, ...this.survey]
-      return this.survey
+        steps = [this.fakeDoorQuestion, ...steps]
+      if (this.isPresessionNearPeerQuestionEnabled)
+        steps = [...steps, this.nearPeerQuestion]
+
+      return steps
     },
     isSurveyComplete() {
       for (const question of this.surveySteps) {
@@ -233,6 +277,7 @@ export default {
         const userResponse = this.userResponse[questionId]
 
         if (questionId === this.fakeDoorQuestionId) continue
+        if (questionId === this.nearPeerQuestionId) continue
 
         if (!userResponse?.responseId) return false
 
@@ -287,6 +332,7 @@ export default {
       const submissions = []
       for (const question of this.surveySteps) {
         if (question.questionId === this.fakeDoorQuestionId) continue
+        if (question.questionId === this.nearPeerQuestionId) continue
 
         const questionId = question.questionId
         const response = this.userResponse[questionId]
@@ -324,6 +370,23 @@ export default {
                 selectedResponseIds.includes(response.responseId)
               )
               .map((response) => response.responseText),
+          }
+        )
+      }
+
+      if (
+        this.currentQuestion.questionId === this.nearPeerQuestionId &&
+        this.userResponse[this.nearPeerQuestionId]?.responseId
+      ) {
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_SELECTED_PRESESSION_NEAR_PEER_TUTOR_OPTION,
+          {
+            subject: this.subject,
+            response: this.nearPeerQuestion.responses.find(
+              (response) =>
+                response.responseId ===
+                this.userResponse[this.nearPeerQuestionId].responseId
+            )?.responseText,
           }
         )
       }
@@ -463,6 +526,14 @@ export default {
       }
     }
   }
+
+  &__info-box {
+    margin-top: 16px;
+    background-color: $light-blue-background;
+    padding: 12px;
+    font-size: 12px;
+    color: $c-information-blue;
+  }
 }
 
 .fake-door-checkbox {
@@ -486,5 +557,14 @@ export default {
   fill: $icon-grey;
   width: 15px;
   height: 15px;
+}
+.info-icon :deep(path) {
+  fill: $c-information-blue;
+}
+
+.info-icon {
+  height: 12px;
+  width: 12px;
+  margin-bottom: 3px;
 }
 </style>
