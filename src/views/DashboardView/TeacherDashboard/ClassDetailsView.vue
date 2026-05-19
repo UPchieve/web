@@ -597,7 +597,7 @@ export default {
       const code = this.classData.code
       this.$store.dispatch('app/modal/show', {
         component: 'TeacherClassCodeModal',
-        data: {
+        modalTemplateProps: {
           code,
         },
       })
@@ -606,7 +606,7 @@ export default {
     openEditClassModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'EditTeacherClassModal',
-        data: {
+        modalTemplateProps: {
           classInfo: this.classData,
           topics: this.topics,
           updateTeacherClass: this.updateTeacherClass,
@@ -619,7 +619,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_OPEN_CREATE_MODAL)
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAndEditAssignmentModal',
-        data: {
+        modalTemplateProps: {
           onAssignmentCreated: this.handleAssignmentCreated,
           classes: this.classes,
           currentClass: this.classData,
@@ -634,7 +634,7 @@ export default {
       })
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAndEditAssignmentModal',
-        data: {
+        modalTemplateProps: {
           onAssignmentEdited: this.handleEditAssignment,
           classes: this.classes,
           currentClass: this.classData,
@@ -647,8 +647,7 @@ export default {
     openRemoveAssignmentConfirmationModal(assignmentId) {
       this.$store.dispatch('app/modal/show', {
         component: 'RemoveAssignmentConfirmationModal',
-        data: {
-          showTemplateButtons: false,
+        modalTemplateProps: {
           deleteAssignment: this.deleteAssignment,
           assignmentId,
         },

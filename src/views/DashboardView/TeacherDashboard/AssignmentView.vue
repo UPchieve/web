@@ -268,7 +268,7 @@ export default {
     openStudentCompletionModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'StudentCompletionModal',
-        data: {
+        modalTemplateProps: {
           studentCompletion: this.studentCompletion,
         },
       })

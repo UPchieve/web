@@ -358,9 +358,6 @@ export default {
       )
       this.$store.dispatch('app/modal/show', {
         component: 'ReferralModal',
-        data: {
-          showAccept: false,
-        },
       })
     },
     openAmbassadorReferralModal() {

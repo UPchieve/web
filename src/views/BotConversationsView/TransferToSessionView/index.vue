@@ -32,7 +32,7 @@ const showPresessionSurvey = () => {
     // Hack for now: Render the SubjectSelectionModal in the state _after_ the topic is selected
     // (The presession survey step)
     component: SubjectSelectionModal,
-    data: {
+    modalTemplateProps: {
       preSelectedSubtopic: props.subject,
       topic: props.topic,
     },

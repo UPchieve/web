@@ -152,15 +152,14 @@ export default {
         )
         this.$store.dispatch('app/modal/show', {
           component: 'ReferralModal',
-          data: {
+          modalTemplateProps: {
             svg: this.svg,
-            showAccept: false,
           },
         })
       } else {
         this.$store.dispatch('app/modal/show', {
           component: 'SubjectSelectionModal',
-          data: {
+          modalTemplateProps: {
             backText: 'Dashboard',
             acceptText: 'Continue',
             topic: this.topic,
@@ -171,6 +170,7 @@ export default {
             preSelectedSubtopic: this.selectedSubtopic,
             subtitle:
               'Choose a subject so we can connect you with the right tutor.',
+            showTemplateButtons: () => !this.mobileMode,
           },
         })
       }
