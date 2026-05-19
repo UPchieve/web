@@ -1,24 +1,27 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import FormInput from '@/components/FormInput.vue'
 import Loader from '@/components/Loader.vue'
 import { handleLogout } from '@/services/AuthService'
 import NetworkService from '@/services/NetworkService'
+import LargeButton from '@/components/LargeButton.vue'
 
 const deleteInput = ref('')
 const isLoading = ref(false)
 const error = ref('')
+const isDeleteConfirmed = ref(false)
 
 const $router = useRouter()
 const $store = useStore()
+const mobileMode = computed(() => $store.getters['app/mobileMode'])
 
 const emit = defineEmits(['enable-accept'])
 
 watch(deleteInput, (newValue) => {
-  const isDeleteConfirmed = newValue.toLowerCase() === 'delete'
-  emit('enable-accept', isDeleteConfirmed)
+  isDeleteConfirmed.value = newValue.toLowerCase() === 'delete'
+  emit('enable-accept', isDeleteConfirmed.value)
 })
 
 async function onAccept() {
@@ -66,6 +69,17 @@ defineExpose({
     </p>
 
     <form-input v-model="deleteInput" placeholder="Type 'delete' to continue" />
+    <div v-if="mobileMode" class="separator" />
+    <div v-if="mobileMode" class="buttons-container">
+      <large-button
+        :variant="'danger'"
+        :showArrow="false"
+        @click="onAccept"
+        :disabled="!isDeleteConfirmed"
+      >
+        {{ 'Delete Account' }}
+      </large-button>
+    </div>
   </div>
 </template>
 
@@ -77,5 +91,18 @@ h1 {
 
 h2 {
   font-size: 20px;
+}
+
+.separator {
+  border: 1px solid $c-border-grey;
+  width: 100%;
+  height: 1px;
+  margin-top: 16px;
+}
+
+.buttons-container {
+  @include flex-container(row, flex-end);
+  @include child-spacing(left, 16px);
+  margin-top: 8px;
 }
 </style>
