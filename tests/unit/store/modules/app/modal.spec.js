@@ -51,7 +51,7 @@ describe('`app/modal` store module', () => {
       const commit = vi.fn()
       const payload = {
         component: 'component',
-        modalTemplateProps: {},
+        data: {},
         componentProps: { someProp: 1 },
       }
       actions.show({ commit }, payload)
@@ -64,7 +64,7 @@ describe('`app/modal` store module', () => {
       expect(commit).toHaveBeenNthCalledWith(
         3,
         'setModalTemplateProps',
-        payload.modalTemplateProps
+        payload.data
       )
       expect(commit).toHaveBeenNthCalledWith(
         4,

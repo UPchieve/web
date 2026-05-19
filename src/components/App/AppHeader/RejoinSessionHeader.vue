@@ -56,7 +56,7 @@ export default {
     showModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'RejoinSessionModal',
-        modalTemplateProps: { backText: 'Dashboard', important: true },
+        data: { backText: 'Dashboard', important: true },
       })
     },
     rejoin() {

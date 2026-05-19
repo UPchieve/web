@@ -20,7 +20,8 @@ const session = computed(() => store.state.user.session)
 const reportSession = () => {
   store.dispatch('app/modal/show', {
     component: 'ReportSessionModal',
-    modalTemplateProps: {
+    data: {
+      showTemplateButtons: false,
       currentSession: session.value,
       source: 'session',
     },

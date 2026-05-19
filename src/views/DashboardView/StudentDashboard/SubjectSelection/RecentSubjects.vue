@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import RecentSubjectCard from './RecentSubjectCard.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
@@ -50,20 +50,16 @@ export default {
       subjects: (state) => state.subjects.subjects,
       user: (state) => state.user.user,
     }),
-    ...mapGetters({
-      mobileMode: 'app/mobileMode',
-    }),
   },
   methods: {
     togglePresessionSurvey(subject) {
       this.$store.dispatch('app/modal/show', {
         component: 'SubjectSelectionModal',
-        modalTemplateProps: {
+        data: {
           topic: subject.topicName,
           title: subject.displayName,
           svg: subject.topicIconLink,
           preSelectedSubtopic: subject.name,
-          showTemplateButtons: () => !this.mobileMode,
         },
       })
     },

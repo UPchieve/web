@@ -48,55 +48,6 @@ describe('AppModal', () => {
     )
   })
 
-  it('does not show ModalTemplate buttons by default', async () => {
-    const state = {
-      modalTemplateProps: { backText: 'Back', acceptText: 'Okay' },
-    }
-    wrapper = await getWrapper(state)
-
-    expect(wrapper.find('.ModalTemplate-buttons').exists()).toBe(false)
-  })
-
-  it('shows ModalTemplate buttons when requested', async () => {
-    const state = {
-      modalTemplateProps: {
-        backText: 'Back',
-        acceptText: 'Okay',
-        showTemplateButtons: () => true,
-      },
-    }
-    wrapper = await getWrapper(state)
-
-    expect(wrapper.find('.ModalTemplate-buttons').exists()).toBe(true)
-    expect(wrapper.text()).toContain('Back')
-    expect(wrapper.text()).toContain('Okay')
-  })
-
-  it('hides ModalTemplate buttons when requested', async () => {
-    const state = {
-      modalTemplateProps: { showTemplateButtons: () => false },
-    }
-    wrapper = await getWrapper(state)
-
-    expect(wrapper.find('.ModalTemplate-buttons').exists()).toBe(false)
-  })
-
-  it('does not show the cancel button for alert modals', async () => {
-    const state = {
-      modalTemplateProps: {
-        alertModal: true,
-        backText: 'Back',
-        acceptText: 'Okay',
-        showTemplateButtons: () => true,
-      },
-    }
-    wrapper = await getWrapper(state)
-
-    expect(wrapper.find('.ModalTemplate-buttons').exists()).toBe(true)
-    expect(wrapper.text()).not.toContain('Back')
-    expect(wrapper.text()).toContain('Okay')
-  })
-
   it('renders SubjectSelectionModal', async () => {
     const state = { component: 'SubjectSelectionModal', modalTemplateProps: {} }
     wrapper = await getWrapper(state)

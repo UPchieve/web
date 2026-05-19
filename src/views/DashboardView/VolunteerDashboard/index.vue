@@ -376,7 +376,6 @@ export default {
       isCombinedOnboardingChecklistEnabled:
         'featureFlags/isCombinedOnboardingChecklistEnabled',
       hasASubjectCertification: 'user/hasASubjectCertification',
-      mobileMode: 'app/mobileMode',
     }),
     shouldShowNotificationsCard() {
       return (
@@ -817,11 +816,7 @@ export default {
     showOnboardingModal() {
       this.$store.dispatch('app/modal/show', {
         component: 'VolunteerOnboardingModal',
-        modalTemplateProps: {
-          alertModal: true,
-          acceptText: 'Get started',
-          showTemplateButtons: () => !this.mobileMode,
-        },
+        data: { alertModal: true, acceptText: 'Get started' },
       })
     },
     toggleWelcomeModal() {

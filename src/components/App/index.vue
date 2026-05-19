@@ -91,6 +91,9 @@ export default {
         setTimeout(() => {
           this.$store.dispatch('app/modal/show', {
             component: 'UpgradeAppModal',
+            data: {
+              showTemplateButtons: false,
+            },
           })
         }, 1000)
       }
