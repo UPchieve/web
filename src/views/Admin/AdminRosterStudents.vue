@@ -12,11 +12,14 @@
     >
       {{ msg }}
     </div>
-    <p>Create student profiles for a partner school.</p>
+    <p>Create, update, or deactivate student profiles for a partner school.</p>
     <p>
-      Note: This upload is only for new students. If a student with the email
-      already has an account with us, you'll receive a warning at the end of the
-      upload that the student failed to be created.
+      Rows with an email unassociated with any existing account will create a
+      new account. Rows with an email associated with an existing account will
+      update the associated account with values from the CSV. Rows with a value
+      in <code>deactivatedOn</code> will first update the account with values
+      from the CSV and then deactivate the student's partner org instance for
+      this school as of that timestamp.
     </p>
     <p>
       Before submitting, please make sure the CSV file with the list of students
@@ -45,6 +48,13 @@
         <code>password</code> - optional, but required if students can't receive
         our emails and the <code>proxyEmail</code> is not willing to forward
         "Set Password" emails to students.
+      </li>
+      <li>
+        <code>deactivatedOn</code> - optional. If set to a timestamp (e.g.
+        <code>2026-05-12</code> or a full ISO date like
+        <code>2026-05-12T00:00:00Z</code>), the student's partner org instance
+        for the selected school is deactivated as of that timestamp. The student
+        must already exist; the row will fail otherwise.
       </li>
     </ul>
 
@@ -165,21 +175,34 @@ export default {
         const { data } =
           await NetworkService.adminUploadRosterStudents(formData)
 
-        if (!data.failed.length && !data.updated.length) {
-          this.msg = 'Success!'
-          return
+        const segments = []
+        if (data.created?.length) {
+          segments.push(
+            `Created: ${data.created.map((u) => u.email).join(', ')}`
+          )
         }
-        this.isWarning = true
+        if (data.updated?.length) {
+          segments.push(
+            `Updated: ${data.updated.map((u) => u.email).join(', ')}`
+          )
+        }
+        if (data.deactivated?.length) {
+          segments.push(
+            `Deactivated: ${data.deactivated.map((u) => u.email).join(', ')}`
+          )
+        }
+        if (data.failed?.length) {
+          this.isWarning = true
+          const entries = data.failed
+            .map((u) => (u.reason ? `${u.email} (${u.reason})` : u.email))
+            .join(', ')
+          segments.push(`Failed: ${entries}`)
+        }
 
-        if (data.failed.length) {
-          const failedEmails = data.failed.map((u) => u.email).join(', ')
-          this.msg = `Failed: ${failedEmails}\n`
-        }
-
-        if (data.updated.length) {
-          const updatedEmails = data.updated.map((u) => u.email).join(', ')
-          this.msg += `Updated: ${updatedEmails}`
-        }
+        this.msg = [
+          this.isWarning ? 'Warning!' : 'Success!', 
+          ...segments
+        ].join('\n')
       } catch (error) {
         this.msg = error.response.data.err
         this.isError = true
