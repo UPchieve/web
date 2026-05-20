@@ -23,6 +23,10 @@
           <span v-if="message.type === 'voice'"
             ><voice-message :message="message"></voice-message
           ></span>
+          <span
+            v-else-if="message.contents?.startsWith('LATEX:')"
+            v-html="renderLatex(message.contents)"
+          ></span>
           <span v-else>{{ message.contents }}</span>
         </div>
         <div class="time">
@@ -40,6 +44,7 @@ import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
 import { mapState, mapGetters } from 'vuex'
 import { dayjs } from '@/utils/time-utils'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
+import { renderLatex } from '@/utils/chatbot-utils'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -86,6 +91,7 @@ export default {
       if (!isStudentMessage && !isVolunteerMessage) return 'contents--chat-bot'
       return ''
     },
+    renderLatex,
   },
 }
 </script>

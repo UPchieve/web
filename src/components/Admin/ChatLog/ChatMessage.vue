@@ -5,6 +5,11 @@
       <div v-if="message.type === 'voice'">
         <voice-message :message="message"></voice-message>
       </div>
+      <div
+        v-else-if="message.contents?.startsWith('LATEX:')"
+        class="chat-message__content"
+        v-html="renderLatex(message.contents)"
+      ></div>
       <div v-else class="chat-message__content">{{ message.contents }}</div>
     </div>
     <div class="chat-message__timestamp">{{ timestamp }}</div>
@@ -15,6 +20,7 @@
 import { dayjs } from '@/utils/time-utils'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import VoiceMessage from '@/components/VoiceMessaging/VoiceMessage.vue'
+import { renderLatex } from '@/utils/chatbot-utils'
 
 export default {
   name: 'ChatMessage',
@@ -37,6 +43,10 @@ export default {
     avatar() {
       return getChatAvatar(this.message.user, this.studentId, this.volunteerId)
     },
+  },
+
+  methods: {
+    renderLatex,
   },
 }
 </script>

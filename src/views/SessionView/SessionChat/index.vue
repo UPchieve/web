@@ -94,7 +94,7 @@
                     message.isLatex ||
                     message.contents?.startsWith(this.latexPrefix)
                   "
-                  v-html="renderLatex(message.contents)"
+                  v-html="renderLatexContent(message.contents)"
                 >
                 </span>
                 <transcribed-message
@@ -269,7 +269,7 @@ import getChatAvatar from '@/utils/get-chat-avatar'
 import sendWebNotification from '@/utils/send-web-notification'
 
 import 'mathlive'
-import katex from 'katex'
+import { renderLatex } from '@/utils/chatbot-utils'
 import 'katex/dist/katex.min.css'
 
 import { Mathematics, migrateMathStrings } from '@tiptap/extension-mathematics'
@@ -334,7 +334,6 @@ export default {
       isTutorJoiningForFirstTime: false,
       pendingTextMessages: [],
       isMathMode: false,
-      isComposerEmpty: true,
       editor: null,
       latexPrefix: 'LATEX:',
     }
@@ -349,7 +348,6 @@ export default {
       ],
       content: '',
       onUpdate: () => {
-        this.syncComposerIsEmpty()
         this.onEditorInput()
       },
     })
@@ -381,6 +379,18 @@ export default {
         state.liveMedia.audio.myInProgressCaptionMessage,
       partnerInProgressCaptionMessage: (state) =>
         state.liveMedia.audio.partnerInProgressCaptionMessage,
+      isComposerEmpty() {
+        if (!this.editor) return true
+        return (
+          this.editor
+            .getText({
+              textSerializers: {
+                inlineMath: ({ node }) => `$${node.attrs.latex}$`,
+              },
+            })
+            .trim().length === 0
+        )
+      },
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
@@ -580,7 +590,6 @@ export default {
     resetComposer() {
       if (this.isShowTipTapEditorEnabled) {
         this.editor.commands.clearContent(true)
-        this.isComposerEmpty = true
         this.focusEditor()
       } else {
         this.newMessage = ''
@@ -824,23 +833,8 @@ export default {
       div.appendChild(node)
       return div.innerHTML
     },
-    renderLatex(contents) {
-      const stripped = contents.startsWith(this.latexPrefix)
-        ? contents.slice(this.latexPrefix.length)
-        : contents
-
-      //splits on $...$ math delimiters, gets content between them
-      return stripped
-        .split(/\$([^$]+)\$/)
-        .map((part, i) =>
-          i % 2 === 1
-            ? katex.renderToString(part, {
-                throwOnError: false,
-                displayMode: false,
-              })
-            : this.escapeHtml(part)
-        )
-        .join('')
+    renderLatexContent(contents) {
+      return renderLatex(contents, this.escapeHtml)
     },
     async onComposerKeydown(event) {
       if (event.key === 'Enter' && event.shiftKey) return
@@ -849,14 +843,6 @@ export default {
         await this.sendMessage()
         return
       }
-    },
-    syncComposerIsEmpty() {
-      if (!this.editor) return
-      const hasText = this.editor.getText().trim().length > 0
-      const hasMath = JSON.stringify(this.editor.getJSON()).includes(
-        '"inlineMath"'
-      )
-      this.isComposerEmpty = !hasText && !hasMath
     },
 
     focusEditor() {

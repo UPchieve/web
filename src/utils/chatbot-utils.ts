@@ -1,3 +1,5 @@
+import katex from 'katex'
+
 export function getSessionEndDMsMessage(
   isSessionStudent: boolean,
   isViewingSessionRecap: boolean
@@ -8,4 +10,25 @@ export function getSessionEndDMsMessage(
   }
   contents += `\n\nYour ${isSessionStudent ? 'coach' : 'student'} will receive an email notification about your message and may respond later.`
   return contents
+}
+
+export function renderLatex(
+  contents: string,
+  escapeHtml?: (s: string) => string
+) {
+  const stripped = contents.startsWith('LATEX:') ? contents.slice(6) : contents
+
+  return stripped
+    .split(/\$([^$]+)\$/)
+    .map((part, i) =>
+      i % 2 === 1
+        ? katex.renderToString(part, {
+            throwOnError: false,
+            displayMode: false,
+          })
+        : escapeHtml
+          ? escapeHtml(part)
+          : part
+    )
+    .join('')
 }
