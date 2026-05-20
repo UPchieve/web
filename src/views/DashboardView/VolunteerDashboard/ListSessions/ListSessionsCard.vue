@@ -13,6 +13,7 @@ import { computed, onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MenuContent from '@/views/DashboardView/VolunteerDashboard/ListSessions/MenuContent.vue'
 import Menu from '@/components/Menu.vue'
+import LargeButton from '@/components/LargeButton.vue'
 
 const store = useStore()
 const router = useRouter()
@@ -91,13 +92,13 @@ function rejoinHelpSession() {
               :sessionClickOverride="props.sessionClickOverride"
             />
             <div v-else class="rejoin-session-container">
-              <button
-                class="btn rejoinSessionBtn"
+              <LargeButton
+                variant="primary-blue"
                 type="button"
                 @click.prevent="rejoinHelpSession()"
               >
                 Rejoin your coaching session
-              </button>
+              </LargeButton>
             </div>
           </div>
         </div>
@@ -120,5 +121,10 @@ function rejoinHelpSession() {
   display: flex;
   width: 100%;
   position: relative;
+}
+.rejoin-session-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 </style>
