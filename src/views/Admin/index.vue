@@ -66,8 +66,7 @@ export default {}
   font-weight: 600;
   color: #fff;
   text-decoration: none;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 0 24px;
   margin-bottom: 30px;
   max-width: 500px;
 
