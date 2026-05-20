@@ -25,11 +25,12 @@
 @include meta.load-css('layout/training');
 @include meta.load-css('layout/vuetify-overrides');
 
-* {
-  -webkit-user-select: auto;
-  -moz-user-select: auto;
-  -ms-user-select: auto;
-  user-select: auto;
+html.plt-mobile ion-app,
+ion-app {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 *,
