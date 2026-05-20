@@ -14,6 +14,7 @@ type ConfirmModalData = {
   backText?: string
   acceptText: string
   acceptButtonVariant?: string
+  heroImageUrl?: string
   onConfirm?: () => void
   onCancel?: () => void
 }
@@ -44,6 +45,11 @@ defineExpose({
 <template>
   <div class="uc-column text-start">
     <h1 class="title">{{ modalData.title }}</h1>
+    <img
+      v-if="props.modalData.heroImageUrl"
+      :src="props.modalData.heroImageUrl"
+      class="hero-image"
+    />
     <p class="message">{{ modalData.message }}</p>
 
     <div class="uc-row uc-column-sm justify-end gap-sm">
@@ -73,5 +79,12 @@ defineExpose({
 
 .message {
   @include font-category('body');
+  padding: 1em 0;
+}
+
+.hero-image {
+  object-fit: cover;
+  border: 3px solid black;
+  max-height: 300px;
 }
 </style>

@@ -25,6 +25,7 @@ export type SessionErrorModalData = ModalTemplateProps & {
 export type ConfirmModalData = ModalTemplateProps & {
   title: string
   message: string
+  heroImageUrl?: string
   onConfirm?: () => void
   onCancel?: () => void
 }
@@ -97,6 +98,7 @@ export default {
       acceptText?: string
       acceptButtonVariant?: string
       backText?: string
+      heroImageUrl?: string
     }
   ): Promise<boolean> {
     return new Promise((resolve) => {
@@ -107,6 +109,7 @@ export default {
         acceptButtonVariant: options?.acceptButtonVariant,
         showTemplateButtons: false,
         backText: options?.backText ?? 'Cancel',
+        heroImageUrl: options?.heroImageUrl,
         onConfirm: () => resolve(true),
         onCancel: () => resolve(false),
       })

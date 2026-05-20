@@ -1033,6 +1033,8 @@ router.afterEach((to, from) => {
   }
   store.commit('app/setIsLoading', false)
   preloadViews(to.meta?.preloadViews ?? {})
+
+  store.commit('app/setFromRoute', from.path)
 })
 
 // If endpoint returns 401, redirect to login (except for requests to get user or user's

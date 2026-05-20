@@ -69,6 +69,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE]: '', // tutor-count-shown | tutor-count-hidden
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY]: '', // completed-first-hour-of-tutoring | tutored-first-three-students
+      [POSTHOG_FEATURE_FLAGS.BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS]: '', // 'control' | 'math-only' | 'reading-writing-only',
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
@@ -283,5 +284,9 @@ export default {
       ],
     isPresessionNearPeerQuestionEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PRESESSION_NEAR_PEER_QUESTION],
+    becomeVolunteerInSubjectWithNoRequestsVariant: (state: FeatureFlagState) =>
+      state.multivariantFlags[
+        POSTHOG_FEATURE_FLAGS.BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS
+      ],
   },
 }
