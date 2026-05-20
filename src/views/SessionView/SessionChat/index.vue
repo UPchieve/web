@@ -89,6 +89,14 @@
             >
               <div class="bubble" :class="chatBotMessageStyle(message)">
                 <span v-if="message.hasHtml" v-html="message.contents"></span>
+                <span
+                  v-else-if="
+                    message.isLatex ||
+                    message.contents?.startsWith(this.latexPrefix)
+                  "
+                  v-html="renderLatex(message.contents)"
+                >
+                </span>
                 <transcribed-message
                   v-else-if="message.type === 'audio-transcription'"
                   :message="message"
@@ -179,36 +187,59 @@
           {{ sessionPartnerName || 'Chatbot' }} is typing...
         </div>
       </transition>
-      <div class="message-input">
-        <textarea
-          autocomplete="off"
-          class="message-textarea"
-          :class="{ hidden: textMessageHidden }"
-          data-testid="chat-textarea"
-          autofocus
-          @keydown="onTypingInChat"
-          @input="resizeTextarea"
-          v-model="newMessage"
-          placeholder="Type a message..."
-          ref="textareaRef"
-        />
-        <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
-        <button
-          type="button"
-          :disabled="isSendMessageDisabled"
-          class="send-button"
-          :class="{ hidden: textMessageHidden }"
-          @click="sendMessage"
-        >
-          <SendMessage></SendMessage>
-        </button>
-      </div>
     </div>
+    <div class="message-input" :class="{ 'math-active': isMathMode }">
+      <button
+        v-if="isShowTipTapEditorEnabled"
+        type="button"
+        class="math-toggle-button"
+        :class="{ active: isMathMode }"
+        @click="insertInlineMathField"
+        title="Insert math"
+      >
+        ∑
+      </button>
+      <textarea
+        v-if="!isShowTipTapEditorEnabled"
+        autocomplete="off"
+        class="message-textarea"
+        :class="{ hidden: textMessageHidden }"
+        data-testid="chat-textarea"
+        autofocus
+        @keydown="onTypingInChat"
+        @input="resizeTextarea"
+        v-model="newMessage"
+        placeholder="Type a message..."
+        ref="textareaRef"
+      />
+
+      <editor-content
+        class="message-composer"
+        :class="{ 'message-composer--empty': isComposerEmpty }"
+        :editor="editor"
+        @keydown="onComposerKeydown"
+      />
+      <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
+      <button
+        type="button"
+        :disabled="isSendMessageDisabled"
+        class="send-button"
+        :class="{ hidden: textMessageHidden }"
+        @click="sendMessage"
+      >
+        <SendMessage />
+      </button>
+    </div>
+    <div
+      v-if="isShowTipTapEditorEnabled"
+      class="math-keyboard-container"
+      ref="mathKeyboardContainer"
+    ></div>
   </div>
 </template>
 
 <script>
-import { isEmpty, startCase } from 'lodash-es'
+import { startCase } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
 import { dayjs } from '@/utils/time-utils'
 import { socket } from '@/socket'
@@ -237,6 +268,15 @@ import { DEFAULT_CELEBRATION_DURATION } from '@/store/modules/celebrations'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import sendWebNotification from '@/utils/send-web-notification'
 
+import 'mathlive'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
+
+import { Mathematics, migrateMathStrings } from '@tiptap/extension-mathematics'
+import StarterKit from '@tiptap/starter-kit'
+import { Editor, EditorContent } from '@tiptap/vue-3'
+import Placeholder from '@tiptap/extension-placeholder'
+
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
   RIGHT: 'right',
@@ -260,6 +300,7 @@ export default {
     ScrollToLatestButton,
     TranscribedMessage,
     CelebrationButton,
+    EditorContent,
   },
 
   props: {
@@ -292,9 +333,41 @@ export default {
       hasStartedTyping: false,
       isTutorJoiningForFirstTime: false,
       pendingTextMessages: [],
+      isMathMode: false,
+      isComposerEmpty: true,
+      editor: null,
+      latexPrefix: 'LATEX:',
     }
   },
+  mounted() {
+    if (!this.isShowTipTapEditorEnabled) return
+    this.editor = new Editor({
+      extensions: [
+        StarterKit,
+        Mathematics,
+        Placeholder.configure({ placeholder: 'Type a message...' }),
+      ],
+      content: '',
+      onUpdate: () => {
+        this.syncComposerIsEmpty()
+        this.onEditorInput()
+      },
+    })
 
+    //converts strings to inline math nodes
+    migrateMathStrings(this.editor)
+
+    document.addEventListener('click', this.mathClickOutsideHandler)
+
+    this.$nextTick(() => {
+      window.mathVirtualKeyboard.container = this.$refs.mathKeyboardContainer
+    })
+  },
+  beforeUnmount() {
+    if (!this.isShowTipTapEditorEnabled) return
+    document.removeEventListener('click', this.mathClickOutsideHandler)
+    this.editor.destroy()
+  },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
@@ -320,6 +393,7 @@ export default {
       isConfettiCelebrationEnabled: 'featureFlags/isConfettiCelebrationEnabled',
       isPendingMessagesEnabled: 'featureFlags/isPendingMessagesEnabled',
       isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
+      isShowTipTapEditorEnabled: 'featureFlags/isShowTipTapEditorEnabled',
     }),
     showMyInProgressCaptionMessage() {
       return this.myInProgressCaptionMessage?.text?.length > 0
@@ -377,6 +451,13 @@ export default {
       )
     },
     isSendMessageDisabled() {
+      if (this.isShowTipTapEditorEnabled) {
+        return (
+          this.isComposerEmpty ||
+          !this.isSocketSessionRoomConnected ||
+          this.waitingForModeration
+        )
+      }
       return (
         this.newMessage.length === 0 ||
         !this.isSocketSessionRoomConnected ||
@@ -452,47 +533,61 @@ export default {
         return
       }
 
-      if (!this.hasStartedTyping) {
-        this.hasStartedTyping = true
-        socket.emit('typing', {
-          sessionId: this.currentSession.id,
-        })
-      }
-
-      // Every time a key is pressed, set an inactive timer.
-      // If another key is pressed within 2 seconds, reset timer.
-      clearTimeout(this.typingTimeout)
-      this.typingTimeout = setTimeout(() => {
-        this.notTyping()
-      }, 2000)
+      this.indicateStartTyping()
     },
-
     async sendMessage() {
-      const message = this.newMessage.trim()
-      // Early exit if message is blank.
-      if (isEmpty(message) || this.isSendMessageDisabled) return
+      const { text, isLatex } = this.isShowTipTapEditorEnabled
+        ? this.getTipTapMessageText()
+        : { text: this.newMessage.trim(), isLatex: false }
+
+      if (!text || this.isSendMessageDisabled) return
 
       clearTimeout(this.typingTimeout)
       this.notTyping()
 
-      const isClean = await this.moderateMessage(message)
+      const isClean = await this.moderateMessage(text)
+      if (!isClean) return
 
-      if (isClean) {
-        const newMessage = {
-          contents: message,
-          user: this.user.id,
-          createdAt: new Date().toISOString(),
-        }
-        if (this.isPendingMessagesEnabled) {
-          this.pendingTextMessages.push(newMessage)
-        }
+      const newMessage = {
+        contents: text,
+        isLatex,
+        user: this.user.id,
+        createdAt: new Date().toISOString(),
+      }
+
+      if (this.isPendingMessagesEnabled) {
+        this.pendingTextMessages.push(newMessage)
+      }
+
+      this.handleOutgoingMessage(newMessage)
+      this.scrollToBottom()
+      this.resetComposer()
+    },
+
+    getTipTapMessageText() {
+      if (!this.editor || this.isComposerEmpty)
+        return { text: '', isLatex: false }
+      const text = this.editor
+        .getText({
+          textSerializers: {
+            inlineMath: ({ node }) => `$${node.attrs.latex}$`,
+          },
+        })
+        .trim()
+      return { text, isLatex: /\$[^$]+\$/.test(text) }
+    },
+
+    resetComposer() {
+      if (this.isShowTipTapEditorEnabled) {
+        this.editor.commands.clearContent(true)
+        this.isComposerEmpty = true
+        this.focusEditor()
+      } else {
         this.newMessage = ''
-        await this.$nextTick()
-        this.resizeTextarea({ target: this.$refs.textareaRef })
-        this.$refs.textareaRef.focus()
-        this.scrollToBottom()
-
-        this.handleOutgoingMessage(newMessage)
+        this.$nextTick(() => {
+          this.resizeTextarea({ target: this.$refs.textareaRef })
+          this.$refs.textareaRef.focus()
+        })
       }
     },
 
@@ -525,10 +620,13 @@ export default {
 
     handleOutgoingMessage(message) {
       message.emitted = true
+      const socketMessage = message.isLatex
+        ? `${this.latexPrefix}${message.contents}`
+        : message.contents
       socket.emit('message', {
         sessionId: this.currentSession.id,
         user: this.user,
-        message: message.contents,
+        message: socketMessage,
         createdAt: message.createdAt,
         source:
           this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
@@ -536,8 +634,13 @@ export default {
     },
 
     removePendingMessage(message) {
+      const normalizedMessage =
+        this.isShowTipTapEditorEnabled && message.startsWith(this.latexPrefix)
+          ? message.slice(this.latexPrefix.length)
+          : message
+
       const index = this.pendingTextMessages.findIndex((m) => {
-        return m.contents === message && m.emitted
+        return m.contents === normalizedMessage && m.emitted
       })
       if (index > -1) {
         this.pendingTextMessages.splice(index, 1)
@@ -714,6 +817,153 @@ export default {
       })
 
       AnalyticsService.captureEvent(EVENTS.USER_SENT_CELEBRATION)
+    },
+    escapeHtml(contents) {
+      const node = document.createTextNode(contents)
+      const div = document.createElement('div')
+      div.appendChild(node)
+      return div.innerHTML
+    },
+    renderLatex(contents) {
+      const stripped = contents.startsWith(this.latexPrefix)
+        ? contents.slice(this.latexPrefix.length)
+        : contents
+
+      //splits on $...$ math delimiters, gets content between them
+      return stripped
+        .split(/\$([^$]+)\$/)
+        .map((part, i) =>
+          i % 2 === 1
+            ? katex.renderToString(part, {
+                throwOnError: false,
+                displayMode: false,
+              })
+            : this.escapeHtml(part)
+        )
+        .join('')
+    },
+    async onComposerKeydown(event) {
+      if (event.key === 'Enter' && event.shiftKey) return
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        await this.sendMessage()
+        return
+      }
+    },
+    syncComposerIsEmpty() {
+      if (!this.editor) return
+      const hasText = this.editor.getText().trim().length > 0
+      const hasMath = JSON.stringify(this.editor.getJSON()).includes(
+        '"inlineMath"'
+      )
+      this.isComposerEmpty = !hasText && !hasMath
+    },
+
+    focusEditor() {
+      this.editor?.commands.focus()
+    },
+
+    closeMathKeyboard() {
+      this.isMathMode = false
+      const existing = this.$el.querySelector('math-field.active-math-input')
+      if (existing) existing.remove()
+      if (this.$refs.mathKeyboardContainer) {
+        this.$refs.mathKeyboardContainer.style.display = 'none'
+      }
+      window.mathVirtualKeyboard?.hide()
+    },
+
+    insertInlineMathField() {
+      if (!this.editor) return
+      if (this.isMathMode) {
+        const existing = this.$el.querySelector('math-field.active-math-input')
+        if (existing) this.commitMathField(existing)
+        else this.closeMathKeyboard()
+        return
+      }
+
+      this.isMathMode = true
+      if (this.$refs.mathKeyboardContainer) {
+        this.$refs.mathKeyboardContainer.style.display = 'block'
+      }
+
+      const mathField = document.createElement('math-field')
+      mathField.setAttribute('math-virtual-keyboard-policy', 'manual')
+      mathField.classList.add('active-math-input')
+      this.$refs.mathKeyboardContainer.insertAdjacentElement(
+        'beforebegin',
+        mathField
+      )
+
+      let committed = false
+      const commit = (andSend = false) => {
+        if (committed) return
+        committed = true
+        this.commitMathField(mathField)
+        if (andSend) this.sendMessage()
+      }
+
+      mathField.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          e.stopPropagation()
+          commit(true)
+        }
+        if (e.key === 'Tab') {
+          e.preventDefault()
+          e.stopPropagation()
+          commit(false)
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          this.closeMathKeyboard()
+          this.focusEditor()
+        }
+      })
+
+      mathField.addEventListener('change', () => commit(false))
+
+      this.$nextTick(() => {
+        mathField.focus()
+        window.mathVirtualKeyboard?.show()
+      })
+    },
+    commitMathField(mathField) {
+      const latex =
+        mathField.getValue?.('latex') ?? mathField.value?.trim() ?? ''
+      mathField.remove()
+      this.closeMathKeyboard()
+      if (latex) {
+        this.editor
+          .chain()
+          .focus()
+          .insertContent({
+            type: 'inlineMath',
+            attrs: { latex },
+          })
+          .insertContent(' ')
+          .run()
+      } else {
+        this.focusEditor()
+      }
+    },
+    onEditorInput() {
+      this.indicateStartTyping()
+    },
+    mathClickOutsideHandler(e) {
+      if (this.isMathMode && !this.$el.contains(e.target)) {
+        this.closeMathKeyboard()
+      }
+    },
+    indicateStartTyping() {
+      if (!this.hasStartedTyping) {
+        this.hasStartedTyping = true
+        socket.emit('typing', { sessionId: this.currentSession.id })
+      }
+      clearTimeout(this.typingTimeout)
+      this.typingTimeout = setTimeout(() => {
+        this.notTyping()
+      }, 2000)
     },
   },
 
@@ -946,15 +1196,17 @@ export default {
 
   .contents {
     max-width: 80%;
+    min-width: 0;
 
     .bubble {
       text-align: left;
       padding: 0.625em 0.875em;
-      overflow-wrap: break-word;
+      overflow-wrap: anywhere;
       background-color: $c-background-grey;
       border-radius: 20px;
       white-space: pre-line;
       word-break: break-word;
+      overflow-x: auto;
 
       &--chat-bot {
         background-color: $upchieve-chat-bot-green;
@@ -1029,7 +1281,6 @@ export default {
   align-items: center;
   border-top: 1px solid $c-border-grey;
   min-width: 0;
-  flex-grow: 1;
   width: 100%;
   border-top: none;
   column-gap: 0.75em;
@@ -1063,6 +1314,7 @@ export default {
     }
   }
 }
+
 .send-button {
   padding-right: 18px;
   @include breakpoint-below('medium') {
@@ -1076,5 +1328,90 @@ export default {
   :deep(circle) {
     fill: $c-disabled-grey;
   }
+}
+
+.message-composer {
+  flex: 1;
+  max-height: 250px;
+  overflow: auto;
+  padding: 0.6em;
+  margin-top: 0.5em;
+  line-height: 1.5;
+  outline: none;
+  word-break: break-word;
+  cursor: text;
+
+  :deep(.ProseMirror) {
+    outline: none;
+    min-height: 1.5em;
+
+    p.is-editor-empty:first-child::before {
+      content: attr(data-placeholder);
+      color: #9e9e9e;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .math-inline,
+    .math-block {
+      display: inline;
+      border: 1px solid $c-border-grey;
+      border-radius: 6px;
+      padding: 0 4px;
+      background: $upchieve-white;
+      font-size: 1em;
+    }
+
+    .math-inline.ProseMirror-selectednode,
+    .math-block.ProseMirror-selectednode {
+      border-color: $c-information-blue;
+      box-shadow: 0 0 0 2px rgba($c-information-blue, 0.15);
+    }
+  }
+
+  @include breakpoint-below('medium') {
+    border: 1px solid $c-border-grey;
+    border-radius: 20px;
+  }
+}
+
+.math-toggle-button {
+  padding: 0 12px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $c-disabled-grey;
+  flex-shrink: 0;
+  &.active {
+    color: $c-information-blue;
+  }
+}
+
+.math-keyboard-container {
+  width: 100%;
+  min-height: 218px;
+  display: none;
+}
+
+math-field.active-math-input {
+  display: block;
+  width: 100%;
+  border: 1px solid $c-information-blue;
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: $upchieve-white;
+  font-size: 1em;
+  box-shadow: 0 0 0 2px rgba($c-information-blue, 0.15);
+}
+</style>
+
+<style>
+.ML__virtual-keyboard-toggle[data-tooltip]::after {
+  display: none !important;
+}
+
+math-field::part(virtual-keyboard-toggle) {
+  display: none !important;
 }
 </style>

@@ -960,6 +960,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   STUDENT_POST_SESSION_SURVEY_VARIANT = 'student-post-session-survey-variant',
   VOLUNTEER_ASK_FOR_COLLEGE_INTEREST = 'volunteer-ask-for-college-interest',
   BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS = 'become-volunteer-in-subject-with-no-requests',
+  SHOW_TIP_TAP_EDITOR = 'show-tip-tap-editor'
 }
 
 export const ANALYTICS_REPORT_ROW = {
