@@ -331,7 +331,7 @@ import Check from '@/assets/check.svg'
 import CleverLogo from '@/components/CleverLogo.vue'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
 import Pencil from '@/assets/pencil.svg'
-import { dayjs } from '@/utils/time-utils'
+import { dayjs, secondsInMs } from '@/utils/time-utils'
 import { EVENTS } from '@/consts'
 import MenuButtonsIcon from '@/assets/Menu.svg'
 import VerticalMenuButtonsIcon from '@/assets/VerticalMenuButtons.svg'
@@ -457,11 +457,20 @@ export default {
   },
 
   methods: {
+    async handleModerationFailures(failures, assignmentTitle) {
+      const moderationIssues = failures.map((issueKey) => {
+        return issueKey.replace('_', ' ')
+      })
+      await this.showToast(
+        `The assignment "${assignmentTitle}" could not be edited due to a safety policy violation in the content. Please review your assignment content for: ${moderationIssues}`,
+        true
+      )
+    },
     async showToast(message, isError) {
       const toast = await toastController.create({
         message,
         color: isError ? 'danger' : 'dark',
-        duration: 2000,
+        duration: secondsInMs(5),
         position: 'bottom',
       })
       await toast.present()
@@ -670,15 +679,26 @@ export default {
           selectedStudents.length > 0
             ? selectedStudents.map((selectedStudent) => selectedStudent.id)
             : []
-        const assignments = await Promise.all(
-          classIds.map(async (classId) => {
-            const assignmentInfo = { classId, ...assignmentData, studentIds }
-            const {
-              data: { assignment },
-            } = await NetworkService.createAssignment(assignmentInfo)
-            return { ...assignment, studentIds }
-          })
-        )
+        let assignments = []
+        try {
+          assignments = await Promise.all(
+            classIds.map(async (classId) => {
+              const assignmentInfo = { classId, ...assignmentData, studentIds }
+              const response =
+                await NetworkService.createAssignment(assignmentInfo)
+              const assignment = response.data?.assignment
+              return { ...assignment, studentIds }
+            })
+          )
+        } catch (err) {
+          if (err.response?.data?.moderationFailures) {
+            await this.handleModerationFailures(
+              err.response?.data.moderationFailures,
+              assignmentData.title
+            )
+            return
+          }
+        }
         const selectedClassAssignment = assignments.find(
           (a) => a.classId === this.$route.params.classId
         )
@@ -720,17 +740,16 @@ export default {
       files,
     }) {
       try {
-        const {
-          data: { assignment },
-        } = await NetworkService.editAssignment({
+        const response = await NetworkService.editAssignment({
           ...assignmentData,
           studentsToAdd: studentsToAdd,
           studentsToRemove: studentsToRemove,
         })
+
         //Changes the assignment info in the UI
         const updatedAssignments = this.assignments.map((assnmt) =>
-          assnmt.id === assignment.id
-            ? { ...assignment, studentIds: selectedStudents }
+          assnmt.id === response.assignment.id
+            ? { ...response.assignment, studentIds: selectedStudents }
             : assnmt
         )
         this.assignments = updatedAssignments
@@ -738,12 +757,12 @@ export default {
           (assignment) => assignment.id
         )
         const getStudentAssignments = await this.mapStudentAssignments([
-          assignment.id,
+          response.assignment.id,
         ])
 
-        this.assignmentsCompletion[assignment.id] =
+        this.assignmentsCompletion[response.assignment.id] =
           this.getSingleAssignmentCompletion(
-            assignment.id,
+            response.assignment.id,
             getStudentAssignments
           )
 
@@ -753,6 +772,13 @@ export default {
           })
         }
       } catch (err) {
+        if (err.response.data?.moderationFailures) {
+          await this.handleModerationFailures(
+            err.response?.data.moderationFailures,
+            assignmentData.title
+          )
+          return
+        }
         this.error = err.response.data.err ?? 'Unable to edit assignment.'
       }
     },

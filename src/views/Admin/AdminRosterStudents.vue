@@ -199,10 +199,9 @@ export default {
           segments.push(`Failed: ${entries}`)
         }
 
-        this.msg = [
-          this.isWarning ? 'Warning!' : 'Success!', 
-          ...segments
-        ].join('\n')
+        this.msg = [this.isWarning ? 'Warning!' : 'Success!', ...segments].join(
+          '\n'
+        )
       } catch (error) {
         this.msg = error.response.data.err
         this.isError = true

@@ -243,7 +243,6 @@ export default {
         this.assignmentDocs = await this.getAssignmentDocuments(
           this.assignmentId
         )
-
         return assignment
       } catch (err) {
         this.error =
