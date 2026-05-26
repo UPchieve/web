@@ -4,6 +4,8 @@ import SessionService from '@/services/SessionService'
 import ModalService from '@/services/ModalService'
 import { computed } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 const props = defineProps({
   variant: {
@@ -33,6 +35,12 @@ function finish() {
   SessionService.postSessionRedirect(session.value)
 }
 
+function emitEndSessionConfirmationEvent() {
+  AnalyticsService.captureEvent(EVENTS.CLICKED_CONFIRM_END_SESSION, {
+    sessionId: store.state.user.session?.id,
+    userType: store.getters['user/userType'],
+  })
+}
 async function end() {
   if (isSessionEnding.value) {
     return
@@ -73,6 +81,7 @@ async function end() {
       store.commit('user/setSessionIsEnding', false)
       return
     }
+    emitEndSessionConfirmationEvent()
   }
 
   SessionService.endAndExitSession()
