@@ -23,6 +23,14 @@
         </div>
 
         <div
+          v-if="isPresessionNearPeerQuestionEnabled"
+          class="presession-info-box"
+        >
+          We'll do our best to match your coach preference, but may pair you
+          with the next available tutor.
+        </div>
+
+        <div
           class="question__responses"
           :class="{
             'question__responses-images': isRowOfImages,
@@ -329,6 +337,23 @@ export default {
 
       if (!this.isSurveyComplete) return
 
+      if (
+        this.currentQuestion.questionId === this.nearPeerQuestionId &&
+        this.userResponse[this.nearPeerQuestionId]?.responseId
+      ) {
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_SELECTED_PRESESSION_NEAR_PEER_TUTOR_OPTION,
+          {
+            subject: this.subject,
+            response: this.nearPeerQuestion.responses.find(
+              (response) =>
+                response.responseId ===
+                this.userResponse[this.nearPeerQuestionId].responseId
+            )?.responseText,
+          }
+        )
+      }
+
       const submissions = []
       for (const question of this.surveySteps) {
         if (question.questionId === this.fakeDoorQuestionId) continue
@@ -558,13 +583,10 @@ export default {
   width: 15px;
   height: 15px;
 }
-.info-icon :deep(path) {
-  fill: $c-information-blue;
-}
 
-.info-icon {
-  height: 12px;
-  width: 12px;
-  margin-bottom: 3px;
+.presession-info-box {
+  background-color: $c-background-blue;
+  padding: 10px;
+  font-size: 14px;
 }
 </style>
