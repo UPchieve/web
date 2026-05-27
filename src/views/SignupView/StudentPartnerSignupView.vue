@@ -27,17 +27,12 @@
         We're a free online tutoring platform for high school students.
       </p>
 
-      <div
-        v-if="
-          (useGoogleSSO || useCleverSSO || useClassLinkSSO) &&
-          !useParentGuardianSignUpFlow
-        "
-      >
+      <div v-if="isSsoSignup">
         <div class="uc-form-element">
           <FormSelect
             id="grade"
-            label="What is your current grade?"
-            v-model="sso.currentGrade"
+            :label="`What is your ${getFormLabelIdentifierPossessive} current grade?`"
+            v-model="formData.gradeLevel"
             placeholder="Select your grade"
             aria-label="Select your grade"
             :options="gradeLevels"
@@ -172,6 +167,18 @@
             {{ getFormQuestionIdentifier }}
             currently a middle or high school student?
           </label>
+        </div>
+
+        <div class="uc-form-element">
+          <FormSelect
+            id="grade"
+            :label="`What is ${getFormLabelIdentifierPossessive} current grade?`"
+            v-model="formData.gradeLevel"
+            placeholder="Select your grade"
+            aria-label="Select your grade"
+            :options="gradeLevels"
+            :is-required="true"
+          />
         </div>
 
         <div v-if="showHighSchoolSelector" class="uc-form-element">
@@ -508,6 +515,9 @@ export default {
             requiredIf(() => this.requireSignupSource)
           ),
         },
+        gradeLevel: {
+          required: helpers.withMessage('Required', required),
+        },
       },
     }
   },
@@ -567,9 +577,6 @@ export default {
       useParentGuardianSignUpFlow: false,
       showParentGuardianConfirmationPage: false,
       gradeLevels: GRADES,
-      sso: {
-        currentGrade: '',
-      },
       studentPartner: {
         name: '',
         highSchoolSignup: false,
@@ -590,6 +597,7 @@ export default {
         parentGuardianEmail: '',
         schoolId: undefined,
         signupSourceId: undefined,
+        gradeLevel: '',
       },
       errors: [],
       serverErrorMsg: '',
@@ -611,7 +619,14 @@ export default {
     trimGradeLevel() {
       // extracting the first word out of the gradeLevels
       // example: "8th grade" --> "8th"
-      return this.sso.currentGrade.split(' ')[0]
+      return this.formData.gradeLevel.split(' ')[0]
+    },
+
+    isSsoSignup() {
+      return (
+        (this.useGoogleSSO || this.useCleverSSO || this.useClassLinkSSO) &&
+        !this.useParentGuardianSignUpFlow
+      )
     },
 
     showHighSchoolCheckbox() {
@@ -839,6 +854,7 @@ export default {
         signupSourceId: this.formData.signupSourceId,
         studentPartnerOrgKey: this.$route.params.partnerId,
         studentPartnerOrgSiteName: this.formData.partnerSite,
+        gradeLevel: this.trimGradeLevel,
       })
         .then(() => {
           if (this.useParentGuardianSignUpFlow) {
