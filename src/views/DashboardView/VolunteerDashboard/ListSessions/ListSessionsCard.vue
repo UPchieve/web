@@ -14,6 +14,7 @@ import { useRouter } from 'vue-router'
 import MenuContent from '@/views/DashboardView/VolunteerDashboard/ListSessions/MenuContent.vue'
 import Menu from '@/components/Menu.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import { rejoinSession } from '@/utils/session'
 
 const store = useStore()
 const router = useRouter()
@@ -50,12 +51,15 @@ onBeforeMount(() => {
 })
 
 function rejoinHelpSession() {
-  const path = sessionPath.value
-  if (path) {
-    router.push(path)
-  } else {
-    router.push('/')
-  }
+  rejoinSession(
+    {
+      $router: router,
+      $store: store,
+    },
+    sessionPath.value,
+    store.getters['user/userType'],
+    store.getters['user/roleInCurrentSession']
+  )
 }
 </script>
 
