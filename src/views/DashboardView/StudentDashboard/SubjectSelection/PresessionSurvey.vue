@@ -245,20 +245,24 @@ export default {
         questionType: 'multiple choice',
         responses: [
           {
-            responseId: 'noPreference',
-            responseText: 'No preference',
-          },
-          {
-            responseId: 'highSchoolTutor',
-            responseText: 'A high school tutor',
+            responseId: 'adultTutor',
+            responseText: 'A tutor who is a college graduate',
+            analyticsResponse: 'An adult tutor',
           },
           {
             responseId: 'collegeTutor',
-            responseText: 'A college tutor',
+            responseText: 'A tutor who is currently in college',
+            analyticsResponse: 'A college tutor',
           },
           {
-            responseId: 'adultTutor',
-            responseText: 'An adult tutor',
+            responseId: 'highSchoolTutor',
+            responseText: 'A tutor who is currently in high school',
+            analyticsResponse: 'A high school tutor',
+          },
+          {
+            responseId: 'noPreference',
+            responseText: 'No preference',
+            analyticsResponse: 'No preference',
           },
         ],
       }
@@ -349,7 +353,8 @@ export default {
               (response) =>
                 response.responseId ===
                 this.userResponse[this.nearPeerQuestionId].responseId
-            )?.responseText,
+            )?.analyticsResponse,
+            nearPeerQuestionVersion: '2',
           }
         )
       }
@@ -411,7 +416,8 @@ export default {
               (response) =>
                 response.responseId ===
                 this.userResponse[this.nearPeerQuestionId].responseId
-            )?.responseText,
+            )?.analyticsResponse,
+            nearPeerQuestionVersion: '2',
           }
         )
       }
