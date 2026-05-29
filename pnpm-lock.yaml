@@ -119,9 +119,6 @@ importers:
       quill-cursors:
         specifier: ^4.0.3
         version: 4.2.0
-      sass:
-        specifier: 1.91.0
-        version: 1.91.0
       socket.io-client:
         specifier: ^4.7.5
         version: 4.8.3
@@ -194,13 +191,13 @@ importers:
         version: 5.2.6
       '@vitejs/plugin-vue':
         specifier: ^6.0.5
-        version: 6.0.5(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))
+        version: 6.0.5(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))
       '@vitest/browser':
         specifier: ^4.0.16
-        version: 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vitest@4.1.3)
+        version: 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vitest@4.1.3)
       '@vitest/browser-playwright':
         specifier: ^4.0.16
-        version: 4.1.3(playwright@1.59.1)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vitest@4.1.3)
+        version: 4.1.3(playwright@1.59.1)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vitest@4.1.3)
       '@vitest/eslint-plugin':
         specifier: ^1.3.16
         version: 1.6.14(@typescript-eslint/eslint-plugin@8.58.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)(vitest@4.1.3)
@@ -258,27 +255,30 @@ importers:
       rollup-plugin-visualizer:
         specifier: ^7.0.1
         version: 7.0.1(rollup@4.60.1)
+      sass:
+        specifier: 1.100.0
+        version: 1.100.0
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
       vite:
         specifier: ^7.3.2
-        version: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
+        version: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
       vite-bundle-analyzer:
         specifier: ^1.3.7
         version: 1.3.7
       vite-plugin-vue-devtools:
         specifier: ^8.1.1
-        version: 8.1.1(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))
+        version: 8.1.1(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))
       vite-plugin-vuetify:
         specifier: ^2.1.3
-        version: 2.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))(vuetify@3.11.8)
+        version: 2.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))(vuetify@3.11.8)
       vite-svg-loader:
         specifier: ^5.1.0
         version: 5.1.1(vue@3.5.32(typescript@5.9.3))
       vitest:
         specifier: ^4.0.16
-        version: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+        version: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
       vitest-browser-vue:
         specifier: ^2.0.1
         version: 2.1.0(vitest@4.1.3)(vue@3.5.32(typescript@5.9.3))
@@ -2298,9 +2298,9 @@ packages:
       chart.js: '>=2.8.0'
       dayjs: '>=1.11.0'
 
-  chokidar@4.0.3:
-    resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
-    engines: {node: '>= 14.16.0'}
+  chokidar@5.0.0:
+    resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
+    engines: {node: '>= 20.19.0'}
 
   chownr@1.1.4:
     resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
@@ -3996,9 +3996,9 @@ packages:
     resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
     engines: {node: '>= 6'}
 
-  readdirp@4.1.2:
-    resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
-    engines: {node: '>= 14.18.0'}
+  readdirp@5.0.0:
+    resolution: {integrity: sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ==}
+    engines: {node: '>= 20.19.0'}
 
   registry-auth-token@5.1.1:
     resolution: {integrity: sha512-P7B4+jq8DeD2nMsAcdfaqHbssgHtZ7Z5+++a5ask90fvmJ8p5je4mOa+wzu+DB4vQ5tdJV/xywY+UnVFeQLV5Q==}
@@ -4097,9 +4097,9 @@ packages:
     resolution: {integrity: sha512-b3rppTKm9T+PsVCBEOUR46GWI7fdOs00VKZ1+9c1EWDaDMvjQc6tUwuFyIprgGgTcWoVHSKrU8H31ZHA2e0RHA==}
     engines: {node: '>=10'}
 
-  sass@1.91.0:
-    resolution: {integrity: sha512-aFOZHGf+ur+bp1bCHZ+u8otKGh77ZtmFyXDo4tlYvT7PWql41Kwd8wdkPqhhT+h2879IVblcHFglIMofsFd1EA==}
-    engines: {node: '>=14.0.0'}
+  sass@1.100.0:
+    resolution: {integrity: sha512-B5j0rYMlinhhOo9tjQebMVVn0TfyXAF+wB3b2ggZUuJ/is/Y+7+JGjirAMxHZ9Z3hIP98NPfamlAkBHa1lAaXQ==}
+    engines: {node: '>=20.19.0'}
     hasBin: true
 
   sax@1.6.0:
@@ -6761,35 +6761,35 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@6.0.5(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.5(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-rc.2
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
       vue: 3.5.32(typescript@5.9.3)
 
-  '@vitest/browser-playwright@4.1.3(playwright@1.59.1)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vitest@4.1.3)':
+  '@vitest/browser-playwright@4.1.3(playwright@1.59.1)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vitest@4.1.3)':
     dependencies:
-      '@vitest/browser': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vitest@4.1.3)
-      '@vitest/mocker': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      '@vitest/browser': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vitest@4.1.3)
+      '@vitest/mocker': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
       playwright: 1.59.1
       tinyrainbow: 3.1.0
-      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
     transitivePeerDependencies:
       - bufferutil
       - msw
       - utf-8-validate
       - vite
 
-  '@vitest/browser@4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vitest@4.1.3)':
+  '@vitest/browser@4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vitest@4.1.3)':
     dependencies:
       '@blazediff/core': 1.9.1
-      '@vitest/mocker': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      '@vitest/mocker': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
       '@vitest/utils': 4.1.3
       magic-string: 0.30.21
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.1.0
-      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
       ws: 8.20.0
     transitivePeerDependencies:
       - bufferutil
@@ -6805,7 +6805,7 @@ snapshots:
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.58.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)
       typescript: 5.9.3
-      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
     transitivePeerDependencies:
       - supports-color
 
@@ -6818,13 +6818,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))':
+  '@vitest/mocker@4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))':
     dependencies:
       '@vitest/spy': 4.1.3
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
 
   '@vitest/pretty-format@4.1.3':
     dependencies:
@@ -7244,9 +7244,9 @@ snapshots:
       chart.js: 4.5.1
       dayjs: 1.11.20
 
-  chokidar@4.0.3:
+  chokidar@5.0.0:
     dependencies:
-      readdirp: 4.1.2
+      readdirp: 5.0.0
 
   chownr@1.1.4: {}
 
@@ -7993,7 +7993,7 @@ snapshots:
       prompts: 2.4.2
       semver: 7.7.4
     optionalDependencies:
-      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
 
   http-errors@2.0.1:
     dependencies:
@@ -8884,7 +8884,7 @@ snapshots:
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
 
-  readdirp@4.1.2: {}
+  readdirp@5.0.0: {}
 
   registry-auth-token@5.1.1:
     dependencies:
@@ -8998,9 +8998,9 @@ snapshots:
 
   safe-stable-stringify@2.5.0: {}
 
-  sass@1.91.0:
+  sass@1.100.0:
     dependencies:
-      chokidar: 4.0.3
+      chokidar: 5.0.0
       immutable: 5.1.5
       source-map-js: 1.2.1
     optionalDependencies:
@@ -9315,17 +9315,17 @@ snapshots:
 
   vite-bundle-analyzer@1.3.7: {}
 
-  vite-dev-rpc@1.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)):
+  vite-dev-rpc@1.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)):
     dependencies:
       birpc: 2.9.0
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
-      vite-hot-client: 2.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
+      vite-hot-client: 2.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
 
-  vite-hot-client@2.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)):
+  vite-hot-client@2.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)):
     dependencies:
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
 
-  vite-plugin-inspect@11.3.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)):
+  vite-plugin-inspect@11.3.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)):
     dependencies:
       ansis: 4.2.0
       debug: 4.4.3
@@ -9335,26 +9335,26 @@ snapshots:
       perfect-debounce: 2.1.0
       sirv: 3.0.2
       unplugin-utils: 0.3.1
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
-      vite-dev-rpc: 1.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
+      vite-dev-rpc: 1.1.0(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vue-devtools@8.1.1(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3)):
+  vite-plugin-vue-devtools@8.1.1(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-core': 8.1.1(vue@3.5.32(typescript@5.9.3))
       '@vue/devtools-kit': 8.1.1
       '@vue/devtools-shared': 8.1.1
       sirv: 3.0.2
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
-      vite-plugin-inspect: 11.3.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
-      vite-plugin-vue-inspector: 5.4.0(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
+      vite-plugin-inspect: 11.3.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
+      vite-plugin-vue-inspector: 5.4.0(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
     transitivePeerDependencies:
       - '@nuxt/kit'
       - supports-color
       - vue
 
-  vite-plugin-vue-inspector@5.4.0(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)):
+  vite-plugin-vue-inspector@5.4.0(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)):
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-proposal-decorators': 7.29.0(@babel/core@7.29.0)
@@ -9365,16 +9365,16 @@ snapshots:
       '@vue/compiler-dom': 3.5.32
       kolorist: 1.8.0
       magic-string: 0.30.21
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vuetify@2.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))(vuetify@3.11.8):
+  vite-plugin-vuetify@2.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))(vuetify@3.11.8):
     dependencies:
       '@vuetify/loader-shared': 2.1.2(vue@3.5.32(typescript@5.9.3))(vuetify@3.11.8)
       debug: 4.4.3
       upath: 2.0.1
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
       vue: 3.5.32(typescript@5.9.3)
       vuetify: 3.11.8(typescript@5.9.3)(vite-plugin-vuetify@2.1.3)(vue@3.5.32(typescript@5.9.3))
     transitivePeerDependencies:
@@ -9388,7 +9388,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3):
+  vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -9399,19 +9399,19 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.39
       fsevents: 2.3.3
-      sass: 1.91.0
+      sass: 1.100.0
       yaml: 2.8.3
 
   vitest-browser-vue@2.1.0(vitest@4.1.3)(vue@3.5.32(typescript@5.9.3)):
     dependencies:
       '@vue/test-utils': 2.4.6
-      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      vitest: 4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
       vue: 3.5.32(typescript@5.9.3)
 
-  vitest@4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)):
+  vitest@4.1.3(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/browser-playwright@4.1.3)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)):
     dependencies:
       '@vitest/expect': 4.1.3
-      '@vitest/mocker': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))
+      '@vitest/mocker': 4.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))
       '@vitest/pretty-format': 4.1.3
       '@vitest/runner': 4.1.3
       '@vitest/snapshot': 4.1.3
@@ -9428,12 +9428,12 @@ snapshots:
       tinyexec: 1.1.1
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3)
+      vite: 7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
       '@types/node': 20.19.39
-      '@vitest/browser-playwright': 4.1.3(playwright@1.59.1)(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vitest@4.1.3)
+      '@vitest/browser-playwright': 4.1.3(playwright@1.59.1)(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vitest@4.1.3)
     transitivePeerDependencies:
       - msw
 
@@ -9501,7 +9501,7 @@ snapshots:
       vue: 3.5.32(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
-      vite-plugin-vuetify: 2.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.91.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))(vuetify@3.11.8)
+      vite-plugin-vuetify: 2.1.3(vite@7.3.2(@types/node@20.19.39)(sass@1.100.0)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))(vuetify@3.11.8)
 
   vuex@4.1.0(vue@3.5.32(typescript@5.9.3)):
     dependencies:
