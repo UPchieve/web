@@ -9,4 +9,11 @@ allowBuilds:
 
 blockExoticSubdeps: true
 minimumReleaseAge: 10080
-# trustPolicy: no-downgrade
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  # Released July 2023, required transitively by a number of vite related dependencies.
+  - 'semver@6.3.1'
+  # Released Aug 2025, required by amazon-chime-sdk-js.
+  - 'ua-parser-js@1.0.41'
+  # Released Nov 2024, required by transitive @types/node@20.19.39.
+  - 'undici-types@6.21.0'
