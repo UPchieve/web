@@ -457,12 +457,39 @@ export default {
   },
 
   methods: {
-    async handleModerationFailures(failures, assignmentTitle) {
+    async uploadFiles(assignmentIds, files) {
+      const responses = await Promise.allSettled(
+        assignmentIds.map((assignmentId) =>
+          NetworkService.uploadFiles({ assignmentId, files })
+        )
+      )
+      const failed = responses.filter(
+        (r) => !!r.reason?.response?.data?.moderationFailures
+      )
+      if (failed.length) {
+        await this.handleAssignmentAttachmentModerationFailure(
+          failed[0].reason.response.data.moderationFailures
+        )
+      }
+    },
+    async handleAssignmentInfoModerationFailure(failures, assignmentTitle) {
       const moderationIssues = failures.map((issueKey) => {
         return issueKey.replace('_', ' ')
       })
       await this.showToast(
         `The assignment "${assignmentTitle}" could not be edited due to a safety policy violation in the content. Please review your assignment content for: ${moderationIssues}`,
+        true
+      )
+    },
+    async handleAssignmentAttachmentModerationFailure(fileNameToFailuresMap) {
+      const fileName = Object.keys(fileNameToFailuresMap)[0]
+      const moderationIssues = fileNameToFailuresMap[fileName].map(
+        (issueKey) => {
+          return issueKey.replace('_', ' ')
+        }
+      )
+      await this.showToast(
+        `The files could not be attached to the assignment due to a safety policy violation in the content of file "${fileName}" - Please review your file content for: ${moderationIssues}`,
         true
       )
     },
@@ -692,7 +719,7 @@ export default {
           )
         } catch (err) {
           if (err.response?.data?.moderationFailures) {
-            await this.handleModerationFailures(
+            await this.handleAssignmentInfoModerationFailure(
               err.response?.data.moderationFailures,
               assignmentData.title
             )
@@ -714,9 +741,7 @@ export default {
         )
 
         if (files.length) {
-          assignmentIds.forEach(async (assignmentId) => {
-            await NetworkService.uploadFiles({ assignmentId, files })
-          })
+          await this.uploadFiles(assignmentIds, files)
         }
 
         this.isSelected = 'assignments'
@@ -773,7 +798,7 @@ export default {
         }
       } catch (err) {
         if (err.response.data?.moderationFailures) {
-          await this.handleModerationFailures(
+          await this.handleAssignmentInfoModerationFailure(
             err.response?.data.moderationFailures,
             assignmentData.title
           )
