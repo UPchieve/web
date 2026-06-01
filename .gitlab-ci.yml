@@ -7,17 +7,20 @@ stages:
 cache:
   key:
     files:
-      - package-lock.json
+      - pnpm-lock.yaml
   paths:
-    - .npm
+    - .pnpm-store
 
-variables:
-  # TODO: Is this variable actually ?
-  npm_config_cache: '$CI_PROJECT_DIR/.npm'
+.node_setup:
+  image: node:24.15.0-bullseye
+  before_script:
+    - corepack enable pnpm
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
 
 .build_artifact:
   stage: build
-  image: 'node:24.15.0-bullseye'
+  extends: .node_setup
   cache: []
   environment:
     action: prepare
@@ -26,12 +29,12 @@ variables:
     paths:
       - dist/
   before_script:
-    - npm ci
+    - !reference [.node_setup, before_script]
     - apt update && apt install -y curl gnupg
     - curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sh
   script:
     - 'echo "{\"version\": \"$CI_COMMIT_SHA-$CI_ENVIRONMENT_NAME\"}" > public/version.json'
-    - doppler run --token $DOPPLER_TOKEN -- npm run build
+    - doppler run --token $DOPPLER_TOKEN -- pnpm run build
 
 build_staging_artifact:
   extends: .build_artifact
@@ -120,12 +123,12 @@ new_relic_deploy_tracker:
 
 test:
   stage: test
-  image: node:24.15.0-bullseye
+  extends: .node_setup
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - !reference [.node_setup, before_script]
     - npx playwright install --with-deps chromium
   script:
-    - npm run test
+    - pnpm run test
   rules:
     - if: '$TEST_DISABLED'
       when: never
@@ -134,6 +137,7 @@ test:
 
 e2e-test:
   stage: test
+  extends: .node_setup
   image: mcr.microsoft.com/playwright:v1.57.0-jammy
   services:
     - postgres:14
@@ -149,13 +153,13 @@ e2e-test:
     REDIS_PORT: 6379
   before_script:
     - echo 'Set up high-line...'
-    - npm ci --cache .npm --prefer-offline
+    - !reference [.node_setup, before_script]
     - echo 'Install Chrome to test against the branded browser...'
     - npx playwright install chrome
     - echo 'Set up subway...'
     - git clone --depth=1 https://gitlab.com/upchieve/subway.git
     # TODO: Figure out a way to cache subway node_modules.
-    - cd subway && npm ci
+    - cd subway && pnpm install --frozen-lockfile
     - echo 'Verify Postgres is running and seed database...'
     - apt-get update && apt-get install -y postgresql-client
     - export PGPASSWORD=$POSTGRES_PASSWORD
@@ -174,7 +178,7 @@ e2e-test:
     - export SUBWAY_REDIS_HOST=$REDIS_HOST
     - export SUBWAY_SERVER_HOST=localhost:8081
     - echo 'Start subway server...'
-    - npm run dev:backend > ../subway.log 2>&1 &
+    - pnpm run dev:backend > ../subway.log 2>&1 &
     - |
       for i in {1..30}; do
         if curl -f http://localhost:3000/healthz 2>/dev/null; then
@@ -191,7 +195,7 @@ e2e-test:
     - cd $CI_PROJECT_DIR
     - echo 'e2e environment ready!'
   script:
-    - npm run test:e2e
+    - pnpm run test:e2e
   artifacts:
     access: developer
     when: always
@@ -210,11 +214,9 @@ e2e-test:
 
 lint:
   stage: test
-  image: node:24.15.0-bullseye
-  before_script:
-    - npm ci --cache .npm --prefer-offline
+  extends: .node_setup
   script:
-    - npm run lint:dry
+    - pnpm run lint:dry
   rules:
     - if: '$TEST_DISABLED'
       when: never
@@ -223,11 +225,9 @@ lint:
 
 html_validate:
   stage: test
-  image: node:24.15.0-bullseye
-  before_script:
-    - npm ci --cache .npm --prefer-offline
+  extends: .node_setup
   script:
-    - npm run html-validate
+    - pnpm run html-validate
   rules:
     - if: '$TEST_DISABLED'
       when: never

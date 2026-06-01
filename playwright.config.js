@@ -33,7 +33,7 @@ module.exports = defineConfig({
     },
   },
   webServer: {
-    command: `npm run serve -- --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}> high-line.log 2>&1`,
+    command: `pnpm run serve -- --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}> high-line.log 2>&1`,
     url: 'http://localhost:8081',
     reuseExistingServer: false,
     stdout: 'ignore',

@@ -1,0 +1,12 @@
+allowBuilds:
+  '@fastify/pre-commit': true
+  '@parcel/watcher': true
+  core-js: true
+  esbuild: true
+  keytar: true
+  protobufjs: true
+  vue-demi: true
+
+# blockExoticSubdeps: true
+# minimumReleaseAge: 10080
+# trustPolicy: no-downgrade

@@ -35,7 +35,7 @@ function getSubwayRepoPath() {
 }
 
 function createSubwayE2eEnvironment(subwayRepoPath: string) {
-  const { error } = spawnSync('npm', ['run', 'e2e:create'], {
+  const { error } = spawnSync('pnpm', ['run', 'e2e:create'], {
     cwd: subwayRepoPath,
     stdio: ['ignore', 'inherit', 'inherit'],
   })
@@ -48,7 +48,7 @@ function createSubwayE2eEnvironment(subwayRepoPath: string) {
 
 async function startSubway(subwayRepoPath: string) {
   let isUp = false
-  subwayProcess = spawn('npm', ['run', 'e2e:backend'], {
+  subwayProcess = spawn('pnpm', ['run', 'e2e:backend'], {
     cwd: subwayRepoPath,
     stdio: ['ignore', 'inherit', 'inherit'],
     detached: true,
@@ -73,7 +73,7 @@ async function startSubway(subwayRepoPath: string) {
 
   if (!isUp) {
     throw new Error(
-      `Subway did not start after ${waitTimes.reduce((acc, v) => (acc += v), 0) / 1000} seconds`
+      `Subway did not start after ${waitTimes.reduce((acc, v) => acc + v, 0) / 1000} seconds`
     )
   }
 }
@@ -89,7 +89,7 @@ async function exitSubway() {
 }
 
 function destroySubwayE2eEnvironment(subwayRepoPath: string) {
-  spawnSync('npm', ['run', 'e2e:destroy'], {
+  spawnSync('pnpm', ['run', 'e2e:destroy'], {
     cwd: subwayRepoPath,
     stdio: ['ignore', 'inherit', 'inherit'],
   })

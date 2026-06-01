@@ -44,7 +44,7 @@ export default {
       return session && session[key]
     },
     moderationInfractionSource: (state): string => {
-      let source = ''
+      let source
       switch (state.moderationInfraction?.source) {
         case 'whiteboard_text_node':
           source = 'whiteboard text content'

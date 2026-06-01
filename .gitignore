@@ -41,3 +41,6 @@ todo.local.md
 high-line.log
 
 stats.html
+
+# We no longer use npm.
+package-lock.json

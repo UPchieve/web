@@ -81,7 +81,7 @@ export default {
     },
 
     writtenFeedback() {
-      let otherFeedback = ''
+      let otherFeedback
       const studentFeedbackKeys = [
         'studentTutoringFeedback.other-feedback',
         'studentCounselingFeedback.other-feedback',

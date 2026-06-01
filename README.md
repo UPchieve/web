@@ -13,6 +13,7 @@ This repository is the frontend SPA only. It relies on the API server and worker
 - [UPchieve SPA(#upchieve-spa)
   - [Local Development](#local-development)
     - [Local Dependencies](#local-dependencies)
+    - [Package Manager](#package-manager)
     - [App Dependencies](#app-dependencies)
     - [Run the Local Server](#run-the-local-server)
     - [Quality Checks](#quality-checks)
@@ -25,23 +26,26 @@ This repository is the frontend SPA only. It relies on the API server and worker
 
 ### Local Dependencies
 
-1. The recommended tool for runtime version management is [`nvm`][nvm].
+1. The recommended tool for runtime version management is [`nvm`][nvm]. We currently run on Node v24.15.0.
 
-   ```shell
-      nvm install v24.15.0 && nvm use v24.15.0
-   ```
+ ```shell
+$ nvm install v24.15.0 && nvm use v24.15.0
+ ```
 
-2. Install dependencies
+2. Install dependencies.
 
-   ```shell
-   npm install
-   ```
+ ```shell
+$ pnpm install
+ ```
 
-3. Set local environment variables
+3. Set local environment variables.
 
-   ```shell
-     cp .env.template .env.local
-   ```
+ ```shell
+$ cp .env.template .env.local
+ ```
+
+### Package Manager
+This project uses [pnpm](https://pnpm.io/) instead of npm. Once [installed](https://pnpm.io/installation), use `pnpm install <dependency>` to install dependencies, and `pnpm run <script>` to run scripts.
 
 ### App Dependencies
 
@@ -52,7 +56,7 @@ As noted above you will also need the backend running on `localhost` on port `30
 The local server (which supports hot reloading) can be started using:
 
 ```shell
-     npm run serve
+$ pnpm run serve
 ```
 
 The local server does not support one frontend feature, which is notifying when
@@ -65,36 +69,22 @@ Once the both the backend and frontend local servers are running, you can open t
 
 The CI server runs checks on code linting and HTML validation.
 
-Lint checking currently runs as a pre-commit hook. To fix most issues you can run `$ npm run lint`.
+Lint checking currently runs as a pre-commit hook. To fix most issues you can run `$ pnpm run lint`.
 
-HTML validation can be run using `$ npm run html-validate`, although currently there are some unresolved errors that
+HTML validation can be run using `$ pnpm run html-validate`, although currently there are some unresolved errors that
 we are working on correcting. The goal for new development should be to not add any _more_ issues while we fix the current ones.
 
-Tests can be run using `$ npm run test`
+Tests can be run using `$ pnpm run test`
 
 ## Production Builds
 
 A production build of the frontend resources (index.html/js/css/images) can be done by running
 
-    ```shell
-    npm run build
-    ```
+```shell
+$ pnpm run build
+```
 
 which puts the output in the directory `dist/`
-
-### Production Server
-
-We deploy this application in a container, and the files built above are served by a Node/Express server
-which is defined in `server.js`.
-
-This handles security settings and also serves up the version of the app on `/healthz`. To test the feature
-where the frontend can recognize that a new version is available and prompt the user to refresh,
-
-1. do a production build
-2. set the environment variable `HIGH_LINE_VERSION` to something other than `development`
-3. start the server using `$ npm run start`
-
-`$ npm run start` is the command the container uses to start the server in our cloud deployment environments.
 
 ## Component Library
 
@@ -119,7 +109,7 @@ All _new_ components should go into Storybook, with stories for each of their st
 Test components in a real Chromium browser using Vitest Browser Mode:
 
 ```shell
-npm run test:browser
+pnpm run test:browser
 ```
 
 Tests live in `tests/browser/` and use `vitest-browser-vue` to render components. The setup file at `tests/browser/setup.ts` loads global styles so components render with production styling. Extract mock data into fixture files for maintainability.
@@ -143,7 +133,7 @@ So, after extensive research and exhausting nearly all possible options of rende
 
 ### How it works
 
-When you run `npm run test:e2e`, the subway and high-line servers are started for you, and subway will use fresh, dockerized postgres and redis instances that are hosted on ports 5500 and 5501 by default. The db is seeded with the scripts in the `/db_init` folder of the subway repo on your machine.
+When you run `pnpm run test:e2e`, the subway and high-line servers are started for you, and subway will use fresh, dockerized postgres and redis instances that are hosted on ports 5500 and 5501 by default. The db is seeded with the scripts in the `/db_init` folder of the subway repo on your machine.
 
 If there was an existing E2E postgres or redis docker container, they will be destroyed before new ones are created.
 
@@ -153,8 +143,8 @@ Note: You don't need to start the backend or frontend servers yourself. Playwrig
 
 1. Install chrome for playwright: `npx playwright install chrome`
 2. **Set your environment variable `SUBWAY_REPO_PATH` to wherever your subway project is stored on your machine.** This enables the startup script to create the dockerized e2e environment and start the subway server.
-3. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the npm command)
-4. Now run `npm run test:e2e` or `npm run test:e2e:ui`
+3. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the pnpm command)
+4. Now run `pnpm run test:e2e` or `pnpm run test:e2e:ui`
 
 ### Adding test data
 
@@ -166,7 +156,7 @@ For now, all test suites work off of the same postgres instance in parallel, and
 
 The E2E tests include several [snapshot tests](https://playwright.dev/docs/test-snapshots), which make pixel-by-pixel comparisons between a pre-saved snapshot file and the state of the screen during test.
 
-Remember to update snapshots as needed with `npm run test:e2e:update-snapshots` when applicable.
+Remember to update snapshots as needed with `pnpm run test:e2e:update-snapshots` when applicable.
 
 Sometimes, snapshot tests fail because dynamically generated inputs, such as anything faker-generated, get rendered on screen and are bound to be different from run to run. To exclude those elements from snapshot comparisons, you can use a [toHaveScreenshot mask](https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-screenshot-1-option-mask).
 

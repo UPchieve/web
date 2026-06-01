@@ -337,8 +337,6 @@ export default {
   emits: ['survey-completed'],
   methods: {
     submitSurvey() {
-      let surveyResponses = this.responses
-
       if (!this.isSurveyComplete) return
 
       if (
@@ -373,7 +371,7 @@ export default {
         })
       }
 
-      surveyResponses = {
+      const surveyResponses = {
         surveyId: this.surveyId,
         surveyTypeId: this.surveyTypeId,
         submissions,

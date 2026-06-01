@@ -241,6 +241,7 @@ export function useSurvey(data: UseSurveyPayload) {
         (err as Error).message ||
         'Unknown error'
       LoggerService.noticeError(error.value)
+      // eslint-disable-next-line preserve-caught-error
       throw new Error(error.value)
     }
   }
@@ -290,6 +291,7 @@ export function useSurvey(data: UseSurveyPayload) {
         ((err as AxiosError).response?.data as { err?: string })?.err ||
         (err as Error).message ||
         'Unknown error'
+      // eslint-disable-next-line preserve-caught-error
       throw new Error(error.value)
     }
   }
