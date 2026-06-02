@@ -45,6 +45,16 @@
           :reduce="(option) => option.displayName"
           @update:modelValue="filter"
         />
+        <div class="unread-dms-checkbox">
+          <label>
+            <input
+              type="checkbox"
+              v-model="filters.hasUnreadDMs"
+              @change="filter"
+            />
+            Sessions with unread messages
+          </label>
+        </div>
         <button type="button" class="clear-filters" @click="clearFilters">
           Clear all
         </button>
@@ -120,7 +130,7 @@
                       sessionsWithUnreadDMs.includes(session.id) &&
                       isShowDMNotificationsEnabled
                     "
-                    >New Message</span
+                    ><bell-icon class="bell-icon" />New Message</span
                   ><span v-else>Session Recap</span></large-button
                 >
               </div>
@@ -269,6 +279,7 @@ import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
+import BellIcon from '@/assets/BellIcon.svg'
 
 export default {
   name: 'session-history-view',
@@ -279,6 +290,7 @@ export default {
     LargeButton,
     Loader,
     FormSearchableSelect,
+    BellIcon,
   },
   data() {
     return {
@@ -289,6 +301,7 @@ export default {
         studentId: '',
         volunteerId: '',
         filteredSessions: [],
+        hasUnreadDMs: false,
       },
       page: 1,
       isFetchingSessions: false,
@@ -370,6 +383,7 @@ export default {
       this.filters.subjectName = ''
       this.filters.studentId = ''
       this.filters.volunteerId = ''
+      this.filters.hasUnreadDMs = false
       this.page = 1
 
       this.filter()
@@ -392,8 +406,17 @@ export default {
         const matchesVolunteer =
           !volunteerId || session.volunteerId === volunteerId
 
+        const hasUnreadDMs =
+          !this.filters.hasUnreadDMs ||
+          (this.sessionsWithUnreadDMs.includes(session.id) &&
+            this.isShowDMNotificationsEnabled)
+
         return (
-          matchesName && matchesSubject && matchesStudent && matchesVolunteer
+          matchesName &&
+          matchesSubject &&
+          matchesStudent &&
+          matchesVolunteer &&
+          hasUnreadDMs
         )
       })
 
@@ -825,5 +848,15 @@ ul {
 
 .see-all-link {
   font-size: 18px;
+}
+
+.unread-dms-checkbox {
+  margin-top: 10px;
+}
+
+.bell-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
 }
 </style>
