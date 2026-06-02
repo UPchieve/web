@@ -41,6 +41,7 @@
       <router-link to="admin/clever-roster" class="admin-link btn"
         >Clever Roster</router-link
       >
+      <router-link to="admin/nths" class="admin-link btn">NTHS</router-link>
     </div>
   </div>
 </template>

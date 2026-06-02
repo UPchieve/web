@@ -756,6 +756,12 @@ export default {
       this._errorHandler
     )
   },
+  adminNTHSAffiliateWithSchool(data: { chapterIds: string[] }) {
+    return httpPost(`${ADMIN_ROOT}/nths/school-affiliation`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   getQuestions(data) {
     return httpPost(`${API_ROOT}/training/questions`, data).then(
       this._successHandler,
