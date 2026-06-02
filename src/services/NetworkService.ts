@@ -1481,4 +1481,16 @@ export default {
       token,
     }).then(this._successHandler, this._axiosErrorHandler)
   },
+  updateSessionLastSeen(sessionId: Uuid, userId: Uuid) {
+    return httpPost(
+      `${API_ROOT}/session/${sessionId}/recap/${userId}/update-last-seen`,
+      {}
+    ).then(this._successHandler, this._errorHandler)
+  },
+  checkForUnreadDMs() {
+    return httpGet(`${API_ROOT}/sessions/unread-dms`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
 }

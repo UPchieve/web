@@ -224,6 +224,7 @@ export default {
       topics: (state) => state.subjects.topics,
       productFlags: (state) => state.productFlags.flags,
       isConnected: (state) => state.socket.isConnected,
+      messageData: (state) => state.socket.messageData,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -235,6 +236,7 @@ export default {
       showInAppSessionNotifications:
         'featureFlags/showInAppSessionNotifications',
       isReadyToTutor: 'volunteer/isReadyToTutor',
+      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
     }),
     shouldShowInAppSessionNotifications() {
       return this.showInAppSessionNotifications && this.isReadyToTutor
@@ -297,6 +299,9 @@ export default {
               : 'extension',
           })
         }
+
+        if (this.isShowDMNotificationsEnabled)
+          this.$store.dispatch('user/fetchUnreadDMs')
       } else if (currentUserValue.id) {
         const userProps = this.getUserPropsForAnalytics()
         AnalyticsService.updateUser(userProps)
@@ -343,6 +348,10 @@ export default {
       if (isConnected && isVolunteer) {
         this.emitList({ retryCount: 0, maxRetries: 5 })
       }
+    },
+    messageData(data) {
+      if (!data) return
+      this.$store.dispatch('user/fetchUnreadDMs')
     },
   },
 }

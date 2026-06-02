@@ -276,6 +276,7 @@ import { Mathematics, migrateMathStrings } from '@tiptap/extension-mathematics'
 import StarterKit from '@tiptap/starter-kit'
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import Placeholder from '@tiptap/extension-placeholder'
+import NetworkService from '@/services/NetworkService'
 
 const MESSAGE_ALIGNMENT = {
   LEFT: 'left',
@@ -336,9 +337,13 @@ export default {
       isMathMode: false,
       editor: null,
       latexPrefix: 'LATEX:',
+      isAtBottom: false,
     }
   },
   mounted() {
+    this.$nextTick(() => {
+      this.scrollToBottom()
+    })
     if (!this.isShowTipTapEditorEnabled) return
     this.editor = new Editor({
       extensions: [
@@ -404,6 +409,8 @@ export default {
       isPendingMessagesEnabled: 'featureFlags/isPendingMessagesEnabled',
       isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
       isShowTipTapEditorEnabled: 'featureFlags/isShowTipTapEditorEnabled',
+      hasUnreadDMs: 'user/hasUnreadDMs',
+      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
     }),
     showMyInProgressCaptionMessage() {
       return this.myInProgressCaptionMessage?.text?.length > 0
@@ -473,6 +480,14 @@ export default {
         !this.isSocketSessionRoomConnected ||
         this.waitingForModeration
       )
+    },
+    hasDMs() {
+      const messages = this.currentSession?.messages ?? []
+      const endedAt = this.currentSession?.endedAt
+
+      if (!endedAt) return false
+
+      return messages.some((message) => message.createdAt > endedAt)
     },
   },
 
@@ -718,12 +733,20 @@ export default {
       )
     },
     updateAutoscrolling() {
-      // enable autoscrolling if scrolled to bottom
       const messagesBox = this.$refs.messages
-      this.isAutoscrolling =
-        messagesBox.scrollTop + messagesBox.clientHeight >=
-        messagesBox.lastElementChild.offsetTop +
-          messagesBox.lastElementChild.offsetHeight
+      if (!messagesBox) return
+
+      const isScrollable = messagesBox.scrollHeight > messagesBox.clientHeight
+      this.isAtBottom =
+        !isScrollable ||
+        Math.ceil(messagesBox.scrollTop + messagesBox.clientHeight) >=
+          messagesBox.scrollHeight
+
+      this.isAutoscrolling = this.isAtBottom
+
+      if (this.isShowDMNotificationsEnabled && this.isAtBottom && this.hasDMs) {
+        this.updateSessionLastSeen()
+      }
     },
     scrollToUnread() {
       const messagesBox = this.$refs.messages
@@ -951,6 +974,16 @@ export default {
         this.notTyping()
       }, 2000)
     },
+    async updateSessionLastSeen() {
+      try {
+        const sessionId = this.currentSession.id
+        const userId = this.user.id
+        await NetworkService.updateSessionLastSeen(sessionId, userId)
+        this.$store.dispatch('user/fetchUnreadDMs')
+      } catch (error) {
+        LoggerService.noticeError(error)
+      }
+    },
   },
 
   watch: {
@@ -1020,6 +1053,16 @@ export default {
           this.scrollToBottom()
         })
       }
+    },
+    'currentSession.messages': {
+      handler(messages) {
+        if (messages?.length) {
+          this.$nextTick(() => {
+            this.scrollToBottom()
+          })
+        }
+      },
+      once: true,
     },
   },
 }

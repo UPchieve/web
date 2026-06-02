@@ -233,6 +233,10 @@ export default {
         }
       )
 
+      socket.on('dm:received', () => {
+        dispatch('user/fetchUnreadDMs', null, { root: true })
+      })
+
       socket.on('sessions/recap:joined', () => {
         commit('setSocketJoinedRoom', true)
       })

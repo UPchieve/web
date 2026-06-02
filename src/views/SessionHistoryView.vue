@@ -109,7 +109,13 @@
                 <large-button
                   variant="outlined"
                   @click="routeToSessionRecap(session.id)"
-                  >Session Recap</large-button
+                  ><span
+                    v-if="
+                      sessionsWithUnreadDMs.includes(session.id) &&
+                      isShowDMNotificationsEnabled
+                    "
+                    >New Message</span
+                  ><span v-else>Session Recap</span></large-button
                 >
               </div>
             </div>
@@ -287,6 +293,8 @@ export default {
       isStudent: 'user/isStudent',
       sessionPartner: 'user/sessionPartner',
       subjectsByTopics: 'subjects/subjectsByTopics',
+      sessionsWithUnreadDMs: 'user/sessionsWithUnreadDMs',
+      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
     }),
     isFirstPage() {
       return this.page === 1

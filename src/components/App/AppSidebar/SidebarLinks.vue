@@ -101,6 +101,10 @@
           id="session-history-sidebar-link"
         >
           <clock-icon class="icon" />
+          <bell-icon
+            v-if="hasUnreadDMs && isShowDMNotificationsEnabled"
+            class="SidebarLinks__bell-icon"
+          />
         </sidebar-link>
 
         <sidebar-link
@@ -228,6 +232,7 @@ import CompassIcon from '@/assets/compass.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
+import BellIcon from '@/assets/BellIcon.svg'
 import { EVENTS } from '@/consts'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 import { defineAsyncComponent } from 'vue'
@@ -256,6 +261,7 @@ export default {
     GroupsIcon,
     CalculatorIcon,
     ChatBotIcon,
+    BellIcon,
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {
@@ -295,6 +301,8 @@ export default {
       volunteerHoursCalculatorLinkCopy:
         'featureFlags/volunteerHoursCalculatorLinkCopy',
       aiTutor: 'featureFlags/aiTutor',
+      hasUnreadDMs: 'user/hasUnreadDMs',
+      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
     }),
     hasSeenCalculator() {
       if (this.shouldShowVolunteerHoursCalculatorLink) {
@@ -426,6 +434,13 @@ export default {
 
   &__notification {
     order: 3;
+    margin-left: 0.4em;
+  }
+
+  &__bell-icon {
+    order: 3;
+    height: 20px;
+    width: 20px;
     margin-left: 0.4em;
   }
 }

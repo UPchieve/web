@@ -48,6 +48,8 @@ export type UserStoreState = {
   sessionIsEnding: boolean
   hasSharedMilestone: boolean
   progressReportIntervalId: number | null
+  hasUnreadDMs: boolean
+  sessionsWithUnreadDMs: string[]
 }
 
 type UserStoreGetterValues = {
@@ -67,6 +69,8 @@ type UserStoreGetterValues = {
   isVolunteerReferralAmbassador: boolean
   isVolunteerProgramAmbassador: boolean
   getUserPropsForAnalytics: () => Record<string, unknown>
+  sessionsWithUnreadDMs: string[]
+  hasUnreadDMs: boolean
 }
 
 type UserActionContext = Omit<
@@ -94,6 +98,8 @@ export default {
     sessionIsEnding: false,
     hasSharedMilestone: false,
     progressReportIntervalId: null,
+    hasUnreadDMs: false,
+    sessionsWithUnreadDMs: [],
   } as UserStoreState,
   mutations: {
     setUser: (state: UserStoreState, user = {}) => (state.user = user),
@@ -228,6 +234,10 @@ export default {
     ) => {
       state.progressReportIntervalId = intervalId
     },
+
+    setSessionsWithUnreadDMs: (state: UserStoreState, sessionIds: string[]) => {
+      state.sessionsWithUnreadDMs = sessionIds
+    },
   },
   actions: {
     fetch: ({ dispatch }: UserActionContext) => {
@@ -282,6 +292,16 @@ export default {
             LoggerService.noticeError(err)
           }
         })
+    },
+
+    fetchUnreadDMs: async ({ commit }: UserActionContext) => {
+      try {
+        const response = await NetworkService.checkForUnreadDMs()
+
+        commit('setSessionsWithUnreadDMs', response.data.sessionsWithUnreadDMs)
+      } catch (err) {
+        LoggerService.noticeError(err)
+      }
     },
 
     clearSession: ({ commit }: UserActionContext) => {
@@ -791,5 +811,11 @@ export default {
     banType: (state: UserStoreState) => {
       return state.user?.banType ?? null
     },
+
+    hasUnreadDMs: (_state: UserStoreState, getters: UserStoreGetterValues) =>
+      getters.sessionsWithUnreadDMs.length > 0,
+
+    sessionsWithUnreadDMs: (state: UserStoreState) =>
+      state.sessionsWithUnreadDMs,
   },
 }
