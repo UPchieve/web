@@ -108,7 +108,13 @@
               <div class="session-list__session-recap">
                 <large-button
                   variant="outlined"
-                  @click="routeToSessionRecap(session.id)"
+                  @click="
+                    routeToSessionRecap(
+                      session.id,
+                      sessionsWithUnreadDMs.includes(session.id) &&
+                        isShowDMNotificationsEnabled
+                    )
+                  "
                   ><span
                     v-if="
                       sessionsWithUnreadDMs.includes(session.id) &&
@@ -205,7 +211,13 @@
                 </div>
                 <caret-icon
                   class="caret--next"
-                  @click="routeToSessionRecap(session.id)"
+                  @click="
+                    routeToSessionRecap(
+                      session.id,
+                      sessionsWithUnreadDMs.includes(session.id) &&
+                        isShowDMNotificationsEnabled
+                    )
+                  "
                 />
               </div>
               <div class="border--thin" v-if="index !== 5"></div>
@@ -443,7 +455,12 @@ export default {
             : session.isFavorited,
       }))
     },
-    routeToSessionRecap(sessionId) {
+    routeToSessionRecap(sessionId, hasNewMessage) {
+      if (hasNewMessage && this.isStudent) {
+        AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_NEW_MESSAGE)
+      } else if (hasNewMessage && this.isVolunteer) {
+        AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_NEW_MESSAGE)
+      }
       this.$router.push(`/sessions/${sessionId}/recap`)
     },
   },
