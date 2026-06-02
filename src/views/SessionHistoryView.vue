@@ -45,7 +45,7 @@
           :reduce="(option) => option.displayName"
           @update:modelValue="filter"
         />
-        <div class="unread-dms-checkbox">
+        <div class="unread-dms-checkbox" v-if="isShowDMNotificationsEnabled">
           <label>
             <input
               type="checkbox"
