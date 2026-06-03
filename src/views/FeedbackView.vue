@@ -1,7 +1,10 @@
 <template>
   <div class="feedback">
     <div class="feedback__container">
-      <header class="feedback__header-container">
+      <header
+        class="feedback__header-container"
+        v-if="!showCoachNominationForm"
+      >
         <h1 class="feedback__header">Session Feedback</h1>
         <template v-if="session.createdAt">
           <p class="feedback__subheader">
@@ -13,7 +16,60 @@
         </template>
       </header>
 
-      <template v-if="completedFeedback">
+      <div v-if="showCoachNominationForm">
+        <h2 class="feedback__header">
+          Nominate {{ session.studentFirstName }} as a Coach
+        </h2>
+        <h3 class="feedback__subheader">Help grow our community of coaches</h3>
+
+        <div class="nomination-content">
+          <p class="nomination-subtext">
+            Based on your session with {{ session.studentFirstName }}, do you
+            think they'd make a great UPchieve Academic Coach? Coaches like you
+            help thousands of students every year — and a quick nomination from
+            you could be the nudge they need.
+          </p>
+          <p class="nomination-text">
+            Choose the behaviors you actually observed in this session. These
+            will be shared with the student!
+          </p>
+
+          <div class="nomination-coaching-skills-container">
+            <FormCheckBox
+              v-for="skill in coachingSkills"
+              :label="skill.coachFacingValue"
+              :name="skill.coachFacingValue"
+              :key="skill.coachFacingValue"
+              @update:modelValue="() => toggleCoachingSkill(skill)"
+              class="coaching-skill"
+              :class="{
+                'coaching-skill-checked': skill.checked,
+              }"
+            />
+          </div>
+          <div class="nomination-buttons">
+            <Spinner v-if="isSubmitting" />
+            <LargeButton
+              v-else
+              variant="primary-blue"
+              @click="submitNomination"
+              :showArrow="true"
+              :disabled="!hasSelectedCoachingSkills"
+            >
+              Submit nomination
+            </LargeButton>
+            <button
+              type="button"
+              @click="() => this.$router.push(`/dashboard`)"
+              class="tertiary-button"
+            >
+              No thanks, go to dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <template v-else-if="completedFeedback">
         <h2 class="feedback__header" v-if="completedFeedback">
           Thank you for your feedback!
         </h2>
@@ -240,7 +296,7 @@
         >
           Submit
         </large-button>
-        <loader v-if="isSubmittingFeedback || isLoading" :overlay="true" />
+        <loader v-if="isSubmitting || isLoading" :overlay="true" />
       </template>
     </div>
   </div>
@@ -259,12 +315,17 @@ import SurveyRateNumber from '../components/Surveys/SurveyRateNumber.vue'
 import SurveyChipOption from '../components/Surveys/SurveyChipOption.vue'
 import SurveyCheckbox from '../components/Surveys/SurveyCheckbox.vue'
 import { map, remove, orderBy, find, forEach, isEmpty } from 'lodash-es'
-import { EVENTS } from '@/consts'
+import { COACHING_SKILLS, EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import FormCheckBox from '@/components/FormCheckBox.vue'
+import LoggerService from '@/services/LoggerService'
+import Spinner from '@/components/Spinner.vue'
 
 export default {
   name: 'FeedbackView',
   components: {
+    Spinner,
+    FormCheckBox,
     LargeButton,
     Loader,
     SurveyImage,
@@ -278,14 +339,19 @@ export default {
     return {
       session: {},
       isLoading: true,
-      isSubmittingFeedback: false,
+      isSubmitting: false,
       completedFeedback: false,
+      surveySubmitted: false,
       isFavoriteCoach: false,
       isFavoriteCoachLimitReached: false,
       allQuestions: [],
       error: '',
       userResponse: {},
       volunteerFeedbackForStudent: '',
+      coachingSkills: COACHING_SKILLS.map((skill) => ({
+        ...skill,
+        checked: false,
+      })),
     }
   },
   computed: {
@@ -297,11 +363,21 @@ export default {
         'featureFlags/volunteerFeedbackForStudentFlag',
       getStudentPostSessionSurveyNameVariant:
         'featureFlags/getStudentPostSessionSurveyNameVariant',
+      isInvitationToCoachEnabled: 'featureFlags/isInvitationToCoachEnabled',
     }),
     ...mapState({
       subjects: (state) => state.subjects.subjects,
       userId: (state) => state.user.user.id,
     }),
+    hasSelectedCoachingSkills() {
+      return this.coachingSkills.some((skill) => skill.checked)
+    },
+    isEligibleToNominateCoach() {
+      return this.isSessionVolunteer && this.isInvitationToCoachEnabled
+    },
+    showCoachNominationForm() {
+      return this.surveySubmitted && this.isEligibleToNominateCoach
+    },
     isSessionVolunteer() {
       return this.session.volunteerId === this.userId
     },
@@ -405,6 +481,46 @@ export default {
     })
   },
   methods: {
+    async submitNomination() {
+      const selectedCoachingSkills = this.coachingSkills.filter(
+        (s) => s.checked
+      )
+      const studentFacingCoachingSkills = selectedCoachingSkills.map(
+        (s) => s.studentFacingValue
+      )
+      try {
+        const requestBody = {
+          sessionId: this.session.id,
+          invitedUserId: this.session.studentId,
+          coachingSkills: studentFacingCoachingSkills,
+        }
+        this.isSubmitting = true
+        await NetworkService.createInvitationToCoach(requestBody)
+        this.$store.commit('volunteer/setLastCoachNomination', {
+          coachingSkills: selectedCoachingSkills,
+        })
+      } catch (err) {
+        LoggerService.noticeError(
+          err,
+          'Error while attempting to create invitation to coach'
+        )
+        this.error = 'We could not submit your coach nomination due to an error'
+      } finally {
+        this.isSubmitting = false
+        this.$router.push('/dashboard')
+      }
+    },
+    toggleCoachingSkill(skill) {
+      const existingSkillIndex = this.coachingSkills.findIndex(
+        (s) => s.coachFacingValue === skill.coachFacingValue
+      )
+      const existingSkill = this.coachingSkills[existingSkillIndex]
+      const newSkill = {
+        ...existingSkill,
+        checked: !existingSkill.checked,
+      }
+      this.coachingSkills[existingSkillIndex] = newSkill
+    },
     getQuestionDisplayType(question) {
       if (question.questionType === 'multiple choice') {
         if (question.questionText.startsWith('How do you think')) {
@@ -582,8 +698,8 @@ export default {
       return false
     },
     async submitFeedback() {
-      if (this.isSubmittingFeedback) return
-      this.isSubmittingFeedback = true
+      if (this.isSubmitting) return
+      this.isSubmitting = true
       this.error = ''
       const submissions = []
       let hasGivenHighRating = false
@@ -664,9 +780,13 @@ export default {
           surveyNameVariant: this.getStudentPostSessionSurveyNameVariant,
         })
         localStorage.setItem('high-session-rating', hasGivenHighRating)
-        this.$router.push('/dashboard')
       }
-      this.isSubmittingFeedback = false
+      this.isSubmitting = false
+      if (!this.isEligibleToNominateCoach) {
+        this.$router.push('/dashboard')
+      } else {
+        this.surveySubmitted = true
+      }
     },
     // builds a default user response to be stored in state that maps a survey question ID to a response map
     buildUserResponse() {
@@ -811,10 +931,12 @@ export default {
   &__header {
     @include font-category('display-small');
   }
+
   &__subheader {
     font-size: 22px;
     color: $c-secondary-grey;
     margin: 0;
+    font-weight: 500;
   }
 
   &__questions-list {
@@ -954,5 +1076,61 @@ export default {
     outline: none;
     border-color: $c-success-green;
   }
+}
+
+.nomination-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.nomination-subtext {
+  color: $c-secondary-grey;
+  padding-top: 48px;
+}
+
+.nomination-text {
+  @include font-category('heading');
+}
+
+.nomination-coaching-skills-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coaching-skill {
+  border: 1px solid $c-border-grey;
+  border-radius: 4px;
+  padding: 16px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: darken($c-background-grey, 5%);
+  }
+}
+
+.coaching-skill-checked {
+  background-color: $c-background-blue;
+
+  &:hover {
+    background-color: darken($c-background-blue, 5%);
+  }
+}
+
+.nomination-buttons {
+  display: flex;
+  flex-direction: column;
+  padding-top: 32px;
+  gap: 16px;
+  width: 50%;
+  align-items: center;
+}
+
+.tertiary-button {
+  text-decoration: underline;
+  color: $c-secondary-grey;
 }
 </style>

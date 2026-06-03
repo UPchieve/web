@@ -65,6 +65,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PRESESSION_NEAR_PEER_QUESTION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS]: false,
+      [POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -294,5 +295,7 @@ export default {
       ],
     isShowDMNotificationsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
+    isInvitationToCoachEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH],
   },
 }

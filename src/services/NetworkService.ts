@@ -1499,4 +1499,11 @@ export default {
       this._errorHandler
     )
   },
+  createInvitationToCoach(data: {
+    sessionId: string
+    invitedUserId: string
+    coachingSkills: string[]
+  }) {
+    return httpPost(`${API_ROOT}/user/coaching-invitation`, data)
+  },
 }

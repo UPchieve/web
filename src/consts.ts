@@ -965,6 +965,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS = 'become-volunteer-in-subject-with-no-requests',
   SHOW_TIP_TAP_EDITOR = 'show-tip-tap-editor',
   SHOW_DM_NOTIFICATIONS = 'show-dm-notifications',
+  INVITATION_TO_COACH = 'invitation-to-coach',
 }
 
 export const ANALYTICS_REPORT_ROW = {
@@ -1061,4 +1062,34 @@ export const LANGUAGES: Language[] = [
   { code: 'uk', name: 'Ukrainian' },
   { code: 'vi', name: 'Vietnamese' },
   { code: 'other', name: 'Other' },
+]
+
+export const COACHING_SKILLS = [
+  {
+    coachFacingValue: 'Asked thoughtful questions during our session',
+    studentFacingValue: '🤔 You ask great questions',
+    emoji: '🤔',
+  },
+  {
+    coachFacingValue:
+      'Caught on quickly and wanted to understand, not just get the answer',
+    studentFacingValue: '💡 You work hard to fully understand the answer',
+    emoji: '💡',
+  },
+  {
+    coachFacingValue: 'Stayed engaged and put in real effort',
+    studentFacingValue: '🔍 You stay focused and put in your best effort',
+    emoji: '🔍',
+  },
+  {
+    coachFacingValue:
+      'Had a positive, motivated attitude even when things got hard',
+    studentFacingValue: "💪 You stay calm when you're stuck",
+    emoji: '💪',
+  },
+  {
+    coachFacingValue: 'Explained their thinking clearly when asked',
+    studentFacingValue: '🗣️ You explain things clearly',
+    emoji: '🗣',
+  },
 ]

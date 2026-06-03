@@ -1,5 +1,5 @@
 <template>
-  <div class="uc-form-checkbox">
+  <label class="uc-form-checkbox" :for="name">
     <input
       :id="name"
       :name="name"
@@ -9,10 +9,10 @@
       @change="onChange"
       :required="isRequired"
     />
-    <label :for="name" class="checkbox-label">
+    <span class="checkbox-label">
       {{ label }}
-    </label>
-  </div>
+    </span>
+  </label>
 </template>
 
 <script>
@@ -61,3 +61,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.checkbox-label {
+  margin-left: 8px;
+}
+</style>

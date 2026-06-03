@@ -11,6 +11,7 @@ export default {
     allOpenSessions: [],
     tickIntervalId: null,
     ticks: 0,
+    lastCoachNomination: null,
   },
   mutations: {
     setNewWaitingStudentAudioElement: (state, element) =>
@@ -29,6 +30,8 @@ export default {
         state.allOpenSessions.splice(indexOfSession, 1)
       }
     },
+    setLastCoachNomination: (state, nominationData) =>
+      (state.lastCoachNomination = nominationData),
   },
   actions: {
     gotoSession({ dispatch }, { context, session }) {

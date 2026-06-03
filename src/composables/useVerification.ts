@@ -174,6 +174,7 @@ export function useVerification(data: UseVerificationPayload = {}) {
       error.value =
         ((err as AxiosError).response?.data as { err?: string })?.err ||
         'Unknown error'
+
       // eslint-disable-next-line preserve-caught-error
       throw new Error(error.value)
     }
