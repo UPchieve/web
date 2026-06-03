@@ -955,7 +955,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   MODERATE_ZWIBBLER_TEXT_NODES = 'moderate-zwibbler-text-nodes',
   NTHS_APPLICATION_PAGE = 'nths-application-page',
   PRESESSION_FAKE_DOOR_QUESTION = 'presession-fake-door-question',
-  SHOW_BECOME_VOLUNTEER_AD = 'show-become-volunteer-ad',
   SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK = 'show-volunteer-hours-calculator-link',
   UPBOT_SESSION_EDITOR_CONTEXT = 'upbot-session-editor-context',
   COMBINED_ONBOARDING_CHECKLIST = 'combined-onboarding-checklist',

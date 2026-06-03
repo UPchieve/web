@@ -76,9 +76,6 @@
       nextButtonText="Next"
       acceptButtonText="Get started!"
     />
-    <div v-if="shouldShowBecomeVolunteer" class="volunteer-ad">
-      <BecomeVolunteerAd />
-    </div>
   </div>
 </template>
 
@@ -120,7 +117,6 @@ import {
   isTargetEmailDomain,
 } from '@/utils/secondary-email-modal-utils'
 import { defineAsyncComponent } from 'vue'
-import BecomeVolunteerAd from '@/components/BecomeVolunteerAd.vue'
 import ModalService from '@/services/ModalService'
 import StudyImg from '@/assets/study.png?url'
 import CoachingInvitationModal from '@/views/DashboardView/StudentDashboard/CoachingInvitationModal.vue'
@@ -154,7 +150,6 @@ export default {
     StudentAssignments,
     OnboardingModal,
     JourneyModal,
-    BecomeVolunteerAd,
   },
   async created() {
     if (
@@ -335,7 +330,6 @@ export default {
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
       volunteerSubjectPresenceVariant:
         'featureFlags/volunteerSubjectPresenceVariant',
-      shouldShowBecomeVolunteer: 'featureFlags/shouldShowBecomeVolunteer',
       becomeVolunteerInSubjectWithNoRequestsVariant:
         'featureFlags/becomeVolunteerInSubjectWithNoRequestsVariant',
       isStudent: 'user/isStudent',
