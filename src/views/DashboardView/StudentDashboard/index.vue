@@ -50,6 +50,10 @@
       :closeModal="toggleImpactStudySurveyModal"
       :impactStudyCampaignId="impactStudySurveyCampaignId"
     />
+    <CoachingInvitationModal
+      v-if="showCoachingInvitationModal"
+      @closed="() => (dismissedCoachingInvitationModal = true)"
+    />
 
     <journey-modal v-if="showJourneyModal" :closeModal="toggleJourneyModal" />
 
@@ -119,6 +123,7 @@ import { defineAsyncComponent } from 'vue'
 import BecomeVolunteerAd from '@/components/BecomeVolunteerAd.vue'
 import ModalService from '@/services/ModalService'
 import StudyImg from '@/assets/study.png?url'
+import CoachingInvitationModal from '@/views/DashboardView/StudentDashboard/CoachingInvitationModal.vue'
 
 const ImpactStudySurveyModal = defineAsyncComponent(
   () => import('./ImpactStudySurveyModal.vue')
@@ -136,6 +141,7 @@ const BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS_VARIANTS = {
 export default {
   name: 'student-dashboard',
   components: {
+    CoachingInvitationModal,
     SecondaryEmailModal,
     DashboardBanner,
     SubjectSelection,
@@ -301,6 +307,7 @@ export default {
       showJourneyModal: false,
       dismissedSecondaryEmailModal: false,
       impactStudySurveyCampaignId: '',
+      dismissedCoachingInvitationModal: false,
     }
   },
   computed: {
@@ -331,7 +338,17 @@ export default {
       shouldShowBecomeVolunteer: 'featureFlags/shouldShowBecomeVolunteer',
       becomeVolunteerInSubjectWithNoRequestsVariant:
         'featureFlags/becomeVolunteerInSubjectWithNoRequestsVariant',
+      isStudent: 'user/isStudent',
+      hasVolunteerRole: 'user/hasVolunteerRole',
     }),
+    showCoachingInvitationModal() {
+      return (
+        !!this.$route.query.coachinvitation &&
+        this.isStudent &&
+        !this.hasVolunteerRole &&
+        !this.dismissedCoachingInvitationModal
+      )
+    },
     hasPermanentlyDismissedSecondaryEmailModal() {
       return hasPermanentlyDismissedSecondaryEmailModal(this.user.id)
     },

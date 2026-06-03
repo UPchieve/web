@@ -782,12 +782,13 @@ const routes = [
     name: 'AddVolunteerRole',
     beforeEnter: async (to, from, next) => {
       // We are using this route to add a volunteer role to students
-      // and switch to volunteer mode via gleap experiement CTAs
+      // and switch to volunteer mode via gleap experiment CTAs, emails, etc.
 
       // abort route change when FF is disabled
-      if (
-        !store.getters['featureFlags/isVolunteerAskForCollegeInterestEnabled']
-      ) {
+      const isAllowed =
+        store.getters['featureFlags/isVolunteerAskForCollegeInterestEnabled'] ||
+        to.query.invitedByCoach
+      if (!isAllowed) {
         return next(from)
       }
 
