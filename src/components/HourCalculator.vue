@@ -15,6 +15,11 @@ const currentHours = ref<number | null>(0)
 const targetMonth = ref<number>(now.getMonth() + 1)
 const targetYear = ref<number>(now.getFullYear() + 1)
 
+const showCalculator = computed(() => {
+  return store.getters['featureFlags/studentToVolunteerHoursPageVersion']
+    .showCalculator
+})
+
 const monthOptions = [
   { value: 1, label: 'January' },
   { value: 2, label: 'February' },
@@ -51,8 +56,8 @@ onMounted(() => {
 <template>
   <div class="hour-calculator">
     <BecomeVolunteerAd class="full" />
-    <div class="inputs">
-      <h2 class="headline">Earn Service Hours</h2>
+    <div v-if="showCalculator" class="inputs">
+      <h2 class="headline">Service Hours Calculator</h2>
       <p class="hook">
         Graduation requirements or college apps that stand out — whatever your
         goal, we'll help you get there. Enter your hours and deadline, and we'll
@@ -108,6 +113,7 @@ onMounted(() => {
       </div>
     </div>
     <YourPlan
+      v-if="showCalculator"
       :required-hours="requiredHours"
       :current-hours="currentHours"
       :month-options="monthOptions"

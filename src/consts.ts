@@ -964,7 +964,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   MODERATE_ZWIBBLER_TEXT_NODES = 'moderate-zwibbler-text-nodes',
   NTHS_APPLICATION_PAGE = 'nths-application-page',
   PRESESSION_FAKE_DOOR_QUESTION = 'presession-fake-door-question',
-  SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK = 'show-volunteer-hours-calculator-link',
   UPBOT_SESSION_EDITOR_CONTEXT = 'upbot-session-editor-context',
   COMBINED_ONBOARDING_CHECKLIST = 'combined-onboarding-checklist',
   PRESESSION_NEAR_PEER_QUESTION = 'presession-near-peer-question',
@@ -973,6 +972,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   SHOW_TIP_TAP_EDITOR = 'show-tip-tap-editor',
   SHOW_DM_NOTIFICATIONS = 'show-dm-notifications',
   INVITATION_TO_COACH = 'invitation-to-coach',
+  SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE = 'show-student-to-volunteer-hours-page',
 }
 
 export const ANALYTICS_REPORT_ROW = {

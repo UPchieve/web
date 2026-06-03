@@ -57,7 +57,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES]: false,
       [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK]: false,
       [POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST]: false,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST]: false,
@@ -65,6 +64,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -87,8 +87,9 @@ export default {
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
 
-      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK]:
-        'Service Hours',
+      [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: {
+        showCalculator: true,
+      },
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
     },
   },
@@ -259,13 +260,13 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.MODERATE_ZWIBBLER_TEXT_NODES],
     isNTHSApplicationPageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE],
-    shouldShowVolunteerHoursCalculatorLink: (state: FeatureFlagState) =>
+    shouldShowStudentToVolunteerHoursPage: (state: FeatureFlagState) =>
       state.toggleFlags[
-        POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK
+        POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE
       ],
-    volunteerHoursCalculatorLinkCopy: (state: FeatureFlagState) =>
+    studentToVolunteerHoursPageVersion: (state: FeatureFlagState) =>
       state.payloadFlags[
-        POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_HOURS_CALCULATOR_LINK
+        POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE
       ],
     isPresessionFakeDoorQuestionEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION],

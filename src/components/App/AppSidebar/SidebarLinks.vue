@@ -171,9 +171,9 @@
           <folder-icon class="icon" />
         </sidebar-link>
         <sidebar-link
-          v-if="shouldShowVolunteerHoursCalculatorLink"
+          v-if="shouldShowStudentToVolunteerHoursPage"
           to="/hour-calculator"
-          :text="volunteerHoursCalculatorLinkCopy"
+          text="Service Hours"
           id="hour-calculator-modal-link"
         >
           <calculator-icon class="icon" />
@@ -296,16 +296,14 @@ export default {
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
       userIsApprovedNTHSPresident: 'featureFlags/userIsApprovedNTHSPresident',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
-      shouldShowVolunteerHoursCalculatorLink:
-        'featureFlags/shouldShowVolunteerHoursCalculatorLink',
-      volunteerHoursCalculatorLinkCopy:
-        'featureFlags/volunteerHoursCalculatorLinkCopy',
+      shouldShowStudentToVolunteerHoursPage:
+        'featureFlags/shouldShowStudentToVolunteerHoursPage',
       aiTutor: 'featureFlags/aiTutor',
       hasUnreadDMs: 'user/hasUnreadDMs',
       isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
     }),
     hasSeenCalculator() {
-      if (this.shouldShowVolunteerHoursCalculatorLink) {
+      if (this.shouldShowStudentToVolunteerHoursPage) {
         void this.$route.path // run this each time the route changes
         const userIds = JSON.parse(
           localStorage.getItem('has-seen-volunteer-calculator') ?? '[]'
