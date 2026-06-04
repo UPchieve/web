@@ -343,6 +343,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.scrollToBottom()
+      this.updateAutoscrolling()
     })
     if (!this.isShowTipTapEditorEnabled) return
     this.editor = new Editor({
