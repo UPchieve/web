@@ -88,7 +88,6 @@ import UpdateSchoolModal from './UpdateSchoolModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
-import UserService from '@/services/UserService'
 import { EVENTS, POSTHOG_FEATURE_FLAGS } from '@/consts'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -117,8 +116,6 @@ import {
   isTargetEmailDomain,
 } from '@/utils/secondary-email-modal-utils'
 import { defineAsyncComponent } from 'vue'
-import ModalService from '@/services/ModalService'
-import StudyImg from '@/assets/study.png?url'
 import CoachingInvitationModal from '@/views/DashboardView/StudentDashboard/CoachingInvitationModal.vue'
 
 const ImpactStudySurveyModal = defineAsyncComponent(
@@ -127,12 +124,6 @@ const ImpactStudySurveyModal = defineAsyncComponent(
 const FallIncentiveEnrollmentModal = defineAsyncComponent(
   () => import('./FallIncentiveEnrollmentModal.vue')
 )
-
-const BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS_VARIANTS = {
-  CONTROL: 'control',
-  MATH_ONLY: 'math-only',
-  READING_WRITING_ONLY: 'reading-writing-only',
-}
 
 export default {
   name: 'student-dashboard',
@@ -241,56 +232,6 @@ export default {
     }
 
     if (this.shouldSeeJourneyModal) this.showJourneyModal = true
-
-    /* Part of study 766
-     * https://upchieve.fibery.io/Product/Study/Are-high-school-students-more-likely-to-become-a-tutor-in-subjects-they-do-not-request-sessions-in-766
-     */
-    if (this.shouldShowSubjectBasedBecomeVolunteerModal()) {
-      let title = 'Become a tutor!'
-      let message =
-        'Improve your college applications and earn service hours by tutoring students on UPchieve!'
-
-      if (
-        this.becomeVolunteerInSubjectWithNoRequestsVariant ===
-        BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS_VARIANTS.MATH_ONLY
-      ) {
-        title = 'Become a reading and writing tutor!'
-        message =
-          'Improve your college applications and earn service hours by tutoring students in reading and writing on UPchieve!'
-      }
-
-      if (
-        this.becomeVolunteerInSubjectWithNoRequestsVariant ===
-        BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS_VARIANTS.READING_WRITING_ONLY
-      ) {
-        title = 'Become a math tutor!'
-        message =
-          'Improve your college applications and earn service hours by tutoring students in math on UPchieve!'
-      }
-
-      const getStarted = await ModalService.showConfirm(title, message, {
-        acceptText: 'Get started',
-        backText: 'No thanks',
-        heroImageUrl: StudyImg,
-      })
-
-      AnalyticsService.captureEvent(EVENTS.BECOME_VOLUNTEER_IN_SUBJECT_SEEN)
-
-      localStorage.setItem('hasSeenSubjectBasedBecomeVolunteerModal', 'true')
-
-      if (getStarted) {
-        AnalyticsService.captureEvent(
-          EVENTS.BECOME_VOLUNTEER_IN_SUBJECT_CLICKED
-        )
-        await NetworkService.addVolunteerRoleForStudent()
-        await UserService.switchActiveRole({ $store: this.$store }, 'volunteer')
-        await this.$router.replace('/dashboard')
-      } else {
-        AnalyticsService.captureEvent(
-          EVENTS.BECOME_VOLUNTEER_IN_SUBJECT_DISMISSED
-        )
-      }
-    }
   },
   data() {
     return {
@@ -315,7 +256,6 @@ export default {
       productFlags: (state) => state.productFlags.flags,
       currentSession: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
-      fromRoute: (state) => state.app.fromRoute,
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',
@@ -330,8 +270,6 @@ export default {
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
       volunteerSubjectPresenceVariant:
         'featureFlags/volunteerSubjectPresenceVariant',
-      becomeVolunteerInSubjectWithNoRequestsVariant:
-        'featureFlags/becomeVolunteerInSubjectWithNoRequestsVariant',
       isStudent: 'user/isStudent',
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),
@@ -400,25 +338,6 @@ export default {
     },
   },
   methods: {
-    shouldShowSubjectBasedBecomeVolunteerModal() {
-      /*
-       * Part of study 766 - pop the modal when users are:
-       *
-       * 1. targeted by the feature flag
-       * 2. are coming from a `feedback` route, meaning they just took a session.
-       *    we think they might be more receptive to a CTA here rather than when
-       *    the first hit the dashboard
-       * 3. have never seen the modal
-       */
-      const variants = Object.values(
-        BECOME_VOLUNTEER_IN_SUBJECT_WITH_NO_REQUESTS_VARIANTS
-      )
-      return (
-        variants.includes(this.becomeVolunteerInSubjectWithNoRequestsVariant) &&
-        this.$store.state.app.fromRoute.includes('feedback') &&
-        !localStorage.getItem('hasSeenSubjectBasedBecomeVolunteerModal')
-      )
-    },
     setPermanentlyDismissedSecondaryEmailModal() {
       setPermanentlyDismissSecondaryEmailModal(this.user.id, new Date())
     },
