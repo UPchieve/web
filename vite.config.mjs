@@ -153,13 +153,17 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id
-              .toString()
-              .split('node_modules/')[1]
-              .split('/')[0]
-              .toString()
+          if (!id.includes('node_modules')) return
+
+          const packagePath = id.split('node_modules/').pop()
+
+          // Handle scoped packages (@scope/package).
+          if (packagePath?.startsWith('@')) {
+            return packagePath.split('/').slice(0, 2).join('/')
           }
+
+          // Handle regular packages (package-name).
+          return packagePath.split('/')[0]
         },
       },
     },
