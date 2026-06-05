@@ -61,7 +61,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST]: false,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST]: false,
-      [POSTHOG_FEATURE_FLAGS.PRESESSION_NEAR_PEER_QUESTION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH]: false,
@@ -291,8 +290,6 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST
       ],
-    isPresessionNearPeerQuestionEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.PRESESSION_NEAR_PEER_QUESTION],
     isShowDMNotificationsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
   },

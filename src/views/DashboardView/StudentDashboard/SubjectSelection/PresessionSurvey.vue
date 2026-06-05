@@ -23,14 +23,6 @@
         </div>
 
         <div
-          v-if="isPresessionNearPeerQuestionEnabled"
-          class="presession-info-box"
-        >
-          We'll do our best to match your coach preference, but may pair you
-          with the next available tutor.
-        </div>
-
-        <div
           class="question__responses"
           :class="{
             'question__responses-images': isRowOfImages,
@@ -175,7 +167,6 @@ export default {
       surveyId: null,
       surveyTypeId: null,
       fakeDoorQuestionId: 'fakeDoorQuestion',
-      nearPeerQuestionId: 'nearPeerQuestion',
     }
   },
 
@@ -198,11 +189,6 @@ export default {
       AnalyticsService.captureEvent(
         EVENTS.STUDENT_PRESESSION_FAKE_DOOR_QUESTION_SHOWN
       )
-
-    if (this.isPresessionNearPeerQuestionEnabled)
-      AnalyticsService.captureEvent(
-        EVENTS.STUDENT_PRESESSION_NEAR_PEER_QUESTION_SHOWN
-      )
   },
 
   computed: {
@@ -210,8 +196,6 @@ export default {
       mobileMode: 'app/mobileMode',
       isPresessionFakeDoorQuestionEnabled:
         'featureFlags/isPresessionFakeDoorQuestionEnabled',
-      isPresessionNearPeerQuestionEnabled:
-        'featureFlags/isPresessionNearPeerQuestionEnabled',
     }),
     fakeDoorQuestion() {
       return {
@@ -238,48 +222,12 @@ export default {
         ],
       }
     },
-    nearPeerQuestion() {
-      return {
-        questionId: this.nearPeerQuestionId,
-        questionText: 'Who would you prefer to work with today?',
-        questionType: 'multiple choice',
-        responses: [
-          {
-            responseId: 'adultTutor',
-            responseText: 'A tutor who is a college graduate',
-            analyticsResponse: 'An adult tutor',
-          },
-          {
-            responseId: 'collegeTutor',
-            responseText: 'A tutor who is currently in college',
-            analyticsResponse: 'A college tutor',
-          },
-          {
-            responseId: 'highSchoolTutor',
-            responseText: 'A tutor who is currently in high school',
-            analyticsResponse: 'A high school tutor',
-          },
-          {
-            responseId: 'noPreference',
-            responseText: 'No preference',
-            analyticsResponse: 'No preference',
-          },
-        ],
-      }
-    },
 
     surveySteps() {
       let steps = this.survey
 
-      //do not show step 2 if near peer question is enabled
-      if (this.isPresessionNearPeerQuestionEnabled) {
-        steps = steps.filter((_, i) => i !== 1)
-      }
-
       if (this.isPresessionFakeDoorQuestionEnabled)
         steps = [this.fakeDoorQuestion, ...steps]
-      if (this.isPresessionNearPeerQuestionEnabled)
-        steps = [...steps, this.nearPeerQuestion]
 
       return steps
     },
@@ -289,7 +237,6 @@ export default {
         const userResponse = this.userResponse[questionId]
 
         if (questionId === this.fakeDoorQuestionId) continue
-        if (questionId === this.nearPeerQuestionId) continue
 
         if (!userResponse?.responseId) return false
 
@@ -339,28 +286,9 @@ export default {
     submitSurvey() {
       if (!this.isSurveyComplete) return
 
-      if (
-        this.currentQuestion.questionId === this.nearPeerQuestionId &&
-        this.userResponse[this.nearPeerQuestionId]?.responseId
-      ) {
-        AnalyticsService.captureEvent(
-          EVENTS.STUDENT_SELECTED_PRESESSION_NEAR_PEER_TUTOR_OPTION,
-          {
-            subject: this.subject,
-            response: this.nearPeerQuestion.responses.find(
-              (response) =>
-                response.responseId ===
-                this.userResponse[this.nearPeerQuestionId].responseId
-            )?.analyticsResponse,
-            nearPeerQuestionVersion: '2',
-          }
-        )
-      }
-
       const submissions = []
       for (const question of this.surveySteps) {
         if (question.questionId === this.fakeDoorQuestionId) continue
-        if (question.questionId === this.nearPeerQuestionId) continue
 
         const questionId = question.questionId
         const response = this.userResponse[questionId]
@@ -398,24 +326,6 @@ export default {
                 selectedResponseIds.includes(response.responseId)
               )
               .map((response) => response.responseText),
-          }
-        )
-      }
-
-      if (
-        this.currentQuestion.questionId === this.nearPeerQuestionId &&
-        this.userResponse[this.nearPeerQuestionId]?.responseId
-      ) {
-        AnalyticsService.captureEvent(
-          EVENTS.STUDENT_SELECTED_PRESESSION_NEAR_PEER_TUTOR_OPTION,
-          {
-            subject: this.subject,
-            response: this.nearPeerQuestion.responses.find(
-              (response) =>
-                response.responseId ===
-                this.userResponse[this.nearPeerQuestionId].responseId
-            )?.analyticsResponse,
-            nearPeerQuestionVersion: '2',
           }
         )
       }
@@ -555,14 +465,6 @@ export default {
       }
     }
   }
-
-  &__info-box {
-    margin-top: 16px;
-    background-color: $light-blue-background;
-    padding: 12px;
-    font-size: 12px;
-    color: $c-information-blue;
-  }
 }
 
 .fake-door-checkbox {
@@ -586,11 +488,5 @@ export default {
   fill: $icon-grey;
   width: 15px;
   height: 15px;
-}
-
-.presession-info-box {
-  background-color: $c-background-blue;
-  padding: 10px;
-  font-size: 14px;
 }
 </style>
