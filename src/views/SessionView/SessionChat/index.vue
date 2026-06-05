@@ -343,7 +343,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.scrollToBottom()
-      this.updateAutoscrolling()
+      this.updateSessionLastSeen()
     })
     if (!this.isShowTipTapEditorEnabled) return
     this.editor = new Editor({
@@ -1054,6 +1054,16 @@ export default {
           this.scrollToBottom()
         })
       }
+    },
+    'currentSession.id': {
+      handler(newId) {
+        if (!newId) return
+        this.$nextTick(() => {
+          this.scrollToBottom()
+          this.updateAutoscrolling()
+        })
+      },
+      immediate: true,
     },
     'currentSession.messages': {
       handler(messages) {
