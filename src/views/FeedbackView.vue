@@ -16,7 +16,7 @@
         </template>
       </header>
 
-      <div v-if="showCoachNominationForm">
+      <div v-if="showCoachNominationForm" id="coach-nomination-form">
         <h2 class="feedback__header">
           Nominate {{ session.studentFirstName }} as a Coach
         </h2>
@@ -60,7 +60,7 @@
             </LargeButton>
             <button
               type="button"
-              @click="() => this.$router.push(`/dashboard`)"
+              @click="optOutOfNomination"
               class="tertiary-button"
             >
               No thanks, go to dashboard
@@ -481,6 +481,12 @@ export default {
     })
   },
   methods: {
+    optOutOfNomination() {
+      AnalyticsService.captureEvent(EVENTS.COACH_SKIPPED_NOMINATION, {
+        sessionId: this.session.id,
+      })
+      this.$router.push('/dashboard')
+    },
     async submitNomination() {
       const selectedCoachingSkills = this.coachingSkills.filter(
         (s) => s.checked
@@ -499,7 +505,16 @@ export default {
         this.$store.commit('volunteer/setLastCoachNomination', {
           coachingSkills: selectedCoachingSkills,
         })
+        AnalyticsService.captureEvent(EVENTS.COACH_SUBMITTED_NOMINATION, {
+          sessionId: this.session.id,
+        })
       } catch (err) {
+        AnalyticsService.captureEvent(
+          EVENTS.ERROR_SUBMITTING_COACH_NOMINATION,
+          {
+            sessionId: this.session.id,
+          }
+        )
         LoggerService.noticeError(
           err,
           'Error while attempting to create invitation to coach'
@@ -520,6 +535,14 @@ export default {
         checked: !existingSkill.checked,
       }
       this.coachingSkills[existingSkillIndex] = newSkill
+      if (newSkill.checked) {
+        AnalyticsService.captureEvent(
+          EVENTS.COACH_CLICKED_COACHING_SKILLS_CHECKBOX,
+          {
+            skill: skill.coachFacingValue,
+          }
+        )
+      }
     },
     getQuestionDisplayType(question) {
       if (question.questionType === 'multiple choice') {

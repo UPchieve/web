@@ -6,15 +6,31 @@ import { useStore } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Spinner from '@/components/Spinner.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const emit = defineEmits(['closed'])
 const store = useStore()
 const router = useRouter()
 const isLoading = ref<boolean>(false)
+
+function closeModal() {
+  AnalyticsService.captureEvent(EVENTS.NOMINATED_STUDENT_DISMISSED_MODAL)
+  emit('closed')
+}
+
+onMounted(() => {
+  AnalyticsService.captureEvent(
+    EVENTS.NOMINATED_STUDENT_SAW_COACHING_INFO_MODAL
+  )
+})
 async function switchToVolunteerMode() {
+  AnalyticsService.captureEvent(
+    EVENTS.NOMINATED_STUDENT_CLICKED_I_WANT_TO_VOLUNTEER
+  )
   try {
     isLoading.value = true
     if (!store.getters['user/hasVolunteerRole']) {
@@ -35,7 +51,7 @@ async function switchToVolunteerMode() {
 
 <template>
   <Modal>
-    <div class="exit-button" @click="emit('closed')">
+    <div class="exit-button" @click="closeModal">
       <CrossIcon class="exit-icon" />
     </div>
     <h2>WHAT IT LOOKS LIKE FROM THE OTHER SIDE</h2>
@@ -79,7 +95,7 @@ async function switchToVolunteerMode() {
         :showArrow="false"
         >I want to coach</LargeButton
       >
-      <button @click="emit('closed')" class="tertiary-button" type="button">
+      <button @click="closeModal" class="tertiary-button" type="button">
         Not for me
       </button>
     </div>

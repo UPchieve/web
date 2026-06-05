@@ -785,9 +785,10 @@ const routes = [
       // and switch to volunteer mode via gleap experiment CTAs, emails, etc.
 
       // abort route change when FF is disabled
+      const isFromNominationEmail = !!to.query.invitedByCoach
       const isAllowed =
         store.getters['featureFlags/isVolunteerAskForCollegeInterestEnabled'] ||
-        to.query.invitedByCoach
+        isFromNominationEmail
       if (!isAllowed) {
         return next(from)
       }
@@ -798,6 +799,7 @@ const routes = [
       AnalyticsService.captureEvent(EVENTS.BECOME_VOLUNTEER_FROM_ROUTE, {
         params: to.query,
       })
+
       try {
         await NetworkService.addVolunteerRoleForStudent()
         await UserService.switchActiveRole({ $store: store }, 'volunteer')

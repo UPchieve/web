@@ -1,11 +1,17 @@
 <script lang="ts" setup>
 import Modal from '@/components/Modal.vue'
-import { computed, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 import CrossIcon from '@/assets/cross.svg'
 import UpdogHooray from '@/assets/updog-hooray.svg'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
+
+onMounted(() => {
+  AnalyticsService.captureEvent(EVENTS.COACH_SAW_NOMINATION_CONFIRMATION_MODAL)
+})
 
 onUnmounted(() => {
   store.commit('volunteer/setLastCoachNomination', null)
