@@ -656,6 +656,12 @@ export default {
         source:
           this.isInRecap || this.eligibleForSessionRecapChat ? 'recap' : '',
       })
+
+      if (this.isStudent && this.hasDMs) {
+        AnalyticsService.captureEvent(EVENTS.STUDENT_DM_SENT, {
+          sessionId: this.currentSession.id,
+        })
+      }
     },
 
     removePendingMessage(message) {
