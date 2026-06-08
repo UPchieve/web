@@ -20,6 +20,6 @@
   ],
   "navigationFallback": {
     "rewrite": "index.html",
-    "exclude": ["*.{png,jpg,svg,css,scss}"]
+    "exclude": ["*.{png,jpg,svg,css,scss,js,mjs,wasm}"]
   }
 }
