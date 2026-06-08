@@ -50,6 +50,7 @@ export type UserStoreState = {
   progressReportIntervalId: number | null
   hasUnreadDMs: boolean
   sessionsWithUnreadDMs: string[]
+  fetchingSessionPromise: null | Promise<Record<string, never>>
 }
 
 type UserStoreGetterValues = {
@@ -100,6 +101,7 @@ export default {
     progressReportIntervalId: null,
     hasUnreadDMs: false,
     sessionsWithUnreadDMs: [],
+    fetchingSessionPromise: null,
   } as UserStoreState,
   mutations: {
     setUser: (state: UserStoreState, user = {}) => (state.user = user),
@@ -238,6 +240,12 @@ export default {
     setSessionsWithUnreadDMs: (state: UserStoreState, sessionIds: string[]) => {
       state.sessionsWithUnreadDMs = sessionIds
     },
+    setFetchSessionPromise: (
+      state: UserStoreState,
+      p: Promise<Record<string, never>> | null
+    ) => {
+      state.fetchingSessionPromise = p
+    },
   },
   actions: {
     fetch: ({ dispatch }: UserActionContext) => {
@@ -267,8 +275,10 @@ export default {
       commit('setUser', {})
     },
 
-    fetchSession: ({ commit }: UserActionContext) => {
-      SessionService.getCurrentSession()
+    fetchSession: ({ state, commit }: UserActionContext) => {
+      if (state.user.fetchingSessionPromise)
+        return state.user.fetchingSessionPromise
+      const p = SessionService.getCurrentSession()
         .then(({ sessionData }) => {
           commit('setSession', sessionData)
         })
@@ -276,6 +286,11 @@ export default {
           commit('setSession', {})
           LoggerService.noticeError(err)
         })
+        .finally(() => {
+          commit('setFetchSessionPromise', null)
+        })
+      commit('setFetchSessionPromise', p)
+      return p
     },
 
     fetchRecapSessionForDms: async (
@@ -620,7 +635,7 @@ export default {
     },
 
     roleInCurrentSession: (state: UserStoreState) => {
-      if (!state.session) return undefined
+      if (!state.session?.id) return undefined
       const studentId = state.session?.student?.id
       return studentId === state.user.id ? 'student' : 'volunteer'
     },
