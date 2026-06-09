@@ -69,6 +69,7 @@ export default {
     languages: { type: Array },
     isInRecap: { type: Boolean },
     isDisplayingLanguagesSpoken: { type: Boolean, default: false },
+    isExclusiveSession: { type: Boolean, default: false },
   },
 
   computed: {
@@ -135,17 +136,32 @@ export default {
         }
       )
     } else if (this.isSessionWaitingForVolunteer && !this.isSessionOver) {
-      const botMessages = [
-        {
-          msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`,
-        },
-        {
-          msg: "Right now we're searching for a live coach to pair you with. This process should only take 5-10 minutes, so please hang tight!",
-        },
-        {
-          msg: "While you're waiting, you can save time by telling us what you need help with in the chat! You can also write out a problem you're working on on the whiteboard.",
-        },
-      ]
+      const botMessages = this.isExclusiveSession
+        ? [
+            {
+              msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`,
+            },
+            {
+              msg: "We've messaged your requested tutor to let them know you'd like to work together again! If they're available, they'll join you here soon.",
+            },
+            {
+              msg: "If you'd rather not wait, tap “Open to all tutors” at the top to let any available tutor pick up your session.",
+            },
+            {
+              msg: "While you wait, you can save time by telling us what you need help with in the chat — or sketch the problem on the whiteboard.",
+            },
+          ]
+        : [
+            {
+              msg: `Hey ${this.firstName}! I'm the UPchieve Bot.`,
+            },
+            {
+              msg: "Right now we're searching for a live coach to pair you with. This process should only take 5-10 minutes, so please hang tight!",
+            },
+            {
+              msg: "While you're waiting, you can save time by telling us what you need help with in the chat! You can also write out a problem you're working on on the whiteboard.",
+            },
+          ]
 
       this.unsentBotMessages = botMessages
 

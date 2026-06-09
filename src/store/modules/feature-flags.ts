@@ -41,6 +41,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES]: false,
       [POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS]: false,
+      [POSTHOG_FEATURE_FLAGS.STUDENT_REQUEST_SPECIFIC_VOLUNTEER_SESSIONS]: false,
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
@@ -220,6 +221,12 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO],
     isStudentsInitiateDmsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS],
+    isStudentRequestSpecificVolunteerSessionsEnabled: (
+      state: FeatureFlagState
+    ) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.STUDENT_REQUEST_SPECIFIC_VOLUNTEER_SESSIONS
+      ],
     getVolunteerMilestoneSharingStudyVariant: (state: FeatureFlagState) =>
       state.multivariantFlags[
         POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY

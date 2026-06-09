@@ -270,8 +270,9 @@ export default {
     unlockedOpenSessions: (state, getters, rootState) => {
       if (getters['isReadyToTutor']) {
         const unlockedSubjects = rootState.user.user.subjects ?? []
-        return state.allOpenSessions.filter((session) =>
-          unlockedSubjects.includes(session.subTopic)
+        return state.allOpenSessions.filter(
+          (session) =>
+            unlockedSubjects.includes(session.subTopic) && !session.isExclusive
         )
       } else {
         return []
@@ -281,10 +282,25 @@ export default {
       if (getters['isReadyToTutor']) {
         const unlockedSubjects = rootState.user.user.subjects ?? []
         return state.allOpenSessions.filter(
-          (session) => !unlockedSubjects.includes(session.subTopic)
+          (session) =>
+            !unlockedSubjects.includes(session.subTopic) && !session.isExclusive
         )
       } else {
         return state.allOpenSessions
+      }
+    },
+    exclusiveSessions: (state, getters, rootState) => {
+      if (getters['isReadyToTutor']) {
+        const unlockedSubjects = rootState.user.user.subjects ?? []
+        const userId = rootState.user.user.id
+        return state.allOpenSessions.filter(
+          (session) =>
+            unlockedSubjects.includes(session.subTopic) &&
+            session.isExclusive &&
+            session.requestedVolunteerId === userId
+        )
+      } else {
+        return []
       }
     },
   },

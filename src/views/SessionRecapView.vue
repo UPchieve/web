@@ -1,5 +1,18 @@
 <template>
   <div class="session-recap-page">
+    <div
+      v-if="exclusiveRequest && isVolunteer"
+      class="exclusive-request-banner"
+    >
+      <span class="exclusive-request-banner__text">
+        <strong>{{ exclusiveRequest.studentFirstName }}</strong> is requesting a
+        <strong>{{ exclusiveRequest.subjectDisplayName }}</strong> session with
+        you right now.
+      </span>
+      <large-button @click="joinExclusiveRequest" variant="primary-blue">
+        Join now
+      </large-button>
+    </div>
     <loader v-if="isLoadingRecap" class="recap-loader" />
     <template v-else>
       <div class="chat-card-editor-container">
@@ -49,6 +62,19 @@
                 class="heart"
               />
             </div>
+            <template v-if="canRequestSessionWithSameTutor">
+              <span class="card-detail__title"></span>
+              <div class="card-detail recap-card__exclusive-cta-cell">
+                <large-button
+                  variant="primary-blue"
+                  @click="openRequestSessionWithTutorModal"
+                  :showArrow="false"
+                >
+                  Start another {{ session.subject }} session with
+                  {{ session.volunteerFirstName }}
+                </large-button>
+              </div>
+            </template>
             <template
               v-if="isStudent && isSessionSummaryEnabled && sessionSummary"
             >
@@ -235,6 +261,7 @@ import ProgressReportSession from '@/components/ProgressReportSession.vue'
 import Dropdown from '@/components/Dropdown.vue'
 import Separator from '@/components/Separator.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import Case from 'case'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
@@ -276,13 +303,30 @@ export default {
       recapSession: (state) => state.user.recapSession,
       socketJoinedRoom: (state) => state.socket.socketJoinedRoom,
       isConnected: (state) => state.socket.isConnected,
+      subjectsMap: (state) => state.subjects.subjects,
+      currentSession: (state) => state.user.session,
     }),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
       mobileMode: 'app/mobileMode',
+      exclusiveSessions: 'volunteer/exclusiveSessions',
       isSessionSummaryEnabled: 'featureFlags/isSessionSummaryEnabled',
+      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
+      isStudentRequestSpecificVolunteerSessionsEnabled:
+        'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
+      hasCooldown: 'session/hasCooldown',
     }),
+    canRequestSessionWithSameTutor() {
+      return (
+        this.isStudent &&
+        this.isStudentsInitiateDmsEnabled &&
+        this.isStudentRequestSpecificVolunteerSessionsEnabled &&
+        !!this.session?.volunteerId &&
+        !this.currentSession.id &&
+        !this.hasCooldown
+      )
+    },
     whiteboardDimensions() {
       return {
         width: 1000,
@@ -305,6 +349,15 @@ export default {
     },
     showFeedbackFromStudent() {
       return this.feedbackStarQuestionAnswers.length > 0
+    },
+    exclusiveRequest() {
+      return (
+        this.exclusiveSessions.find(
+          (session) =>
+            session.student.id === this.session.studentId &&
+            session.requestedVolunteerId === this.user.id
+        ) ?? null
+      )
     },
   },
   data() {
@@ -420,6 +473,12 @@ export default {
     this.zwibblerCtx?.destroy()
   },
   methods: {
+    joinExclusiveRequest() {
+      if (!this.exclusiveRequest) return
+      const { id, type, subTopic } = this.exclusiveRequest
+      const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
+      this.$router.push(path)
+    },
     getSessionTime(sessionCreatedAt) {
       return dayjs(sessionCreatedAt).format('l, h:mm A')
     },
@@ -473,6 +532,51 @@ export default {
       )
       this.$router.push('/session/readingWriting/reading/')
     },
+    openRequestSessionWithTutorModal() {
+      // Mirror SessionHistoryView.openRequestSessionModal: lock the new
+      // session to the same subject as the recap'd session and ride the
+      // tutor's id through as requestedVolunteerId so the backend gates the
+      // session as exclusive to them.
+      const matchedSubject = Object.values(this.subjectsMap).find(
+        (s) =>
+          s.topicName === this.session.topic &&
+          s.displayName === this.session.subject
+      )
+      if (!matchedSubject) return
+
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_CLICKED_REQUEST_TUTOR_AGAIN,
+        {
+          sourceView: 'session-recap',
+          requestedVolunteerId: this.session.volunteerId,
+          subject: matchedSubject.name,
+          topic: this.session.topic,
+          pastSessionId: this.session.id,
+        }
+      )
+
+      const subtopics = [matchedSubject.name]
+      const subtopicDisplayNames = {
+        [matchedSubject.name]: matchedSubject.displayName,
+      }
+
+      this.$store.dispatch('app/modal/show', {
+        component: 'SubjectSelectionModal',
+        data: {
+          backText: 'Session Recap',
+          acceptText: 'Continue',
+          topic: this.session.topic,
+          title: matchedSubject.topicDisplayName || '',
+          subtopics,
+          subtopicDisplayNames,
+          preSelectedSubtopic: matchedSubject.name,
+          subtitle: `Start a ${matchedSubject.displayName} session with ${this.session.volunteerFirstName}.`,
+          sessionArgs: {
+            requestedVolunteerId: this.session.volunteerId,
+          },
+        },
+      })
+    },
     handleProgressReportToggle(isOpen) {
       if (isOpen)
         AnalyticsService.captureEvent(
@@ -514,6 +618,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.exclusive-request-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  background: #fff8e6;
+  border: 1px solid #f3c244;
+  border-radius: 6px;
+  color: #4d3a00;
+  width: 100%;
+
+  &__text {
+    flex: 1;
+    font-size: 15px;
+  }
+}
+
 .chat-card-editor-container {
   @include flex-container(column);
   width: 60%;
@@ -569,6 +692,11 @@ export default {
     &:hover {
       background: darken($c-information-blue, 5%);
     }
+  }
+
+  &__exclusive-cta-cell {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
   }
 }
 

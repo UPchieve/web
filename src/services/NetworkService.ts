@@ -357,6 +357,7 @@ export default {
     sessionSubTopic: string // subject
     docEditorVersion: number
     assignmentId?: string
+    requestedVolunteerId?: string
     presessionSurvey?: {
       surveyId: number
       surveyTypeId: number
@@ -377,11 +378,22 @@ export default {
       throw this._axiosErrorHandler(err as AxiosError)
     }
   },
+  async breakoutSession(sessionId: string) {
+    try {
+      return await httpPost<{
+        sessionId: Uuid
+        session: CurrentSessionPublic
+      }>(`${API_ROOT}/session/${sessionId}/breakout`, {})
+    } catch (err) {
+      throw this._axiosErrorHandler(err as AxiosError)
+    }
+  },
   async joinSession(data: { sessionId: string; joinedFrom?: string }) {
     try {
       return await httpPost<{
         session: CurrentSessionPublic
         isZwibserveSession: boolean
+        exclusiveVolunteerId?: string
       }>(`${API_ROOT}/session/join`, data)
     } catch (err) {
       throw this._axiosErrorHandler(err as AxiosError)

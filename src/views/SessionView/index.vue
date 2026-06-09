@@ -4,6 +4,27 @@
     :class="{ 'session--whiteboard': auxiliaryType === 'WHITEBOARD' }"
   >
     <div
+      v-if="exclusiveVolunteerId && !session?.volunteerId"
+      class="exclusive-session-banner"
+    >
+      <span class="exclusive-session-banner__text">
+        Your session is currently visible only to your requested tutor. Tap
+        "Open to all tutors" to get help faster from any available tutor.
+      </span>
+      <large-button
+        variant="primary-blue"
+        :showArrow="false"
+        @click="confirmBreakout('banner')"
+      >
+        Open to all tutors
+      </large-button>
+    </div>
+    <breakout-prompt-modal
+      v-if="showBreakoutPrompt"
+      :closeModal="dismissBreakoutPrompt"
+      @confirm="confirmBreakout('prompt-modal')"
+    />
+    <div
       v-if="sessionId"
       class="session-contents-container"
       v-bind:class="{
@@ -220,6 +241,7 @@
           :isSocketSessionRoomConnected="isSocketSessionRoomConnected"
           :isSessionAlive="isSessionAlive"
           :sessionHasEnded="sessionHasEnded"
+          :isExclusiveSession="!!exclusiveVolunteerId && !session?.volunteerId"
         />
       </div>
     </div>
@@ -305,6 +327,8 @@ import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
 import AboutSessionModal from './AboutSessionModal.vue'
+import BreakoutPromptModal from './BreakoutPromptModal.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import AssignmentDetailModal from './AssignmentDetailModal.vue'
 import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
@@ -354,6 +378,8 @@ export default {
     QuestionMarkIcon,
     FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
+    BreakoutPromptModal,
+    LargeButton,
     LiveMediaChatHeader,
     PartnerAckScreenShareInfractionModal,
     AckPartnerIntiatedPotentialBan,
@@ -391,17 +417,22 @@ export default {
 
   async created() {
     try {
-      const { session, isZwibserveSession } =
+      const requestedVolunteerId = this.$route.query?.requestedVolunteerId
+      const { session, isZwibserveSession, exclusiveVolunteerId } =
         await SessionService.createOrJoinSession(
           this.$route.params.topic,
           this.$route.params.subTopic,
           this.$route.params.sessionId,
           this.$route.query?.assignmentId,
-          this.prevRoute?.name ?? ''
+          this.prevRoute?.name ?? '',
+          requestedVolunteerId
         )
 
       this.sessionId = session.id
       this.isZwibserveSession = isZwibserveSession
+      // Prefer the backend-derived value (survives page refresh)
+      this.exclusiveVolunteerId = exclusiveVolunteerId || requestedVolunteerId
+      if (this.exclusiveVolunteerId) this.handleBreakoutPrompt()
       await this.linkTransferredTutorBotConversation(session.id)
 
       if (this.journeySessionData) {
@@ -488,6 +519,7 @@ export default {
     if (this.joinSocketSessionAbortController) {
       this.joinSocketSessionAbortController.abort()
     }
+    clearTimeout(this.breakoutPromptTimeout)
     socket.emit('sessions:leave', {
       sessionId: this.sessionId,
     })
@@ -500,6 +532,8 @@ export default {
     return {
       auxiliaryOpen: false,
       sessionId: null,
+      exclusiveVolunteerId: null,
+      showBreakoutPrompt: false,
       hasSeenNewMessage: true,
       showNotificationModal: false,
       showAboutSessionModal: false,
@@ -532,6 +566,7 @@ export default {
       joinSocketSessionAbortController: null,
       isSocketSessionRoomConnected: false,
       isZwibserveSession: false,
+      breakoutPromptTimeout: null,
     }
   },
   computed: {
@@ -864,6 +899,55 @@ export default {
     },
   },
   methods: {
+    handleBreakoutPrompt() {
+      const key = `breakoutPromptSeen:${this.sessionId}`
+      if (sessionStorage.getItem(key)) return
+
+      const createdAt = new Date(this.session.createdAt).getTime()
+      const fiveMinutes = 5 * 60 * 1000
+      const elapsed = Date.now() - createdAt
+      const delay = Math.max(fiveMinutes - elapsed, 0)
+
+      this.breakoutPromptTimeout = setTimeout(() => {
+        if (sessionStorage.getItem(key)) return
+
+        this.showBreakoutPrompt = true
+        sessionStorage.setItem(key, 'true')
+
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_SAW_BREAKOUT_PROMPT_MODAL,
+          {
+            sessionId: this.sessionId,
+            requestedVolunteerId: this.exclusiveVolunteerId,
+          }
+        )
+      }, delay)
+    },
+    async confirmBreakout(source = 'banner') {
+      try {
+        await NetworkService.breakoutSession(this.sessionId)
+        AnalyticsService.captureEvent(
+          EVENTS.STUDENT_BROKE_OUT_EXCLUSIVE_SESSION,
+          {
+            sessionId: this.sessionId,
+            source,
+            requestedVolunteerId: this.exclusiveVolunteerId,
+          }
+        )
+        this.exclusiveVolunteerId = null
+      } catch (err) {
+        LoggerService.noticeError(err)
+      } finally {
+        this.showBreakoutPrompt = false
+      }
+    },
+    dismissBreakoutPrompt() {
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_DISMISSED_BREAKOUT_PROMPT_MODAL,
+        { sessionId: this.sessionId }
+      )
+      this.showBreakoutPrompt = false
+    },
     startScreenShare() {
       this.meetingActor.send({ type: 'share_screen' })
     },
@@ -1103,11 +1187,29 @@ export default {
   width: 100%;
   position: relative; /*[1]*/
   height: 100%; /*[1]*/
+  display: flex;
+  flex-direction: column;
   &--whiteboard {
     .toggleButton.back {
       bottom: calc(100% - 140px);
       right: 35px;
     }
+  }
+}
+
+.exclusive-session-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #eef9f6;
+  border-bottom: 1px solid #b8e0d2;
+  color: #114b3f;
+  font-size: 14px;
+
+  &__text {
+    flex: 1;
   }
 }
 
@@ -1137,6 +1239,8 @@ export default {
   grid-template-rows: minmax(min-content, max-content) 1fr;
   grid-column-gap: 15px;
   grid-row-gap: 0;
+  flex: 1;
+  min-height: 0;
 
   @include breakpoint-above('medium') {
     padding: 20px;

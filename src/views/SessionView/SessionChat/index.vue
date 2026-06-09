@@ -47,6 +47,7 @@
           v-if="isStudent && isSessionWaitingForVolunteer"
           :currentSession="currentSession"
           :isInRecap="false"
+          :isExclusiveSession="isExclusiveSession"
           @new-bot-message="handleNewMessageScrollPosition"
         />
         <chat-bot
@@ -316,6 +317,7 @@ export default {
     isSessionRecapEligible: { type: Boolean, default: false },
     sessionHasEnded: { type: Boolean, default: false },
     aiWidgetPresent: { type: Boolean, default: false },
+    isExclusiveSession: { type: Boolean, default: false },
   },
 
   data() {

@@ -38,7 +38,8 @@ export default {
     subTopic: string,
     sessionId?: string,
     assignmentId?: string,
-    joinedFrom?: string
+    joinedFrom?: string,
+    requestedVolunteerId?: string
   ) {
     const {
       data: { isValid },
@@ -49,7 +50,7 @@ export default {
 
     if (sessionId) {
       const {
-        data: { session, isZwibserveSession },
+        data: { session, isZwibserveSession, exclusiveVolunteerId },
       } = await NetworkService.joinSession({ sessionId, joinedFrom })
       await store.dispatch('user/updateSession', {
         ...session,
@@ -57,7 +58,7 @@ export default {
         subTopic,
         _id: session.id,
       })
-      return { session, isZwibserveSession }
+      return { session, isZwibserveSession, exclusiveVolunteerId }
     }
 
     const presessionSurvey = Object.keys(store.state.user.presessionSurvey)
@@ -71,13 +72,22 @@ export default {
       sessionSubTopic: subTopic,
       docEditorVersion: 2,
       assignmentId,
+      requestedVolunteerId,
       presessionSurvey,
     })
 
+    // Only attach exclusive metadata when this is actually an exclusive
+    // request — regular SESSION_REQUESTED events stay byte-identical to
+    // their pre-experiment shape so PostHog doesn't accumulate experiment-
+    // specific property definitions on the broader event when we don't
+    // need them.
     AnalyticsService.captureEvent(EVENTS.SESSION_REQUESTED, {
       event: EVENTS.SESSION_REQUESTED,
       sessionId: session.id,
       subject: subTopic,
+      ...(requestedVolunteerId
+        ? { isExclusiveRequest: true, requestedVolunteerId }
+        : {}),
     })
     await Promise.all([
       store.dispatch('user/updateSession', {
@@ -89,7 +99,11 @@ export default {
       store.dispatch('user/clearPresessionSurvey'),
     ])
     await router.replace(store.getters['user/sessionPath'])
-    return { session, isZwibserveSession }
+    return {
+      session,
+      isZwibserveSession,
+      exclusiveVolunteerId: requestedVolunteerId,
+    }
   },
 
   // TODO: Make all paths use `endAndExitSession` instead.
@@ -129,12 +143,9 @@ export default {
       store.state.user.session.subTopic
     )
 
-    // Do not send the user directly to the feedback page if they can leave DMs.
-    const isStudentWhoCanInitiateDms =
-      store.getters['user/isStudent'] &&
-      store.getters['featureFlags/isStudentsInitiateDmsEnabled']
-    const canInitiateDms =
-      isStudentWhoCanInitiateDms || store.getters['user/isVolunteer']
+    // Students always go directly to the post-session feedback flow on End.
+    // Volunteers stay in the session to leave DMs (existing behavior).
+    const canInitiateDms = store.getters['user/isVolunteer']
     if (!canInitiateDms) {
       this.postSessionRedirect(endedSession)
     }

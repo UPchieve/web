@@ -67,7 +67,7 @@
           <span>SUBJECT</span>
           <span>DATE</span>
           <span>{{ isVolunteer ? 'STUDENT' : 'COACH' }}</span>
-          <span>SESSION RECAP</span>
+          <span></span>
         </div>
         <div v-if="error" class="info">
           {{ error }}
@@ -116,6 +116,14 @@
                 </span>
               </div>
               <div class="session-list__session-recap">
+                <large-button
+                  v-if="canRequestSessionWith(session)"
+                  variant="primary-blue"
+                  :showArrow="false"
+                  class="request-tutor-button"
+                  @click="openRequestSessionModal(session)"
+                  >Request {{ session.volunteerFirstName }} again</large-button
+                >
                 <large-button
                   variant="outlined"
                   @click="
@@ -218,6 +226,14 @@
                   <span class="mobile-session-list__created-at">
                     {{ getSessionTimeForMobile(session.createdAt) }}</span
                   >
+                  <large-button
+                    v-if="canRequestSessionWith(session)"
+                    class="request-tutor-button request-tutor-button--mobile"
+                    primary
+                    @click="openRequestSessionModal(session)"
+                    >Request session with
+                    {{ session.volunteerFirstName }}</large-button
+                  >
                 </div>
                 <caret-icon
                   class="caret--next"
@@ -268,7 +284,7 @@
 
 <script>
 import { dayjs } from '@/utils/time-utils'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { EVENTS } from '@/consts'
 import CaretIcon from '@/assets/caret.svg'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -320,6 +336,14 @@ export default {
       subjectsByTopics: 'subjects/subjectsByTopics',
       sessionsWithUnreadDMs: 'user/sessionsWithUnreadDMs',
       isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
+      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
+      isStudentRequestSpecificVolunteerSessionsEnabled:
+        'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
+      hasCooldown: 'session/hasCooldown',
+    }),
+    ...mapState({
+      subjectsMap: (state) => state.subjects.subjects,
+      currentSession: (state) => state.user.session,
     }),
     isFirstPage() {
       return this.page === 1
@@ -486,6 +510,58 @@ export default {
       }
       this.$router.push(`/sessions/${sessionId}/recap`)
     },
+    canRequestSessionWith(session) {
+      return (
+        this.isStudent &&
+        this.isStudentsInitiateDmsEnabled &&
+        this.isStudentRequestSpecificVolunteerSessionsEnabled &&
+        !!session.volunteerId &&
+        !!session.volunteerFirstName &&
+        !this.currentSession?.id &&
+        !this.hasCooldown
+      )
+    },
+    openRequestSessionModal(session) {
+      const matchedSubject = Object.values(this.subjectsMap).find(
+        (s) =>
+          s.topicName === session.topic && s.displayName === session.subject
+      )
+      if (!matchedSubject) return
+
+      AnalyticsService.captureEvent(
+        EVENTS.STUDENT_CLICKED_REQUEST_TUTOR_AGAIN,
+        {
+          sourceView: 'session-history',
+          requestedVolunteerId: session.volunteerId,
+          subject: matchedSubject.name,
+          topic: session.topic,
+          pastSessionId: session.id,
+        }
+      )
+
+      // Lock the request to the past session's subject — no picker for this
+      // flow. Backend trusts the locked subject (no certification re-check),
+      // so the modal must not offer alternatives.
+      const subtopics = [matchedSubject.name]
+      const subtopicDisplayNames = {
+        [matchedSubject.name]: matchedSubject.displayName,
+      }
+
+      this.$store.dispatch('app/modal/show', {
+        component: 'SubjectSelectionModal',
+        data: {
+          backText: 'Session History',
+          acceptText: 'Continue',
+          topic: session.topic,
+          title: matchedSubject.topicDisplayName || '',
+          subtopics,
+          subtopicDisplayNames,
+          preSelectedSubtopic: matchedSubject.name,
+          subtitle: `Start a ${matchedSubject.displayName} session with ${session.volunteerFirstName}.`,
+          sessionArgs: { requestedVolunteerId: session.volunteerId },
+        },
+      })
+    },
   },
 }
 </script>
@@ -555,6 +631,13 @@ ul {
 .clear-filters {
   color: $c-information-blue;
   font-weight: 600;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 1;
+  // `.uc-form-element` has a 10px top margin - need to match for alignment
+  margin-top: 10px;
 }
 .info {
   @include flex-container(row, center, center);
@@ -650,7 +733,8 @@ ul {
   }
 
   &__session-recap {
-    @include flex-container(row, center, center);
+    @include flex-container(row, flex-end, center);
+    gap: 12px;
   }
 }
 

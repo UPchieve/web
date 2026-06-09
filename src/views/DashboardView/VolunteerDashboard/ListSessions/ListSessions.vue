@@ -3,6 +3,22 @@
     <div v-if="hasError" class="session-list__error">
       <p>Failed to load a list of students. Please try refreshing</p>
     </div>
+    <div
+      v-if="sortedExclusiveSessions.length"
+      class="session-list__exclusive-callout"
+      data-testid="exclusive-requests-callout"
+    >
+      <span class="session-list__exclusive-callout-emoji">🙋</span>
+      <span>
+        <strong v-if="sortedExclusiveSessions.length === 1"
+          >A student has specifically requested your help!</strong
+        >
+        <strong v-else
+          >{{ sortedExclusiveSessions.length }} students have specifically
+          requested your help!</strong
+        >
+      </span>
+    </div>
     <table class="table table-striped">
       <tr>
         <th scope="col">Student</th>
@@ -16,9 +32,17 @@
           :id="session.id"
           :data-testid="`session-row-${session.id}`"
           class="session-row"
+          :class="{ 'session-row--exclusive': session.isExclusive }"
           @click="sessionClicked(session)"
         >
           <td>
+            <span
+              v-if="session.isExclusive"
+              class="session-row__eyebrow"
+              data-testid="exclusive-eyebrow"
+              >Specifically Requested You</span
+            >
+            <span v-if="session.isExclusive" class="exclusive-emoji">🙋</span>
             <!--            Anonymize first name of student for locked sessions only-->
             {{
               session.isUnlocked
@@ -123,9 +147,28 @@ const sortedLockedSessions = computed(() => {
   sessions.sort(sortByCreatedAt)
   return sessions
 })
+const sortedExclusiveSessions = computed(() => {
+  const sessions = [...store.getters['volunteer/exclusiveSessions']]
+  sessions.forEach((session: any) => {
+    session.isUnlocked = true
+  })
+  sessions.sort(sortByCreatedAt)
+  return sessions
+})
 const isReadyToTutor = computed(() => store.getters['volunteer/isReadyToTutor'])
 
 const sessionClicked = (session) => {
+  if (session.isExclusive) {
+    AnalyticsService.captureEvent(
+      EVENTS.VOLUNTEER_CLICKED_EXCLUSIVE_REQUEST_ROW,
+      {
+        sessionId: session.id,
+        source: 'list-sessions-row',
+        subject: session.subTopic,
+        topic: session.type,
+      }
+    )
+  }
   if (session.isUnlocked) {
     gotoSession(session)
   } else if (isReadyToTutor.value) {
@@ -141,15 +184,21 @@ const sessionClicked = (session) => {
 }
 
 const sortedSessions = computed(() => {
+  // Exclusive requests pin to the top of the list — these students hand-picked
+  // this volunteer specifically, so the prompt should be impossible to miss.
   // There must be no more than MAX_AVAILABLE_SECTIONS unlocked sessions for us to display the locked ones,
   // and to display locked ones, props.showLockedSessions must be true.
   if (
     sortedUnlockedSessions.value.length > MAX_AVAILABLE_SECTIONS ||
     !props.showLockedSessions
   ) {
-    return sortedUnlockedSessions.value
+    return [...sortedExclusiveSessions.value, ...sortedUnlockedSessions.value]
   }
-  return [...sortedUnlockedSessions.value, ...sortedLockedSessions.value]
+  return [
+    ...sortedExclusiveSessions.value,
+    ...sortedUnlockedSessions.value,
+    ...sortedLockedSessions.value,
+  ]
 })
 
 function openAmbassadorReferralModal() {
@@ -233,6 +282,26 @@ function waitTime(args: { createdAt: any }) {
     color: $c-error-red;
     text-align: center;
   }
+
+  // Highlight strip above the table when one or more students have
+  // specifically requested this tutor.
+  &__exclusive-callout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    background: #fff8e6;
+    border: 1px solid #f3c244;
+    border-radius: 6px;
+    color: #4d3a00;
+    font-size: 14px;
+  }
+
+  &__exclusive-callout-emoji {
+    font-size: 20px;
+    line-height: 1;
+  }
 }
 
 .session-row {
@@ -240,6 +309,31 @@ function waitTime(args: { createdAt: any }) {
   &:hover {
     background: lighten($c-information-blue, 50%);
   }
+
+  // Tutor-exclusive request rows: tinted background overrides zebra,
+  // brighter border to stand out, eyebrow + emoji prefix in the first cell.
+  &--exclusive {
+    background: #fff8e6 !important;
+    border-left: 3px solid #f3c244;
+
+    &:hover {
+      background: darken(#fff8e6, 3%) !important;
+    }
+  }
+
+  &__eyebrow {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4d3a00;
+    margin-bottom: 2px;
+  }
+}
+
+.exclusive-emoji {
+  margin-right: 4px;
 }
 
 .session-row td {
