@@ -1,7 +1,4 @@
 import type { Commit } from 'vuex'
-import { EVENTS } from '@/consts'
-import AnalyticsService from '@/services/AnalyticsService'
-import type { RootGetters } from '..'
 
 export type Celebration = {
   id: number
@@ -34,7 +31,7 @@ export default {
   },
   actions: {
     celebrate: (
-      { commit, rootGetters }: { commit: Commit; rootGetters: RootGetters },
+      { commit }: { commit: Commit },
       duration = DEFAULT_CELEBRATION_DURATION
     ) => {
       const id = Date.now()
@@ -42,9 +39,6 @@ export default {
       setTimeout(() => {
         commit('removeConfetti', id)
       }, duration)
-      if (rootGetters['user/isStudent']) {
-        AnalyticsService.captureEvent(EVENTS.USER_RECEIVED_CELEBRATION)
-      }
     },
   },
 }

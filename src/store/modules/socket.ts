@@ -7,6 +7,8 @@ import {
   IMAGE_UPLOAD_EVENTS,
   PARTNER_IMAGE_UPLOAD_STATUS,
 } from '@/composables/imageUploadState'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 /**
  * These errors handled internally and shouldn't be forwarded to our logger.
@@ -210,6 +212,9 @@ export default {
 
       socket.on('celebrate', (data: { duration: number }) => {
         dispatch('celebrations/celebrate', data.duration, { root: true })
+        if (rootGetters['user/isStudent']) {
+          AnalyticsService.captureEvent(EVENTS.USER_RECEIVED_CELEBRATION)
+        }
       })
 
       socket.on('messageSend', (data: MessageData) => {

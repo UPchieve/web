@@ -4,7 +4,6 @@ import Modal from '@/components/Modal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { useStore } from 'vuex'
 import NetworkService from '@/services/NetworkService'
-import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -35,8 +34,7 @@ async function switchToVolunteerMode() {
     isLoading.value = true
     if (!store.getters['user/hasVolunteerRole']) {
       await NetworkService.addVolunteerRoleForStudent()
-      await UserService.switchActiveRole({ $store: store }, 'volunteer')
-      await router.replace('/dashboard')
+      await router.replace('/switch-mode?isNewMode=true')
     }
   } catch (err) {
     LoggerService.noticeError(

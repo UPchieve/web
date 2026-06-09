@@ -105,6 +105,7 @@ import Case from 'case'
 import { getStatus } from '@/services/AuthService'
 import LoggerService from './services/LoggerService'
 import { EVENTS } from './consts'
+import ModeTransitionView from '@/views/ModeTransitionView.vue'
 
 const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -802,8 +803,12 @@ const routes = [
 
       try {
         await NetworkService.addVolunteerRoleForStudent()
-        await UserService.switchActiveRole({ $store: store }, 'volunteer')
-        return next('/dashboard')
+        if (!isFromNominationEmail) {
+          await UserService.switchActiveRole({ $store: store }, 'volunteer')
+          return next('/dashboard')
+        } else {
+          return next('/switch-mode?isNewMode=true')
+        }
       } catch (e) {
         LoggerService.noticeError(
           e,
@@ -918,6 +923,18 @@ const routes = [
     name: 'TotpEnroll',
     component: TotpEnroll,
     meta: { protected: true, requiresAdmin: true, hideNavigation: true },
+  },
+  {
+    path: '/switch-mode',
+    name: 'SwitchMode',
+    component: ModeTransitionView,
+    props: (route) => {
+      return {
+        isFirstTransitionToTargetMode: route.query.isNewMode ?? false,
+        targetRoute: route.query.to ?? '/dashboard',
+      }
+    },
+    meta: { protected: true, hideNavigation: true },
   },
   {
     path: '/:pathMatch(.*)*',
