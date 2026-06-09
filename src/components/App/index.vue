@@ -398,8 +398,7 @@ ion-content {
   }
 
   &--sidebar {
-    @include bind-app-sidebar-width(padding-left);
-    padding-left: 0;
+    @include bind-app-sidebar-width(padding-left, 0);
   }
 }
 </style>

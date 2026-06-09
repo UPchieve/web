@@ -48,8 +48,8 @@ $app-sidebar-width-map: (
 /// @requires {map} breakpoint-map
 /// @requires {mixin} breakpoint-above
 /// @param {string} $property
-@mixin bind-app-sidebar-width($property) {
-  #{$property}: get-app-sidebar-width();
+@mixin bind-app-sidebar-width($property, $default: get-app-sidebar-width()) {
+  #{$property}: $default;
 
   @each $key, $value in $app-sidebar-width-map {
     @if map.get(breakpoints.$breakpoint-map, $key) {
