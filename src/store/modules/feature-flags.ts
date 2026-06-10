@@ -295,7 +295,5 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PRESESSION_NEAR_PEER_QUESTION],
     isShowDMNotificationsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
-    isInvitationToCoachEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH],
   },
 }

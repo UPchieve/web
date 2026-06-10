@@ -148,7 +148,7 @@ export default {
               msg: "If you'd rather not wait, tap “Open to all tutors” at the top to let any available tutor pick up your session.",
             },
             {
-              msg: "While you wait, you can save time by telling us what you need help with in the chat — or sketch the problem on the whiteboard.",
+              msg: 'While you wait, you can save time by telling us what you need help with in the chat — or sketch the problem on the whiteboard.',
             },
           ]
         : [

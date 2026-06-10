@@ -315,11 +315,12 @@ import SurveyRateNumber from '../components/Surveys/SurveyRateNumber.vue'
 import SurveyChipOption from '../components/Surveys/SurveyChipOption.vue'
 import SurveyCheckbox from '../components/Surveys/SurveyCheckbox.vue'
 import { map, remove, orderBy, find, forEach, isEmpty } from 'lodash-es'
-import { COACHING_SKILLS, EVENTS } from '@/consts'
+import { COACHING_SKILLS, EVENTS, POSTHOG_FEATURE_FLAGS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import FormCheckBox from '@/components/FormCheckBox.vue'
 import LoggerService from '@/services/LoggerService'
 import Spinner from '@/components/Spinner.vue'
+import FeatureFlagService from '@/services/FeatureFlagService'
 
 export default {
   name: 'FeedbackView',
@@ -352,6 +353,7 @@ export default {
         ...skill,
         checked: false,
       })),
+      isInvitationToCoachEnabledForStudent: false,
     }
   },
   computed: {
@@ -363,7 +365,6 @@ export default {
         'featureFlags/volunteerFeedbackForStudentFlag',
       getStudentPostSessionSurveyNameVariant:
         'featureFlags/getStudentPostSessionSurveyNameVariant',
-      isInvitationToCoachEnabled: 'featureFlags/isInvitationToCoachEnabled',
     }),
     ...mapState({
       subjects: (state) => state.subjects.subjects,
@@ -373,7 +374,9 @@ export default {
       return this.coachingSkills.some((skill) => skill.checked)
     },
     isEligibleToNominateCoach() {
-      return this.isSessionVolunteer && this.isInvitationToCoachEnabled
+      return (
+        this.isSessionVolunteer && this.isInvitationToCoachEnabledForStudent
+      )
     },
     showCoachNominationForm() {
       return this.surveySubmitted && this.isEligibleToNominateCoach
@@ -474,11 +477,31 @@ export default {
 
     this.isLoading = false
   },
-  mounted() {
+  async mounted() {
     AnalyticsService.captureEvent(EVENTS.POST_SESSION_SURVEY_SHOWN, {
       sessionId: this.session.id,
       surveyNameVariant: this.getStudentPostSessionSurveyNameVariant,
     })
+  },
+  watch: {
+    async isSessionVolunteer(current) {
+      if (current) {
+        try {
+          // The feature where the coach can nominate the student to become a coach
+          // is driven by a feature flag which targets the *student*, not the coach.
+          const flagResponse = await FeatureFlagService.isFeatureEnabledForUser(
+            POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH,
+            this.session.studentId
+          )
+          this.isInvitationToCoachEnabledForStudent = flagResponse.isEnabled
+        } catch (err) {
+          LoggerService.noticeError(
+            err,
+            'Failed to check if student is eligible for coach nomination form'
+          )
+        }
+      }
+    },
   },
   methods: {
     optOutOfNomination() {

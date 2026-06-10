@@ -8,14 +8,16 @@ import { useStore } from 'vuex'
 const router = useRouter()
 const store = useStore()
 
-const props = withDefaults(defineProps<{
-  isFirstTransitionToTargetMode: boolean
-  targetRoute: string
-}>(), {
-  isFirstTransitionToTargetMode: false,
-  targetRoute: '/dashboard'
-})
-
+const props = withDefaults(
+  defineProps<{
+    isFirstTransitionToTargetMode: boolean
+    targetRoute: string
+  }>(),
+  {
+    isFirstTransitionToTargetMode: false,
+    targetRoute: '/dashboard',
+  }
+)
 
 const targetMode = store.getters['user/isStudent'] ? 'volunteer' : 'student' // intentionally non-reactive.
 const targetModeDisplayName =
