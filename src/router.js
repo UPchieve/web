@@ -685,6 +685,16 @@ const routes = [
       },
     },
     beforeEnter: async (_to, _from, next) => {
+      //Don't capture click event on refresh
+      if (_from.path !== '/' && !_from.path.startsWith('/sessions/progress')) {
+        AnalyticsService.captureEvent(
+          EVENTS.USER_CLICKED_MY_PROGRESS_SIDEBAR_LINK,
+          {
+            hadUnreadIndicator:
+              store.getters['user/hasUnreadProgressOverviewReports'],
+          }
+        )
+      }
       const response =
         await NetworkService.getLatestProgressReportOverviewSubject()
       const subject = response.data

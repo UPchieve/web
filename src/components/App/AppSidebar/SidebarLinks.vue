@@ -32,7 +32,7 @@
 
         <sidebar-link
           v-if="isStudent"
-          @click="onClickMyProgressSidebarLink"
+          to="/sessions/progress"
           text="My Progress"
           class="SidebarLinks__container"
           id="my-progress-sidebar-link"
@@ -379,15 +379,6 @@ export default {
     closeAmbassadorReferralModal() {
       AnalyticsService.captureEvent(EVENTS.REFERRAL_MODAL_CLOSE)
       this.ambassadorReferralModalIsOpen = false
-    },
-    onClickMyProgressSidebarLink() {
-      AnalyticsService.captureEvent(
-        EVENTS.USER_CLICKED_MY_PROGRESS_SIDEBAR_LINK,
-        {
-          hadUnreadIndicator: this.hasUnreadProgressOverviewReports,
-        }
-      )
-      this.$router.push('/sessions/progress')
     },
   },
   watch: {
