@@ -7,7 +7,7 @@ import { storeOptions } from '@/store'
 import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 
-const getWrapper = () => {
+const getWrapper = (overrides = {}) => {
   const store = createStore(
     merge({}, storeOptions, {
       modules: {
@@ -16,6 +16,8 @@ const getWrapper = () => {
             user: {
               pastSessions: [],
               studentAssignments: [],
+              gradeLevel: '8th',
+              ...(overrides.user?.state?.user ?? {}),
             },
           },
         },
@@ -47,6 +49,17 @@ describe('StudentDashboard', () => {
 
     const selection = wrapper.findComponent(SubjectSelection)
     expect(selection.exists()).toBe(true)
+  })
+
+  test('shows grade level card if student has no grade level and there are no assignments', () => {
+    const wrapper = getWrapper({
+      user: { state: { user: { gradeLevel: null } } },
+    })
+    expect(wrapper.classes('student-dashboard')).toBe(true)
+    const gradeLevelComponent = wrapper.find(
+      '[data-testid="grade-level-select"]'
+    )
+    expect(gradeLevelComponent.exists()).toBe(true)
   })
 
   test('shows journey modal when not seen before', async () => {

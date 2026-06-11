@@ -1,14 +1,17 @@
 <template>
   <div class="student-dashboard">
+    <div v-if="showAssignments">
+      <StudentAssignments :assignments="user.studentAssignments" />
+    </div>
+    <div v-else-if="showGradeLevelSelect">
+      <GradeLevelSelect data-testid="grade-level-select" />
+    </div>
     <dashboard-banner
-      v-if="!user.studentAssignments.length"
+      v-else
       :subheader="
         showDashboardRedesign ? `What can we help you with today?` : ``
       "
     />
-    <div v-else>
-      <StudentAssignments :assignments="user.studentAssignments" />
-    </div>
     <!-- TODO: Make notices into a reusable component. -->
     <div class="dashboard-notices">
       <div
@@ -117,6 +120,7 @@ import {
 } from '@/utils/secondary-email-modal-utils'
 import { defineAsyncComponent } from 'vue'
 import CoachingInvitationModal from '@/views/DashboardView/StudentDashboard/CoachingInvitationModal.vue'
+import GradeLevelSelect from '@/views/GradeLevelSelect.vue'
 
 const ImpactStudySurveyModal = defineAsyncComponent(
   () => import('./ImpactStudySurveyModal.vue')
@@ -128,6 +132,7 @@ const FallIncentiveEnrollmentModal = defineAsyncComponent(
 export default {
   name: 'student-dashboard',
   components: {
+    GradeLevelSelect,
     CoachingInvitationModal,
     SecondaryEmailModal,
     DashboardBanner,
@@ -148,6 +153,8 @@ export default {
       this.shouldSeeIncentiveModalForSecondTime
     )
       this.triggerIncentiveEnrollmentModal()
+
+    this.hasGradeLevel = !!this.user.gradeLevel
 
     // TODO: Do this better.
     // Dashboard page view ends up coming before account created/verified.
@@ -244,6 +251,7 @@ export default {
       dismissedSecondaryEmailModal: false,
       impactStudySurveyCampaignId: '',
       dismissedCoachingInvitationModal: false,
+      hasGradeLevel: false,
     }
   },
   computed: {
@@ -273,6 +281,12 @@ export default {
       isStudent: 'user/isStudent',
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),
+    showGradeLevelSelect() {
+      return !this.hasGradeLevel
+    },
+    showAssignments() {
+      return this.user.studentAssignments?.length
+    },
     showCoachingInvitationModal() {
       return (
         !!this.$route.query.coachinvitation &&
