@@ -239,6 +239,12 @@ export default {
       if (volunteerIsNotInSession && newSession) {
         const isCertifiedInSubject = user.subjects.includes(newSession.subTopic)
         if (isCertifiedInSubject) {
+          // Avoid sending out notifications to coaches that were not explicitly requested
+          if (
+            newSession.isExclusive &&
+            user.id !== newSession.requestedVolunteerId
+          )
+            return
           /*
            * ping subway with this; if the user is currently PASSIVE_ON_SITE,
            * subway will set a countdown for marking them as INACTIVE_ON_SITE.
