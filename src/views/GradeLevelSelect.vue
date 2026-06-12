@@ -9,6 +9,7 @@ import UserService from '@/services/UserService'
 import { useStore } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import AnalyticsService from '@/services/AnalyticsService'
+import CrossIcon from '@/assets/cross.svg'
 
 const store = useStore()
 const isSaving = ref<boolean>(false)
@@ -64,18 +65,28 @@ async function saveGradeLevel() {
 }
 
 const selectedGradeLevel = ref<string>('')
+const emit = defineEmits(['dismissed'])
 </script>
 
 <template>
   <div class="grade-level-container">
-    <div class="title">
-      <h1>
-        Confirm your grade level for the {{ academicYear() }} academic year
-      </h1>
-      <h2 v-if="!updated">
-        This helps us tailor your UPchieve experience to you
-      </h2>
-      <h2 v-else class="success">Your information has been saved!</h2>
+    <div class="header">
+      <div class="headings">
+        <h1>
+          Confirm your grade level for the {{ academicYear() }} academic year
+        </h1>
+        <h2 v-if="!updated">
+          This helps us tailor your UPchieve experience to you
+        </h2>
+        <h2 v-else class="success">Your information has been saved!</h2>
+      </div>
+      <button
+        class="dismiss-button"
+        type="button"
+        @click="() => emit('dismissed')"
+      >
+        <CrossIcon class="cross-icon" />
+      </button>
     </div>
     <form
       @submit.prevent="saveGradeLevel"
@@ -141,5 +152,20 @@ h2 {
   margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+}
+
+.dismiss-button {
+  margin-left: auto;
+  margin-bottom: auto;
+
+  .cross-icon {
+    height: 20px;
+    width: 20px;
+  }
 }
 </style>

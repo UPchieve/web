@@ -4,7 +4,10 @@
       <StudentAssignments :assignments="user.studentAssignments" />
     </div>
     <div v-else-if="showGradeLevelSelect">
-      <GradeLevelSelect data-testid="grade-level-select" />
+      <GradeLevelSelect
+        data-testid="grade-level-select"
+        @dismissed="setGradeLevelTaskDismissed"
+      />
     </div>
     <dashboard-banner
       v-else
@@ -91,6 +94,7 @@ import UpdateSchoolModal from './UpdateSchoolModal.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
+import * as BrowserStorageService from '@/services/BrowserStorageService'
 import { EVENTS, POSTHOG_FEATURE_FLAGS } from '@/consts'
 import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -146,6 +150,12 @@ export default {
     StudentAssignments,
     OnboardingModal,
     JourneyModal,
+  },
+  beforeMount() {
+    if (BrowserStorageService.getGradeLevelTaskFromStorage()) {
+      BrowserStorageService.setGradeLevelTaskInStorage()
+      this.dismissedGradeLevelTask = true
+    }
   },
   async created() {
     if (
@@ -252,6 +262,7 @@ export default {
       impactStudySurveyCampaignId: '',
       dismissedCoachingInvitationModal: false,
       hasGradeLevel: false,
+      dismissedGradeLevelTask: false,
     }
   },
   computed: {
@@ -282,7 +293,7 @@ export default {
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),
     showGradeLevelSelect() {
-      return !this.hasGradeLevel
+      return !this.hasGradeLevel && !this.dismissedGradeLevelTask
     },
     showAssignments() {
       return this.user.studentAssignments?.length
@@ -352,6 +363,10 @@ export default {
     },
   },
   methods: {
+    setGradeLevelTaskDismissed() {
+      this.dismissedGradeLevelTask = true
+      BrowserStorageService.setGradeLevelTaskInStorage()
+    },
     setPermanentlyDismissedSecondaryEmailModal() {
       setPermanentlyDismissSecondaryEmailModal(this.user.id, new Date())
     },
