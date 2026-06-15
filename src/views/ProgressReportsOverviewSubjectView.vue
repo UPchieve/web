@@ -433,7 +433,6 @@ export default {
       isLastPage: false,
       hasPageError: false,
       error: '',
-      subjectByProgressReports: [],
     }
   },
   computed: {
@@ -504,7 +503,6 @@ export default {
       }
     )
     this.isLoadingPage = true
-    await this.getProgressReportOverviewSubjectStats()
     await this.generatePage()
     window.addEventListener('resize', this.handleResize)
   },
@@ -594,9 +592,10 @@ export default {
         .filter((summary) => !summary.reportReadAt)
         .map((summary) => summary.reportId)
 
-      this.$store.dispatch('user/updateProgressReportsReadStatus', reportIds)
-      //remove reports in store to mark reports are read
-      this.$store.dispatch('user/setProgressReportOverviewSubjectStats', [])
+      this.$store.dispatch('user/updateProgressReportsReadStatus', {
+        reportIds,
+        subjectName: this.subject,
+      })
     },
     gradeLabel(grade) {
       return gradeLabel(grade)
@@ -615,19 +614,20 @@ export default {
 
       // Get the previous three months and the next one month
       const months = []
-      for (let i = 2; i >= -1; i--) {
+      for (let i = 3; i >= -1; i--) {
         months.push(
-          currentDate.clone().subtract(i, 'months').format('MMMM YYYY')
+          currentDate.clone().subtract(i, 'months').format('YYYY-MM-DD')
         )
       }
 
       const labels = months
       const mobileMode = this.mobileMode
       const dataset = sortedData.map((entry) => ({
-        x: dayjs.utc(entry.sessionCreatedAt).local(),
+        x: dayjs.utc(entry.sessionCreatedAt).format('YYYY-MM-DD'),
         y: entry.overallGrade,
         label: this.gradeLabel(entry.overallGrade),
       }))
+
       const gradeRanges = {
         60: 'Almost there',
         70: 'Passing Grade',
@@ -677,10 +677,16 @@ export default {
             },
             x: {
               type: 'time',
+              min: currentDate
+                .clone()
+                .subtract(3, 'months')
+                .startOf('month')
+                .toDate(),
+              max: currentDate.clone().add(1, 'month').endOf('month').toDate(),
               time: {
                 unit: 'month',
                 displayFormats: {
-                  month: 'MMM YYYY',
+                  month: 'MMMM YYYY',
                 },
               },
               grid: {
@@ -713,15 +719,6 @@ export default {
       if (this.chart) {
         this.chart.destroy()
         this.chart = null
-      }
-    },
-    async getProgressReportOverviewSubjectStats() {
-      try {
-        const response = await NetworkService.getUnreadProgressReports()
-        this.subjectByProgressReports = response.data
-      } catch (error) {
-        LoggerService.noticeError(error)
-        this.hasPageError = true
       }
     },
     async generatePage() {
@@ -954,7 +951,7 @@ p {
       }
 
       @media screen and (min-width: '1600px') {
-        grid-template-columns: 20% 20% 1fr;
+        grid-template-columns: 20% 20% minmax(0, 1fr);
         grid-template-rows: 1fr;
       }
 
@@ -1015,7 +1012,7 @@ p {
     }
 
     &-content--big {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 600;
     }
 

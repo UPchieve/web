@@ -445,12 +445,30 @@ export default {
       commit('setProgressReportIntervalId', progressReportIntervalId)
     },
 
-    // eslint-disable-next-line no-empty-pattern
-    updateProgressReportsReadStatus: async ({}, reportIds: Array<string>) => {
-      if (!Array.isArray(reportIds) || !reportIds.length) return
-
+    updateProgressReportsReadStatus: async (
+      { state, commit }: UserActionContext,
+      {
+        reportIds,
+        subjectName,
+      }: { reportIds: Array<string>; subjectName: string }
+    ) => {
       try {
-        await NetworkService.updateProgressReportsReadStatus(reportIds)
+        if (reportIds?.length) {
+          //don't wait for the response since the DB isn't the source of truth immediately
+          NetworkService.updateProgressReportsReadStatus(reportIds)
+        }
+
+        commit(
+          'setProgressReportOverviewSubjectStats',
+          state.progressReportOverviewSubjectStats.map((subjectStats) =>
+            subjectStats.subject === subjectName
+              ? {
+                  ...subjectStats,
+                  totalUnreadReports: 0,
+                }
+              : subjectStats
+          )
+        )
       } catch (error) {
         LoggerService.noticeError(error.response.data.err)
       }
