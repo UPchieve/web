@@ -353,7 +353,7 @@ export default {
         ...skill,
         checked: false,
       })),
-      isInvitationToCoachEnabledForStudent: false,
+      isNominationFormEnabled: false,
     }
   },
   computed: {
@@ -374,9 +374,7 @@ export default {
       return this.coachingSkills.some((skill) => skill.checked)
     },
     isEligibleToNominateCoach() {
-      return (
-        this.isSessionVolunteer && this.isInvitationToCoachEnabledForStudent
-      )
+      return this.isSessionVolunteer && this.isNominationFormEnabled
     },
     showCoachNominationForm() {
       return this.surveySubmitted && this.isEligibleToNominateCoach
@@ -489,11 +487,21 @@ export default {
         try {
           // The feature where the coach can nominate the student to become a coach
           // is driven by a feature flag which targets the *student*, not the coach.
-          const flagResponse = await FeatureFlagService.isFeatureEnabledForUser(
-            POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH,
-            this.session.studentId
-          )
-          this.isInvitationToCoachEnabledForStudent = flagResponse.isEnabled
+          // In addition, there is a bug with PH preventing us from reliably excluding users targeted
+          // by the S2V volunteer page FF from this set, so we do that ourselves here.
+          const isCoachNominationEnabled =
+            await FeatureFlagService.isFeatureEnabledForUser(
+              POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH,
+              this.session.studentId
+            )
+          const isVolunteerHoursPageEnabled =
+            await FeatureFlagService.isFeatureEnabledForUser(
+              POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE,
+              this.session.studentId
+            )
+          this.isNominationFormEnabled =
+            isCoachNominationEnabled.isEnabled &&
+            !isVolunteerHoursPageEnabled.isEnabled
         } catch (err) {
           LoggerService.noticeError(
             err,
