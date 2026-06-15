@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import FormSelect from '@/components/FormInputs/FormSelect.vue'
-import { EVENTS, GRADES } from '@/consts'
+import { EVENTS } from '@/consts'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import { onMounted, ref } from 'vue'
-import moment from 'moment-timezone'
+import { getAcademicYear } from '@/utils/academic-year'
 import LoggerService from '@/services/LoggerService'
 import UserService from '@/services/UserService'
 import { useStore } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import CrossIcon from '@/assets/cross.svg'
+import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 
 const store = useStore()
 const isSaving = ref<boolean>(false)
@@ -21,24 +21,6 @@ onMounted(() => {
     userType: store.getters['user/userType'],
   })
 })
-
-function academicYear(): string {
-  // We want the most recent academic year that the student is in or has completed
-  // to work with the grade level calculation on the backend. Consider July 1 the start of the school year.
-  const today = moment()
-  const JULY_MONTH = 6 // 0-indexed
-  let yearStart: null | number
-  let yearEnd: null | number
-  if (today.month() >= JULY_MONTH) {
-    yearStart = today.year()
-    yearEnd = today.year() + 1
-  } else {
-    yearStart = today.year() - 1
-    yearEnd = today.year()
-  }
-
-  return `${yearStart.toString()}-${yearEnd.toString()}`
-}
 
 async function saveGradeLevel() {
   try {
@@ -73,7 +55,8 @@ const emit = defineEmits(['dismissed'])
     <div class="header">
       <div class="headings">
         <h1>
-          Confirm your grade level for the {{ academicYear() }} academic year
+          Confirm your grade level for the
+          {{ getAcademicYear().asString }} academic year
         </h1>
         <h2 v-if="!updated">
           This helps us tailor your UPchieve experience to you
@@ -94,13 +77,7 @@ const emit = defineEmits(['dismissed'])
       v-if="!updated"
       autocomplete="off"
     >
-      <FormSelect
-        v-model="selectedGradeLevel"
-        name="grade level"
-        :options="GRADES"
-        placeholder="Grade level"
-        :label="`What grade will you be in during the ${academicYear()} academic year?`"
-      />
+      <GradeLevelSelect v-model="selectedGradeLevel" />
       <HyperlinkButton
         v-if="!isSaving"
         :disabled="!selectedGradeLevel"

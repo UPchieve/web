@@ -4,7 +4,7 @@
       <StudentAssignments :assignments="user.studentAssignments" />
     </div>
     <div v-else-if="showGradeLevelSelect">
-      <GradeLevelSelect
+      <GradeLevelTask
         data-testid="grade-level-select"
         @dismissed="setGradeLevelTaskDismissed"
       />
@@ -124,7 +124,7 @@ import {
 } from '@/utils/secondary-email-modal-utils'
 import { defineAsyncComponent } from 'vue'
 import CoachingInvitationModal from '@/views/DashboardView/StudentDashboard/CoachingInvitationModal.vue'
-import GradeLevelSelect from '@/views/GradeLevelSelect.vue'
+import GradeLevelTask from '@/views/GradeLevelTask.vue'
 
 const ImpactStudySurveyModal = defineAsyncComponent(
   () => import('./ImpactStudySurveyModal.vue')
@@ -136,7 +136,7 @@ const FallIncentiveEnrollmentModal = defineAsyncComponent(
 export default {
   name: 'student-dashboard',
   components: {
-    GradeLevelSelect,
+    GradeLevelTask,
     CoachingInvitationModal,
     SecondaryEmailModal,
     DashboardBanner,
