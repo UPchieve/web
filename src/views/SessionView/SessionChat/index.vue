@@ -587,6 +587,13 @@ export default {
         this.pendingTextMessages.push(newMessage)
       }
 
+      if (newMessage.isLatex) {
+        AnalyticsService.captureEvent(EVENTS.LATEX_MESSAGE_SENT, {
+          userType: this.isStudent ? 'student' : 'volunteer',
+          subject: this.currentSession.subTopic,
+        })
+      }
+
       this.handleOutgoingMessage(newMessage)
       this.scrollToBottom()
       this.resetComposer()
@@ -940,6 +947,11 @@ export default {
       })
 
       mathField.addEventListener('change', () => commit(false))
+
+      AnalyticsService.captureEvent(EVENTS.TIP_TAP_EDITOR_OPENED, {
+        userType: this.isStudent ? 'student' : 'volunteer',
+        subject: this.currentSession.subTopic,
+      })
 
       this.$nextTick(() => {
         mathField.focus()
