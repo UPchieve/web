@@ -459,6 +459,7 @@ export default {
         const update = {
           occupation: data.occupation,
           country: data.country,
+          gradeLevel: data.gradeLevel ?? this.user.gradeLevel ?? '',
         }
         await this.$store.dispatch('user/addToUser', update)
       } catch (error) {

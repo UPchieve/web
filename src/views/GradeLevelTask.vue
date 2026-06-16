@@ -24,20 +24,22 @@ onMounted(() => {
 
 async function saveGradeLevel() {
   try {
-    const gradeLevel = selectedGradeLevel.value.split(' ')[0] // i.e. "8th grade" => "8th"
     isError.value = false
     isSaving.value = true
     await UserService.setProfile(
       {
-        gradeLevel,
+        gradeLevel: selectedGradeLevel.value,
       },
       store
     )
     AnalyticsService.captureEvent(EVENTS.UPDATED_GRADE_LEVEL, {
       userType: store.getters['user/userType'],
-      gradeLevel,
+      gradeLevel: selectedGradeLevel.value,
     })
     updated.value = true
+    await store.dispatch('user/addToUser', {
+      gradeLevel: selectedGradeLevel.value,
+    })
   } catch (err) {
     LoggerService.noticeError(err, 'Failed to update user grade level')
     isError.value = true

@@ -289,6 +289,28 @@
           </div>
 
           <div
+            v-if="showSection(ProfileSections.GRADE_LEVEL, showGradeLevel)"
+            class="container-section"
+          >
+            <hr />
+            <div class="prompt">
+              Confirm your grade level for the
+              {{ getAcademicYear().asString }} academic year
+            </div>
+            <div class="description">
+              This helps us tailor your UPchieve experience to you.
+            </div>
+            <GradeLevelSelect
+              v-model="selectedGradeLevel"
+              :modelValue="selectedGradeLevel"
+              @update:modelValue="saveGradeLevel"
+              :placeholder="
+                user.gradeLevel ? user.gradeLevel + ' grade' : 'Grade level'
+              "
+            />
+          </div>
+
+          <div
             v-if="showSection(ProfileSections.TUTORING_LANGUAGES)"
             class="container-section"
           >
@@ -453,6 +475,9 @@ import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { IonToast } from '@ionic/vue'
 import TutoringExperienceQuestion from '@/views/TutoringExperienceQuestion.vue'
+import { VolunteerOccupations } from '@/services/VolunteerService'
+import { getAcademicYear } from '../../utils/academic-year'
+import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 
 const ProfileSections = {
   EMAIL: 'email',
@@ -468,6 +493,7 @@ const ProfileSections = {
   DELETE_ACCOUNT: 'deleteAccount',
   UNLOCKED_SUBJECTS: 'unlockedSubjects',
   TUTORING_EXPERIENCE: 'tutoringExperience',
+  GRADE_LEVEL: 'gradeLevel',
 }
 
 const RoleSections = {
@@ -481,6 +507,7 @@ const RoleSections = {
     ProfileSections.RESET_PASSWORD,
     ProfileSections.DELETE_ACCOUNT,
     ProfileSections.UNLOCKED_SUBJECTS,
+    ProfileSections.GRADE_LEVEL, // only if they are in high school
   ],
   student: [
     ProfileSections.EMAIL,
@@ -490,6 +517,7 @@ const RoleSections = {
     ProfileSections.PREFERRED_LANGUAGE,
     ProfileSections.RESET_PASSWORD,
     ProfileSections.DELETE_ACCOUNT,
+    ProfileSections.GRADE_LEVEL,
   ],
   teacher: [
     ProfileSections.EMAIL,
@@ -502,6 +530,7 @@ const RoleSections = {
 export default {
   name: 'profile-view',
   components: {
+    GradeLevelSelect,
     TutoringExperienceQuestion,
     IonToast,
     SecondaryEmailModal,
@@ -539,6 +568,7 @@ export default {
       smsConsent: false,
       newMutedSubjectAlerts: [],
       showSecondaryEmailModal: false,
+      selectedGradeLevel: '',
       errorMessage: '',
     }
   },
@@ -584,6 +614,15 @@ export default {
       hasStudentRole: 'user/hasStudentRole',
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),
+    showGradeLevel() {
+      return (
+        this.isStudent ||
+        (this.isVolunteer &&
+          this.user.occupation?.includes(
+            VolunteerOccupations.HIGH_SCHOOL_STUDENT
+          ))
+      )
+    },
     isPartnerTeacher() {
       return this.isTeacher && this.user.isSchoolPartner
     },
@@ -632,11 +671,25 @@ export default {
     },
   },
   methods: {
-    showSection(sectionName) {
-      if (this.isVolunteer) return RoleSections.volunteer.includes(sectionName)
-      if (this.isStudent) return RoleSections.student.includes(sectionName)
-      if (this.isTeacher) return RoleSections.teacher.includes(sectionName)
-      return false
+    async saveGradeLevel() {
+      await this.setProfile(
+        this.createUpdateProfileRequestBody({
+          gradeLevel: this.selectedGradeLevel,
+        }),
+        'grade level'
+      )
+    },
+    getAcademicYear,
+    showSection(sectionName, additionalCriteria = true) {
+      let maybeShowSection = false
+      if (this.isVolunteer)
+        maybeShowSection = RoleSections.volunteer.includes(sectionName)
+      if (this.isStudent)
+        maybeShowSection = RoleSections.student.includes(sectionName)
+      if (this.isTeacher)
+        maybeShowSection = RoleSections.teacher.includes(sectionName)
+      // apply optional additional filters
+      return maybeShowSection && additionalCriteria
     },
     onPreferredLanguageError(err) {
       this.errorMessage =

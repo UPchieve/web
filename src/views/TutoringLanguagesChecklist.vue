@@ -17,7 +17,7 @@ const languageOptions = computed((): string[] => {
   // Include whatever "Other" language the user may have supplied
   const l = new Set<string>(LANGUAGES.map((lang) => lang.name))
   userTutoringLanguages.value.forEach((lang) => l.add(lang))
-  return Array.from(l)
+  return Array.from(l).filter((l) => l !== 'English')
 })
 const selectedOptions = ref<string[]>(userTutoringLanguages.value ?? [])
 const selectedLanguages = computed(() => {
