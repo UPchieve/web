@@ -1,5 +1,5 @@
 <template>
-  <div class="feedback">
+  <div class="feedback" ref="feedbackMainContainer">
     <div class="feedback__container">
       <header
         class="feedback__header-container"
@@ -512,6 +512,9 @@ export default {
     },
   },
   methods: {
+    scrollToTop() {
+      this.$refs.feedbackMainContainer.scrollIntoView({ behavior: 'smooth' })
+    },
     optOutOfNomination() {
       AnalyticsService.captureEvent(EVENTS.COACH_SKIPPED_NOMINATION, {
         sessionId: this.session.id,
@@ -841,6 +844,8 @@ export default {
       } else {
         this.surveySubmitted = true
       }
+
+      this.scrollToTop()
     },
     // builds a default user response to be stored in state that maps a survey question ID to a response map
     buildUserResponse() {
