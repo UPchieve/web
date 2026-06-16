@@ -137,7 +137,7 @@
             <p class="background-info__question-description">
               Select all that apply.
             </p>
-            <p v-if="showInputErrors && occupation.length === 0" class="error">
+            <p v-if="showInputErrors && occupations.length === 0" class="error">
               Please fill out this field.
             </p>
             <div
@@ -148,7 +148,7 @@
               <input
                 type="checkbox"
                 :value="option"
-                v-model="occupation"
+                v-model="occupations"
                 :id="option"
                 :data-testid="option"
               />
@@ -189,6 +189,17 @@
                 autocomplete="off"
               />
             </template>
+          </li>
+
+          <li v-if="isInHighSchool">
+            <p data-testid="grade-level-question" class="uc-form-label">
+              What grade will you be in during the
+              {{ getAcademicYear().asString }} academic year?<span
+                class="background-info__question-required"
+                >*</span
+              >
+            </p>
+            <GradeLevelSelect v-model="gradeLevel" />
           </li>
 
           <li class="uc-form-col">
@@ -262,10 +273,13 @@ import { isEmpty } from 'lodash-es'
 import Callout from '@/components/Callout.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
+import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
+import { getAcademicYear } from '../utils/academic-year'
 
 export default {
   name: 'background-info-view',
   components: {
+    GradeLevelSelect,
     FormSearchableSelect,
     Callout,
     LargeButton,
@@ -278,7 +292,7 @@ export default {
       },
       showInputErrors: false,
       formError: '',
-      occupation: [],
+      occupations: [],
       linkedInUrl: '',
       wasSubmitted: false,
       country: '',
@@ -294,12 +308,16 @@ export default {
       phoneInputInfo: {},
       phoneNumber: '',
       showRemovedFromNTHSMessage: false,
+      gradeLevel: '',
     }
   },
   async beforeMount() {
     await this.getSignupSources()
   },
   computed: {
+    isInHighSchool() {
+      return this.occupations.includes(VolunteerOccupations.HIGH_SCHOOL_STUDENT)
+    },
     ...mapState({
       user: (state) => state.user.user,
     }),
@@ -332,13 +350,13 @@ export default {
     },
     isCollegeEducated() {
       return (
-        this.occupation.includes('An undergraduate student') ||
-        this.occupation.includes('A graduate student')
+        this.occupations.includes('An undergraduate student') ||
+        this.occupations.includes('A graduate student')
       )
     },
     isWorkingFullTime() {
       return (
-        this.occupation.includes('Working full-time') &&
+        this.occupations.includes('Working full-time') &&
         !this.user.volunteerPartnerOrg
       )
     },
@@ -356,6 +374,7 @@ export default {
     },
   },
   methods: {
+    getAcademicYear,
     goToDashboard() {
       this.$router.push('/dashboard')
     },
@@ -403,7 +422,7 @@ export default {
       this.wasSubmitted = true
 
       const data = {
-        occupation: this.occupation,
+        occupation: this.occupations,
         linkedInUrl: this.linkedInUrl,
         country: this.country,
         state: this.isUnitedStatesSelected ? this.state : '',
@@ -413,6 +432,7 @@ export default {
         phoneNumber: this.phoneNumber,
         signupSourceId: this.signupSourceId,
         otherSignupSource: this.otherSignupSource,
+        gradeLevel: this.isInHighSchool ? this.gradeLevel : undefined, // only send up if HS occupation remains selected
       }
 
       try {
@@ -452,14 +472,15 @@ export default {
     },
     invalidForm() {
       return (
-        this.occupation.length === 0 ||
+        this.occupations.length === 0 ||
         (this.signedUpWithGoogle && !this.phoneNumber) ||
         !this.country ||
         !this.city ||
         (this.isUnitedStatesSelected && !this.state) ||
         !this.isValidLinkedInUrl ||
         (this.isCollegeEducated && !this.college) ||
-        (this.isWorkingFullTime && !this.company)
+        (this.isWorkingFullTime && !this.company) ||
+        (this.isInHighSchool && !this.gradeLevel)
       )
     },
   },

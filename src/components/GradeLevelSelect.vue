@@ -3,9 +3,16 @@ import { GRADES } from '@/consts'
 import { getAcademicYear } from '@/utils/academic-year'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 
-const academicYear = getAcademicYear()
+type GradeLevelSelectProps = {
+  modelValue: any
+  placeholder: string
+  label: string
+}
 const emit = defineEmits(['update:modelValue'])
-const props = defineProps(['modelValue'])
+const props = withDefaults(defineProps<GradeLevelSelectProps>(), {
+  placeholder: 'Grade level',
+  label: `What grade will you be in during the ${getAcademicYear().asString} academic year?`,
+})
 
 function trimGradeLevel(gradeLevel: string) {
   return gradeLevel.split(' ')[0]
@@ -17,8 +24,8 @@ function trimGradeLevel(gradeLevel: string) {
     :value="props.modelValue"
     name="grade level"
     :options="GRADES"
-    placeholder="Grade level"
-    :label="`What grade will you be in during the ${academicYear.asString} academic year?`"
+    :placeholder="props.placeholder"
+    :label="props.label"
     @update:modelValue="emit('update:modelValue', $event)"
     :reduce="trimGradeLevel"
   />
