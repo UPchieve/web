@@ -727,6 +727,7 @@ export default {
           hasVolunteerRole: getters.hasVolunteerRole,
           hasTeacherRole: getters.hasTeacherRole,
           occupation: state.user.occupation?.join(', '),
+          lastActivityAt: state.user.lastActivityAt,
         }
         userProps.partner =
           state.user.volunteerPartnerOrg ?? state.user.studentPartnerOrg
