@@ -18,13 +18,13 @@ shift  # Remove first argument, keep the rest
 
 case "$COMMAND" in
     scan)
-        .venv/bin/detect-secrets scan --baseline .secrets.baseline --exclude-files package-lock.json "$@"
+        .venv/bin/detect-secrets scan --baseline .secrets.baseline --exclude-files pnpm-lock.yaml "$@"
         ;;
     audit)
         .venv/bin/detect-secrets audit .secrets.baseline "$@"
         ;;
     hook)
-        git diff --staged --name-only -z | xargs -0 .venv/bin/detect-secrets-hook --baseline .secrets.baseline --exclude-files package-lock.json "$@"
+        git diff --staged --name-only -z | xargs -0 .venv/bin/detect-secrets-hook --baseline .secrets.baseline --exclude-files pnpm-lock.yaml "$@"
         ;;
     *)
         echo "❌ Error: Unknown command '$COMMAND'"

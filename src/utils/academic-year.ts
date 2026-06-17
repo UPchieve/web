@@ -1,4 +1,5 @@
-import moment from 'moment-timezone'
+import { dayjs } from '@/utils/time-utils'
+
 export function getAcademicYear(): {
   yearStart: number
   yearEnd: number
@@ -6,7 +7,7 @@ export function getAcademicYear(): {
 } {
   // We want the most recent academic year that the student is in or has completed
   // to work with the grade level calculation on the backend. Consider July 1 the start of the school year.
-  const today = moment()
+  const today = dayjs()
   const JULY_MONTH = 6 // 0-indexed
   let yearStart: null | number
   let yearEnd: null | number
