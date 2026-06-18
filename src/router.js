@@ -111,37 +111,6 @@ const autoflowRedirect = (to, from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
   else next()
 }
-const switchToVolunteerOrCancel = async (_to, _from, next) => {
-  if (store.getters['user/isVolunteer']) {
-    next() // already volunteer, continue
-  } else if (store.getters['user/hasVolunteerRole']) {
-    try {
-      await UserService.switchActiveRole({ $store: store }, 'volunteer')
-      next() // switch and continue
-    } catch {
-      next('/dashboard')
-    }
-  } else {
-    next('/dashboard') // not a volunteer at all, prevent nav
-  }
-}
-
-const ensureActiveRoleMatchesSessionRole = async (_to, _from, next) => {
-  if (typeof store.getters['user/roleInCurrentSession'] === 'undefined') {
-    await store.dispatch('user/fetchSession')
-  }
-
-  if (
-    store.getters['user/userType'] !==
-    store.getters['user/roleInCurrentSession']
-  ) {
-    await UserService.switchActiveRole(
-      { $store: store },
-      store.getters['user/roleInCurrentSession']
-    )
-  }
-  next()
-}
 
 async function getAuthStatus(to, isBlockingRoute) {
   try {
@@ -454,7 +423,6 @@ const routes = [
         volunteer: [FeedbackView, ...VOLUNTEER_SIDEBAR_LINKED_VIEWS],
       },
     },
-    beforeEnter: [ensureActiveRoleMatchesSessionRole],
   },
   {
     path: '/resources',
@@ -511,14 +479,13 @@ const routes = [
         ],
       },
     },
-    beforeEnter: [autoflowRedirect, switchToVolunteerOrCancel],
+    beforeEnter: autoflowRedirect,
   },
   {
     path: '/training/review/:category',
     name: 'ReviewMaterialsView',
     component: ReviewMaterialsView,
     meta: { protected: true },
-    beforeEnter: [autoflowRedirect, switchToVolunteerOrCancel],
   },
   {
     path: '/training/:category/quiz',
@@ -531,7 +498,6 @@ const routes = [
     name: 'TrainingCourseView',
     component: TrainingCourseView,
     meta: { protected: true },
-    beforeEnter: [switchToVolunteerOrCancel],
   },
   {
     path: '/profile',
@@ -564,7 +530,7 @@ const routes = [
       protected: true,
       preloadViews: { volunteer: VOLUNTEER_SIDEBAR_LINKED_VIEWS },
     },
-    beforeEnter: [autoflowRedirect, switchToVolunteerOrCancel],
+    beforeEnter: autoflowRedirect,
   },
   {
     path: '/admin',
