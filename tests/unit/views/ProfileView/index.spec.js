@@ -10,6 +10,7 @@ import { vi } from 'vitest'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import { nextTick } from 'vue'
 import vuetify from '@/plugins/vuetify'
+import { VolunteerOccupations } from '@/services/VolunteerService'
 
 describe('ProfileView', () => {
   let DEFAULT_FLAGS_GETTERS, DEFAULT_USER
@@ -154,6 +155,70 @@ describe('ProfileView', () => {
         ).toEqual(expected)
       }
     )
+
+    test('Shows the grade level question for students', async () => {
+      const wrapper = getWrapper({
+        user: {
+          getters: {
+            isStudent: () => true,
+          },
+        },
+      })
+      expect(
+        wrapper.find('[data-testid="grade-level-select"]').isVisible()
+      ).toEqual(true)
+    })
+
+    test('Does not show the grade level question for non-HS volunteers', async () => {
+      const wrapper = getWrapper({
+        user: {
+          getters: {
+            isStudent: () => false,
+            isVolunteer: () => true,
+          },
+          state: {
+            occupation: ['A graduate student'],
+          },
+        },
+      })
+      expect(
+        wrapper.find('[data-testid="grade-level-select"]').exists()
+      ).toEqual(false)
+    })
+
+    test('Does not show the grade level question for non-HS volunteers (no occupation)', async () => {
+      const wrapper = getWrapper({
+        user: {
+          getters: {
+            isStudent: () => false,
+            isVolunteer: () => true,
+          },
+        },
+      })
+      expect(
+        wrapper.find('[data-testid="grade-level-select"]').exists()
+      ).toEqual(false)
+    })
+
+    test('Shows the grade level question for HS volunteers', async () => {
+      const wrapper = getWrapper({
+        user: {
+          getters: {
+            isStudent: () => false,
+            isVolunteer: () => true,
+          },
+          state: {
+            occupation: [
+              'Working part-time',
+              VolunteerOccupations.HIGH_SCHOOL_STUDENT,
+            ],
+          },
+        },
+      })
+      expect(
+        wrapper.find('[data-testid="grade-level-select"]').isVisible()
+      ).toEqual(true)
+    })
   })
 
   describe('Phone numbers', () => {

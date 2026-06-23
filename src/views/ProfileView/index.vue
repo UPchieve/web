@@ -291,6 +291,7 @@
           <div
             v-if="showSection(ProfileSections.GRADE_LEVEL, showGradeLevel)"
             class="container-section"
+            data-testid="grade-level-select"
           >
             <hr />
             <div class="prompt">
@@ -615,13 +616,15 @@ export default {
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),
     showGradeLevel() {
-      return (
-        this.isStudent ||
-        (this.isVolunteer &&
-          this.user.occupation?.includes(
-            VolunteerOccupations.HIGH_SCHOOL_STUDENT
-          ))
-      )
+      if (this.isStudent) {
+        return true
+      }
+      if (this.isVolunteer) {
+        return (this.user.occupation ?? []).includes(
+          VolunteerOccupations.HIGH_SCHOOL_STUDENT
+        )
+      }
+      return false
     },
     isPartnerTeacher() {
       return this.isTeacher && this.user.isSchoolPartner
