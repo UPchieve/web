@@ -743,6 +743,7 @@ export default {
           hasTeacherRole: getters.hasTeacherRole,
           occupation: state.user.occupation?.join(', '),
           lastActivityAt: state.user.lastActivityAt,
+          gradeLevel: state.user.gradeLevel,
         }
         userProps.partner =
           state.user.volunteerPartnerOrg ?? state.user.studentPartnerOrg
@@ -800,9 +801,6 @@ export default {
             ...certificationInfo,
           }
           userProps.hasSubjectCertification = hasSubjectCertification
-        }
-        if (getters.hasStudentRole) {
-          userProps.gradeLevel = state.user.gradeLevel
         }
 
         if (getters.hasStudentRole || getters.hasTeacherRole) {
