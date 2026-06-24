@@ -1,4 +1,4 @@
-import LogoIcon from '@/assets/logo-02.png'
+import LogoIcon from '@/assets/logos/logo-02.png'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'

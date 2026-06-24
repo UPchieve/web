@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import LogoImageUrl from '@/assets/header-logo-teal.svg?url'
+import LogoImageUrl from '@/assets/logos/header-logo-teal.svg?url'
 import getOperatingSystem from '@/utils/get-operating-system'
 import AppStoreLogo from '@/assets/app-store-logo.svg'
 import { GOOGLE_PLAY_STORE_LINK, APP_STORE_LINK } from '@/consts'

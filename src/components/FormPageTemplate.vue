@@ -33,7 +33,7 @@
         <img
           v-if="!hideLogo"
           class="logo teal"
-          src="@/assets/header-logo-teal.svg?url"
+          src="@/assets/logos/header-logo-teal.svg?url"
           aria-hidden
         />
         <slot></slot>
@@ -41,7 +41,7 @@
     </div>
     <img
       class="logo white"
-      src="@/assets/header-logo-teal.svg?url"
+      src="@/assets/logos/header-logo-teal.svg?url"
       aria-hidden
     />
 

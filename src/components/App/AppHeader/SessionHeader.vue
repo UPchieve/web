@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import LogoImageUrl from '@/assets/header-logo-teal.svg?url'
+import LogoImageUrl from '@/assets/logos/header-logo-teal.svg?url'
 import ReportSessionButton from '@/components/ReportSessionButton.vue'
 import EndSessionButton from '@/components/EndSessionButton.vue'
 import { mapGetters } from 'vuex'
