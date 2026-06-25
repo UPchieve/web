@@ -84,7 +84,7 @@
         data-testid="student-email-input"
         :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
         :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
-        label="Student Email"
+        label="Email"
         :is-required="false"
         v-bind:class="{
           'uc-form-text-input-invalid': hasFormValidationError(
@@ -426,7 +426,7 @@
             v-bind:class="{
               error: hasFormValidationError(v$.eligibility.studentEmail),
             }"
-            >Student Email</label
+            >Email</label
           >
           <div
             v-if="hasFormValidationError(v$.eligibility.studentEmail)"
