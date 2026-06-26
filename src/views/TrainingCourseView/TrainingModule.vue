@@ -480,6 +480,24 @@ function goToResource(externalLink: string) {
                 <p>❌ Say, “#5 is wrong. The answer is actually XYZ.”</p>
               </td>
             </tr>
+
+            <tr class="do-donts-header">
+              <th colspan="1" class="do-donts-cell">Use AI Responsibly</th>
+            </tr>
+            <tr class="do-donts-row">
+              <td class="do-donts-cell">
+                <p>
+                  ✅ Use UPbot to find alternative explanations, generate
+                  practice problems, clarify language, and refresh your memory.
+                </p>
+              </td>
+              <td class="do-donts-cell">
+                <p>
+                  ❌ Use AI to write or rewrite essays, provide feedback on
+                  essays, or generate full explanations.
+                </p>
+              </td>
+            </tr>
           </table>
 
           <div class="blue-information-box do-donts-information">
