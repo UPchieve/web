@@ -56,6 +56,7 @@ export default {
 .session-header {
   @include flex-container(row, space-between, center);
   flex: 1;
+  background-color: var(--bg-color);
 
   @include header-child;
 
@@ -85,7 +86,7 @@ export default {
 
   &__dashboard-link {
     text-decoration: none;
-    color: $c-soft-black;
+    color: var(--text-color);
   }
 }
 </style>

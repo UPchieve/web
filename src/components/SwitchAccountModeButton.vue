@@ -121,7 +121,7 @@ const closeErrorModal = () => {
 }
 
 .switch-role-button {
-  color: $c-information-blue;
+  color: var(--switch-role-button-color);
   font-weight: 500;
 }
 </style>

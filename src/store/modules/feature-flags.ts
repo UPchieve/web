@@ -64,7 +64,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.INVITATION_TO_COACH]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: true,
+      [POSTHOG_FEATURE_FLAGS.S2V_THEMING]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -292,5 +293,7 @@ export default {
       ],
     isShowDMNotificationsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
+    isS2VThemingEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.S2V_THEMING],
   },
 }

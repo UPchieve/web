@@ -980,6 +980,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   SHOW_DM_NOTIFICATIONS = 'show-dm-notifications',
   INVITATION_TO_COACH = 'invitation-to-coach',
   SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE = 'show-student-to-volunteer-hours-page',
+  S2V_THEMING = 's2v-theming',
 }
 
 export const ANALYTICS_REPORT_ROW = {

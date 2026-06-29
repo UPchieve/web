@@ -10,7 +10,7 @@
           text="Request AI help"
           emphasized
         >
-          <chat-bot-icon class="icon" />
+          <chat-bot-icon class="icon keep-original-color" />
         </sidebar-link>
         <sidebar-link
           v-if="!isTeacher"
@@ -191,7 +191,7 @@
           text="Contact us"
           id="contact-us-sidebar-link"
         >
-          <hand-wave-icon class="icon" />
+          <hand-wave-icon class="icon hand-wave-icon" />
         </sidebar-link>
         <sidebar-link
           v-if="isVolunteer && showSlackButton"
@@ -200,7 +200,7 @@
           :openNewTab="true"
           id="community-sidebar-link"
         >
-          <slack-logo-icon class="icon" />
+          <slack-logo-icon class="icon keep-original-color" />
         </sidebar-link>
       </div>
     </div>
@@ -412,7 +412,7 @@ export default {
 
   &-about {
     @include font-category('body');
-    color: $c-secondary-grey;
+    color: var(--secondary-text-color);
     margin-top: 40px;
     text-align: left;
   }
@@ -440,9 +440,23 @@ export default {
   width: 24px;
 }
 
+:deep(.SidebarLink .icon) {
+  color: var(--text-color);
+}
+:deep(.SidebarLink .icon:not(.keep-original-color) path) {
+  fill: var(--text-color);
+}
 :deep(.SidebarLink--active .icon path) {
   fill: $c-success-green;
 }
+:deep(.SidebarLink .icon.hand-wave-icon path) {
+  fill: none;
+  stroke: var(--text-color);
+}
+:deep(.SidebarLink .hand-wave-icon g) {
+  stroke: none;
+}
+
 // Order here matters - we want to set fill to none for
 // the heart icon.
 :deep(.SidebarLink--active .star-icon path) {
@@ -450,6 +464,6 @@ export default {
 }
 
 :deep(.SidebarLink--active .compass-icon path) {
-  fill: $c-soft-black;
+  fill: var(--text-color);
 }
 </style>

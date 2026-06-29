@@ -48,7 +48,7 @@ export default {
 .AppSidebar {
   @include bind-app-sidebar-width(width);
 
-  background: white;
+  background: var(--bg-color);
   box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
   height: 100%;
   overflow-y: auto;
@@ -71,5 +71,6 @@ export default {
   @include flex-container(column);
   height: 100%;
   position: relative;
+  background-color: var(--bg-color);
 }
 </style>

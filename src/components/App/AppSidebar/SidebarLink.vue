@@ -1,7 +1,8 @@
 <template>
   <div>
     <a v-if="openNewTab" :href="to" target="_blank" :class="parentClass"
-      ><slot></slot>{{ text }}</a
+      ><slot></slot>
+      <p>{{ text }}</p></a
     >
     <div v-else-if="onClick" :class="parentClass" @click="onClick">
       <slot></slot>
@@ -91,7 +92,7 @@ export default {
   cursor: pointer;
 
   p {
-    color: $c-soft-black;
+    color: var(--text-color);
     margin: 0;
     padding: 0;
   }

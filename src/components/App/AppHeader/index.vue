@@ -170,6 +170,7 @@ export default {
 .menu-container {
   left: 15px;
   position: absolute;
+  fill: var(--text-color);
 
   .menu-notification {
     height: 10px;

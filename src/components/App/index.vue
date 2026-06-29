@@ -1,32 +1,34 @@
 <template>
-  <div id="app" class="App" :class="isIOS && 'is-ios'">
-    <Celebration />
-    <ion-app>
-      <ion-content>
-        <refresh-app-alert v-if="doMountRefreshAppAlert" />
-        <route-loading-indicator />
-        <app-header v-show="showHeader" />
-        <app-sidebar v-if="showSidebar" />
-        <app-modal v-if="showModal" />
-        <app-banner v-if="showBanner" />
-        <div
-          :class="{
-            'App-router-view-wrapper': true,
-            'App-router-view-wrapper--header': showHeader,
-            'App-router-view-wrapper--sidebar': showSidebar,
-          }"
-        >
-          <attention-boxes v-if="shouldShowInAppSessionNotifications" />
-          <router-view v-slot="{ Component, route }">
-            <component
-              :is="Component"
-              :key="route.meta.disableComponentReuse ? route.path : undefined"
-            />
-          </router-view>
-        </div>
-      </ion-content>
-    </ion-app>
-  </div>
+  <AppTheme>
+    <div id="app" class="App" :class="isIOS && 'is-ios'">
+      <Celebration />
+      <ion-app>
+        <ion-content>
+          <refresh-app-alert v-if="doMountRefreshAppAlert" />
+          <route-loading-indicator />
+          <app-header v-show="showHeader" />
+          <app-sidebar v-if="showSidebar" />
+          <app-modal v-if="showModal" />
+          <app-banner v-if="showBanner" />
+          <div
+            :class="{
+              'App-router-view-wrapper': true,
+              'App-router-view-wrapper--header': showHeader,
+              'App-router-view-wrapper--sidebar': showSidebar,
+            }"
+          >
+            <attention-boxes v-if="shouldShowInAppSessionNotifications" />
+            <router-view v-slot="{ Component, route }">
+              <component
+                :is="Component"
+                :key="route.meta.disableComponentReuse ? route.path : undefined"
+              />
+            </router-view>
+          </div>
+        </ion-content>
+      </ion-app>
+    </div>
+  </AppTheme>
 </template>
 
 <script>
@@ -52,6 +54,7 @@ import Celebration from '@/components/Celebration.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS } from '@/consts'
 import RouteLoadingIndicator from '../RouteLoadingIndicator.vue'
+import AppTheme from './AppTheme.vue'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
@@ -68,6 +71,7 @@ export default {
     IonContent,
     Celebration,
     RouteLoadingIndicator,
+    AppTheme,
   },
   data() {
     return {

@@ -31,6 +31,7 @@ export default {
 .DefaultHeader {
   @include header-child;
   @include flex-container(row, center, center);
+  background-color: var(--bg-color);
 }
 
 .DefaultHeader-logo {

@@ -308,13 +308,13 @@ function logout() {
 }
 .first-name {
   @include font-category(subheading);
-  color: $c-soft-black;
+  color: var(--text-color);
   margin-top: 4px;
   margin-bottom: 0px;
 }
 
 .account-type {
-  color: $c-secondary-grey;
+  color: var(--secondary-text-color);
   font-size: 14px;
   line-height: 1.15;
   margin-bottom: 0;
