@@ -969,7 +969,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   NEW_VOLUNTEER_SIGN_UP_FLOW = 'new-volunteer-sign-up-flow',
   USER_IS_APPROVED_NTHS_PRESIDENT = 'user-is-approved-nths-president',
   GET_SESSION_SUMMARY = 'get-session-summary',
-  MODERATE_ZWIBBLER_TEXT_NODES = 'moderate-zwibbler-text-nodes',
   NTHS_APPLICATION_PAGE = 'nths-application-page',
   PRESESSION_FAKE_DOOR_QUESTION = 'presession-fake-door-question',
   UPBOT_SESSION_EDITOR_CONTEXT = 'upbot-session-editor-context',

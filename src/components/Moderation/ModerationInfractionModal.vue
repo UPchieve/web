@@ -60,6 +60,10 @@ const reasons = computed(() => {
 
 const RESHARE_SCREEN_MESSAGE = `Please check the content of your screen for any potentially problematic content, and remove it before sharing your screen again. `
 const detailedMessage = computed(() => {
+  if (props.moderationInfraction.source === 'whiteboard_text_node') {
+    return
+  }
+
   let message =
     "For everyone's safety, your screen share and microphone have been disabled. "
   if (

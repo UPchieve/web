@@ -589,8 +589,6 @@ export default {
       isBanned: 'user/banType',
       partnerImageUploadError: 'socket/partnerImageUploadError',
       partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
-      isModerateZwibblerTextNodesEnabled:
-        'featureFlags/isModerateZwibblerTextNodesEnabled',
     }),
     isAiWidgetHidden() {
       return this.aiWidgetHidden
@@ -633,7 +631,6 @@ export default {
   },
   methods: {
     async maybeHandleTextNodeInfraction(nodeIds) {
-      if (!this.isModerateZwibblerTextNodesEnabled) return
       const moderationResults = await this.moderateTextNodes(nodeIds)
       const failures = moderationResults.filter((result) => !!result)
 
