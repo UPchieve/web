@@ -132,6 +132,13 @@ const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {
     next('/dashboard') // not a volunteer at all, prevent nav
   }
 }
+const switchToTeacherOrCancel: NavigationGuard = async (_to, _from, next) => {
+  if (store.getters['user/isTeacher']) {
+    next()
+  } else {
+    next('/dashboard')
+  }
+}
 
 const ensureActiveRoleMatchesSessionRole: NavigationGuard = async (
   _to,
@@ -805,6 +812,7 @@ const routes: RouteRecordRaw[] = [
     name: 'TeacherDashboard',
     component: TeacherDashboardView,
     meta: { protected: true },
+    beforeEnter: [switchToTeacherOrCancel],
     children: [
       {
         path: 'class/:classId',
