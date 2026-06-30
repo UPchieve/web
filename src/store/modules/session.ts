@@ -1,6 +1,5 @@
 import type { ActionContext } from 'vuex'
 import LoggerService from '@/services/LoggerService'
-import type { RootState } from '@/store/index'
 import errorFromHttpResponse from '@/utils/error-from-http-response'
 import SessionService from '@/services/SessionService'
 
@@ -49,6 +48,41 @@ export default {
   } as SessionState,
 
   getters: {
+    sessionStatus(_state, _getters, rootState, rootGetters) {
+      const inSession = rootGetters['user/isSessionAlive']
+      const isVolunteer = rootGetters['user/isVolunteer']
+      const user = rootState.user.user
+      const status = {
+        text: 'Ready to chat',
+        class: '',
+      }
+
+      if (isVolunteer) {
+        status.text = 'Ready to help'
+      }
+
+      if (user?.banType === 'complete') {
+        status.class += 'indicator--banned'
+        status.text = 'Paused'
+      }
+
+      if (inSession) {
+        status.class += 'indicator--session'
+        status.text = 'Chat in session'
+      }
+
+      if (isVolunteer && !user?.isOnboarded) {
+        status.class += 'indicator--onboarding'
+        status.text = 'Onboarding'
+      }
+
+      if (isVolunteer && user?.isOnboarded && !user?.isApproved) {
+        status.class += 'indicator--onboarding'
+        status.text = 'Pending approval'
+      }
+
+      return status
+    },
     hasCooldown(state: SessionState) {
       return state.cooldownMinutes > 0
     },

@@ -61,6 +61,12 @@ function rejoinHelpSession() {
     store.getters['user/roleInCurrentSession']
   )
 }
+
+// Menu
+const isMenuOpen = ref<boolean>(false)
+function toggleMenuOpen(value: boolean) {
+  isMenuOpen.value = value
+}
 </script>
 
 <template>
@@ -71,7 +77,13 @@ function rejoinHelpSession() {
     >
       <template v-slot:heading-content>
         <div class="heading-content">
-          <Menu location="bottom start" class="settings-menu">
+          <Menu
+            location="bottom start"
+            :buttonHeightPx="20"
+            caretThickness="bold"
+            :isOpen="isMenuOpen"
+            @update:isOpen="toggleMenuOpen"
+          >
             <template v-slot:content>
               <MenuContent
                 :showLockedSessions="showLockedSessions"
@@ -112,19 +124,14 @@ function rejoinHelpSession() {
 </template>
 
 <style lang="scss" scoped>
-.settings-menu {
-  display: flex;
-  flex-direction: column;
-  margin-left: auto;
-}
 .waiting-students-content {
   width: 100%;
 }
 
 .heading-content {
   display: flex;
-  width: 100%;
   position: relative;
+  margin-left: auto;
 }
 .rejoin-session-container {
   width: 100%;
