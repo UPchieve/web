@@ -361,21 +361,21 @@ describe('Assignments View', () => {
       const wrapper = await getWrapper({
         data: { classData: { id: '123123' } },
       })
-      expect(wrapper.vm.isSelected).toBe('assignments')
-      const classDetailsBtn = wrapper.find('[data-testid="class-details-tab"]')
+      expect(wrapper.vm.isSelected).toBe('assignments-tab')
+      const classDetailsBtn = wrapper.find('[data-testid="students-tab"]')
       await classDetailsBtn.trigger('click')
       await flushPromises()
-      expect(wrapper.vm.isSelected).toBe('classDetails')
+      expect(wrapper.vm.isSelected).toBe('students-tab')
     })
 
     test('Click assignments tab', async () => {
       await router.push(`/dashboard/teacher/class/class-id`)
       const wrapper = await getWrapper()
-      expect(wrapper.vm.isSelected).toBe('classDetails')
+      expect(wrapper.vm.isSelected).toBe('students-tab')
       const assignmentsTab = wrapper.find('[data-testid="assignments-tab"]')
       await assignmentsTab.trigger('click')
       await flushPromises()
-      expect(wrapper.vm.isSelected).toBe('assignments')
+      expect(wrapper.vm.isSelected).toBe('assignments-tab')
     })
   })
 

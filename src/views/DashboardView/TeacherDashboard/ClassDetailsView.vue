@@ -51,22 +51,24 @@
       <div class="tabs">
         <p
           class="tabs__header-type"
-          :class="isSelected === 'classDetails' ? 'is-selected' : null"
-          @click="openTab(isSelected)"
-          data-testid="class-details-tab"
+          :class="isSelected === 'students-tab' ? 'is-selected' : null"
+          @click="openTab('students-tab')"
+          data-testid="students-tab"
+          role="button"
         >
           Students
         </p>
         <p
           class="tabs__header-type"
-          :class="isSelected === 'assignments' ? 'is-selected' : null"
-          @click="openTab(isSelected)"
+          :class="isSelected === 'assignments-tab' ? 'is-selected' : null"
+          @click="openTab('assignments-tab')"
           data-testid="assignments-tab"
+          role="button"
         >
           Assignments
         </p>
       </div>
-      <div v-if="isSelected === 'classDetails'" class="classes-container">
+      <div v-if="isSelected === 'students-tab'" class="classes-container">
         <loader v-if="isLoading" />
         <div v-else-if="!students.length">
           <div v-if="classData.cleverId" class="empty-sessions-container">
@@ -400,29 +402,35 @@ export default {
   },
 
   async created() {
-    this.classData = await this.getClassInfo(this.classId)
-    this.className = this.classData.name
-    this.topicId = this.classData.topicId
+    try {
+      this.isLoading = true
+      this.classData = await this.getClassInfo(this.classId)
+      this.className = this.classData.name
+      this.topicId = this.classData.topicId
 
-    const {
-      data: { teacherClasses },
-    } = await NetworkService.getTeacherClasses()
-    this.classes = teacherClasses.filter((c) => !c.deactivatedOn)
+      // TODO: Pass teacher classes from parent view instead.
+      const {
+        data: { teacherClasses },
+      } = await NetworkService.getTeacherClasses()
+      this.classes = teacherClasses.filter((c) => !c.deactivatedOn)
 
-    await this.$store.dispatch('subjects/awaitTopics')
-    if (this.classData.topicId) {
-      const topic = this.topics.find((t) => t.id === this.classData.topicId)
-      this.filters.topic.name = topic.name
-      this.subjectPlaceholder = topic.displayName
-    } else {
-      this.filters.topic.name = 'other'
-      this.subjectPlaceholder = 'All Subjects'
-    }
+      await this.$store.dispatch('subjects/awaitTopics')
+      if (this.classData.topicId) {
+        const topic = this.topics.find((t) => t.id === this.classData.topicId)
+        this.filters.topic.name = topic.name
+        this.subjectPlaceholder = topic.displayName
+      } else {
+        this.filters.topic.name = 'other'
+        this.subjectPlaceholder = 'All Subjects'
+      }
 
-    if (this.$route.path.includes('assignments')) {
-      await this.showAssignments()
-    } else {
-      this.students = await this.getStudents(this.classId)
+      await Promise.all([this.getClassStudents(), this.showAssignments()])
+    } catch {
+      this.showToast(
+        'Something went wrong. Please refresh the page and try again.',
+        true
+      )
+    } finally {
       this.isLoading = false
     }
   },
@@ -433,8 +441,8 @@ export default {
     },
     isSelected() {
       return this.$route.name === 'ClassDetailsView'
-        ? 'classDetails'
-        : 'assignments'
+        ? 'students-tab'
+        : 'assignments-tab'
     },
     isChildRoute() {
       return (
@@ -527,11 +535,11 @@ export default {
       }
     },
 
-    async getStudents(classId) {
+    async getClassStudents() {
       try {
         const {
           data: { students },
-        } = await NetworkService.getStudentsInTeacherClass(classId)
+        } = await NetworkService.getStudentsInTeacherClass(this.classId)
         const studentsAndSessions = await Promise.all(
           students.map(async (student) => {
             const {
@@ -607,9 +615,9 @@ export default {
 
           return dateB.diff(dateA)
         })
-
-        return studentsAndSessions
+        this.students = studentsAndSessions
       } catch (err) {
+        // TODO: There is no place where this error (and others) is shown.
         this.error =
           err.response.data.err ??
           'Unable to load students. Please refresh the page and try again.'
@@ -617,7 +625,7 @@ export default {
     },
 
     async submitFilter() {
-      this.students = await this.getStudents(this.$route.params.classId)
+      await this.getClassStudents(this.$route.params.classId)
     },
 
     openTeacherCodeModal() {
@@ -824,19 +832,13 @@ export default {
       )
     },
 
-    async openTab(isSelected) {
-      if (
-        isSelected === 'classDetails' &&
-        !this.$route.path.includes('assignments')
-      ) {
+    async openTab(tabTo) {
+      if (tabTo === 'students-tab') {
+        this.$router.push(`/dashboard/teacher/class/${this.classData.id}`)
+      } else if (tabTo === 'assignments-tab') {
         this.$router.push(
           `/dashboard/teacher/class/${this.classData.id}/assignments`
         )
-        await this.showAssignments()
-      } else {
-        this.$router.push(`/dashboard/teacher/class/${this.classData.id}`)
-        this.students = await this.getStudents(this.classId)
-        this.isLoading = false
       }
     },
 
