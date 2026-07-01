@@ -6,7 +6,7 @@
       </button>
     </div>
     <div class="loader-container" v-if="isLoading">
-      <loader class="loader" />
+      <loader />
     </div>
     <div v-else>
       <h1 class="assignment-header">
