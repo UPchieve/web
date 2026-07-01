@@ -30,6 +30,7 @@ const isMobileMode = computed(() => store.getters['app/mobileMode'])
 const isStudentVolunteer = computed(
   () => store.getters['user/isStudentVolunteer']
 )
+const isS2VThemingEnabled = store.getters['featureFlags/isS2VThemingEnabled']
 
 // Menu
 function goTo(path: string) {
@@ -82,6 +83,7 @@ function resetErrorMessage() {
       :buttonHeightPx="12"
       transition="slide-y-transition"
       :activatorId="props.activatorId"
+      :useS2vTheming="isS2VThemingEnabled"
     >
       <template v-slot:content>
         <div

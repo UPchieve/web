@@ -72,11 +72,7 @@ const userAccountType = computed(() => {
 </script>
 
 <template>
-  <div
-    :class="[
-      'user-avatar-container',
-    ]"
-  >
+  <div :class="['user-avatar-container']">
     <div
       :class="[
         'avatar-container',

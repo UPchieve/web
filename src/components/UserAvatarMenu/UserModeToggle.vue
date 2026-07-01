@@ -3,14 +3,17 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
+const router = useRouter()
 const userType = computed(() => store.getters['user/userType'])
 const emit = defineEmits<{
   (e: 'switchModeError', message: string): void
 }>()
 async function switchMode() {
   const targetMode = userType.value === 'student' ? 'volunteer' : 'student'
+  const isOnDashboard = router.currentRoute.value.path === '/dashboard'
   try {
     await UserService.switchActiveRole(
       {
@@ -18,6 +21,9 @@ async function switchMode() {
       },
       targetMode
     )
+    if (!isOnDashboard) {
+      await router.push('/dashboard')
+    }
   } catch (err) {
     LoggerService.noticeError(
       'Failed to switch account modes via UserModeToggle',
@@ -90,6 +96,7 @@ const sessionStatus = computed(
   padding: 4px;
   align-items: center;
   gap: 4px;
+  color: var(--secondary-text-color);
 
   &--selected {
     background-color: #e3f2fd;

@@ -13,6 +13,7 @@ export type MenuProps = {
   offsetY: number
   transition: 'scale-transition' | 'slide-x-transition' | 'slide-y-transition'
   activatorId: string
+  useS2vTheming: boolean
 }
 
 const props = withDefaults(defineProps<MenuProps>(), {
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<MenuProps>(), {
   offsetX: 0,
   offsetY: 0,
   transition: 'scale-transition',
+  useS2vTheming: false,
 })
 const buttonHeight = computed(() => props.buttonHeightPx + 'px')
 const store = useStore()
@@ -84,12 +86,12 @@ const activatorId = computed(() =>
         :backdrop-dismiss="true"
         :can-dismiss="true"
         presentation="sheet"
-        class="menu-modal"
+        :class="['menu-modal', { s2v: props.useS2vTheming }]"
       >
         <slot name="content" />
       </IonModal>
       <!--      On non-mobile, the menu opens in a popover-->
-      <div v-else class="menu">
+      <div v-else :class="['menu', { s2v: props.useS2vTheming }]">
         <slot name="content" />
       </div>
     </v-menu>
@@ -150,8 +152,7 @@ const activatorId = computed(() =>
 }
 
 .menu {
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: white;
   border: 2px solid $c-border-grey;
   box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
   padding: 12px;
@@ -160,7 +161,16 @@ const activatorId = computed(() =>
   width: max-content;
 }
 
+.menu.s2v {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
 :global(.menu-modal) {
+  --background: white;
+}
+
+:global(.menu-modal.s2v) {
   --background: var(--bg-color);
 }
 </style>
