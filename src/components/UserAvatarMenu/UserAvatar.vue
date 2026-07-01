@@ -5,6 +5,7 @@ import { computed } from 'vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import Case from 'case'
+import SwitchModeIcon from '@/assets/arrow-right-left.svg'
 
 const store = useStore()
 
@@ -31,6 +32,22 @@ const isMobileMode = computed(() => store.getters['app/mobileMode'])
 const user = computed(() => store.state.user.user)
 const sessionStatus = computed(() => store.getters['session/sessionStatus'])
 
+// Student-volunteer accounts
+const isStudentVolunteer = computed(
+  () => store.getters['user/isStudentVolunteer']
+)
+const userTypeDisplayName = computed(() => {
+  const userType = store.getters['user/userType']
+  return userType === 'volunteer' ? 'coach' : 'student'
+})
+const statusColor = computed(() => {
+  return sessionStatus.value.class === ''
+    ? '#16d2aa' // c-success-green
+    : sessionStatus.value.class === 'indicator--banned'
+      ? '#8b939f' // $c-banned-grey
+      : '#ff8c5f' // c-warning-orange
+})
+
 // Ambassador logic
 const showAmbassadorTitle = computed(
   () => store.getters['user/showAmbassadorTitle']
@@ -50,23 +67,36 @@ const userAccountType = computed(() => {
     AnalyticsService.captureEvent(EVENTS.AMBASSADOR_SAW_AMBASSADOR_TITLE)
     return 'Volunteer Ambassador'
   }
-  return Case.capital(store.getters['user/userType']) + ' Account'
+  return Case.capital(userTypeDisplayName.value) + ' Account'
 })
 </script>
 
 <template>
-  <div class="user-avatar-container">
+  <div
+    :class="[
+      'user-avatar-container',
+    ]"
+  >
     <div
-      class="avatar-container"
-      :class="{ 'avatar-container--indicator-ring': props.showIndicatorRing }"
+      :class="[
+        'avatar-container',
+        { 'avatar-container--indicator-ring': props.showIndicatorRing },
+        { 'avatar-container--indicator-ring-s2v': isStudentVolunteer },
+      ]"
     >
       <component :is="avatar?.component" class="avatar" aria-hidden="true" />
       <div
         v-if="props.showIndicatorRing"
-        class="indicator-container"
+        :class="[
+          'indicator-container',
+          { 'indicator-container--s2v': isStudentVolunteer },
+        ]"
         :aria-label="sessionStatus?.text"
       >
-        <div class="indicator" :class="sessionStatus?.class" />
+        <div v-if="isStudentVolunteer" class="switch-mode-icon-container">
+          <SwitchModeIcon />
+        </div>
+        <div v-else :class="['indicator', sessionStatus?.class]" />
       </div>
     </div>
     <div class="core-info-container">
@@ -133,6 +163,11 @@ const userAccountType = computed(() => {
   &--indicator-ring {
     border: 2px solid #d8dee5;
   }
+
+  &--indicator-ring-s2v {
+    border: 2px solid #d8dee5;
+    border-color: v-bind(statusColor);
+  }
 }
 
 .avatar {
@@ -149,6 +184,10 @@ const userAccountType = computed(() => {
   position: absolute;
   right: 1px;
   width: 15px;
+
+  &--s2v {
+    background: none;
+  }
 }
 
 .indicator {
@@ -169,6 +208,15 @@ const userAccountType = computed(() => {
   &--mobile {
     margin-right: 8px;
   }
+}
+
+.switch-mode-icon-container {
+  display: flex;
+  flex-direction: column;
+  border-radius: 50%;
+  padding: 2px;
+  background-color: white;
+  top: 1px;
 }
 
 .core-info-container {

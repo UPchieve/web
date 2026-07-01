@@ -1,16 +1,11 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
-import SwitchAccountModeButton from '@/components/SwitchAccountModeButton.vue'
 import UserAvatarMenu from '@/components/UserAvatarMenu/index.vue'
 
 const $store = useStore()
 
 const isAuthenticated = computed(() => $store.getters['user/isAuthenticated'])
-const isStudentVolunteer = computed(
-  () => $store.getters['user/isStudentVolunteer']
-)
-
 const isUserMenuOpen = ref<boolean>(false)
 </script>
 
@@ -20,11 +15,12 @@ const isUserMenuOpen = ref<boolean>(false)
       id="info-container"
       class="info-container"
       role="button"
-      :aria-label="isMenuOpen ? 'Close user menu' : 'Open user menu'"
-      :aria-expanded="isMenuOpen"
+      :aria-label="isUserMenuOpen ? 'Close user menu' : 'Open user menu'"
+      :aria-expanded="isUserMenuOpen"
       aria-haspopup="menu"
     >
       <UserAvatarMenu
+        id="user-avatar-menu"
         :showSessionStatusLabel="false"
         :showAccountModeLabel="true"
         v-model:isMenuOpen="isUserMenuOpen"
@@ -32,10 +28,6 @@ const isUserMenuOpen = ref<boolean>(false)
       />
     </div>
     <hr class="ml-2 mr-2" />
-    <SwitchAccountModeButton
-      v-if="isStudentVolunteer"
-      class="switch-account-mode-button"
-    />
   </div>
 </template>
 
@@ -83,10 +75,5 @@ const isUserMenuOpen = ref<boolean>(false)
 hr {
   margin: 0;
   border: 1px solid $c-background-grey;
-}
-
-.switch-account-mode-button {
-  padding-left: 20px;
-  padding-top: 15px;
 }
 </style>

@@ -43,7 +43,7 @@ const error = ref<string>('')
 const userId = computed(() => store.state.user.user.id)
 const userType = computed(() => store.getters['user/userType'])
 const alternateRole = computed(() =>
-  userType.value === 'student' ? 'volunteer' : 'student'
+  userType.value === 'student' ? 'coach' : 'student'
 )
 const alternateRoleNotOnboarded = computed(() => {
   return !store.state.user.user.isOnboarded && userType.value === 'student'

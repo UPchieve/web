@@ -48,7 +48,19 @@ export default {
   } as SessionState,
 
   getters: {
-    sessionStatus(_state, _getters, rootState, rootGetters) {
+    sessionStatus(
+      _state,
+      _getters,
+      rootState,
+      rootGetters
+    ): {
+      text: string
+      class:
+        | ''
+        | 'indicator--banned'
+        | 'indicator--session'
+        | 'indicator--onboarding'
+    } {
       const inSession = rootGetters['user/isSessionAlive']
       const isVolunteer = rootGetters['user/isVolunteer']
       const user = rootState.user.user

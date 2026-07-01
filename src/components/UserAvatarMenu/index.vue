@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { useStore } from 'vuex'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import Menu from '@/components/Menu.vue'
 import { useRouter } from 'vue-router'
 import AuthService from '@/services/AuthService'
 import UserAvatar from '@/components/UserAvatarMenu/UserAvatar.vue'
+import UserModeToggle from '@/components/UserAvatarMenu/UserModeToggle.vue'
+import { IonToast } from '@ionic/vue'
 
 const props = withDefaults(
   defineProps<{
@@ -25,11 +27,9 @@ const router = useRouter()
 
 const sessionStatus = computed(() => store.getters['session/sessionStatus'])
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
-
-// @TODO: Use me to create 2nd variant
-// const canSwitchAccountModes = computed(
-//   (): boolean => store.getters['user/isStudentVolunteer']
-// )
+const isStudentVolunteer = computed(
+  () => store.getters['user/isStudentVolunteer']
+)
 
 // Menu
 function goTo(path: string) {
@@ -42,11 +42,28 @@ function logout() {
   AuthService.logout({ $router: router, $store: store })
 }
 
-const emit = defineEmits(['update:isMenuOpen'])
+const emit = defineEmits<{
+  (e: 'update:isMenuOpen', value: boolean): void
+  (e: 'switchModeError', message: string): void
+}>()
 const isMenuOpen = computed({
   get: () => props.isMenuOpen,
-  set: (value) => emit('update:isMenuOpen', value),
+  set: (value) => {
+    emit('update:isMenuOpen', value)
+    if (!value && errorMessage.value.length) {
+      errorMessage.value = ''
+    }
+  },
 })
+
+function onSwitchModeError(message: string) {
+  errorMessage.value = message
+  isMenuOpen.value = true
+}
+const errorMessage = ref<string>('')
+function resetErrorMessage() {
+  errorMessage.value = ''
+}
 </script>
 
 <template>
@@ -74,11 +91,29 @@ const isMenuOpen = computed({
           ]"
         >
           <!--          On mobile, also show the avatar in the drawer/modal since the drawer will cover the other one-->
+          <!--          Skip this for student-volunteers because we need the space to show the mode toggle.-->
           <UserAvatar
             class="user-avatar"
-            v-if="isMobileMode"
+            v-if="isMobileMode && !isStudentVolunteer"
             :showAccountModeLabel="false"
             :showIndicatorRing="false"
+          />
+          <UserModeToggle
+            id="mode-toggle"
+            class="user-menu-toggle"
+            v-if="isStudentVolunteer"
+            @switchModeError="onSwitchModeError"
+          />
+          <!--          On desktop, show error in a toast-->
+          <IonToast
+            v-if="!isMobileMode"
+            :isOpen="errorMessage.length"
+            :message="errorMessage"
+            :duration="1000 * 5"
+            position="bottom"
+            positionAnchor="mode-toggle"
+            @didDismiss="resetErrorMessage"
+            class="anchored-error-toast"
           />
 
           <div
@@ -96,6 +131,9 @@ const isMenuOpen = computed({
             <span>
               {{ sessionStatus.text }}
             </span>
+          </div>
+          <div class="error" v-if="isMobileMode && errorMessage.length">
+            {{ errorMessage }}
           </div>
           <hr />
           <div
@@ -213,5 +251,29 @@ hr {
   &--mobile {
     margin-right: 8px;
   }
+}
+
+.user-menu-toggle {
+  margin-bottom: 12px;
+}
+
+.anchored-error-toast {
+  --max-width: 300px;
+  --start: -40%;
+  --color: #791f1f;
+  --background: #fcebeb;
+  --border-style: solid;
+  --border-width: 1px;
+  --border-color: $c-error-red;
+  --border-radius: 12px;
+}
+
+.error {
+  color: #791f1f;
+  background-color: #fcebeb;
+  border: 1px solid $c-error-red;
+  padding: 8px;
+  border-radius: 12px;
+  text-align: center;
 }
 </style>

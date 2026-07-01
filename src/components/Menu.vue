@@ -4,10 +4,6 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { IonModal } from '@ionic/vue'
 
-/**
- * @property activatorId: When provided, the menu will open when the element with the given ID is clicked.
- * When not provided, the caret button will be the activator by default.
- */
 export type MenuProps = {
   location: string
   buttonHeightPx: number
@@ -121,7 +117,6 @@ const activatorId = computed(() =>
   flex-direction: column;
   justify-content: center;
   align-self: center;
-  background-color: red;
 }
 
 .caret {
