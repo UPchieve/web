@@ -8,17 +8,20 @@ import Case from 'case'
 import SwitchModeIcon from '@/assets/arrow-right-left.svg'
 
 const store = useStore()
+const emit = defineEmits(['animationend'])
 
 const props = withDefaults(
   defineProps<{
     showAccountModeLabel: boolean
     showSessionStatusLabel: boolean
     showIndicatorRing: boolean
+    animate: boolean
   }>(),
   {
     showAccountModeLabel: true,
     showSessionStatusLabel: true,
     showIndicatorRing: true,
+    animate: false,
   }
 )
 
@@ -80,7 +83,12 @@ const userAccountType = computed(() => {
         { 'avatar-container--indicator-ring-s2v': isStudentVolunteer },
       ]"
     >
-      <component :is="avatar?.component" class="avatar" aria-hidden="true" />
+      <component
+        :is="avatar?.component"
+        :class="['avatar', 'shake', { 'is-shaking': props.animate }]"
+        @animationend="() => emit('animationend')"
+        aria-hidden="true"
+      />
       <div
         v-if="props.showIndicatorRing"
         :class="[
@@ -268,5 +276,33 @@ ion-popover::part(content) {
   line-height: 1.15;
   margin-bottom: 0;
   white-space: nowrap;
+}
+
+.shake {
+  --shake-duration: 350ms;
+  --shake-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --shake-rotate: 25deg; // max rotation
+  --shake-scale: 1.3; // max size
+
+  transform-origin: center;
+  display: inline-block;
+}
+
+.shake.is-shaking {
+  animation: shake var(--shake-duration) var(--shake-easing);
+}
+
+@keyframes shake {
+  0% {
+    transform: rotate(-90deg) scale(0);
+  }
+
+  70% {
+    transform: rotate(var(--shake-rotate)) scale(var(--shake-scale));
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
 }
 </style>

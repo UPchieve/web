@@ -24,6 +24,7 @@ describe('`app` store module', () => {
       isWebPageHidden: false,
       version: '',
       prefersReducedMotion: false,
+      fadeInContent: false,
     })
   })
 

@@ -10,6 +10,7 @@ const router = useRouter()
 const userType = computed(() => store.getters['user/userType'])
 const emit = defineEmits<{
   (e: 'switchModeError', message: string): void
+  (e: 'switchedMode'): void
 }>()
 async function switchMode() {
   const targetMode = userType.value === 'student' ? 'volunteer' : 'student'
@@ -24,6 +25,7 @@ async function switchMode() {
     if (!isOnDashboard) {
       await router.push('/dashboard')
     }
+    emit('switchedMode')
   } catch (err) {
     LoggerService.noticeError(
       'Failed to switch account modes via UserModeToggle',

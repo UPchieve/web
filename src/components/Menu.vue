@@ -125,8 +125,7 @@ const activatorId = computed(() =>
   transform: rotate(90deg);
   transition: 200ms linear;
   align-self: center;
-  margin-left: auto;
-  margin-right: 4px;
+  margin-left: 16px;
   height: v-bind(buttonHeight);
   width: v-bind(buttonHeight);
 

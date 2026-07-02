@@ -57,6 +57,12 @@ const isMenuOpen = computed({
   },
 })
 
+const animateAvatar = ref<boolean>(false)
+function onSwitchedMode() {
+  animateAvatar.value = true
+  store.commit('app/setFadeInContent', true) // start animation
+}
+
 function onSwitchModeError(message: string) {
   errorMessage.value = message
   isMenuOpen.value = true
@@ -74,7 +80,12 @@ function resetErrorMessage() {
       'main-container--mobile': isMobileMode,
     }"
   >
-    <UserAvatar class="user-avatar" :showSessionStatusLabel="false" />
+    <UserAvatar
+      class="user-avatar"
+      @animationend="() => (animateAvatar = false)"
+      :showSessionStatusLabel="false"
+      :animate="animateAvatar"
+    />
     <Menu
       v-model:isOpen="isMenuOpen"
       class="user-menu"
@@ -105,6 +116,7 @@ function resetErrorMessage() {
             class="user-menu-toggle"
             v-if="isStudentVolunteer"
             @switchModeError="onSwitchModeError"
+            @switchedMode="onSwitchedMode"
           />
           <!--          On desktop, show error in a toast-->
           <IonToast

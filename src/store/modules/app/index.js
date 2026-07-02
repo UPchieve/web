@@ -21,6 +21,7 @@ export default {
     prefersReducedMotion: false,
     isLoading: true,
     fromRoute: '',
+    fadeInContent: false,
   },
   mutations: {
     setWindowWidth: (state, width = 0) =>
@@ -33,6 +34,7 @@ export default {
     setPrefersReducedMotion: (state, val) => (state.prefersReducedMotion = val),
     setIsLoading: (state, val) => (state.isLoading = val),
     setFromRoute: (state, route) => (state.fromRoute = route),
+    setFadeInContent: (state, val) => (state.fadeInContent = val),
   },
   actions: {
     showNavigation: ({ commit, dispatch }) => {

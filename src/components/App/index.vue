@@ -22,6 +22,8 @@
               <component
                 :is="Component"
                 :key="route.meta.disableComponentReuse ? route.path : undefined"
+                :class="{ 'fade-in': fadeInContent }"
+                @animationend="endFade"
               />
             </router-view>
           </div>
@@ -137,6 +139,9 @@ export default {
       .removeEventListener('change', this.updateMotionPreference)
   },
   methods: {
+    endFade() {
+      this.$store.commit('app/setFadeInContent', false)
+    },
     updateMotionPreference(e) {
       this.$store.commit('app/setPrefersReducedMotion', e.matches)
     },
@@ -229,6 +234,7 @@ export default {
       productFlags: (state) => state.productFlags.flags,
       isConnected: (state) => state.socket.isConnected,
       messageData: (state) => state.socket.messageData,
+      fadeInContent: (state) => state.app.fadeInContent,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -375,6 +381,19 @@ ion-content {
   --background: transparent;
   font-family: $font-family-default;
   font-display: swap;
+}
+
+.fade-in {
+  animation: fadeInContent 350ms ease forwards;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .App {
