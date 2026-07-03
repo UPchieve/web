@@ -109,7 +109,6 @@
                 { name: 'other', displayName: 'All Subjects' },
               ]"
               v-model="filters.topic.name"
-              @update:modelValue="submitFilter"
             />
             <FormDateInput
               class="date-input"
@@ -117,7 +116,6 @@
               id="session-activity-from"
               :placeholder="filters.sessionActivityFrom"
               v-model="filters.sessionActivityFrom"
-              @update:modelValue="submitFilter"
             />
             <FormDateInput
               class="date-input"
@@ -125,7 +123,6 @@
               id="session-activity-to"
               :placeholder="filters.sessionActivityTo"
               v-model="filters.sessionActivityTo"
-              @update:modelValue="submitFilter"
             />
           </div>
           <table class="classes-table">
@@ -370,7 +367,7 @@ export default {
   data() {
     return {
       isLoading: true,
-      students: [],
+      unfilteredStudents: [],
       viewSessions: false,
       student: {},
       studentId: '',
@@ -437,6 +434,63 @@ export default {
   },
 
   computed: {
+    students() {
+      const from = new Date(this.filters.sessionActivityFrom + 'T00:00:00Z')
+      const to = new Date(this.filters.sessionActivityTo + 'T23:59:59')
+      const filteredSubjectNames = Object.values(this.subjects)
+        .filter((subject) =>
+          this.filters.topic.name === 'other'
+            ? true
+            : subject.topicName === this.filters.topic.name
+        )
+        .map((subject) => subject.name)
+
+      return this.unfilteredStudents
+        .map((student) => {
+          const filteredSessionDetails = student.sessionDetails.filter(
+            (session) =>
+              filteredSubjectNames.includes(session.name) &&
+              session.startedAt >= from &&
+              session.startedAt <= to
+          )
+          const minTutored = filteredSessionDetails.reduce(
+            (acc, curr) => acc + (curr.endedAt - curr.startedAt) / (1000 * 60),
+            0
+          )
+
+          const timeTutored = minutesToHoursAndMinutes(
+            minTutored,
+            ({ hours, minutes }) => {
+              return hours > 0
+                ? `${hours} hr and ${Math.round(minutes)} m`
+                : `${Math.round(minutes)} minutes`
+            }
+          )
+
+          const lastSessionDate = filteredSessionDetails.sort(
+            (a, b) => b.endedAt - a.endedAt
+          )[0]?.endedAt
+          const lastSession = lastSessionDate
+            ? dayjs(lastSessionDate).format('MM/DD/YYYY')
+            : 'Has not completed a session.'
+
+          return {
+            ...student,
+            numSessions: filteredSessionDetails.length,
+            timeTutored,
+            lastSession,
+          }
+        })
+        .sort((a, b) => {
+          if (a.lastSession === 'Has not completed a session.') return 1
+          if (b.lastSession === 'Has not completed a session.') return -1
+
+          const dateA = dayjs(a.lastSession, 'MM/DD/YYYY')
+          const dateB = dayjs(b.lastSession, 'MM/DD/YYYY')
+
+          return dateB.diff(dateA)
+        })
+    },
     classId() {
       return this.$route.params.classId
     },
@@ -541,92 +595,28 @@ export default {
         const {
           data: { students },
         } = await NetworkService.getStudentsInTeacherClass(this.classId)
-        const studentsAndSessions = await Promise.all(
+        this.unfilteredStudents = await Promise.all(
           students.map(async (student) => {
             const {
               data: { sessionDetails },
             } = await NetworkService.getStudentSessionDetails(student.id)
 
-            const from = new Date(
-              this.filters.sessionActivityFrom + 'T00:00:00Z'
-            )
-            const to = new Date(this.filters.sessionActivityTo + 'T23:59:59')
-            const filteredSubjectNames = Object.values(this.subjects)
-              .filter((subject) =>
-                this.filters.topic.name === 'other'
-                  ? true
-                  : subject.topicName === this.filters.topic.name
-              )
-              .map((subject) => subject.name)
-
-            const filteredSessionDetails = sessionDetails
-              .map((session) => {
-                const endedAt = new Date(session.endedAt)
-                const startedAt = new Date(session.createdAt)
-                return { endedAt, startedAt, name: session.name }
-              })
-              .filter(
-                (session) =>
-                  filteredSubjectNames.includes(session.name) &&
-                  session.startedAt >= from &&
-                  session.startedAt <= to
-              )
-              .map((session) => {
-                return {
-                  endedAt: session.endedAt,
-                  duration: (session.endedAt - session.startedAt) / (1000 * 60),
-                }
-              })
-            const minTutored = filteredSessionDetails.reduce(
-              (acc, curr) => acc + curr.duration,
-              0
-            )
-
-            const timeTutored = minutesToHoursAndMinutes(
-              minTutored,
-              ({ hours, minutes }) => {
-                return hours > 0
-                  ? `${hours} hr and ${Math.round(minutes)} m`
-                  : `${Math.round(minutes)} minutes`
-              }
-            )
-
-            const lastSessionDate = filteredSessionDetails.sort(
-              (a, b) => b.endedAt - a.endedAt
-            )[0]?.endedAt
-            const lastSession = lastSessionDate
-              ? dayjs(lastSessionDate).format('MM/DD/YYYY')
-              : 'Has not completed a session.'
-
             return {
               ...student,
-              numSessions: filteredSessionDetails.length,
-              timeTutored,
-              lastSession,
+              sessionDetails: sessionDetails.map((session) => ({
+                name: session.name,
+                startedAt: new Date(session.createdAt),
+                endedAt: new Date(session.endedAt),
+              })),
             }
           })
         )
-
-        studentsAndSessions.sort((a, b) => {
-          if (a.lastSession === 'Has not completed a session') return 1
-          if (b.lastsession === 'Has not completed a session') return -1
-
-          const dateA = dayjs(a.lastSession, 'MM/DD/YYYY')
-          const dateB = dayjs(b.lastSession, 'MM/DD/YYYY')
-
-          return dateB.diff(dateA)
-        })
-        this.students = studentsAndSessions
       } catch (err) {
         // TODO: There is no place where this error (and others) is shown.
         this.error =
           err.response.data.err ??
           'Unable to load students. Please refresh the page and try again.'
       }
-    },
-
-    async submitFilter() {
-      await this.getClassStudents(this.$route.params.classId)
     },
 
     openTeacherCodeModal() {
@@ -954,7 +944,7 @@ export default {
           )
         }
         this.toggledStudentMenuId = ''
-        this.students = this.students.filter(
+        this.unfilteredStudents = this.unfilteredStudents.filter(
           (student) => student.userId !== removedId[0].studentid
         )
       } catch (err) {

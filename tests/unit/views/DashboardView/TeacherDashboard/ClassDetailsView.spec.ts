@@ -66,6 +66,17 @@ const getWrapper = async (overrides: Overrides = {}) => {
       },
       subjects: {
         ...subjectsModule,
+        state: {
+          ...subjectsModule.state,
+          subjects: {
+            math: {
+              id: 1,
+              name: 'Math',
+              topicName: 'Math',
+              displayName: 'Math',
+            },
+          },
+        },
       },
     },
   })
@@ -174,9 +185,27 @@ describe('Class Details View', () => {
         firstName: 'Student',
         lastName: 'UPchieve',
         email: 'student1@upchieve.org',
-        numSessions: 3,
-        timeTutored: '1 hour(s) and 3 minute(s)',
-        lastSession: '07/26/2024',
+        // Following session details calculate to the following:
+        // numSessions: 3,
+        // timeTutored: '1 hr and 3 m' (63 min total),
+        // lastSession: '07/26/2024',
+        sessionDetails: [
+          {
+            name: 'Math',
+            startedAt: new Date('2024-07-20T10:00:00Z'),
+            endedAt: new Date('2024-07-20T10:20:00Z'), // 20 min
+          },
+          {
+            name: 'Math',
+            startedAt: new Date('2024-07-24T10:00:00Z'),
+            endedAt: new Date('2024-07-24T10:20:00Z'), // 20 min
+          },
+          {
+            name: 'Math',
+            startedAt: new Date('2024-07-26T10:00:00Z'),
+            endedAt: new Date('2024-07-26T10:23:00Z'), // 23 min, latest
+          },
+        ],
       },
       {
         userId: 'userId2',
@@ -184,13 +213,20 @@ describe('Class Details View', () => {
         firstName: 'Another',
         lastName: 'Test',
         email: 'test2@upchieve.org',
-        numSessions: 0,
-        timeTutored: '0 minutes',
-        lastSession: 'Has not completed a session.',
+        sessionDetails: [],
       },
     ]
 
-    const wrapper = await getWrapper({ data: { students } })
+    const wrapper = await getWrapper({
+      data: {
+        unfilteredStudents: students,
+        filters: {
+          topic: { name: 'Math' },
+          sessionActivityFrom: '2024-01-01',
+          sessionActivityTo: '2024-12-31',
+        },
+      },
+    })
 
     const studentRows = wrapper.findAll('[data-testid="student-row"]')
     expect(studentRows.length).toBe(students.length)
@@ -198,9 +234,9 @@ describe('Class Details View', () => {
     expect(firstRowCells[0].text()).toBe(
       students[0].firstName + ' ' + students[0].lastName
     )
-    expect(firstRowCells[1].text()).toBe(String(students[0].numSessions))
-    expect(firstRowCells[2].text()).toBe(students[0].timeTutored)
-    expect(firstRowCells[3].text()).toBe(students[0].lastSession)
+    expect(firstRowCells[1].text()).toBe(String(3))
+    expect(firstRowCells[2].text()).toBe('1 hr and 3 m')
+    expect(firstRowCells[3].text()).toBe('07/26/2024')
   })
 
   test('Click student details', async () => {
@@ -208,16 +244,17 @@ describe('Class Details View', () => {
 
     const wrapper = await getWrapper({
       data: {
-        students: [
+        unfilteredStudents: [
           {
             userId: 'userId1',
             id: 'userId1',
             firstName: 'Student',
             lastName: 'UPchieve',
             email: 'student1@upchieve.org',
-            numSessions: 3,
-            timeTutored: '1 hour(s)',
-            lastSession: '07/26/2024',
+            sessionDetails: [
+              { name: 'English', startedAt: new Date(), endedAt: new Date() },
+              { name: 'Science', startedAt: new Date(), endedAt: new Date() },
+            ],
           },
         ],
         classData: {
