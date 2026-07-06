@@ -764,6 +764,7 @@ function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
       name: InputName.GRADE_LEVEL,
       label: getLabelPrefix(isParentGuardian) + 'Grade in 2025-2026',
       placeholder: getLabelPrefix(isParentGuardian) + 'Grade in 2025-2026',
+      isRequired: true,
       reduce: (option: string) => option.split(' ')[0],
     },
   }

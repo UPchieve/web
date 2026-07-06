@@ -60,6 +60,8 @@
 <script lang="ts" setup>
 import { IonSelect, IonSelectOption } from '@ionic/vue'
 import { computed, onMounted, ref } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { helpers, requiredIf } from '@vuelidate/validators'
 
 const props = defineProps({
   label: {
@@ -121,6 +123,13 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 const asyncOptions = ref<any[]>([])
 
+const rules = {
+  modelValue: {
+    required: helpers.withMessage('Required', requiredIf(props.isRequired)),
+  },
+}
+const v$ = useVuelidate(rules, props)
+
 const selectOptions = computed(() => {
   return asyncOptions.value?.length ? asyncOptions.value : props.options
 })
@@ -128,6 +137,7 @@ const selectOptions = computed(() => {
 function updateValue(event: CustomEvent) {
   const selectedValue = event.detail.value
   emit('update:modelValue', selectedValue)
+  v$.value.modelValue.$touch()
 }
 
 onMounted(async () => {
