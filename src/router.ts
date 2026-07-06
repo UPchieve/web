@@ -1,4 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuard,
+  type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type RouteRecordRaw,
+} from 'vue-router'
 import store from './store'
 const AdminView = () => import('./views/Admin/index.vue')
 const AdminCleverRoster = () => import('./views/Admin/AdminCleverRoster.vue')
@@ -107,11 +114,11 @@ import LoggerService from './services/LoggerService'
 import { EVENTS } from './consts'
 import ModeTransitionView from '@/views/ModeTransitionView.vue'
 
-const autoflowRedirect = (to, from, next) => {
+const autoflowRedirect: NavigationGuard = (_to, _from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
   else next()
 }
-const switchToVolunteerOrCancel = async (_to, _from, next) => {
+const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {
   if (store.getters['user/isVolunteer']) {
     next() // already volunteer, continue
   } else if (store.getters['user/hasVolunteerRole']) {
@@ -126,7 +133,11 @@ const switchToVolunteerOrCancel = async (_to, _from, next) => {
   }
 }
 
-const ensureActiveRoleMatchesSessionRole = async (_to, _from, next) => {
+const ensureActiveRoleMatchesSessionRole: NavigationGuard = async (
+  _to,
+  _from,
+  next
+) => {
   if (typeof store.getters['user/roleInCurrentSession'] === 'undefined') {
     await store.dispatch('user/fetchSession')
   }
@@ -144,7 +155,10 @@ const ensureActiveRoleMatchesSessionRole = async (_to, _from, next) => {
   next()
 }
 
-async function getAuthStatus(to, isBlockingRoute) {
+async function getAuthStatus(
+  to: RouteLocationNormalized,
+  isBlockingRoute?: boolean
+) {
   try {
     const isAuthenticated = store.getters['user/isAuthenticated']
     // When we are already authenticated, let's re-fetch in the background
@@ -159,7 +173,7 @@ async function getAuthStatus(to, isBlockingRoute) {
             path: '/login',
             query: {
               redirect: to.fullPath,
-              401: true,
+              401: 'true',
             },
           })
         }
@@ -200,7 +214,17 @@ const STUDENT_SIDEBAR_LINKED_VIEWS = [
 ]
 const TEACHER_SIDEBAR_LINKED_VIEWS = [ProfileView, TeacherDashboardView]
 
-function preloadViews({ volunteer, student, teacher, admin }) {
+function preloadViews({
+  volunteer,
+  student,
+  teacher,
+  admin,
+}: {
+  volunteer?: Array<() => Promise<unknown>>
+  student?: Array<() => Promise<unknown>>
+  teacher?: Array<() => Promise<unknown>>
+  admin?: Array<() => Promise<unknown>>
+}) {
   const isVolunteer = store.getters['user/isVolunteer']
   const isStudent = store.getters['user/isStudent']
   const isTeacher = store.getters['user/isTeacher']
@@ -212,11 +236,16 @@ function preloadViews({ volunteer, student, teacher, admin }) {
   if (isAdmin && admin?.length) admin.forEach((fn) => fn())
 }
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Home',
-    beforeEnter: (to, from, next) => {
+    component: { render: () => null },
+    beforeEnter: (
+      to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       getAuthStatus(to)
         .then(({ authenticated }) => {
           if (authenticated) {
@@ -243,7 +272,11 @@ const routes = [
         teacher: TEACHER_SIDEBAR_LINKED_VIEWS,
       },
     },
-    beforeEnter: (to, from, next) => {
+    beforeEnter: (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       const instance = Gleap.getInstance()
       if (instance.initialized) {
         try {
@@ -261,6 +294,7 @@ const routes = [
   {
     path: '/legal',
     name: 'LegalView',
+    component: { render: () => null },
     beforeEnter: () => {
       if (typeof window !== 'undefined')
         window.location.href = 'https://upchieve.org/legal'
@@ -307,9 +341,7 @@ const routes = [
   {
     path: '/signup',
     name: 'Signup',
-    beforeEnter: (to, from, next) => {
-      next('/sign-up')
-    },
+    redirect: '/sign-up',
   },
   {
     path: '/sign-up/:userType?/:step?',
@@ -317,7 +349,11 @@ const routes = [
     component: SignupView,
     meta: { loggedOutOnly: true, hideNavigation: true },
     props: true,
-    beforeEnter: async (to, from, next) => {
+    beforeEnter: async (
+      to: RouteLocationNormalized,
+      from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       switch (to.params.userType) {
         case UserType.student:
           return studentBeforeEnter(to, from, next)
@@ -344,7 +380,11 @@ const routes = [
     name: 'VolunteerPartnerSignupView',
     component: VolunteerPartnerSignupView,
     meta: { loggedOutOnly: true, hideNavigation: true },
-    beforeEnter: async (to, from, next) => {
+    beforeEnter: async (
+      to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (store.getters['featureFlags/isNewVolunteerSignUpFlowEnabled']) {
         const partner = to.params.partnerId
         next(`sign-up/volunteer?partnerId=${partner}`)
@@ -368,10 +408,7 @@ const routes = [
   {
     path: '/referral/:referredByCode',
     name: 'Referred By',
-    beforeEnter: (to, from, next) => {
-      const referredByCode = to.params.referredByCode
-      next(`/sign-up?referral=${referredByCode}`)
-    },
+    redirect: (to) => `/sign-up?referral=${to.params.referredByCode}`,
   },
   {
     path: '/resetpassword',
@@ -399,18 +436,22 @@ const routes = [
         admin: [AdminView],
       },
     },
-    beforeEnter: async (to, from, next) => {
+    beforeEnter: async (
+      to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (to.query.inviteCode) {
-        localStorage.setItem('joinedTeamCode', to.query.inviteCode)
+        localStorage.setItem('joinedTeamCode', String(to.query.inviteCode))
         delete to.query.inviteCode
       }
       if (store.getters['user/isAutoFlowUser']) {
         next('/welcome')
       }
       if (to.query.classCode) {
-        localStorage.setItem('joinedClassCode', to.query.classCode)
+        localStorage.setItem('joinedClassCode', String(to.query.classCode))
         delete to.query.classCode
-        return next(to, from)
+        return next(to)
       }
 
       return next()
@@ -427,7 +468,11 @@ const routes = [
       },
     },
     props: true,
-    beforeEnter: async (_to, _from, next) => {
+    beforeEnter: async (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (!store.getters['user/isStudent']) {
         return next('/dashboard')
       }
@@ -468,7 +513,11 @@ const routes = [
     name: 'ReferFriendsView',
     component: ReferFriendsView,
     meta: { protected: true },
-    beforeEnter: (to, from, next) => {
+    beforeEnter: (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (store.getters['featureFlags/isReferFriendsActive']) next()
       else next('/dashboard')
     },
@@ -484,7 +533,11 @@ const routes = [
     name: 'VerificationView',
     component: VerificationView,
     meta: { protected: true },
-    beforeEnter: (to, from, next) => {
+    beforeEnter: (
+      to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       getAuthStatus(to)
         .then(({ authenticated }) => {
           if (authenticated && store.getters['user/isVerified']) {
@@ -719,7 +772,11 @@ const routes = [
         ],
       },
     },
-    beforeEnter: async (_to, _from, next) => {
+    beforeEnter: async (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       //Don't capture click event on refresh
       if (_from.path !== '/' && !_from.path.startsWith('/sessions/progress')) {
         AnalyticsService.captureEvent(
@@ -824,9 +881,14 @@ const routes = [
   },
   {
     path: '/add-volunteer-role',
+    component: { render: () => null },
     meta: { protected: true },
     name: 'AddVolunteerRole',
-    beforeEnter: async (to, from, next) => {
+    beforeEnter: async (
+      to: RouteLocationNormalized,
+      from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       // We are using this route to add a volunteer role to students
       // and switch to volunteer mode via gleap experiment CTAs, emails, etc.
 
@@ -868,7 +930,11 @@ const routes = [
     name: 'NTHSApplicationView',
     component: NTHSApplicationView,
     meta: { protected: true },
-    beforeEnter: async (_to, _from, next) => {
+    beforeEnter: async (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (await shouldGoToGroup(store)) return next('/groups')
       if (shouldGoToCreate(store)) return next('/groups/create')
       if (shouldGoToPending(store)) return next('/groups/application-pending')
@@ -882,7 +948,11 @@ const routes = [
     name: 'NTHSApplicationPending',
     component: NTHSApplicationPending,
     meta: { protected: true },
-    beforeEnter: async (_to, _from, next) => {
+    beforeEnter: async (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (await shouldGoToGroup(store)) return next('/groups')
       if (shouldGoToCreate(store)) return next('/groups/create')
       if (shouldGoToApply(store)) return next('/groups/apply')
@@ -896,7 +966,11 @@ const routes = [
     name: 'NTHSCreateGroupView',
     component: NTHSCreateGroupView,
     meta: { protected: true },
-    beforeEnter: async (_to, _from, next) => {
+    beforeEnter: async (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (await shouldGoToGroup(store)) return next('/groups')
       if (shouldGoToApply(store)) return next('/groups/apply')
       if (shouldGoToPending(store)) return next('/groups/application-pending')
@@ -924,7 +998,11 @@ const routes = [
         ],
       },
     },
-    beforeEnter: async (_to, _from, next) => {
+    beforeEnter: async (
+      _to: RouteLocationNormalized,
+      _from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       if (await shouldGoToGroup(store)) return next()
       if (shouldGoToApply(store)) return next('/groups/apply')
       if (shouldGoToPending(store)) return next('/groups/application-pending')
@@ -984,7 +1062,7 @@ const routes = [
   {
     path: '/:pathMatch(.*)*',
     name: 'Not Found',
-    beforeEnter: async (_to, _from, next) => next('/'),
+    redirect: '/',
   },
 ]
 
@@ -1003,7 +1081,7 @@ const router = createRouter({
 export default router
 
 // Router middleware to check authentication for protected routes.
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   store.commit('app/setIsLoading', true)
   if (to.matched.some((route) => route.meta.requiresAdmin)) {
     try {
@@ -1042,7 +1120,7 @@ router.beforeEach(async (to, from, next) => {
             path: '/login',
             query: {
               redirect: to.fullPath,
-              401: true,
+              401: 'true',
             },
           })
         } else if (!store.getters['user/isVerified']) {
@@ -1051,7 +1129,7 @@ router.beforeEach(async (to, from, next) => {
           else
             next({
               path: route,
-              redirect: to.fullPath,
+              query: { redirect: to.fullPath },
             })
         } else {
           next()
@@ -1089,10 +1167,10 @@ router.afterEach((to, from) => {
   // Use typeof to avoid ReferenceError in Vitest
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
     const isAuthenticated = store.getters['user/isAuthenticated']
-    const gtagDimensions = {
-      page_title: router.currentRoute.name,
+    const gtagDimensions: any = {
+      page_title: to.name,
       page_location: window.location.href,
-      page_path: router.currentRoute.path,
+      page_path: to.path,
       is_authenticated: isAuthenticated ? '1' : '0',
     }
     if (isAuthenticated) {
