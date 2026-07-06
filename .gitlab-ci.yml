@@ -165,7 +165,7 @@ e2e-test:
     - export PGPASSWORD=$POSTGRES_PASSWORD
     - psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -c "SELECT 'OK' AS status;"
     - |
-      for file in database/db_init/{schema,auth,local_auth,test_seeds,seed_migrations,refresh_materialized_views}.sql; do
+      for file in database/db_init/{schema,auth,local_auth,test_seeds,seed_migrations}.sql; do
         PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -f $file
       done
     - echo 'Verify Redis is running...'
