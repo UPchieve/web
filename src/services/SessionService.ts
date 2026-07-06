@@ -2,7 +2,7 @@ import { EVENTS } from '../consts'
 import router from '@/router'
 import store from '@/store'
 import AnalyticsService from './AnalyticsService'
-import NetworkService from './NetworkService'
+import NetworkService, { isNetworkError } from './NetworkService'
 import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
 import axios from 'axios'
@@ -124,7 +124,7 @@ export default {
       }
       store.dispatch('americaCountsVolunteer/startCooldown')
     } catch (err) {
-      if (err?.response?.data?.err !== 'Session has already ended') {
+      if (!isNetworkError(err) || err.message !== 'Session has already ended') {
         throw err
       }
     }

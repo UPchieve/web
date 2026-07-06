@@ -30,9 +30,18 @@ const FAULT_TOLERANT_HTTP_TIMEOUT = 10000
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000
 const FAULT_TOLERANT_HTTP_MAX_RETRIES = 10
 
-export type NetworkError = {
-  status: number
-  message: string
+export class NetworkError extends Error {
+  status?: number
+
+  constructor(message: string, status?: number) {
+    super(message)
+    this.name = 'NetworkError'
+    this.status = status
+  }
+}
+
+export function isNetworkError(err: unknown): err is NetworkError {
+  return err instanceof NetworkError
 }
 
 export const axiosInstance = axios.create({
@@ -66,6 +75,8 @@ export async function httpGet<T>(path: string, config?: object) {
 }
 
 // TODO: Use generics instead of Object.
+// TODO: Move NetworkError conversion into these helpers instead of
+// the handling the error through `_errorHandler` and `_axiosErrorHandler`
 export async function httpPost<T>(
   path: string,
   data: object,
@@ -123,11 +134,13 @@ export default {
   _errorHandler(res) {
     return Promise.reject(res)
   },
-  _axiosErrorHandler(res: AxiosError): Promise<NetworkError> {
-    return Promise.reject({
-      status: res.response?.status,
-      message: (res.response?.data as { err?: string })?.err,
-    })
+  _axiosErrorHandler(res: AxiosError): never {
+    const message =
+      (res.response?.data as { err?: string })?.err ??
+      res.message ??
+      'An unexpected network error occurred.'
+    const status = res.response?.status
+    throw new NetworkError(message, status)
   },
   _faultTolerantHttp<T>(
     method: 'get' | 'post',
@@ -375,7 +388,7 @@ export default {
         isZwibserveSession: boolean
       }>(`${API_ROOT}/session/new`, data)
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   async breakoutSession(sessionId: string) {
@@ -385,7 +398,7 @@ export default {
         session: CurrentSessionPublic
       }>(`${API_ROOT}/session/${sessionId}/breakout`, {})
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   async joinSession(data: { sessionId: string; joinedFrom?: string }) {
@@ -396,7 +409,7 @@ export default {
         exclusiveVolunteerId?: string
       }>(`${API_ROOT}/session/join`, data)
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   async endSession(data) {
@@ -406,7 +419,7 @@ export default {
         session: CurrentSessionPublic
       }>(`${API_ROOT}/session/end`, data)
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   checkSession(data, onRetry) {
@@ -424,7 +437,7 @@ export default {
         data: CurrentSessionPublic
       }>(`${API_ROOT}/session/current`, {})
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   getRecapSessionForDms(data) {
@@ -1170,7 +1183,7 @@ export default {
         `${API_ROOT}/tutor-bot/conversations/${conversationId}`
       )
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   getOrCreateTutorBotConversationWithMessagesBySessionId(sessionId: Uuid) {
@@ -1206,7 +1219,7 @@ export default {
         form
       )
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   enrollStudentInIncentiveProgram(proxyEmail) {
@@ -1356,7 +1369,7 @@ export default {
       )
     } catch (err) {
       //  TODO: Error handling and throwing will probably need to be centralized in the `http*` methods (httpGet, httpPost, etc.)
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   sendReferralText(phoneNumber: string) {
@@ -1470,7 +1483,7 @@ export default {
         data
       )
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   async updateTutorBotConversationWithSessionId(
@@ -1485,7 +1498,7 @@ export default {
         }
       )
     } catch (err) {
-      throw this._axiosErrorHandler(err as AxiosError)
+      return this._axiosErrorHandler(err as AxiosError)
     }
   },
   totpEnroll() {
