@@ -148,6 +148,8 @@ export default {
     GenerationFeedback,
   },
 
+  inject: ['classData'],
+
   data() {
     return {
       classId: '',
@@ -170,36 +172,22 @@ export default {
     }
   },
   computed: {
+    className() {
+      return this.classData?.name ?? ''
+    },
     ...mapState({
       topics: (state) => state.subjects.topics,
       subjects: (state) => state.subjects.subjects,
     }),
   },
 
-  props: {
-    className: {
-      type: String,
-    },
-    classInfo: {
-      type: Object,
-    },
-  },
-
   async created() {
-    // TODO: Clean-up routing: Shouldn't need these checks.
-    if (this.$route.params.studentId) {
-      this.classId = this.$route.params.classId
-      this.studentId = this.$route.params.studentId
-    } else if (this.$route.params.classId && !this.$route.params.studentId) {
-      this.classId = this.$route.params.classId
-      this.$router.push(`/dashboard/teacher/class/${this.classId}`)
-    } else {
-      this.$router.push(`/dashboard/teacher`)
-    }
+    this.classId = this.$route.params.classId
+    this.studentId = this.$route.params.studentId
 
     await this.$store.dispatch('subjects/awaitTopics')
-    if (this.classInfo.topicId) {
-      const topic = this.topics.find((t) => t.id === this.classInfo.topicId)
+    if (this.classData?.topicId) {
+      const topic = this.topics.find((t) => t.id === this.classData.topicId)
       this.filters.topic.name = topic.name
       this.subjectPlaceholder = topic.displayName
     } else {
@@ -212,7 +200,7 @@ export default {
 
   methods: {
     backToClasses() {
-      this.$router.push(`dashboard/teacher`)
+      this.$router.push('/dashboard/teacher')
     },
     backToClassDetails() {
       this.$router.push(`/dashboard/teacher/class/${this.classId}`)

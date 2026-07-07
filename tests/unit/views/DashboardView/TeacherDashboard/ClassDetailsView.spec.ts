@@ -1,23 +1,65 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { dayjs } from '@/utils/time-utils'
-import { mount } from '@vue/test-utils'
-import router from '@/router'
-import NetworkService from '@/services/NetworkService'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
+import { createMemoryHistory, createRouter } from 'vue-router'
+
+import '@/store'
 import userModule from '@/store/modules/user'
 import subjectsModule from '@/store/modules/subjects'
 import featureFlagsModule from '@/store/modules/feature-flags'
+import NetworkService from '@/services/NetworkService'
 import ClassDetailsView from '@/views/DashboardView/TeacherDashboard/ClassDetailsView.vue'
 
 type Overrides = {
   data?: Record<string, any>
 }
 
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    {
+      path: '/dashboard/teacher',
+      name: 'TeacherDashboard',
+      children: [
+        {
+          path: 'class/:classId',
+          name: 'ClassDetailsView',
+          component: ClassDetailsView,
+          children: [
+            {
+              path: 'student/:studentId',
+              name: 'StudentDetailsView',
+              redirect: '',
+            },
+          ],
+        },
+        {
+          path: 'class/:classId/assignments',
+          name: 'ClassAssignmentsView',
+          component: ClassDetailsView,
+          children: [
+            {
+              path: ':assignmentId',
+              name: 'AssignmentView',
+              redirect: '',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+})
+
 const getWrapper = async (overrides: Overrides = {}) => {
   const store = createStore({
     modules: {
       user: {
         ...userModule,
+        getters: {
+          isAuthenticated: () => true,
+          userType: () => 'teacher',
+        },
       },
       featureFlags: {
         ...featureFlagsModule,
@@ -30,10 +72,6 @@ const getWrapper = async (overrides: Overrides = {}) => {
   const wrapper = mount(ClassDetailsView, {
     global: {
       plugins: [store, router],
-    },
-    props: {
-      classes: [],
-      classId: 'class-id',
     },
   })
 
@@ -113,6 +151,11 @@ describe('Class Details View', () => {
         },
       },
     })
+
+    NetworkService.getTeacherClasses = vi.fn().mockResolvedValue({
+      data: { teacherClasses: [] },
+    })
+
     await router.push(`/dashboard/teacher/class/class-id`)
   })
 
@@ -159,6 +202,7 @@ describe('Class Details View', () => {
     expect(firstRowCells[2].text()).toBe(students[0].timeTutored)
     expect(firstRowCells[3].text()).toBe(students[0].lastSession)
   })
+
   test('Click student details', async () => {
     const routerPushSpy = vi.spyOn(router, 'push')
 
@@ -289,23 +333,23 @@ describe('Assignments View', () => {
         },
       },
     })
+
+    NetworkService.getTeacherClasses = vi.fn().mockResolvedValue({
+      data: { teacherClasses: [] },
+    })
   })
 
   test('Show no assignments', async () => {
     NetworkService.getAssignmentsByClassId = vi.fn().mockResolvedValue({
       data: { assignments: [] },
     })
-    const wrapper = await getWrapper({
-      data: { assignments: [], isSelected: 'assignments' },
-    })
+    const wrapper = await getWrapper({ data: { assignments: [] } })
     const noAssignments = wrapper.find('[data-testid="no-assignments"]')
     expect(noAssignments.exists()).toBe(true)
   })
 
   test('Shows assignments', async () => {
-    const wrapper = await getWrapper({
-      data: { isSelected: 'assignments', assignments },
-    })
+    const wrapper = await getWrapper({ data: { assignments } })
 
     const hasAssignments = wrapper.find('[data-testid="has-assignments"]')
     expect(hasAssignments.exists()).toBe(true)
@@ -313,20 +357,24 @@ describe('Assignments View', () => {
 
   describe('Open tabs', () => {
     test('Click class details tab', async () => {
+      await router.push(`/class/123123/assignments`)
       const wrapper = await getWrapper({
-        data: { isSelected: 'assignments' },
+        data: { classData: { id: '123123' } },
       })
+      expect(wrapper.vm.isSelected).toBe('assignments')
       const classDetailsBtn = wrapper.find('[data-testid="class-details-tab"]')
-      classDetailsBtn.trigger('click')
+      await classDetailsBtn.trigger('click')
+      await flushPromises()
       expect(wrapper.vm.isSelected).toBe('classDetails')
     })
 
     test('Click assignments tab', async () => {
-      const wrapper = await getWrapper({
-        data: { isSelected: 'classDetails' },
-      })
-      const classDetailsBtn = wrapper.find('[data-testid="assignments-tab"]')
-      classDetailsBtn.trigger('click')
+      await router.push(`/dashboard/teacher/class/class-id`)
+      const wrapper = await getWrapper()
+      expect(wrapper.vm.isSelected).toBe('classDetails')
+      const assignmentsTab = wrapper.find('[data-testid="assignments-tab"]')
+      await assignmentsTab.trigger('click')
+      await flushPromises()
       expect(wrapper.vm.isSelected).toBe('assignments')
     })
   })
@@ -334,7 +382,7 @@ describe('Assignments View', () => {
   describe('View assignment info', () => {
     test('See assignment title and due date', async () => {
       const wrapper = await getWrapper({
-        data: { isSelected: 'assignments', assignments, assignmentsCompletion },
+        data: { assignments, assignmentsCompletion },
       })
       const assignmentTitle = wrapper.find(
         '[data-testid="assignment-title-assignment-1"]'
@@ -349,7 +397,6 @@ describe('Assignments View', () => {
     test('See no students assigned text', async () => {
       const wrapper = await getWrapper({
         data: {
-          isSelected: 'assignments',
           assignments,
           assignmentsCompletion: {},
         },
@@ -362,7 +409,7 @@ describe('Assignments View', () => {
 
     test('See correct student completion text', async () => {
       const wrapper = await getWrapper({
-        data: { isSelected: 'assignments', assignments, assignmentsCompletion },
+        data: { assignments, assignmentsCompletion },
       })
       const studentCompletion = wrapper.find(
         '[data-testid="student-completion"]'

@@ -1,21 +1,6 @@
 <template>
   <div class="teacher-dashboard">
-    <ClassDetails
-      v-if="this.view === 'classDetails'"
-      :classId="classId"
-      :classes="classes"
-      :initialClassData="currentClassInfo"
-    />
-    <StudentDetails
-      v-else-if="this.view === 'studentDetails'"
-      :classInfo="currentClassInfo"
-      :className="currentClassInfo.name"
-      :topics="topics"
-    />
-    <Assignment
-      v-else-if="this.view === 'assignment'"
-      :currentClassCode="currentClassInfo.code"
-    />
+    <router-view v-if="$route.name !== 'TeacherDashboard'" />
     <div v-else>
       <div class="dashboard-banner">
         <div>
@@ -152,9 +137,6 @@
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
-import ClassDetails from './ClassDetailsView.vue'
-import StudentDetails from './StudentDetailsView.vue'
-import Assignment from './AssignmentView.vue'
 import ClassImgPreferred from '@/assets/class.avif?url'
 import ClassImgFallback from '@/assets/class.svg?url'
 import Checklist from '@/assets/Checklist.svg'
@@ -174,15 +156,11 @@ import TeacherOnboarding_Frame4Fallback from '@/assets/teacher_onboarding_frames
 import { mapState, mapGetters } from 'vuex'
 import { toastController } from '@ionic/vue'
 import { EVENTS } from '@/consts'
-import { isEmpty } from 'lodash-es'
 
 export default {
   name: 'teacher-dashboard',
   components: {
     Loader,
-    ClassDetails,
-    StudentDetails,
-    Assignment,
     Checklist,
     CleverLogo,
     ExternalPage,
@@ -208,36 +186,13 @@ export default {
 
   data() {
     return {
-      view: null,
       classes: [],
       isLoading: true,
-      classId: '',
-      studentId: '',
-      currentClassInfo: {},
       showOnboardingModal: false,
       pages: [],
       ClassImgPreferred,
       ClassImgFallback,
     }
-  },
-  watch: {
-    $route(to) {
-      if (
-        to.params.classId &&
-        !to.params.studentId &&
-        !to.params.assignmentId
-      ) {
-        this.classId = to.params.classId
-        this.view = 'classDetails'
-      } else if (to.params.classId && to.params.studentId) {
-        this.classId = to.params.classId
-        this.view = 'studentDetails'
-      } else if (to.params.classId && to.params.assignmentId) {
-        this.view = 'assignment'
-      } else {
-        this.view = ''
-      }
-    },
   },
 
   async created() {
@@ -296,28 +251,6 @@ export default {
         },
       },
     ]
-    // TODO: Clean-up routing.
-    const { classId, studentId, assignmentId } = this.$route.params
-
-    if (classId) {
-      this.classId = classId
-
-      if (isEmpty(this.currentClassInfo)) {
-        this.currentClassInfo = await this.getClassInfo(this.classId)
-      }
-    }
-
-    if (classId && !studentId && !assignmentId) {
-      this.view = 'classDetails'
-    } else if (studentId) {
-      this.studentId = studentId
-      this.view = 'studentDetails'
-    } else if (assignmentId) {
-      this.view = 'assignment'
-    } else {
-      this.view = ''
-    }
-
     await this.getTeacherClasses()
 
     if (
@@ -349,20 +282,6 @@ export default {
         position: 'bottom',
       })
       await toast.present()
-    },
-
-    async getClassInfo(classId) {
-      try {
-        const {
-          data: { teacherClass },
-        } = await NetworkService.getTeacherClassById(classId)
-        return teacherClass
-      } catch (err) {
-        const error =
-          err?.response?.data?.err ??
-          'Unable to get class information. Please refresh the page and try again.'
-        this.showToast(error, true)
-      }
     },
 
     async getTeacherClasses() {
@@ -462,9 +381,6 @@ export default {
 
     viewDetails(teacherClass) {
       AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CLASS_ON_DASH)
-      this.classId = teacherClass.id
-      this.currentClassInfo = teacherClass
-      this.currentClassName = teacherClass.name
       this.$router.push(`/dashboard/teacher/class/${teacherClass.id}`)
     },
     handleTeacherGuidanceClick() {

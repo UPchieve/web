@@ -163,10 +163,13 @@ export default {
   name: 'Assignment',
   components: { AssignmentIcon, Calendar, Loader, CopyIcon },
 
+  inject: ['classData'],
+
   data() {
     return {
       isLoading: true,
       assignmentId: '',
+      classId: '',
       assignmentInfo: {},
       startDate: '',
       dueDate: '',
@@ -178,19 +181,12 @@ export default {
     }
   },
 
-  props: {
-    currentClassCode: {
-      type: String,
-      required: false,
-    },
-  },
-
   async created() {
     this.assignmentId = this.$route.params.assignmentId
+    this.classId = this.$route.params.classId
     this.assignmentInfo = await this.getAssignmentDetails(this.assignmentId)
     this.startDate = dayjs(this.assignmentInfo.startDate).format('MM/DD/YYYY')
     this.dueDate = dayjs(this.assignmentInfo.dueDate).format('MM/DD/YYYY')
-    this.classId = this.$route.params.classId
     this.studentCompletion = await this.getAssignmentCompletionInfo(
       this.assignmentId
     )
@@ -208,7 +204,7 @@ export default {
   methods: {
     async copyURL() {
       const { copy } = useClipboard()
-      copy(`https://app.upchieve.org/join-class/${this.currentClassCode}`)
+      copy(`https://app.upchieve.org/join-class/${this.classData?.code}`)
 
       const toast = await toastController.create({
         message: 'Your unique class link has been copied!',

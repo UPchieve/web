@@ -1,7 +1,9 @@
-import router from '@/router'
 import { createStore } from 'vuex'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createMemoryHistory, createRouter } from 'vue-router'
+
+import '@/store'
 import userModule from '@/store/modules/user'
 import subjectsModule from '@/store/modules/subjects'
 import NetworkService from '@/services/NetworkService'
@@ -58,6 +60,17 @@ const topics = [
     trainingOrder: 6,
   },
 ]
+
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    {
+      path: '/dashboard/teacher',
+      name: 'TeacherDashboard',
+      component: TeacherDashboard,
+    },
+  ],
+})
 
 const getWrapper = async (overrides = {}) => {
   const store = createStore({

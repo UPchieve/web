@@ -1,6 +1,7 @@
 <template>
   <div class="class-details-view" ref="classDetails">
-    <div class="main">
+    <router-view v-if="isChildRoute" />
+    <div v-else class="main">
       <div class="class-header">
         <div class="breadcrumbs">
           <button
@@ -320,6 +321,7 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { mapState, mapGetters } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
@@ -338,7 +340,6 @@ import VerticalMenuButtonsIcon from '@/assets/VerticalMenuButtons.svg'
 import TrashIcon from '@/assets/trash.svg'
 import RemoveIcon from '@/assets/Remove.svg'
 import { toastController } from '@ionic/vue'
-import { isEmpty } from 'lodash-es'
 import FormDateInput from '@/components/FormInputs/FormDateInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import {
@@ -348,6 +349,13 @@ import {
 
 export default {
   name: 'ClassDetails',
+
+  provide() {
+    return {
+      classData: computed(() => this.classData),
+    }
+  },
+
   components: {
     Loader,
     LinkUnion,
@@ -371,10 +379,10 @@ export default {
       viewSessions: false,
       student: {},
       studentId: '',
-      isSelected: 'classDetails',
       assignments: [],
       toggledAssignmentId: '',
       assignmentsCompletion: {},
+      classes: [],
       className: '',
       topicId: '',
       toggledStudentMenuId: '',
@@ -390,20 +398,6 @@ export default {
       },
     }
   },
-  props: {
-    initialClassData: {
-      type: Object,
-      required: true,
-    },
-    classes: {
-      type: Array,
-      required: true,
-    },
-    classId: {
-      type: String,
-      required: true,
-    },
-  },
 
   mounted() {
     this.$refs.classDetails.addEventListener('click', this.closeMenu)
@@ -414,11 +408,15 @@ export default {
   },
 
   async created() {
-    this.classData = isEmpty(this.initialClassData)
-      ? await this.getClassInfo(this.$route.params.classId)
-      : this.initialClassData
+    this.classData = await this.getClassInfo(this.classId)
     this.className = this.classData.name
     this.topicId = this.classData.topicId
+
+    const {
+      data: { teacherClasses },
+    } = await NetworkService.getTeacherClasses()
+    this.classes = teacherClasses.filter((c) => !c.deactivatedOn)
+
     await this.$store.dispatch('subjects/awaitTopics')
     if (this.classData.topicId) {
       const topic = this.topics.find((t) => t.id === this.classData.topicId)
@@ -428,25 +426,30 @@ export default {
       this.filters.topic.name = 'other'
       this.subjectPlaceholder = 'All Subjects'
     }
-    if (
-      this.$route.params.classId &&
-      !this.$route.path.includes('assignments') &&
-      !this.$route.params.studentId
-    ) {
-      this.students = await this.getStudents(this.$route.params.classId)
-      this.isLoading = false
-    } else if (
-      this.$route.params.classId &&
-      this.$route.path.includes('assignments')
-    ) {
-      this.isSelected = 'assignments'
+
+    if (this.$route.path.includes('assignments')) {
       await this.showAssignments()
-    } else if (!this.$route.params.classId) {
-      this.$router.push('/dashboard')
+    } else {
+      this.students = await this.getStudents(this.classId)
+      this.isLoading = false
     }
   },
 
   computed: {
+    classId() {
+      return this.$route.params.classId
+    },
+    isSelected() {
+      return this.$route.name === 'ClassDetailsView'
+        ? 'classDetails'
+        : 'assignments'
+    },
+    isChildRoute() {
+      return (
+        this.$route.name === 'StudentDetailsView' ||
+        this.$route.name === 'AssignmentView'
+      )
+    },
     ...mapState({
       topics: (state) => state.subjects.topics,
       subjects: (state) => state.subjects.subjects,
@@ -743,8 +746,6 @@ export default {
         if (files.length) {
           await this.uploadFiles(assignmentIds, files)
         }
-
-        this.isSelected = 'assignments'
       } catch (err) {
         this.error = err.response.data.err ?? 'Unable to create assignment.'
       }
@@ -840,13 +841,11 @@ export default {
         isSelected === 'classDetails' &&
         !this.$route.path.includes('assignments')
       ) {
-        this.isSelected = 'assignments'
         this.$router.push(
           `/dashboard/teacher/class/${this.classData.id}/assignments`
         )
         await this.showAssignments()
       } else {
-        this.isSelected = 'classDetails'
         this.$router.push(`/dashboard/teacher/class/${this.classData.id}`)
         this.students = await this.getStudents(this.classId)
         this.isLoading = false
@@ -862,7 +861,7 @@ export default {
 
     viewAssignment(assignmentId) {
       this.$router.push(
-        `/dashboard/teacher/class/${this.classData.id}/assignment/${assignmentId}`
+        `/dashboard/teacher/class/${this.classData.id}/assignments/${assignmentId}`
       )
     },
 

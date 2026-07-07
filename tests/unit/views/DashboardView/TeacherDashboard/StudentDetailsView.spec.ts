@@ -1,11 +1,12 @@
-import StudentDetailsView from '@/views/DashboardView/TeacherDashboard/StudentDetailsView.vue'
-import NetworkService from '@/services/NetworkService'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
-import router from '@/router'
 import { createStore } from 'vuex'
+import { createMemoryHistory, createRouter } from 'vue-router'
+
 import subjectsModule from '@/store/modules/subjects'
 import { dayjs } from '@/utils/time-utils'
+import StudentDetailsView from '@/views/DashboardView/TeacherDashboard/StudentDetailsView.vue'
+import NetworkService from '@/services/NetworkService'
 
 const algebraClassInfo = {
   id: 'classId',
@@ -72,6 +73,40 @@ const sessionDetails = [
   },
 ]
 
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    {
+      path: '/dashboard/teacher',
+      name: 'TeacherDashboard',
+      children: [
+        {
+          path: 'class/:classId',
+          name: 'ClassDetailsView',
+          children: [
+            {
+              path: 'student/:studentId',
+              name: 'StudentDetailsView',
+              component: StudentDetailsView,
+            },
+          ],
+        },
+        {
+          path: 'class/:classId/assignments',
+          name: 'ClassAssignmentsView',
+          children: [
+            {
+              path: ':assignmentId',
+              name: 'AssignmentView',
+              redirect: '',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+})
+
 const getWrapper = async ({ data = {}, classInfo = algebraClassInfo }) => {
   const store = createStore({
     modules: {
@@ -119,10 +154,9 @@ const getWrapper = async ({ data = {}, classInfo = algebraClassInfo }) => {
   const wrapper = mount(StudentDetailsView, {
     global: {
       plugins: [store, router],
-    },
-    props: {
-      className: classInfo.name,
-      classInfo,
+      provide: {
+        classData: classInfo,
+      },
     },
   })
 

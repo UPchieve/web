@@ -71,6 +71,12 @@ const ProgressReportsOverviewSubjectView = () =>
   import('./views/ProgressReportsOverviewSubjectView.vue')
 const TeacherDashboardView = () =>
   import('./views/DashboardView/TeacherDashboard/index.vue')
+const TeacherClassDetailsView = () =>
+  import('./views/DashboardView/TeacherDashboard/ClassDetailsView.vue')
+const TeacherStudentDetailsView = () =>
+  import('./views/DashboardView/TeacherDashboard/StudentDetailsView.vue')
+const TeacherAssignmentView = () =>
+  import('./views/DashboardView/TeacherDashboard/AssignmentView.vue')
 const CleverSigninInstructions = () =>
   import('./views/SignupView/CleverSigninInstructions.vue')
 const RewardsView = () => import('./views/RewardsView.vue')
@@ -817,19 +823,24 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'class/:classId',
         name: 'ClassDetailsView',
+        component: TeacherClassDetailsView,
         children: [
           {
             path: 'student/:studentId',
             name: 'StudentDetailsView',
+            component: TeacherStudentDetailsView,
           },
+        ],
+      },
+      {
+        path: 'class/:classId/assignments',
+        name: 'ClassAssignmentsView',
+        component: TeacherClassDetailsView,
+        children: [
           {
-            path: 'assignment/:assignmentId',
+            path: ':assignmentId',
             name: 'AssignmentView',
-          },
-          {
-            path: 'assignments',
-            name: 'ClassAssignmentsView',
-            component: TeacherDashboardView,
+            component: TeacherAssignmentView,
           },
         ],
       },
