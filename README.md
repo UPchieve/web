@@ -129,7 +129,7 @@ Our unit tests do not incorporate visual testing for SVG components (refer to th
 
 So, after extensive research and exhausting nearly all possible options of rendering and testing SVGs, as of August 4 2021, we realized that this has been a prolonged JSDOM/JavaScript [issue](https://github.com/vuejs/vue-test-utils/issues/369) and not something that is occuring due to vue-test-utils or jest capabilities. Hence, consider it acceptable to not visually test SVGs for the time being. Or, use Vitest browser tests with a real browser.
 
-## E2E Testing (Under construction)
+## E2E Testing
 
 ### How it works
 
@@ -143,7 +143,7 @@ Note: You don't need to start the backend or frontend servers yourself. Playwrig
 
 1. Install chrome for playwright: `npx playwright install chrome`
 2. **Set your environment variable `SUBWAY_REPO_PATH` to wherever your subway project is stored on your machine.** This enables the startup script to create the dockerized e2e environment and start the subway server.
-3. By default, the subway server logs are not output into the terminal, but to change this, set `log = true` in `/tests/e2e/setup.js`. (@TODO - Parameterize this in the pnpm command)
+3. You will see subway logs only for the log level defined in your subway env variables - check your subway's `.env.e2e` and set `SUBWAY_LOG_LEVEL` to whichever level (i.e. `info, error`) you'd like.
 4. Now run `pnpm run test:e2e` or `pnpm run test:e2e:ui`
 
 ### Adding test data
