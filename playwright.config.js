@@ -1,5 +1,39 @@
 // @ts-check
-const { defineConfig, devices } = require('@playwright/test')
+import { defineConfig, devices } from '@playwright/test'
+
+const localBrowsers = [
+  {
+    name: 'firefox',
+    use: { ...devices['Desktop Firefox'] },
+  },
+
+  {
+    name: 'webkit',
+    use: { ...devices['Desktop Safari'] },
+  },
+
+  /* Test against mobile viewports. */
+  {
+    name: 'Mobile Chrome',
+    use: { ...devices['Pixel 5'] },
+  },
+  {
+    name: 'Mobile Safari',
+    use: { ...devices['iPhone 12'] },
+  },
+
+  /* Test against branded browsers. */
+  {
+    name: 'Google Chrome',
+    use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+  },
+]
+const ciBrowsers = [
+  {
+    name: 'Google Chrome',
+    use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+  },
+]
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -16,7 +50,7 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: process.env.CI ? 'list' : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -33,7 +67,7 @@ module.exports = defineConfig({
     },
   },
   webServer: {
-    command: `pnpm run serve -- --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}> high-line.log 2>&1`,
+    command: `pnpm run serve --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}> high-line.log 2>&1`,
     url: 'http://localhost:8081',
     reuseExistingServer: false,
     stdout: 'ignore',
@@ -45,31 +79,5 @@ module.exports = defineConfig({
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
-
-    /* Test against branded browsers. */
-    {
-      name: 'Google Chrome',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    },
-  ],
+  projects: process.env.CI ? ciBrowsers : localBrowsers,
 })

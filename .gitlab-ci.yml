@@ -126,7 +126,7 @@ test:
   extends: .node_setup
   before_script:
     - !reference [.node_setup, before_script]
-    - npx playwright install --with-deps chromium
+    - pnpm exec playwright install --with-deps chromium
   script:
     - pnpm run test
   rules:
@@ -138,9 +138,9 @@ test:
 e2e-test:
   stage: test
   extends: .node_setup
-  image: mcr.microsoft.com/playwright:v1.57.0-jammy
+  image: mcr.microsoft.com/playwright:v1.59.1-jammy
   services:
-    - postgres:14
+    - postgres:15.17
     - redis:6.2.1
   variables:
     CI: 'true'
@@ -155,11 +155,14 @@ e2e-test:
     - echo 'Set up high-line...'
     - !reference [.node_setup, before_script]
     - echo 'Install Chrome to test against the branded browser...'
-    - npx playwright install chrome
+    - pnpm exec playwright install chrome
     - echo 'Set up subway...'
     - git clone --depth=1 https://gitlab.com/upchieve/subway.git
+    - cd subway
+    - echo 'Subway commit version'
+    - echo $(git rev-parse HEAD)
     # TODO: Figure out a way to cache subway node_modules.
-    - cd subway && pnpm install --frozen-lockfile
+    - pnpm install --frozen-lockfile
     - echo 'Verify Postgres is running and seed database...'
     - apt-get update && apt-get install -y postgresql-client
     - export PGPASSWORD=$POSTGRES_PASSWORD
