@@ -207,13 +207,11 @@ e2e-test:
       - high-line.log
       - playwright-report/
     expire_in: 7 days
-  allow_failure: true
   rules:
     - if: '$TEST_DISABLED'
       when: never
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
-    - if: $CI_PIPELINE_SOURCE == "schedule" # Scheduled pipeline.
-    - when: manual
 
 lint:
   stage: test
