@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
 import '@/store'
@@ -61,6 +61,7 @@ const topics = [
   },
 ]
 
+const stubTemplate = { template: '<div />' }
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
@@ -68,6 +69,37 @@ const router = createRouter({
       path: '/dashboard/teacher',
       name: 'TeacherDashboard',
       component: TeacherDashboard,
+      meta: { breadcrumb: 'Classes' },
+      children: [
+        {
+          path: 'class/:classId',
+          name: 'ClassDetailsView',
+          component: stubTemplate,
+          meta: { breadcrumb: 'Class Details' },
+          children: [
+            {
+              path: 'student/:studentId',
+              name: 'StudentDetailsView',
+              component: stubTemplate,
+              meta: { breadcrumb: 'Student Details' },
+            },
+          ],
+        },
+        {
+          path: 'class/:classId/assignments',
+          name: 'ClassAssignmentsView',
+          component: stubTemplate,
+          meta: { breadcrumb: 'Class Details' },
+          children: [
+            {
+              path: ':assignmentId',
+              name: 'AssignmentView',
+              component: stubTemplate,
+              meta: { breadcrumb: 'Assignment Details' },
+            },
+          ],
+        },
+      ],
     },
   ],
 })
@@ -164,5 +196,111 @@ describe('Teacher Dashboard', () => {
     expect(routerPushSpy).toHaveBeenCalledWith(
       `/dashboard/teacher/class/${classes[0].id}`
     )
+  })
+
+  describe('breadcrumbs', () => {
+    beforeEach(async () => {
+      vi.restoreAllMocks()
+      NetworkService.getTopics = vi.fn().mockResolvedValue({ data: { topics } })
+      NetworkService.getTeacherClasses = vi
+        .fn()
+        .mockResolvedValue({ data: { teacherClasses: [] } })
+    })
+    async function mountAt(path: string) {
+      await router.push(path)
+      return getWrapper()
+    }
+
+    const labels = (wrapper: any) =>
+      wrapper.vm.breadcrumbs.map((crumb: any) => crumb.label)
+
+    test('breadcrumbs do not appear on dashboard page', async () => {
+      const wrapper = await mountAt('/dashboard/teacher')
+      expect(wrapper.find('[data-testid="breadcrumbs"]').exists()).toBeFalsy()
+    })
+
+    test('class details view renders "Class Details" as the current page, not a link', async () => {
+      const wrapper = await mountAt('/dashboard/teacher/class/123')
+      expect(labels(wrapper)).toEqual(['Classes', 'Class Details'])
+      expect(wrapper.find('a[data-testid="Class Details"]').exists()).toBe(
+        false
+      )
+      expect(wrapper.find('span[data-testid="Class Details"]').exists()).toBe(
+        true
+      )
+      expect(wrapper.find('a[data-testid="Classes"]').exists()).toBe(true)
+    })
+
+    test('student details view renders "Student Details" as the current page, not a link', async () => {
+      const wrapper = await mountAt('/dashboard/teacher/class/123/student/000')
+      expect(labels(wrapper)).toEqual([
+        'Classes',
+        'Class Details',
+        'Student Details',
+      ])
+      expect(wrapper.find('a[data-testid="Student Details"]').exists()).toBe(
+        false
+      )
+      expect(wrapper.find('span[data-testid="Student Details"]').exists()).toBe(
+        true
+      )
+      expect(wrapper.find('a[data-testid="Classes"]').exists()).toBe(true)
+      expect(wrapper.find('a[data-testid="Class Details"]').exists()).toBe(true)
+    })
+
+    test('assignment details view renders "Assignment Details" as the current page, not a link', async () => {
+      const wrapper = await mountAt(
+        '/dashboard/teacher/class/123/assignments/999'
+      )
+      expect(labels(wrapper)).toEqual([
+        'Classes',
+        'Class Details',
+        'Assignment Details',
+      ])
+      expect(wrapper.find('a[data-testid="Assignment Details"]').exists()).toBe(
+        false
+      )
+      expect(
+        wrapper.find('span[data-testid="Assignment Details"]').exists()
+      ).toBe(true)
+      expect(wrapper.find('a[data-testid="Classes"]').exists()).toBe(true)
+      expect(wrapper.find('a[data-testid="Class Details"]').exists()).toBe(true)
+    })
+
+    test('student detail links "Class Details" back to the Students tab', async () => {
+      const wrapper = await mountAt('/dashboard/teacher/class/123/student/456')
+      const link = wrapper.find('[data-testid="Class Details"]')
+      await link.trigger('click')
+      await flushPromises()
+      expect(router.currentRoute.value.name).toBe('ClassDetailsView')
+    })
+
+    test('student detail links "Classes" back to the dashboard', async () => {
+      const wrapper = await mountAt('/dashboard/teacher/class/123/student/456')
+      const link = wrapper.find('[data-testid="Classes"]')
+      await link.trigger('click')
+      await flushPromises()
+      expect(router.currentRoute.value.name).toBe('TeacherDashboard')
+    })
+
+    test('assignment detail links "Class Details" back to the Assignments tab', async () => {
+      const wrapper = await mountAt(
+        '/dashboard/teacher/class/123/assignments/789'
+      )
+      const link = wrapper.find('[data-testid="Class Details"]')
+      await link.trigger('click')
+      await flushPromises()
+      expect(router.currentRoute.value.name).toBe('ClassAssignmentsView')
+    })
+
+    test('assignment detail links "Classes" back to the Assignments tab', async () => {
+      const wrapper = await mountAt(
+        '/dashboard/teacher/class/123/assignments/789'
+      )
+      const link = wrapper.find('[data-testid="Classes"]')
+      await link.trigger('click')
+      await flushPromises()
+      expect(router.currentRoute.value.name).toBe('TeacherDashboard')
+    })
   })
 })

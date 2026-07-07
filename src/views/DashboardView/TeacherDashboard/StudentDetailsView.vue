@@ -2,13 +2,6 @@
   <div>
     <div class="main">
       <div class="student-header">
-        <button type="button" class="back-btn" @click="backToClasses()">
-          Classes
-        </button>
-        <button type="button" class="back-btn" @click="backToClassDetails()">
-          > Class Details
-        </button>
-        <span class="student-details"> > Student Details</span>
         <div class="student-info">
           <div class="img-container">
             <student-avatar class="img"></student-avatar>
@@ -152,7 +145,6 @@ export default {
 
   data() {
     return {
-      classId: '',
       studentId: '',
       sessions: [],
       studentFirstName: '',
@@ -182,7 +174,6 @@ export default {
   },
 
   async created() {
-    this.classId = this.$route.params.classId
     this.studentId = this.$route.params.studentId
 
     await this.$store.dispatch('subjects/awaitTopics')
@@ -199,13 +190,6 @@ export default {
   },
 
   methods: {
-    backToClasses() {
-      this.$router.push('/dashboard/teacher')
-    },
-    backToClassDetails() {
-      this.$router.push(`/dashboard/teacher/class/${this.classId}`)
-    },
-
     formatTimestamp(timestamp) {
       const date = dayjs(timestamp)
       return date.format('MM/DD/YYYY')
@@ -285,17 +269,6 @@ export default {
 <style lang="scss" scoped>
 .main {
   @include flex-container(column, center);
-}
-
-.back-btn {
-  color: #1855d1;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-.student-details {
-  color: #666f7d;
-  font-size: 14px;
 }
 
 .student-info {

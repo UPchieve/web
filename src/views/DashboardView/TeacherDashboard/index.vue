@@ -1,6 +1,29 @@
 <template>
   <div class="teacher-dashboard">
-    <router-view v-if="$route.name !== 'TeacherDashboard'" />
+    <template v-if="$route.name !== 'TeacherDashboard'">
+      <nav
+        v-if="breadcrumbs.length"
+        class="breadcrumbs"
+        aria-label="Breadcrumb"
+        data-testid="breadcrumbs"
+      >
+        <template v-for="(crumb, index) in breadcrumbs" :key="crumb.label">
+          <span v-if="index > 0" class="breadcrumb-separator">&gt;</span>
+          <router-link
+            v-if="index < breadcrumbs.length - 1"
+            :to="crumb.to"
+            class="breadcrumb-link"
+            :data-testid="crumb.label"
+          >
+            {{ crumb.label }}
+          </router-link>
+          <span v-else class="breadcrumb-current" :data-testid="crumb.label">{{
+            crumb.label
+          }}</span>
+        </template>
+      </nav>
+      <router-view />
+    </template>
     <div v-else>
       <div class="dashboard-banner">
         <div>
@@ -170,6 +193,16 @@ export default {
   },
 
   computed: {
+    breadcrumbs() {
+      return this.$route.matched
+        .filter((route) => !!route.meta.breadcrumb)
+        .map((route) => {
+          return {
+            label: route.meta.breadcrumb,
+            to: { name: route.name, params: this.$route.params },
+          }
+        })
+    },
     ...mapState({
       user: (state) => state.user,
       subjects: (state) => state.subjects.subjects,
@@ -397,6 +430,22 @@ export default {
   height: 100%;
   overflow: auto;
   background-color: #fbfbfc;
+}
+
+.breadcrumbs {
+  @include flex-container(row, flex-start, center);
+  font-size: 14px;
+  gap: 6px;
+  margin-bottom: 16px;
+
+  .breadcrumb-link {
+    color: $c-information-blue;
+  }
+
+  .breadcrumb-current,
+  .breadcrumb-separator {
+    color: #666f7d;
+  }
 }
 
 .dashboard-banner {

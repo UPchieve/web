@@ -3,16 +3,6 @@
     <router-view v-if="isChildRoute" />
     <div v-else class="main">
       <div class="class-header">
-        <div class="breadcrumbs">
-          <button
-            type="button"
-            class="back-to-classes"
-            @click="backToClasses()"
-          >
-            Classes
-          </button>
-          <span class="class-details"> > Class Details</span>
-        </div>
         <div class="class-info">
           <div class="start-col">
             <img
@@ -63,7 +53,7 @@
           @click="openTab(isSelected)"
           data-testid="class-details-tab"
         >
-          Class Details
+          Students
         </p>
         <p
           class="tabs__header-type"
@@ -504,10 +494,6 @@ export default {
         position: 'bottom',
       })
       await toast.present()
-    },
-
-    backToClasses() {
-      this.$router.push('/dashboard')
     },
 
     formatTimestamp(timestamp) {
@@ -1024,19 +1010,6 @@ export default {
 
 .date-input {
   margin: 0px;
-}
-
-.breadcrumbs {
-  @include flex-container(row, flex-start, center);
-  font-size: 14px;
-
-  .back-to-classes {
-    color: $c-information-blue;
-  }
-
-  .class-details {
-    color: #666f7d;
-  }
 }
 
 .empty-sessions-container {

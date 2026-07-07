@@ -817,18 +817,20 @@ const routes: RouteRecordRaw[] = [
     path: '/dashboard/teacher',
     name: 'TeacherDashboard',
     component: TeacherDashboardView,
-    meta: { protected: true },
+    meta: { protected: true, breadcrumb: 'Classes' },
     beforeEnter: [switchToTeacherOrCancel],
     children: [
       {
         path: 'class/:classId',
         name: 'ClassDetailsView',
         component: TeacherClassDetailsView,
+        meta: { breadcrumb: 'Class Details' },
         children: [
           {
             path: 'student/:studentId',
             name: 'StudentDetailsView',
             component: TeacherStudentDetailsView,
+            meta: { breadcrumb: 'Student Details' },
           },
         ],
       },
@@ -836,11 +838,13 @@ const routes: RouteRecordRaw[] = [
         path: 'class/:classId/assignments',
         name: 'ClassAssignmentsView',
         component: TeacherClassDetailsView,
+        meta: { breadcrumb: 'Class Details' },
         children: [
           {
             path: ':assignmentId',
             name: 'AssignmentView',
             component: TeacherAssignmentView,
+            meta: { breadcrumb: 'Assignment Details' },
           },
         ],
       },

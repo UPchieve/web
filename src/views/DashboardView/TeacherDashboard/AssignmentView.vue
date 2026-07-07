@@ -1,10 +1,5 @@
 <template>
   <div class="assignment-container">
-    <div class="breadcrumbs-container">
-      <button type="button" class="back-btn" @click="backToAssignments()">
-        ← Back to assignments
-      </button>
-    </div>
     <div class="loader-container" v-if="isLoading">
       <loader />
     </div>
@@ -169,7 +164,6 @@ export default {
     return {
       isLoading: true,
       assignmentId: '',
-      classId: '',
       assignmentInfo: {},
       startDate: '',
       dueDate: '',
@@ -183,7 +177,6 @@ export default {
 
   async created() {
     this.assignmentId = this.$route.params.assignmentId
-    this.classId = this.$route.params.classId
     this.assignmentInfo = await this.getAssignmentDetails(this.assignmentId)
     this.startDate = dayjs(this.assignmentInfo.startDate).format('MM/DD/YYYY')
     this.dueDate = dayjs(this.assignmentInfo.dueDate).format('MM/DD/YYYY')
@@ -249,10 +242,6 @@ export default {
       }
     },
 
-    backToAssignments() {
-      this.$router.push(`/dashboard/teacher/class/${this.classId}/assignments`)
-    },
-
     async getAssignmentCompletionInfo(assignmentId) {
       const {
         data: { studentAssignments },
@@ -280,12 +269,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.back-btn {
-  color: $c-information-blue;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
 .assignment {
   color: #666f7d;
   font-size: 14px;
@@ -336,10 +319,6 @@ export default {
   padding: 16px;
   border-radius: 8px;
   border: 3px solid $c-success-green;
-}
-
-.breadcrumbs-container {
-  margin-left: 2em;
 }
 
 .dates-container {
