@@ -58,7 +58,11 @@ onMounted(async () => {
     <div v-if="!mobileMode" class="journey-modal__separator" />
 
     <footer class="journey-modal__buttons">
-      <large-button @click="handleLater">Maybe later</large-button>
+      <large-button
+        data-testid="journey-modal-maybe-later-button"
+        @click="handleLater"
+        >Maybe later</large-button
+      >
       <large-button
         @click="goToJourneysPage"
         variant="primary-blue"

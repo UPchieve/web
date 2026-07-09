@@ -32,7 +32,7 @@ test.describe('Session notifications', async () => {
     await dbClient.release()
   })
 
-  test.skip('Volunteer gets session notification', async ({ browser }) => {
+  test('Volunteer gets session notification', async ({ browser }) => {
     const { volunteerPage } = await loginVolunteer(browser, volunteerUser)
     await setFeatureFlags(volunteerPage, {
       [POSTHOG_FEATURE_FLAGS.SHOW_IN_APP_SESSION_NOTIFICATIONS]: true,
@@ -41,6 +41,7 @@ test.describe('Session notifications', async () => {
 
     // Now that the volunteer is ready, request a session as a student
     const { studentDashboard } = await loginStudent(browser, studentUser)
+    await studentDashboard.dismissJourneyModal()
     const { sessionId } = await requestSession(studentDashboard, {
       topic: 'prealgebra',
       subject: 'math',

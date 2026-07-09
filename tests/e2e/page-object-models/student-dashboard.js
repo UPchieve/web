@@ -11,6 +11,14 @@ export class StudentDashboard {
     return this.page.viewportSize().width < 767
   }
 
+  async dismissJourneyModal() {
+    return this.page.getByTestId('journey-modal-maybe-later-button').click()
+  }
+
+  async dismissNotificationModal() {
+    return this.page.getByTestId('close-notification-modal').click()
+  }
+
   async createSessionFor(sessionArgs) {
     const { subject, topic } = sessionArgs
     const card = await this.page.getByTestId(`${subject}-subject-card`)

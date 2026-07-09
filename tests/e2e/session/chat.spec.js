@@ -31,7 +31,7 @@ test.describe('Session', async () => {
     await dbClient.release()
   })
 
-  test.skip('can chat', async ({ browser }) => {
+  test('can chat', async ({ browser }) => {
     /* Sign in student */
     const studentContext = await browser.newContext()
     const studentPage = await studentContext.newPage()
@@ -55,14 +55,17 @@ test.describe('Session', async () => {
     await volunteerLogin.loginWith(volunteerUser)
     await volunteerPage.waitForURL('**/dashboard')
 
-    await studentDashboard.createSessionFor({
+    await studentDashboard.dismissJourneyModal()
+    const { sessionId } = await studentDashboard.createSessionFor({
       subject: 'math',
       topic: 'prealgebra',
     })
+    await studentDashboard.dismissNotificationModal()
+
     const studentMessage = `hello from ${studentUser.firstName}`
     await studentSessionView.sendMessage(studentMessage)
 
-    await volunteerDashboard.joinSessionFor(studentUser.firstName)
+    await volunteerDashboard.joinSessionFor(sessionId)
     await volunteerSessionView.hasMessage(studentMessage)
 
     const volunteerMessage = `hi from ${volunteerUser.firstName}`

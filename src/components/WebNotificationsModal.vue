@@ -27,6 +27,7 @@
             Yes, notify me!
           </large-button>
           <hyperlink-button
+            data-testid="close-notification-modal"
             class="web-notifications-modal__no_button"
             @click="closeModal"
             >No, thanks</hyperlink-button
