@@ -181,6 +181,7 @@ e2e-test:
     - export SUBWAY_REDIS_HOST=$REDIS_HOST
     - export SUBWAY_SERVER_HOST=localhost:8081
     - export SUBWAY_LOG_LEVEL=info
+    - export NODE_ENV=test_e2e_ci
     - echo 'Start subway server...'
     - pnpm run dev:backend > ../subway.log 2>&1 &
     - |
