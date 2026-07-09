@@ -1,5 +1,5 @@
 <template>
-  <div class="student-dashboard">
+  <div class="student-dashboard" data-testid="student-dashboard">
     <div v-if="showAssignments">
       <StudentAssignments :assignments="user.studentAssignments" />
     </div>

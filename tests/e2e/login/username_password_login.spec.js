@@ -62,10 +62,10 @@ for (const v of [true, false]) {
       const loginPage = new Login(page)
       await loginPage.loginWith({ email, password })
       await page.waitForURL('**/dashboard')
-      await expect(page.getByTestId('dashboard-banner')).toBeVisible()
+      await expect(page.getByTestId('student-dashboard')).toBeVisible()
     })
 
-    test.skip(
+    test(
       'Error message appears when incorrect credentials are provided' +
         nameSuffix(v),
       async ({ page }) => {
