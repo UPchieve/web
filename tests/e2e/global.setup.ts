@@ -4,6 +4,7 @@ import {
   setSubwayProcess,
   registerSubwaySignalHandlers,
 } from './teardown-functions'
+import { openSync } from 'node:fs'
 
 setup('create new database', async () => {
   if (process.env.CI) {
@@ -45,20 +46,25 @@ function createSubwayE2eEnvironment(subwayRepoPath: string) {
   }
 }
 
+/**
+ * @NOTE
+ * need to see the subway logs while developing?
+ * you can change `SUBWAY_LOG_LEVEL` in `subway/.env.e2e` and
+ * `tail` the file below. like this:
+ *
+ * `tail -f /tmp/high-line-e2e-subway.log`
+ */
+const out = openSync('/tmp/high-line-e2e-subway.log', 'a')
 async function startSubway(subwayRepoPath: string) {
   // eslint-disable-next-line no-console
   console.log('[SUBWAY] subway is starting...')
   let isUp = false
   const subwayProcess = spawn('pnpm', ['run', 'e2e:backend'], {
     cwd: subwayRepoPath,
+    stdio: ['ignore', out, out],
     detached: true,
   })
   setSubwayProcess(subwayProcess)
-
-  subwayProcess.stdout.on('data', (data) => {
-    // eslint-disable-next-line no-console
-    console.log('[SUBWAY]', data.toString())
-  })
 
   const waitTimes = [5000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]
   const waitTimeIds: NodeJS.Timeout[] = []

@@ -42,10 +42,18 @@ export class StudentDashboard {
     await this.page.getByTestId('presession-submit').click()
 
     await this.page.waitForURL(`**/session/${subject}/${topic}`)
-    await expect(
-      this.page.getByTestId('cancel-session-button'),
-      'should be in session without a partner'
-    ).toBeVisible()
+    if (this.isMobile) {
+      const header = this.page.locator('.session-header-container')
+      await expect(
+        header.getByTestId('cancel-session-button'),
+        'should be in session without a partner'
+      ).toBeVisible()
+    } else {
+      await expect(
+        this.page.getByTestId('cancel-session-button'),
+        'should be in session without a partner'
+      ).toBeVisible()
+    }
 
     const regex = new RegExp(`.*/session/${subject}/${topic}/(.*)`)
     return {
