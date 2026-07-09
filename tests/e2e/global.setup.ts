@@ -1,28 +1,27 @@
-import { spawn, spawnSync, type ChildProcessByStdio } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
+import { test as setup } from '@playwright/test'
+import {
+  setSubwayProcess,
+  registerSubwaySignalHandlers,
+} from './teardown-functions'
 
-let subwayProcess: ChildProcessByStdio<null, null, null>
-;['exit', 'SIGTERM', 'uncaughtException', 'rejectionHandled', 'SIGINT'].forEach(
-  (signal) => process.on(signal, exitSubway)
-)
-
-export default async function () {
+setup('create new database', async () => {
   if (process.env.CI) {
     // eslint-disable-next-line no-console
-    console.log('CI environment detected, skipping environment setup.')
+    console.warn('CI environment detected, skipping environment setup.')
     return
   }
 
+  registerSubwaySignalHandlers()
+
   const subwayPath = getSubwayRepoPath()
   createSubwayE2eEnvironment(subwayPath)
-  // Give time for db to be ready for connections
-  // @TODO Wait for a signal or healthcheck instead
-  await new Promise((resolve) => setTimeout(resolve, 2 * 1000))
   // NOTE: This setup expects subway's .env.e2e to have:
   //   SUBWAY_API_PORT=3001
   //   SUBWAY_SOCKETS_PORT=3001
   // This avoids port conflicts with the dev subway instance (which runs on port 3000).
   await startSubway(subwayPath)
-}
+})
 
 function getSubwayRepoPath() {
   const subwayRepoPath = process.env.SUBWAY_REPO_PATH
@@ -47,50 +46,42 @@ function createSubwayE2eEnvironment(subwayRepoPath: string) {
 }
 
 async function startSubway(subwayRepoPath: string) {
+  // eslint-disable-next-line no-console
+  console.log('[SUBWAY] subway is starting...')
   let isUp = false
-  subwayProcess = spawn('pnpm', ['run', 'e2e:backend'], {
+  const subwayProcess = spawn('pnpm', ['run', 'e2e:backend'], {
     cwd: subwayRepoPath,
-    stdio: ['ignore', 'inherit', 'inherit'],
     detached: true,
+  })
+  setSubwayProcess(subwayProcess)
+
+  subwayProcess.stdout.on('data', (data) => {
+    // eslint-disable-next-line no-console
+    console.log('[SUBWAY]', data.toString())
   })
 
   const waitTimes = [5000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]
+  const waitTimeIds: NodeJS.Timeout[] = []
   for (const waitTimeMs of waitTimes) {
-    await new Promise((r) => setTimeout(r, waitTimeMs))
+    await new Promise((r) => waitTimeIds.push(setTimeout(r, waitTimeMs)))
     try {
       const response = await fetch('http://localhost:3001/healthz')
       if (response.status === 200) {
         isUp = true
+        waitTimeIds.forEach(clearTimeout)
         // eslint-disable-next-line no-console
-        console.log('subway has started!')
+        console.log('[SUBWAY] subway has started!')
         break
       }
     } catch {
       // eslint-disable-next-line no-console
-      console.log(`waited ${waitTimeMs}ms, subway not started yet`)
+      console.log(`[SUBWAY] waited ${waitTimeMs}ms, subway not started yet`)
     }
   }
 
   if (!isUp) {
     throw new Error(
-      `Subway did not start after ${waitTimes.reduce((acc, v) => acc + v, 0) / 1000} seconds`
+      `[SUBWAY] subway did not start after ${waitTimes.reduce((acc, v) => acc + v, 0) / 1000} seconds`
     )
   }
-}
-
-async function exitSubway() {
-  // Kill all pids spawned by subwayProcess:
-  // https://azimi.me/2014/12/31/kill-child_process-node-js.html
-  if (subwayProcess?.pid) {
-    process.kill(-subwayProcess.pid)
-  }
-  destroySubwayE2eEnvironment(getSubwayRepoPath())
-  process.exit()
-}
-
-function destroySubwayE2eEnvironment(subwayRepoPath: string) {
-  spawnSync('pnpm', ['run', 'e2e:destroy'], {
-    cwd: subwayRepoPath,
-    stdio: ['ignore', 'inherit', 'inherit'],
-  })
 }

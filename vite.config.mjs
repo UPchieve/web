@@ -113,6 +113,14 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 8080,
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/subway/**',
+        '**/.pnpm-store/**',
+        '**/playwright-report/**',
+      ],
+    },
   },
   css: {
     preprocessorOptions: {

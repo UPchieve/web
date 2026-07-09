@@ -19,7 +19,7 @@
     "test:watch": "vitest --project unit --watch",
     "test": "vitest --project unit --run --pool=forks",
     "test:e2e": "pnpm playwright test tests/e2e/sign-up/student/eligibility-flow.spec.js:26",
-    "test:e2e:ui": "pnpm playwright test --ui",
+    "test:e2e:ui": "pnpm playwright test --ui --project='setup subway' --project='Google Chrome'",
     "test:e2e:snapshots": "export INCLUDE_SNAPSHOT_TESTS=true && pnpm playwright test",
     "test:e2e:update-snapshots": "pnpm playwright test --update-snapshots",
     "setup:detect-secrets": "./scripts/setup-detect-secrets.sh",

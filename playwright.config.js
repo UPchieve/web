@@ -1,34 +1,48 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test'
 
-const localBrowsers = [
+const localProjects = [
+  {
+    name: 'setup subway',
+    testMatch: /global\.setup\.ts/,
+    teardown: 'teardown subway',
+  },
+  {
+    name: 'teardown subway',
+    testMatch: /global\.teardown\.ts/,
+  },
   {
     name: 'firefox',
+    dependencies: ['setup subway'],
     use: { ...devices['Desktop Firefox'] },
   },
 
   {
     name: 'webkit',
+    dependencies: ['setup subway'],
     use: { ...devices['Desktop Safari'] },
   },
 
   /* Test against mobile viewports. */
   {
     name: 'Mobile Chrome',
+    dependencies: ['setup subway'],
     use: { ...devices['Pixel 5'] },
   },
   {
     name: 'Mobile Safari',
+    dependencies: ['setup subway'],
     use: { ...devices['iPhone 12'] },
   },
 
   /* Test against branded browsers. */
   {
     name: 'Google Chrome',
+    dependencies: ['setup subway'],
     use: { ...devices['Desktop Chrome'], channel: 'chrome' },
   },
 ]
-const ciBrowsers = [
+const ciProjects = [
   {
     name: 'Google Chrome',
     use: { ...devices['Desktop Chrome'], channel: 'chrome' },
@@ -39,7 +53,6 @@ const ciBrowsers = [
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
-  globalSetup: './tests/e2e/setup.ts',
   testDir: './tests/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -67,17 +80,23 @@ module.exports = defineConfig({
     },
   },
   webServer: {
+    // command: `pnpm run serve --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}`,
     command: `pnpm run serve --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}> high-line.log 2>&1`,
     url: 'http://localhost:8081',
     reuseExistingServer: false,
-    stdout: 'ignore',
-    stderr: 'ignore',
-    timeout: 30000,
+    stdout: 'pipe',
+    stderr: 'pipe',
+    timeout: 60000,
+
     env: {
       NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+    },
+    gracefulShutdown: {
+      signal: 'SIGINT', // Sends a Ctrl+C signal to your server
+      timeout: 30000, // Wait before doing a hard kill
     },
   },
 
   /* Configure projects for major browsers */
-  projects: process.env.CI ? ciBrowsers : localBrowsers,
+  projects: process.env.CI ? ciProjects : localProjects,
 })
