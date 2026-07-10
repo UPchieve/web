@@ -168,6 +168,24 @@ const ensureActiveRoleMatchesSessionRole: NavigationGuard = async (
   next()
 }
 
+/**
+ * Locked alias subjects (e.g. apChemistry) reuse another subject's quiz and
+ * have none of their own, so `/training/ap-chemistry/quiz` 500s. Redirect to
+ * the reused quiz (`unlockQuizName`) so it loads regardless of entry point.
+ */
+const redirectQuizAlias: NavigationGuard = async (to, _from, next) => {
+  if (!store.getters['subjects/allSubtopicNames'].length) {
+    await store.dispatch('subjects/getSubjects')
+  }
+  const category = Case.camel(to.params.category as string)
+  const quizSubject = store.getters['subjects/quizSubjectToUnlock'](category)
+  if (quizSubject !== category) {
+    next({ path: `/training/${Case.kebab(quizSubject)}/quiz`, replace: true })
+  } else {
+    next()
+  }
+}
+
 async function getAuthStatus(
   to: RouteLocationNormalized,
   isBlockingRoute?: boolean
@@ -592,6 +610,7 @@ const routes: RouteRecordRaw[] = [
     name: 'QuizView',
     component: QuizView,
     meta: { protected: true },
+    beforeEnter: redirectQuizAlias,
   },
   {
     path: '/training/course/:courseKey',
