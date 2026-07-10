@@ -237,7 +237,10 @@ function goToSubjectCert(session: any) {
     const route = `/training?openTo=${session.subTopic}`
     router.push(route)
   } else {
-    const route = `/training/${kebab(session.subTopic)}/quiz`
+    const quizSubject = store.getters['subjects/quizSubjectToUnlock'](
+      session.subTopic
+    )
+    const route = `/training/${kebab(quizSubject)}/quiz`
     router.push(route)
   }
 }

@@ -226,6 +226,9 @@ export default {
     isComputedUnlockSubject: (state) => (subject) => {
       return state.subjects[subject].isComputedUnlock
     },
+    quizSubjectToUnlock: (state) => (subject) => {
+      return state.subjects[subject]?.unlockQuizName || subject
+    },
     subjectsById: (state) => {
       return Object.values(state.subjects).reduce((acc, subject) => {
         acc[subject.id] = subject

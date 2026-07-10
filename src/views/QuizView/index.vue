@@ -303,13 +303,21 @@ export default {
       this.loadQuiz()
     },
     async loadQuiz() {
-      const quizLength = await TrainingService.loadQuiz(this.category)
-      this.quizLoading = false
-      this.showQuizResults = false
-      this.showQuizReview = false
-      this.quizResults = {}
-      this.quizLength = quizLength
-      this.showQuizStart = !!quizLength
+      this.quizLoading = true
+      try {
+        const quizLength = await TrainingService.loadQuiz(this.category)
+        this.quizLength = quizLength
+        this.showQuizStart = !!quizLength
+      } catch (err) {
+        this.quizLength = 0
+        this.showQuizStart = false
+        LoggerService.noticeError(err)
+      } finally {
+        this.quizLoading = false
+        this.showQuizResults = false
+        this.showQuizReview = false
+        this.quizResults = {}
+      }
     },
     goToStudyMaterials() {
       this.$router.push(`/training/review/${Case.kebab(this.category)}`)
