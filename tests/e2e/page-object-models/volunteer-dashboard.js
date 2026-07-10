@@ -92,9 +92,9 @@ export class VolunteerDashboard {
   }
 
   async photoUploadIsComplete() {
-    await expect(this.proofOfIdentityAccountAction).toContainText(
-      'Waiting for review (1-2 business days)'
-    )
+    await expect(
+      this.page.getByTestId('Proof of identity-container')
+    ).toContainText('Waiting for review (1-2 business days)')
     await this.proofOfIdentityAccountAction.click()
     await expect(this.page.getByTestId('photo-submitted-content')).toBeVisible()
   }

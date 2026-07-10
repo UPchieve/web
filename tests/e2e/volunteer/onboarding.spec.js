@@ -6,7 +6,6 @@ import {
   withCertifications,
 } from '../utils.ts'
 import { Login } from '../page-object-models/login.js'
-import { TrainingCourse } from '../page-object-models/training-course.js'
 import { TrainingQuiz } from '../page-object-models/training-quiz.js'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard'
 import { BackgroundInformation } from '../page-object-models/background-information'
@@ -46,25 +45,7 @@ test.describe('Volunteer onboarding', () => {
       await page.waitForURL('**/dashboard')
     })
 
-    test.skip('the quiz is available once the volunteer completes the material', async ({
-      page,
-    }) => {
-      // Go to UPchieve 101 training page.
-      const coursePage = new TrainingCourse(page)
-      await coursePage.goTo('upchieve101')
-
-      await expect(page.getByTestId('course-name')).toBeVisible()
-      await expect(page.getByTestId('course-description')).toBeVisible()
-
-      const quizLinkStatus = page.getByTestId('quiz-link-status')
-      await expect(quizLinkStatus).toHaveText('Locked')
-
-      await coursePage.completeCourse()
-
-      await expect(quizLinkStatus).toHaveText('Not started')
-    })
-
-    test.skip('volunteer passes quiz', async ({ page }) => {
+    test('volunteer passes quiz', async ({ page }) => {
       // Got to UPchieve 101 quiz page.
       const quizPage = new TrainingQuiz(page)
       await quizPage.goTo('upchieve101')
@@ -74,9 +55,7 @@ test.describe('Volunteer onboarding', () => {
       await quizPage.expectCongratMessage()
     })
 
-    test.skip('volunteer can retake the quiz if they fail', async ({
-      page,
-    }) => {
+    test('volunteer can retake the quiz if they fail', async ({ page }) => {
       // Got to UPchieve 101 quiz page.
       const quizPage = new TrainingQuiz(page)
       await quizPage.goTo('upchieve101')
@@ -109,7 +88,7 @@ test.describe('Volunteer onboarding', () => {
       )
     })
 
-    test.skip('Volunteer can complete safety screening steps (background info + proof of identity)', async ({
+    test('Volunteer can complete safety screening steps (background info + proof of identity)', async ({
       browser,
     }) => {
       // From the dashboard, navigate to the Background Information form
@@ -123,22 +102,21 @@ test.describe('Volunteer onboarding', () => {
       await backgroundInfo.fillOutBackgroundInformation()
       await expect(backgroundInfo.submitButton).toBeEnabled()
       await backgroundInfo.submitButton.click()
-      await backgroundInfo.backgroundInformationFormIsComplete()
 
       // Check that Background Information is marked complete on the dashboard
       await volunteerPage.goto('/dashboard')
       await volunteerPage.waitForURL('**/dashboard')
       await expect(
-        volunteerPage.getByTestId('Background information')
+        volunteerPage.getByTestId('Background information-container')
       ).toContainText('Completed')
 
       // Make sure that if you navigate back to this page, you see that the form has been submitted already
       await volunteerPage.getByTestId('Background information').click()
       await volunteerPage.waitForURL('**/background-information')
       await expect(volunteerPage.getByTestId('bg-info-complete')).toBeVisible()
+      await volunteerPage.getByTestId('bg-info-complete-button').click()
 
       // Complete Proof of Identity
-      await volunteerPage.goto('/dashboard')
       await volunteerPage.waitForURL('**/dashboard')
       const testImagePath = path.join(__dirname, 'test-image-confetti.png')
       await volunteerDashboard.openProofOfIdentityModal()

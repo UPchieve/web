@@ -141,6 +141,7 @@
       <template v-else>
         <TaskCard
           v-if="!user.isApproved"
+          data-testid="safety-screening"
           title="Safety Screening"
           :subtitle="approvalCardSubheader"
           :actions="safetyScreeningActions"

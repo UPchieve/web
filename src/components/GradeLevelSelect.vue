@@ -21,6 +21,7 @@ function trimGradeLevel(gradeLevel: string) {
 
 <template>
   <FormSelect
+    data-testid="grade-level-selector"
     :value="props.modelValue"
     name="grade level"
     :options="GRADES"

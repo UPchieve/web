@@ -1169,6 +1169,7 @@ function goToResource(externalLink: string) {
         :showArrow="true"
         @click="props.onNext"
         class="next-button"
+        data-testid="training-next-button"
         >Next</LargeButton
       >
     </template>

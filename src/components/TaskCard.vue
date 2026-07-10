@@ -58,9 +58,16 @@ const props = defineProps<TaskCardProps>()
             />
             <CheckIcon v-else class="action-icon complete" />
           </div>
-          <div class="action-content">
-            <div class="action-title">{{ action.title }}</div>
-            <div class="action-subtitle">{{ action.subtitle }}</div>
+          <div
+            class="action-content"
+            :data-testid="`${action.title}-container`"
+          >
+            <div class="action-title" :data-testid="action.title">
+              {{ action.title }}
+            </div>
+            <div class="action-subtitle">
+              {{ action.subtitle }}
+            </div>
           </div>
           <div
             class="action-time"

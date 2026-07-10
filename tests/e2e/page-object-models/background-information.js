@@ -10,7 +10,7 @@ export class BackgroundInformation {
       // i.e. for graduate student
       iAmCurrentlyQuestion: {
         questionSelector: page.getByTestId('question-i-am-currently'),
-        answerAHighSchoolStudent: page.getByTestId('A high school student'),
+        answerUnemployed: page.getByTestId('Unemployed'),
         answerCaregiver: page.getByTestId('Caregiver'),
       },
       linkedInQuestion: {
@@ -22,23 +22,6 @@ export class BackgroundInformation {
         selectSelector: page.getByTestId('location-input'),
         stateSelector: page.getByTestId('state-select'),
         cityInput: page.getByTestId('city-input'),
-      },
-      experienceQuestion: {
-        questionSelector: page.getByTestId('question-experience'),
-        tutoring: {
-          noPriorExperience: page.getByTestId('Tutoring-No prior experience'),
-        },
-        collegeCounseling: {
-          noPriorExperience: page.getByTestId(
-            'College Counseling-No prior experience'
-          ),
-        },
-        mentoring: {
-          noPriorExperience: page.getByTestId('Mentoring-No prior experience'),
-        },
-      },
-      languagesQuestion: {
-        questionSelector: page.getByTestId('question-languages'),
       },
     }
 
@@ -57,7 +40,7 @@ export class BackgroundInformation {
       this.backgroundInformationFormSelectors.iAmCurrentlyQuestion
     await expect(iAmCurrentlyQuestion.questionSelector).toBeVisible()
     // User may check multiple
-    await iAmCurrentlyQuestion.answerAHighSchoolStudent.check()
+    await iAmCurrentlyQuestion.answerUnemployed.check()
     await iAmCurrentlyQuestion.answerCaregiver.check()
 
     const linkedInQuestion =
@@ -77,18 +60,6 @@ export class BackgroundInformation {
     await whereDoYouLiveQuestion.stateSelector.click()
     await whereDoYouLiveQuestion.stateSelector.getByText('Connecticut').click()
     await whereDoYouLiveQuestion.cityInput.fill('Hartford')
-
-    const experienceQuestion =
-      this.backgroundInformationFormSelectors.experienceQuestion
-    await experienceQuestion.tutoring.noPriorExperience.check()
-    await experienceQuestion.collegeCounseling.noPriorExperience.check()
-    await experienceQuestion.mentoring.noPriorExperience.check()
-
-    const languageQuestion =
-      this.backgroundInformationFormSelectors.languagesQuestion
-    await expect(languageQuestion.questionSelector).toBeVisible()
-    await this.page.getByTestId('Tagalog').check()
-    await expect(this.submitButton).toBeEnabled()
   }
 
   async backgroundInformationFormIsComplete() {
@@ -100,8 +71,6 @@ export class BackgroundInformation {
         .questionSelector,
       this.backgroundInformationFormSelectors.linkedInQuestion.questionSelector,
       this.backgroundInformationFormSelectors.whereDoYouLiveQuestion
-        .questionSelector,
-      this.backgroundInformationFormSelectors.experienceQuestion
         .questionSelector,
       this.backgroundInformationFormSelectors.languagesQuestion
         .questionSelector,

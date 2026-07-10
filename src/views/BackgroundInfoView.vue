@@ -21,6 +21,7 @@
         </Callout>
         <LargeButton
           variant="primary"
+          data-testid="bg-info-complete-button"
           class="continue-onboarding-btn"
           :showArrow="false"
           @click="goToDashboard"
