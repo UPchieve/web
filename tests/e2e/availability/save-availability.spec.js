@@ -17,11 +17,12 @@ test.describe('Save availability', async () => {
     await dbClient.release()
   })
 
-  test.skip('can save timezone and availability', async ({ page }) => {
+  test('can save timezone and availability', async ({ page }) => {
     const volunteerLogin = new Login(page)
     const availabilityView = new AvailabilityView(page)
     await volunteerLogin.goto()
     await volunteerLogin.loginWith(volunteerUser)
+    await page.waitForURL('**/dashboard')
     await availabilityView.goto()
     const timezone = 'America/New_York'
     await availabilityView.selectTimezone(timezone)
