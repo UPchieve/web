@@ -62,6 +62,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import Case from 'case'
+import { quizRoute } from '@/utils/quiz-route'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
@@ -132,7 +133,7 @@ export default {
       return ''
     },
     quizLink() {
-      return `/training/${Case.kebab(this.category)}/quiz`
+      return quizRoute(this.category)
     },
   },
 }

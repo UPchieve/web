@@ -57,7 +57,7 @@ import { startSession } from '@/utils/session'
 import LargeButton from '@/components/LargeButton.vue'
 import PresessionSurvey from './PresessionSurvey.vue'
 import getCookie from '@/utils/get-cookie'
-import Case from 'case'
+import { quizRoute } from '@/utils/quiz-route'
 
 /**
  *
@@ -150,7 +150,7 @@ export default {
       return /[AEIOUaeiou]/i.test(word[0])
     },
     handleTrainingRedirect() {
-      this.$router.push(`/training/${Case.kebab(this.selectedSubtopic)}/quiz`)
+      this.$router.push(quizRoute(this.selectedSubtopic))
     },
   },
 }

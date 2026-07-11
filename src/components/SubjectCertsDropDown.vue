@@ -73,6 +73,7 @@
 <script>
 import { mapState } from 'vuex'
 import Case from 'case'
+import { quizRoute } from '@/utils/quiz-route'
 import CheckMark from '@/components/CheckMark.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -122,7 +123,7 @@ export default {
       return `/training/review/${Case.kebab(cert)}`
     },
     certQuizLink(cert) {
-      return `/training/${Case.kebab(cert)}/quiz`
+      return quizRoute(cert)
     },
     progressStatus(cert) {
       if (this.isComplete(cert)) return 'Completed'

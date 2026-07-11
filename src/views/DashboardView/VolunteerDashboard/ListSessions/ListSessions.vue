@@ -96,7 +96,8 @@
 
 <script lang="ts" setup>
 import { useStore } from 'vuex'
-import Case, { kebab } from 'case'
+import Case from 'case'
+import { quizRoute } from '@/utils/quiz-route'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import { computed, defineAsyncComponent, ref } from 'vue'
@@ -240,7 +241,7 @@ function goToSubjectCert(session: any) {
     const quizSubject = store.getters['subjects/quizSubjectToUnlock'](
       session.subTopic
     )
-    const route = `/training/${kebab(quizSubject)}/quiz`
+    const route = quizRoute(quizSubject)
     router.push(route)
   }
 }

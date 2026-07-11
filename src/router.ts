@@ -115,6 +115,7 @@ import { beforeEnter as studentBeforeEnter } from '@/services/SignUpService/Stud
 import { beforeEnter as teacherBeforeEnter } from '@/services/SignUpService/TeacherSignUpService'
 import { beforeEnter as volunteerBeforeEnter } from '@/services/SignUpService/VolunteerSignUpService'
 import Case from 'case'
+import { quizRoute } from '@/utils/quiz-route'
 import { getStatus } from '@/services/AuthService'
 import LoggerService from './services/LoggerService'
 import { EVENTS } from './consts'
@@ -180,7 +181,7 @@ const redirectQuizAlias: NavigationGuard = async (to, _from, next) => {
   const category = Case.camel(to.params.category as string)
   const quizSubject = store.getters['subjects/quizSubjectToUnlock'](category)
   if (quizSubject !== category) {
-    next({ path: `/training/${Case.kebab(quizSubject)}/quiz`, replace: true })
+    next({ path: quizRoute(quizSubject), replace: true })
   } else {
     next()
   }

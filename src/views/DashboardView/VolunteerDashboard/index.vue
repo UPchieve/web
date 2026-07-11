@@ -263,7 +263,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
 import JoinedTeamModal from './JoinedTeamModal.vue'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
-import { kebab } from 'case'
+import { quizRoute } from '@/utils/quiz-route'
 import CoachNominationConfirmationModal from '@/views/DashboardView/VolunteerDashboard/CoachNominationConfirmationModal.vue'
 
 // (1) Hours selected
@@ -814,7 +814,7 @@ export default {
         this.$router.push(route)
       } else {
         const quizSubject = this.quizSubjectToUnlock(session.subTopic)
-        const route = `/training/${kebab(quizSubject)}/quiz`
+        const route = quizRoute(quizSubject)
         this.$router.push(route)
       }
     },
