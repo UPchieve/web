@@ -192,22 +192,6 @@ export const loginVolunteer = async (
   }
 }
 
-export const logInUserViaAPI = async (
-  browser: Browser,
-  user: { email: string; password: string },
-  authFilePath: string
-) => {
-  const context = await browser.newContext({ storageState: undefined })
-  await context.request.post('http://localhost:3001/auth/login', {
-    data: {
-      email: user.email,
-      password: user.password,
-    },
-  })
-  await context.storageState({ path: authFilePath })
-  await context.close()
-}
-
 export const setFeatureFlags = async (page: Page, featureFlags: any) => {
   await page.route('*/**/feature-flags', async (route) => {
     const json = {

@@ -1,32 +1,36 @@
 import { test } from '@playwright/test'
 import { getClient } from '../db.ts'
-import { createVolunteer, logInUserViaAPI } from '../utils.ts'
+import { createVolunteer } from '../utils.ts'
 import { VolunteerTraining } from '../page-object-models/volunteer-training.js'
-import path from 'path'
+import { Login } from '../page-object-models/login'
 
 let dbClient
-const authFile = path.join(
-  __dirname,
-  '../../../playwright/.auth/volunteer.json'
-)
 
 test.describe('Training', async () => {
   let volunteerUser
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeEach(async () => {
     dbClient = await getClient().connect()
     volunteerUser = await createVolunteer(dbClient)
-
-    await logInUserViaAPI(browser, volunteerUser, authFile)
   })
 
   test.afterAll(async () => {
     await dbClient.release()
   })
 
-  test.use({ storageState: authFile })
+  async function loginVolunteer(page) {
+    const volunteerLogin = new Login(page)
+    await volunteerLogin.goto()
+    await volunteerLogin.loginWith({
+      email: volunteerUser.email,
+      password: volunteerUser.password,
+    })
+    await page.waitForURL('**/dashboard')
+  }
 
-  test.skip('pass prealgebra quiz', async ({ page }) => {
+  test('pass prealgebra quiz', async ({ page }) => {
+    await loginVolunteer(page)
+
     /* Volunteer pages */
     const volunteerTraining = new VolunteerTraining(page)
 
@@ -50,9 +54,11 @@ test.describe('Training', async () => {
     await volunteerTraining.checkResults('You passed!')
   })
 
-  test.skip('fail prealgebra quiz, review answers, retake quiz', async ({
+  test('fail prealgebra quiz, review answers, retake quiz', async ({
     page,
   }) => {
+    await loginVolunteer(page)
+
     /* Volunteer pages */
     const volunteerTraining = new VolunteerTraining(page)
 
@@ -82,9 +88,11 @@ test.describe('Training', async () => {
     await volunteerTraining.startQuiz()
   })
 
-  test.skip('fail prealgebra quiz, review answers, review concepts, retake quiz', async ({
+  test('fail prealgebra quiz, review answers, review concepts, retake quiz', async ({
     page,
   }) => {
+    await loginVolunteer(page)
+
     /* Volunteer pages */
     const volunteerTraining = new VolunteerTraining(page)
 

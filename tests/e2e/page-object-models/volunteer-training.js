@@ -30,7 +30,8 @@ export class VolunteerTraining {
   async chooseSubject(subject) {
     await this.subjectCertifications.click()
     await expect(this.page.getByTestId(`cert-${subject}`)).toBeVisible()
-    await this.page.getByTestId(`start-quiz-btn-${subject}`).click()
+    const subjectQuizButton = this.page.getByTestId(`start-quiz-btn-${subject}`)
+    await subjectQuizButton.click()
   }
 
   async startQuiz() {
