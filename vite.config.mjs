@@ -132,7 +132,22 @@ export default defineConfig({
   },
   logLevel: 'error',
   optimizeDeps: {
-    include: ['vue-select', 'vue-star-rating', 'vue-draggable-resizable'],
+    include: [
+      'vue-select',
+      'vue-star-rating',
+      'vue-draggable-resizable',
+      // Vuetify auto-import deps discovered mid test run trigger a reload
+      // that kills in-flight test file imports. If vitest warns "Vite
+      // unexpectedly reloaded a test", add the dep it names here.
+      // (A vuetify/components/* glob breaks on css-less stubs.)
+      'vuetify/components/VAutocomplete',
+      'vuetify/components/VDatePicker',
+      'vuetify/components/VMenu',
+      'vuetify/components/VProgressLinear',
+      'vuetify/components/VSelect',
+      'vuetify/components/VTextField',
+      'vuetify/directives',
+    ],
   },
   test: {
     globals: true,
