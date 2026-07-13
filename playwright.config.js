@@ -80,7 +80,7 @@ module.exports = defineConfig({
     },
   },
   webServer: {
-    command: `pnpm run serve --port 8081 --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'}> high-line.log 2>&1`,
+    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} && pnpm run preview --port 8081 > high-line.log 2>&1`,
     url: 'http://localhost:8081',
     reuseExistingServer: false,
     stdout: 'pipe',
