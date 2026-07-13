@@ -36,10 +36,6 @@
         v-for="subject in subjectsMapped"
         :key="subject.displayName"
         class="pr-sidebar__subject"
-        :class="{
-          active:
-            $route.path === `/sessions/progress/${Case.kebab(subject.name)}`,
-        }"
         @click="handleSubjectChange(subject)"
       >
         <div class="pr-sidebar__subject--head">
@@ -159,10 +155,6 @@ export default {
     &:hover {
       background-color: $c-background-blue;
       cursor: pointer;
-    }
-
-    &.active {
-      background-color: $c-background-blue;
     }
 
     &--head {
