@@ -32,8 +32,10 @@ cache:
     - !reference [.node_setup, before_script]
     - apt update && apt install -y curl gnupg
     - curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sh
+    - export VUE_APP_GOOGLE_RECAPTCHA_KEY="$GOOGLE_RECAPTCHA_KEY"
   script:
     - 'echo "{\"version\": \"$CI_COMMIT_SHA-$CI_ENVIRONMENT_NAME\"}" > public/version.json'
+    - export VUE_APP_GOOGLE_RECAPTCHA_KEY="$GOOGLE_RECAPTCHA_KEY"
     - doppler run --token $DOPPLER_TOKEN -- pnpm run build
 
 build_staging_artifact:
@@ -181,6 +183,7 @@ e2e-test:
     - export SUBWAY_POSTGRES_ANALYTICS_HOST=$POSTGRES_HOST
     - export SUBWAY_REDIS_HOST=$REDIS_HOST
     - export SUBWAY_SERVER_HOST=localhost:8081
+    - export VUE_APP_GOOGLE_RECAPTCHA_KEY=$GOOGLE_RECAPTCHA_KEY
     - echo 'Start subway server...'
     - pnpm run dev:backend > ../subway.log 2>&1 &
     - |

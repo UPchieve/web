@@ -9,6 +9,7 @@ public/version.json
 .env.development
 .env.local
 .env.*.local
+.env.test_e2e_ci
 
 # Log files
 npm-debug.log*

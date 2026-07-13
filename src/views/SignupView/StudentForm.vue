@@ -813,6 +813,7 @@
             : null
         "
         type="submit"
+        data-testid="create-account-btn"
       >
         Create my account
       </button>

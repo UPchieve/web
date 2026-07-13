@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test'
 const BASE_SIGN_UP_URL = '/sign-up'
 
 test.describe('Open sign-up index page', () => {
-  test.skip('Shows option to sign up as student or volunteer if is not referral', async ({
+  test('Shows option to sign up as student or volunteer if is not referral', async ({
     page,
   }) => {
     await page.goto(BASE_SIGN_UP_URL)
@@ -31,7 +31,18 @@ test.describe('Open sign-up index page', () => {
 test.describe('[OLD DESIGN]', async () => {
   function getFormFields(page) {
     return {
-      gradeInput: page.getByTestId('student-grade-select'),
+      gradeInput: {
+        selectGradeLevel: async (gradeLevel) => {
+          await page.getByTestId('student-grade-select').click()
+          // workaround for ion-select; `getByText()` won't work because of how ion overlays elements / it's not "visible"
+          await page.getByRole('radio', { name: gradeLevel }).click()
+          // There is something strange about the <ion-select>'s implementation where it prevents
+          // future elements the browser interacts with from getting/keeping focus.
+          // For the tests, manually trigger ion to blur.
+          await page.keyboard.press('Escape')
+          await page.waitForTimeout(100)
+        },
+      },
       schoolInput: page.getByTestId('student-school-autocomplete'),
       zipInput: page.getByTestId('student-zipcode-input'),
       studentEmailInput: page.getByTestId('student-email-input'),
@@ -41,10 +52,11 @@ test.describe('[OLD DESIGN]', async () => {
       parentGuardianEmailInput: page.getByTestId('parent-guardian-email-input'),
       pgStudentFirstNameInput: page.getByTestId('pg-student-first-name-input'),
       pgStudentLastNameInput: page.getByTestId('pg-student-last-name-input'),
+      createAccountButton: page.getByTestId('create-account-btn'),
     }
   }
 
-  test.skip('open student', async ({ page }) => {
+  test('open student', async ({ page }) => {
     await page.goto(BASE_SIGN_UP_URL + '/student/eligibility')
 
     const {
@@ -55,15 +67,22 @@ test.describe('[OLD DESIGN]', async () => {
       studentFirstNameInput,
       studentLastNameInput,
       passwordInput,
+      createAccountButton,
     } = getFormFields(page)
 
-    await gradeInput.click()
-    await page.getByText('8th grade').click()
     await schoolInput.click()
-    await schoolInput.fill('Approved School')
-    await page.getByText(/Approved School*/).click()
+    await schoolInput.fill('Approved')
+    await expect(schoolInput).toBeFocused()
+    await page
+      .getByText('Approved School (Denver, CO)', { exact: true })
+      .click()
+    await zipInput.click()
     await zipInput.fill('00000')
     await studentEmailInput.fill(faker.internet.email())
+    // For some reason, the grade input prevents other elements from maintaining focus in Playwright runs, so we interact with this
+    // one last.
+    // TODO: Figure out why.
+    await gradeInput.selectGradeLevel('8th grade')
 
     await page.getByTestId('eligibility-form-submit-btn').click()
     await page.waitForURL('**/sign-up/student/eligible')
@@ -71,14 +90,21 @@ test.describe('[OLD DESIGN]', async () => {
     await page.getByText('Continue').click()
     await page.waitForURL('**/sign-up/student/account')
 
+    await expect(studentFirstNameInput).toBeEditable()
+    await studentFirstNameInput.click()
+    await page.waitForTimeout(100)
     await studentFirstNameInput.fill(faker.person.firstName())
+    await studentLastNameInput.click()
     await studentLastNameInput.fill(faker.person.lastName())
+
+    await passwordInput.click()
     await passwordInput.fill('Password123')
-    await page.getByText('Create my account').click()
+    await expect(createAccountButton).toBeEnabled()
+    await createAccountButton.click()
     await page.waitForURL('**/verify')
   })
 
-  test.skip('partner student', async ({ page }) => {
+  test('partner student', async ({ page }) => {
     await page.goto(
       BASE_SIGN_UP_URL + '/student/eligibility?partner=college-mentors'
     )
@@ -86,19 +112,18 @@ test.describe('[OLD DESIGN]', async () => {
     const { gradeInput, schoolInput, zipInput, studentEmailInput } =
       getFormFields(page)
 
-    await gradeInput.click()
-    await page.getByText('10th grade').click()
     await schoolInput.click()
     await schoolInput.fill('Unapproved School')
     await page.getByText(/Unapproved School*/).click()
     await zipInput.fill('00000')
     await studentEmailInput.fill('partnerstudenteligibility@e2etest.com')
+    await gradeInput.selectGradeLevel('10th grade')
 
     await page.getByTestId('eligibility-form-submit-btn').click()
     await page.waitForURL('**/sign-up/student/eligible')
   })
 
-  test.skip('parent/guardian', async ({ page }) => {
+  test('parent/guardian', async ({ page }) => {
     await page.goto(
       BASE_SIGN_UP_URL + '/student/eligibility?parent&partner=college-mentors'
     )
@@ -115,14 +140,13 @@ test.describe('[OLD DESIGN]', async () => {
 
     await pgStudentFirstNameInput.fill(faker.person.firstName())
     await pgStudentLastNameInput.fill(faker.person.lastName())
-    await gradeInput.click()
-    await page.getByText('7th grade').click()
     await schoolInput.click()
     await schoolInput.fill('Another Approved')
     await page.getByText(/Another Approved*/).click()
     await zipInput.fill('00000')
     await studentEmailInput.fill(faker.internet.email())
     await parentGuardianEmailInput.fill(faker.internet.email())
+    await gradeInput.selectGradeLevel('7th grade')
 
     await page.getByTestId('eligibility-form-submit-btn').click()
     await page.waitForSelector('#pg-confirmation-message')
