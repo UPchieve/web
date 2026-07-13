@@ -8,6 +8,9 @@ export class SessionView {
   }
 
   async sendMessage(message) {
+    await expect(
+      this.page.getByText('Attempting to connect the chat')
+    ).toBeHidden()
     await this.page.getByTestId('chat-textarea').fill(message)
     await this.page.keyboard.press('Enter')
     await this.hasMessage(message)
