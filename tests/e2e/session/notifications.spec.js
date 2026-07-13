@@ -41,7 +41,6 @@ test.describe('Session notifications', async () => {
 
     // Now that the volunteer is ready, request a session as a student
     const { studentDashboard } = await loginStudent(browser, studentUser)
-    await studentDashboard.dismissJourneyModal()
     const { sessionId } = await requestSession(studentDashboard, {
       topic: 'prealgebra',
       subject: 'math',

@@ -151,6 +151,7 @@ e2e-test:
     POSTGRES_PORT: 5432
     REDIS_HOST: redis
     REDIS_PORT: 6379
+    NODE_ENV: test_e2e_ci
   before_script:
     - echo 'Set up high-line...'
     - !reference [.node_setup, before_script]
@@ -180,8 +181,6 @@ e2e-test:
     - export SUBWAY_POSTGRES_ANALYTICS_HOST=$POSTGRES_HOST
     - export SUBWAY_REDIS_HOST=$REDIS_HOST
     - export SUBWAY_SERVER_HOST=localhost:8081
-    - export SUBWAY_LOG_LEVEL=info
-    - export NODE_ENV=test_e2e_ci
     - echo 'Start subway server...'
     - pnpm run dev:backend > ../subway.log 2>&1 &
     - |
