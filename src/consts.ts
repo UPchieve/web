@@ -879,18 +879,6 @@ export const EVENTS = {
   CLICKED_CONFIRM_END_SESSION: 'CLICKED_CONFIRM_END_SESSION',
   STUDENT_CLICKED_NEW_MESSAGE: 'STUDENT_CLICKED_NEW_MESSAGE',
   VOLUNTEER_CLICKED_NEW_MESSAGE: 'VOLUNTEER_CLICKED_NEW_MESSAGE',
-  COACH_CLICKED_COACHING_SKILLS_CHECKBOX:
-    'COACH_CLICKED_COACHING_SKILLS_CHECKBOX',
-  COACH_SUBMITTED_NOMINATION: 'COACH_SUBMITTED_NOMINATION',
-  ERROR_SUBMITTING_COACH_NOMINATION: 'ERROR_SUBMITTING_COACH_NOMINATION',
-  COACH_SKIPPED_NOMINATION: 'COACH_SKIPPED_NOMINATION',
-  COACH_SAW_NOMINATION_CONFIRMATION_MODAL:
-    'COACH_SAW_NOMINATION_CONFIRMATION_MODAL',
-  NOMINATED_STUDENT_SAW_COACHING_INFO_MODAL:
-    'NOMINATED_STUDENT_SAW_COACHING_INFO_MODAL',
-  NOMINATED_STUDENT_CLICKED_I_WANT_TO_VOLUNTEER:
-    'NOMINATED_STUDENT_CLICKED_I_WANT_TO_VOLUNTEER',
-  NOMINATED_STUDENT_DISMISSED_MODAL: 'NOMINATED_STUDENT_DISMISSED_MODAL',
   STUDENT_DM_SENT: 'STUDENT_DM_SENT',
   LATEX_MESSAGE_SENT: 'LATEX_MESSAGE_SENT',
   TIP_TAP_EDITOR_OPENED: 'TIP_TAP_EDITOR_OPENED',
@@ -977,7 +965,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   VOLUNTEER_ASK_FOR_COLLEGE_INTEREST = 'volunteer-ask-for-college-interest',
   SHOW_TIP_TAP_EDITOR = 'show-tip-tap-editor',
   SHOW_DM_NOTIFICATIONS = 'show-dm-notifications',
-  INVITATION_TO_COACH = 'invitation-to-coach',
   SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE = 'show-student-to-volunteer-hours-page',
   S2V_THEMING = 's2v-theming',
 }
@@ -1076,34 +1063,4 @@ export const LANGUAGES: Language[] = [
   { code: 'uk', name: 'Ukrainian' },
   { code: 'vi', name: 'Vietnamese' },
   { code: 'other', name: 'Other' },
-]
-
-export const COACHING_SKILLS = [
-  {
-    coachFacingValue: 'Asked thoughtful questions during our session',
-    studentFacingValue: '🤔 You ask great questions',
-    emoji: '🤔',
-  },
-  {
-    coachFacingValue:
-      'Caught on quickly and wanted to understand, not just get the answer',
-    studentFacingValue: '💡 You work hard to fully understand the answer',
-    emoji: '💡',
-  },
-  {
-    coachFacingValue: 'Stayed engaged and put in real effort',
-    studentFacingValue: '🔍 You stay focused and put in your best effort',
-    emoji: '🔍',
-  },
-  {
-    coachFacingValue:
-      'Had a positive, motivated attitude even when things got hard',
-    studentFacingValue: "💪 You stay calm when you're stuck",
-    emoji: '💪',
-  },
-  {
-    coachFacingValue: 'Explained their thinking clearly when asked',
-    studentFacingValue: '🗣️ You explain things clearly',
-    emoji: '🗣',
-  },
 ]

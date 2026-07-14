@@ -31,7 +31,6 @@ const getWrapper = (overrides = {}) => {
   return shallowMount(StudentDashboard, {
     global: {
       plugins: [store],
-      mocks: { $route: { query: {} } },
     },
   })
 }

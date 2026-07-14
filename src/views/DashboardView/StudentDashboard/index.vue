@@ -56,10 +56,6 @@
       :closeModal="toggleImpactStudySurveyModal"
       :impactStudyCampaignId="impactStudySurveyCampaignId"
     />
-    <CoachingInvitationModal
-      v-if="showCoachingInvitationModal"
-      @closed="() => (dismissedCoachingInvitationModal = true)"
-    />
 
     <journey-modal v-if="showJourneyModal" :closeModal="toggleJourneyModal" />
 
@@ -123,7 +119,6 @@ import {
   isTargetEmailDomain,
 } from '@/utils/secondary-email-modal-utils'
 import { defineAsyncComponent } from 'vue'
-import CoachingInvitationModal from '@/views/DashboardView/StudentDashboard/CoachingInvitationModal.vue'
 import GradeLevelTask from '@/views/GradeLevelTask.vue'
 
 const ImpactStudySurveyModal = defineAsyncComponent(
@@ -137,7 +132,6 @@ export default {
   name: 'student-dashboard',
   components: {
     GradeLevelTask,
-    CoachingInvitationModal,
     SecondaryEmailModal,
     DashboardBanner,
     SubjectSelection,
@@ -260,7 +254,6 @@ export default {
       showJourneyModal: false,
       dismissedSecondaryEmailModal: false,
       impactStudySurveyCampaignId: '',
-      dismissedCoachingInvitationModal: false,
       hasGradeLevel: false,
       dismissedGradeLevelTask: false,
     }
@@ -297,14 +290,6 @@ export default {
     },
     showAssignments() {
       return this.user.studentAssignments?.length
-    },
-    showCoachingInvitationModal() {
-      return (
-        !!this.$route.query.coachinvitation &&
-        this.isStudent &&
-        !this.hasVolunteerRole &&
-        !this.dismissedCoachingInvitationModal
-      )
     },
     hasPermanentlyDismissedSecondaryEmailModal() {
       return hasPermanentlyDismissedSecondaryEmailModal(this.user.id)

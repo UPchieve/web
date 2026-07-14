@@ -119,7 +119,6 @@ import { quizRoute } from '@/utils/quiz-route'
 import { getStatus } from '@/services/AuthService'
 import LoggerService from './services/LoggerService'
 import { EVENTS } from './consts'
-import ModeTransitionView from '@/views/ModeTransitionView.vue'
 
 const autoflowRedirect: NavigationGuard = (_to, _from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -940,11 +939,9 @@ const routes: RouteRecordRaw[] = [
       // and switch to volunteer mode via gleap experiment CTAs, emails, etc.
 
       // abort route change when FF is disabled
-      const isFromNominationEmail = !!to.query.invitedByCoach
-      const isAllowed =
-        store.getters['featureFlags/isVolunteerAskForCollegeInterestEnabled'] ||
-        isFromNominationEmail
-      if (!isAllowed) {
+      if (
+        !store.getters['featureFlags/isVolunteerAskForCollegeInterestEnabled']
+      ) {
         return next(from)
       }
 
@@ -957,12 +954,8 @@ const routes: RouteRecordRaw[] = [
 
       try {
         await NetworkService.addVolunteerRoleForStudent()
-        if (!isFromNominationEmail) {
-          await UserService.switchActiveRole({ $store: store }, 'volunteer')
-          return next('/dashboard')
-        } else {
-          return next('/switch-mode?isNewMode=true')
-        }
+        await UserService.switchActiveRole({ $store: store }, 'volunteer')
+        return next('/dashboard')
       } catch (e) {
         LoggerService.noticeError(
           e,
@@ -1093,18 +1086,6 @@ const routes: RouteRecordRaw[] = [
     name: 'TotpEnroll',
     component: TotpEnroll,
     meta: { protected: true, requiresAdmin: true, hideNavigation: true },
-  },
-  {
-    path: '/switch-mode',
-    name: 'SwitchMode',
-    component: ModeTransitionView,
-    props: (route) => {
-      return {
-        isFirstTransitionToTargetMode: route.query.isNewMode ?? false,
-        targetRoute: route.query.to ?? '/dashboard',
-      }
-    },
-    meta: { protected: true, hideNavigation: true },
   },
   {
     path: '/:pathMatch(.*)*',

@@ -221,10 +221,6 @@
       :closeModal="toggleNextTaskModal"
       :nextTask="nextTask"
     />
-    <CoachNominationConfirmationModal
-      v-if="showCoachNominationConfirmationModal"
-      @closed="() => (dismissedCoachNominationModal = true)"
-    />
   </div>
 </template>
 
@@ -264,7 +260,6 @@ import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessi
 import JoinedTeamModal from './JoinedTeamModal.vue'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import { quizRoute } from '@/utils/quiz-route'
-import CoachNominationConfirmationModal from '@/views/DashboardView/VolunteerDashboard/CoachNominationConfirmationModal.vue'
 
 // (1) Hours selected
 const userHasSchedule = flow([get, isBoolean])
@@ -279,7 +274,6 @@ const ETA = {
 export default {
   name: 'volunteer-dashboard',
   components: {
-    CoachNominationConfirmationModal,
     HyperlinkButton,
     ListSessionsCard,
     TaskCard,
@@ -358,7 +352,6 @@ export default {
       notificationsCardWasDismissed: false,
       joinedTeamCode: '',
       nextTask: {},
-      dismissedCoachNominationModal: false,
     }
   },
   computed: {
@@ -386,12 +379,6 @@ export default {
         'featureFlags/isCombinedOnboardingChecklistEnabled',
       hasASubjectCertification: 'user/hasASubjectCertification',
     }),
-    showCoachNominationConfirmationModal() {
-      return (
-        !!this.$store.state.volunteer.lastCoachNomination &&
-        !this.dismissedCoachNominationModal
-      )
-    },
     shouldShowNotificationsCard() {
       return (
         !this.notificationsCardWasDismissed &&
