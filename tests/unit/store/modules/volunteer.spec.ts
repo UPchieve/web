@@ -98,6 +98,7 @@ describe('Volunteer store module', () => {
       { state: { isApproved: false } },
       { state: { isOnboarded: false } },
       { state: { banType: 'complete' } },
+      { state: { banType: 'shadow' } },
     ])('Negative cases: Returns FALSE when %s', (arg) => {
       const store = getStore({
         user: {
@@ -115,5 +116,22 @@ describe('Volunteer store module', () => {
 
       expect(store.getters['volunteer/isReadyToTutor']).toEqual(false)
     })
+  })
+
+  it('Is true even if the coach is live media-banned', () => {
+    const store = getStore({
+      user: {
+        state: {
+          user: {
+            userType: 'volunteer',
+            isOnboarded: true,
+            isApproved: true,
+            banType: 'live_media',
+          },
+        },
+      },
+    })
+
+    expect(store.getters['volunteer/isReadyToTutor']).toEqual(true)
   })
 })

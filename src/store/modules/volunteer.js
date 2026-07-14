@@ -267,7 +267,8 @@ export default {
         rootGetters['user/isVolunteer'] &&
         rootState.user.user.isOnboarded &&
         rootState.user.user.isApproved &&
-        rootState.user.user.banType !== 'complete'
+        rootState.user.user.banType !== 'complete' &&
+        rootState.user.user.banType !== 'shadow'
       )
     },
     unlockedOpenSessions: (state, getters, rootState) => {
