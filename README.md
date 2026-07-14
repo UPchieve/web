@@ -146,6 +146,36 @@ Note: You don't need to start the backend or frontend servers yourself. Playwrig
 3. You will see subway logs only for the log level defined in your subway env variables - check your subway's `.env.e2e` and set `SUBWAY_LOG_LEVEL` to whichever level (i.e. `info, error`) you'd like.
 4. Set up a `.env.test_e2e` file for your local E2E test runs. You can pull this from 1Pass.
 5. Now run `pnpm run test:e2e` or `pnpm run test:e2e:ui`
+   - If running in UI mode, you will want to manually run the "setup subway" project, which will recreate and seed a DB and run subway. To do so, you may have to check it in the Projects dropdown.
+   - You need to run this at least once for tests to have a properly seeded database to test against. After the first run, you may choose to deselect it in the Projects to save time.
+
+### CI debugging tips
+
+CI can be a bit harder to debug because, without UI mode, you can't see browser logs or UI replays.
+
+Some things to keep in mind with CI:
+- You can adjust the `test:e2e` script in package.json to just run the test(s) you care about
+- Take note of how many workers are running in CI vs. local.
+- Try to write tests that aren't dependent on each other / share some user state
+
+You can also forward browser logs to the CI job by adding the following in your test file:
+
+```ts
+test.beforeEach(async ({ page }) => {
+  page.on('console', msg => {
+    console.log(`[browser:${msg.type()}] ${msg.text()}`)
+  })
+})
+```
+
+You might also print the inner HTML at whatever point in time in your failing test you need to "see" what is in the DOM. You can open the output into an HTML viewer:
+
+```ts
+  const innerHtml = await page.innerHTML('.my-class')
+  console.log(innerHtml)
+```
+
+Each E2E CI job also outputs log artifacts that you can look at. When the test completes, look for the "Artifacts" button on the right side and download `high-line.log` and `subway.log`.
 
 ### Adding test data
 
