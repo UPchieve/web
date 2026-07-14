@@ -49,6 +49,60 @@ const ciProjects = [
   },
 ]
 
+const localServers = [
+  {
+    command: `cd ${process.env.SUBWAY_REPO_PATH} && pnpm run e2e:destroy && pnpm run e2e:create && pnpm run e2e:backend`,
+    name: 'SUBWAY',
+    url: 'http://localhost:3001/healthz',
+    reuseExistingServer: false,
+    timeout: 60000,
+    stdout: 'pipe',
+    stderr: 'pipe',
+    env: {
+      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+    },
+    gracefulShutdown: {
+      signal: 'SIGTERM', // Sends a Ctrl+C signal to your server
+      timeout: 20000, // Wait before doing a hard kill
+    },
+  },
+  {
+    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port 8081`,
+    name: 'HIGH-LINE SERVE',
+    url: 'http://localhost:8081',
+    reuseExistingServer: false,
+    stdout: 'pipe',
+    stderr: 'pipe',
+    timeout: 60000,
+    env: {
+      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+    },
+    gracefulShutdown: {
+      signal: 'SIGTERM', // Sends a Ctrl+C signal to your server
+      timeout: 500, // Wait before doing a hard kill
+    },
+  },
+]
+
+const ciServers = [
+  {
+    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port 8081 > high-line.log 2>&1`,
+    name: 'HIGH-LINE SERVE',
+    url: 'http://localhost:8081',
+    reuseExistingServer: false,
+    stdout: 'pipe',
+    stderr: 'pipe',
+    timeout: 60000,
+    env: {
+      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+    },
+    gracefulShutdown: {
+      signal: 'SIGTERM', // Sends a Ctrl+C signal to your server
+      timeout: 10000, // Wait before doing a hard kill
+    },
+  },
+]
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -79,22 +133,7 @@ module.exports = defineConfig({
       maxDiffPixelRatio: 0.05,
     },
   },
-  webServer: {
-    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} && pnpm run preview --port 8081 > high-line.log 2>&1`,
-    url: 'http://localhost:8081',
-    reuseExistingServer: false,
-    stdout: 'pipe',
-    stderr: 'pipe',
-    timeout: 60000,
-
-    env: {
-      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
-    },
-    gracefulShutdown: {
-      signal: 'SIGINT', // Sends a Ctrl+C signal to your server
-      timeout: 30000, // Wait before doing a hard kill
-    },
-  },
+  webServer: process.env.CI ? ciServers : localServers,
 
   /* Configure projects for major browsers */
   projects: process.env.CI ? ciProjects : localProjects,

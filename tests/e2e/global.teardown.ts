@@ -1,5 +1,5 @@
 import { test as teardown } from '@playwright/test'
-import { teardownSubway } from './teardown-functions'
+import { spawnSync } from 'node:child_process'
 
 teardown('delete database', async () => {
   if (process.env.CI) {
@@ -8,5 +8,8 @@ teardown('delete database', async () => {
     return
   }
 
-  teardownSubway()
+  spawnSync('pnpm run e2e:destroy', {
+    cwd: process.env.SUBWAY_REPO_PATH,
+    stdio: 'pipe',
+  })
 })
