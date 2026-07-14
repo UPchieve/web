@@ -42,22 +42,23 @@
 
         <ol>
           <li v-if="signedUpWithGoogle" class="uc-form-col">
-            <p>How did you hear about us?</p>
-            <p class="background-info__question-description">(optional)</p>
+            <p>
+              How did you hear about us?
+              <span class="background-info__question-required">*</span>
+            </p>
             <FormSelect
               data-testid="signupSourceField"
               name="signup-source"
               v-model="signupSourceId"
               :options="signupSourcesOptions"
               option-text-field="name"
-              :is-required="false"
+              :is-required="true"
               :reduce="(option) => option.id"
             />
             <div class="uc-column" v-if="shouldShowOtherSignupInput">
               <input
                 id="otherSignupSource"
                 data-testid="otherSignupSource"
-                :required="false"
                 type="text"
                 class="uc-form-input"
                 v-model="otherSignupSource"
@@ -65,10 +66,10 @@
                   'uc-form-input--invalid':
                     invalidInputs.indexOf('otherSignupSource') > -1,
                 }"
+                placeholder="Tell us where you heard about us!"
                 autofocus
                 autocomplete="off"
               />
-              <p class="uc-form-subtext">Tell us where you heard about us!</p>
             </div>
           </li>
 
@@ -236,7 +237,7 @@
               id="phoneNumber"
               data-testid="phoneNumberField"
               class="phone-input"
-              required="true"
+              :required="true"
               show-code-on-list
               @update="onPhoneInputUpdate"
               v-model="phoneNumber"
@@ -276,6 +277,7 @@ import { VolunteerOccupations } from '@/services/VolunteerService'
 import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 import { getAcademicYear } from '../utils/academic-year'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
 
 export default {
   name: 'background-info-view',
@@ -285,6 +287,7 @@ export default {
     Callout,
     LargeButton,
     MazPhoneNumberInput,
+    FormSelect,
   },
   data() {
     return {
@@ -306,7 +309,7 @@ export default {
       otherSignupSource: '',
       isLoadingSignupSources: false,
       invalidInputs: [],
-      phoneInputInfo: {},
+      phoneInputData: {},
       phoneNumber: '',
       showRemovedFromNTHSMessage: false,
       gradeLevel: '',
@@ -379,8 +382,8 @@ export default {
     goToDashboard() {
       this.$router.push('/dashboard')
     },
-    onPhoneInputUpdate(pii) {
-      this.phoneInputInfo = pii
+    onPhoneInputUpdate(newData) {
+      this.phoneInputData = newData
     },
     async getSignupSources() {
       this.isLoadingSignupSources = true
@@ -475,14 +478,16 @@ export default {
     invalidForm() {
       return (
         this.occupations.length === 0 ||
-        (this.signedUpWithGoogle && !this.phoneNumber) ||
+        (this.signedUpWithGoogle &&
+          (!this.phoneInputData.isValid || !this.signupSourceId)) ||
         !this.country ||
         !this.city ||
         (this.isUnitedStatesSelected && !this.state) ||
         !this.isValidLinkedInUrl ||
         (this.isCollegeEducated && !this.college) ||
         (this.isWorkingFullTime && !this.company) ||
-        (this.isInHighSchool && !this.gradeLevel)
+        (this.isInHighSchool && !this.gradeLevel) ||
+        (this.shouldShowOtherSignupInput && !this.otherSignupSource)
       )
     },
   },
