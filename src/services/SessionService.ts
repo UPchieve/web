@@ -5,7 +5,9 @@ import AnalyticsService from './AnalyticsService'
 import NetworkService, { isNetworkError } from './NetworkService'
 import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
+import ModalService from './ModalService'
 import axios from 'axios'
+import LoggerService from './LoggerService'
 
 export type Session = any
 
@@ -106,7 +108,6 @@ export default {
     }
   },
 
-  // TODO: Make all paths use `endAndExitSession` instead.
   async endSession(sessionId: string, subTopic: string) {
     try {
       const currentSession = store.state.user.session
@@ -123,34 +124,39 @@ export default {
         store.dispatch('session/startCooldownInterval')
       }
       store.dispatch('americaCountsVolunteer/startCooldown')
+      AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {
+        event: EVENTS.SESSION_ENDED,
+        sessionId: sessionId,
+        subject: subTopic,
+      })
     } catch (err) {
       if (!isNetworkError(err) || err.message !== 'Session has already ended') {
         throw err
       }
+      LoggerService.noticeError(err)
     }
-    AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {
-      event: EVENTS.SESSION_ENDED,
-      sessionId: sessionId,
-      subject: subTopic,
-    })
   },
 
   async endAndExitSession() {
+    if (store.state.user.sessionIsEnding) return
+    store.commit('user/setSessionIsEnding', true)
+
     const endedSession = { ...store.state.user.session }
+    try {
+      await this.endSession(endedSession.id, endedSession.subTopic)
 
-    await this.endSession(
-      store.state.user.session.id,
-      store.state.user.session.subTopic
-    )
-
-    // Students always go directly to the post-session feedback flow on End.
-    // Volunteers stay in the session to leave DMs (existing behavior).
-    const canInitiateDms = store.getters['user/isVolunteer']
-    if (!canInitiateDms) {
-      this.postSessionRedirect(endedSession)
+      // Students always go directly to the post-session feedback flow on End.
+      // Volunteers stay in the session to leave DMs (existing behavior).
+      const canInitiateDms = store.getters['user/isVolunteer']
+      if (!canInitiateDms) {
+        this.postSessionRedirect(endedSession)
+      }
+    } catch {
+      ModalService.showAlert('Error', 'Could not end session')
+    } finally {
+      store.commit('user/setSessionIsEnding', false)
+      store.dispatch('app/modal/hide')
     }
-
-    store.commit('user/setSessionIsEnding', false)
   },
 
   postSessionRedirect(session: Session) {
@@ -179,7 +185,7 @@ export default {
       })
   },
 
-  getRecapSessionForDms(sessionId) {
+  getRecapSessionForDms(sessionId: string) {
     return NetworkService.getRecapSessionForDms({
       sessionId,
     })

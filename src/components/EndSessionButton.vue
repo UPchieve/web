@@ -28,7 +28,6 @@ const isSessionWaitingForVolunteer = computed(
 )
 const isSessionOver = computed(() => store.getters['user/isSessionOver'])
 const isSessionAlive = computed(() => store.getters['user/isSessionAlive'])
-const isSessionEnding = computed(() => store.state.user.sessionIsEnding)
 const session = computed(() => store.state.user.session)
 
 function finish() {
@@ -42,11 +41,6 @@ function emitEndSessionConfirmationEvent() {
   })
 }
 async function end() {
-  if (isSessionEnding.value) {
-    return
-  }
-  store.commit('user/setSessionIsEnding', true)
-
   if (isSessionWaitingForVolunteer.value) {
     const shouldEndSession = await ModalService.showConfirm(
       'Cancel Request',
@@ -58,10 +52,7 @@ async function end() {
       }
     )
 
-    if (!shouldEndSession) {
-      store.commit('user/setSessionIsEnding', false)
-      return
-    }
+    if (!shouldEndSession) return
   } else {
     // Only ask for confirmation if session hasn't been ended by other user.
     const shouldEndSession = isSessionAlive.value
@@ -77,14 +68,12 @@ async function end() {
       : true
 
     // Early exit if user didn't confirm
-    if (!shouldEndSession) {
-      store.commit('user/setSessionIsEnding', false)
-      return
-    }
+    if (!shouldEndSession) return
+
     emitEndSessionConfirmationEvent()
   }
 
-  SessionService.endAndExitSession()
+  await SessionService.endAndExitSession()
 }
 </script>
 <template>

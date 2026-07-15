@@ -73,7 +73,6 @@ import sound from '@/assets/audio/alert.mp3'
 import ActivityDot from '@/components/ActivityDot.vue'
 import ReportSessionButton from '@/components/ReportSessionButton.vue'
 import EndSessionButton from '@/components/EndSessionButton.vue'
-import SessionService from '@/services/SessionService'
 
 export default {
   data() {
@@ -146,9 +145,6 @@ export default {
     },
   },
   methods: {
-    endAndExitSession() {
-      SessionService.endAndExitSession()
-    },
     isWaitingTooLong() {
       if (this.session.volunteer) {
         clearInterval(this.isWaitingIntervalId)

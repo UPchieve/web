@@ -16,6 +16,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import * as sessionUtils from '@/utils/session'
+import SessionService from '@/services/SessionService'
 import LargeButton from '@/components/LargeButton.vue'
 
 export default {
@@ -43,8 +44,8 @@ export default {
         this.roleInCurrentSession
       )
     },
-    end() {
-      sessionUtils.endSession(this)
+    async end() {
+      await SessionService.endAndExitSession()
     },
   },
 }
