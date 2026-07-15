@@ -63,19 +63,19 @@ class FeatureFlagService {
     }
   }
 
-  static setPersonPropertiesForFlags(props) {
+  static setPersonPropertiesForFlags(props: any) {
     posthog.setPersonPropertiesForFlags(props)
   }
 
-  static setPersonProperties(props) {
+  static setPersonProperties(props: any) {
     posthog.setPersonProperties(props)
   }
 
-  static isFeatureEnabled(featureFlagKey) {
+  static isFeatureEnabled(featureFlagKey: string) {
     return posthog.isFeatureEnabled(featureFlagKey)
   }
 
-  static async isFeatureEnabledForUser(featureFlagKey, userId) {
+  static async isFeatureEnabledForUser(featureFlagKey: string, userId: string) {
     try {
       if (!userId) throw new Error('Missing user ID')
       const axiosInstance = axios.create()
@@ -109,15 +109,15 @@ class FeatureFlagService {
     }
   }
 
-  static getFeatureFlag(featureFlagKey) {
+  static getFeatureFlag(featureFlagKey: string) {
     return posthog.getFeatureFlag(featureFlagKey)
   }
 
-  static getFeatureFlagPayload(featureFlagKey) {
+  static getFeatureFlagPayload(featureFlagKey: string) {
     return posthog.getFeatureFlagPayload(featureFlagKey)
   }
 
-  static async preloadPersonPropertiesToStore(props) {
+  static async preloadPersonPropertiesToStore(props: any) {
     const { default: store } = await import('@/store')
     await store.dispatch('productFlags/addToProductFlags', {
       fallIncentiveEnrollmentAt: props?.fallIncentiveEnrollmentAt,
@@ -126,7 +126,7 @@ class FeatureFlagService {
 }
 
 class DevFeatureFlagService {
-  static async init(id, featureFlags, featureFlagPayloads) {
+  static async init(id: string, featureFlags: any, featureFlagPayloads: any) {
     // eslint-disable-next-line no-console
     console.info(
       'FeatureFlagService.init',
@@ -147,22 +147,22 @@ class DevFeatureFlagService {
     }
   }
 
-  static setPersonPropertiesForFlags(props) {
+  static setPersonPropertiesForFlags(props: any) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.setPersonPropertiesForFlags', props)
   }
 
-  static setPersonProperties(props) {
+  static setPersonProperties(props: any) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.setPersonProperties', props)
   }
 
-  static isFeatureEnabled(featureFlagKey) {
+  static isFeatureEnabled(featureFlagKey: string) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.isFeatureEnabled', featureFlagKey)
   }
 
-  static async isFeatureEnabledForUser(featureFlagKey, userId) {
+  static async isFeatureEnabledForUser(featureFlagKey: string, userId: string) {
     const { default: store } = await import('@/store')
     // eslint-disable-next-line no-console
     console.info(
@@ -181,23 +181,23 @@ class DevFeatureFlagService {
     }
   }
 
-  static getFeatureFlag(featureFlagKey) {
+  static getFeatureFlag(featureFlagKey: string) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.getFeatureFlag', featureFlagKey)
   }
 
-  static getFeatureFlagPayload(featureFlagKey) {
+  static getFeatureFlagPayload(featureFlagKey: string) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.getFeatureFlagPayload', featureFlagKey)
   }
 
-  static async preloadPersonPropertiesToStore(props) {
+  static async preloadPersonPropertiesToStore(props: any) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.preloadPersonPropertiesToStore', props)
   }
 }
 
-function getFeatureFlagService() {
+function getFeatureFlagService(): DevFeatureFlagService | FeatureFlagService {
   switch (config.nodeEnv) {
     case 'development':
     case 'test':

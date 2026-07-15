@@ -897,18 +897,6 @@ export default {
       this._errorHandler
     )
   },
-  addReference({ referenceFirstName, referenceLastName, referenceEmail }) {
-    return httpPost(`${API_ROOT}/user/volunteer-approval/reference`, {
-      referenceFirstName,
-      referenceLastName,
-      referenceEmail,
-    }).then(this._successHandler, this._errorHandler)
-  },
-  deleteReference({ referenceEmail }) {
-    return httpPost(`${API_ROOT}/user/volunteer-approval/reference/delete`, {
-      referenceEmail,
-    }).then(this._successHandler, this._errorHandler)
-  },
   checkReference(referenceId) {
     return httpGet(`${REFERENCE_API_ROOT}/${referenceId}`).then(
       this._successHandler,

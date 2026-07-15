@@ -5,7 +5,10 @@ import LoggerService from './LoggerService'
 import NetworkService from './NetworkService'
 import { socket } from '@/socket'
 
-export async function logout(context, logoutRoute) {
+export async function logout(
+  context: { $store: any; $router: any },
+  logoutRoute: string
+) {
   try {
     await NetworkService.logout()
   } finally {
@@ -13,7 +16,10 @@ export async function logout(context, logoutRoute) {
   }
 }
 
-export async function handleLogout(context, logoutRoute) {
+export async function handleLogout(
+  context: { $store: any; $router: any },
+  logoutRoute: string
+) {
   await context.$store.dispatch('user/clear')
   resetServices()
   socket.disconnect()
@@ -30,7 +36,7 @@ function resetServices() {
 }
 
 export default {
-  async login(creds) {
+  async login(creds: { email: string; password: string }) {
     const { email, password } = creds
     if (!email || !password || !isEmail(email) || password.length < 1) {
       return Promise.reject('Invalid login form submission')
@@ -43,7 +49,7 @@ export default {
     return loginResponse.data
   },
 
-  registerOpenVolunteer(signupData) {
+  async registerOpenVolunteer(signupData: any) {
     return NetworkService.registerOpenVolunteer(signupData)
       .then((res) => {
         const data = { ...res.data }
@@ -57,7 +63,7 @@ export default {
       })
   },
 
-  registerPartnerVolunteer(signupData) {
+  async registerPartnerVolunteer(signupData: any) {
     return NetworkService.registerPartnerVolunteer(signupData)
       .then((res) => {
         const data = { ...res.data }
@@ -71,7 +77,7 @@ export default {
       })
   },
 
-  async registerStudent(signupData) {
+  async registerStudent(signupData: any) {
     try {
       await NetworkService.registerStudent(signupData)
     } catch (e) {
@@ -79,13 +85,17 @@ export default {
     }
   },
 
-  checkRegister(creds) {
+  async checkRegister(creds: any) {
     return NetworkService.checkRegister(creds).catch((res) => {
       throw errorFromHttpResponse(res)
     })
   },
 
-  sendReset(context, email, redirect) {
+  async sendReset(
+    context: { msg: any; $router: any },
+    email: string,
+    redirect: string
+  ) {
     return NetworkService.sendReset({ email })
       .then((res) => {
         const data = { ...res.data }
@@ -106,7 +116,11 @@ export default {
       })
   },
 
-  confirmReset(context, credentials, redirect) {
+  async confirmReset(
+    context: { $router: any },
+    credentials: any,
+    redirect: string
+  ) {
     return NetworkService.confirmReset(credentials)
       .then((res) => {
         const data = { ...res.data }
@@ -125,13 +139,13 @@ export default {
       })
   },
 
-  initiateVerification(data) {
+  async initiateVerification(data: any) {
     return NetworkService.sendVerification(data).catch((err) => {
       throw errorFromHttpResponse(err)
     })
   },
 
-  confirmVerification(data) {
+  async confirmVerification(data: any) {
     return NetworkService.confirmVerification(data).catch((err) => {
       throw errorFromHttpResponse(err)
     })

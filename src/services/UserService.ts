@@ -34,7 +34,7 @@ export default {
       }
     })
   },
-  getVolunteersAvailability(certifiedSubject) {
+  getVolunteersAvailability(certifiedSubject: string) {
     return NetworkService.getVolunteersAvailability(certifiedSubject).then(
       (res) => {
         if (res.data.err) {
@@ -48,7 +48,10 @@ export default {
     )
   },
 
-  async switchActiveRole(context, activeRole) {
+  async switchActiveRole(
+    context: { $store: any },
+    activeRole: 'student' | 'volunteer'
+  ) {
     const response = await NetworkService.switchActiveRole(activeRole)
     const newActiveRole = response.data.activeRole
     const newUser = response.data.user
