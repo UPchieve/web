@@ -436,7 +436,7 @@ export default {
   @include flex-container(row, flex-start, center);
   font-size: 14px;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 
   .breadcrumb-link {
     color: $c-information-blue;

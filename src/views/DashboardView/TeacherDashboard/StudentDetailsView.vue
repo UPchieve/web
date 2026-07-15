@@ -8,39 +8,37 @@
           </div>
           <div class="student-info-text">
             <h1>{{ studentFirstName }} {{ studentLastName }}</h1>
-            <h3>{{ className }}</h3>
+            <h2>{{ className }}</h2>
           </div>
         </div>
       </div>
       <div class="filter-container">
         <div class="filter-controls">
-          <label class="select-label"
-            >Select Subject
-            <FormSelect
-              v-if="topics.length"
-              class="topics-dropdown"
-              :name="'topic'"
-              :placeholder="subjectPlaceholder"
-              :optionTextField="'displayName'"
-              :reduce="(option) => option.name"
-              :options="[
-                ...topics,
-                { name: 'other', displayName: 'All Subjects' },
-              ]"
-              v-model="filters.topic.name"
-              @update:modelValue="submitFilter"
-            />
-          </label>
+          <FormSelect
+            v-if="topics.length"
+            class="topics-dropdown"
+            name="topic"
+            label="Subject"
+            :placeholder="subjectPlaceholder"
+            :optionTextField="'displayName'"
+            :reduce="(option) => option.name"
+            :options="[
+              ...topics,
+              { name: 'other', displayName: 'All Subjects' },
+            ]"
+            v-model="filters.topic.name"
+            @update:modelValue="submitFilter"
+          />
           <div class="date-input-container">
             <FormDateInput
-              label="from"
+              label="From"
               id="session-activity-from"
               :placeholder="filters.sessionActivityFrom"
               v-model="filters.sessionActivityFrom"
               @update:modelValue="submitFilter"
             />
             <FormDateInput
-              label="to"
+              label="To"
               id="session-activity-to"
               :placeholder="filters.sessionActivityTo"
               v-model="filters.sessionActivityTo"
@@ -267,13 +265,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
 .main {
   @include flex-container(column, center);
 }
 
 .student-info {
   @include flex-container(row);
-  margin-top: 20px;
 }
 
 .sessions-container {
@@ -287,6 +294,7 @@ export default {
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
+  margin-right: 12px;
 }
 
 .img {
@@ -294,14 +302,8 @@ export default {
   max-height: 100%;
 }
 
-.student-info h1 {
-  font-size: 24px;
-  margin: 0 12px;
-}
-
-.student-info h3 {
-  font-size: 16px;
-  margin: 6px 12px;
+.student-info-text {
+  @include flex-container(column, flex-start, flex-start);
 }
 
 .sessions-header {
@@ -400,14 +402,13 @@ export default {
 .topics-dropdown {
   background-color: #ffffff;
   border-radius: 5px;
+  margin-right: 10px;
 }
 
 .filter-container {
   @include flex-container(column, flex-start);
-  margin-bottom: 16px;
   border-radius: 8px;
-  padding: 12px;
-  margin-top: 12px;
+  margin-top: 8px;
 
   @include breakpoint-below('small') {
     @include flex-container(row, center);
@@ -419,7 +420,7 @@ export default {
   @include flex-container(row, center);
   width: 100%;
   max-width: 600px;
-  margin: 10px 0;
+  margin-bottom: 10px;
   align-items: center;
 
   @include breakpoint-below('medium') {

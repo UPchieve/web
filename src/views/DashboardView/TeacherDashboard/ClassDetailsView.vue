@@ -5,15 +5,17 @@
       <div class="class-header">
         <div class="class-info">
           <div class="start-col">
-            <img
-              v-if="classData.topicId"
-              :src="topicIdToTopic[classData.topicId]?.iconLink"
-              :alt="altImageText"
-              class="subject-icon"
-              aria-hidden
-            />
-            <task-badge v-else class="subject-icon" aria-hidden />
-            <clever-logo v-if="classData.cleverId" class="clever-logo" />
+            <div class="subject-icon-container">
+              <img
+                v-if="classData.topicId"
+                :src="topicIdToTopic[classData.topicId]?.iconLink"
+                :alt="altImageText"
+                class="subject-icon"
+                aria-hidden
+              />
+              <task-badge v-else class="subject-icon" aria-hidden />
+              <clever-logo v-if="classData.cleverId" class="clever-logo" />
+            </div>
             <h1>{{ classData.name }}</h1>
             <span class="students-text"
               >{{ classData.totalStudents || '0' }}
@@ -1048,7 +1050,7 @@ export default {
 
 .class-info {
   @include flex-container(row, space-between, left);
-  margin: 20px 0 10px 0;
+  margin-bottom: 10px;
 
   h1 {
     font-size: 24px;
@@ -1370,10 +1372,19 @@ export default {
   }
 }
 
-.subject-icon,
+.subject-icon-container {
+  position: relative;
+}
+.subject-icon {
+  height: 40px;
+  margin-right: 12px;
+  width: 40px;
+}
+
 .clever-logo {
-  height: 28px;
-  margin-right: 4px;
-  width: 28px;
+  bottom: -4px;
+  position: absolute;
+  right: 4px;
+  width: 20px;
 }
 </style>

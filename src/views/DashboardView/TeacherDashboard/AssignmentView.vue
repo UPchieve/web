@@ -5,7 +5,7 @@
     </div>
     <div v-else>
       <h1 class="assignment-header">
-        <AssignmentIcon /><span class="assignment-title">{{
+        <AssignmentIcon class="assignment-icon" /><span>{{
           assignmentInfo.title
         }}</span>
       </h1>
@@ -154,6 +154,7 @@ import { toastController } from '@ionic/vue'
 import CopyIcon from '@/assets/copy-icon.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 
+// TODO: Reuse for student assignment view as well.
 export default {
   name: 'Assignment',
   components: { AssignmentIcon, Calendar, Loader, CopyIcon },
@@ -269,14 +270,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  font-size: 24px;
+  margin-bottom: 0;
+}
+
+.assignment-header {
+  @include flex-container(row, flex-start, center);
+}
+
+.assignment-icon {
+  height: 40px;
+  margin-right: 12px;
+  width: 40px;
+}
+
 .assignment {
   color: #666f7d;
   font-size: 14px;
 }
 
-.assignment-header {
-  margin-left: 1em;
-}
 .calendar-icon {
   height: 16px;
   margin-right: 4px;
@@ -285,19 +298,12 @@ export default {
 .bold-text {
   font-weight: 500;
 }
-.assignment-container {
-  margin: 40px;
-}
-.assignment-title {
-  margin-left: 12px;
-  font-size: 28px;
-}
 
 .assignment-info,
 .instructions,
 .line-break,
 .teacher-notes {
-  margin-left: 5em;
+  margin-left: 3em;
 }
 
 .instructions-header {
