@@ -5,7 +5,7 @@ import { Login } from '../page-object-models/login'
 import { POSTHOG_FEATURE_FLAGS } from '../../../src/consts'
 
 const BAD_CREDENTIALS_ERROR =
-  "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google, Clever, or ClassLink SSO."
+  "Email and password don't match Check both, or use the button below if you signed up with Google, Clever, or ClassLink.  Reset password "
 
 let dbClient
 let testUser

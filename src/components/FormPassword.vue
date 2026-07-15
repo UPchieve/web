@@ -12,22 +12,33 @@
         {{ getRequiredError() }}
       </div>
     </div>
-    <input
-      :id="name"
-      :data-testid="testid"
-      :name="name"
-      :placeholder="placeholder"
-      autocomplete="new-password"
-      type="password"
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-      class="uc-form-text-input"
-      :class="{
-        'uc-form-text-input-invalid': hasValidationError(),
-      }"
-      @blur="onBlur"
-      :required="isRequired"
-    />
+    <div class="password-input-wrapper">
+      <input
+        :id="name"
+        :data-testid="testid"
+        :name="name"
+        :placeholder="placeholder"
+        autocomplete="off"
+        :type="isPasswordVisible ? 'text' : 'password'"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+        class="uc-form-text-input"
+        :class="{
+          'uc-form-text-input-invalid': hasValidationError(),
+        }"
+        @blur="onBlur"
+        :required="isRequired"
+      />
+
+      <button
+        type="button"
+        class="password-toggle"
+        :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
+        @click="togglePasswordVisibility"
+      >
+        <v-icon :icon="isPasswordVisible ? mdiEye : mdiEyeOff" size="20" />
+      </button>
+    </div>
 
     <div
       v-if="modelValue && showPasswordRequirements"
@@ -62,6 +73,7 @@
 import { helpers, requiredIf, minLength } from '@vuelidate/validators'
 import AnalyticsService from '@/services/AnalyticsService'
 import { useInputValidation } from '@/composables/InputValidation'
+import { mdiEye, mdiEyeOff } from '@mdi/js'
 
 export default {
   props: {
@@ -112,6 +124,9 @@ export default {
   data() {
     return {
       hasEnteredPassword: false,
+      isPasswordVisible: false,
+      mdiEye,
+      mdiEyeOff,
     }
   },
 
@@ -167,6 +182,9 @@ export default {
       )
       return requiredError ? requiredError.$message : ''
     },
+    togglePasswordVisibility() {
+      this.isPasswordVisible = !this.isPasswordVisible
+    },
   },
 }
 </script>
@@ -196,5 +214,27 @@ export default {
 .requirement-icon {
   font-weight: bold;
   font-size: 1rem;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 4px;
+  color: $c-secondary-grey;
+
+  &:hover {
+    color: $c-default-grey;
+  }
+}
+
+.uc-form-text-input {
+  padding-right: 36px;
+  width: 100%;
 }
 </style>

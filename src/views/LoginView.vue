@@ -9,7 +9,22 @@
         Hey, welcome back!
       </h1>
       <div
-        v-if="error || message"
+        v-if="hasLoginError"
+        class="alert alert-danger"
+        role="alert"
+        data-testid="error"
+      >
+        <strong>Email and password don't match</strong>
+        <div>
+          Check both, or use the button below if you signed up with Google,
+          Clever, or ClassLink.
+        </div>
+        <router-link to="/resetpassword" class="uc-link">
+          Reset password
+        </router-link>
+      </div>
+      <div
+        v-else-if="error || message"
         class="alert"
         :class="{ 'alert-success': !!message, 'alert-danger': !!error }"
         role="alert"
@@ -42,7 +57,22 @@
           @click.prevent="signIn"
           :disabled="!isValidForm || isLoggingIn ? true : null"
         >
-          {{ useNewSignUpFlow ? 'Log in' : 'Sign In' }}
+          <Spinner
+            v-if="isLoggingIn"
+            class="button-spinner"
+            :container-width="16"
+            :container-height="16"
+            :width="16"
+            :height="16"
+            :thickness="2"
+          />
+          {{
+            isLoggingIn
+              ? 'Signing in...'
+              : useNewSignUpFlow
+                ? 'Log in'
+                : 'Sign In'
+          }}
         </button>
         <LineDivider
           :text="useNewSignUpFlow ? 'Or continue with:' : 'Sign In with'"
@@ -93,6 +123,7 @@ import LineDivider from '@/components/LineDivider.vue'
 import SsoButton from '@/components/SsoButton.vue'
 import { EVENTS } from '@/consts'
 import config from '../config'
+import Spinner from '@/components/Spinner.vue'
 
 export default {
   components: {
@@ -101,6 +132,7 @@ export default {
     FormPageTemplate,
     LineDivider,
     SsoButton,
+    Spinner,
   },
   setup() {
     return { SsoProvider }
@@ -153,6 +185,7 @@ export default {
       error,
       message: query.message ?? '',
       isLoggingIn: false,
+      hasLoginError: false,
     }
   },
   methods: {
@@ -168,8 +201,7 @@ export default {
           this.$router.push(this.$route.query.redirect || '/')
         })
         .catch(() => {
-          this.error =
-            "Oops! That email and password combination doesn't work. Check your password or if you signed up with Google, Clever, or ClassLink SSO."
+          this.hasLoginError = true
         })
         .finally(() => {
           this.isLoggingIn = false
@@ -208,6 +240,21 @@ export default {
 <style lang="scss" scoped>
 .alert {
   margin: 25px 0;
+  border: 2px solid #fbbc05;
+  border-radius: 8px;
+  background-color: rgba(251, 188, 5, 0.1);
+  padding: 8px 12px;
+
+  strong,
+  div,
+  a {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  a:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .uc-form-text {
@@ -216,5 +263,12 @@ export default {
 
 .uc-link.subtext {
   margin: 2px 0 0 10px;
+}
+
+.button-spinner {
+  margin-right: 6px;
+  :deep(div) {
+    border-color: $c-secondary-grey transparent transparent transparent;
+  }
 }
 </style>

@@ -11,6 +11,9 @@ importers:
       '@ionic/vue':
         specifier: ^8.0.1
         version: 8.8.3(@stencil/core@4.43.0)(vue-router@4.6.4(vue@3.5.32(typescript@5.9.3)))(vue@3.5.32(typescript@5.9.3))
+      '@mdi/js':
+        specifier: ^7.4.47
+        version: 7.4.47
       '@neoconfetti/vue':
         specifier: ^2.2.1
         version: 2.2.1
@@ -935,6 +938,9 @@ packages:
   '@mazui/cli@3.50.1':
     resolution: {integrity: sha512-M8N/LdAJUfGt6eAGAJ8/VgA+yFSs+9IrLpDrt2oJfSVKseHRHT4C2t1A2KLlmt5EzeLQibX/eKj00TVNVavllA==}
     hasBin: true
+
+  '@mdi/js@7.4.47':
+    resolution: {integrity: sha512-KPnNOtm5i2pMabqZxpUz7iQf+mfrYZyKCZ8QNz85czgEt7cuHcGorWfdzUMWYA0SD+a6Hn4FmJ+YhzzzjkTZrQ==}
 
   '@neoconfetti/vue@2.2.1':
     resolution: {integrity: sha512-GXe5XoHlMK8VIxmxKuAgF9QQwRoDLmtiwVhONA9rzF+zOLGfOVLxo4OEDZqU9F0gJkB7U23BLlGJ3ouOb+kguw==}
@@ -5763,6 +5769,8 @@ snapshots:
       figlet: 1.11.0
       tinycolor2: 1.6.0
       typescript: 5.6.2
+
+  '@mdi/js@7.4.47': {}
 
   '@neoconfetti/vue@2.2.1': {}
 

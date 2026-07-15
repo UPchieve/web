@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@ionic/vue": "^8.0.1",
+    "@mdi/js": "^7.4.47",
     "@neoconfetti/vue": "^2.2.1",
     "@rushstack/eslint-patch": "^1.10.3",
     "@tiptap/extension-mathematics": "^3.22.5",
