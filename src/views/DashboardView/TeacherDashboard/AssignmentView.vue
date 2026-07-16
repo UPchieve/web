@@ -159,35 +159,41 @@ export default {
   name: 'Assignment',
   components: { AssignmentIcon, Calendar, Loader, CopyIcon },
 
-  inject: ['classData'],
+  inject: ['classData', 'assignmentsCompletion'],
 
   data() {
     return {
       isLoading: true,
-      assignmentId: '',
       assignmentInfo: {},
       startDate: '',
       dueDate: '',
-      studentCompletion: [],
-      totalStudents: 0,
-      completedStudents: 0,
       assignmentDocs: '',
       isGettingStarted: false,
     }
   },
 
+  computed: {
+    assignmentId() {
+      return this.$route.params.assignmentId
+    },
+    completion() {
+      return this.assignmentsCompletion?.[this.assignmentId]
+    },
+    studentCompletion() {
+      return this.completion?.studentsCompletion ?? []
+    },
+    totalStudents() {
+      return this.completion?.totalStudents ?? 0
+    },
+    completedStudents() {
+      return this.completion?.completedStudents ?? 0
+    },
+  },
+
   async created() {
-    this.assignmentId = this.$route.params.assignmentId
     this.assignmentInfo = await this.getAssignmentDetails(this.assignmentId)
     this.startDate = dayjs(this.assignmentInfo.startDate).format('MM/DD/YYYY')
     this.dueDate = dayjs(this.assignmentInfo.dueDate).format('MM/DD/YYYY')
-    this.studentCompletion = await this.getAssignmentCompletionInfo(
-      this.assignmentId
-    )
-    this.totalStudents = this.studentCompletion.length
-    this.completedStudents = this.studentCompletion.filter(
-      (student) => student.submitted_at !== null
-    ).length
     this.isGettingStarted = this.assignmentInfo.isGettingStartedAssignment
 
     AnalyticsService.captureEvent(EVENTS.TEACHER_VIEWED_ASSIGNMENT, {
@@ -241,13 +247,6 @@ export default {
       } finally {
         this.isLoading = false
       }
-    },
-
-    async getAssignmentCompletionInfo(assignmentId) {
-      const {
-        data: { studentAssignments },
-      } = await NetworkService.getStudentAssignmentCompletion(assignmentId)
-      return studentAssignments
     },
 
     openStudentCompletionModal() {

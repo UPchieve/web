@@ -1,14 +1,29 @@
 import AssignmentView from '@/views/DashboardView/TeacherDashboard/AssignmentView.vue'
 import { mount } from '@vue/test-utils'
 import store from '@/store'
-import router from '@/router'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import NetworkService from '@/services/NetworkService'
 
-const getWrapper = async (data = {}) => {
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    {
+      path: '/dashboard/teacher/class/:classId/assignments/:assignmentId',
+      name: 'AssignmentView',
+      component: AssignmentView,
+    },
+  ],
+})
+
+const getWrapper = async (data = {}, assignmentsCompletion = {}) => {
   const wrapper = mount(AssignmentView, {
     global: {
       plugins: [store, router],
+      provide: {
+        classData: {},
+        assignmentsCompletion,
+      },
     },
   })
 
@@ -53,15 +68,13 @@ describe('Assignment View', () => {
     NetworkService.getAssignmentById = vi.fn().mockResolvedValue({
       data: { assignment },
     })
-    NetworkService.getStudentAssignmentCompletion = vi
-      .fn()
-      .mockResolvedValue({ data: { studentAssignments } })
     NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
       data: { assignmentDocuments: [] },
     })
     await router.push(
-      `/dashboard/teacher/class/class-id/assignment/assignment-1`
+      `/dashboard/teacher/class/class-id/assignments/assignment-1`
     )
+    await router.isReady()
   })
   test('Show instructions message', async () => {
     const assignmentWithDirections = {
@@ -88,7 +101,16 @@ describe('Assignment View', () => {
   })
 
   test('Show correct number for students completed', async () => {
-    const wrapper = await getWrapper({ completedStudents: 1, totalStudents: 2 })
+    const wrapper = await getWrapper(
+      { assignmentInfo: assignment },
+      {
+        'assignment-1': {
+          studentsCompletion: studentAssignments,
+          totalStudents: 2,
+          completedStudents: 1,
+        },
+      }
+    )
 
     expect(wrapper.find('[data-testid="student-completion"').text()).toBe(
       'Student Completion 1/2'

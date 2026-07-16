@@ -347,6 +347,7 @@ export default {
   provide() {
     return {
       classData: computed(() => this.classData),
+      assignmentsCompletion: computed(() => this.assignmentsCompletion),
     }
   },
 
@@ -905,7 +906,7 @@ export default {
       if (studentsCompletion && studentsCompletion.length > 0) {
         const totalStudents = studentsCompletion.length
         const completedStudents = studentsCompletion.filter(
-          (student) => student.submitted_at !== null
+          (student) => !!student.submittedAt
         ).length
 
         return {
