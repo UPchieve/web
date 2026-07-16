@@ -59,7 +59,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION]: false,
       [POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST]: false,
-      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: true,
@@ -283,10 +282,6 @@ export default {
       ],
     isShowTipTapEditorEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR],
-    isVolunteerAskForCollegeInterestEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[
-        POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASK_FOR_COLLEGE_INTEREST
-      ],
     isShowDMNotificationsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
     isS2VThemingEnabled: (state: FeatureFlagState) =>

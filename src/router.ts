@@ -926,46 +926,6 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/add-volunteer-role',
-    component: { render: () => null },
-    meta: { protected: true },
-    name: 'AddVolunteerRole',
-    beforeEnter: async (
-      to: RouteLocationNormalized,
-      from: RouteLocationNormalized,
-      next: NavigationGuardNext
-    ) => {
-      // We are using this route to add a volunteer role to students
-      // and switch to volunteer mode via gleap experiment CTAs, emails, etc.
-
-      // abort route change when FF is disabled
-      if (
-        !store.getters['featureFlags/isVolunteerAskForCollegeInterestEnabled']
-      ) {
-        return next(from)
-      }
-
-      // this should never happen but if you get to this route as a volunteer, abort
-      if (store.getters['user/hasVolunteerRole']) return next(from)
-
-      AnalyticsService.captureEvent(EVENTS.BECOME_VOLUNTEER_FROM_ROUTE, {
-        params: to.query,
-      })
-
-      try {
-        await NetworkService.addVolunteerRoleForStudent()
-        await UserService.switchActiveRole({ $store: store }, 'volunteer')
-        return next('/dashboard')
-      } catch (e) {
-        LoggerService.noticeError(
-          e,
-          `Failed to add or switch active role for user: ${store.state.user.user.id}`
-        )
-        return next('/dashboard')
-      }
-    },
-  },
-  {
     path: '/groups/apply',
     name: 'NTHSApplicationView',
     component: NTHSApplicationView,

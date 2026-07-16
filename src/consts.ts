@@ -962,7 +962,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   UPBOT_SESSION_EDITOR_CONTEXT = 'upbot-session-editor-context',
   COMBINED_ONBOARDING_CHECKLIST = 'combined-onboarding-checklist',
   STUDENT_POST_SESSION_SURVEY_VARIANT = 'student-post-session-survey-variant',
-  VOLUNTEER_ASK_FOR_COLLEGE_INTEREST = 'volunteer-ask-for-college-interest',
   SHOW_TIP_TAP_EDITOR = 'show-tip-tap-editor',
   SHOW_DM_NOTIFICATIONS = 'show-dm-notifications',
   SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE = 'show-student-to-volunteer-hours-page',
