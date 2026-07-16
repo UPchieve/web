@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import LargeButton from '../LargeButton.vue'
-import AnalyticsService from '../../services/AnalyticsService'
+import AnalyticsService from '../../services/AnalyticsService.js'
 import { EVENTS } from '@/consts'
 import { useRouter } from 'vue-router'
 import UserService from '@/services/UserService'
