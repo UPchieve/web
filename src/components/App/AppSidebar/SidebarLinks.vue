@@ -172,7 +172,7 @@
         </sidebar-link>
         <sidebar-link
           v-if="shouldShowStudentToVolunteerHoursPage"
-          to="/hour-calculator"
+          to="/volunteer-hours"
           text="Service Hours"
           id="hour-calculator-modal-link"
         >

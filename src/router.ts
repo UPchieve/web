@@ -913,6 +913,10 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/hour-calculator',
+    redirect: '/volunteer-hours',
+  },
+  {
+    path: '/volunteer-hours',
     name: 'HourCalculatorView',
     component: HourCalculatorView,
     meta: {
