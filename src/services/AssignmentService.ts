@@ -18,13 +18,67 @@ type AssignmentData = {
 type TeacherClass = { id: string }
 type StudentId = string
 
-export async function upsertAssignment(
+export async function createAssignment(
   assignmentData: AssignmentData,
   selectedClasses: TeacherClass[],
-  studentsToAdd: StudentId[],
-  studentsToRemove: StudentId[],
-  files: File[]
+  studentsToAdd?: StudentId[],
+  files: File[] = []
 ) {
+  const result = await upsertAssignment({
+    assignmentData,
+    selectedClasses,
+    studentsToAdd,
+    files,
+    action: 'create',
+  })
+
+  if (!result.error) {
+    AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
+  }
+
+  return result
+}
+
+export async function editAssignment(
+  assignmentData: AssignmentData,
+  selectedClasses: TeacherClass[],
+  studentsToAdd?: StudentId[],
+  studentsToRemove?: StudentId[],
+  files: File[] = []
+) {
+  const result = await upsertAssignment({
+    assignmentData,
+    selectedClasses,
+    studentsToAdd,
+    studentsToRemove,
+    files,
+    action: 'edit',
+  })
+
+  if (!result.error) {
+    AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_EDITED, assignmentData)
+  }
+
+  return result
+}
+
+async function upsertAssignment(options: {
+  assignmentData: AssignmentData
+  selectedClasses: TeacherClass[]
+  studentsToAdd?: StudentId[]
+  studentsToRemove?: StudentId[]
+  files?: File[]
+  action: 'create' | 'edit'
+}) {
+  const {
+    assignmentData,
+    selectedClasses,
+    studentsToAdd,
+    studentsToRemove,
+    files,
+    action,
+  } = options
+
   if (!selectedClasses.length) {
     return {
       error: 'Must select at least one class',
@@ -58,8 +112,6 @@ export async function upsertAssignment(
           )
         )
 
-    AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
-
     return { assignments: assignments ?? [assignment] }
   } catch (err) {
     const errData = (err as AxiosError).response?.data as {
@@ -83,7 +135,7 @@ export async function upsertAssignment(
       }
     }
 
-    if (errData.imageModerationInfractions) {
+    if (errData?.imageModerationInfractions) {
       return {
         savedAssignment,
         error: formatModerationInfractionFileMessage(
@@ -94,7 +146,7 @@ export async function upsertAssignment(
 
     return {
       savedAssignment,
-      error: `Unable to create assignment`,
+      error: `Unable to ${action} assignment`,
     }
   }
 }

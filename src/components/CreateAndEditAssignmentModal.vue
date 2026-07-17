@@ -160,14 +160,12 @@
 <script>
 import { dayjs } from '@/utils/time-utils'
 import { mapGetters, mapState } from 'vuex'
-import { EVENTS } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from './FormInputs/FormDateInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import Modal from '@/components/Modal.vue'
 import FileDialog from '@/components/FileDialog.vue'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
-import AnalyticsService from '@/services/AnalyticsService'
 import ModalService from '@/services/ModalService'
 import { BYTES_PER_MEGABYTE, formatBytes } from '@/utils/bytes'
 
@@ -375,27 +373,21 @@ export default {
         assignmentData.id = this.assignmentId
         this.modalData.onAssignmentEdited({
           assignmentData,
+          selectedClasses: this.selectedClasses,
           studentsToAdd,
           studentsToRemove,
-          selectedStudents: selectedStudentIds,
           files: this.files,
         })
-        this.$store.dispatch('app/modal/hide')
       } else {
         this.modalData.onAssignmentCreated({
           assignmentData,
           selectedClasses: this.selectedClasses,
-          selectedStudents: this.selectedStudents,
+          studentsToAdd: this.selectedStudents.map((s) => s.id),
           files: this.files,
+          currentClass: this.modalData.currentClass,
         })
-        AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
-        this.$store.dispatch('app/modal/hide')
-        if (!this.$route.path.includes('assignments')) {
-          this.$router.push(
-            `/dashboard/teacher/class/${this.modalData.currentClass.id}/assignments`
-          )
-        }
       }
+      this.close()
     },
   },
 }

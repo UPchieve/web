@@ -1237,11 +1237,6 @@ export default {
       this._errorHandler
     )
   },
-  createAssignment(assignmentData: unknown) {
-    return httpPost(`${API_ROOT}/teachers/assignment`, {
-      assignmentData,
-    }).then(this._successHandler, this._errorHandler)
-  },
   upsertAssignment(formData: FormData) {
     return httpPut(`${API_ROOT}/teachers/assignment`, formData).then(
       this._successHandler,
@@ -1249,35 +1244,10 @@ export default {
     )
   },
   createAssignments(formData: FormData) {
-    return httpPost(`${API_ROOT}/teachers/assignment`, formData).then(
+    return httpPost(`${API_ROOT}/teachers/assignments`, formData).then(
       this._successHandler,
       this._errorHandler
     )
-  },
-  editAssignment(assignmentData: unknown) {
-    return httpPost(`${API_ROOT}/teachers/assignment/edit`, {
-      assignmentData,
-    }).then(this._successHandler, this._errorHandler)
-  },
-  uploadFiles({
-    assignmentId,
-    files,
-  }: {
-    assignmentId: string
-    files: File[]
-  }) {
-    const formData = new FormData()
-    formData.append('assignmentId', assignmentId)
-
-    files.forEach((file) => {
-      formData.append('files', file)
-    })
-
-    return httpPut(`${API_ROOT}/assignment/upload`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then(this._successHandler, this._errorHandler)
   },
   getAssignmentsByClassId(classId: string) {
     return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(

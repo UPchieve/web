@@ -160,6 +160,7 @@
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import * as AssignmentService from '@/services/AssignmentService'
 import ClassImgPreferred from '@/assets/class.avif?url'
 import ClassImgFallback from '@/assets/class.svg?url'
 import Checklist from '@/assets/Checklist.svg'
@@ -374,7 +375,7 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAndEditAssignmentModal',
         data: {
-          onAssignmentCreated: this.handleAssignmentCreated,
+          onAssignmentCreated: this.handleCreateAssignment,
           classes: this.classes,
           currentClass: teacherClass,
           classStudents: teacherClass.students,
@@ -383,30 +384,30 @@ export default {
       })
     },
 
-    // TODO: Move to service method.
-    async handleAssignmentCreated({
+    async handleCreateAssignment({
       assignmentData,
       selectedClasses,
-      selectedStudents,
+      studentsToAdd,
+      files,
+      currentClass,
     }) {
       try {
-        const classIds = selectedClasses.map(
-          (selectedClass) => selectedClass.id
+        const result = await AssignmentService.createAssignment(
+          assignmentData,
+          selectedClasses,
+          studentsToAdd,
+          files
         )
-        const studentIds =
-          selectedStudents.length > 0
-            ? selectedStudents.map((selectedStudent) => selectedStudent.id)
-            : []
-        await Promise.all(
-          classIds.map(async (classId) => {
-            const assignmentInfo = { classId, ...assignmentData, studentIds }
-            const {
-              data: { assignment },
-            } = await NetworkService.createAssignment(assignmentInfo)
-            return { ...assignment, studentIds }
-          })
-        )
+
+        if (result.error) {
+          this.showToast(result.error, true)
+          return
+        }
+
         this.showToast('Assignment created.')
+
+        const classId = currentClass.id
+        this.$router.push(`/dashboard/teacher/class/${classId}/assignments`)
       } catch (err) {
         const error = err?.response?.data?.err ?? 'Unable to create assignment.'
         this.showToast(error, true)

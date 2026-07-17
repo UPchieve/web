@@ -317,6 +317,7 @@ import { mapState, mapGetters } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import * as AssignmentService from '@/services/AssignmentService'
 import ModalService from '@/services/ModalService'
 import LinkUnion from '@/assets/LinkUnion.svg'
 import Checklist from '@/assets/Checklist.svg'
@@ -514,42 +515,6 @@ export default {
   },
 
   methods: {
-    async uploadFiles(assignmentIds, files) {
-      const responses = await Promise.allSettled(
-        assignmentIds.map((assignmentId) =>
-          NetworkService.uploadFiles({ assignmentId, files })
-        )
-      )
-      const failed = responses.filter(
-        (r) => !!r.reason?.response?.data?.moderationFailures
-      )
-      if (failed.length) {
-        await this.handleAssignmentAttachmentModerationFailure(
-          failed[0].reason.response.data.moderationFailures
-        )
-      }
-    },
-    async handleAssignmentInfoModerationFailure(failures, assignmentTitle) {
-      const moderationIssues = failures.map((issueKey) => {
-        return issueKey.replace('_', ' ')
-      })
-      await this.showToast(
-        `The assignment "${assignmentTitle}" could not be edited due to a safety policy violation in the content. Please review your assignment content for: ${moderationIssues}`,
-        true
-      )
-    },
-    async handleAssignmentAttachmentModerationFailure(fileNameToFailuresMap) {
-      const fileName = Object.keys(fileNameToFailuresMap)[0]
-      const moderationIssues = fileNameToFailuresMap[fileName].map(
-        (issueKey) => {
-          return issueKey.replace('_', ' ')
-        }
-      )
-      await this.showToast(
-        `The files could not be attached to the assignment due to a safety policy violation in the content of file "${fileName}" - Please review your file content for: ${moderationIssues}`,
-        true
-      )
-    },
     async showToast(message, isError) {
       const toast = await toastController.create({
         message,
@@ -645,7 +610,7 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'CreateAndEditAssignmentModal',
         data: {
-          onAssignmentCreated: this.handleAssignmentCreated,
+          onAssignmentCreated: this.handleCreateAssignment,
           classes: this.classes,
           currentClass: this.classData,
           classStudents: this.unfilteredStudents,
@@ -683,52 +648,42 @@ export default {
       this.toggledAssignmentMenuId = ''
     },
 
-    async handleAssignmentCreated({
+    async handleCreateAssignment({
       assignmentData,
       selectedClasses,
-      selectedStudents,
+      studentsToAdd,
       files,
     }) {
       try {
-        const classIds = selectedClasses.map(
-          (selectedClass) => selectedClass.id
+        const { assignments, error } = await AssignmentService.createAssignment(
+          assignmentData,
+          selectedClasses,
+          studentsToAdd,
+          files
         )
-        const studentIds =
-          selectedStudents.length > 0
-            ? selectedStudents.map((selectedStudent) => selectedStudent.id)
-            : []
-        let assignments = []
-        try {
-          assignments = await Promise.all(
-            classIds.map(async (classId) => {
-              const assignmentInfo = { classId, ...assignmentData, studentIds }
-              const response =
-                await NetworkService.createAssignment(assignmentInfo)
-              const assignment = response.data?.assignment
-              return { ...assignment, studentIds }
-            })
-          )
-        } catch (err) {
-          if (err.response?.data?.moderationFailures) {
-            await this.handleAssignmentInfoModerationFailure(
-              err.response?.data.moderationFailures,
-              assignmentData.title
-            )
-            return
-          }
+
+        if (error) {
+          this.showToast(error, true)
+          return
         }
-        const selectedClassAssignment = assignments.find(
-          (a) => a.classId === this.$route.params.classId
+
+        const newAssignmentForThisClass = assignments.find(
+          (a) => a.classId === this.classData.id
         )
-        if (selectedClassAssignment) {
-          this.assignments.push(selectedClassAssignment)
+        if (newAssignmentForThisClass) {
+          this.assignments.push({
+            ...newAssignmentForThisClass,
+            studentIds: studentsToAdd,
+          })
         }
 
         await this.getStudentAssignmentCompletions()
+        this.$store.dispatch('app/modal/hide')
 
-        if (files.length) {
-          const assignmentIds = assignments.map((assignment) => assignment.id)
-          await this.uploadFiles(assignmentIds, files)
+        if (!this.$route.path.includes('assignments')) {
+          this.$router.push(
+            `/dashboard/teacher/class/${this.classData.id}/assignments`
+          )
         }
       } catch (err) {
         const error = err?.response?.data?.err ?? 'Unable to create assignment'
@@ -738,47 +693,44 @@ export default {
 
     async handleEditAssignment({
       assignmentData,
+      selectedClasses,
       studentsToAdd,
       studentsToRemove,
-      selectedStudents,
+      selectedStudentIds,
       files,
     }) {
       try {
-        const {
-          data: { assignment },
-        } = await NetworkService.editAssignment({
-          ...assignmentData,
-          studentsToAdd: studentsToAdd,
-          studentsToRemove: studentsToRemove,
-        })
-
-        //Changes the assignment info in the UI
-        const updatedAssignments = this.assignments.map((assnmt) =>
-          assnmt.id === assignment.id
-            ? { ...assignment, studentIds: selectedStudents }
-            : assnmt
-        )
-        this.assignments = updatedAssignments
-        const assignmentIds = updatedAssignments.map(
-          (assignment) => assignment.id
+        const { assignments, error } = await AssignmentService.editAssignment(
+          assignmentData,
+          selectedClasses,
+          studentsToAdd,
+          studentsToRemove,
+          files
         )
 
-        await this.getStudentAssignmentCompletions()
-
-        if (files.length) {
-          assignmentIds.forEach(async (assignmentId) => {
-            await NetworkService.uploadFiles({ assignmentId, files })
-          })
-        }
-      } catch (err) {
-        if (err.response.data?.moderationFailures) {
-          await this.handleAssignmentInfoModerationFailure(
-            err.response?.data.moderationFailures,
-            assignmentData.title
-          )
+        if (error) {
+          this.showToast(error, true)
           return
         }
-        this.error = err.response.data.err ?? 'Unable to edit assignment.'
+
+        const editedAssignmentForThisClass = assignments.find(
+          (a) => a.classId === this.classData.id
+        )
+        if (editedAssignmentForThisClass) {
+          this.assignments = this.assignments.map((a) =>
+            a.id === editedAssignmentForThisClass.id
+              ? {
+                  ...editedAssignmentForThisClass,
+                  studentIds: selectedStudentIds,
+                }
+              : a
+          )
+        }
+
+        await this.getStudentAssignmentCompletions()
+      } catch (err) {
+        const error = err?.response?.data?.err ?? 'Unable to edit assignment'
+        this.showToast(error, true)
       }
     },
 
