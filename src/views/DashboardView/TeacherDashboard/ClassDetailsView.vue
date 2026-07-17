@@ -648,6 +648,7 @@ export default {
           onAssignmentCreated: this.handleAssignmentCreated,
           classes: this.classes,
           currentClass: this.classData,
+          classStudents: this.unfilteredStudents,
           topics: this.topics,
         },
       })
@@ -663,6 +664,7 @@ export default {
           onAssignmentEdited: this.handleEditAssignment,
           classes: this.classes,
           currentClass: this.classData,
+          classStudents: this.unfilteredStudents,
           topics: this.topics,
           assignment: assignment,
         },

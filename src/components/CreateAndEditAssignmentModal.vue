@@ -235,7 +235,6 @@ export default {
       headingText: 'Create a',
       isEdit: false,
       assignmentId: '',
-      removedStudents: [],
       files: [],
     }
   },
@@ -275,9 +274,14 @@ export default {
 
     this.classes = this.modalData.classes
     this.selectedClasses = this.classes.filter(
-      (cls) => cls.id === this.modalData.currentClass.id
+      (c) => c.id === this.modalData.currentClass.id
     )
-    this.showClassStudents()
+    this.classStudents = this.modalData.classStudents ?? []
+    this.selectedStudents = this.modalData.assignment
+      ? this.classStudents.filter((student) =>
+          this.modalData.assignment.studentIds.includes(student.id)
+        )
+      : this.classStudents
   },
 
   methods: {
@@ -341,24 +345,6 @@ export default {
       return Object.values(topicsAndSubjects).sort((a, b) =>
         a.topicId === currentTopicId ? -1 : b.topicId === currentTopicId ? 1 : 0
       )
-    },
-
-    showClassStudents() {
-      if (this.selectedClasses.length === 1) {
-        this.classStudents = this.selectedClasses[0].students ?? []
-        if (this.modalData.assignment) {
-          const assignedStudents = this.modalData.assignment.studentIds
-
-          this.selectedStudents = this.classStudents.filter((student) =>
-            assignedStudents.includes(student.id)
-          )
-        } else {
-          this.selectedStudents = this.selectedClasses[0].students ?? []
-        }
-      } else {
-        this.classStudents = []
-        this.selectedStudents = []
-      }
     },
 
     async createAssignment() {

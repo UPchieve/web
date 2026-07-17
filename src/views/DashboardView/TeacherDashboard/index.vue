@@ -377,6 +377,7 @@ export default {
           onAssignmentCreated: this.handleAssignmentCreated,
           classes: this.classes,
           currentClass: teacherClass,
+          classStudents: teacherClass.students,
           topics: this.topics,
         },
       })

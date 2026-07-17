@@ -31,6 +31,19 @@ const classes = [
   },
 ]
 
+const classStudents = [
+  {
+    id: 'student-1',
+    firstName: 'Student',
+    lastName: 'One',
+  },
+  {
+    id: 'student-2',
+    firstName: 'Student',
+    lastName: 'Two',
+  },
+]
+
 const topics = [
   {
     id: 1,
@@ -119,6 +132,7 @@ const getWrapper = async (data: {}) => {
       modalData: {
         classes,
         currentClass: classes[0],
+        classStudents,
         topics,
         onAssignmentCreated: onAssignmentCreatedMock,
       },
