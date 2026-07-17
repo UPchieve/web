@@ -262,7 +262,7 @@
                 >
                   Due date: {{ formatTimestamp(assignment.dueDate) }}
                 </p>
-                <div v-if="!assignmentsCompletion[assignment.id]">
+                <div v-if="!assignment.studentAssignments?.length">
                   <p
                     data-testid="no-students-assigned"
                     class="no-students-assigned"
@@ -279,8 +279,9 @@
                 >
                   Student completion
                   {{
-                    assignmentsCompletion[assignment.id].completedStudents
-                  }}/{{ assignmentsCompletion[assignment.id].totalStudents }}
+                    assignment.studentAssignments.filter((c) => !!c.submittedAt)
+                      .length
+                  }}/{{ assignment.studentAssignments.length }}
                 </button>
               </div>
             </div>
@@ -290,17 +291,16 @@
               class="students-container"
             >
               <div
-                v-for="student in assignmentsCompletion[assignment.id]
-                  .studentsCompletion"
+                v-for="student in assignment.studentAssignments"
                 :key="student.assignmentId"
                 class="student-row"
               >
-                <span v-if="student.submitted_at" class="check-mark"
+                <span v-if="student.submittedAt" class="check-mark"
                   ><Check class="check"
                 /></span>
                 <span v-else class="check-mark"></span>
                 <p class="student-name">
-                  {{ student.first_name }} {{ student.last_name }}
+                  {{ student.firstName }} {{ student.lastName }}
                 </p>
               </div>
             </div>
@@ -344,7 +344,7 @@ export default {
   provide() {
     return {
       classData: computed(() => this.classData),
-      assignmentsCompletion: computed(() => this.assignmentsCompletion),
+      assignments: computed(() => this.assignments),
     }
   },
 
@@ -373,7 +373,6 @@ export default {
       studentId: '',
       assignments: [],
       toggledAssignmentId: '',
-      assignmentsCompletion: {},
       classes: [],
       className: '',
       topicId: '',
@@ -422,7 +421,7 @@ export default {
         this.subjectPlaceholder = 'All Subjects'
       }
 
-      await Promise.all([this.getClassStudents(), this.showAssignments()])
+      await Promise.all([this.getClassStudents(), this.getAssignments()])
     } catch {
       this.showToast(
         'Something went wrong. Please refresh the page and try again.',
@@ -722,27 +721,17 @@ export default {
         if (selectedClassAssignment) {
           this.assignments.push(selectedClassAssignment)
         }
-        const assignmentIds = assignments.map((assignment) => assignment.id)
-        const studentAssignments = this.mapStudentAssignments(assignmentIds)
 
-        this.assignmentsCompletion = this.getAssignmentCompletion(
-          this.assignments,
-          studentAssignments
-        )
+        await this.getStudentAssignmentCompletions()
 
         if (files.length) {
+          const assignmentIds = assignments.map((assignment) => assignment.id)
           await this.uploadFiles(assignmentIds, files)
         }
       } catch (err) {
-        this.error = err.response.data.err ?? 'Unable to create assignment.'
+        const error = err?.response?.data?.err ?? 'Unable to create assignment'
+        this.showToast(error, true)
       }
-    },
-
-    async mapStudentAssignments(assignmentIds) {
-      const assignments = await this.getStudentAssignments(assignmentIds)
-      return Object.fromEntries(
-        assignments.map((a) => [a.assignmentId, a.studentAssignments])
-      )
     },
 
     async handleEditAssignment({
@@ -769,15 +758,8 @@ export default {
         const assignmentIds = updatedAssignments.map(
           (assignment) => assignment.id
         )
-        const getStudentAssignments = await this.mapStudentAssignments([
-          response.assignment.id,
-        ])
 
-        this.assignmentsCompletion[response.assignment.id] =
-          this.getSingleAssignmentCompletion(
-            response.assignment.id,
-            getStudentAssignments
-          )
+        await this.getStudentAssignmentCompletions()
 
         if (files.length) {
           assignmentIds.forEach(async (assignmentId) => {
@@ -811,16 +793,40 @@ export default {
       }
     },
 
-    async showAssignments() {
-      this.assignments = await this.getClassAssignments()
-      const assignmentIds = this.assignments.map((assignment) => assignment.id)
+    async getAssignments() {
+      try {
+        const {
+          data: { assignments },
+        } = await NetworkService.getAssignmentsByClassId(this.classId)
+        this.assignments = assignments
+      } catch (err) {
+        const error =
+          err?.response?.data?.err ??
+          'Unable to get assignments. Please refresh the page and try again.'
+        this.showToast(error, true)
+      }
 
-      const getStudentAssignments =
-        await this.mapStudentAssignments(assignmentIds)
-      this.assignmentsCompletion = this.getAssignmentCompletion(
-        this.assignments,
-        getStudentAssignments
-      )
+      await this.getStudentAssignmentCompletions()
+    },
+
+    async getStudentAssignmentCompletions() {
+      try {
+        this.assignments = await Promise.all(
+          this.assignments.map(async (assignment) => {
+            const {
+              data: { studentAssignments },
+            } = await NetworkService.getStudentAssignmentCompletion(
+              assignment.id
+            )
+            return { ...assignment, studentAssignments }
+          })
+        )
+      } catch (err) {
+        const error =
+          err?.response?.data?.err ??
+          'Unable to get assignment completion data. Please refresh the page and try again.'
+        this.showToast(error, true)
+      }
     },
 
     async openTab(tabTo) {
@@ -833,29 +839,10 @@ export default {
       }
     },
 
-    async getClassAssignments() {
-      const {
-        data: { assignments },
-      } = await NetworkService.getAssignmentsByClassId(this.classId)
-      return assignments
-    },
-
     viewAssignment(assignmentId) {
       this.$router.push(
         `/dashboard/teacher/class/${this.classData.id}/assignments/${assignmentId}`
       )
-    },
-
-    async getStudentAssignments(assignmentIds) {
-      const studentAssignments = await Promise.all(
-        assignmentIds.map(async (assignmentId) => {
-          const {
-            data: { studentAssignments },
-          } = await NetworkService.getStudentAssignmentCompletion(assignmentId)
-          return { assignmentId, studentAssignments }
-        })
-      )
-      return studentAssignments
     },
 
     toggleStudentCompletion(assignmentId) {
@@ -872,41 +859,6 @@ export default {
       } else {
         this.toggledAssignmentMenuId = assignmentId
       }
-    },
-
-    getAssignmentCompletion(assignments, completionData) {
-      const result = {}
-
-      assignments.forEach((assignment) => {
-        const completion = this.getSingleAssignmentCompletion(
-          assignment.id,
-          completionData
-        )
-        if (completion) {
-          result[assignment.id] = completion
-        }
-      })
-
-      return result
-    },
-
-    getSingleAssignmentCompletion(assignmentId, completionData) {
-      const studentsCompletion = completionData[assignmentId] || null
-
-      if (studentsCompletion && studentsCompletion.length > 0) {
-        const totalStudents = studentsCompletion.length
-        const completedStudents = studentsCompletion.filter(
-          (student) => !!student.submittedAt
-        ).length
-
-        return {
-          studentsCompletion,
-          totalStudents,
-          completedStudents,
-        }
-      }
-
-      return null // Return null if there are no students or no completion data
     },
 
     async updateTeacherClass(classData) {

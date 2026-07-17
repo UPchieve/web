@@ -16,13 +16,13 @@ const router = createRouter({
   ],
 })
 
-const getWrapper = async (data = {}, assignmentsCompletion = {}) => {
+const getWrapper = async (data = {}, assignments = []) => {
   const wrapper = mount(AssignmentView, {
     global: {
       plugins: [store, router],
       provide: {
         classData: {},
-        assignmentsCompletion,
+        assignments,
       },
     },
   })
@@ -53,14 +53,14 @@ const assignment = {
 
 const studentAssignments = [
   {
-    first_name: 'Student',
-    last_name: 'UPchieve',
-    submitted_at: null,
+    firstName: 'Student',
+    lastName: 'UPchieve',
+    submittedAt: null,
   },
   {
-    first_name: 'Student',
-    last_name: 'UPchieve',
-    submitted_at: '2024-09-23T20:31:44.156Z',
+    firstName: 'Student',
+    lastName: 'UPchieve',
+    submittedAt: '2024-09-23T20:31:44.156Z',
   },
 ]
 describe('Assignment View', () => {
@@ -101,16 +101,12 @@ describe('Assignment View', () => {
   })
 
   test('Show correct number for students completed', async () => {
-    const wrapper = await getWrapper(
-      { assignmentInfo: assignment },
+    const wrapper = await getWrapper({ assignmentInfo: assignment }, [
       {
-        'assignment-1': {
-          studentsCompletion: studentAssignments,
-          totalStudents: 2,
-          completedStudents: 1,
-        },
-      }
-    )
+        id: 'assignment-1',
+        studentAssignments,
+      },
+    ])
 
     expect(wrapper.find('[data-testid="student-completion"').text()).toBe(
       'Student Completion 1/2'

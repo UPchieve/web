@@ -297,24 +297,24 @@ describe('Assignments View', () => {
       updatedAt: '2024-09-23T18:11:15.318Z',
     },
   ]
-  const assignmentsCompletion = {
-    'assignment-1': {
-      studentsCompletion: [
-        {
-          first_name: 'Student',
-          last_name: 'UPchieve',
-          submitted_at: null,
-        },
-        {
-          first_name: 'Student',
-          last_name: 'UPchieve',
-          submitted_at: '2024-09-23T20:31:44.156Z',
-        },
-      ],
-      totalStudents: 2,
-      completedStudents: 1,
+  const studentAssignments = [
+    {
+      firstName: 'Student',
+      lastName: 'UPchieve',
+      submittedAt: null,
     },
-  }
+    {
+      firstName: 'Student',
+      lastName: 'UPchieve',
+      submittedAt: '2024-09-23T20:31:44.156Z',
+    },
+  ]
+  const assignmentsWithCompletion = [
+    {
+      ...assignments[0],
+      studentAssignments,
+    },
+  ]
   beforeEach(async () => {
     await router.push(`/dashboard/teacher/class/class-id/assignments`)
     vi.resetAllMocks()
@@ -341,18 +341,7 @@ describe('Assignments View', () => {
       .mockImplementation(() => {
         return Promise.resolve({
           data: {
-            studentAssignments: [
-              {
-                first_name: 'Student',
-                last_name: 'UPchieve',
-                submitted_at: null,
-              },
-              {
-                first_name: 'Student',
-                last_name: 'UPchieve',
-                submitted_at: '2024-09-23T20:31:44.156Z',
-              },
-            ],
+            studentAssignments,
           },
         })
       })
@@ -419,7 +408,7 @@ describe('Assignments View', () => {
   describe('View assignment info', () => {
     test('See assignment title and due date', async () => {
       const wrapper = await getWrapper({
-        data: { assignments, assignmentsCompletion },
+        data: { assignments: assignmentsWithCompletion },
       })
       const assignmentTitle = wrapper.find(
         '[data-testid="assignment-title-assignment-1"]'
@@ -435,7 +424,6 @@ describe('Assignments View', () => {
       const wrapper = await getWrapper({
         data: {
           assignments,
-          assignmentsCompletion: {},
         },
       })
       const noStudentsAssigned = wrapper.find(
@@ -446,7 +434,7 @@ describe('Assignments View', () => {
 
     test('See correct student completion text', async () => {
       const wrapper = await getWrapper({
-        data: { assignments, assignmentsCompletion },
+        data: { assignments: assignmentsWithCompletion },
       })
       const studentCompletion = wrapper.find(
         '[data-testid="student-completion"]'

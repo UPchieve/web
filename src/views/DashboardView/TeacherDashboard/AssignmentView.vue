@@ -159,7 +159,7 @@ export default {
   name: 'Assignment',
   components: { AssignmentIcon, Calendar, Loader, CopyIcon },
 
-  inject: ['classData', 'assignmentsCompletion'],
+  inject: ['classData', 'assignments'],
 
   data() {
     return {
@@ -176,17 +176,20 @@ export default {
     assignmentId() {
       return this.$route.params.assignmentId
     },
-    completion() {
-      return this.assignmentsCompletion?.[this.assignmentId]
+    assignment() {
+      return this.assignments?.find((a) => a.id === this.assignmentId)
     },
-    studentCompletion() {
-      return this.completion?.studentsCompletion ?? []
+    studentAssignments() {
+      return this.assignment?.studentAssignments ?? []
     },
     totalStudents() {
-      return this.completion?.totalStudents ?? 0
+      return this.studentAssignments?.length ?? 0
     },
     completedStudents() {
-      return this.completion?.completedStudents ?? 0
+      return (
+        this.studentAssignments?.filter((student) => !!student.submittedAt)
+          .length ?? 0
+      )
     },
   },
 
@@ -253,7 +256,7 @@ export default {
       this.$store.dispatch('app/modal/show', {
         component: 'StudentCompletionModal',
         data: {
-          studentCompletion: this.studentCompletion,
+          studentCompletion: this.studentAssignments,
         },
       })
     },
