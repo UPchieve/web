@@ -25,6 +25,7 @@ const props = defineProps<{
 const error = ref<string>('')
 const user = computed(() => store.state.user.user)
 const hasVolunteerRole = computed(() => store.getters['user/hasVolunteerRole'])
+const isVolunteer = computed(() => store.getters['user/isVolunteer'])
 
 const hoursRemaining = computed(() => {
   if (props.requiredHours === null) return null
@@ -248,7 +249,7 @@ const switchRole = async () => {
       </template>
     </div>
 
-    <div class="footer">
+    <div class="footer" v-if="!isVolunteer">
       <large-button
         v-if="hasVolunteerRole"
         class="cta"

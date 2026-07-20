@@ -8,14 +8,20 @@ import DocumentTitle from './DocumentTitle.vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import HourCalculator from './VolunteerHours/HourCalculator.vue'
 import { setHasSeenVolunteerHours } from '@/services/BrowserStorageService.js'
+import ImpactSummaryCard from './ImpactSummaryCard.vue'
 
 const store = useStore()
 
 const title = ref('Volunteer Hours')
-const showCalculator = computed(() => {
-  return store.getters['featureFlags/studentToVolunteerHoursPageVersion']
-    .showCalculator
-})
+const hasStudentRole = computed(() => store.getters['user/hasStudentRole'])
+const hasVolunteerRole = computed(() => store.getters['user/hasVolunteerRole'])
+const showBecomeVolunteerAd = computed(
+  () => hasStudentRole.value && !hasVolunteerRole.value
+)
+const showCalculator = computed(
+  () => hasStudentRole.value && hasVolunteerRole.value
+)
+const showImpactSummary = computed(() => hasVolunteerRole.value)
 
 onMounted(() => {
   AnalyticsService.captureEvent(EVENTS.V_HOUR_CALCULATOR_SEEN)
@@ -29,7 +35,11 @@ onBeforeRouteLeave(() => {
 <template>
   <document-title :title="title"></document-title>
   <div class="volunteer-hours">
-    <BecomeVolunteerAd class="full" />
+    <ImpactSummaryCard
+      v-if="showImpactSummary"
+      class="full"
+    ></ImpactSummaryCard>
+    <BecomeVolunteerAd v-if="showBecomeVolunteerAd" class="full" />
     <HourCalculator v-if="showCalculator"></HourCalculator>
   </div>
 </template>
