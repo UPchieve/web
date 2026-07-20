@@ -92,6 +92,7 @@
               v-model="country"
               :options="countries"
               data-testid="location-input"
+              isRequired="true"
             />
             <template v-if="isUnitedStatesSelected">
               <label class="uc-form-label location-label"
@@ -107,6 +108,7 @@
                 :options="states"
                 :searchable="true"
                 data-testid="state-select"
+                isRequired="true"
               />
             </template>
             <template v-if="country">
