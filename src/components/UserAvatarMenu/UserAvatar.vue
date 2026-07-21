@@ -290,6 +290,9 @@ ion-popover::part(content) {
 
 .shake.is-shaking {
   animation: shake var(--shake-duration) var(--shake-easing);
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 @keyframes shake {

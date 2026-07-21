@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { secondsInMs } from '@/utils/time-utils'
 import NetworkService from '@/services/NetworkService'
 import { useRouter } from 'vue-router'
@@ -8,35 +8,11 @@ import { useStore } from 'vuex'
 const router = useRouter()
 const store = useStore()
 
-const props = withDefaults(
-  defineProps<{
-    isFirstTransitionToTargetMode: boolean
-    targetRoute: string
-  }>(),
-  {
-    isFirstTransitionToTargetMode: false,
-    targetRoute: '/dashboard',
-  }
-)
-
-const targetMode = store.getters['user/isStudent'] ? 'volunteer' : 'student' // intentionally non-reactive.
-const targetModeDisplayName =
-  targetMode.charAt(0).toUpperCase() + targetMode.slice(1)
-
-const title = computed(() => {
-  const verb = props.isFirstTransitionToTargetMode
-    ? 'Building your'
-    : 'Switching to your'
-  const mode = targetMode === 'volunteer' ? 'coaching' : 'student'
-  // i.e. "Building your coaching experience..."
-  // i.e. "Switching to your student experience...
-  return `${verb} ${mode} experience`
-})
-
+const targetMode = 'volunteer'
 const isSwitchModePromiseResolved = ref<boolean>(false)
 const isSwitchModePromiseRejected = ref<boolean>(false)
 const progress = ref<number>(0)
-const TOTAL_TIME = secondsInMs(2.5)
+const TOTAL_TIME = secondsInMs(2)
 const intervalId = ref<number | null>(null)
 const readyToSwitch = ref<boolean>(false)
 
@@ -61,17 +37,15 @@ onMounted(() => {
     .catch(() => {
       isSwitchModePromiseRejected.value = true
     })
-
-  if (props.isFirstTransitionToTargetMode) {
-    store.dispatch('celebrations/celebrate')
-  }
+  // trigger confetti
+  store.dispatch('celebrations/celebrate')
 })
 
 watch(
   [isSwitchModePromiseResolved, readyToSwitch],
   async ([isResolved, readyToSwitch]) => {
     if (isResolved && readyToSwitch) {
-      await router.push(props.targetRoute)
+      await router.push('/dashboard')
     }
   }
 )
@@ -98,10 +72,10 @@ watch(isSwitchModePromiseRejected, async (isRejected) => {
         height="8"
       />
     </div>
-    <h1>{{ title }}</h1>
+    <h1>Building your coaching experience</h1>
   </div>
   <div class="main-container" v-else>
-    <h1>There was an issue switching to {{ targetModeDisplayName }} Mode.</h1>
+    <h1>There was an issue switching to Coach Mode.</h1>
     <span>Sending you back to your dashboard...</span>
   </div>
 </template>

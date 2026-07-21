@@ -71,4 +71,13 @@ export default {
   async completeGoogleSsoVolunteerSignup(data) {
     return NetworkService.completeGoogleSsoVolunteerSignup(data)
   },
+
+  /**
+   * Add the volunteer role to the user's account and show them the "Building your coach experience"
+   * screen
+   */
+  async firstTransitionToVolunteerMode(router) {
+    await NetworkService.addVolunteerRoleForStudent()
+    await router.push('/building-your-coach-experience')
+  },
 }

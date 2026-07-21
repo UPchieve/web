@@ -4,7 +4,6 @@ import StudyImg from '@/assets/study.avif?url'
 import BubbleSvg from '@/assets/bubble.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '../services/AnalyticsService'
-import NetworkService from '../services/NetworkService'
 import UserService from '../services/UserService'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
@@ -22,10 +21,7 @@ onMounted(() => {
 const becomeAVolunteer = async () => {
   AnalyticsService.captureEvent(EVENTS.BECOME_VOLUNTEER_AD_CLICKED)
   try {
-    await NetworkService.addVolunteerRoleForStudent()
-    await UserService.switchActiveRole({ $store: store }, 'volunteer')
-    if (router.currentRoute.value.path === '/dashboard') router.go(0)
-    else await router.replace('/dashboard')
+    await UserService.firstTransitionToVolunteerMode(router)
   } catch (e) {
     LoggerService.noticeError(
       e,

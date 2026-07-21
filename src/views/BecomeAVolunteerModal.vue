@@ -2,7 +2,6 @@
 import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import NetworkService from '@/services/NetworkService'
 import UserService from '@/services/UserService'
 import { useRouter } from 'vue-router'
 import { EVENTS } from '@/consts'
@@ -19,10 +18,7 @@ const becomeAVolunteer = async () => {
     EVENTS.ROLE_SWITCHING_USER_CLICKED_BECOME_A_VOLUNTEER
   )
   try {
-    await NetworkService.addVolunteerRoleForStudent()
-    await UserService.switchActiveRole({ $store: store }, 'volunteer')
-    if (router.currentRoute.value.path === '/dashboard') router.go(0)
-    else await router.replace('/dashboard')
+    await UserService.firstTransitionToVolunteerMode(router)
   } catch {
     // @TODO
   }

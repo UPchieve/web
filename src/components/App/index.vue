@@ -385,6 +385,9 @@ ion-content {
 
 .fade-in {
   animation: fadeInContent 350ms ease forwards;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 @keyframes fadeInContent {

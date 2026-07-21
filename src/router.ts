@@ -119,6 +119,7 @@ import { quizRoute } from '@/utils/quiz-route'
 import { getStatus } from '@/services/AuthService'
 import LoggerService from './services/LoggerService'
 import { EVENTS } from './consts'
+import CoachModeTransition from '@/views/CoachModeTransition.vue'
 
 const autoflowRedirect: NavigationGuard = (_to, _from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -1046,6 +1047,12 @@ const routes: RouteRecordRaw[] = [
     name: 'TotpEnroll',
     component: TotpEnroll,
     meta: { protected: true, requiresAdmin: true, hideNavigation: true },
+  },
+  {
+    path: '/building-your-coach-experience',
+    name: 'CoachModeTransition',
+    component: CoachModeTransition,
+    meta: { protected: true, hideNavigation: true },
   },
   {
     path: '/:pathMatch(.*)*',
