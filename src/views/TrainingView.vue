@@ -1,6 +1,10 @@
 <template>
   <div v-if="isVolunteer" class="training-view">
-    <div class="certificate-container" v-if="canDownloadCertificate">
+    <div
+      class="certificate-container"
+      v-if="canDownloadCertificate"
+      data-testid="certificate-enabled"
+    >
       <div class="certificate-icon-and-text">
         <div class="certificate-icon">
           <certificate-icon />
@@ -20,7 +24,11 @@
         </div>
       </div>
       <div class="certificate-buttons">
-        <button type="button" @click="downloadCertificate">
+        <button
+          type="button"
+          @click="downloadCertificate"
+          data-testid="download-certificate-button"
+        >
           <download-icon />
         </button>
       </div>
@@ -36,8 +44,8 @@
           </div>
           <div>
             <p>
-              Complete UPchieve's training course and pass a subject quiz to
-              earn your official tutor certification.
+              Complete UPchieve's training course, pass a subject quiz, and
+              start tutoring to earn your official tutor certification.
             </p>
           </div>
         </div>
@@ -194,6 +202,7 @@ export default {
       trainingCourseData: null,
       fetchingTrainingError: false,
       isLoadingTrainingCourse: true,
+      firstSessionDate: null,
     }
   },
 
@@ -212,6 +221,7 @@ export default {
     } finally {
       this.isLoadingTrainingCourse = false
     }
+    await this.getFirstSessionDate()
   },
   computed: {
     ...mapGetters({
@@ -286,10 +296,22 @@ export default {
       )
     },
     canDownloadCertificate() {
-      return this.hasCompletedVolunteerTraining && this.hasASubjectCertification
+      return (
+        this.hasCompletedVolunteerTraining &&
+        this.hasASubjectCertification &&
+        !!this.firstSessionDate
+      )
     },
     openToSubject() {
       return this.$route.query?.openTo
+    },
+    effectiveDate() {
+      return this.firstSessionDate
+        ? dayjs(this.firstSessionDate).format('MM/DD/YYYY')
+        : ''
+    },
+    volunteerFullName() {
+      return `${this.user.firstName} ${this.user.lastName}`
     },
   },
   methods: {
@@ -314,25 +336,17 @@ export default {
     setInitialTopic() {
       this.currentTopic = this.subjectTypes[0].key
     },
+    async getFirstSessionDate() {
+      try {
+        const {
+          data: { firstSessionDate },
+        } = await NetworkService.getVolunteerFirstSessionDate()
+        this.firstSessionDate = firstSessionDate ?? null
+      } catch {
+        this.firstSessionDate = null
+      }
+    },
     downloadCertificate() {
-      const volunteerName = `${this.user.firstName} ${this.user.lastName}`
-      const earnedCerts = Object.entries(this.user.certifications).filter(
-        ([name]) => {
-          return [
-            'coachingStrategies',
-            'academicIntegrity',
-            'dei',
-            'communitySafety',
-            UpchieveTrainingCourseKeyEnum.LEGACY,
-          ].includes(name)
-        }
-      )
-      earnedCerts.sort((certA, certB) => {
-        return certA.lastAttemptedAt < certB.lastAttemptedAt
-      })
-      const effectiveDate = dayjs(earnedCerts[0].lastAttemptedAt).format(
-        'MM/DD/YYYY'
-      )
       const canvas = document.createElement('canvas')
       canvas.width = 2892
       canvas.height = 1623
@@ -347,10 +361,10 @@ export default {
         ctx.font = "80px 'Brush Script MT', cursive"
         ctx.fillStyle = '#000'
         ctx.textAlign = 'center'
-        ctx.fillText(volunteerName, canvas.width / 2, 850)
+        ctx.fillText(this.volunteerFullName, canvas.width / 2, 850)
 
         ctx.font = "40px 'Times New Roman', serif"
-        ctx.fillText(effectiveDate, canvas.width / 2 - 840, 1275)
+        ctx.fillText(this.effectiveDate, canvas.width / 2 - 840, 1275)
 
         const link = document.createElement('a')
         link.href = canvas.toDataURL('image/png')

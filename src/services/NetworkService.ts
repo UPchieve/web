@@ -1014,6 +1014,12 @@ export default {
       `${API_ROOT}/sessions/history/total${queryParams.length ? `?${queryParams}` : ''}`
     ).then(this._successHandler, this._errorHandler)
   },
+  getVolunteerFirstSessionDate() {
+    return httpGet(`${API_ROOT}/sessions/first-session-date`).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   getFavoriteVolunteers(page) {
     return httpGet(
       `${API_ROOT}/students/favorite-volunteers?page=${page}`
