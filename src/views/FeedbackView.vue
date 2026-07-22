@@ -61,7 +61,41 @@
                   ),
                 }"
               >
+                <div
+                  v-if="questionInfo.questionType === 'free response'"
+                  class="question__free-response"
+                >
+                  <div
+                    v-if="isOpenFeedbackQuestion(questionInfo.question)"
+                    class="question__subtext"
+                  >
+                    Tell us about your experience. This could be about the app,
+                    the session you had, or anything else you want to share. We
+                    read every comment and use your ideas to make UPchieve
+                    better.
+                  </div>
+                  <div
+                    v-if="isHowFarInSchoolQuestion(questionInfo.question)"
+                    class="question__subtext"
+                  >
+                    There's no right or wrong answer. Just share what feels most
+                    true for you right now.
+                  </div>
+                  <feedback-textarea
+                    :id="`${questionInfo.questionId}-free-response`"
+                    @input="
+                      (responseText) =>
+                        updateUserResponse(
+                          questionInfo.questionId,
+                          null,
+                          responseText
+                        )
+                    "
+                  >
+                  </feedback-textarea>
+                </div>
                 <template
+                  v-else
                   v-for="(response, index) in questionInfo.question.responses"
                 >
                   <survey-image
@@ -165,40 +199,6 @@
                     "
                     @survey-rate-click="updateUserResponse"
                   />
-                  <div
-                    v-else-if="questionInfo.questionType === 'free response'"
-                    :key="`${response.responseId}-free-response`"
-                    class="question__free-response"
-                  >
-                    <div
-                      v-if="isOpenFeedbackQuestion(questionInfo.question)"
-                      class="question__subtext"
-                    >
-                      Tell us about your experience. This could be about the
-                      app, the session you had, or anything else you want to
-                      share. We read every comment and use your ideas to make
-                      UPchieve better.
-                    </div>
-                    <div
-                      v-if="isHowFarInSchoolQuestion(questionInfo.question)"
-                      class="question__subtext"
-                    >
-                      There's no right or wrong answer. Just share what feels
-                      most true for you right now.
-                    </div>
-                    <feedback-textarea
-                      :id="`${questionInfo.questionId}_${response.responseId}`"
-                      @input="
-                        (responseText) =>
-                          updateUserResponse(
-                            questionInfo.questionId,
-                            response.responseId,
-                            responseText
-                          )
-                      "
-                    >
-                    </feedback-textarea>
-                  </div>
                 </template>
               </div>
               <div
@@ -611,11 +611,12 @@ export default {
             })
           })
         } else {
-          if (response.responseId) {
+          const openResponse = response.openResponse?.trim() ?? ''
+          if (response.responseId || openResponse) {
             submissions.push({
               questionId: Number(question.questionId),
               responseChoiceId: response.responseId,
-              openResponse: response.openResponse,
+              openResponse,
             })
           }
         }
