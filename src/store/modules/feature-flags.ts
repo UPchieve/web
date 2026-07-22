@@ -63,6 +63,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: true,
       [POSTHOG_FEATURE_FLAGS.S2V_THEMING]: false,
+      [POSTHOG_FEATURE_FLAGS.HS_STUDENTS_BARRED_FROM_COACHING_COLLEGE_SUBJECTS]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -286,5 +287,11 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
     isS2VThemingEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.S2V_THEMING],
+    areHighSchoolStudentsBarredFromCoachingCollegeSubjects: (
+      state: FeatureFlagState
+    ) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.HS_STUDENTS_BARRED_FROM_COACHING_COLLEGE_SUBJECTS
+      ],
   },
 }

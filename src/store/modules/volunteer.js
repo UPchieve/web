@@ -3,6 +3,9 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
+import { VolunteerOccupations } from '@/services/VolunteerService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   namespaced: true,
@@ -165,7 +168,7 @@ export default {
         dispatch('tickInterval', 1000)
       }
 
-      const results = []
+      const eligibleSessions = []
       const socketSessions = sessions.filter((session) => !session.volunteer)
       for (const session of socketSessions) {
         const { subTopic } = session
@@ -186,7 +189,7 @@ export default {
               session,
             })
           ) {
-            results.push(session)
+            eligibleSessions.push(session)
           }
           /*
            * when we're in this if block, we always want to continue
@@ -197,7 +200,7 @@ export default {
         }
 
         if (!user.mutedSubjectAlerts.includes(subTopic)) {
-          results.push(session)
+          eligibleSessions.push(session)
         }
       }
 
@@ -208,29 +211,45 @@ export default {
        * this session from the list.
        */
       const removedSessions = prevOpenSessions.filter(
-        (session) => !results.some((s) => s.id === session.id)
+        (session) => !eligibleSessions.some((s) => s.id === session.id)
       )
       for (const removedSession of removedSessions) {
         this.dispatch('notifications/remove', removedSession.id)
         const isLockedSession = !user.subjects.includes(removedSession.subTopic)
         if (isLockedSession) {
           dispatch('setSessionToExpire', removedSession.id)
-          results.push(removedSession) // Add session back to the list for now
+          eligibleSessions.push(removedSession) // Add session back to the list for now
         }
       }
-      commit('setAllOpenSessions', results)
 
-      // Look for the new session added
-      let newSession
-      for (const session of results) {
-        const { id: sessionId } = session
-        let isOldSession = false
-        for (const oldSession of prevOpenSessions) {
-          if (oldSession.id === sessionId) isOldSession = true
-        }
-
-        if (!isOldSession) newSession = session
+      /* Experiment: If the user is a high school student, filter out college-related sessions from
+       * the open sessions list.
+       */
+      const occupations = user.occupation ?? []
+      const isHighSchooler = occupations.includes(
+        VolunteerOccupations.HIGH_SCHOOL_STUDENT
+      )
+      const hideCollegeSessions =
+        this.getters[
+          'featureFlags/areHighSchoolStudentsBarredFromCoachingCollegeSubjects'
+        ]
+      const filtered =
+        isHighSchooler && hideCollegeSessions
+          ? eligibleSessions.filter((session) => session.type !== 'college')
+          : eligibleSessions
+      if (filtered.length !== eligibleSessions.length) {
+        AnalyticsService.captureEvent(EVENTS.HS_CC_COLLEGE_SESSIONS_HIDDEN)
       }
+
+      commit('setAllOpenSessions', filtered)
+
+      // We will send volunteers a notification if new session(s) have come in and they are
+      // available.
+      const oldSessionIds = prevOpenSessions.map((s) => s.id)
+      const newSessions = filtered.filter((s) => !oldSessionIds.includes(s.id))
+      const newSession = newSessions.length
+        ? newSessions[newSessions.length - 1]
+        : null
 
       const volunteerIsNotInSession = !this.getters['user/isSessionAlive']
       if (volunteerIsNotInSession && newSession) {
@@ -256,7 +275,9 @@ export default {
         this.getters['americaCountsVolunteer/isAmericaCountsVolunteer'] &&
         !this.state.user.session?.id
       ) {
-        AmericaCountsVolunteerService.maybeAutoJoinOldestSession(results)
+        AmericaCountsVolunteerService.maybeAutoJoinOldestSession(
+          eligibleSessions
+        )
       }
     },
   },
