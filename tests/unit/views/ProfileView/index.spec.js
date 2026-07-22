@@ -169,56 +169,27 @@ describe('ProfileView', () => {
       ).toEqual(true)
     })
 
-    test('Does not show the grade level question for non-HS volunteers', async () => {
-      const wrapper = getWrapper({
-        user: {
-          getters: {
-            isStudent: () => false,
-            isVolunteer: () => true,
+    test.each([
+      [undefined],
+      [['A graduate student']],
+      [['Working part-time', VolunteerOccupations.HIGH_SCHOOL_STUDENT]],
+    ])(
+      'Does not show the grade level question for volunteers (occupation: %j)',
+      async (occupation) => {
+        const wrapper = getWrapper({
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+            },
+            state: occupation ? { occupation } : {},
           },
-          state: {
-            occupation: ['A graduate student'],
-          },
-        },
-      })
-      expect(
-        wrapper.find('[data-testid="grade-level-select"]').exists()
-      ).toEqual(false)
-    })
-
-    test('Does not show the grade level question for non-HS volunteers (no occupation)', async () => {
-      const wrapper = getWrapper({
-        user: {
-          getters: {
-            isStudent: () => false,
-            isVolunteer: () => true,
-          },
-        },
-      })
-      expect(
-        wrapper.find('[data-testid="grade-level-select"]').exists()
-      ).toEqual(false)
-    })
-
-    test('Shows the grade level question for HS volunteers', async () => {
-      const wrapper = getWrapper({
-        user: {
-          getters: {
-            isStudent: () => false,
-            isVolunteer: () => true,
-          },
-          state: {
-            occupation: [
-              'Working part-time',
-              VolunteerOccupations.HIGH_SCHOOL_STUDENT,
-            ],
-          },
-        },
-      })
-      expect(
-        wrapper.find('[data-testid="grade-level-select"]').isVisible()
-      ).toEqual(true)
-    })
+        })
+        expect(
+          wrapper.find('[data-testid="grade-level-select"]').exists()
+        ).toEqual(false)
+      }
+    )
   })
 
   describe('Phone numbers', () => {

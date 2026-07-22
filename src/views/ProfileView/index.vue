@@ -194,6 +194,45 @@
           </div>
 
           <div
+            v-if="showSection(ProfileSections.OCCUPATION)"
+            class="container-section"
+            data-testid="occupation-field"
+          >
+            <hr />
+            <EditOccupation
+              @success="() => (errorMessage = '')"
+              @error="
+                () =>
+                  (errorMessage =
+                    'Something went wrong while updating your background information')
+              "
+            />
+          </div>
+
+          <div
+            v-if="showSection(ProfileSections.GRADE_LEVEL)"
+            class="container-section"
+            data-testid="grade-level-select"
+          >
+            <hr />
+            <div class="prompt">
+              Confirm your grade level for the
+              {{ getAcademicYear().asString }} academic year
+            </div>
+            <div class="description">
+              This helps us tailor your UPchieve experience to you.
+            </div>
+            <GradeLevelSelect
+              v-model="selectedGradeLevel"
+              :modelValue="selectedGradeLevel"
+              @update:modelValue="saveGradeLevel"
+              :placeholder="
+                user.gradeLevel ? user.gradeLevel + ' grade' : 'Grade level'
+              "
+            />
+          </div>
+
+          <div
             v-if="showSection(ProfileSections.ACCOUNT_STATUS)"
             class="container-section"
           >
@@ -285,29 +324,6 @@
               ref="preferredLanguageSelectRef"
               :userPreferredLanguage="user.preferredLanguage"
               @error="onPreferredLanguageError"
-            />
-          </div>
-
-          <div
-            v-if="showSection(ProfileSections.GRADE_LEVEL, showGradeLevel)"
-            class="container-section"
-            data-testid="grade-level-select"
-          >
-            <hr />
-            <div class="prompt">
-              Confirm your grade level for the
-              {{ getAcademicYear().asString }} academic year
-            </div>
-            <div class="description">
-              This helps us tailor your UPchieve experience to you.
-            </div>
-            <GradeLevelSelect
-              v-model="selectedGradeLevel"
-              :modelValue="selectedGradeLevel"
-              @update:modelValue="saveGradeLevel"
-              :placeholder="
-                user.gradeLevel ? user.gradeLevel + ' grade' : 'Grade level'
-              "
             />
           </div>
 
@@ -461,6 +477,7 @@ import DeactivateAccountModal from '../DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
+import { getAcademicYear } from '@/utils/academic-year'
 import Loader from '@/components/Loader.vue'
 import VerificationModal from '../VerificationModal.vue'
 import Checkbox from '@/components/CheckBox.vue'
@@ -476,8 +493,7 @@ import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { IonToast } from '@ionic/vue'
 import TutoringExperienceQuestion from '@/views/TutoringExperienceQuestion.vue'
-import { VolunteerOccupations } from '@/services/VolunteerService'
-import { getAcademicYear } from '../../utils/academic-year'
+import EditOccupation from '@/views/ProfileView/EditOccupation.vue'
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 
 const ProfileSections = {
@@ -494,6 +510,7 @@ const ProfileSections = {
   DELETE_ACCOUNT: 'deleteAccount',
   UNLOCKED_SUBJECTS: 'unlockedSubjects',
   TUTORING_EXPERIENCE: 'tutoringExperience',
+  OCCUPATION: 'occupation',
   GRADE_LEVEL: 'gradeLevel',
 }
 
@@ -508,7 +525,7 @@ const RoleSections = {
     ProfileSections.RESET_PASSWORD,
     ProfileSections.DELETE_ACCOUNT,
     ProfileSections.UNLOCKED_SUBJECTS,
-    ProfileSections.GRADE_LEVEL, // only if they are in high school
+    ProfileSections.OCCUPATION,
   ],
   student: [
     ProfileSections.EMAIL,
@@ -531,7 +548,7 @@ const RoleSections = {
 export default {
   name: 'profile-view',
   components: {
-    GradeLevelSelect,
+    EditOccupation,
     TutoringExperienceQuestion,
     IonToast,
     SecondaryEmailModal,
@@ -548,6 +565,7 @@ export default {
     ToggleButton,
     PreferredLanguageSelect,
     LargeButton,
+    GradeLevelSelect,
   },
   data() {
     return {
@@ -569,8 +587,8 @@ export default {
       smsConsent: false,
       newMutedSubjectAlerts: [],
       showSecondaryEmailModal: false,
-      selectedGradeLevel: '',
       errorMessage: '',
+      selectedGradeLevel: '',
     }
   },
   async created() {
@@ -583,6 +601,7 @@ export default {
     if (this.isVolunteer) {
       this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
     }
+    this.selectedGradeLevel = this.user.gradeLevel ?? ''
     this.updateVerifiedPhoneInfo()
 
     if (this.$route?.query?.error) {
@@ -615,17 +634,7 @@ export default {
       hasStudentRole: 'user/hasStudentRole',
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),
-    showGradeLevel() {
-      if (this.isStudent) {
-        return true
-      }
-      if (this.isVolunteer) {
-        return (this.user.occupation ?? []).includes(
-          VolunteerOccupations.HIGH_SCHOOL_STUDENT
-        )
-      }
-      return false
-    },
+
     isPartnerTeacher() {
       return this.isTeacher && this.user.isSchoolPartner
     },
@@ -674,6 +683,7 @@ export default {
     },
   },
   methods: {
+    getAcademicYear,
     async saveGradeLevel() {
       await this.setProfile(
         this.createUpdateProfileRequestBody({
@@ -682,7 +692,6 @@ export default {
         'grade level'
       )
     },
-    getAcademicYear,
     showSection(sectionName, additionalCriteria = true) {
       let maybeShowSection = false
       if (this.isVolunteer)
