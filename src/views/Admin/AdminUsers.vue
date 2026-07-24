@@ -3,7 +3,7 @@
     <div class="search-panel">
       <div class="col">
         <div class="row">
-          <label for="user-id" class="uc-form-label">User Id</label>
+          <label for="user-id" class="uc-form-label">User ID</label>
           <input id="user-id" type="text" autocomplete="off" v-model="userId" />
         </div>
         <div class="row">
@@ -32,6 +32,7 @@
       <div class="row">
         <FormSelect
           id="partner-org"
+          name="partner-org"
           class="option-select"
           :options="listedPartnerOrgs"
           label="Partner org"
@@ -59,9 +60,23 @@
     />
     <div class="list-wrapper">
       <div class="list">
+        <div class="list-header">
+          <p class="list-header__column">User ID</p>
+          <p class="list-header__column">Created At</p>
+          <p class="list-header__column">Name</p>
+          <p class="list-header__column">Email</p>
+          <p class="list-header__column">Roles</p>
+        </div>
         <user-list-item v-for="user in users" :key="user.id" :user="user" />
       </div>
     </div>
+    <page-control
+      :page="page"
+      :isFirstPage="isFirstPage"
+      :isLastPage="isLastPage"
+      @nextPage="nextPage"
+      @previousPage="previousPage"
+    />
   </div>
 </template>
 
@@ -247,11 +262,31 @@ input {
 }
 
 .list-wrapper {
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 .list {
+  width: 100%;
   min-width: 750px;
-  max-width: 1200px;
+}
+
+.list-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 4px 40px 6px;
+  border-bottom: 2px solid #d6e0ef;
+
+  &__column {
+    flex: 1;
+    min-width: 0;
+    padding-right: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+  }
 }
 
 .uc-form-label {
