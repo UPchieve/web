@@ -41,7 +41,9 @@ const isStudentVolunteer = computed(
 )
 const userTypeDisplayName = computed(() => {
   const userType = store.getters['user/userType']
-  return userType === 'volunteer' ? 'coach' : 'student'
+  if (userType === 'volunteer') return 'coach'
+  if (userType === 'teacher') return 'teacher'
+  return 'student'
 })
 const statusColor = computed(() => {
   return sessionStatus.value.class === ''
@@ -68,9 +70,9 @@ const ambassadorTooltipText = computed(() => {
 const userAccountType = computed(() => {
   if (showAmbassadorTitle.value) {
     AnalyticsService.captureEvent(EVENTS.AMBASSADOR_SAW_AMBASSADOR_TITLE)
-    return 'Volunteer Ambassador'
+    return 'Coach Ambassador'
   }
-  return Case.capital(userTypeDisplayName.value) + ' Account'
+  return Case.capital(userTypeDisplayName.value)
 })
 </script>
 
