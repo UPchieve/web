@@ -354,24 +354,32 @@ export default {
         this.userType
       )
     this.surveyDefinition = postsessionSurveyDefinitionResponse.data.survey
-    this.allQuestions = map(this.surveyDefinition.survey, (q) => {
+    const orderedQuestions = orderBy(
+      this.surveyDefinition.survey,
+      (q) => q.displayPriority
+    )
+
+    this.allQuestions = map(orderedQuestions, (q, index) => {
       const isHiddenOnStart =
         this.isLowRatingQuestion(q) ||
         this.isHighRatingQuestion(q) ||
         this.isGuidelineIssueListQuestion(q)
       q.responses = orderBy(q.responses, (r) => r.displayPriority)
+      const currentSection = this.getQuestionSectionHeader(q)
+      const previousQuestion = orderedQuestions[index - 1]
+      const previousSection = previousQuestion
+        ? this.getQuestionSectionHeader(previousQuestion)
+        : undefined
+
       return {
         questionId: q.questionId,
         question: q,
         isVisible: !isHiddenOnStart,
         questionType: this.getQuestionDisplayType(q),
-        headerText: this.getQuestionSectionHeader(q),
+        headerText:
+          currentSection !== previousSection ? currentSection : undefined,
       }
     })
-    this.allQuestions = orderBy(
-      this.allQuestions,
-      (q) => q.question.displayPriority
-    )
     this.buildUserResponse()
 
     if (postsessionAlreadySavedResponse.data.length > 0) {
@@ -439,8 +447,8 @@ export default {
           return 'Your Concerns'
         } else if (this.isHowSupportiveQuestion(question)) {
           return 'Your Coach'
-        } else if (this.isConfidenceQuestion(question)) {
-          return 'Your Progress'
+        } else if (this.isAcademicJourneyQuestion(question)) {
+          return 'Your Academic Journey'
         }
       }
       if (question.questionType === 'free response') {
@@ -483,12 +491,43 @@ export default {
     },
     isConfidenceQuestion(question) {
       return question.questionText.startsWith(
-        'How confident are you right now that you can solve problems like the one you worked on today - on your own?'
+        'How confident are you right now that you can solve problems like the one you worked on today'
       )
     },
     isHowFarInSchoolQuestion(question) {
       return question.questionText.startsWith(
         'How far in school do you think you will get?'
+      )
+    },
+    isSomeoneCaresAcademicallyQuestion(question) {
+      return question.questionText.startsWith(
+        `I feel like someone cares about how I'm doing academically`
+      )
+    },
+    belongToCommunityQuestion(question) {
+      return question.questionText.startsWith(`I feel like I belong to the`)
+    },
+    acceptedToCollegeQuestion(question) {
+      return question.questionText.startsWith(
+        `I can get accepted to a 4-year college/university`
+      )
+    },
+    belongInCollegeQuestion(question) {
+      return question.questionText.startsWith(
+        `I belong at a 4-year college/university`
+      )
+    },
+    canEarnADegreeQuestion(question) {
+      return question.questionText.startsWith(`I can earn a 4-year degree`)
+    },
+    isAcademicJourneyQuestion(question) {
+      return (
+        this.isConfidenceQuestion(question) ||
+        this.isSomeoneCaresAcademicallyQuestion(question) ||
+        this.belongToCommunityQuestion(question) ||
+        this.acceptedToCollegeQuestion(question) ||
+        this.belongInCollegeQuestion(question) ||
+        this.canEarnADegreeQuestion(question)
       )
     },
     isNumericalRatingQuestion(question) {
@@ -501,9 +540,8 @@ export default {
         question.questionText.startsWith(
           `After this session, I want to keep working on`
         ) ||
-        question.questionText.startsWith(
-          `How confident are you right now that you can solve problems like the one you worked on today - on your own?`
-        )
+        this.isConfidenceQuestion(question) ||
+        this.isAcademicJourneyQuestion(question)
       )
     },
 
