@@ -318,6 +318,7 @@ export default {
     sessionHasEnded: { type: Boolean, default: false },
     aiWidgetPresent: { type: Boolean, default: false },
     isExclusiveSession: { type: Boolean, default: false },
+    isListeningToPartnerAudio: { type: Boolean, default: false },
   },
 
   data() {
@@ -787,17 +788,22 @@ export default {
     },
 
     async triggerAlert(data) {
-      try {
-        await this.receiveMessageAudio.play()
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.log('Unable to play audio', error)
-      }
+      const isAudioTranscription = data.type === 'audio-transcription'
+      const isFromMe = data.user === this.user.id
+      const skipAlert =
+        isFromMe || (isAudioTranscription && this.isListeningToPartnerAudio)
+      if (!skipAlert) {
+        try {
+          await this.receiveMessageAudio.play()
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log('Unable to play audio', error)
+        }
 
-      sendWebNotification(`${this.sessionPartnerName} has sent a message`, {
-        body: data.contents,
-      })
-      return
+        sendWebNotification(`${this.sessionPartnerName} has sent a message`, {
+          body: data.contents,
+        })
+      }
     },
     getUserMessageElements() {
       // the DOM elements corresponding to messages sent by users

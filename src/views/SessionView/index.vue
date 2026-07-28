@@ -242,6 +242,7 @@
           :isSessionAlive="isSessionAlive"
           :sessionHasEnded="sessionHasEnded"
           :isExclusiveSession="!!exclusiveVolunteerId && !session?.volunteerId"
+          :isListeningToPartnerAudio="!isSpeakerMuted"
         />
       </div>
     </div>
