@@ -8,7 +8,7 @@ import TransferToSessionView from '@/views/BotConversationsView/TransferToSessio
 import SystemMessage from '@/views/BotConversationsView/SystemMessage.vue'
 import type { RootState } from '@/store'
 import { DISPLAY_CONTEXT } from '@/constants/bot-conversations'
-import type { Subject, TopicWithSubjects } from '@/types/subjects'
+import type { Subject } from '@/types/subjects'
 
 const store = useStore<RootState>()
 const route = useRoute()
@@ -26,23 +26,9 @@ const conversation = computed(
 const errors = computed(() => store.state.botConversations.errors ?? [])
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
 
-const topics = computed<TopicWithSubjects[]>(() => {
-  const grouped = store.getters['subjects/subjectsByTopics'] ?? []
-  const rawTopics = store.state.subjects.topics ?? []
-  // TODO: Use correct type when avaiable
-  return grouped.map((groupedTopic: any) => {
-    const matchingTopic = rawTopics.find(
-      (topic: any) => topic.id === groupedTopic.topicId
-    )
-
-    return {
-      id: groupedTopic.topicId,
-      name: matchingTopic?.name ?? '',
-      displayName: matchingTopic?.displayName ?? groupedTopic.topicName,
-      subjects: groupedTopic.subjects ?? [],
-    }
-  })
-})
+const topics = computed(
+  () => store.getters['subjects/sessionRequestableSubjectsByTopics'] ?? []
+)
 
 const subjectsById = computed<Record<number, Subject>>(
   () => store.getters['subjects/subjectsById'] ?? {}
@@ -60,10 +46,10 @@ const currentSubject = computed<Subject | undefined>(() => {
   )
 })
 
-const currentTopic = computed<TopicWithSubjects | undefined>(() => {
+const currentTopic = computed(() => {
   const topicId = currentSubject.value?.topicId ?? selectedTopicId.value
   if (!topicId) return
-  return topics.value.find((topic) => String(topic.id) === String(topicId))
+  return topics.value.find((topic) => String(topic.topicId) === String(topicId))
 })
 
 const sortedTopics = computed(() =>
@@ -231,14 +217,14 @@ watch(
 
         <button
           v-for="topic in sortedTopics"
-          :key="String(topic.id)"
+          :key="String(topic.topicId)"
           type="button"
           class="standalone__choice"
           :class="{
             'standalone__choice--selected':
-              String(topic.id) === selectedTopicId,
+              String(topic.topicId) === selectedTopicId,
           }"
-          @click="selectTopic(String(topic.id))"
+          @click="selectTopic(String(topic.topicId))"
         >
           {{ topic.displayName }}
         </button>

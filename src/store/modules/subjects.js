@@ -141,6 +141,27 @@ export default {
         }
       })
     },
+    sessionRequestableSubjectsByTopics: (
+      state,
+      getters,
+      rootState,
+      rootGetters
+    ) => {
+      const rolledOutSubjects =
+        rootGetters['featureFlags/subjectRequestRollout']
+      const subjects = Object.values(state.subjects).filter(
+        (subject) => subject.active || rolledOutSubjects.includes(subject.name)
+      )
+
+      return state.topics
+        .map((topic) => ({
+          topicId: topic.id,
+          name: topic.name,
+          displayName: topic.displayName,
+          subjects: subjects.filter((subject) => subject.topicId === topic.id),
+        }))
+        .filter((topic) => topic.subjects.length)
+    },
     // TODO: remove in subjects-database-hydration flag cleanup
     allSubtopics: (state) => {
       let subtopicObj = {}
@@ -168,14 +189,13 @@ export default {
         return topics
       }, {})
     },
-    sessionRequestTopicCards: (state, getters, rootState, rootGetters) => {
-      const rolledOutSubjects =
-        rootGetters['featureFlags/subjectRequestRollout']
-      return generateTopicCards(
-        state.subjects,
-        (subject) =>
-          !subject.active && !rolledOutSubjects.includes(subject.name)
+    sessionRequestTopicCards: (state, getters) => {
+      const requestableSubjects = Object.fromEntries(
+        getters.sessionRequestableSubjectsByTopics
+          .flatMap((topic) => topic.subjects)
+          .map((subject) => [subject.name, subject])
       )
+      return generateTopicCards(requestableSubjects, () => false)
     },
     quizTopicCards: (state, getters, rootState, rootGetters) => {
       const rolledOutQuizzes = rootGetters['featureFlags/quizRollout']
