@@ -636,8 +636,7 @@ export default {
       }
 
       const chartRef = this.$refs.chart
-      if (!chartRef)
-        return
+      if (!chartRef) return
       this.chart = new Chart(chartRef, {
         type: 'line',
         data: {
@@ -766,7 +765,7 @@ export default {
       if (current !== prev) {
         this.generatePage()
       }
-    }
+    },
   },
 }
 </script>

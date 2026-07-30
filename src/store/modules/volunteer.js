@@ -3,9 +3,6 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
-import { VolunteerOccupations } from '@/services/VolunteerService'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 export default {
   namespaced: true,
@@ -222,31 +219,14 @@ export default {
         }
       }
 
-      /* Experiment: If the user is a high school student, filter out college-related sessions from
-       * the open sessions list.
-       */
-      const occupations = user.occupation ?? []
-      const isHighSchooler = occupations.includes(
-        VolunteerOccupations.HIGH_SCHOOL_STUDENT
-      )
-      const hideCollegeSessions =
-        this.getters[
-          'featureFlags/areHighSchoolStudentsBarredFromCoachingCollegeSubjects'
-        ]
-      const filtered =
-        isHighSchooler && hideCollegeSessions
-          ? eligibleSessions.filter((session) => session.type !== 'college')
-          : eligibleSessions
-      if (filtered.length !== eligibleSessions.length) {
-        AnalyticsService.captureEvent(EVENTS.HS_CC_COLLEGE_SESSIONS_HIDDEN)
-      }
-
-      commit('setAllOpenSessions', filtered)
+      commit('setAllOpenSessions', eligibleSessions)
 
       // We will send volunteers a notification if new session(s) have come in and they are
       // available.
       const oldSessionIds = prevOpenSessions.map((s) => s.id)
-      const newSessions = filtered.filter((s) => !oldSessionIds.includes(s.id))
+      const newSessions = eligibleSessions.filter(
+        (s) => !oldSessionIds.includes(s.id)
+      )
       const newSession = newSessions.length
         ? newSessions[newSessions.length - 1]
         : null
