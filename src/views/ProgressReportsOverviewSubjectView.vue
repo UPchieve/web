@@ -604,7 +604,6 @@ export default {
       return gradeDescription(grade)
     },
     createChart() {
-      const chartRef = this.$refs.chart
       const sortedData = [
         ...this.summaries.sort(
           (a, b) => new Date(a.sessionCreatedAt) - new Date(b.sessionCreatedAt)
@@ -636,6 +635,9 @@ export default {
         100: 'Superb',
       }
 
+      const chartRef = this.$refs.chart
+      if (!chartRef)
+        return
       this.chart = new Chart(chartRef, {
         type: 'line',
         data: {
@@ -760,6 +762,11 @@ export default {
     $route(to, from) {
       if (to.params.subject !== from.params.subject) this.generatePage()
     },
+    subjectData(current, prev) {
+      if (current !== prev) {
+        this.generatePage()
+      }
+    }
   },
 }
 </script>
