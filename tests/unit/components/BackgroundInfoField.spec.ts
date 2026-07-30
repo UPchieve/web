@@ -1,17 +1,33 @@
-import OccupationField from '@/components/OccupationField.vue'
+import BackgroundInfoField from '@/components/BackgroundInfoField.vue'
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
+import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { it, describe, expect } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
+import { createStore } from 'vuex'
 
 function getWrapper(props = {}) {
-  return mount(OccupationField, {
+  return mount(BackgroundInfoField, {
     props: {
       modelValue: [],
       college: '',
       company: '',
       gradeLevel: '',
+      highSchoolId: '',
+      highSchoolName: '',
+      city: '',
+      state: '',
+      country: '',
       ...props,
+    },
+    global: {
+      plugins: [
+        createStore({
+          modules: {
+            user: { namespaced: true, state: { user: {} } },
+          },
+        }),
+      ],
     },
   })
 }
@@ -20,7 +36,7 @@ function checkboxFor(wrapper: VueWrapper, occupation: string) {
   return wrapper.find(`[data-testid="${occupation}"]`)
 }
 
-describe('OccupationField', () => {
+describe('BackgroundInfoField', () => {
   it('renders a checkbox for every occupation option', () => {
     const wrapper = getWrapper()
 
@@ -155,5 +171,42 @@ describe('OccupationField', () => {
       .vm.$emit('update:modelValue', '9th grade')
 
     expect(wrapper.emitted('update:gradeLevel')![0][0]).toBe('9th grade')
+  })
+
+  it('emits update:highSchoolId when a high school is selected', async () => {
+    const wrapper = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+    })
+
+    await wrapper
+      .findComponent(FormSchoolSearch)
+      .vm.$emit('update:modelValue', 'school-123')
+
+    expect(wrapper.emitted('update:highSchoolId')![0][0]).toBe('school-123')
+  })
+
+  it('emits update:highSchoolName when a high school is selected', async () => {
+    const wrapper = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+    })
+
+    await wrapper
+      .findComponent(FormSchoolSearch)
+      .vm.$emit('selected-school-name', 'Central High')
+
+    expect(wrapper.emitted('update:highSchoolName')![0][0]).toBe('Central High')
+  })
+
+  it('only shows school search for high school students in the United States', () => {
+    const internationalStudent = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'Canada',
+    })
+
+    expect(internationalStudent.findComponent(FormSchoolSearch).exists()).toBe(
+      false
+    )
   })
 })

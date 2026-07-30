@@ -160,6 +160,35 @@
                 {{ option }}
               </label>
             </div>
+            <template v-if="isInHighSchool">
+              <p
+                data-testid="grade-level-question"
+                class="uc-form-label occupations-label"
+              >
+                What grade will you be in during the
+                {{ getAcademicYear().asString }} academic year?<span
+                  class="background-info__question-required"
+                  >*</span
+                >
+              </p>
+              <GradeLevelSelect v-model="gradeLevel" :label="'Grade level'" />
+            </template>
+            <template v-if="isInHighSchool && isUnitedStatesSelected">
+              <label class="uc-form-label occupations-label" for="school">
+                What high school do you currently attend?<span
+                  class="background-info__question-required"
+                  >*</span
+                >
+              </label>
+              <FormSchoolSearch
+                :isRequired="true"
+                startSearchEvent=""
+                cannotFindSchoolEvent=""
+                selectedEvent=""
+                v-model="highSchoolId"
+              />
+            </template>
+
             <template v-if="isCollegeEducated">
               <label class="uc-form-label occupations-label" for="college"
                 >What college/university do you currently attend?<span
@@ -193,17 +222,6 @@
                 autocomplete="off"
               />
             </template>
-          </li>
-
-          <li v-if="isInHighSchool">
-            <p data-testid="grade-level-question" class="uc-form-label">
-              What grade will you be in during the
-              {{ getAcademicYear().asString }} academic year?<span
-                class="background-info__question-required"
-                >*</span
-              >
-            </p>
-            <GradeLevelSelect v-model="gradeLevel" />
           </li>
 
           <li class="uc-form-col">
@@ -280,10 +298,12 @@ import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.v
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 import { getAcademicYear } from '../utils/academic-year'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 
 export default {
   name: 'background-info-view',
   components: {
+    FormSchoolSearch,
     GradeLevelSelect,
     FormSearchableSelect,
     Callout,
@@ -306,6 +326,7 @@ export default {
       city: '',
       college: '',
       company: '',
+      highSchoolId: null,
       signupSourceId: '',
       signupSourcesOptions: [],
       otherSignupSource: '',
@@ -439,6 +460,7 @@ export default {
         signupSourceId: this.signupSourceId,
         otherSignupSource: this.otherSignupSource,
         gradeLevel: this.isInHighSchool ? this.gradeLevel : undefined, // only send up if HS occupation remains selected
+        highSchoolId: this.isInHighSchool ? this.highSchoolId : undefined,
       }
 
       try {
@@ -489,7 +511,10 @@ export default {
         (this.isCollegeEducated && !this.college) ||
         (this.isWorkingFullTime && !this.company) ||
         (this.isInHighSchool && !this.gradeLevel) ||
-        (this.shouldShowOtherSignupInput && !this.otherSignupSource)
+        (this.shouldShowOtherSignupInput && !this.otherSignupSource) ||
+        (this.isInHighSchool &&
+          this.isUnitedStatesSelected &&
+          !this.highSchoolId)
       )
     },
   },

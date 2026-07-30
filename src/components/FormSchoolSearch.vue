@@ -100,7 +100,7 @@ export default {
       type: String,
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'selected-school-name'],
 
   created() {
     this.CANNOT_FIND_SCHOOL_TEXT = `Can't find your school?`
@@ -169,6 +169,7 @@ export default {
         }
         this.school = school || {}
         this.$emit('update:modelValue', school.id)
+        this.$emit('selected-school-name', school.name)
       }
     },
 

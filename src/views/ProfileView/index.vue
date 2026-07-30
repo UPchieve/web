@@ -199,7 +199,7 @@
             data-testid="occupation-field"
           >
             <hr />
-            <EditOccupation
+            <EditBackgroundInfo
               @success="() => (errorMessage = '')"
               @error="
                 () =>
@@ -493,7 +493,7 @@ import SecondaryEmailModal from '@/views/SecondaryEmailModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { IonToast } from '@ionic/vue'
 import TutoringExperienceQuestion from '@/views/TutoringExperienceQuestion.vue'
-import EditOccupation from '@/views/ProfileView/EditOccupation.vue'
+import EditBackgroundInfo from '@/views/ProfileView/EditBackgroundInfo.vue'
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 
 const ProfileSections = {
@@ -548,7 +548,7 @@ const RoleSections = {
 export default {
   name: 'profile-view',
   components: {
-    EditOccupation,
+    EditBackgroundInfo,
     TutoringExperienceQuestion,
     IonToast,
     SecondaryEmailModal,

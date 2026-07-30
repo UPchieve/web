@@ -1,6 +1,7 @@
-import EditOccupation from '@/views/ProfileView/EditOccupation.vue'
-import OccupationField from '@/components/OccupationField.vue'
+import EditBackgroundInfo from '@/views/ProfileView/EditBackgroundInfo.vue'
+import BackgroundInfoField from '@/components/BackgroundInfoField.vue'
 import NetworkService from '@/services/NetworkService'
+import UserService from '@/services/UserService'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { it, describe, expect, vi, beforeEach } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
@@ -21,30 +22,36 @@ function getWrapper(user = {}) {
           addToUser({ commit }, updates) {
             commit('updateUser', updates)
           },
+          fetchUser: vi.fn(),
         },
       },
     },
   })
-  return mount(EditOccupation, {
+  return mount(EditBackgroundInfo, {
     global: { plugins: [store] },
     attachTo: document.body,
   })
 }
 
 function editButton(wrapper: VueWrapper) {
-  return wrapper.find('[data-testid="edit-occupation-btn"]')
+  return wrapper.find('[data-testid="edit-background-info-btn"]')
 }
 
-describe('EditOccupation', () => {
+describe('EditBackgroundInfo', () => {
   beforeEach(() => {
     vi.spyOn(NetworkService, 'setProfile').mockResolvedValue({})
+    vi.spyOn(UserService, 'setProfile').mockImplementation((data, store) =>
+      NetworkService.setProfile(data).then(() =>
+        store.dispatch('user/addToUser', data)
+      )
+    )
   })
 
   it('starts in read mode showing a fallback message when there is no occupation data', () => {
     const wrapper = getWrapper({})
 
-    expect(wrapper.text()).toContain('No occupation information provided')
-    expect(wrapper.findComponent(OccupationField).isVisible()).toBe(false)
+    expect(wrapper.text()).toContain('No background information provided')
+    expect(wrapper.findComponent(BackgroundInfoField).isVisible()).toBe(false)
     expect(editButton(wrapper).text()).toBe('Edit')
   })
 
@@ -63,13 +70,13 @@ describe('EditOccupation', () => {
     expect(wrapper.text()).not.toContain('Grade level')
   })
 
-  it('switches to edit mode on Edit click, revealing the OccupationField form', async () => {
+  it('switches to edit mode on Edit click, revealing the BackgroundInfoField form', async () => {
     const wrapper = getWrapper({})
 
     await editButton(wrapper).trigger('click')
 
     expect(editButton(wrapper).text()).toBe('Save')
-    expect(wrapper.findComponent(OccupationField).isVisible()).toBe(true)
+    expect(wrapper.findComponent(BackgroundInfoField).isVisible()).toBe(true)
   })
 
   it('blocks saving and shows a validation error when no occupation is selected', async () => {
@@ -87,7 +94,7 @@ describe('EditOccupation', () => {
   })
 
   it('saves the selected occupation info and returns to read mode', async () => {
-    const wrapper = getWrapper({})
+    const wrapper = getWrapper({ country: 'Canada', city: 'Toronto' })
 
     await editButton(wrapper).trigger('click')
     await wrapper
@@ -110,12 +117,49 @@ describe('EditOccupation', () => {
     expect(wrapper.text()).toContain('Company: Acme')
   })
 
+  it('sends schoolId when saving a US high school student', async () => {
+    const wrapper = getWrapper({
+      occupation: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      state: 'New York',
+      city: 'New York',
+      schoolId: 'school-123',
+    })
+
+    await editButton(wrapper).trigger('click')
+    await editButton(wrapper).trigger('click')
+
+    expect(NetworkService.setProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ schoolId: 'school-123' })
+    )
+  })
+
+  it('clears schoolId when saving an international high school student', async () => {
+    const wrapper = getWrapper({
+      occupation: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'Canada',
+      city: 'Toronto',
+      schoolId: 'school-123',
+      schoolName: 'Central High',
+    })
+
+    await editButton(wrapper).trigger('click')
+    await editButton(wrapper).trigger('click')
+
+    expect(NetworkService.setProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ schoolId: null })
+    )
+    expect(wrapper.text()).not.toContain('School: Central High')
+  })
+
   it('reverts to the previous values and stays in edit mode when saving fails', async () => {
     vi.spyOn(NetworkService, 'setProfile').mockRejectedValue(
       new Error('network error')
     )
     const wrapper = getWrapper({
       occupation: [VolunteerOccupations.CAREGIVER],
+      country: 'Canada',
+      city: 'Toronto',
     })
 
     await editButton(wrapper).trigger('click')
