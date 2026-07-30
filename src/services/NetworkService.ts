@@ -1242,6 +1242,16 @@ export default {
       assignmentData,
     }).then(this._successHandler, this._errorHandler)
   },
+  upsertAssignment(assignmentData: unknown) {
+    return httpPut(`${API_ROOT}/teachers/assignment`, {
+      assignmentData,
+    }).then(this._successHandler, this._errorHandler)
+  },
+  createAssignments(assignmentData: unknown) {
+    return httpPost(`${API_ROOT}/teachers/assignment`, {
+      assignmentData,
+    }).then(this._successHandler, this._errorHandler)
+  },
   editAssignment(assignmentData: unknown) {
     return httpPost(`${API_ROOT}/teachers/assignment/edit`, {
       assignmentData,

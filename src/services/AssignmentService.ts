@@ -4,6 +4,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 
 type AssignmentData = {
+  id?: string
   description: string
   title: string
   numberOfSessions: number
@@ -14,13 +15,14 @@ type AssignmentData = {
   subjectId: number
 }
 
-type TeacherClass = any
-type Student = any
+type TeacherClass = { id: string }
+type StudentId = string
 
-export async function createAssignment(
+export async function upsertAssignment(
   assignmentData: AssignmentData,
   selectedClasses: TeacherClass[],
-  selectedStudents: Student[],
+  studentsToAdd: StudentId[],
+  studentsToRemove: StudentId[],
   files: File[]
 ) {
   if (!selectedClasses.length) {
@@ -32,24 +34,26 @@ export async function createAssignment(
   let newAssignments
   try {
     const classIds = selectedClasses.map((selectedClass) => selectedClass.id)
-    const studentIds =
-      selectedStudents.length > 0
-        ? selectedStudents.map((selectedStudent) => selectedStudent.id)
-        : []
 
     const {
-      data: { assignment },
-    } = await NetworkService.createAssignment({
-      ...assignmentData,
-      classIds,
-      studentIds,
-    })
+      data: { assignment, assignments },
+    } = isAssignmentForSingleClass(classIds)
+      ? await NetworkService.upsertAssignment({
+          ...assignmentData,
+          classId: classIds[0],
+          studentsToAdd,
+          studentsToRemove,
+        })
+      : await NetworkService.createAssignments({
+          ...assignmentData,
+          classIds,
+        })
 
-    newAssignments = assignment
+    newAssignments = assignments ?? [assignment]
   } catch (err) {
     const moderationInfraction = (
-      (err as AxiosError).response?.data as { moderationFailures?: string[] }
-    )?.moderationFailures
+      (err as AxiosError).response?.data as { moderationInfractions?: string[] }
+    )?.moderationInfractions
     if (moderationInfraction) {
       return {
         error: formatModerationInfractionMessage(
@@ -84,54 +88,6 @@ export async function createAssignment(
   return { assignments: newAssignments }
 }
 
-export async function editAssignment(
-  assignmentData: AssignmentData,
-  studentsToAdd: string[],
-  studentsToRemove: string[],
-  files: File[]
-) {
-  let edittedAssignment
-  try {
-    const {
-      data: { assignment },
-    } = await NetworkService.editAssignment({
-      ...assignmentData,
-      studentsToAdd,
-      studentsToRemove,
-    })
-    edittedAssignment = assignment
-  } catch (err) {
-    const moderationInfraction = (
-      (err as AxiosError).response?.data as { moderationFailures?: string[] }
-    )?.moderationFailures
-    if (moderationInfraction) {
-      return {
-        error: formatModerationInfractionMessage(
-          moderationInfraction,
-          assignmentData.title
-        ),
-      }
-    }
-    return {
-      error: 'Unable to edit assignment',
-    }
-  }
-
-  // TODO: Move to backend in previous request.
-  if (files.length) {
-    const infractions = await uploadFiles([edittedAssignment.id], files)
-    if (infractions.length) {
-      return {
-        error: formatModerationInfractionFileMessage(
-          (infractions[0] as PromiseRejectedResult).reason.response.data
-            .moderationFailures
-        ),
-      }
-    }
-  }
-  return { assignment: edittedAssignment }
-}
-
 async function uploadFiles(assignmentIds: string[], files: File[]) {
   const responses = await Promise.allSettled(
     assignmentIds.map((assignmentId) =>
@@ -144,6 +100,10 @@ async function uploadFiles(assignmentIds: string[], files: File[]) {
       r.status === 'rejected' && !!r.reason?.response?.data?.moderationFailures
   )
   return infractions
+}
+
+function isAssignmentForSingleClass(classes: string[]) {
+  return classes.length === 1
 }
 
 function formatModerationInfractionMessage(
