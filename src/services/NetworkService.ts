@@ -1242,15 +1242,17 @@ export default {
       assignmentData,
     }).then(this._successHandler, this._errorHandler)
   },
-  upsertAssignment(assignmentData: unknown) {
-    return httpPut(`${API_ROOT}/teachers/assignment`, {
-      assignmentData,
-    }).then(this._successHandler, this._errorHandler)
+  upsertAssignment(formData: FormData) {
+    return httpPut(`${API_ROOT}/teachers/assignment`, formData).then(
+      this._successHandler,
+      this._errorHandler
+    )
   },
-  createAssignments(assignmentData: unknown) {
-    return httpPost(`${API_ROOT}/teachers/assignment`, {
-      assignmentData,
-    }).then(this._successHandler, this._errorHandler)
+  createAssignments(formData: FormData) {
+    return httpPost(`${API_ROOT}/teachers/assignment`, formData).then(
+      this._successHandler,
+      this._errorHandler
+    )
   },
   editAssignment(assignmentData: unknown) {
     return httpPost(`${API_ROOT}/teachers/assignment/edit`, {
@@ -1277,7 +1279,7 @@ export default {
       },
     }).then(this._successHandler, this._errorHandler)
   },
-  getAssignmentsByClassId(classId) {
+  getAssignmentsByClassId(classId: string) {
     return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(
       this._successHandler,
       this._errorHandler

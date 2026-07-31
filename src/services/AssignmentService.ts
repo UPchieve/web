@@ -31,99 +31,113 @@ export async function upsertAssignment(
     }
   }
 
-  let newAssignments
   try {
     const classIds = selectedClasses.map((selectedClass) => selectedClass.id)
 
     const {
       data: { assignment, assignments },
     } = isAssignmentForSingleClass(classIds)
-      ? await NetworkService.upsertAssignment({
-          ...assignmentData,
-          classId: classIds[0],
-          studentsToAdd,
-          studentsToRemove,
-        })
-      : await NetworkService.createAssignments({
-          ...assignmentData,
-          classIds,
-        })
+      ? await NetworkService.upsertAssignment(
+          buildAssignmentFormDataForRequest(
+            {
+              ...assignmentData,
+              classId: classIds[0],
+              studentsToAdd,
+              studentsToRemove,
+            },
+            files
+          )
+        )
+      : await NetworkService.createAssignments(
+          buildAssignmentFormDataForRequest(
+            {
+              ...assignmentData,
+              classIds,
+            },
+            files
+          )
+        )
 
-    newAssignments = assignments ?? [assignment]
+    AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
+
+    return { assignments: assignments ?? [assignment] }
   } catch (err) {
-    const moderationInfraction = (
-      (err as AxiosError).response?.data as { moderationInfractions?: string[] }
-    )?.moderationInfractions
-    if (moderationInfraction) {
+    const errData = (err as AxiosError).response?.data as {
+      moderationInfractions?: string[]
+      imageModerationInfractions?: { [fileName: string]: string[] }
+      assignment?: { id: string }
+    }
+
+    // If we created the assignment but then something failed (e.g. an
+    // attached file was flagged), we have created the assignment, but want
+    // to retry upsert for that newly created assignment.
+    const savedAssignment = errData?.assignment
+
+    if (errData?.moderationInfractions) {
       return {
+        savedAssignment,
         error: formatModerationInfractionMessage(
-          moderationInfraction,
+          errData.moderationInfractions,
           assignmentData.title
         ),
       }
     }
-    return {
-      error: 'Unable to create assignment',
-    }
-  }
 
-  // TODO: Move to backend in previous request.
-  if (files.length) {
-    const infractions = await uploadFiles(
-      newAssignments.map((a: { id: string }) => a.id),
-      files
-    )
-    if (infractions.length) {
+    if (errData.imageModerationInfractions) {
       return {
+        savedAssignment,
         error: formatModerationInfractionFileMessage(
-          (infractions[0] as PromiseRejectedResult).reason.response.data
-            .moderationFailures
+          errData.imageModerationInfractions
         ),
       }
     }
+
+    return {
+      savedAssignment,
+      error: `Unable to create assignment`,
+    }
   }
-
-  AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_CREATED, assignmentData)
-
-  return { assignments: newAssignments }
-}
-
-async function uploadFiles(assignmentIds: string[], files: File[]) {
-  const responses = await Promise.allSettled(
-    assignmentIds.map((assignmentId) =>
-      NetworkService.uploadFiles({ assignmentId, files })
-    )
-  )
-
-  const infractions = responses.filter(
-    (r) =>
-      r.status === 'rejected' && !!r.reason?.response?.data?.moderationFailures
-  )
-  return infractions
 }
 
 function isAssignmentForSingleClass(classes: string[]) {
   return classes.length === 1
 }
 
+function buildAssignmentFormDataForRequest(
+  assignmentData: unknown,
+  files?: File[]
+) {
+  const formData = new FormData()
+  formData.append('assignmentData', JSON.stringify(assignmentData))
+
+  if (files) {
+    files.forEach((file) => {
+      formData.append('files', file)
+    })
+  }
+
+  return formData
+}
+
 function formatModerationInfractionMessage(
   infractions: string[],
   assignmentTitle: string
 ) {
-  const moderationIssues = infractions.map((issueKey) => {
-    return issueKey.replace('_', ' ')
-  })
+  const moderationIssues = infractions
+    .map((issueKey) => issueKey.replaceAll('_', ' '))
+    .join(', ')
 
-  return `The assignment "${assignmentTitle}" could not be edited due to a safety policy violation in the content. Please review your assignment content for: ${moderationIssues}`
+  return `The assignment "${assignmentTitle}" has a safety policy violation in the content. Please review your assignment content for: ${moderationIssues}`
 }
 
-function formatModerationInfractionFileMessage(fileNameToFailuresMap: {
+function formatModerationInfractionFileMessage(fileNameToInfractionsMap: {
   [fileName: string]: string[]
 }) {
-  const fileName = Object.keys(fileNameToFailuresMap)[0]
-  const moderationIssues = fileNameToFailuresMap[fileName].map((issueKey) => {
-    return issueKey.replace('_', ' ')
-  })
+  const fileNames = Object.keys(fileNameToInfractionsMap)
+  const infractions = Object.values(fileNameToInfractionsMap)
+    .flat()
+    .map((i) => i.replaceAll('_', ' '))
+    .join(', ')
 
-  return `The files could not be attached to the assignment due to a safety policy violation in the content of file "${fileName}" - Please review your file content for: ${moderationIssues}`
+  return `The files could not be attached to the assignment due to a safety policy violation in the content of the following files "${fileNames.join(', ')}". Please review your file content for: ${infractions}`
 }
