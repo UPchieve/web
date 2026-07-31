@@ -357,6 +357,7 @@ export default {
         startDate: dayjs(this.startDate).startOf('day').toDate(),
         isRequired: false,
         subjectId: this.selectedSessionToComplete.id,
+        classId: this.modalData.currentClass.id,
       }
       if (this.isEdit) {
         const currentStudentsAssigned = this.modalData.assignment.studentIds

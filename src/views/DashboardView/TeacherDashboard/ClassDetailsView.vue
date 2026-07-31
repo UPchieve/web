@@ -744,7 +744,9 @@ export default {
       files,
     }) {
       try {
-        const response = await NetworkService.editAssignment({
+        const {
+          data: { assignment },
+        } = await NetworkService.editAssignment({
           ...assignmentData,
           studentsToAdd: studentsToAdd,
           studentsToRemove: studentsToRemove,
@@ -752,8 +754,8 @@ export default {
 
         //Changes the assignment info in the UI
         const updatedAssignments = this.assignments.map((assnmt) =>
-          assnmt.id === response.assignment.id
-            ? { ...response.assignment, studentIds: selectedStudents }
+          assnmt.id === assignment.id
+            ? { ...assignment, studentIds: selectedStudents }
             : assnmt
         )
         this.assignments = updatedAssignments
