@@ -37,12 +37,10 @@
           name="subject"
           class="filter-input"
           placeholder="Subject"
-          :options="subjectsByTopics"
+          :options="filterBySubjectOptions"
           :multiple="false"
-          optionTextField="displayName"
           groupField="topicName"
           group="subjects"
-          :reduce="(option) => option.displayName"
           @update:modelValue="filter"
         />
         <div class="unread-dms-checkbox" v-if="isShowDMNotificationsEnabled">
@@ -354,6 +352,22 @@ export default {
       currentSession: (state) => state.user.session,
       userId: (state) => state.user.user.id,
     }),
+    filterBySubjectOptions() {
+      /**
+       * when there are duplicate subject displayNames (e.g. `Applications` in College Counseling),
+       * we only want to show one in the drop down. it's fine to drop the other since we query history
+       * by displayName, not id
+       */
+      const dedupedSubjects = [
+        ...new Set(topic.subjects.map(({ displayName }) => displayName)),
+      ]
+      return this.subjectsByTopics.map((topic) => {
+        return {
+          ...topic,
+          subjects: dedupedSubjects,
+        }
+      })
+    },
     isFirstPage() {
       return this.page === 1
     },
