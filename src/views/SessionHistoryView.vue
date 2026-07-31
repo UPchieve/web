@@ -319,12 +319,12 @@ export default {
   data() {
     return {
       sessions: [],
+      filteredSessions: [],
       filters: {
         firstName: '',
         subjectName: '',
         studentId: '',
         volunteerId: '',
-        filteredSessions: [],
         hasUnreadDMs: false,
       },
       page: 1,
@@ -453,7 +453,7 @@ export default {
         )
       })
 
-      this.filters.filteredSessions = filtered
+      this.filteredSessions = filtered
       this.page = 1
       this.paginate()
     },
@@ -465,8 +465,8 @@ export default {
       const start = (this.page - 1) * this.sessionLimitPerPage
       const end = this.page * this.sessionLimitPerPage
 
-      this.isLastPage = end >= this.filters.filteredSessions.length
-      this.sessions = this.filters.filteredSessions.slice(start, end)
+      this.isLastPage = end >= this.filteredSessions.length
+      this.sessions = this.filteredSessions.slice(start, end)
     },
     async fetchSessionHistory() {
       this.isFetchingSessions = true
