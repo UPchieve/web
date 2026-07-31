@@ -101,7 +101,7 @@
               </p>
               <div class="session-list__partner-name-container">
                 <favoriting-toggle
-                  v-if="isStudent"
+                  v-if="isStudent && session.volunteerId !== userId"
                   :initialIsFavorite="session.isFavorited"
                   :volunteerName="session.volunteerFirstName"
                   :volunteerId="session.volunteerId"
@@ -110,8 +110,12 @@
                 <span class="session-list__partner-name">
                   {{
                     isVolunteer
-                      ? session.studentFirstName
-                      : session.volunteerFirstName
+                      ? session.studentId === userId
+                        ? 'You'
+                        : session.studentFirstName
+                      : session.volunteerId === userId
+                        ? 'You'
+                        : session.volunteerFirstName
                   }}
                 </span>
               </div>
@@ -209,7 +213,7 @@
                 <div class="mobile-session-list__createdAt-container">
                   <div class="mobile-session-list__partner-name-container">
                     <favoriting-toggle
-                      v-if="isStudent"
+                      v-if="isStudent && session.volunteerId !== userId"
                       :initialIsFavorite="session.isFavorited"
                       :volunteerName="session.volunteerFirstName"
                       :volunteerId="session.volunteerId"
@@ -218,8 +222,12 @@
                     <span class="mobile-session-list__partner-name">
                       {{
                         isVolunteer
-                          ? session.studentFirstName
-                          : session.volunteerFirstName
+                          ? session.studentId === userId
+                            ? 'You'
+                            : session.studentFirstName
+                          : session.volunteerId === userId
+                            ? 'You'
+                            : session.volunteerFirstName
                       }}
                     </span>
                   </div>
@@ -344,6 +352,7 @@ export default {
     ...mapState({
       subjectsMap: (state) => state.subjects.subjects,
       currentSession: (state) => state.user.session,
+      userId: (state) => state.user.user.id,
     }),
     isFirstPage() {
       return this.page === 1
