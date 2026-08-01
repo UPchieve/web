@@ -401,13 +401,16 @@ export default {
 
         if (result.error) {
           this.showToast(result.error, true)
-          return
+          // Let the modal stay open and retry against the assignment that was
+          // already saved, if any.
+          return { savedAssignment: result.savedAssignment }
         }
 
         this.showToast('Assignment created.')
 
         const classId = currentClass.id
         this.$router.push(`/dashboard/teacher/class/${classId}/assignments`)
+        this.$store.dispatch('app/modal/hide')
       } catch (err) {
         const error = err?.response?.data?.err ?? 'Unable to create assignment.'
         this.showToast(error, true)

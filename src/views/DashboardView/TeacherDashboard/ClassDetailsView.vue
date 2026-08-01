@@ -655,16 +655,19 @@ export default {
       files,
     }) {
       try {
-        const { assignments, error } = await AssignmentService.createAssignment(
-          assignmentData,
-          selectedClasses,
-          studentsToAdd,
-          files
-        )
+        const { assignments, error, savedAssignment } =
+          await AssignmentService.createAssignment(
+            assignmentData,
+            selectedClasses,
+            studentsToAdd,
+            files
+          )
 
         if (error) {
           this.showToast(error, true)
-          return
+          // Let the modal stay open and retry against the assignment that was
+          // already saved, if any.
+          return { savedAssignment }
         }
 
         const newAssignmentForThisClass = assignments.find(
@@ -700,17 +703,18 @@ export default {
       files,
     }) {
       try {
-        const { assignments, error } = await AssignmentService.editAssignment(
-          assignmentData,
-          selectedClasses,
-          studentsToAdd,
-          studentsToRemove,
-          files
-        )
+        const { assignments, error, savedAssignment } =
+          await AssignmentService.editAssignment(
+            assignmentData,
+            selectedClasses,
+            studentsToAdd,
+            studentsToRemove,
+            files
+          )
 
         if (error) {
           this.showToast(error, true)
-          return
+          return { savedAssignment }
         }
 
         const editedAssignmentForThisClass = assignments.find(
@@ -728,6 +732,7 @@ export default {
         }
 
         await this.getStudentAssignmentCompletions()
+        this.$store.dispatch('app/modal/hide')
       } catch (err) {
         const error = err?.response?.data?.err ?? 'Unable to edit assignment'
         this.showToast(error, true)

@@ -1,5 +1,6 @@
 <template>
   <modal class="create-assignment-wrapper">
+    <loader v-if="isSubmitting" overlay />
     <div class="modal-container">
       <h1>{{ headingText }} Tutoring Assignment</h1>
       <FormInput
@@ -34,7 +35,7 @@
             optionTextField="name"
             v-model="selectedClasses"
             :multiple="true"
-            :disabled="isEdit"
+            :disabled="disableClassSelection"
           />
           <FormSelect
             label="Selected student(s)"
@@ -163,6 +164,7 @@ import { mapGetters, mapState } from 'vuex'
 import FormInput from '@/components/FormInput.vue'
 import FormDateInput from './FormInputs/FormDateInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import Loader from '@/components/Loader.vue'
 import Modal from '@/components/Modal.vue'
 import FileDialog from '@/components/FileDialog.vue'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
@@ -175,6 +177,7 @@ export default {
     FormInput,
     FormDateInput,
     FormSelect,
+    Loader,
     FileDialog,
     PhotoUploadIcon,
   },
@@ -205,6 +208,9 @@ export default {
         this.numMinutes
       )
     },
+    disableClassSelection() {
+      return this.isEdit || !!this.assignmentId
+    },
     showStudentsInClassDisabled() {
       return this.selectedClasses.length !== 1
     },
@@ -234,6 +240,7 @@ export default {
       isEdit: false,
       assignmentId: '',
       files: [],
+      isSubmitting: false,
     }
   },
 
@@ -346,48 +353,59 @@ export default {
     },
 
     async createAssignment() {
-      const assignmentData = {
-        description: this.description,
-        title: this.assignmentName,
-        numberOfSessions: this.numSessions,
-        minDurationInMinutes: this.numMinutes,
-        dueDate: dayjs(this.dueDate).endOf('day').toDate(),
-        startDate: dayjs(this.startDate).startOf('day').toDate(),
-        isRequired: false,
-        subjectId: this.selectedSessionToComplete.id,
-        classId: this.modalData.currentClass.id,
-      }
-      if (this.isEdit) {
-        const currentStudentsAssigned = this.modalData.assignment.studentIds
-        const selectedStudentIds = this.selectedStudents.map(
-          (student) => student.id
-        )
+      try {
+        this.isSubmitting = true
+        const assignmentData = {
+          description: this.description,
+          title: this.assignmentName,
+          numberOfSessions: this.numSessions,
+          minDurationInMinutes: this.numMinutes,
+          dueDate: dayjs(this.dueDate).endOf('day').toDate(),
+          startDate: dayjs(this.startDate).startOf('day').toDate(),
+          isRequired: false,
+          subjectId: this.selectedSessionToComplete.id,
+          classId: this.modalData.currentClass.id,
+        }
+        if (this.assignmentId) {
+          assignmentData.id = this.assignmentId
+        }
+        if (this.isEdit) {
+          const currentStudentsAssigned = this.modalData.assignment.studentIds
+          const selectedStudentIds = this.selectedStudents.map(
+            (student) => student.id
+          )
 
-        const studentsToRemove = currentStudentsAssigned.filter(
-          (id) => !selectedStudentIds.includes(id)
-        )
-        const studentsToAdd = selectedStudentIds.filter(
-          (id) => !currentStudentsAssigned.includes(id)
-        )
+          const studentsToRemove = currentStudentsAssigned.filter(
+            (id) => !selectedStudentIds.includes(id)
+          )
+          const studentsToAdd = selectedStudentIds.filter(
+            (id) => !currentStudentsAssigned.includes(id)
+          )
 
-        assignmentData.id = this.assignmentId
-        this.modalData.onAssignmentEdited({
-          assignmentData,
-          selectedClasses: this.selectedClasses,
-          studentsToAdd,
-          studentsToRemove,
-          files: this.files,
-        })
-      } else {
-        this.modalData.onAssignmentCreated({
-          assignmentData,
-          selectedClasses: this.selectedClasses,
-          studentsToAdd: this.selectedStudents.map((s) => s.id),
-          files: this.files,
-          currentClass: this.modalData.currentClass,
-        })
+          await this.modalData.onAssignmentEdited({
+            assignmentData,
+            selectedClasses: this.selectedClasses,
+            studentsToAdd,
+            studentsToRemove,
+            selectedStudentIds,
+            files: this.files,
+          })
+        } else {
+          const result = await this.modalData.onAssignmentCreated({
+            assignmentData,
+            selectedClasses: this.selectedClasses,
+            studentsToAdd: this.selectedStudents.map((s) => s.id),
+            files: this.files,
+            currentClass: this.modalData.currentClass,
+          })
+
+          if (result?.savedAssignment) {
+            this.assignmentId = result.savedAssignment.id
+          }
+        }
+      } finally {
+        this.isSubmitting = false
       }
-      this.close()
     },
   },
 }
