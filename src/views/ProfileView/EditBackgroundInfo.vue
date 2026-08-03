@@ -34,15 +34,17 @@ if (occupations.value.length === 0) {
   AnalyticsService.captureEvent(EVENTS.COACH_HAS_OCCUPATION)
 }
 
-if (highSchoolId.value) {
-  AnalyticsService.captureEvent(EVENTS.COACH_HAS_SCHOOL)
-} else {
-  AnalyticsService.captureEvent(EVENTS.COACH_HAS_NO_SCHOOL)
-}
-
 const isInHighSchool = computed(() =>
   occupations.value.includes(VolunteerOccupations.HIGH_SCHOOL_STUDENT)
 )
+
+if (isInHighSchool.value) {
+  if (highSchoolId.value) {
+    AnalyticsService.captureEvent(EVENTS.COACH_HAS_SCHOOL)
+  } else {
+    AnalyticsService.captureEvent(EVENTS.COACH_HAS_NO_SCHOOL)
+  }
+}
 
 const isCollegeEducated = computed(
   () =>
