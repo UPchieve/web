@@ -265,7 +265,7 @@ export default {
     },
 
     async getSessions() {
-      this.$router.push({
+      this.$router.replace({
         path: '/admin/sessions',
         query: {
           page: this.page,

@@ -84,7 +84,7 @@ export default {
         page: this.page,
         studentFirstName: this.studentFirstName,
       }
-      this.$router.push({
+      this.$router.replace({
         path: '/admin/sessions/review',
         query,
       })

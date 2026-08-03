@@ -168,7 +168,7 @@ export default {
           isPartner: this.isPartner,
           page: this.page,
         }
-        this.$router.push({
+        this.$router.replace({
           path: '/admin/schools',
           query: queryData,
         })

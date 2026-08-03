@@ -62,7 +62,10 @@ export default {
     async setPage(page) {
       this.page = page
       this.volunteers = []
-      this.$router.push({ path: '/admin/volunteers/review', query: { page } })
+      this.$router.replace({
+        path: '/admin/volunteers/review',
+        query: { page },
+      })
       const { volunteers, isLastPage } = await getVolunteersToReview(page)
       this.volunteers = volunteers
       this.isLastPage = isLastPage

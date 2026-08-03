@@ -207,7 +207,7 @@ export default {
         page: this.page.toString(),
       }
       if (!isEqual(data, this.$route.query)) {
-        this.$router.push({
+        this.$router.replace({
           path: '/admin/users',
           query: data,
         })

@@ -67,7 +67,7 @@ export default {
   methods: {
     async setPage(page) {
       this.page = page
-      this.$router.push({
+      this.$router.replace({
         path: '/admin/ineligible-students',
         query: { page },
       })
