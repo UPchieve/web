@@ -253,7 +253,7 @@ describe('User store module', () => {
         expect.objectContaining({
           prealgebra: true,
           upchieve101: true,
-          certifications: ['upchieve101', 'prealgebra']
+          certifications: ['upchieve101', 'prealgebra'],
         })
       )
     })

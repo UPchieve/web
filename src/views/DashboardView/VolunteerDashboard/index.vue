@@ -55,6 +55,7 @@
           </template>
         </TaskCard>
       </template>
+
       <TaskCard
         v-if="shouldShowNotificationsCard"
         id="dashboard-notifications-card"
@@ -245,7 +246,7 @@ export default {
     shouldShowNotificationsCard() {
       return (
         !this.notificationsCardWasDismissed &&
-        !this.didCompleteAllNotificationActions
+        !this.hasCompletedAllNotificationActions
       )
     },
 
@@ -478,13 +479,13 @@ export default {
         ? 'complete'
         : 'not-started'
     },
-    didSetAvailability() {
+    hasSetAvailability() {
       return this.availabilityLastModifiedAt ? 'complete' : 'not-started'
     },
-    didCompleteAllNotificationActions() {
+    hasCompletedAllNotificationActions() {
       return (
         this.webNotificationsStatus === 'complete' &&
-        this.didSetAvailability === 'complete'
+        this.hasSetAvailability === 'complete'
       )
     },
 
@@ -506,7 +507,7 @@ export default {
         {
           title: 'Sign Up for Texts',
           subtitle: this.availabilityLastModifiedAt ? 'Completed' : 'Optional',
-          status: this.didSetAvailability,
+          status: this.hasSetAvailability,
           onClick: this.onClickSignupForTextNotifications,
           icon: SquareTextIcon,
           estimatedTimeToCompleteInMinutes: 1,
@@ -757,6 +758,31 @@ export default {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 40px;
+      align-items: start;
+      grid-auto-flow: dense;
+
+      > *:nth-child(odd) {
+        grid-column: 1;
+      }
+
+      > *:nth-child(even) {
+        grid-column: 2;
+        // This only really works for current configuration
+        // of 3 or less cards, where the left column cards
+        // are longer than the right column.
+        //
+        // We are telling the right column card (there's only 1
+        // ever in it right now) to take up the space of two cell-rows.
+        // The next spot available, then, for the third card (in left column)
+        // is still in that second row of the _first_ column,
+        // meaning we don't get the big gap.
+        //
+        // `masonry` is still experimental, but hopefully it's more
+        // widely used by the time we need an extra card. If not,
+        // we can be hyper-specific about number of cells each child
+        // should take up.
+        grid-row-end: span 2;
+      }
     }
   }
 }

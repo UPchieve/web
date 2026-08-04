@@ -3,17 +3,18 @@ import CaretIcon from '@/assets/right-caret.svg'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { IonModal } from '@ionic/vue'
+import type { Anchor } from 'vuetify'
 
 export type MenuProps = {
-  location: string
+  location: Anchor
   buttonHeightPx: number
   caretThickness: 'regular' | 'bold'
   isOpen: boolean
-  offsetX: number
-  offsetY: number
-  transition: 'scale-transition' | 'slide-x-transition' | 'slide-y-transition'
-  activatorId: string
-  useS2vTheming: boolean
+  offsetX?: number
+  offsetY?: number
+  transition?: 'scale-transition' | 'slide-x-transition' | 'slide-y-transition'
+  activatorId?: Element
+  useS2vTheming?: boolean
 }
 
 const props = withDefaults(defineProps<MenuProps>(), {
@@ -52,7 +53,7 @@ const activatorId = computed(() =>
       :scrim="false"
       :offset="[props.offsetX, props.offsetY]"
       :transition="props.transition"
-      :activator="activatorId"
+      :activator="activatorId ?? undefined"
     >
       <template
         v-if="!props.activatorId"
@@ -112,6 +113,7 @@ const activatorId = computed(() =>
 <style lang="scss" scoped>
 .menu-container {
   position: absolute;
+  right: 0;
 }
 
 .menu-toggle-container {
