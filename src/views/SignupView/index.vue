@@ -37,11 +37,11 @@
       ></loader>
       <div v-else>
         <h1 class="uc-form-header">{{ welcomeMessage }}</h1>
-        <p v-if="isReferredByStudent" class="uc-form-text">
+        <p v-if="userSelection === 'student'" class="uc-form-text">
           UPchieve is a nonprofit that provides 100% free online tutoring and
           college counseling, available 24/7! Check if you are eligible!
         </p>
-        <p v-else-if="isReferredByVolunteer" class="uc-form-text">
+        <p v-else-if="userSelection === 'volunteer'" class="uc-form-text">
           UPchieve is a nonprofit that provides 100% free online tutoring and
           college counseling to low income students in the U.S.
           <br /><br />
@@ -53,7 +53,7 @@
           counseling to eligible middle and high school students.
         </p>
 
-        <div v-if="isReferredByStudent" class="uc-column items-center">
+        <div v-if="userSelection === 'student'" class="uc-column items-center">
           <button
             class="uc-form-button"
             type="submit"
@@ -70,7 +70,10 @@
             >Tell me more about UPchieve first
           </a>
         </div>
-        <div v-else-if="isReferredByVolunteer" class="uc-column items-center">
+        <div
+          v-else-if="userSelection === 'volunteer'"
+          class="uc-column items-center"
+        >
           <button
             class="uc-form-button"
             type="submit"
@@ -202,7 +205,6 @@ export default {
           window.localStorage.setItem('upcReferredByCode', referralCode)
           AnalyticsService.captureEvent(EVENTS.USER_VISITED_REFERRAL_LINK, {
             referralCode,
-            userType: this.referredBy.userType,
           })
         }
       } finally {
@@ -234,12 +236,6 @@ export default {
         return `${capitalize(this.referredBy.firstName)} invited you to UPchieve!`
 
       return 'Welcome to UPchieve!'
-    },
-    isReferredByStudent() {
-      return this.referredBy.userType === this.UserType.student
-    },
-    isReferredByVolunteer() {
-      return this.referredBy.userType === this.UserType.volunteer
     },
   },
 
