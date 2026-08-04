@@ -358,10 +358,10 @@ export default {
        * we only want to show one in the drop down. it's fine to drop the other since we query history
        * by displayName, not id
        */
-      const dedupedSubjects = [
-        ...new Set(topic.subjects.map(({ displayName }) => displayName)),
-      ]
       return this.subjectsByTopics.map((topic) => {
+        const dedupedSubjects = [
+          ...new Set(topic.subjects.map(({ displayName }) => displayName)),
+        ]
         return {
           ...topic,
           subjects: dedupedSubjects,
