@@ -794,13 +794,18 @@ export default {
             acc[subject] = quizInfo.passed
             return acc
           }, {})
+          const certifications = Object.entries(certificationInfo)
+            .filter((entry) => entry[1])
+            .map((entry) => entry[0])
 
+          // Send up certifications as both an array of strings (new) and individual properties per subject (legacy)
           const hasSubjectCertification = getters.hasASubjectCertification
           userProps = {
             ...userProps,
+            certifications,
             ...certificationInfo,
+            hasSubjectCertification,
           }
-          userProps.hasSubjectCertification = hasSubjectCertification
         }
 
         if (getters.hasStudentRole || getters.hasTeacherRole) {
