@@ -89,6 +89,7 @@ export default {
         showCalculator: true,
       },
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
+      [POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM]: null,
     },
   },
   mutations: {
@@ -286,5 +287,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
     isS2VThemingEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.S2V_THEMING],
+    isDashboardAlgorithmEnabled: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM],
   },
 }

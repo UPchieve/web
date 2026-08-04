@@ -3,16 +3,27 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
+import { secondsInMs } from '@/utils/time-utils'
+import { intersection } from 'lodash-es'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export default {
   namespaced: true,
   state: {
     newWaitingStudentAudioElement: null,
     allOpenSessions: [],
+    delayedSessions: new Map(),
     tickIntervalId: null,
     ticks: 0,
   },
   mutations: {
+    addDelayedSession: (state, session) => {
+      state.delayedSessions.set(session.id, session)
+    },
+    removeDelayedSession: (state, session) => {
+      state.delayedSessions.delete(session.id)
+    },
     setNewWaitingStudentAudioElement: (state, element) =>
       (state.newWaitingStudentAudioElement = element),
     setAllOpenSessions: (state, allOpenSessions) =>
@@ -31,6 +42,24 @@ export default {
     },
   },
   actions: {
+    delaySession({ state, commit, dispatch }, { context, session, delayMs }) {
+      if (state.delayedSessions.has(session.id)) {
+        return
+      }
+      commit('addDelayedSession', session)
+      AnalyticsService.captureEvent(EVENTS.SESSION_DELAYED, {
+        sessionId: session.id,
+        subject: session.subTopic,
+      })
+      setTimeout(() => {
+        commit('removeDelayedSession', session)
+        dispatch('alertVolunteer', { context, session })
+        AnalyticsService.captureEvent(EVENTS.SESSION_SHOWN_AFTER_DELAY, {
+          sessionId: session.id,
+          subject: session.subTopic,
+        })
+      }, delayMs)
+    },
     gotoSession({ dispatch }, { context, session }) {
       const { type, subTopic, id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
@@ -46,10 +75,10 @@ export default {
       { context, session }
     ) {
       try {
-        const isUnlockedSession = this.state.user.user.subjects.includes(
-          session.subTopic
+        const isAvailableSession = getters['availableSessions'].some(
+          (s) => s.id === session.id
         )
-        if (isUnlockedSession) {
+        if (isAvailableSession) {
           state.newWaitingStudentAudioElement.play()
         }
       } catch (error) {
@@ -73,20 +102,20 @@ export default {
       const rollupShowing =
         notifications.findIndex(({ id }) => id === 'rollup-alert') > -1
       if (
-        (!isMobile && getters.unlockedOpenSessions.length > 4) ||
-        (isMobile && getters.unlockedOpenSessions.length > 3)
+        (!isMobile && getters.availableSessions.length > 4) ||
+        (isMobile && getters.availableSessions.length > 3)
       ) {
         if (rollupShowing) {
           this.dispatch('notifications/updateTitle', {
             notificationId: 'rollup-alert',
-            title: `There are ${getters.unlockedOpenSessions.length} students that need help`,
+            title: `There are ${getters.availableSessions.length} students that need help`,
           })
         } else {
           this.dispatch('notifications/clear')
           this.dispatch('notifications/add', {
             id: 'rollup-alert',
             icon: StudentIcon,
-            title: `There are ${getters.unlockedOpenSessions.length} students that need help`,
+            title: `There are ${getters.availableSessions.length} students that need help`,
             cta: {
               text: 'Go to dashboard',
               action: () => context.$router.push('/'),
@@ -144,6 +173,8 @@ export default {
       { context, sessions }
     ) {
       const user = this.state.user.user
+      const dashboardAlgorithm =
+        this.getters['featureFlags/isDashboardAlgorithmEnabled']
 
       /*
        * EXPERIMENT: we have a new combined onboarding checklist that shows all available sessions
@@ -196,8 +227,37 @@ export default {
           continue
         }
 
-        if (!user.mutedSubjectAlerts.includes(subTopic)) {
+        const isMuted = user.mutedSubjectAlerts.includes(subTopic)
+
+        if (!isMuted) {
           eligibleSessions.push(session)
+        }
+
+        /*
+         * Experiment: Delay showing low-priority sessions to high-priority volunteers.
+         */
+        if (dashboardAlgorithm) {
+          const totalDelayMs = dashboardAlgorithm?.delayMs ?? secondsInMs(30)
+          const highPrioritySubjects = dashboardAlgorithm?.subjects ?? []
+          const isHighPriorityCoach =
+            intersection(user.subjects, highPrioritySubjects).length && !isMuted
+          const isHighPrioritySession = highPrioritySubjects.includes(subTopic)
+          // Only delay the session if it hasn't already been waiting for at least `totalDelayMs`
+          const sessionAge = new Date(session.createdAt).getTime()
+          const currentTime = new Date().getTime()
+          const remainingDelay = totalDelayMs - (currentTime - sessionAge)
+
+          if (
+            isHighPriorityCoach &&
+            !isHighPrioritySession &&
+            remainingDelay > 0
+          ) {
+            dispatch('delaySession', {
+              session,
+              delayMs: remainingDelay,
+              context,
+            })
+          }
         }
       }
 
@@ -225,7 +285,7 @@ export default {
       // available.
       const oldSessionIds = prevOpenSessions.map((s) => s.id)
       const newSessions = eligibleSessions.filter(
-        (s) => !oldSessionIds.includes(s.id)
+        (s) => !oldSessionIds.includes(s.id) && !state.delayedSessions.has(s.id)
       )
       const newSession = newSessions.length
         ? newSessions[newSessions.length - 1]
@@ -272,12 +332,14 @@ export default {
         rootState.user.user.banType !== 'shadow'
       )
     },
-    unlockedOpenSessions: (state, getters, rootState) => {
+    availableSessions: (state, getters, rootState) => {
       if (getters['isReadyToTutor']) {
         const unlockedSubjects = rootState.user.user.subjects ?? []
         return state.allOpenSessions.filter(
           (session) =>
-            unlockedSubjects.includes(session.subTopic) && !session.isExclusive
+            unlockedSubjects.includes(session.subTopic) &&
+            !session.isExclusive &&
+            !state.delayedSessions.has(session.id)
         )
       } else {
         return []

@@ -133,7 +133,7 @@ const sortByCreatedAt = (first: any, second: any) => {
 }
 
 const sortedUnlockedSessions = computed(() => {
-  const sessions = [...store.getters['volunteer/unlockedOpenSessions']]
+  const sessions = [...store.getters['volunteer/availableSessions']]
   sessions.sort(sortByCreatedAt)
   sessions.forEach((session: any) => {
     session.isUnlocked = true
