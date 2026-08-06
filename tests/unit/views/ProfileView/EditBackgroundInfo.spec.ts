@@ -1,5 +1,6 @@
 import EditBackgroundInfo from '@/views/ProfileView/EditBackgroundInfo.vue'
 import BackgroundInfoField from '@/components/BackgroundInfoField.vue'
+import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import NetworkService from '@/services/NetworkService'
 import UserService from '@/services/UserService'
 import { VolunteerOccupations } from '@/services/VolunteerService'
@@ -7,12 +8,15 @@ import { it, describe, expect, vi, beforeEach } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { createStore } from 'vuex'
 
-function getWrapper(user = {}) {
+function getWrapper(user = {}, { hasExistingStudentSchool = false } = {}) {
   const store = createStore({
     modules: {
       user: {
         namespaced: true,
         state: { user },
+        getters: {
+          hasExistingStudentSchool: () => hasExistingStudentSchool,
+        },
         mutations: {
           updateUser(state, updates) {
             state.user = { ...state.user, ...updates }
@@ -45,6 +49,7 @@ describe('EditBackgroundInfo', () => {
         store.dispatch('user/addToUser', data)
       )
     )
+    ;(NetworkService.setProfile as any).mockClear()
   })
 
   it('starts in read mode showing a fallback message when there is no occupation data', () => {
@@ -150,6 +155,131 @@ describe('EditBackgroundInfo', () => {
       expect.objectContaining({ schoolId: null })
     )
     expect(wrapper.text()).not.toContain('School: Central High')
+  })
+
+  it('clears the existing school when the coach says they cannot find it', async () => {
+    const wrapper = getWrapper({
+      occupation: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      state: 'New York',
+      city: 'New York',
+      schoolId: 'school-123',
+      schoolName: 'Central High',
+    })
+
+    await editButton(wrapper).trigger('click')
+    await wrapper
+      .findComponent(FormSchoolSearch)
+      .vm.$emit('update:modelValue', null)
+    await wrapper
+      .findComponent(FormSchoolSearch)
+      .vm.$emit('update:cannotFindSchool', true)
+    await wrapper
+      .findComponent(FormSchoolSearch)
+      .vm.$emit('selected-school-name', '')
+    await wrapper.vm.$nextTick()
+    await editButton(wrapper).trigger('click')
+    await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick()
+
+    expect(NetworkService.setProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ schoolId: null })
+    )
+    expect(wrapper.text()).not.toContain('School: Central High')
+  })
+
+  it('blocks saving when a US high schooler has not selected a school or said they cannot find it', async () => {
+    const wrapper = getWrapper({
+      occupation: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      state: 'New York',
+      city: 'New York',
+    })
+
+    await editButton(wrapper).trigger('click')
+    await editButton(wrapper).trigger('click')
+
+    expect(NetworkService.setProfile).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="school-required-error"]').exists()).toBe(
+      true
+    )
+    expect(editButton(wrapper).text()).toBe('Save')
+  })
+
+  it('allows saving a US high schooler who says they cannot find their school', async () => {
+    const wrapper = getWrapper({
+      occupation: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      state: 'New York',
+      city: 'New York',
+    })
+
+    await editButton(wrapper).trigger('click')
+    const schoolSearch = wrapper.findComponent(FormSchoolSearch)
+    await schoolSearch.vm.$emit('update:modelValue', null)
+    await schoolSearch.vm.$emit('update:cannotFindSchool', true)
+    await schoolSearch.vm.$emit('selected-school-name', '')
+    await editButton(wrapper).trigger('click')
+    await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick()
+
+    expect(NetworkService.setProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ schoolId: null })
+    )
+    expect(editButton(wrapper).text()).toBe('Edit')
+  })
+
+  it('hides school search and leaves schoolId out of the save payload when the account already has a student school', async () => {
+    const wrapper = getWrapper(
+      {
+        occupation: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+        country: 'United States of America',
+        state: 'New York',
+        city: 'New York',
+        schoolId: 'school-123',
+        schoolName: 'Central High',
+      },
+      { hasExistingStudentSchool: true }
+    )
+
+    await editButton(wrapper).trigger('click')
+    expect(wrapper.findComponent(FormSchoolSearch).exists()).toBe(false)
+
+    await editButton(wrapper).trigger('click')
+    await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick()
+
+    const payload = (NetworkService.setProfile as any).mock.calls.at(-1)[0]
+    expect(Object.hasOwn(payload, 'schoolId')).toBe(false)
+    expect(wrapper.text()).toContain('School: Central High')
+  })
+
+  it('does not clear the student-owned school when unchecking the high-school occupation', async () => {
+    const wrapper = getWrapper(
+      {
+        occupation: [
+          VolunteerOccupations.HIGH_SCHOOL_STUDENT,
+          VolunteerOccupations.WORKING_PART_TIME,
+        ],
+        country: 'United States of America',
+        state: 'New York',
+        city: 'New York',
+        schoolId: 'school-123',
+        schoolName: 'Central High',
+      },
+      { hasExistingStudentSchool: true }
+    )
+
+    await editButton(wrapper).trigger('click')
+    await wrapper
+      .find(`[data-testid="${VolunteerOccupations.HIGH_SCHOOL_STUDENT}"]`)
+      .setValue(false)
+    await editButton(wrapper).trigger('click')
+    await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick()
+
+    const payload = (NetworkService.setProfile as any).mock.calls.at(-1)[0]
+    expect(Object.hasOwn(payload, 'schoolId')).toBe(false)
   })
 
   it('reverts to the previous values and stays in edit mode when saving fails', async () => {

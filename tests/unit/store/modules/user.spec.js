@@ -408,4 +408,32 @@ describe('User store module', () => {
       expect(store.getters['user/hasASubjectCertification']).toEqual(false)
     })
   })
+
+  describe('hasExistingStudentSchool', () => {
+    it('Returns true when a user with the student role has a student school', () => {
+      const store = getStore({
+        user: { state: { user: { studentSchoolId: 'school-abc' } } },
+      })
+      expect(store.getters['user/hasExistingStudentSchool']).toEqual(true)
+    })
+
+    it('Returns false when the user has the student role but no student school', () => {
+      const store = getStore()
+      expect(store.getters['user/hasExistingStudentSchool']).toEqual(false)
+    })
+
+    it('Returns false when the user does not have the student role', () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              roleContext: { roles: ['volunteer'] },
+              studentSchoolId: 'school-abc',
+            },
+          },
+        },
+      })
+      expect(store.getters['user/hasExistingStudentSchool']).toEqual(false)
+    })
+  })
 })

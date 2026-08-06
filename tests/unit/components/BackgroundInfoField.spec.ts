@@ -6,7 +6,7 @@ import { it, describe, expect } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { createStore } from 'vuex'
 
-function getWrapper(props = {}) {
+function getWrapper(props = {}, { hasExistingStudentSchool = false } = {}) {
   return mount(BackgroundInfoField, {
     props: {
       modelValue: [],
@@ -15,6 +15,7 @@ function getWrapper(props = {}) {
       gradeLevel: '',
       highSchoolId: '',
       highSchoolName: '',
+      cannotFindHighSchool: false,
       city: '',
       state: '',
       country: '',
@@ -24,7 +25,13 @@ function getWrapper(props = {}) {
       plugins: [
         createStore({
           modules: {
-            user: { namespaced: true, state: { user: {} } },
+            user: {
+              namespaced: true,
+              state: { user: {} },
+              getters: {
+                hasExistingStudentSchool: () => hasExistingStudentSchool,
+              },
+            },
           },
         }),
       ],
@@ -199,6 +206,71 @@ describe('BackgroundInfoField', () => {
     expect(wrapper.emitted('update:highSchoolName')![0][0]).toBe('Central High')
   })
 
+  it('clears the school when the coach says they cannot find it', async () => {
+    const wrapper = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      highSchoolId: 'school-123',
+      highSchoolName: 'Central High',
+    })
+
+    const schoolSearch = wrapper.findComponent(FormSchoolSearch)
+    expect(schoolSearch.props('allowCannotFindSchool')).toBe(true)
+
+    await schoolSearch.vm.$emit('update:modelValue', null)
+    await schoolSearch.vm.$emit('selected-school-name', '')
+
+    expect(wrapper.emitted('update:highSchoolId')![0][0]).toBe(null)
+    expect(wrapper.emitted('update:highSchoolName')![0][0]).toBe('')
+  })
+
+  it('emits update:cannotFindHighSchool when the coach says they cannot find their school', async () => {
+    const wrapper = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+    })
+
+    await wrapper
+      .findComponent(FormSchoolSearch)
+      .vm.$emit('update:cannotFindSchool', true)
+
+    expect(wrapper.emitted('update:cannotFindHighSchool')![0][0]).toBe(true)
+  })
+
+  it('shows a required-field error for the school field when showInputErrors is true and no school is chosen', () => {
+    const wrapper = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      showInputErrors: true,
+    })
+
+    expect(wrapper.find('[data-testid="school-required-error"]').exists()).toBe(
+      true
+    )
+  })
+
+  it('hides the school required-field error once a school is chosen', () => {
+    const withSchool = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      highSchoolId: 'school-123',
+      showInputErrors: true,
+    })
+    expect(
+      withSchool.find('[data-testid="school-required-error"]').exists()
+    ).toBe(false)
+
+    const cannotFindSchool = getWrapper({
+      modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+      country: 'United States of America',
+      cannotFindHighSchool: true,
+      showInputErrors: true,
+    })
+    expect(
+      cannotFindSchool.find('[data-testid="school-required-error"]').exists()
+    ).toBe(false)
+  })
+
   it('only shows school search for high school students in the United States', () => {
     const internationalStudent = getWrapper({
       modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
@@ -208,5 +280,21 @@ describe('BackgroundInfoField', () => {
     expect(internationalStudent.findComponent(FormSchoolSearch).exists()).toBe(
       false
     )
+  })
+
+  it('hides school search and shows a note when the account already has a student school', () => {
+    const wrapper = getWrapper(
+      {
+        modelValue: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+        country: 'United States of America',
+        highSchoolName: 'Central High',
+      },
+      { hasExistingStudentSchool: true }
+    )
+
+    expect(wrapper.findComponent(FormSchoolSearch).exists()).toBe(false)
+    expect(
+      wrapper.find('[data-testid="school-set-from-student-account"]').exists()
+    ).toBe(true)
   })
 })

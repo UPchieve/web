@@ -33,8 +33,15 @@
             {{ result.name }} ({{ result.city }}, {{ result.state }})
           </div>
           <div v-if="result.cannotFindSchool">
+            <div
+              v-if="allowCannotFindSchool"
+              class="result"
+              data-testid="cannot-find-school-option"
+            >
+              {{ CANNOT_FIND_SCHOOL_OPTION_TEXT }}
+            </div>
             <a
-              v-if="showCannotFindSchoolForm"
+              v-else-if="showCannotFindSchoolForm"
               target="_blank"
               href="https://upchieve.org/cant-find-school"
             >
@@ -92,6 +99,12 @@ export default {
       type: Boolean,
       default: true,
     },
+    // Makes the "can't find my school" row a selectable option rather than a
+    // link out to the eligibility form, which only applies to students.
+    allowCannotFindSchool: {
+      type: Boolean,
+      default: false,
+    },
     selectedEvent: {
       type: String,
       default: EVENTS.STUDENT_SELECTED_SCHOOL,
@@ -100,10 +113,15 @@ export default {
       type: String,
     },
   },
-  emits: ['update:modelValue', 'selected-school-name'],
+  emits: [
+    'update:modelValue',
+    'update:cannotFindSchool',
+    'selected-school-name',
+  ],
 
   created() {
     this.CANNOT_FIND_SCHOOL_TEXT = `Can't find your school?`
+    this.CANNOT_FIND_SCHOOL_OPTION_TEXT = `I can't find my school`
   },
 
   setup() {
@@ -129,6 +147,8 @@ export default {
   methods: {
     async autocompleteSchool(input) {
       this.school = {}
+      // searching again retracts a previous "can't find my school" selection
+      this.$emit('update:cannotFindSchool', false)
 
       if (!this.hasStartedSearchingForSchool && this.startSearchEvent) {
         AnalyticsService.captureEvent(this.startSearchEvent)
@@ -154,23 +174,32 @@ export default {
     },
     getSchoolDisplayName(school) {
       if (school.cannotFindSchool) {
-        return
+        return this.allowCannotFindSchool
+          ? this.CANNOT_FIND_SCHOOL_OPTION_TEXT
+          : undefined
       }
       return `${school.name} (${school.city}, ${school.state})`
     },
     handleSelectSchool(school) {
-      if (school.value === this.CANNOT_FIND_SCHOOL_TEXT) {
+      if (school.cannotFindSchool) {
         if (this.cannotFindSchoolEvent) {
           AnalyticsService.captureEvent(this.cannotFindSchoolEvent)
         }
-      } else {
-        if (this.selectedEvent) {
-          AnalyticsService.captureEvent(this.selectedEvent)
-        }
-        this.school = school || {}
-        this.$emit('update:modelValue', school.id)
-        this.$emit('selected-school-name', school.name)
+        // the sentinel object is what satisfies this field's required check
+        this.school = school
+        this.$emit('update:modelValue', null)
+        this.$emit('update:cannotFindSchool', true)
+        this.$emit('selected-school-name', '')
+        return
       }
+
+      if (this.selectedEvent) {
+        AnalyticsService.captureEvent(this.selectedEvent)
+      }
+      this.school = school
+      this.$emit('update:modelValue', school.id)
+      this.$emit('update:cannotFindSchool', false)
+      this.$emit('selected-school-name', school.name)
     },
 
     onBlur() {

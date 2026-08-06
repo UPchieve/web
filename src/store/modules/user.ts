@@ -62,6 +62,7 @@ type UserStoreGetterValues = {
   isStudent: boolean
   isTeacher: boolean
   hasStudentRole: boolean
+  hasExistingStudentSchool: boolean
   hasVolunteerRole: boolean
   hasTeacherRole: boolean
   isAmbassador: boolean
@@ -550,6 +551,12 @@ export default {
       getters.userRoles.includes('volunteer'),
     hasStudentRole: (_state: UserStoreState, getters: UserStoreGetterValues) =>
       getters.userRoles.includes('student'),
+    // the student role owns this school, so the volunteer forms show it as
+    // already on file instead of asking for it again
+    hasExistingStudentSchool: (
+      state: UserStoreState,
+      getters: UserStoreGetterValues
+    ) => getters.hasStudentRole && !!state.user.studentSchoolId,
     hasVolunteerRole: (
       _state: UserStoreState,
       getters: UserStoreGetterValues

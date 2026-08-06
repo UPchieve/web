@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import CheckBox from '@/components/CheckBox.vue'
@@ -28,6 +28,9 @@ const company = defineModel<string>('company', { default: '' })
 const gradeLevel = defineModel<string>('gradeLevel', { default: '' })
 const highSchoolId = defineModel<string>('highSchoolId', { default: '' })
 const highSchoolName = defineModel<string>('highSchoolName', { default: '' })
+const cannotFindHighSchool = defineModel<boolean>('cannotFindHighSchool', {
+  default: false,
+})
 
 const city = defineModel<string>('city', { default: '' })
 const state = defineModel<string>('state', { default: '' })
@@ -53,9 +56,29 @@ const isInUnitedStates = computed(
   () => country.value === 'United States of America'
 )
 
-const shouldShowSchoolField = computed(
+const hasExistingStudentSchool = computed(
+  () => store.getters['user/hasExistingStudentSchool']
+)
+
+const isUsHighSchooler = computed(
   () => isInHighSchool.value && isInUnitedStates.value
 )
+const shouldShowSchoolField = computed(
+  () => isUsHighSchooler.value && !hasExistingStudentSchool.value
+)
+const shouldShowStudentSchoolNote = computed(
+  () => isUsHighSchooler.value && hasExistingStudentSchool.value
+)
+
+// v-if unmounts the school field, so the values it drives are reset here to
+// keep them from going stale behind a blank field
+watch(shouldShowSchoolField, (shows) => {
+  if (!shows) {
+    highSchoolId.value = ''
+    highSchoolName.value = ''
+    cannotFindHighSchool.value = false
+  }
+})
 
 function isOccupationSelected(occupation: VolunteerOccupations) {
   return occupations.value.includes(occupation)
@@ -163,17 +186,33 @@ function updateHighSchool(name: string) {
         </CheckBox>
       </div>
       <div v-if="shouldShowSchoolField" class="occupation-field__school">
+        <p
+          v-if="props.showInputErrors && !highSchoolId && !cannotFindHighSchool"
+          class="error"
+          data-testid="school-required-error"
+        >
+          Please select your school.
+        </p>
         <FormSchoolSearch
           :isRequired="true"
+          :allowCannotFindSchool="true"
           :label="'What high school do you currently attend?'"
           startSearchEvent=""
           cannotFindSchoolEvent=""
           selectedEvent=""
           :placeholder="highSchoolName || user.schoolName"
           v-model="highSchoolId"
+          v-model:cannotFindSchool="cannotFindHighSchool"
           @selected-school-name="updateHighSchool"
         />
       </div>
+      <p
+        v-else-if="shouldShowStudentSchoolNote"
+        data-testid="school-set-from-student-account"
+        class="background-info__question-description"
+      >
+        We already have your school on file from your student account.
+      </p>
       <template v-if="isCollegeEducated">
         <FormInput
           v-model="college"

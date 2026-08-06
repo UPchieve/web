@@ -24,6 +24,7 @@ const company = ref(user.value.company ?? '')
 const gradeLevel = ref(user.value.gradeLevel ?? '')
 const highSchoolId = ref(user.value.schoolId ?? '')
 const highSchoolName = ref(user.value.schoolName ?? '')
+const cannotFindHighSchool = ref(false)
 const city = ref(user.value.city ?? '')
 const state = ref(user.value.state ?? '')
 const country = ref(user.value.country ?? '')
@@ -63,6 +64,16 @@ const hasOccupationInfo = computed(() => occupations.value.length > 0)
 const isInUnitedStates = computed(
   () => country.value === 'United States of America'
 )
+const isUsHighSchooler = computed(
+  () => isInHighSchool.value && isInUnitedStates.value
+)
+
+const hasExistingStudentSchool = computed(
+  () => store.getters['user/hasExistingStudentSchool']
+)
+const shouldShowSchoolField = computed(
+  () => isUsHighSchooler.value && !hasExistingStudentSchool.value
+)
 
 async function onEditButtonClick() {
   if (!isEditing.value) {
@@ -75,7 +86,10 @@ async function onEditButtonClick() {
     !country.value ||
     !city.value ||
     (isInUnitedStates.value && !state.value) ||
-    occupations.value.length === 0
+    occupations.value.length === 0 ||
+    (shouldShowSchoolField.value &&
+      !highSchoolId.value &&
+      !cannotFindHighSchool.value)
   ) {
     showInputErrors.value = true
     return
@@ -87,11 +101,17 @@ async function onEditButtonClick() {
   const previousGradeLevel = gradeLevel.value
   const previousHighSchoolId = highSchoolId.value
   const previousHighSchoolName = highSchoolName.value
+  const previousCannotFindHighSchool = cannotFindHighSchool.value
   const previousCity = city.value
   const previousCountry = country.value
   const previousState = state.value
 
-  const clearsSchool = !(isInHighSchool.value && isInUnitedStates.value)
+  const clearsSchool =
+    !hasExistingStudentSchool.value && !isUsHighSchooler.value
+  // the student role owns this school, so it stays out of the payload
+  const schoolUpdate = hasExistingStudentSchool.value
+    ? {}
+    : { schoolId: clearsSchool ? null : highSchoolId.value }
 
   try {
     await UserService.setProfile(
@@ -100,9 +120,7 @@ async function onEditButtonClick() {
         college: college.value,
         company: company.value,
         ...(gradeLevel.value ? { gradeLevel: gradeLevel.value } : {}),
-        ...(clearsSchool
-          ? { schoolId: null }
-          : { schoolId: highSchoolId.value }),
+        ...schoolUpdate,
         state: state.value,
         country: country.value,
         city: city.value,
@@ -124,6 +142,7 @@ async function onEditButtonClick() {
     gradeLevel.value = previousGradeLevel
     highSchoolId.value = previousHighSchoolId
     highSchoolName.value = previousHighSchoolName
+    cannotFindHighSchool.value = previousCannotFindHighSchool
     city.value = previousCity
     state.value = previousState
     country.value = previousCountry
@@ -166,7 +185,7 @@ async function onEditButtonClick() {
           </li>
         </ul>
         <div v-if="company && isWorking">Company: {{ company }}</div>
-        <div v-if="highSchoolName && isInHighSchool && isInUnitedStates">
+        <div v-if="highSchoolName && isUsHighSchooler">
           School: {{ highSchoolName }}
         </div>
         <div v-if="gradeLevel && isInHighSchool">
@@ -184,6 +203,7 @@ async function onEditButtonClick() {
       v-model:grade-level="gradeLevel"
       v-model:high-school-id="highSchoolId"
       v-model:high-school-name="highSchoolName"
+      v-model:cannot-find-high-school="cannotFindHighSchool"
       v-model:country="country"
       v-model:city="city"
       v-model:state="state"

@@ -173,7 +173,7 @@
               </p>
               <GradeLevelSelect v-model="gradeLevel" :label="'Grade level'" />
             </template>
-            <template v-if="isInHighSchool && isUnitedStatesSelected">
+            <template v-if="shouldShowSchoolField">
               <label class="uc-form-label occupations-label" for="school">
                 What high school do you currently attend?<span
                   class="background-info__question-required"
@@ -182,12 +182,21 @@
               </label>
               <FormSchoolSearch
                 :isRequired="true"
+                :allowCannotFindSchool="true"
                 startSearchEvent=""
                 cannotFindSchoolEvent=""
                 selectedEvent=""
                 v-model="highSchoolId"
+                v-model:cannotFindSchool="cannotFindHighSchool"
               />
             </template>
+            <p
+              v-else-if="shouldShowStudentSchoolNote"
+              data-testid="school-set-from-student-account"
+              class="background-info__question-description"
+            >
+              We already have your school on file from your student account.
+            </p>
 
             <template v-if="isCollegeEducated">
               <label class="uc-form-label occupations-label" for="college"
@@ -327,6 +336,7 @@ export default {
       college: '',
       company: '',
       highSchoolId: null,
+      cannotFindHighSchool: false,
       signupSourceId: '',
       signupSourcesOptions: [],
       otherSignupSource: '',
@@ -350,6 +360,7 @@ export default {
     }),
     ...mapGetters({
       isStudentVolunteer: 'user/isStudentVolunteer',
+      hasExistingStudentSchool: 'user/hasExistingStudentSchool',
     }),
     hasCompletedBackgroundInfo() {
       return (
@@ -367,6 +378,15 @@ export default {
     },
     isUnitedStatesSelected() {
       return this.country === 'United States of America'
+    },
+    isUsHighSchooler() {
+      return this.isInHighSchool && this.isUnitedStatesSelected
+    },
+    shouldShowSchoolField() {
+      return this.isUsHighSchooler && !this.hasExistingStudentSchool
+    },
+    shouldShowStudentSchoolNote() {
+      return this.isUsHighSchooler && this.hasExistingStudentSchool
     },
     linkedInUrlPattern() {
       return /https?:\/\/(www\.)?linkedin\.com.*\/in\/.{1,}$/
@@ -398,6 +418,16 @@ export default {
     },
     signedUpWithGoogle() {
       return !isEmpty(this.user.issuers)
+    },
+  },
+  watch: {
+    // v-if unmounts the school field, so the values it drives are reset here to
+    // keep them from going stale behind a blank field
+    shouldShowSchoolField(shows) {
+      if (!shows) {
+        this.highSchoolId = null
+        this.cannotFindHighSchool = false
+      }
     },
   },
   methods: {
@@ -460,7 +490,9 @@ export default {
         signupSourceId: this.signupSourceId,
         otherSignupSource: this.otherSignupSource,
         gradeLevel: this.isInHighSchool ? this.gradeLevel : undefined, // only send up if HS occupation remains selected
-        highSchoolId: this.isInHighSchool ? this.highSchoolId : undefined,
+        highSchoolId: this.shouldShowSchoolField
+          ? this.highSchoolId
+          : undefined,
       }
 
       try {
@@ -512,9 +544,9 @@ export default {
         (this.isWorkingFullTime && !this.company) ||
         (this.isInHighSchool && !this.gradeLevel) ||
         (this.shouldShowOtherSignupInput && !this.otherSignupSource) ||
-        (this.isInHighSchool &&
-          this.isUnitedStatesSelected &&
-          !this.highSchoolId)
+        (this.shouldShowSchoolField &&
+          !this.highSchoolId &&
+          !this.cannotFindHighSchool)
       )
     },
   },
