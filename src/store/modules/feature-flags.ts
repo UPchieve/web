@@ -286,6 +286,6 @@ export default {
     isDashboardAlgorithmEnabled: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM],
     isAsyncEssayReviewEnabled: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW],
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW],
   },
 }
