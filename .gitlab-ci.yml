@@ -150,6 +150,9 @@ e2e-test:
     POSTGRES_PASSWORD: Password123 # pragma: allowlist secret
     POSTGRES_USER: admin
     POSTGRES_DB: upchieve
+    # Services can only reached over _their_ native ports, so
+    # the 5500/5501 database ports in we typically use in subway
+    # for the databases will not work..
     POSTGRES_PORT: 5432
     REDIS_HOST: redis
     REDIS_PORT: 6379
@@ -172,23 +175,26 @@ e2e-test:
     - psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -c "SELECT 'OK' AS status;"
     - |
       for file in database/db_init/{schema,auth,local_auth,test_seeds,seed_migrations}.sql; do
-        PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -f $file
+        PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -f $file
       done
     - echo 'Verify Redis is running...'
     - apt-get install -y redis-tools
     - redis-cli -h $REDIS_HOST -p $REDIS_PORT PING
     - echo 'Set environment variables we do not want defaults...'
+    # These env variables will take precedence over the variables in .env file.
     - export SUBWAY_POSTGRES_HOST=$POSTGRES_HOST
     - export SUBWAY_POSTGRES_RO_HOST=$POSTGRES_HOST
     - export SUBWAY_POSTGRES_ANALYTICS_HOST=$POSTGRES_HOST
+    - export SUBWAY_POSTGRES_PORT=$POSTGRES_PORT
     - export SUBWAY_REDIS_HOST=$REDIS_HOST
+    - export SUBWAY_REDIS_PORT=$REDIS_PORT
     - export SUBWAY_SERVER_HOST=localhost:8081
     - export VUE_APP_GOOGLE_RECAPTCHA_KEY=$GOOGLE_RECAPTCHA_KEY
     - echo 'Start subway server...'
-    - pnpm run dev:backend > ../subway.log 2>&1 &
+    - pnpm run e2e:backend > ../subway.log 2>&1 &
     - |
       for i in {1..30}; do
-        if curl -f http://localhost:3000/healthz 2>/dev/null; then
+        if curl -f http://localhost:3001/healthz 2>/dev/null; then
           echo ' Subway is up!'
           break
         fi

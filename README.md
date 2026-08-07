@@ -38,11 +38,10 @@ $ nvm install v24.15.0 && nvm use v24.15.0
 $ pnpm install
  ```
 
-3. Set local environment variables.
+3. Set local environment variables by installing 1Password and Doppler CLIs.
+Instead of copying secrets to an unencrypted `.env` file, we inject the **dev** secrets when starting up the local Vite server with `pnpm run serve` using a Doppler service token (scoped to read-access of the dev secrets only) stored in the 1Password engineering vault.
 
- ```shell
-$ cp .env.template .env.local
- ```
+You'll need read access to the `engineering` vault in 1Password, and to login to 1Password from the CLI before starting the vite server. Since we use a Doppler service token, you do **not** need to login to Doppler.
 
 ### Package Manager
 This project uses [pnpm](https://pnpm.io/) instead of npm. Once [installed](https://pnpm.io/installation), use `pnpm install <dependency>` to install dependencies, and `pnpm run <script>` to run scripts.

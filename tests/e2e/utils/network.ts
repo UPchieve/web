@@ -1,7 +1,7 @@
 // TODO: Pull from environment variables instead.
-const baseUrl = process.env.CI
-  ? 'http://localhost:3000'
-  : 'http://localhost:3001'
+// CI and local both start the backend with `e2e:backend`, which serves on the
+// port set by SUBWAY_API_PORT in subway's .env.e2e.
+const baseUrl = 'http://localhost:3001'
 
 export async function post(route: string, body: Record<string, unknown>) {
   if (!route.startsWith('/')) {
