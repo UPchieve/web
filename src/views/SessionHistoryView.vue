@@ -394,7 +394,14 @@ export default {
   },
   async created() {
     const {
-      query: { page, firstName, subjectName, studentId, volunteerId },
+      query: {
+        page,
+        firstName,
+        subjectName,
+        studentId,
+        volunteerId,
+        hasUnreadDMs,
+      },
     } = this.$route
 
     this.page = parseInt(page ?? this.page)
@@ -402,6 +409,7 @@ export default {
     this.filters.volunteerId = volunteerId ?? this.filters.volunteerId
     this.filters.firstName = firstName ?? this.filters.firstName
     this.filters.subjectName = subjectName ?? this.filters.subjectName
+    this.filters.hasUnreadDMs = hasUnreadDMs ?? this.filters.hasUnreadDMs
 
     await this.fetchSessionHistory()
   },
