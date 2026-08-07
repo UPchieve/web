@@ -85,6 +85,7 @@ export default {
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
+      isAsyncEssayReviewEnabled: 'featureFlags/isAsyncEssayReviewEnabled',
     }),
     title() {
       if (this.modalData.title)
@@ -92,6 +93,12 @@ export default {
           this.startsWithVowel(this.modalData.title) ? 'n' : ''
         } ${this.modalData.title} subject`
       return ''
+    },
+    shouldShowEssayHelpModal() {
+      return (
+        this.isAsyncEssayReviewEnabled &&
+        this.selectedSubtopic === 'applicationEssays'
+      )
     },
   },
   emits: ['enable-accept'],
@@ -107,6 +114,12 @@ export default {
     },
     handleMobileStart(subject) {
       this.setSelectedSubtopic(subject)
+
+      if (this.shouldShowEssayHelpModal) {
+        this.onAccept()
+        return
+      }
+
       const hasSentPushTokenRegister = getCookie('hasSentPushTokenRegister')
 
       if (
@@ -130,7 +143,19 @@ export default {
     onAccept() {
       if (this.selectedSubtopic === '') return
       else if (this.modalData.trainingSelect) this.handleTrainingRedirect()
-      else this.showSurvey = true
+      else if (this.shouldShowEssayHelpModal) {
+        this.$store.dispatch('app/modal/show', {
+          component: 'EssayHelpModal',
+          data: {
+            backText: 'Dashboard',
+            showTemplateButtons: false,
+            topic: this.modalData.topic,
+            subject: this.selectedSubtopic,
+            sessionArgs: this.modalData.sessionArgs,
+            svg: this.modalData.svg,
+          },
+        })
+      } else this.showSurvey = true
     },
     onSurveyCompleted() {
       const queryParams = Object.prototype.hasOwnProperty.call(

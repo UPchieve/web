@@ -99,6 +99,11 @@ const StandaloneBotChatView = () =>
   import('./views/BotConversationsView/StandaloneBotChatView.vue')
 const Totp = () => import('./views/Totp/index.vue')
 const TotpEnroll = () => import('./views/Totp/Enroll.vue')
+const EssayReviewView = () => import('./views/EssayReviewView.vue')
+const AdminEssayReviewList = () =>
+  import('./views/Admin/AdminEssayReviewList.vue')
+const AdminEssayReviewDetail = () =>
+  import('./views/Admin/AdminEssayReviewDetail.vue')
 
 import {
   shouldGoToApply,
@@ -1053,6 +1058,24 @@ const routes: RouteRecordRaw[] = [
     name: 'CoachModeTransition',
     component: CoachModeTransition,
     meta: { protected: true, hideNavigation: true },
+  },
+  {
+    path: '/essay-review',
+    name: 'EssayReviewView',
+    component: EssayReviewView,
+    meta: { protected: true },
+  },
+  {
+    path: '/admin/essay-reviews',
+    name: 'AdminEssayReviewList',
+    component: AdminEssayReviewList,
+    meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/essay-reviews/:submissionId',
+    name: 'AdminEssayReviewDetail',
+    component: AdminEssayReviewDetail,
+    meta: { protected: true, requiresAdmin: true },
   },
   {
     path: '/:pathMatch(.*)*',

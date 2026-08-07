@@ -7,7 +7,7 @@ import type { ImpactStudyCampaign } from '@/types'
 import type { NTHSActionName } from './NTHSGroupService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
-import type { Uuid } from '@/types/shared'
+import type { DateString, Uuid } from '@/types/shared'
 import type {
   TutorBotAddMessagePayload,
   TutorBotAddMessageResponsePublic,
@@ -15,6 +15,10 @@ import type {
   TutorBotNewConversationPublic,
   TutorBotTranscriptPublic,
 } from '@/types/bot-conversations'
+import type {
+  EssayReviewStatus,
+  EssayReviewSubmission,
+} from '@/types/essay-review'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -1517,5 +1521,55 @@ export default {
       this._successHandler,
       this._errorHandler
     )
+  },
+  async submitEssayReview(data: {
+    essay: string
+    essayPurpose?: string
+    essayPrompt?: string
+    additionalContext?: string
+    reviewReasons: string[]
+  }) {
+    try {
+      return await httpPost<{
+        essayReview: {
+          id: Uuid
+          status: EssayReviewStatus
+          submittedAt: DateString
+        }
+      }>(`${API_ROOT}/essay-reviews`, data)
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async adminGetEssayReviews() {
+    try {
+      return await httpGet<{ essayReviews: EssayReviewSubmission[] }>(
+        `${ADMIN_ROOT}/essay-reviews`
+      )
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async adminGetEssayReview(submissionId: string) {
+    try {
+      return await httpGet<{ essayReview: EssayReviewSubmission }>(
+        `${ADMIN_ROOT}/essay-reviews/${submissionId}`
+      )
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async adminUpdateEssayReview(
+    submissionId: string,
+    status: EssayReviewStatus
+  ) {
+    try {
+      return await httpPost<{ essayReview: EssayReviewSubmission }>(
+        `${ADMIN_ROOT}/essay-reviews/${submissionId}`,
+        { status }
+      )
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
   },
 }

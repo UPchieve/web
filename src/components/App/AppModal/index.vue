@@ -47,6 +47,7 @@ import VerificationAppModal from './VerificationAppModal.vue'
 import DeleteAccountConfirmationModal from '@/components/DeleteAccountConfirmationModal.vue'
 import RemoveTeamMemberModal from '@/components/NTHS/RemoveTeamMemberModal.vue'
 import RemoveMemberConfirmation from '@/views/NTHS/RemoveMemberConfirmation.vue'
+import EssayHelpModal from '@/views/DashboardView/StudentDashboard/EssayHelpModal.vue'
 
 export default {
   components: {
@@ -70,6 +71,7 @@ export default {
     DeleteAccountConfirmationModal,
     RemoveTeamMemberModal,
     RemoveMemberConfirmation,
+    EssayHelpModal,
   },
   data() {
     return {

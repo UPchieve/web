@@ -42,6 +42,10 @@
         >Clever Roster</router-link
       >
       <router-link to="admin/nths" class="admin-link btn">NTHS</router-link>
+
+      <router-link to="admin/essay-reviews" class="admin-link btn"
+        >Essay Review</router-link
+      >
     </div>
   </div>
 </template>
