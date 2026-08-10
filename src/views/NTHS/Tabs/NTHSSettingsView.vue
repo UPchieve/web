@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import ModalService from '@/services/ModalService'
 import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
@@ -10,9 +10,9 @@ import SchoolAffiliation from '@/components/NTHS/SchoolAffiliation.vue'
 const store = useStore()
 const group = computed(() => store.state.nths.NTHSGroups?.[0])
 
-const groupMembers = computed(
-  () => store.state.nths.NTHSGroupMembers?.[group.value?.groupInfo?.id]
-)
+const groupMembers = computed(() => {
+  return store.state.nths.NTHSGroupMembers?.[group.value?.groupInfo?.id]
+})
 const currentGroupMember = computed(() =>
   groupMembers.value?.find(
     (member: any) => member.userId === store.state.user.user.id
@@ -21,11 +21,25 @@ const currentGroupMember = computed(() =>
 const isGroupAdmin = computed(
   () => group.value?.memberInfo?.roleName === 'admin'
 )
-function onLeaveTeam() {
-  ModalService.showLeaveTeamModal({
-    isRemovingSelf: true,
-    memberToRemove: currentGroupMember.value,
-  })
+
+const isFetchingGroupMembers = ref(false)
+async function onLeaveTeam() {
+  try {
+    if (!groupMembers.value && group.value) {
+      isFetchingGroupMembers.value = true
+      await store.dispatch(
+        'nths/fetchNTHSGroupMembers',
+        group.value?.groupInfo?.id
+      )
+    }
+
+    ModalService.showLeaveTeamModal({
+      isRemovingSelf: true,
+      memberToRemove: currentGroupMember.value,
+    })
+  } finally {
+    isFetchingGroupMembers.value = false
+  }
 }
 </script>
 
@@ -50,7 +64,8 @@ function onLeaveTeam() {
       @click="onLeaveTeam"
       :showArrow="false"
       class="shrink"
-      >Leave team</LargeButton
+      :disabled="isFetchingGroupMembers"
+      >{{ isFetchingGroupMembers ? '...Loading' : 'Leave Team' }}</LargeButton
     >
   </div>
 </template>
