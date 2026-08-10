@@ -52,12 +52,14 @@ export default {
         subject: session.subTopic,
       })
       setTimeout(() => {
+        if (state.allOpenSessions.some((sess) => sess.id === session.id)) {
+          AnalyticsService.captureEvent(EVENTS.SESSION_SHOWN_AFTER_DELAY, {
+            sessionId: session.id,
+            subject: session.subTopic,
+          })
+          dispatch('alertVolunteer', { context, session })
+        }
         commit('removeDelayedSession', session)
-        dispatch('alertVolunteer', { context, session })
-        AnalyticsService.captureEvent(EVENTS.SESSION_SHOWN_AFTER_DELAY, {
-          sessionId: session.id,
-          subject: session.subTopic,
-        })
       }, delayMs)
     },
     gotoSession({ dispatch }, { context, session }) {
