@@ -42,7 +42,6 @@ test.describe('Session', async () => {
     await studentLogin.loginWith(studentUser)
     await studentPage.waitForURL('**/dashboard')
     if (studentDashboard.isMobile) {
-      await studentDashboard.dismissJourneyModal()
       await studentPage.getByTestId('download-app-close-button').click()
     }
 
@@ -56,9 +55,6 @@ test.describe('Session', async () => {
     await volunteerLogin.loginWith(volunteerUser)
     await volunteerPage.waitForURL('**/dashboard')
 
-    if (!studentDashboard.isMobile) {
-      await studentDashboard.dismissJourneyModal()
-    }
     const { sessionId } = await studentDashboard.createSessionFor({
       subject: 'math',
       topic: 'prealgebra',

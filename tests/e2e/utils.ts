@@ -152,7 +152,6 @@ export const loginStudent = async (
   await studentLogin.goto()
   await studentLogin.loginWith(studentUser)
   await studentPage.waitForURL('**/dashboard')
-  await studentDashboard.dismissJourneyModal()
   if (studentDashboard.isMobile) {
     await studentPage.getByTestId('download-app-close-button').click()
   }

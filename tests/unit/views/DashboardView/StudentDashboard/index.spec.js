@@ -1,7 +1,6 @@
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import StudentDashboard from '@/views/DashboardView/StudentDashboard/index.vue'
 import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection/index.vue'
-import JourneyModal from '@/views/DashboardView/StudentDashboard/JourneyModal.vue'
 import { shallowMount } from '@vue/test-utils'
 import { storeOptions } from '@/store'
 import { merge } from 'lodash-es'
@@ -59,25 +58,5 @@ describe('StudentDashboard', () => {
       '[data-testid="grade-level-select"]'
     )
     expect(gradeLevelComponent.exists()).toBe(true)
-  })
-
-  test('shows journey modal when not seen before', async () => {
-    const wrapper = getWrapper()
-
-    await wrapper.vm.$nextTick()
-
-    const journeyModal = wrapper.findComponent(JourneyModal)
-    expect(journeyModal.exists()).toBe(true)
-  })
-
-  test('does not show journey modal when already seen', async () => {
-    localStorage.setItem('seenJourneyModal', 'true')
-
-    const wrapper = getWrapper()
-
-    await wrapper.vm.$nextTick()
-
-    const journeyModal = wrapper.findComponent(JourneyModal)
-    expect(journeyModal.exists()).toBe(false)
   })
 })

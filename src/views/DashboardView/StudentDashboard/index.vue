@@ -57,8 +57,6 @@
       :impactStudyCampaignId="impactStudySurveyCampaignId"
     />
 
-    <journey-modal v-if="showJourneyModal" :closeModal="toggleJourneyModal" />
-
     <update-school-modal />
 
     <secondary-email-modal
@@ -97,7 +95,6 @@ import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import StudentAssignments from '@/components/StudentAssignments.vue'
 import OnboardingModal from '@/components/OnboardingModal.vue'
-import JourneyModal from './JourneyModal.vue'
 import Student_Onboarding_Frame1 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame1.avif?url'
 import Student_Onboarding_Frame2 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame2.avif?url'
 import Student_Onboarding_Frame3 from '@/assets/student_onboarding_frames/Student_Onboarding_Frame3.avif?url'
@@ -143,7 +140,6 @@ export default {
     LargeButton,
     StudentAssignments,
     OnboardingModal,
-    JourneyModal,
   },
   beforeMount() {
     if (BrowserStorageService.getGradeLevelTaskFromStorage()) {
@@ -241,8 +237,6 @@ export default {
       // We have to reset here so that this isn't triggered on every dashboard view
       this.$store.dispatch('user/updateHadASession', false)
     }
-
-    if (this.shouldSeeJourneyModal) this.showJourneyModal = true
   },
   data() {
     return {
@@ -251,7 +245,6 @@ export default {
       assignments: [],
       onboardingFrames: [],
       showImpactStudySurveyModal: false,
-      showJourneyModal: false,
       dismissedSecondaryEmailModal: false,
       impactStudySurveyCampaignId: '',
       hasGradeLevel: false,
@@ -342,10 +335,6 @@ export default {
         return JSON.parse(cacheHit)
       return undefined
     },
-    shouldSeeJourneyModal() {
-      const hasSeen = localStorage.getItem('seenJourneyModal')
-      return !hasSeen
-    },
   },
   methods: {
     setGradeLevelTaskDismissed() {
@@ -373,9 +362,6 @@ export default {
     },
     toggleImpactStudySurveyModal() {
       this.showImpactStudySurveyModal = !this.showImpactStudySurveyModal
-    },
-    toggleJourneyModal() {
-      this.showJourneyModal = !this.showJourneyModal
     },
     triggerIncentiveEnrollmentModal() {
       if (this.showFallIncentiveEnrollmentModal) return
@@ -519,9 +505,6 @@ export default {
     volunteerSubjectPresenceVariant(currentValue, prevValue) {
       if (currentValue && !prevValue)
         this.scheduleVolunteerPresenceNotification()
-    },
-    shouldSeeJourneyModal(currentValue, prevValue) {
-      if (currentValue && !prevValue) this.showJourneyModal = true
     },
   },
 }
