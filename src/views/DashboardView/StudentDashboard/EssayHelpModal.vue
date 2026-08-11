@@ -75,7 +75,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="EssayHelpModal">
+  <div class="essay-help">
     <presession-survey
       v-if="showSurvey"
       :subject="modalData.subject"
@@ -85,7 +85,7 @@ defineExpose({
     <template v-else>
       <button
         type="button"
-        class="EssayHelpModal-close"
+        class="essay-help-close"
         aria-label="Close"
         @click="closeModal"
       >
@@ -95,45 +95,44 @@ defineExpose({
       <component
         v-if="typeof modalData.svg === 'object'"
         :is="modalData.svg"
-        class="EssayHelpModal-icon"
+        class="essay-help-icon"
       />
 
       <img
         v-else
         :src="modalData.svg"
         alt=""
-        class="EssayHelpModal-icon"
+        class="essay-help-icon"
         aria-hidden="true"
       />
 
-      <h1 class="EssayHelpModal-title">How would you like help?</h1>
+      <h1 class="essay-help-title">How would you like help?</h1>
 
-      <div class="EssayHelpModal-options">
+      <div class="essay-help-options">
         <button
           type="button"
-          class="EssayHelpModal-option"
+          class="essay-help-option"
           data-testid="essay-live-chat-option"
           @click="startLiveChat"
         >
-          <span class="EssayHelpModal-option-title">Chat with a coach</span>
+          <span class="essay-help-option-title">Chat with a coach</span>
 
-          <span class="EssayHelpModal-option-description">
+          <span class="essay-help-option-description">
             Work on your essay together in a live session.
           </span>
         </button>
 
         <button
           type="button"
-          class="EssayHelpModal-option"
+          class="essay-help-option"
           data-testid="essay-review-option"
           @click="startEssayReview"
         >
-          <span class="EssayHelpModal-option-title">
-            Get written feedback
-          </span>
+          <span class="essay-help-option-title">Get written feedback</span>
 
-          <span class="EssayHelpModal-option-description">
-            Submit your essay and hear back within 24 hours.
+          <span class="essay-help-option-description">
+            Submit your essay for review by 3 coaches and hear back within 24
+            hours.
           </span>
         </button>
       </div>
@@ -142,13 +141,13 @@ defineExpose({
 </template>
 
 <style lang="scss" scoped>
-.EssayHelpModal {
+.essay-help {
   position: relative;
   width: 100%;
   text-align: center;
 }
 
-.EssayHelpModal-close {
+.essay-help-close {
   position: absolute;
   top: 0;
   right: 0;
@@ -164,18 +163,18 @@ defineExpose({
   }
 }
 
-.EssayHelpModal-icon {
+.essay-help-icon {
   width: 80px;
   height: 80px;
   margin-bottom: 16px;
 }
 
-.EssayHelpModal-title {
+.essay-help-title {
   @include font-category('display-small');
   margin: 0 0 24px;
 }
 
-.EssayHelpModal-options {
+.essay-help-options {
   display: grid;
   gap: 16px;
   text-align: left;
@@ -185,7 +184,7 @@ defineExpose({
   }
 }
 
-.EssayHelpModal-option {
+.essay-help-option {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -205,12 +204,12 @@ defineExpose({
   }
 }
 
-.EssayHelpModal-option-title {
+.essay-help-option-title {
   @include font-category('heading');
   font-weight: 600;
 }
 
-.EssayHelpModal-option-description {
+.essay-help-option-description {
   @include font-category('helper-text');
   color: $c-secondary-grey;
 }

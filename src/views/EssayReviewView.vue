@@ -136,7 +136,7 @@ onMounted(() => {
       <h1>Get your essay reviewed</h1>
 
       <p>
-        Share your draft with our coaches and get written feedback within 24
+        Share your draft with 3 coaches and get written feedback within 24
         hours.
       </p>
     </header>
@@ -148,7 +148,7 @@ onMounted(() => {
           <h2>Add your essay</h2>
         </div>
 
-        <div class="fieldGroup">
+        <div class="field-group">
           <label for="essay">Write or paste your essay</label>
 
           <textarea
@@ -184,7 +184,7 @@ onMounted(() => {
           <h2>Tell us what you need help with</h2>
         </div>
 
-        <div class="fieldGroup">
+        <div class="field-group">
           <label for="essayPurpose">What is this essay for?</label>
 
           <input
@@ -197,7 +197,7 @@ onMounted(() => {
           />
         </div>
 
-        <div class="fieldGroup">
+        <div class="field-group">
           <label for="essayPrompt">What prompt are you answering?</label>
 
           <textarea
@@ -225,7 +225,7 @@ onMounted(() => {
             <span>Choose up to {{ maxReviewReasons }}</span>
           </legend>
 
-          <div class="chipList">
+          <div class="chip-list">
             <button
               v-for="reason in reviewReasonOptions"
               :key="reason"
@@ -242,7 +242,7 @@ onMounted(() => {
           </div>
         </fieldset>
 
-        <div class="fieldGroup">
+        <div class="field-group">
           <label for="additionalContext">
             Is there anything else we should know?
             <span class="optionalLabel">Optional</span>
@@ -291,11 +291,11 @@ onMounted(() => {
   </div>
 
   <div v-else class="essay-review">
-    <div class="successCard">
+    <div>
       <h1>Your essay is on its way!</h1>
 
       <p>
-        Our team will review your essay and email your feedback within
+        3 coaches will review your essay and email your feedback within
         <strong>24 hours.</strong>
       </p>
 
@@ -304,9 +304,7 @@ onMounted(() => {
         live tutoring session.
       </p>
 
-      <router-link class="dashboardButton" to="/dashboard">
-        Back to dashboard
-      </router-link>
+      <router-link to="/dashboard"> Back to dashboard </router-link>
     </div>
   </div>
 </template>
@@ -412,7 +410,7 @@ onMounted(() => {
   font-weight: 700;
 }
 
-.fieldGroup {
+.field-group {
   display: grid;
   gap: 8px;
 
@@ -509,7 +507,7 @@ input {
   }
 }
 
-.chipList {
+.chip-list {
   display: flex;
   flex-wrap: wrap;
   gap: 9px;
