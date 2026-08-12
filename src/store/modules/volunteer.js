@@ -33,12 +33,9 @@ export default {
     incTicks: (state) => (state.ticks = state.ticks + 1),
     resetTicks: (state) => (state.ticks = 0),
     removeSession: (state, sessionId) => {
-      const indexOfSession = state.allOpenSessions.findIndex(
-        (session) => session.id === sessionId
+      state.allOpenSessions = state.allOpenSessions.filter(
+        (s) => s.id !== sessionId
       )
-      if (indexOfSession >= 0) {
-        state.allOpenSessions.splice(indexOfSession, 1)
-      }
     },
   },
   actions: {
@@ -76,13 +73,14 @@ export default {
       { state, dispatch, rootGetters, getters },
       { context, session }
     ) {
+      const isAvailableSession = getters['availableSessions'].some(
+        (s) => s.id === session.id
+      )
+      if (!isAvailableSession) {
+        return
+      }
       try {
-        const isAvailableSession = getters['availableSessions'].some(
-          (s) => s.id === session.id
-        )
-        if (isAvailableSession) {
-          state.newWaitingStudentAudioElement.play()
-        }
+        state.newWaitingStudentAudioElement.play()
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log('Unable to play audio', error)
@@ -273,6 +271,8 @@ export default {
         (session) => !eligibleSessions.some((s) => s.id === session.id)
       )
       for (const removedSession of removedSessions) {
+        // If a locked session was cancelled or picked up, let it remain in the list for
+        // a short time to give the coach a chance to still click on it to take the cert quiz.
         this.dispatch('notifications/remove', removedSession.id)
         const isLockedSession = !user.subjects.includes(removedSession.subTopic)
         if (isLockedSession) {
