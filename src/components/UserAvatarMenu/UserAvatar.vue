@@ -108,21 +108,29 @@ const userAccountType = computed(() => {
     <div class="core-info-container">
       <span class="first-name">{{ user.firstName }}</span>
       <div v-if="props.showAccountModeLabel">
-        <span class="secondary-info">{{ userAccountType }}</span>
-        <QuestionIcon
-          v-if="showAmbassadorTitle"
-          class="ambassador-tooltip-icon"
-          id="ambassador-tooltip-icon"
-          @click.stop
-        />
-        <ion-popover
-          alignment="center"
-          :showBackdrop="false"
-          trigger="ambassador-tooltip-icon"
-          trigger-action="click"
+        <div
+          :class="[
+            'secondary-info',
+            { 'ambassador-info': showAmbassadorTitle },
+          ]"
         >
-          {{ ambassadorTooltipText }}
-        </ion-popover>
+          {{ userAccountType }}
+          <div v-if="showAmbassadorTitle">
+            <QuestionIcon
+              class="ambassador-tooltip-icon"
+              id="ambassador-tooltip-icon"
+              @click.stop
+            />
+            <ion-popover
+              alignment="center"
+              :showBackdrop="false"
+              trigger="ambassador-tooltip-icon"
+              trigger-action="click"
+            >
+              {{ ambassadorTooltipText }}
+            </ion-popover>
+          </div>
+        </div>
       </div>
       <div v-if="props.showSessionStatusLabel">
         <div
@@ -153,7 +161,7 @@ const userAccountType = computed(() => {
   flex-direction: row;
   gap: 8px;
   align-items: center;
-  padding: 4px 0px 4px 8px;
+  padding: 4px;
 }
 
 .avatar-container {
@@ -277,7 +285,13 @@ ion-popover::part(content) {
   font-size: 14px;
   line-height: 1.15;
   margin-bottom: 0;
-  white-space: nowrap;
+}
+
+.ambassador-info {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  gap: 8px;
 }
 
 .shake {

@@ -229,8 +229,8 @@ hr {
 .main-container {
   display: grid;
   grid-template-rows: 1fr;
-  grid-template-columns: [avatar] 0.3fr [details] 0.4fr [menu-button] 0.3fr;
-  grid-column-gap: 8px;
+  grid-template-columns: [avatar-info] 0.95fr [menu-button] 0.05fr;
+  grid-column-gap: 4px;
   align-items: center;
   width: 100%;
 
@@ -243,7 +243,7 @@ hr {
 
 .user-avatar {
   grid-row: 1;
-  grid-column: avatar;
+  grid-column: avatar-info;
 }
 
 .session-status-container {
