@@ -7,6 +7,9 @@ const $store = useStore()
 
 const isAuthenticated = computed(() => $store.getters['user/isAuthenticated'])
 const isUserMenuOpen = ref<boolean>(false)
+function toggleIsUserMenuOpen() {
+  isUserMenuOpen.value = !isUserMenuOpen.value
+}
 </script>
 
 <template>
@@ -18,13 +21,14 @@ const isUserMenuOpen = ref<boolean>(false)
       :aria-label="isUserMenuOpen ? 'Close user menu' : 'Open user menu'"
       :aria-expanded="isUserMenuOpen"
       aria-haspopup="menu"
+      @click="toggleIsUserMenuOpen"
     >
       <UserAvatarMenu
         id="user-avatar-menu"
         :showSessionStatusLabel="false"
         :showAccountModeLabel="true"
-        v-model:isMenuOpen="isUserMenuOpen"
-        activatorId="info-container"
+        :isMenuOpen="isUserMenuOpen"
+        @changedOpenState="toggleIsUserMenuOpen"
       />
     </div>
     <hr class="ml-2 mr-2" />

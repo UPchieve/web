@@ -37,5 +37,6 @@ watch(
   --secondary-text-color: #e8e6e6;
   --bg-color: #16213a;
   --switch-role-button-color: #b2c8f7;
+  --hover-text-color: $c-soft-black;
 }
 </style>

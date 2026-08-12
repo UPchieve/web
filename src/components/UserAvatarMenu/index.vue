@@ -13,7 +13,6 @@ const props = withDefaults(
     showAccountModeLabel: boolean
     showSessionStatusLabel: boolean
     isMenuOpen: boolean
-    activatorId: string
   }>(),
   {
     showAccountModeLabel: true,
@@ -46,6 +45,7 @@ function logout() {
 const emit = defineEmits<{
   (e: 'update:isMenuOpen', value: boolean): void
   (e: 'switchModeError', message: string): void
+  (e: 'changedOpenState'): void
 }>()
 const isMenuOpen = computed({
   get: () => props.isMenuOpen,
@@ -90,11 +90,11 @@ function resetErrorMessage() {
       v-model:isOpen="isMenuOpen"
       class="user-menu"
       location="bottom center"
-      caretThickness="regular"
+      caretThickness="bold"
       :buttonHeightPx="12"
       transition="slide-y-transition"
-      :activatorId="props.activatorId"
       :useS2vTheming="isS2VThemingEnabled"
+      @update:isOpen="emit('changedOpenState')"
     >
       <template v-slot:content>
         <div
@@ -150,27 +150,35 @@ function resetErrorMessage() {
             {{ errorMessage }}
           </div>
           <hr />
-          <div
-            class="menu-row"
-            role="button"
-            tabindex="0"
-            @click.stop="goTo('/profile')"
-            @keydown.stop.enter="goTo('/profile')"
-            data-testid="menu-row-profile"
-          >
-            Profile
-          </div>
-          <hr />
-          <div
-            class="menu-row"
-            role="button"
-            tabindex="0"
-            @click.stop="logout"
-            @keydown.stop.enter="logout"
-            data-testid="menu-row-logout"
-          >
-            Log out of UPchieve
-          </div>
+          <table>
+            <tr>
+              <td>
+                <div
+                  role="button"
+                  tabindex="0"
+                  @click.stop="goTo('/profile')"
+                  @keydown.stop.enter="goTo('/profile')"
+                  data-testid="menu-row-profile"
+                >
+                  Profile
+                </div>
+              </td>
+            </tr>
+            <hr />
+            <tr>
+              <td>
+                <div
+                  role="button"
+                  tabindex="0"
+                  @click.stop="logout"
+                  @keydown.stop.enter="logout"
+                  data-testid="menu-row-logout"
+                >
+                  Log out of UPchieve
+                </div>
+              </td>
+            </tr>
+          </table>
         </div>
       </template>
     </Menu>
@@ -198,7 +206,13 @@ function resetErrorMessage() {
   color: $c-soft-black;
 }
 
-.menu-row {
+tr {
+  cursor: pointer;
+  &:hover {
+    background-color: lighten($c-information-blue, 50%);
+    color: var(--hover-text-color);
+  }
+
   display: flex;
   flex-direction: row;
   align-items: center;

@@ -12,7 +12,6 @@ const props = defineProps<{
 const emit = defineEmits(['toggleShowLockedSessions'])
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 const tooltipText = "See sessions in subjects you haven't unlocked yet"
-const lockedSessionsLabel = '🔒Locked sessions'
 </script>
 
 <template>
@@ -24,7 +23,7 @@ const lockedSessionsLabel = '🔒Locked sessions'
       }"
     >
       <label for="show-locked-sessions-toggle" class="setting-label">
-        {{ lockedSessionsLabel }}</label
+        🔒 Locked sessions</label
       >
       <!--      Desktop view uses a tooltip-->
       <span

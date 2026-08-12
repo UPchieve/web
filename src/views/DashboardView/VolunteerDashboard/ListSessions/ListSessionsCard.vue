@@ -78,7 +78,7 @@ function toggleMenuOpen(value: boolean) {
       <template v-slot:heading-content>
         <div class="heading-content">
           <Menu
-            location="bottom start"
+            location="bottom center"
             :buttonHeightPx="20"
             caretThickness="bold"
             :isOpen="isMenuOpen"

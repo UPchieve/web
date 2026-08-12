@@ -13,7 +13,6 @@ export type MenuProps = {
   offsetX?: number
   offsetY?: number
   transition?: 'scale-transition' | 'slide-x-transition' | 'slide-y-transition'
-  activatorId?: Element
   useS2vTheming?: boolean
 }
 
@@ -38,14 +37,10 @@ const isMenuOpen = computed({
   get: () => props.isOpen,
   set: (value) => emit('update:isOpen', value),
 })
-
-const activatorId = computed(() =>
-  props.activatorId ? `#${props.activatorId}` : null
-)
 </script>
 
 <template>
-  <div class="menu-container">
+  <div>
     <v-menu
       v-model="isMenuOpen"
       :location="props.location"
@@ -53,12 +48,8 @@ const activatorId = computed(() =>
       :scrim="false"
       :offset="[props.offsetX, props.offsetY]"
       :transition="props.transition"
-      :activator="activatorId ?? undefined"
     >
-      <template
-        v-if="!props.activatorId"
-        v-slot:activator="{ props: activatorProps }"
-      >
+      <template v-slot:activator="{ props: activatorProps }">
         <div
           class="menu-toggle-container"
           data-testid="menu-container"
@@ -88,6 +79,7 @@ const activatorId = computed(() =>
         :can-dismiss="true"
         presentation="sheet"
         :class="['menu-modal', { s2v: props.useS2vTheming }]"
+        @didDismiss="(e) => emit('update:isOpen', e)"
       >
         <slot name="content" />
       </IonModal>
@@ -97,25 +89,9 @@ const activatorId = computed(() =>
       </div>
     </v-menu>
   </div>
-  <!--  If there is another element being used as the activator, still render the caret to animate as the-->
-  <!--  menu opens or closes-->
-  <CaretIcon
-    v-if="props.activatorId"
-    :class="[
-      'caret',
-      { 'caret--open': isMenuOpen },
-      { 'caret--regular': props.caretThickness === 'regular' },
-      { 'caret--bold': props.caretThickness === 'bold' },
-    ]"
-  />
 </template>
 
 <style lang="scss" scoped>
-.menu-container {
-  position: absolute;
-  right: 0;
-}
-
 .menu-toggle-container {
   display: flex;
   flex-direction: column;
