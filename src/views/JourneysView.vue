@@ -29,6 +29,9 @@ type Journey = {
 const $router = useRouter()
 const store = useStore()
 const selectedJourney = ref<Journey | undefined>(undefined)
+const isAsyncEssayReviewEnabled = computed(
+  () => store.getters['featureFlags/isAsyncEssayReviewEnabled']
+)
 
 const journeys = computed(() => [
   {
@@ -93,6 +96,7 @@ async function startSession(journeyStep: JourneyStep, stepNumber: number) {
   if (!selectedJourney.value) return
   const { title, sessionTopic, sessionSubject } = journeyStep
   const { dropdownLabel, key } = selectedJourney.value
+
   await store.commit('session/setJourneySessionData', {
     dropdownLabel,
     key,
@@ -100,6 +104,26 @@ async function startSession(journeyStep: JourneyStep, stepNumber: number) {
     title,
     subject: sessionSubject,
   })
+
+  if (
+    isAsyncEssayReviewEnabled.value &&
+    sessionSubject === 'applicationEssays'
+  ) {
+    store.dispatch('app/modal/show', {
+      component: 'EssayHelpModal',
+      data: {
+        backText: 'Dashboard',
+        showTemplateButtons: false,
+        topic: sessionTopic,
+        subject: sessionSubject,
+        sessionArgs: {},
+        svg: TutorIcon,
+        skipPresessionSurvey: true,
+      },
+    })
+
+    return
+  }
   $router.push(`/session/${sessionTopic}/${sessionSubject}`)
 }
 

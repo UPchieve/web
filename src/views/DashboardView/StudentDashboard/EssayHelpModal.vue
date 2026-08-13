@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import CrossIcon from '@/assets/cross.svg'
@@ -13,6 +13,7 @@ interface EssayHelpModalData {
   subject: string
   sessionArgs?: Record<string, unknown>
   svg: string | object
+  skipPresessionSurvey?: boolean
 }
 
 const props = defineProps<{
@@ -21,6 +22,10 @@ const props = defineProps<{
 
 const store = useStore()
 const router = useRouter()
+
+const journeySessionData = computed(
+  () => store.state.session.journeySessionData
+)
 
 const showSurvey = ref(false)
 
@@ -49,6 +54,11 @@ function startLiveChat() {
     subject: props.modalData.subject,
   })
 
+  if (props.modalData.skipPresessionSurvey) {
+    onSurveyCompleted()
+    return
+  }
+
   showSurvey.value = true
 }
 
@@ -56,6 +66,14 @@ function startEssayReview() {
   AnalyticsService.captureEvent(EVENTS.STUDENT_SELECTED_ASYNC_ESSAY_HELP, {
     subject: props.modalData.subject,
   })
+
+  if (journeySessionData.value) {
+    AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_SESSION_REQUESTED, {
+      ...journeySessionData,
+      isAsyncEssay: true,
+    })
+    store.commit('session/setJourneySessionData', undefined)
+  }
 
   router.push('/essay-review')
 }

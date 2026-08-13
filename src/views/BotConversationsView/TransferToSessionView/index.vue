@@ -3,6 +3,7 @@ import TransferToSessionButton from '@/views/BotConversationsView/TransferToSess
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 import { useStore } from 'vuex'
 import { computed } from 'vue'
+import TutorIcon from '@/assets/icons/graduation_cap_icon.svg'
 
 const store = useStore()
 
@@ -20,12 +21,37 @@ const cooldownMinutes = computed(
   () => store.getters['session/sessionRequestCooldownMinutes']
 )
 
+const isAsyncEssayReviewEnabled = computed(
+  () => store.getters['featureFlags/isAsyncEssayReviewEnabled']
+)
+
 const showPresessionSurvey = () => {
   if (currentConversationId.value) {
     store.commit(
       'botConversations/setPendingTransferredConversationId',
       currentConversationId.value
     )
+  }
+
+  if (
+    isAsyncEssayReviewEnabled.value &&
+    props.topic === 'college' &&
+    props.subject === 'essays'
+  ) {
+    store.dispatch('app/modal/show', {
+      component: 'EssayHelpModal',
+      data: {
+        backText: 'Dashboard',
+        showTemplateButtons: false,
+        topic: props.topic,
+        subject: props.subject,
+        sessionArgs: {},
+        svg: TutorIcon,
+        skipPresessionSurvey: false,
+      },
+    })
+
+    return
   }
 
   store.dispatch('app/modal/show', {
