@@ -53,8 +53,8 @@ const COMMUNITY_LINK = {
 // Admin links
 const ADMIN_LINK = { to: '/admin', text: 'Admin' }
 const NTHS_APPLY_LINK = { to: '/groups/apply', text: 'Apply to NTHS' }
-const NTHS_CREATE_TEAM_LINK = { to: '/groups/create', text: 'NTHS Team' }
-const NTHS_TEAM_LINK = { to: '/groups', text: 'NTHS Team' }
+const NTHS_CREATE_TEAM_LINK = { to: '/groups/create', text: 'NTHS' }
+const NTHS_TEAM_LINK = { to: '/groups', text: 'NTHS' }
 
 // Links organized by route & user type. Array indices of the links are important.
 const links = {

@@ -148,7 +148,7 @@
                 ? '/groups/apply'
                 : '/groups'
           "
-          :text="showApplyForNTHSLink ? 'Apply to NTHS' : 'NTHS Team'"
+          :text="showApplyForNTHSLink ? 'Apply to NTHS' : 'NTHS'"
           id="nths-group-sidebar-link"
         >
           <groups-icon class="icon" />
@@ -173,7 +173,7 @@
         <sidebar-link
           v-if="shouldShowStudentToVolunteerHoursPage"
           to="/volunteer-hours"
-          text="Service Hours"
+          text="Volunteer Hours"
           id="hour-calculator-modal-link"
         >
           <calculator-icon class="icon" />
