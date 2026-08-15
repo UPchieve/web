@@ -339,6 +339,11 @@ import { backOff } from 'exponential-backoff'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import LoggerService from '@/services/LoggerService'
 import { socket } from '@/socket'
+import { getShareInfoFields } from '@/services/BrowserStorageService'
+import {
+  buildShareInfoMessage,
+  volunteerDataFromUser,
+} from '@/utils/build-share-info-message'
 import FeatureFlagService from '@/services/FeatureFlagService'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import LiveMediaChatHeader from '@/components/ScreenShare/LiveMediaChatHeader.vue'
@@ -1055,6 +1060,17 @@ export default {
 
             if (success) {
               this.isSocketSessionRoomConnected = true
+
+              if (this.isVolunteer) {
+                const fields = getShareInfoFields(this.user.id) ?? []
+                socket.emit(
+                  'sessions/share-info:opt-in',
+                  buildShareInfoMessage(
+                    fields,
+                    volunteerDataFromUser(this.user)
+                  )
+                )
+              }
             }
           },
           {

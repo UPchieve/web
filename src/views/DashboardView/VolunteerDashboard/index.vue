@@ -117,6 +117,14 @@
       :closeModal="toggleNextTaskModal"
       :nextTask="nextTask"
     />
+    <volunteer-share-info-modal
+      v-if="showShareInfoModal"
+      :closeModal="toggleShareInfoModal"
+      :volunteerOccupations="volunteerInfo.occupations"
+      :numSessionsTutored="volunteerInfo.numSessionsTutored"
+      :numStudentsTutored="volunteerInfo.numStudentsTutored"
+      :totalHoursTutored="volunteerInfo.totalHoursTutored"
+    />
   </div>
 </template>
 
@@ -147,6 +155,8 @@ import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessi
 import JoinedTeamModal from './JoinedTeamModal.vue'
 import { quizRoute } from '@/utils/quiz-route'
 import ImpactSummaryCard from '@/components/ImpactSummaryCard.vue'
+import VolunteerShareInfoModal from './VolunteerShareInfoModal.vue'
+import { hasAnsweredShareInfoOptIn } from '@/services/BrowserStorageService'
 
 const ETA = {
   BACKGROUND_INFO: 1,
@@ -174,6 +184,7 @@ export default {
     JoinedTeamModal,
     NextTaskModal,
     ImpactSummaryCard,
+    VolunteerShareInfoModal,
   },
   directives: {
     tooltip: vTooltip,
@@ -183,6 +194,7 @@ export default {
     if (this.isFirstDashboardVisit) {
       this.toggleWelcomeModal()
     }
+
     if ('Notification' in window) {
       this.notificationPermission = Notification.permission
     } else {
@@ -191,6 +203,8 @@ export default {
 
     this.notificationsCardWasDismissed =
       localStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
+
+    this.hasSeenShareInfoModal = hasAnsweredShareInfoOptIn(this.user.id)
 
     if (localStorage.getItem('isSSOSignUpRedirect')) {
       AnalyticsService.registerVolunteer(this.user)
@@ -218,6 +232,7 @@ export default {
       notificationsCardWasDismissed: false,
       joinedTeamCode: '',
       nextTask: {},
+      hasSeenShareInfoModal: false,
     }
   },
   computed: {
@@ -242,6 +257,7 @@ export default {
       isCombinedOnboardingChecklistEnabled:
         'featureFlags/isCombinedOnboardingChecklistEnabled',
       hasASubjectCertification: 'user/hasASubjectCertification',
+      isShowInfoOptInEnabled: 'featureFlags/isShowInfoOptInEnabled',
     }),
     shouldShowNotificationsCard() {
       return (
@@ -551,6 +567,18 @@ export default {
             this.hasCompletedFirstHourOfTutoring))
       )
     },
+    showShareInfoModal() {
+      return !this.hasSeenShareInfoModal && this.isShowInfoOptInEnabled
+    },
+    volunteerInfo() {
+      return {
+        // Volunteers can select multiple occupations
+        occupations: this.user.occupation ?? [],
+        numSessionsTutored: this.user.pastSessions?.length ?? 0,
+        numStudentsTutored: this.user.uniqueStudentsHelpedCount ?? 0,
+        totalHoursTutored: this.user.hoursTutored ?? 0,
+      }
+    },
   },
   methods: {
     sessionClickDialog(session) {
@@ -664,6 +692,9 @@ export default {
     toggleNextTaskModal(nextTask) {
       this.nextTask = nextTask ? nextTask : {}
       this.showNextTaskModal = !this.showNextTaskModal
+    },
+    toggleShareInfoModal() {
+      this.hasSeenShareInfoModal = true
     },
     clickCertificationAction() {
       this.$router.push('/training')

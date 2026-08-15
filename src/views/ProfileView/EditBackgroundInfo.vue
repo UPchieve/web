@@ -4,9 +4,11 @@ import { useStore } from 'vuex'
 import { EVENTS } from '@/consts'
 import UserService from '@/services/UserService'
 import BackGroundInfoField from '@/components/BackgroundInfoField.vue'
+import ShareInfoFieldsForm from '@/components/ShareInfoFieldsForm.vue'
 import PencilIcon from '@/assets/pencil.svg'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import AnalyticsService from '@/services/AnalyticsService'
+import { volunteerDataFromUser } from '@/utils/build-share-info-message'
 
 const emit = defineEmits<{
   (e: 'error', err: any): void
@@ -75,6 +77,12 @@ const shouldShowSchoolField = computed(
   () => isUsHighSchooler.value && !hasExistingStudentSchool.value
 )
 
+const isShowInfoOptInEnabled = computed(
+  () => store.getters['featureFlags/isShowInfoOptInEnabled']
+)
+const shareInfoVolunteerData = computed(() => volunteerDataFromUser(user.value))
+const shareInfoFormRef = ref<InstanceType<typeof ShareInfoFieldsForm>>()
+
 async function onEditButtonClick() {
   if (!isEditing.value) {
     AnalyticsService.captureEvent(EVENTS.COACH_CLICKED_EDIT_BACKGROUND_INFO)
@@ -131,6 +139,9 @@ async function onEditButtonClick() {
       highSchoolId.value = ''
       highSchoolName.value = ''
     }
+
+    shareInfoFormRef.value?.save()
+
     AnalyticsService.captureEvent(EVENTS.COACH_SAVED_BACKGROUND_INFO)
     showInputErrors.value = false
     isEditing.value = false
@@ -209,6 +220,27 @@ async function onEditButtonClick() {
       v-model:state="state"
       :show-input-errors="showInputErrors"
     />
+
+    <div
+      v-if="isShowInfoOptInEnabled"
+      v-show="isEditing"
+      class="share-info-section"
+    >
+      <div class="prompt">Share With Your Students</div>
+      <div class="description">
+        Choose which information, if any, your students see about you during
+        sessions. This is experimental and separate from the background
+        information above. Changes save with the button above.
+      </div>
+      <ShareInfoFieldsForm
+        ref="shareInfoFormRef"
+        :showButtons="false"
+        :volunteerOccupations="shareInfoVolunteerData.occupations"
+        :numSessionsTutored="shareInfoVolunteerData.numSessionsTutored"
+        :numStudentsTutored="shareInfoVolunteerData.numStudentsTutored"
+        :totalHoursTutored="shareInfoVolunteerData.totalHoursTutored"
+      />
+    </div>
   </div>
 </template>
 
@@ -246,6 +278,12 @@ ul {
 .description {
   margin: 8px 0px;
   @include font-category('helper-text');
+}
+
+.share-info-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid $c-border-grey;
 }
 
 .field-button {

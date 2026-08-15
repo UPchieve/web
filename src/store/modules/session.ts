@@ -31,6 +31,7 @@ type JourneySessionData = {
 
 export type SessionState = {
   isPartnerOnline: boolean
+  partnerSharedInfoMessage: string
   latestSession?: Session
   cooldownMinutes: number
   journeySessionData?: JourneySessionData
@@ -41,6 +42,7 @@ export default {
   namespaced: true,
   state: {
     isPartnerOnline: false,
+    partnerSharedInfoMessage: '',
     latestSession: undefined,
     cooldownMinutes: 0,
     journeySessionData: undefined,
@@ -103,6 +105,8 @@ export default {
   mutations: {
     setIsPartnerOnline: (state: SessionState, flag: boolean) =>
       (state.isPartnerOnline = flag),
+    setPartnerSharedInfoMessage: (state: SessionState, message: string) =>
+      (state.partnerSharedInfoMessage = message),
     setLatestSession: (state: SessionState, session: Session) =>
       (state.latestSession = session),
     setCooldownMinutes: (state: SessionState, cooldownMinutes: number) =>
@@ -119,6 +123,13 @@ export default {
       flag: boolean
     ) {
       commit('setIsPartnerOnline', flag)
+    },
+
+    shareInfoOptInForPartner(
+      { commit }: ActionContext<SessionState, RootState>,
+      message: string
+    ) {
+      commit('setPartnerSharedInfoMessage', message)
     },
 
     calculateCooldown({

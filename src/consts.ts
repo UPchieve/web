@@ -906,6 +906,11 @@ export const EVENTS = {
   STUDENT_CLOSED_ESSAY_HELP_MODAL: 'STUDENT_CLOSED_ESSAY_HELP_MODAL',
   STUDENT_SELECTED_LIVE_ESSAY_HELP: 'STUDENT_SELECTED_LIVE_ESSAY_HELP',
   STUDENT_SELECTED_ASYNC_ESSAY_HELP: 'STUDENT_SELECTED_ASYNC_ESSAY_HELP',
+  SHARE_INFO_OPT_IN_MODAL_ANSWERED: 'SHARE_INFO_OPT_IN_MODAL_ANSWERED',
+  VOLUNTEER_SELECTED_TO_SHARE_INFO: 'VOLUNTEER_SELECTED_TO_SHARE_INFO',
+  VOLUNTEER_OPTED_OUT_OF_SHARE_INFO: 'VOLUNTEER_OPTED_OUT_OF_SHARE_INFO',
+  STUDENT_CLICKED_LEARN_MORE_ABOUT_COACH:
+    'STUDENT_CLICKED_LEARN_MORE_ABOUT_COACH',
 }
 
 export const VERIFICATION_METHOD = {
@@ -984,6 +989,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   HS_STUDENTS_BARRED_FROM_COACHING_COLLEGE_SUBJECTS = 'hs-students-barred-from-coaching-college-subjects',
   DASHBOARD_ALGORITHM = 'dashboard-algorithm',
   ASYNC_ESSAY_REVIEW = 'async-essay-review',
+  SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO = 'show-volunteer-opt-in-to-share-info',
 }
 
 export const ANALYTICS_REPORT_ROW = {
@@ -1081,3 +1087,13 @@ export const LANGUAGES: Language[] = [
   { code: 'vi', name: 'Vietnamese' },
   { code: 'other', name: 'Other' },
 ]
+
+// For volunteer sharing info experiment - can be moved/changed later.
+export const SHARE_INFO_FIELDS = [
+  { key: 'occupation', label: 'Occupation' },
+  { key: 'sessionsTutored', label: 'Number of sessions tutored' },
+  { key: 'studentsTutored', label: 'Number of students tutored' },
+  { key: 'hoursTutored', label: 'Total hours of tutoring' },
+] as const
+
+export type ShareInfoFieldKey = (typeof SHARE_INFO_FIELDS)[number]['key']

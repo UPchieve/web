@@ -9,6 +9,11 @@ import {
 } from '@/composables/imageUploadState'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import { getShareInfoFields } from '@/services/BrowserStorageService'
+import {
+  buildShareInfoMessage,
+  volunteerDataFromUser,
+} from '@/utils/build-share-info-message'
 
 /**
  * These errors handled internally and shouldn't be forwarded to our logger.
@@ -261,6 +266,23 @@ export default {
       socket.on('sessions/partner:in-session', (isOnline: boolean) => {
         dispatch('session/onlineStatusForPartner', isOnline, { root: true })
         if (!isOnline) commit('setIsTyping', false)
+
+        if (isOnline && rootGetters['user/isVolunteer']) {
+          const fields = getShareInfoFields(rootState.user.user.id) ?? []
+          socket.emit(
+            'sessions/share-info:opt-in',
+            buildShareInfoMessage(
+              fields,
+              volunteerDataFromUser(rootState.user.user)
+            )
+          )
+        }
+      })
+
+      socket.on('sessions/partner:share-info-opt-in', (message: string) => {
+        dispatch('session/shareInfoOptInForPartner', message, {
+          root: true,
+        })
       })
 
       socket.on('sessions:partner-banned-from-live-media', () => {

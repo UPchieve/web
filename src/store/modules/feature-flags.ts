@@ -63,6 +63,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: true,
       [POSTHOG_FEATURE_FLAGS.S2V_THEMING]: false,
       [POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -287,5 +288,9 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM],
     isAsyncEssayReviewEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW],
+    isShowInfoOptInEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO
+      ],
   },
 }
