@@ -767,7 +767,7 @@ export default {
       }
     },
     isFavoriteVolunteer() {
-      return this.user.favoriteVolunteers.includes(this.session?.volunteer?.id)
+      return this.user.favoriteVolunteers?.includes(this.session?.volunteer?.id)
     },
   },
   watch: {
