@@ -192,7 +192,17 @@
             You don't haven't had any sessions matching the filters.
           </div>
           <ul v-else class="mobile-session-list">
-            <li v-for="(session, index) in sessions" :key="session._id">
+            <li
+              v-for="(session, index) in sessions"
+              :key="session._id"
+              @click="
+                routeToSessionRecap(
+                  session.id,
+                  sessionsWithUnreadDMs.includes(session.id) &&
+                    isShowDMNotificationsEnabled
+                )
+              "
+            >
               <div class="mobile-session-list__session">
                 <div class="mobile-session-list__subject-container">
                   <img
@@ -216,6 +226,7 @@
                       :volunteerName="session.volunteerFirstName"
                       :volunteerId="session.volunteerId"
                       v-on:change-favorited="updateFavoritedVolunteers"
+                      @click.stop
                     />
                     <span class="mobile-session-list__partner-name">
                       {{
@@ -236,21 +247,12 @@
                     v-if="canRequestSessionWith(session)"
                     class="request-tutor-button request-tutor-button--mobile"
                     primary
-                    @click="openRequestSessionModal(session)"
+                    @click.stop="openRequestSessionModal(session)"
                     >Request session with
                     {{ session.volunteerFirstName }}</large-button
                   >
                 </div>
-                <caret-icon
-                  class="caret--next"
-                  @click="
-                    routeToSessionRecap(
-                      session.id,
-                      sessionsWithUnreadDMs.includes(session.id) &&
-                        isShowDMNotificationsEnabled
-                    )
-                  "
-                />
+                <caret-icon class="caret caret--next mobile-caret" />
               </div>
               <div class="border--thin" v-if="index !== 5"></div>
             </li>
@@ -897,18 +899,29 @@ ul {
   }
 }
 
-// mobile css styling
 .mobile-container {
-  padding: 0.5em 1.5em 0.5em 1.5em;
+  padding: 0.5rem 0;
   margin: 0;
   background-color: white;
   border: 1px solid $c-border-grey;
   border-radius: 20px;
   min-width: 100%;
+
+  .page-actions-container {
+    padding: 0 1.5rem;
+  }
 }
 
 .mobile-session-list {
   padding: 0;
+
+  & > li {
+    cursor: pointer;
+
+    &:hover {
+      background-color: lighten($c-information-blue, 50%);
+    }
+  }
 
   &__partner-name {
     font-weight: 500;
@@ -921,6 +934,7 @@ ul {
 
   &__session {
     @include flex-container(row, space-between, center);
+    padding: 1em 1.5em;
   }
 
   &__subject-container {
@@ -939,6 +953,12 @@ ul {
   }
 }
 
+.mobile-caret {
+  width: 16px;
+  height: 16px;
+  margin-left: 0.75rem;
+}
+
 .mobile-subject {
   text-align: left;
   font-weight: 600;
@@ -951,7 +971,7 @@ ul {
 
   &-name-container {
     @include flex-container(column, center, flex-start);
-    margin: 1.375em;
+    margin: 0 0 0 0.75rem;
   }
 
   &-time-tutored {
