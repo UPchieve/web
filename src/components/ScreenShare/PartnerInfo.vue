@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import StarIcon from '@/assets/icons/star_icon.svg'
 import { EVENTS } from '@/consts'
@@ -28,6 +28,16 @@ function toggleSharedInfo() {
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_LEARN_MORE_ABOUT_COACH)
   showSharedInfo.value = !showSharedInfo.value
 }
+
+watch(
+  sharedInfoMessage,
+  (message, previousMessage) => {
+    if (message && !previousMessage) {
+      AnalyticsService.captureEvent(EVENTS.STUDENT_SAW_LEARN_MORE_ABOUT_COACH)
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>

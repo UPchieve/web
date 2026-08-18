@@ -568,6 +568,7 @@ export default {
       )
     },
     showShareInfoModal() {
+      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_SAW_SHARE_INFO_MODAL)
       return !this.hasSeenShareInfoModal && this.isShowInfoOptInEnabled
     },
     volunteerInfo() {
