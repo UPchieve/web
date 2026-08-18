@@ -142,6 +142,7 @@ export default defineConfig({
       // (A vuetify/components/* glob breaks on css-less stubs.)
       'vuetify/components/VAutocomplete',
       'vuetify/components/VDatePicker',
+      'vuetify/components/VIcon',
       'vuetify/components/VMenu',
       'vuetify/components/VProgressLinear',
       'vuetify/components/VSelect',

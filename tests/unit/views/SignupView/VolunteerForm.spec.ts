@@ -117,6 +117,9 @@ describe('VolunteerForm', () => {
       attachTo: window.document.body,
       global: {
         plugins: [store, router],
+        // MazPhoneNumberInput's country flags lazily import and call a cdn
+        // to get the flag icons. stubing it to prevent the occasional import error
+        stubs: { MazLazyImg: true },
       },
     })
 
