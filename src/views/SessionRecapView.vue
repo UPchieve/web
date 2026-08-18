@@ -153,7 +153,7 @@
               :shouldHideChatSection="false"
               :setHasSeenNewMessage="setHasSeenNewMessage"
               :isInRecap="true"
-              :isSessionConnectionAlive="isSessionConnectionAlive"
+              :isSocketSessionRoomConnected="socketJoinedRoom"
               :isSessionAlive="isSessionAlive"
             />
           </div>
