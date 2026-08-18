@@ -10,6 +10,7 @@ export default {
     NTHSActions: [],
     checksInFlight: [],
     NTHSCandidateApplicationStatus: undefined,
+    canApplyForNTHSPresident: false,
   },
   mutations: {
     setNTHSGroups: (state, groups) => {
@@ -49,6 +50,9 @@ export default {
     setNTHSCandidateApplicationStatus: (state, status) => {
       state.NTHSCandidateApplicationStatus = status
     },
+    setCanApplyForNTHSPresident(state, isEligible) {
+      state.canApplyForNTHSPresident = isEligible
+    },
   },
   actions: {
     appendToChecksInFlight({ commit, state }, id) {
@@ -63,13 +67,16 @@ export default {
     setNTHSCandidateApplicationStatus: (state, status) => {
       state.NTHSCandidateApplicationStatus = status
     },
-    async fetchNTHSGroupsForUser({ commit }) {
+    async fetchNthsData({ commit }) {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
       commit(
         'setNTHSCandidateApplicationStatus',
         results.data.candidateApplicationStatus
       )
+
+      const eligibility = await NetworkService.getNTHSApplicationEligibility()
+      commit('setCanApplyForNTHSPresident', eligibility.data.eligible)
       return results.data.groups
     },
     async fetchNTHSGroupMembers({ commit }, groupId) {
@@ -95,6 +102,12 @@ export default {
   },
 
   getters: {
+    isEligibleToApply(state, _, __, rootGetters) {
+      return (
+        rootGetters['users/isVolunteerInHighSchool'] &&
+        state.NTHSGroups.length == 0
+      )
+    },
     NTHSChecklist: (state) => {
       const checklist = state.NTHSActions.reduce((list, action) => {
         const text = actionsCtaMap[action.name]

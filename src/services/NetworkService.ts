@@ -5,6 +5,7 @@ import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
 import type { NTHSActionName } from './NTHSGroupService'
+import type { NTHSUnlistedSchool } from './NTHSApplicationService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
 import type { DateString, Uuid } from '@/types/shared'
@@ -1460,6 +1461,22 @@ export default {
       `${API_ROOT}/nths-groups/${groupId}/submit-school-affiliation`,
       advisorInfo
     ).then(this._successHandler, this._errorHandler)
+  },
+  getNTHSApplicationEligibility() {
+    return httpGet<{ eligible: boolean; currentGradeName?: string }>(
+      `${API_ROOT}/nths-application/eligibility`
+    )
+  },
+  submitNTHSApplication(data: {
+    schoolId?: string
+    unlistedSchool?: NTHSUnlistedSchool
+    gradeLevel: string
+    responses: Record<string, string | boolean>
+  }) {
+    return httpPost(`${API_ROOT}/nths-application`, data).then(
+      this._successHandler,
+      this._errorHandler
+    )
   },
   async createTutorBotSession(data: TutorBotCreateConvoPayload) {
     try {

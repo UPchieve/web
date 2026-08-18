@@ -112,6 +112,12 @@ export default {
     defaultValue: {
       type: String,
     },
+    // Typed text that was never picked leaves the box looking answered, so a
+    // caller can say what is actually missing instead of a bare "Required".
+    requiredMessage: {
+      type: String,
+      default: 'Required',
+    },
   },
   emits: [
     'update:modelValue',
@@ -139,7 +145,10 @@ export default {
   validations() {
     return {
       school: {
-        required: helpers.withMessage('Required', requiredIf(this.isRequired)),
+        required: helpers.withMessage(
+          this.requiredMessage,
+          requiredIf(this.isRequired)
+        ),
       },
     }
   },
@@ -147,7 +156,10 @@ export default {
   methods: {
     async autocompleteSchool(input) {
       this.school = {}
-      // searching again retracts a previous "can't find my school" selection
+      // Searching again retracts whatever was selected before, including a
+      // preselected school. Leaving the id behind lets a caller save a school
+      // the box has stopped displaying.
+      this.$emit('update:modelValue', null)
       this.$emit('update:cannotFindSchool', false)
 
       if (!this.hasStartedSearchingForSchool && this.startSearchEvent) {

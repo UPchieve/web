@@ -3,29 +3,30 @@ import type { Store } from 'vuex'
 export async function shouldGoToGroup(store: Store<any>) {
   return (
     store.state.nths.NTHSGroups.length > 0 ||
-    (await store.dispatch('nths/fetchNTHSGroupsForUser')).length > 0
+    (await store.dispatch('nths/fetchNthsData')).length > 0
   )
 }
 
+// An approved application is the only thing that unlocks chapter creation, and
+// the server enforces that now. The user-is-approved-nths-president flag used to
+// stand in for it, so honouring it here would offer a button the API refuses.
 export function shouldGoToCreate(store: Store<any>) {
-  const isApprovedPresident =
-    store.getters['featureFlags/userIsApprovedNTHSPresident']
   const candidateApplicationStatus =
     store.state.nths.NTHSCandidateApplicationStatus
 
-  return isApprovedPresident || candidateApplicationStatus === 'approved'
+  return candidateApplicationStatus === 'approved'
 }
 
+// canApplyForNTHSPresident is the server's eligibility check, defaulted to
+// false in the store.
 export function shouldGoToApply(store: Store<any>) {
   const candidateApplicationStatus =
     store.state.nths.NTHSCandidateApplicationStatus
   const isApplicationPageFlagOn =
     store.getters['featureFlags/isNTHSApplicationPageEnabled']
-  const isApprovedPresident =
-    store.getters['featureFlags/userIsApprovedNTHSPresident']
   return (
     isApplicationPageFlagOn &&
-    !isApprovedPresident &&
+    store.state.nths.canApplyForNTHSPresident &&
     !candidateApplicationStatus
   )
 }

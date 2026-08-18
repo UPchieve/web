@@ -254,8 +254,6 @@ export default {
       ],
     isNewVolunteerSignUpFlowEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW],
-    userIsApprovedNTHSPresident: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.USER_IS_APPROVED_NTHS_PRESIDENT],
     isSessionSummaryEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY],
     isNTHSApplicationPageEnabled: (state: FeatureFlagState) =>

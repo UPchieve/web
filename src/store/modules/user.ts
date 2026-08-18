@@ -1,3 +1,4 @@
+import type { ActionContext } from 'vuex'
 import Case from 'case'
 import { some } from 'lodash-es'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
@@ -22,9 +23,10 @@ import type {
   PendingMessage,
   UserMessage,
 } from '@/types/sessions'
-import type { ActionContext } from 'vuex'
+
 import type { RootGetters, RootState } from '@/store/index'
 import type { Uuid } from '@/types/shared'
+import { VolunteerOccupations } from '@/services/VolunteerService'
 
 export type SessionState = Omit<CurrentSessionPublic, 'messages'> & {
   messages: SessionMessage[]
@@ -514,6 +516,9 @@ export default {
     },
   },
   getters: {
+    gradeLevel: (state: UserStoreState) => state.user.gradeLevel,
+    isVolunteerInHighSchool: (state: UserStoreState) =>
+      state.user.occupation?.includes(VolunteerOccupations.HIGH_SCHOOL_STUDENT),
     avatar(_state: UserStoreState, getters: UserStoreGetterValues) {
       if (getters.showAmbassadorTitle) {
         return { component: AmbassadorIcon, id: 'ambassador-avatar' }

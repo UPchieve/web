@@ -1,8 +1,8 @@
-import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
-import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
+import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
+import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -333,9 +333,10 @@ describe('SidebarLinks', () => {
               isNTHSApplicationPageEnabled: () => true,
             },
           },
-          volunteer: {
+          nths: {
             state: {
               NTHSGroups: [],
+              canApplyForNTHSPresident: true,
             },
           },
         })
@@ -352,7 +353,7 @@ describe('SidebarLinks', () => {
         expect(isTargetLinkPresent).toEqual(true)
       })
 
-      it('Renders the "Create Team" link if the user is an approved president and has no group', async () => {
+      it('Renders the "Create Team" link if the application was approved and the user has no group', async () => {
         const wrapper = getWrapper({
           props: {
             authenticated: true,
@@ -366,8 +367,12 @@ describe('SidebarLinks', () => {
           },
           featureFlags: {
             getters: {
-              userIsApprovedNTHSPresident: () => true,
               isNTHSApplicationPageEnabled: () => false,
+            },
+          },
+          nths: {
+            state: {
+              NTHSCandidateApplicationStatus: 'approved',
             },
           },
         })
@@ -382,6 +387,33 @@ describe('SidebarLinks', () => {
           )
         })
         expect(isTargetLinkPresent).toEqual(true)
+      })
+
+      it('Hides the "Create Team" link when only the approved-president flag is set', async () => {
+        const wrapper = getWrapper({
+          props: {
+            authenticated: true,
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              isTeacher: () => false,
+            },
+          },
+          featureFlags: {
+            getters: {
+              isNTHSApplicationPageEnabled: () => false,
+            },
+          },
+        })
+        const sidebarLinks = wrapper.findAllComponents(SidebarLink)
+        // The server requires an approved application, so offering the link on
+        // the flag alone would send the user into a 403.
+        const isTargetLinkPresent = sidebarLinks.some((link) => {
+          return link.props('to') === NTHS_CREATE_TEAM_LINK.to
+        })
+        expect(isTargetLinkPresent).toEqual(false)
       })
 
       it.each([true, false])(

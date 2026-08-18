@@ -3,18 +3,10 @@ import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
-import { computed, onMounted, ref } from 'vue'
-import { useStore } from 'vuex'
-
-const store = useStore()
+import { onMounted } from 'vue'
 
 const learnMoreLink =
   'https://docs.google.com/document/d/1UDxRRJZ4b_Pt3PfjzN_7hxb-ffaF-hGdn_e_q1RCqqs/edit?tab=t.0'
-
-const applicationLink = computed(() => {
-  const user = store.state.user.user
-  return `https://docs.google.com/forms/d/e/1FAIpQLSegNVaO1TGij0IZQyTop_735x0aAflc1jkKQPXlCl_Gmu__hA/viewform?usp=pp_url&entry.1706782819=${user.id}`
-})
 
 function onClickedLearnMore() {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_CLICKED_LEARN_MORE)
@@ -26,15 +18,6 @@ function onClickedApplyNow() {
 onMounted(() => {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_VIEWED_APPLY_NOW_PAGE)
 })
-
-const userId = computed(() => store.state.user.user.id)
-const didCopyUserId = ref<boolean>(false)
-function copyUserId() {
-  if (navigator?.clipboard) {
-    navigator.clipboard.writeText(userId.value)
-    didCopyUserId.value = true
-  }
-}
 </script>
 
 <template>
@@ -64,25 +47,11 @@ function copyUserId() {
           </a>
           <span><em>Please only submit one application.</em></span>
 
-          <div class="user-id-container">
-            <label for="user-id-input" class="user-id-label">
-              <span class="label-main">Your UPchieve User ID</span>
-              <span>(You'll need this for your application!)</span>
-            </label>
-            <div class="copy-container">
-              <input type="text" autocomplete="off" disabled :value="userId" />
-              <button type="button" @click="copyUserId" class="copy-button">
-                {{ didCopyUserId ? 'Copied!' : 'Copy' }}
-              </button>
-            </div>
-          </div>
-
           <LargeButton
             variant="primary-blue"
             class="apply-button"
             :show-arrow="false"
-            :routeTo="applicationLink"
-            target="_blank"
+            routeTo="/groups/apply/form"
             @click="onClickedApplyNow"
             >Apply to Start a Chapter</LargeButton
           >
@@ -96,42 +65,6 @@ function copyUserId() {
 </template>
 
 <style lang="scss" scoped>
-.user-id-container {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid $c-border-grey;
-  border-radius: 8px;
-  background-color: lighten($c-information-blue, 50);
-
-  .copy-container {
-    display: flex;
-    width: 100%;
-    padding: 8px 16px 16px 16px;
-
-    .copy-button {
-      color: $c-information-blue;
-      font-weight: 700;
-    }
-  }
-
-  .user-id-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .label-main {
-      font-weight: 700;
-    }
-  }
-
-  input {
-    border: none;
-    background: none;
-    width: 100%;
-    color: $c-secondary-grey;
-  }
-}
-
 .title {
   font-weight: 500;
   @include breakpoint-below('medium') {

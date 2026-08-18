@@ -265,7 +265,7 @@ export default {
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {
-      this.$store.dispatch('nths/fetchNTHSGroupsForUser')
+      this.$store.dispatch('nths/fetchNthsData')
     }
   },
   props: {
@@ -279,6 +279,7 @@ export default {
       volunteersNTHSGroups: (state) => state.nths.NTHSGroups,
       nthsCandidateApplicationStatus: (state) =>
         state.nths.NTHSCandidateApplicationStatus,
+      canApplyForNTHSPresident: (state) => state.nths.canApplyForNTHSPresident,
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
@@ -294,7 +295,6 @@ export default {
         'featureFlags/isDisableStudentsJoinSlackCommunityEnabled',
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
-      userIsApprovedNTHSPresident: 'featureFlags/userIsApprovedNTHSPresident',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
       shouldShowStudentToVolunteerHoursPage:
         'featureFlags/shouldShowStudentToVolunteerHoursPage',
@@ -317,8 +317,7 @@ export default {
     },
     showCreateNTHSGroupLink() {
       return (
-        (this.userIsApprovedNTHSPresident ||
-          this.nthsCandidateApplicationStatus === 'approved') &&
+        this.nthsCandidateApplicationStatus === 'approved' &&
         this.volunteersNTHSGroups.length === 0
       )
     },
@@ -331,7 +330,7 @@ export default {
     showApplyForNTHSLink() {
       return (
         this.isNTHSApplicationPageEnabled &&
-        !this.userIsApprovedNTHSPresident &&
+        this.canApplyForNTHSPresident &&
         this.volunteersNTHSGroups.length === 0 &&
         this.nthsCandidateApplicationStatus === undefined
       )

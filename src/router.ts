@@ -93,6 +93,8 @@ const NTHSManageTeamView = () =>
   import('./views/NTHS/Tabs/NTHSManageTeamView.vue')
 const NTHSSettingsView = () => import('./views/NTHS/Tabs/NTHSSettingsView.vue')
 const NTHSApplicationView = () => import('@/views/NTHS/NTHSApplicationView.vue')
+const NTHSApplicationFormView = () =>
+  import('@/views/NTHS/NTHSApplicationFormView.vue')
 const NTHSApplicationPending = () =>
   import('./views/NTHS/NTHSApplicationPending.vue')
 const StandaloneBotChatView = () =>
@@ -936,54 +938,84 @@ const routes: RouteRecordRaw[] = [
     name: 'NTHSApplicationView',
     component: NTHSApplicationView,
     meta: { protected: true },
-    beforeEnter: async (
-      _to: RouteLocationNormalized,
-      _from: RouteLocationNormalized,
-      next: NavigationGuardNext
-    ) => {
-      if (await shouldGoToGroup(store)) return next('/groups')
-      if (shouldGoToCreate(store)) return next('/groups/create')
-      if (shouldGoToPending(store)) return next('/groups/application-pending')
-      if (shouldGoToApply(store)) return next()
+    beforeEnter: [
+      switchToVolunteerOrCancel,
+      async (
+        _to: RouteLocationNormalized,
+        _from: RouteLocationNormalized,
+        next: NavigationGuardNext
+      ) => {
+        if (await shouldGoToGroup(store)) return next('/groups')
+        if (shouldGoToCreate(store)) return next('/groups/create')
+        if (shouldGoToPending(store)) return next('/groups/application-pending')
+        if (shouldGoToApply(store)) return next()
 
-      return next('/dashboard')
-    },
+        return next('/dashboard')
+      },
+    ],
+  },
+  {
+    path: '/groups/apply/form',
+    name: 'NTHSApplicationFormView',
+    component: NTHSApplicationFormView,
+    meta: { protected: true },
+    beforeEnter: [
+      switchToVolunteerOrCancel,
+      async (
+        _to: RouteLocationNormalized,
+        _from: RouteLocationNormalized,
+        next: NavigationGuardNext
+      ) => {
+        if (await shouldGoToGroup(store)) return next('/groups')
+        if (shouldGoToCreate(store)) return next('/groups/create')
+        if (shouldGoToPending(store)) return next('/groups/application-pending')
+        if (shouldGoToApply(store)) return next()
+
+        return next('/dashboard')
+      },
+    ],
   },
   {
     path: '/groups/application-pending',
     name: 'NTHSApplicationPending',
     component: NTHSApplicationPending,
     meta: { protected: true },
-    beforeEnter: async (
-      _to: RouteLocationNormalized,
-      _from: RouteLocationNormalized,
-      next: NavigationGuardNext
-    ) => {
-      if (await shouldGoToGroup(store)) return next('/groups')
-      if (shouldGoToCreate(store)) return next('/groups/create')
-      if (shouldGoToApply(store)) return next('/groups/apply')
-      if (shouldGoToPending(store)) return next()
+    beforeEnter: [
+      switchToVolunteerOrCancel,
+      async (
+        _to: RouteLocationNormalized,
+        _from: RouteLocationNormalized,
+        next: NavigationGuardNext
+      ) => {
+        if (await shouldGoToGroup(store)) return next('/groups')
+        if (shouldGoToCreate(store)) return next('/groups/create')
+        if (shouldGoToApply(store)) return next('/groups/apply')
+        if (shouldGoToPending(store)) return next()
 
-      return next('/dashboard')
-    },
+        return next('/dashboard')
+      },
+    ],
   },
   {
     path: '/groups/create',
     name: 'NTHSCreateGroupView',
     component: NTHSCreateGroupView,
     meta: { protected: true },
-    beforeEnter: async (
-      _to: RouteLocationNormalized,
-      _from: RouteLocationNormalized,
-      next: NavigationGuardNext
-    ) => {
-      if (await shouldGoToGroup(store)) return next('/groups')
-      if (shouldGoToApply(store)) return next('/groups/apply')
-      if (shouldGoToPending(store)) return next('/groups/application-pending')
-      if (shouldGoToCreate(store)) return next()
+    beforeEnter: [
+      switchToVolunteerOrCancel,
+      async (
+        _to: RouteLocationNormalized,
+        _from: RouteLocationNormalized,
+        next: NavigationGuardNext
+      ) => {
+        if (await shouldGoToGroup(store)) return next('/groups')
+        if (shouldGoToApply(store)) return next('/groups/apply')
+        if (shouldGoToPending(store)) return next('/groups/application-pending')
+        if (shouldGoToCreate(store)) return next()
 
-      return next('/dashboard')
-    },
+        return next('/dashboard')
+      },
+    ],
   },
 
   {
@@ -1004,18 +1036,21 @@ const routes: RouteRecordRaw[] = [
         ],
       },
     },
-    beforeEnter: async (
-      _to: RouteLocationNormalized,
-      _from: RouteLocationNormalized,
-      next: NavigationGuardNext
-    ) => {
-      if (await shouldGoToGroup(store)) return next()
-      if (shouldGoToApply(store)) return next('/groups/apply')
-      if (shouldGoToPending(store)) return next('/groups/application-pending')
-      if (shouldGoToCreate(store)) return next('/groups/create')
+    beforeEnter: [
+      switchToVolunteerOrCancel,
+      async (
+        _to: RouteLocationNormalized,
+        _from: RouteLocationNormalized,
+        next: NavigationGuardNext
+      ) => {
+        if (await shouldGoToGroup(store)) return next()
+        if (shouldGoToApply(store)) return next('/groups/apply')
+        if (shouldGoToPending(store)) return next('/groups/application-pending')
+        if (shouldGoToCreate(store)) return next('/groups/create')
 
-      return next('/dashboard')
-    },
+        return next('/dashboard')
+      },
+    ],
     children: [
       {
         path: '/groups/dashboard',

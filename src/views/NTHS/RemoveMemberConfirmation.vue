@@ -37,7 +37,7 @@ async function removeTeamMember() {
         groupId,
         groupMembers: [],
       })
-      await store.dispatch('nths/fetchNTHSGroupsForUser')
+      await store.dispatch('nths/fetchNthsData')
       await router.push('/dashboard')
     } else {
       await NetworkService.updateNTHSGroupMember(

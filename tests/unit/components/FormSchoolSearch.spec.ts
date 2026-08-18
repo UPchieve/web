@@ -125,9 +125,23 @@ describe('FormSchoolSearch', () => {
     await wrapper.find('li').trigger('click')
     await flushPromises()
 
-    expect(wrapper.emitted('update:modelValue')![0][0]).toBe(SCHOOL.id)
-    expect(wrapper.emitted('update:cannotFindSchool')![0][0]).toBe(false)
+    // Both fire on every keystroke too, so the pick is the last emission.
+    const modelEmits = wrapper.emitted('update:modelValue')!
+    const cannotFindEmits = wrapper.emitted('update:cannotFindSchool')!
+    expect(modelEmits[modelEmits.length - 1][0]).toBe(SCHOOL.id)
+    expect(cannotFindEmits[cannotFindEmits.length - 1][0]).toBe(false)
     expect(wrapper.emitted('selected-school-name')![0][0]).toBe(SCHOOL.name)
+
+    wrapper.unmount()
+  })
+
+  it('clears a preselected school as soon as the user searches again', async () => {
+    const wrapper = getWrapper({ modelValue: SCHOOL.id })
+
+    await search(wrapper, 'Somewhere else')
+
+    const modelEmits = wrapper.emitted('update:modelValue')!
+    expect(modelEmits[modelEmits.length - 1][0]).toBeNull()
 
     wrapper.unmount()
   })
