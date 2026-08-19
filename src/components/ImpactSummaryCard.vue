@@ -60,14 +60,14 @@ const impactStats = computed<ImpactStats>(() => {
     return getCustomImpactStats({
       availability: user.value.availability,
       totalVolunteerHours: user.value.totalVolunteerHours,
-      pastSessions: user.value.pastSessions,
+      pastSessions: user.value.pastSessionsByRole.asVolunteer,
       totalQuizzesPassed: user.value.totalQuizzesPassed,
     }) as unknown as ImpactStats
   }
 
   return getImpactStats({
     availability: user.value.availability,
-    pastSessions: user.value.pastSessions,
+    pastSessions: user.value.pastSessionsByRole.asVolunteer,
     hoursTutored: user.value.hoursTutored,
     hoursTutoredThisWeek: user.value.hoursTutoredThisWeek,
     elapsedAvailability: user.value.elapsedAvailability,
