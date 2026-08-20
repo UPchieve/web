@@ -1532,6 +1532,7 @@ export default {
     essayPrompt?: string
     additionalContext?: string
     reviewReasons: string[]
+    reviewEmail: string
   }) {
     try {
       return await httpPost<{

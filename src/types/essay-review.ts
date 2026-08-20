@@ -10,6 +10,7 @@ export type EssayReviewSubmission = {
   essayPrompt?: string
   additionalContext?: string
   reviewReasons: string[]
+  reviewEmail?: string
   wordCount: number
   characterCount: number
   status: EssayReviewStatus

@@ -13,6 +13,7 @@ const essayPurpose = ref('')
 const essayPrompt = ref('')
 const additionalContext = ref('')
 const reviewReasons = ref<string[]>([])
+const reviewEmail = ref('')
 
 const error = ref('')
 const pageTop = ref<HTMLElement | null>(null)
@@ -43,6 +44,7 @@ const wordCount = computed(() => {
 const isSubmitDisabled = computed(() => {
   return (
     !normalizedEssay.value ||
+    !reviewEmail.value.trim() ||
     normalizedEssay.value.length > maxEssayLength ||
     isSubmitting.value
   )
@@ -67,6 +69,10 @@ function validateSubmission(): string | null {
 
   if (reviewReasons.value.length > maxReviewReasons) {
     return `Please select no more than ${maxReviewReasons} feedback areas.`
+  }
+
+  if (!reviewEmail.value.trim()) {
+    return 'Please enter an email where we can send your feedback.'
   }
 
   return null
@@ -108,6 +114,7 @@ async function handleSubmit() {
       essayPrompt: essayPrompt.value.trim() || undefined,
       additionalContext: additionalContext.value.trim() || undefined,
       reviewReasons: [...reviewReasons.value],
+      reviewEmail: reviewEmail.value.trim(),
     })
 
     hasSubmitted.value = true
@@ -263,6 +270,35 @@ onMounted(() => {
             <span>
               {{ additionalContext.length.toLocaleString() }} /
               {{ maxAdditionalContextLength.toLocaleString() }} characters
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-card">
+        <div class="section-heading">
+          <span class="step-number" aria-hidden="true">3</span>
+          <h2>Where should we send your feedback?</h2>
+        </div>
+
+        <div class="field-group">
+          <label for="review-email">Email address</label>
+
+          <input
+            id="review-email"
+            v-model="reviewEmail"
+            type="email"
+            name="review-email"
+            aria-describedby="review-email-help"
+            placeholder="Email address"
+            required
+            autocomplete="off"
+          />
+
+          <div class="field-metadata">
+            <span id="review-email-help">
+              School email systems often block messages from us, so a personal
+              email is the best way to make sure you receive your feedback.
             </span>
           </div>
         </div>

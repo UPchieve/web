@@ -155,7 +155,13 @@ onMounted(loadEssayReview)
                 <dd>{{ essayReview.studentFirstName || 'Unknown student' }}</dd>
               </div>
               <div>
-                <dt>Email</dt>
+                <dt>Feedback email</dt>
+                <dd>
+                  {{ essayReview.reviewEmail || essayReview.studentEmail }}
+                </dd>
+              </div>
+              <div>
+                <dt>Account email</dt>
                 <dd>{{ essayReview.studentEmail }}</dd>
               </div>
               <div>
