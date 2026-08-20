@@ -13,14 +13,8 @@ const props = defineProps<{
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
 
-const isShowInfoOptInEnabled = computed(
-  () => store.getters['featureFlags/isShowInfoOptInEnabled']
-)
-
-const sharedInfoMessage = computed(() =>
-  isShowInfoOptInEnabled.value
-    ? store.state.session.partnerSharedInfoMessage
-    : ''
+const sharedInfoMessage = computed(
+  () => store.state.session.partnerSharedInfoMessage
 )
 
 const showSharedInfo = ref(false)
