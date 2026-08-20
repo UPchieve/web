@@ -1480,4 +1480,30 @@ math-field.active-math-input {
 math-field::part(virtual-keyboard-toggle) {
   display: none !important;
 }
+
+/* MathLive anchors its keyboard to the bottom of our container and clips
+   anything that overflows. The abc layout is a row taller than the other three,
+   so it overflowed and the row of layout tabs got clipped away — leaving you
+   stuck on abc with no way back to the numeric keys. Letting the keyboard sit
+   in normal flow lets the container grow to fit whichever layout is showing. */
+.math-keyboard-container .ML__keyboard {
+  height: auto;
+  overflow: visible;
+}
+
+/* MathLive slides the keyboard up into view with a transform, and
+   position: static doesn't cancel a transform, so it has to be switched off by
+   hand — otherwise the keyboard paints one keyboard-height too high, floating
+   over the chat. The repeated .is-visible selector is what makes this rule beat
+   MathLive's own. */
+.math-keyboard-container .ML__keyboard > .MLK__backdrop,
+.math-keyboard-container .ML__keyboard.is-visible > .MLK__backdrop {
+  position: static;
+  height: auto;
+  transform: none;
+}
+
+.math-keyboard-container .MLK__plate {
+  position: static;
+}
 </style>
