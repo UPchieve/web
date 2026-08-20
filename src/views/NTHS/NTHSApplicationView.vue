@@ -6,7 +6,7 @@ import { EVENTS } from '@/consts'
 import { onMounted } from 'vue'
 
 const learnMoreLink =
-  'https://docs.google.com/document/d/1UDxRRJZ4b_Pt3PfjzN_7hxb-ffaF-hGdn_e_q1RCqqs/edit?tab=t.0'
+  'https://docs.google.com/document/d/1UDxRRJZ4b_Pt3PfjzN_7hxb-ffaF-hGdn_e_q1RCqqs/preview'
 
 function onClickedLearnMore() {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_CLICKED_LEARN_MORE)
