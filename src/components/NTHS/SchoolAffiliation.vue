@@ -13,6 +13,7 @@ import Card from './Card.vue'
 const props = defineProps<{
   groupId: string
   initialStatus: AffiliationStatus | null
+  hasSchoolOnRecord: boolean
 }>()
 
 const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
@@ -71,7 +72,10 @@ const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
     >
       <div>
         <div class="header">Chapter Advisor</div>
-        <p class="card-text">
+        <p class="card-text" v-if="hasSchoolOnRecord">
+          Add a faculty advisor who can verify your chapter's affiliation.
+        </p>
+        <p class="card-text" v-else>
           Add your school and a faculty advisor who can verify your chapter's
           affiliation.
         </p>
@@ -87,6 +91,7 @@ const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
         "
         @cancel="() => send({ type: 'WITHDRAW' })"
         :submitting="snapshot.matches('SubmittingAdvisorInfo')"
+        :school-already-known="hasSchoolOnRecord"
       />
     </div>
 

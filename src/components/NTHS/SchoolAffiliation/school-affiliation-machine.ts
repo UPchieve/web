@@ -1,9 +1,16 @@
 import { assign, setup } from 'xstate'
-import { updateStatus, setInitialState, submitAdvisorInfo } from './actors'
+import {
+  updateStatus,
+  setInitialState,
+  submitAdvisorInfo,
+  refetchGroup,
+} from './actors'
 import axios from 'axios'
 
 export type AdvisorInfo = {
-  schoolId: string
+  // Null whenever the chapter's school is already on record, which is the
+  // common case: the form drops the picker rather than re-asking.
+  schoolId?: string | null
   firstName: string
   lastName: string
   email: string
@@ -18,6 +25,20 @@ export type AffiliationStatus =
   | 'AFFILIATED'
   | 'DENIED'
   | 'OPTED_OUT'
+  | 'UNAFFILIATED'
+
+export type SchoolAffiliationEvent =
+  | { type: 'OPT_OUT' }
+  | { type: 'OPT_IN' }
+  | { type: 'SUBMIT_ADVISOR_INFO'; advisorInfo: AdvisorInfo }
+  | { type: 'SUBMITTED_ADVISOR_INFO' }
+  | { type: 'PENDING_UPCHIEVE_VERIFICATION' }
+  | { type: 'APPROVE' }
+  | { type: 'DENY' }
+  | { type: 'WITHDRAW' }
+  | { type: 'INERT' }
+
+export type SchoolAffiliationEventType = SchoolAffiliationEvent['type']
 
 const config = setup({
   types: {
@@ -31,21 +52,15 @@ const config = setup({
       groupId: string
       schoolAffiliationStatus: AffiliationStatus | null
     },
-    events: {} as
-      | { type: 'OPT_OUT' }
-      | { type: 'OPT_IN' }
-      | { type: 'SUBMIT_ADVISOR_INFO'; advisorInfo: AdvisorInfo }
-      | { type: 'SUBMITTED_ADVISOR_INFO' }
-      | { type: 'PENDING_UPCHIEVE_VERIFICATION' }
-      | { type: 'APPROVE' }
-      | { type: 'DENY' }
-      | { type: 'WITHDRAW' }
-      | { type: 'INERT' },
+    events: {} as SchoolAffiliationEvent,
   },
   actors: {
     updateStatus,
     setInitialState,
     submitAdvisorInfo,
+  },
+  actions: {
+    refetchGroup,
   },
 })
 
@@ -97,9 +112,12 @@ export const SchoolAffiliationMachine = config.createMachine({
         }),
         onDone: {
           target: 'SeekingAffiliation',
-          actions: assign({
-            schoolAffiliationStatus: ({ event }) => event.output,
-          }),
+          actions: [
+            assign({
+              schoolAffiliationStatus: ({ event }) => event.output,
+            }),
+            'refetchGroup',
+          ],
         },
       },
     },
@@ -113,9 +131,12 @@ export const SchoolAffiliationMachine = config.createMachine({
         }),
         onDone: {
           target: 'OptedOut',
-          actions: assign({
-            schoolAffiliationStatus: ({ event }) => event.output,
-          }),
+          actions: [
+            assign({
+              schoolAffiliationStatus: ({ event }) => event.output,
+            }),
+            'refetchGroup',
+          ],
         },
       },
     },
@@ -145,9 +166,7 @@ export const SchoolAffiliationMachine = config.createMachine({
         },
         onDone: {
           target: 'AwaitingUPchieveVerification',
-          actions: assign({
-            advisorInfo: ({ event }) => event.output,
-          }),
+          actions: ['refetchGroup'],
         },
         onError: {
           target: 'SeekingAffiliation',

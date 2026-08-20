@@ -31,6 +31,12 @@ async function createTeam() {
       // group page right away if they are a member of a group
       if (e.response.data.err === 'User already in a group') {
         router.replace('/groups')
+      } else if (e.response.status === 422) {
+        // A 422 here is a rule the applicant has run into rather than a fault:
+        // most often another chapter already covers their school, which staff
+        // resolve by handing over that chapter's invite code. The server's
+        // message is already the one to show them.
+        errorMessage.value = e.response.data.err
       } else {
         errorMessage.value = `Unknown error, please try again: ${e.response.data.err}`
         LoggerService.noticeError(e.response.data.err)

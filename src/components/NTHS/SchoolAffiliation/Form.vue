@@ -6,13 +6,20 @@ import FormInput from '@/components/FormInput.vue'
 import useVuelidate from '@vuelidate/core'
 import FormEmail from '@/components/FormEmail.vue'
 import FormPhoneInput from '@/components/FormPhoneInput.vue'
+import type { AdvisorInfo } from './school-affiliation-machine'
 
-const props = defineProps<{ submitting: boolean }>()
+const props = defineProps<{
+  submitting: boolean
+  schoolAlreadyKnown: boolean
+}>()
 
-const emit = defineEmits(['submit', 'cancel'])
+const emit = defineEmits<{
+  submit: [advisorInfo: AdvisorInfo]
+  cancel: []
+}>()
 
 const formInputs = reactive({
-  schoolId: null,
+  schoolId: null as string | null,
   firstName: '',
   lastName: '',
   email: '',
@@ -36,39 +43,47 @@ function onCantFindSchool() {
 
 <template>
   <form @submit.prevent="emit('submit', formInputs)" autocomplete="off">
-    <FormSchoolSearch
-      v-if="showSchoolSearch"
-      :disabled="props.submitting"
-      label="What school do you go to?"
-      v-model="formInputs.schoolId"
-      :hasDefaultValue="false"
-      :isRequired="false"
-      startSearchEvent=""
-      cannotFindSchoolEvent=""
-      selectedEvent=""
-      :showCannotFindSchoolForm="false"
-    >
-      <template v-slot:cannotFindSchool>
-        <div class="cant-find-school-container">
-          <button
-            type="button"
-            class="school-search-button"
-            @click="onCantFindSchool"
-          >
-            (Skip) My school isn't listed
-          </button>
-        </div>
-      </template>
-    </FormSchoolSearch>
-    <button
-      class="school-search-button"
-      v-else
-      type="button"
-      @click="() => (showSchoolSearch = true)"
-      :showArrow="false"
-    >
-      (Optional) Search for my school
-    </button>
+    <!--
+      A chapter with UNAFFILIATED status already has its school on record from
+      founding, so re-showing the picker here would waste the president's time
+      or let them silently overwrite it. Backend (subway's NTHSGroupsService.ts,
+      submitSchoolAffiliation) already treats a missing schoolId as safe.
+    -->
+    <template v-if="!props.schoolAlreadyKnown">
+      <FormSchoolSearch
+        v-if="showSchoolSearch"
+        :disabled="props.submitting"
+        label="What school do you go to?"
+        v-model="formInputs.schoolId"
+        :hasDefaultValue="false"
+        :isRequired="false"
+        startSearchEvent=""
+        cannotFindSchoolEvent=""
+        selectedEvent=""
+        :showCannotFindSchoolForm="false"
+      >
+        <template v-slot:cannotFindSchool>
+          <div class="cant-find-school-container">
+            <button
+              type="button"
+              class="school-search-button"
+              @click="onCantFindSchool"
+            >
+              (Skip) My school isn't listed
+            </button>
+          </div>
+        </template>
+      </FormSchoolSearch>
+      <button
+        class="school-search-button"
+        v-else
+        type="button"
+        @click="() => (showSchoolSearch = true)"
+        :showArrow="false"
+      >
+        (Optional) Search for my school
+      </button>
+    </template>
     <FormInput
       :disabled="props.submitting"
       v-model="formInputs.title"

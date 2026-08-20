@@ -37,13 +37,6 @@ export default {
     appendNTHSGroupAction: (state, action) => {
       state.NTHSGroupActions = [...state.NTHSGroupActions, action]
     },
-    setNTHSGroupStatus: (state, { groupId, schoolAffiliationStatus }) => {
-      const group = state.NTHSGroups.find((g) => g.groupId === groupId)
-      if (group) {
-        const updatedGroup = { ...group, schoolAffiliationStatus }
-        state.NTHSGroups = [updatedGroup]
-      }
-    },
     setChecksInFlight(state, checksInFlight) {
       state.checksInFlight = checksInFlight
     },

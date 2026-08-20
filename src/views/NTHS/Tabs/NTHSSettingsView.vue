@@ -57,6 +57,7 @@ async function onLeaveTeam() {
         v-if="isGroupAdmin && group.groupId"
         :groupId="group.groupId"
         :initialStatus="group.schoolAffiliationStatus"
+        :hasSchoolOnRecord="!!group.hasSchoolOnRecord"
       />
     </section>
     <LargeButton
