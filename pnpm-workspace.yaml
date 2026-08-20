@@ -1,3 +1,13 @@
+# vue@3.5.41 + @vue/test-utils@2.4.11 (both currently latest) break Vite's esbuild
+# dep optimizer in vitest browser mode: `defineComponent` throws "isFunction is not
+# a function" when a test file imports both `vue` and `vue-router`
+# (related? https://github.com/rolldown/rolldown/issues/9502)
+# Remove this override once a compatible pair ships upstream.
+# This might be fixed with vite 8.
+overrides:
+  vue: '3.5.32'
+  '@vue/test-utils': '2.4.6'
+
 allowBuilds:
   '@fastify/pre-commit': true
   '@parcel/watcher': true
