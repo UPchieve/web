@@ -34,6 +34,10 @@ function handleClose(event: MouseEvent) {
     props.closeModal()
   }
 }
+
+function handleBackButton() {
+  props.closeModal?.()
+}
 </script>
 
 <template>
@@ -49,7 +53,7 @@ function handleClose(event: MouseEvent) {
       <div
         v-if="backText"
         class="upc-modal-header-close-button"
-        @click="handleClose"
+        @click="handleBackButton"
       >
         <arrow-icon class="icon" />
         <p>{{ backText }}</p>

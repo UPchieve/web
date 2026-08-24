@@ -151,7 +151,7 @@ defineExpose({
 .uc-form-button {
   margin-left: 0;
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .share-info-form-buttons {

@@ -12,7 +12,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <modal :closeModal="props.closeModal">
+  <modal>
     <div class="content">
       <h1>Help your students get to know you better!</h1>
       <p>
