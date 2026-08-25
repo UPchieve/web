@@ -63,6 +63,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: true,
       [POSTHOG_FEATURE_FLAGS.S2V_THEMING]: false,
       [POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW]: false,
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW]: false,
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW_EMAIL_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO]: false,
     },
     multivariantFlags: {
@@ -286,6 +288,12 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM],
     isAsyncEssayReviewEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW],
+    isVolunteerAsyncEssayReviewEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW],
+    isAsyncEssayReviewEmailNotificationsEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW_EMAIL_NOTIFICATIONS
+      ],
     isShowInfoOptInEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO

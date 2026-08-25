@@ -102,6 +102,7 @@ const StandaloneBotChatView = () =>
 const Totp = () => import('./views/Totp/index.vue')
 const TotpEnroll = () => import('./views/Totp/Enroll.vue')
 const EssayReviewView = () => import('./views/EssayReviewView.vue')
+const VolunteerEssayReviews = () => import('./views/VolunteerEssayReviews.vue')
 const AdminEssayReviewList = () =>
   import('./views/Admin/AdminEssayReviewList.vue')
 const AdminEssayReviewDetail = () =>
@@ -1098,6 +1099,18 @@ const routes: RouteRecordRaw[] = [
     path: '/essay-review',
     name: 'EssayReviewView',
     component: EssayReviewView,
+    meta: { protected: true },
+  },
+  {
+    path: '/volunteer/essay-reviews',
+    name: 'VolunteerEssayReviews',
+    component: VolunteerEssayReviews,
+    meta: { protected: true },
+  },
+  {
+    path: '/volunteer/essay-reviews/:submissionId',
+    name: 'VolunteerEssayReviewDetail',
+    component: VolunteerEssayReviews,
     meta: { protected: true },
   },
   {

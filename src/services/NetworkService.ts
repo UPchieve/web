@@ -19,6 +19,7 @@ import type {
 import type {
   EssayReviewStatus,
   EssayReviewSubmission,
+  EssayReviewSubmissionForVolunteer,
 } from '@/types/essay-review'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
@@ -1550,6 +1551,44 @@ export default {
     try {
       return await httpGet<{ essayReviews: EssayReviewSubmission[] }>(
         `${ADMIN_ROOT}/essay-reviews`
+      )
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async getEssayReviewsForVolunteer() {
+    try {
+      return await httpGet<{
+        essayReviews: EssayReviewSubmissionForVolunteer[]
+      }>(`${API_ROOT}/essay-reviews/list`)
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async submitVolunteerEssayReview(submissionId: string, review: string) {
+    try {
+      return await httpPost<void>(
+        `${API_ROOT}/essay-reviews/volunteer/${submissionId}/reviews`,
+        { review }
+      )
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async getEssayReviewEmailPreference() {
+    try {
+      return await httpGet<{ optedIn: boolean }>(
+        `${API_ROOT}/essay-reviews/volunteer/email-preference`
+      )
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
+  async updateEssayReviewEmailPreference(optedIn: boolean) {
+    try {
+      return await httpPost<void>(
+        `${API_ROOT}/essay-reviews/volunteer/email-preference`,
+        { optedIn }
       )
     } catch (err) {
       return this._axiosErrorHandler(err as AxiosError)

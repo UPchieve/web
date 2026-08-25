@@ -9,11 +9,26 @@
       }}</a>
     </div>
 
-    <div class="volunteer-dashboard__body">
+    <div
+      class="volunteer-dashboard__body"
+      :class="{
+        'volunteer-dashboard__body--essay-review': shouldShowEssayReviewCard,
+      }"
+    >
       <template v-if="user.isApproved && user.isOnboarded">
         <ListSessionsCard
           :notificationsCardWasDismissed="notificationsCardWasDismissed"
         />
+        <TaskCard
+          v-if="shouldShowEssayReviewCard"
+          title="Review Application Essays"
+          subtitle="Give students thoughtful, asynchronous feedback when it works for you."
+          :actions="essayReviewActions"
+        >
+          <template v-slot:icon>
+            <SquareTextIcon />
+          </template>
+        </TaskCard>
         <ImpactSummaryCard />
       </template>
       <template v-else-if="isCombinedOnboardingChecklistEnabled">
@@ -233,6 +248,7 @@ export default {
       joinedTeamCode: '',
       nextTask: {},
       hasSeenShareInfoModal: false,
+      essayReviewCardImpressionTracked: false,
     }
   },
   computed: {
@@ -258,12 +274,36 @@ export default {
         'featureFlags/isCombinedOnboardingChecklistEnabled',
       hasASubjectCertification: 'user/hasASubjectCertification',
       isShowInfoOptInEnabled: 'featureFlags/isShowInfoOptInEnabled',
+      isVolunteerAsyncEssayReviewEnabled:
+        'featureFlags/isVolunteerAsyncEssayReviewEnabled',
     }),
     shouldShowNotificationsCard() {
       return (
         !this.notificationsCardWasDismissed &&
         !this.hasCompletedAllNotificationActions
       )
+    },
+    shouldShowEssayReviewCard() {
+      return (
+        this.user.isApproved &&
+        this.user.isOnboarded &&
+        this.user.banType !== 'complete' &&
+        this.user.banType !== 'shadow' &&
+        this.isVolunteerAsyncEssayReviewEnabled &&
+        this.user.subjects?.includes('applicationEssays')
+      )
+    },
+    essayReviewActions() {
+      return [
+        {
+          title: 'See essays awaiting review',
+          subtitle: 'Open essay list',
+          // Essay review is recurring, so this action never becomes complete
+          status: 'not-started',
+          onClick: this.openEssayReviews,
+          icon: SquareTextIcon,
+        },
+      ]
     },
 
     photoIdAction() {
@@ -581,7 +621,26 @@ export default {
       }
     },
   },
+  watch: {
+    shouldShowEssayReviewCard: {
+      immediate: true,
+      handler(isVisible) {
+        if (isVisible && !this.essayReviewCardImpressionTracked) {
+          this.essayReviewCardImpressionTracked = true
+          AnalyticsService.captureEvent(
+            EVENTS.VOLUNTEER_ASYNC_ESSAY_REVIEW_DASHBOARD_CARD_VIEWED
+          )
+        }
+      },
+    },
+  },
   methods: {
+    openEssayReviews() {
+      AnalyticsService.captureEvent(
+        EVENTS.VOLUNTEER_ASYNC_ESSAY_REVIEW_DASHBOARD_CTA_CLICKED
+      )
+      this.$router.push('/volunteer/essay-reviews')
+    },
     sessionClickDialog(session) {
       if (!this.hasCompletedBackgroundInfo) {
         AnalyticsService.captureEvent(
@@ -814,6 +873,11 @@ export default {
         // we can be hyper-specific about number of cells each child
         // should take up.
         grid-row-end: span 2;
+      }
+
+      &--essay-review > *:nth-child(n) {
+        grid-column: auto;
+        grid-row-end: auto;
       }
     }
   }

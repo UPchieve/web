@@ -15,6 +15,25 @@ export type EssayReviewSubmission = {
   characterCount: number
   status: EssayReviewStatus
   submittedAt: string
-  reviewedAt?: string
-  reviewedBy?: string
+  staffReviewedAt?: string
+  staffReviewerId?: string
+  reviews: TutorEssayReview[]
+  finalReviews?: string[]
+  emailSentAt?: string
+}
+
+export type TutorEssayReview = {
+  id: string
+  reviewerId: string
+  reviewerFirstName?: string
+  review: string
+  submittedAt: string
+}
+
+export type EssayReviewSubmissionForVolunteer = Omit<
+  EssayReviewSubmission,
+  'userId' | 'studentEmail' | 'studentFirstName' | 'reviews'
+> & {
+  reviewCount: number
+  hasReviewed: boolean
 }

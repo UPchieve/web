@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import { useRouter } from 'vue-router'
+import { countWords } from '@/utils/word-count'
 
 const maxEssayLength = 50000
 const maxPromptLength = 5000
@@ -34,12 +35,7 @@ const router = useRouter()
 
 const normalizedEssay = computed(() => essay.value.trim())
 
-const wordCount = computed(() => {
-  if (!normalizedEssay.value) {
-    return 0
-  }
-  return normalizedEssay.value.split(/\s+/u).length
-})
+const wordCount = computed(() => countWords(normalizedEssay.value))
 
 const isSubmitDisabled = computed(() => {
   return (

@@ -196,13 +196,15 @@ onMounted(loadEssayReview)
                   }}
                 </dd>
               </div>
-              <div v-if="essayReview.reviewedAt">
-                <dt>Reviewed</dt>
-                <dd>{{ dayjs(essayReview.reviewedAt).format('l, h:mm a') }}</dd>
+              <div v-if="essayReview.staffReviewedAt">
+                <dt>Staff reviewed</dt>
+                <dd>
+                  {{ dayjs(essayReview.staffReviewedAt).format('l, h:mm a') }}
+                </dd>
               </div>
-              <div v-if="essayReview.reviewedBy">
-                <dt>Reviewed by</dt>
-                <dd>{{ essayReview.reviewedBy }}</dd>
+              <div v-if="essayReview.staffReviewerId">
+                <dt>Staff reviewer ID</dt>
+                <dd>{{ essayReview.staffReviewerId }}</dd>
               </div>
             </dl>
           </section>
