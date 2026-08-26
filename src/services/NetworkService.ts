@@ -1616,4 +1616,14 @@ export default {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
+  async adminSendEssayReviews(submissionId: Uuid, finalReviews: string[]) {
+    try {
+      return await httpPost<{ essayReview: EssayReviewSubmission }>(
+        `${ADMIN_ROOT}/essay-reviews/${submissionId}/send`,
+        { finalReviews }
+      )
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
 }
