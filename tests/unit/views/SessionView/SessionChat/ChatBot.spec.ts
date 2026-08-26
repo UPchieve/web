@@ -5,7 +5,10 @@ import { storeOptions } from '@/store'
 import ChatBot from '@/views/SessionView/SessionChat/ChatBot.vue'
 import NetworkService from '@/services/NetworkService'
 import { nextTick } from 'vue'
-import { getSessionEndDMsMessage } from '../../../../../src/utils/chatbot-utils'
+import {
+  getSessionEndDMsMessage,
+  getSessionEndedMessage,
+} from '../../../../../src/utils/chatbot-utils'
 import { dayjs } from '@/utils/time-utils'
 
 vi.mock('../../../../../services/NetworkService')
@@ -245,6 +248,73 @@ describe('ChatBot', () => {
       await flushPromises()
 
       expect(mockAddMessage).not.toHaveBeenCalled()
+    })
+  })
+  describe('Session ended system message when the session is not recap eligible', () => {
+    const session = {
+      id: 'session',
+      student: { id: 'student' },
+      volunteer: { id: 'volunteer' },
+      messages: [],
+      endedAt: new Date(),
+    }
+
+    const sessionEndedMessageFor = async ({ userId, isStudent }) => {
+      const addMessage = vi.fn()
+      NetworkService.isSessionRecapEligible = vi
+        .fn()
+        .mockResolvedValue({ data: { isEligible: false } })
+      getWrapper({
+        featureFlags: {
+          getters: { isStudentsInitiateDmsEnabled: () => true },
+        },
+        user: {
+          state: {
+            recapSession: { messages: [] },
+            session,
+            user: { id: userId },
+          },
+          getters: {
+            isStudent: () => isStudent,
+            isVolunteer: () => !isStudent,
+          },
+          actions: { addMessage },
+        },
+        props: { currentSession: session, isInRecap: false },
+      })
+      vi.runAllTimers()
+      await nextTick()
+      await flushPromises()
+
+      expect(addMessage).toHaveBeenCalledTimes(1)
+      return addMessage.mock.calls[0][1].contents
+    }
+
+    it('thanks the student for working with their coach', async () => {
+      const contents = await sessionEndedMessageFor({
+        userId: session.student.id,
+        isStudent: true,
+      })
+
+      expect(contents).toBe(getSessionEndedMessage(true))
+    })
+
+    it('thanks the volunteer for picking up the session', async () => {
+      const contents = await sessionEndedMessageFor({
+        userId: session.volunteer.id,
+        isStudent: false,
+      })
+
+      expect(contents).toBe(getSessionEndedMessage(false))
+    })
+
+    it('follows session participation when the active role disagrees', async () => {
+      const contents = await sessionEndedMessageFor({
+        userId: session.volunteer.id,
+        isStudent: true,
+      })
+
+      expect(contents).toBe(getSessionEndedMessage(false))
     })
   })
 })

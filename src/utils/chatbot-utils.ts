@@ -12,6 +12,12 @@ export function getSessionEndDMsMessage(
   return contents
 }
 
+export function getSessionEndedMessage(isSessionStudent: boolean) {
+  return isSessionStudent
+    ? 'The session has ended. Thanks for working with your coach today!'
+    : 'The session has ended. Thanks so much for picking up this session!'
+}
+
 export function renderLatex(
   contents: string,
   escapeHtml?: (s: string) => string

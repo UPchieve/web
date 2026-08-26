@@ -47,7 +47,10 @@ import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
-import { getSessionEndDMsMessage } from '@/utils/chatbot-utils'
+import {
+  getSessionEndDMsMessage,
+  getSessionEndedMessage,
+} from '@/utils/chatbot-utils'
 
 export default {
   name: 'chat-bot',
@@ -97,9 +100,11 @@ export default {
     isStillMessaging() {
       return this.unsentBotMessages.length > 0
     },
+    isSessionStudent() {
+      return this.currentSession.student.id === this.user.id
+    },
     dmsSystemMessage() {
-      const isSessionStudent = this.currentSession.student.id === this.user.id
-      return getSessionEndDMsMessage(isSessionStudent, this.isInRecap)
+      return getSessionEndDMsMessage(this.isSessionStudent, this.isInRecap)
     },
   },
 
@@ -227,8 +232,7 @@ export default {
           } else {
             this.$store.dispatch('user/addMessage', {
               sessionId: this.currentSession.id,
-              contents:
-                'The session has ended. Thanks so much for picking up this session!',
+              contents: getSessionEndedMessage(this.isSessionStudent),
               createdAt: new Date().toISOString(),
               user: null,
               hasHtml: true,
