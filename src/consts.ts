@@ -1000,7 +1000,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   AI_OTHER_SUBJECT_SURVEY = 'ai-other-subject-survey',
   VIDEO_MODERATION_SAMPLE_INTERVAL = 'video-moderation-sample-interval',
   IMPACT_STUDY_SURVEY = 'impact-study-survey',
-  STUDENTS_BECOME_VOLUNTEERS = 'students-become-volunteers',
   TEACHER_GUIDANCE_EXPERIMENT = 'teacher-guidance-experiment',
   DISPLAY_VOLUNTEER_LANGUAGES = 'display-volunteer-languages',
   SECONDARY_EMAIL_ON_PROFILE_PAGE = 'secondary-email-on-profile-page',

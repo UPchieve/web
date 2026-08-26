@@ -28,7 +28,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
-      [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES]: false,
       [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
@@ -92,8 +91,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
       [POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL]: null,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: {},
-      [POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS]:
-        'Interested in becoming a volunteer tutor on UPchieve?',
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
@@ -193,10 +190,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
     getImpactStudySurveyPayload: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY],
-    isStudentsBecomeVolunteersEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
-    studentsBecomeVolunteersCopy: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_BECOME_VOLUNTEERS],
     volunteerFeedbackForStudentFlag: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT],
     isTeacherGuidanceExperimentActive: (state: FeatureFlagState) =>
