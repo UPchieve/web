@@ -11,11 +11,9 @@ export type GroupMember = {
   lastInitial: string
 }
 
-export const actionsCtaMap = {
-  'NAMED YOUR TEAM': 'Name your team in "Settings" below',
-  'REVIEWED RESOURCES': 'Review UPchieve resources',
-  'ATTENDED ORIENTATION': 'Attend orientation',
-}
+export const NTHS_ORIENTATION_URL = 'https://nationaltutor.org/orientation'
+export const NTHS_RESOURCES_URL = 'https://nationaltutor.org/resources'
+
 export type NTHSSchoolAffiliationActionName =
   | 'MARKED SCHOOL AFFILIATION IN PROGRESS'
   | 'SUBMITTED ADVISOR CONTACT INFO'
@@ -27,7 +25,25 @@ export type NTHSActionName =
   | 'NAMED YOUR TEAM'
   | 'REVIEWED RESOURCES'
   | 'ATTENDED ORIENTATION'
+  | 'RECRUITMENT SPRINT'
   | NTHSSchoolAffiliationActionName
+
+// Only the actions listed here render as checkboxes; the rest of upchieve.nths_actions
+// (school affiliation) comes back from the same endpoint and is driven elsewhere.
+export const actionsCtaMap: Partial<
+  Record<NTHSActionName, { text: string; url?: string }>
+> = {
+  'NAMED YOUR TEAM': { text: 'Name your team in "Settings" below' },
+  'REVIEWED RESOURCES': {
+    text: 'Review NTHS resources',
+    url: NTHS_RESOURCES_URL,
+  },
+  'ATTENDED ORIENTATION': {
+    text: 'Complete orientation',
+    url: NTHS_ORIENTATION_URL,
+  },
+  'RECRUITMENT SPRINT': { text: 'Complete the recruitment sprint' },
+}
 
 export enum CheckboxStatus {
   Done = 'done',
@@ -49,6 +65,7 @@ export type SchoolAffiliationAction = {
 
 export type ChecklistItem = {
   text: string
+  url?: string
   status: CheckboxStatus
   actionId: number
   actionName: NTHSActionName

@@ -111,7 +111,7 @@ export default {
     },
     NTHSChecklist: (state) => {
       const checklist = state.NTHSActions.reduce((list, action) => {
-        const text = actionsCtaMap[action.name]
+        const cta = actionsCtaMap[action.name]
         const status = state.checksInFlight.includes(action.id)
           ? CheckboxStatus.Saving
           : state.NTHSGroupActions.some(
@@ -120,9 +120,10 @@ export default {
             ? CheckboxStatus.Done
             : CheckboxStatus.NotDone
 
-        if (text) {
+        if (cta) {
           list.push({
-            text,
+            text: cta.text,
+            url: cta.url,
             status,
             actionId: action.id,
             actionName: action.name,

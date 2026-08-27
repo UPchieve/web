@@ -3,6 +3,7 @@ import InviteLink from '@/components/NTHS/InviteLink.vue'
 import { computed, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import Checklist from '@/components/NTHS/Checklist.vue'
+import { NTHS_RESOURCES_URL } from '@/services/NTHSGroupService'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import LargeButton from '@/components/LargeButton.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
@@ -98,7 +99,7 @@ function goToDashboard() {
           v-if="isGroupAdmin"
           target="_blank"
           rel="noopener noreferrer"
-          routeTo="https://drive.google.com/drive/folders/1ci0PfM_miToxUF1WNzmWK4r-EiJ8juCI?usp=sharing"
+          :routeTo="NTHS_RESOURCES_URL"
           >Review NTHS Resources
         </LargeButton>
       </div>

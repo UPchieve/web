@@ -46,7 +46,15 @@ const checkboxDimensions = 20
             })
           "
         />
-        {{ item.text }}</label
+        <a
+          v-if="item.url"
+          :href="item.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          @click.stop
+          >{{ item.text }}</a
+        >
+        <template v-else>{{ item.text }}</template></label
       >
     </div>
   </Card>
@@ -71,5 +79,9 @@ const checkboxDimensions = 20
 }
 .checkbox.loader :deep(div) {
   border-color: $c-information-blue transparent transparent transparent;
+}
+.row a {
+  color: $c-information-blue;
+  text-decoration: underline;
 }
 </style>
