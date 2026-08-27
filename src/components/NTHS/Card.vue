@@ -23,7 +23,7 @@
   border-bottom: rgb(224, 224, 224) 1px solid;
   line-height: 1.11em;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   text-align: start;
 }
 .content {
