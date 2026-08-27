@@ -13,6 +13,7 @@ const props = defineProps({
   cols: { type: Number, default: 10 },
   rows: { type: Number, default: 10 },
   blurEvent: { type: String },
+  blurEventProperties: { type: Object, default: () => ({}) },
   isRequired: { type: Boolean, default: true },
   label: { type: String },
   maxLength: { type: Number },
@@ -59,7 +60,7 @@ function getValidationErrors(customError = '') {
 function onBlur() {
   v$.value.modelValue.$touch()
   if (props.modelValue && !hasEnteredText.value && props.blurEvent) {
-    AnalyticsService.captureEvent(props.blurEvent)
+    AnalyticsService.captureEvent(props.blurEvent, props.blurEventProperties)
     hasEnteredText.value = true
   }
 }

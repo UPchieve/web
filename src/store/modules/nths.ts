@@ -11,6 +11,7 @@ export default {
     checksInFlight: [],
     NTHSCandidateApplicationStatus: undefined,
     canApplyForNTHSPresident: false,
+    NTHSApplicationIneligibilityReasons: [],
   },
   mutations: {
     setNTHSGroups: (state, groups) => {
@@ -46,6 +47,9 @@ export default {
     setCanApplyForNTHSPresident(state, isEligible) {
       state.canApplyForNTHSPresident = isEligible
     },
+    setNTHSApplicationIneligibilityReasons(state, reasons) {
+      state.NTHSApplicationIneligibilityReasons = reasons
+    },
   },
   actions: {
     appendToChecksInFlight({ commit, state }, id) {
@@ -70,6 +74,10 @@ export default {
 
       const eligibility = await NetworkService.getNTHSApplicationEligibility()
       commit('setCanApplyForNTHSPresident', eligibility.data.eligible)
+      commit(
+        'setNTHSApplicationIneligibilityReasons',
+        eligibility.data.reasons ?? []
+      )
       return results.data.groups
     },
     async fetchNTHSGroupMembers({ commit }, groupId) {

@@ -1,4 +1,7 @@
 import type { Store } from 'vuex'
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 export async function shouldGoToGroup(store: Store<any>) {
   return (
@@ -38,4 +41,16 @@ export function shouldGoToPending(store: Store<any>) {
     store.state.nths.NTHSCandidateApplicationStatus
 
   return isApplicationPageFlagOn && candidateApplicationStatus === 'applied'
+}
+
+export function redirectBlockedApplicant(
+  store: Store<any>,
+  to: RouteLocationNormalized,
+  next: NavigationGuardNext
+) {
+  AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_BLOCKED, {
+    reasons: store.state.nths.NTHSApplicationIneligibilityReasons,
+    attemptedRoute: to.path,
+  })
+  return next('/dashboard')
 }

@@ -1464,9 +1464,11 @@ export default {
     ).then(this._successHandler, this._errorHandler)
   },
   getNTHSApplicationEligibility() {
-    return httpGet<{ eligible: boolean; currentGradeName?: string }>(
-      `${API_ROOT}/nths-application/eligibility`
-    )
+    return httpGet<{
+      eligible: boolean
+      reasons?: string[]
+      currentGradeName?: string
+    }>(`${API_ROOT}/nths-application/eligibility`)
   },
   submitNTHSApplication(data: {
     schoolId?: string

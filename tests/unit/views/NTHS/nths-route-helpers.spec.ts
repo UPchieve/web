@@ -1,14 +1,20 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 import {
+  redirectBlockedApplicant,
   shouldGoToApply,
   shouldGoToCreate,
   shouldGoToPending,
 } from '@/views/NTHS/nths-route-helpers'
 
+vi.mock('@/services/AnalyticsService')
+
 type StoreShape = {
   status?: string
   applicationPageOn?: boolean
   canApply?: boolean
+  reasons?: string[]
 }
 
 // Only the fields these helpers read, so a change to any of them is visible here.
@@ -16,12 +22,14 @@ function fakeStore({
   status,
   applicationPageOn = true,
   canApply = true,
+  reasons = [],
 }: StoreShape) {
   return {
     state: {
       nths: {
         NTHSCandidateApplicationStatus: status,
         canApplyForNTHSPresident: canApply,
+        NTHSApplicationIneligibilityReasons: reasons,
       },
     },
     getters: { 'featureFlags/isNTHSApplicationPageEnabled': applicationPageOn },
@@ -93,5 +101,27 @@ describe('shouldGoToPending', () => {
     expect(shouldGoToPending(fakeStore({ status: 'applied' }))).toBe(true)
     expect(shouldGoToPending(fakeStore({ status: 'approved' }))).toBe(false)
     expect(shouldGoToPending(fakeStore({ status: undefined }))).toBe(false)
+  })
+})
+
+describe('redirectBlockedApplicant', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('reports the server reasons and the route that was refused', () => {
+    const next = vi.fn()
+
+    redirectBlockedApplicant(
+      fakeStore({ canApply: false, reasons: ['notApproved'] }),
+      { path: '/groups/apply' } as never,
+      next
+    )
+
+    expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
+      EVENTS.NTHS_APPLICATION_BLOCKED,
+      { reasons: ['notApproved'], attemptedRoute: '/groups/apply' }
+    )
+    expect(next).toHaveBeenCalledWith('/dashboard')
   })
 })

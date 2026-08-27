@@ -1,4 +1,12 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { onMounted } from 'vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
+
+onMounted(() => {
+  AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_PENDING_VIEWED)
+})
+</script>
 
 <template>
   <div class="page">

@@ -52,6 +52,10 @@ export default {
     blurEvent: {
       type: String,
     },
+    blurEventProperties: {
+      type: Object,
+      default: () => ({}),
+    },
     isRequired: {
       type: Boolean,
       default: true,
@@ -150,7 +154,7 @@ export default {
     onBlur() {
       this.v$.modelValue.$touch()
       if (this.modelValue && !this.hasEnteredText && this.blurEvent) {
-        AnalyticsService.captureEvent(this.blurEvent)
+        AnalyticsService.captureEvent(this.blurEvent, this.blurEventProperties)
         this.hasEnteredText = true
       }
     },

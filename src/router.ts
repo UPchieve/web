@@ -109,6 +109,7 @@ const AdminEssayReviewDetail = () =>
   import('./views/Admin/AdminEssayReviewDetail.vue')
 
 import {
+  redirectBlockedApplicant,
   shouldGoToApply,
   shouldGoToCreate,
   shouldGoToGroup,
@@ -942,7 +943,7 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: [
       switchToVolunteerOrCancel,
       async (
-        _to: RouteLocationNormalized,
+        to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         next: NavigationGuardNext
       ) => {
@@ -951,7 +952,7 @@ const routes: RouteRecordRaw[] = [
         if (shouldGoToPending(store)) return next('/groups/application-pending')
         if (shouldGoToApply(store)) return next()
 
-        return next('/dashboard')
+        return redirectBlockedApplicant(store, to, next)
       },
     ],
   },
@@ -963,7 +964,7 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: [
       switchToVolunteerOrCancel,
       async (
-        _to: RouteLocationNormalized,
+        to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         next: NavigationGuardNext
       ) => {
@@ -972,7 +973,7 @@ const routes: RouteRecordRaw[] = [
         if (shouldGoToPending(store)) return next('/groups/application-pending')
         if (shouldGoToApply(store)) return next()
 
-        return next('/dashboard')
+        return redirectBlockedApplicant(store, to, next)
       },
     ],
   },
@@ -984,7 +985,7 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: [
       switchToVolunteerOrCancel,
       async (
-        _to: RouteLocationNormalized,
+        to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         next: NavigationGuardNext
       ) => {
@@ -993,7 +994,7 @@ const routes: RouteRecordRaw[] = [
         if (shouldGoToApply(store)) return next('/groups/apply')
         if (shouldGoToPending(store)) return next()
 
-        return next('/dashboard')
+        return redirectBlockedApplicant(store, to, next)
       },
     ],
   },
@@ -1005,7 +1006,7 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: [
       switchToVolunteerOrCancel,
       async (
-        _to: RouteLocationNormalized,
+        to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         next: NavigationGuardNext
       ) => {
@@ -1014,7 +1015,7 @@ const routes: RouteRecordRaw[] = [
         if (shouldGoToPending(store)) return next('/groups/application-pending')
         if (shouldGoToCreate(store)) return next()
 
-        return next('/dashboard')
+        return redirectBlockedApplicant(store, to, next)
       },
     ],
   },
@@ -1040,7 +1041,7 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: [
       switchToVolunteerOrCancel,
       async (
-        _to: RouteLocationNormalized,
+        to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         next: NavigationGuardNext
       ) => {
@@ -1049,7 +1050,7 @@ const routes: RouteRecordRaw[] = [
         if (shouldGoToPending(store)) return next('/groups/application-pending')
         if (shouldGoToCreate(store)) return next('/groups/create')
 
-        return next('/dashboard')
+        return redirectBlockedApplicant(store, to, next)
       },
     ],
     children: [

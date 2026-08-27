@@ -12,13 +12,15 @@ import FormErrors from '@/components/FormErrors.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
 import { getAcademicYear } from '@/utils/academic-year'
-import { STATES_WITH_ABBREVIATIONS } from '@/consts'
+import { EVENTS, STATES_WITH_ABBREVIATIONS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import {
   buildEmptyResponses,
   collectResponses,
   HIGH_SCHOOL_GRADES,
   NTHS_APPLICATION_QUESTIONS,
+  type NTHSApplicationResponses,
   type NTHSQuestion,
 } from '@/services/NTHSApplicationService'
 
@@ -61,7 +63,14 @@ const hasSchool = computed(
 )
 const canLeaveSchoolStep = computed(() => hasSchool.value && !!gradeLevel.value)
 
+// The dropdown labels read '11th grade'; the API and the server's own events
+// use the bare GRADES value.
+const submittedGradeLevel = computed(() => gradeLevel.value.split(' ')[0])
+
 const questions = NTHS_APPLICATION_QUESTIONS
+
+const formOpenedAt = Date.now()
+let stepStartedAt = Date.now()
 
 // $silentErrors covers fields the applicant has not touched yet, so the button
 // stays disabled until every required answer and attestation is filled in.
@@ -70,6 +79,10 @@ const isQuestionsStepIncomplete = computed(
 )
 
 onMounted(async () => {
+  AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_FORM_VIEWED, {
+    hadPrefilledSchool: !!profileSchoolName,
+    hadGradeOnFile: !!gradeLevel.value,
+  })
   try {
     // Submitting rewrites users_schools, so an untouched prefill has to resolve
     // to the same school it displays.
@@ -92,11 +105,22 @@ onMounted(async () => {
 function goToQuestions() {
   if (!canLeaveSchoolStep.value) return
   error.value = ''
+  AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_STEP_COMPLETED, {
+    step: 'school',
+    usedUnlistedSchool: !school.schoolId,
+    gradeLevel: submittedGradeLevel.value,
+    secondsOnStep: secondsSince(stepStartedAt),
+  })
+  stepStartedAt = Date.now()
   step.value = 'questions'
 }
 
 function goBackToSchool() {
   error.value = ''
+  AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_STEP_BACK, {
+    secondsOnStep: secondsSince(stepStartedAt),
+  })
+  stepStartedAt = Date.now()
   step.value = 'school'
 }
 
@@ -105,8 +129,34 @@ async function submit() {
   isSubmitting.value = true
   error.value = ''
 
+  const collected = collectResponses(responses)
+  const application = await postApplication(collected)
+  if (!application) {
+    isSubmitting.value = false
+    return
+  }
+
+  AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_SUBMITTED, {
+    formVersion: application.formVersion,
+    usedUnlistedSchool: !school.schoolId,
+    gradeLevel: submittedGradeLevel.value,
+    optionalQuestionsAnswered: answeredOptionalQuestions(collected),
+    secondsFromFormOpen: secondsSince(formOpenedAt),
+  })
   try {
-    await NetworkService.submitNTHSApplication({
+    await store.dispatch('nths/fetchNthsData')
+  } finally {
+    router.replace('/groups/application-pending')
+  }
+}
+
+// Nothing after the POST belongs in here: the application already exists, so a
+// later failure is not a failed submission.
+async function postApplication(
+  collected: NTHSApplicationResponses
+): Promise<{ formVersion: number } | undefined> {
+  try {
+    const response = await NetworkService.submitNTHSApplication({
       schoolId: school.schoolId ?? undefined,
       unlistedSchool: school.schoolId
         ? undefined
@@ -116,23 +166,54 @@ async function submit() {
             state: school.state,
             website: school.website.trim() || undefined,
           },
-      gradeLevel: gradeLevel.value.split(' ')[0],
-      responses: collectResponses(responses),
+      gradeLevel: submittedGradeLevel.value,
+      responses: collected,
     })
-    await store.dispatch('nths/fetchNthsData')
-    router.replace('/groups/application-pending')
+    return response.data.application
   } catch (err: any) {
+    const httpStatus = err?.response?.status
+    AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_SUBMIT_FAILED, {
+      httpStatus,
+      errorClass: submitErrorClass(httpStatus),
+    })
     error.value =
       err?.response?.data?.err ??
       err?.message ??
       'We could not submit your application. Please try again.'
-  } finally {
-    isSubmitting.value = false
   }
 }
 
 function questionTestId(question: NTHSQuestion) {
   return `nths-question-${question.key}`
+}
+
+function secondsSince(startedAt: number) {
+  return Math.round((Date.now() - startedAt) / 1000)
+}
+
+function questionAnsweredProperties(question: NTHSQuestion) {
+  return {
+    questionKey: question.key,
+    questionType: question.type,
+    answerLength: String(responses[question.key]).length,
+  }
+}
+
+function answeredOptionalQuestions(collected: NTHSApplicationResponses) {
+  return questions
+    .filter(
+      (question) => question.isRequired === false && question.key in collected
+    )
+    .map((question) => question.key)
+}
+
+function submitErrorClass(httpStatus?: number) {
+  if (!httpStatus) return 'network'
+  if (httpStatus === 403) return 'ineligible'
+  if (httpStatus === 409) return 'alreadyApplied'
+  if (httpStatus === 422) return 'validation'
+  if (httpStatus >= 500) return 'server'
+  return 'unknown'
 }
 </script>
 
@@ -162,9 +243,9 @@ function questionTestId(question: NTHSQuestion) {
             :isRequired="true"
             requiredMessage="Pick your school from the list"
             :defaultValue="profileSchoolName"
-            startSearchEvent=""
-            cannotFindSchoolEvent=""
-            selectedEvent=""
+            :startSearchEvent="EVENTS.NTHS_APPLICATION_SCHOOL_SEARCHED"
+            :cannotFindSchoolEvent="EVENTS.NTHS_APPLICATION_CANNOT_FIND_SCHOOL"
+            :selectedEvent="EVENTS.NTHS_APPLICATION_SCHOOL_SELECTED"
             v-model="school.schoolId"
             v-model:cannotFindSchool="school.cannotFindSchool"
           />
@@ -239,6 +320,8 @@ function questionTestId(question: NTHSQuestion) {
               :isRequired="question.isRequired !== false"
               :rows="4"
               :maxLength="2000"
+              :blurEvent="EVENTS.NTHS_APPLICATION_QUESTION_ANSWERED"
+              :blurEventProperties="questionAnsweredProperties(question)"
             />
             <FormInput
               v-else-if="question.type === 'shortText'"
@@ -247,6 +330,8 @@ function questionTestId(question: NTHSQuestion) {
               :label="question.label"
               :placeholder="question.placeholder"
               :isRequired="question.isRequired !== false"
+              :blurEvent="EVENTS.NTHS_APPLICATION_QUESTION_ANSWERED"
+              :blurEventProperties="questionAnsweredProperties(question)"
             />
             <FormCheckBox
               v-else
