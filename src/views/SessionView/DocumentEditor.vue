@@ -8,9 +8,6 @@ import { socket } from '@/socket'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import RefreshDocumentEditorModal from '@/views/SessionView/RefreshDocumentEditorModal.vue'
 import FileDialog from '@/components/FileDialog.vue'
-import ModerationService from '@/services/ModerationService'
-import { file2b64 } from '@/utils/fileToBase64'
-import SessionService from '@/services/SessionService'
 import ModalService from '@/services/ModalService'
 import WordCount from '@/components/WordCount.vue'
 import {
@@ -21,6 +18,7 @@ import {
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
 import { ImageDropPaste } from '@/quill/modules/image'
 import type { Uuid } from '@/types/shared'
+import NetworkService from '@/services/NetworkService'
 
 /*
  * NOTE: this component supports midtown's version of the Quill editor.
@@ -100,9 +98,6 @@ const isSessionConnectionAlive = computed(
 )
 const isConnected = computed(() => store.state.socket.isConnected)
 const isSessionEnded = computed(() => !!store.state.user.session?.endedAt)
-const isUpdatedDocEditorImageStorageEnabled = computed<boolean>(
-  () => store.getters['featureFlags/isUpdatedDocEditorImageStorageEnabled']
-)
 const isSocketReadyToRequestForDoc = computed<[boolean, Uuid | undefined]>(
   () => [isConnected.value, currentSession.value?.id]
 )
@@ -179,27 +174,21 @@ async function processAndInsertImage(file: File) {
     formData.append('image', file)
     if (props.sessionId) formData.append('sessionId', props.sessionId)
 
-    const { isClean, failures } =
-      await ModerationService.checkIfImageIsClean(formData)
+    const { data } = await NetworkService.uploadSessionImage({
+      sessionId: props.sessionId,
+      image: file,
+    })
+    const isClean = data.isClean
+
     if (!isClean) {
-      onImageUploadModerationFailure(failures)
+      onImageUploadModerationFailure(data.failures)
       return
     }
 
     if (!quillEditor) return
 
-    if (isUpdatedDocEditorImageStorageEnabled.value) {
-      const imageUrl = await SessionService.uploadSessionImage(
-        props.sessionId!,
-        file
-      )
-      const range = quillEditor.getSelection()
-      quillEditor.insertEmbed(range?.index ?? 0, 'image', imageUrl, 'user')
-    } else {
-      const range = quillEditor.getSelection()
-      const b64 = await file2b64(file)
-      quillEditor.insertEmbed(range?.index ?? 0, 'image', b64, 'user')
-    }
+    const range = quillEditor.getSelection()
+    quillEditor.insertEmbed(range?.index ?? 0, 'image', data.imageUrl, 'user')
   } catch {
     await ModalService.showAlert(
       'Image Error',

@@ -10,11 +10,8 @@ import { toastController } from '@ionic/vue'
 import { closeCircleOutline } from 'ionicons/icons'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import FileDialog from '@/components/FileDialog.vue'
-import ModerationService from '@/services/ModerationService'
 import AnalyticsService from '@/services/AnalyticsService'
-import SessionService from '@/services/SessionService'
 import { EVENTS } from '@/consts'
-import { file2b64 } from '@/utils/fileToBase64'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import LoggerService from '@/services/LoggerService'
 import ActivityDot from '@/components/ActivityDot.vue'
@@ -36,6 +33,7 @@ import {
 } from '@/composables/imageUploadState'
 import ScreenShareToolbarButton from '@/components/ScreenShareToolbarButton.vue'
 import type { Uuid } from '@/types/shared'
+import NetworkService from '@/services/NetworkService'
 
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/image', ImageDropPaste)
@@ -114,9 +112,7 @@ const isSessionEnded = computed(() => !!store.state.user.session?.endedAt)
 const isStudent = computed<boolean>(() => store.getters['user/isStudent'])
 const isBanned = computed(() => store.getters['user/banType'])
 const userType = computed(() => store.getters['user/userType'])
-const isUpdatedDocEditorImageStorageEnabled = computed<boolean>(
-  () => store.getters['featureFlags/isUpdatedDocEditorImageStorageEnabled']
-)
+
 const partnerImageUploadError = computed(
   () => store.getters['socket/partnerImageUploadError']
 )
@@ -303,31 +299,25 @@ async function processAndInsertImage(file: File) {
     formData.append('image', file)
     if (props.sessionId) formData.append('sessionId', props.sessionId)
 
-    const { isClean, failures } =
-      await ModerationService.checkIfImageIsClean(formData)
+    const { data } = await NetworkService.uploadSessionImage({
+      sessionId: props.sessionId,
+      image: file,
+    })
+    const isClean = data.isClean
+
     if (!isClean) {
       socket.emit(IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_FAILED, {
         sessionId: currentSession.value?.id,
-        moderationFailures: failures,
+        moderationFailures: data.failures,
       })
-      onImageFailedModeration(failures)
+      onImageFailedModeration(data.failures)
       return
     }
 
     if (!quillEditor) return
 
-    if (isUpdatedDocEditorImageStorageEnabled.value) {
-      const imageUrl = await SessionService.uploadSessionImage(
-        props.sessionId!,
-        file
-      )
-      const range = quillEditor.getSelection()
-      quillEditor.insertEmbed(range?.index ?? 0, 'image', imageUrl, 'user')
-    } else {
-      const range = quillEditor.getSelection()
-      const b64 = await file2b64(file)
-      quillEditor.insertEmbed(range?.index ?? 0, 'image', b64, 'user')
-    }
+    const range = quillEditor.getSelection()
+    quillEditor.insertEmbed(range?.index ?? 0, 'image', data.imageUrl, 'user')
 
     socket.emit(IMAGE_UPLOAD_EVENTS.IMAGE_UPLOAD_SUCCESS, {
       sessionId: currentSession.value?.id,

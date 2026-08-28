@@ -425,7 +425,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ModerationService from '@/services/ModerationService'
 import { WhiteboardNullTool } from './WhiteboardNullTool'
 import WhiteboardAiTutorButton from './WhiteboardAiTutorButton.vue'
-import SessionService from '@/services/SessionService'
+import NetworkService from '@/services/NetworkService'
 import { processImage, getImageTooLargeMessage } from '@/utils/image-pipeline'
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
 import { secondsInMs } from '@/utils/time-utils'
@@ -589,6 +589,7 @@ export default {
       isBanned: 'user/banType',
       partnerImageUploadError: 'socket/partnerImageUploadError',
       partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
+      roleInCurrentSession: 'user/roleInCurrentSession',
     }),
     isAiWidgetHidden() {
       return this.aiWidgetHidden
@@ -1022,32 +1023,33 @@ export default {
       try {
         file = await processImage(file)
 
-        // Moderate the image
-        const formData = new FormData()
-        formData.append('image', file)
-        formData.append('sessionId', this.sessionId)
-        const { isClean, failures } =
-          await ModerationService.checkIfImageIsClean(formData)
+        //image moderation and upload happens on the backend
+        const { data } = await NetworkService.uploadSessionImage({
+          sessionId: this.sessionId,
+          image: file,
+        })
+
+        const isClean = data.isClean
+
         if (!isClean) {
           socket.emit('imageUploadFailed', {
             sessionId: this.sessionId,
-            moderationFailures: failures,
+            moderationFailures: data.failures,
           })
-          this.handleImageFailedModeration(failures)
+          this.handleImageFailedModeration(data.failures)
           return
+        } else {
+          this.insertPhoto(data.imageUrl)
+          socket.emit('imageUploadSuccess', {
+            sessionId: this.sessionId,
+          })
+          AnalyticsService.captureEvent(
+            EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE,
+            {
+              tool: 'whiteboard',
+            }
+          )
         }
-
-        const imageUrl = await SessionService.uploadSessionImage(
-          this.sessionId,
-          file
-        )
-        this.insertPhoto(imageUrl)
-        socket.emit('imageUploadSuccess', {
-          sessionId: this.sessionId,
-        })
-        AnalyticsService.captureEvent(EVENTS.IMAGE_UPLOAD_USER_UPLOADED_IMAGE, {
-          tool: 'whiteboard',
-        })
       } catch (error) {
         socket.emit('imageUploadFailed', {
           sessionId: this.sessionId,

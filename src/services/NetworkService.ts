@@ -477,6 +477,15 @@ export default {
       this._errorHandler
     )
   },
+  uploadSessionImage({ sessionId, image }) {
+    const formData = new FormData()
+    formData.append('image', image)
+
+    return httpPut(`${API_ROOT}/session/${sessionId}/image`, formData).then(
+      this._successHandler,
+      this._errorHandler
+    )
+  },
   async getAssignmentDocuments(assignmentId) {
     return httpGet(`${API_ROOT}/assignment/${assignmentId}/documents`).then(
       this._successHandler,
