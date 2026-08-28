@@ -10,7 +10,7 @@ import { EVENTS } from '@/consts'
 import { countWords } from '@/utils/word-count'
 import LargeButton from '@/components/LargeButton.vue'
 
-const minimumReviewWordCount = 50
+const minimumReviewWordCount = 100
 
 const route = useRoute()
 const router = useRouter()
@@ -248,7 +248,6 @@ onMounted(load)
               You already submitted a review for this essay.
             </p>
             <template v-else>
-              <!-- TODO: add a minimum amount of characters/words? use the logic from essay detail review?-->
               <textarea
                 id="tutor-review"
                 v-model="review"
@@ -265,7 +264,9 @@ onMounted(load)
                   class="character-count"
                   :class="{ 'minimum-met': !isReviewTooShort }"
                 >
-                  {{ reviewWordCount.toLocaleString() }} / 50 words minimum
+                  {{ reviewWordCount.toLocaleString() }} /
+                  {{ minimumReviewWordCount }} words minimum (recommended
+                  length: 250 words)
                 </span>
 
                 <large-button
