@@ -49,14 +49,28 @@ export default {
         subject: session.subTopic,
       })
       setTimeout(() => {
-        if (state.allOpenSessions.some((sess) => sess.id === session.id)) {
-          AnalyticsService.captureEvent(EVENTS.SESSION_SHOWN_AFTER_DELAY, {
-            sessionId: session.id,
-            subject: session.subTopic,
-          })
-          dispatch('alertVolunteer', { context, session })
-        }
         commit('removeDelayedSession', session)
+        const currentSession = state.allOpenSessions.find(
+          (sess) => sess.id === session.id
+        )
+        if (currentSession) {
+          AnalyticsService.captureEvent(EVENTS.SESSION_SHOWN_AFTER_DELAY, {
+            sessionId: currentSession.id,
+            subject: currentSession.subTopic,
+          })
+          /*
+           * Remove the session from `allOpenSessions` and re-process the open
+           * sessions so the delayed session is treated as brand new. This lets
+           * the full new-session alert flow in `handleIncomingSessions` run AND
+           * still triggers the Presence rule around missing an session request while
+           * being passive
+           */
+          commit('removeSession', currentSession.id)
+          dispatch('handleIncomingSessions', {
+            context,
+            sessions: [...state.allOpenSessions, currentSession],
+          })
+        }
       }, delayMs)
     },
     gotoSession({ dispatch }, { context, session }) {
