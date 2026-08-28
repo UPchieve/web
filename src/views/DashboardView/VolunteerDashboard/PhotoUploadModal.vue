@@ -114,7 +114,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import NetworkService from '@/services/NetworkService'
 import { mapState, mapGetters } from 'vuex'
 import Modal from '@/components/Modal.vue'
@@ -124,6 +123,7 @@ import CrossIcon from '@/assets/cross.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import Link from '@/components/Link.vue'
+import { processImage } from '@/utils/image-pipeline'
 
 export default {
   name: 'volunteer-dashboard',
@@ -182,35 +182,34 @@ export default {
       this.photo = ''
       AnalyticsService.captureEvent(EVENTS.PHOTO_ID_REMOVED)
     },
-    submitPhoto() {
+    async submitPhoto() {
       if (!this.photo) {
         this.error = 'Please upload a photo before submitting.'
         return
       }
       this.error = ''
-      NetworkService.getPhotoUploadUrl().then((res) => {
-        const { uploadUrl } = res.data
-        if (uploadUrl) {
-          axios.put(uploadUrl, this.file, {
-            headers: {
-              'Content-Type': this.file.type,
-            },
-          })
-          this.$store.dispatch('user/addToUser', {
-            photoIdStatus: 'SUBMITTED',
-          })
-          AnalyticsService.captureEvent(EVENTS.PHOTO_ID_ADDED, {
-            event: EVENTS.PHOTO_ID_ADDED,
-          })
-          if (this.isStudentVolunteer)
-            AnalyticsService.captureEvent(
-              EVENTS.ROLE_SWITCHING_USER_UPLOADED_PHOTO_ID
-            )
-          this.closeModal()
-        } else {
-          this.error = 'Sorry, we had trouble uploading your photo.'
-        }
-      })
+
+      const file = await processImage(this.file)
+
+      try {
+        await NetworkService.uploadVolunteerPhoto(file)
+
+        this.$store.dispatch('user/addToUser', {
+          photoIdStatus: 'SUBMITTED',
+        })
+        AnalyticsService.captureEvent(EVENTS.PHOTO_ID_ADDED, {
+          event: EVENTS.PHOTO_ID_ADDED,
+        })
+        if (this.isStudentVolunteer)
+          AnalyticsService.captureEvent(
+            EVENTS.ROLE_SWITCHING_USER_UPLOADED_PHOTO_ID
+          )
+        this.closeModal()
+      } catch (err) {
+        this.error =
+          err?.response?.data?.err ??
+          'Sorry, we had trouble uploading your photo.'
+      }
     },
   },
 }

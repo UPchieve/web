@@ -910,8 +910,10 @@ export default {
       this._errorHandler
     )
   },
-  getPhotoUploadUrl() {
-    return httpGet(`${API_ROOT}/user/volunteer-approval/photo-url`).then(
+  uploadVolunteerPhoto(file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    return httpPut(`${API_ROOT}/user/volunteer-approval/photo`, formData).then(
       this._successHandler,
       this._errorHandler
     )

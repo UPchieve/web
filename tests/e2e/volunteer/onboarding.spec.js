@@ -93,6 +93,18 @@ test.describe('Volunteer onboarding', () => {
     }) => {
       // From the dashboard, navigate to the Background Information form
       const { volunteerPage } = await loginVolunteer(browser, volunteer)
+      await volunteerPage.route(
+        '**/user/volunteer-approval/photo',
+        async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              imageUrl: 'https://example.com/test-photo.png',
+            }),
+          })
+        }
+      )
       const volunteerDashboard = new VolunteerDashboard(volunteerPage)
       await volunteerDashboard.safetyScreeningIsReady()
       const bgInfoPage = await volunteerDashboard.goToBackgroundInformation()
