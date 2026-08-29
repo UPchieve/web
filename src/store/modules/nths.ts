@@ -1,6 +1,14 @@
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
-import { actionsCtaMap, CheckboxStatus } from '@/services/NTHSGroupService'
+import {
+  checklistControls,
+  CheckboxStatus,
+  hasChosenAffiliationPath,
+  SCHOOL_AFFILIATION_ACTION,
+  type AffiliationStatus,
+  type ChecklistItem,
+  type NTHSAction,
+} from '@/services/NTHSGroupService'
 
 export default {
   namespaced: true,
@@ -35,6 +43,16 @@ export default {
         const updatedGroup = { ...group, groupInfo: { ...updatedGroupInfo } }
         state.NTHSGroups = [updatedGroup]
       }
+    },
+    setNTHSGroupSchoolAffiliationStatus: (
+      state,
+      {
+        groupId,
+        schoolAffiliationStatus,
+      }: { groupId: string; schoolAffiliationStatus: AffiliationStatus }
+    ) => {
+      const group = state.NTHSGroups.find((g) => g.groupInfo.id === groupId)
+      if (group) group.schoolAffiliationStatus = schoolAffiliationStatus
     },
     appendNTHSGroupAction: (state, action) => {
       state.NTHSGroupActions = [...state.NTHSGroupActions, action]
@@ -117,28 +135,50 @@ export default {
 
   getters: {
     NTHSChecklist: (state) => {
-      const checklist = state.NTHSActions.reduce((list, action) => {
-        const cta = actionsCtaMap[action.name]
-        const status = state.checksInFlight.includes(action.id)
-          ? CheckboxStatus.Saving
-          : state.NTHSGroupActions.some(
-                ({ actionId }) => actionId === action.id
-              )
-            ? CheckboxStatus.Done
-            : CheckboxStatus.NotDone
+      if (state.NTHSActions.length === 0) return []
 
-        if (cta) {
-          list.push({
-            text: cta.text,
-            url: cta.url,
-            status,
-            actionId: action.id,
-            actionName: action.name,
+      const affiliationStatus =
+        state.NTHSGroups?.[0]?.schoolAffiliationStatus ?? null
+
+      const checklist: ChecklistItem[] = []
+      for (const { action: name, ...control } of checklistControls) {
+        if (name === SCHOOL_AFFILIATION_ACTION) {
+          checklist.push({
+            ...control,
+            locked: true,
+            status: hasChosenAffiliationPath(affiliationStatus)
+              ? CheckboxStatus.Done
+              : CheckboxStatus.NotDone,
+            actionName: name,
           })
+          continue
         }
 
-        return list
-      }, [])
+        const action = state.NTHSActions.find(
+          (a: NTHSAction) => a.name === name
+        )
+        if (!action) continue
+
+        let status: CheckboxStatus
+        if (state.checksInFlight.includes(action.id)) {
+          status = CheckboxStatus.Saving
+        } else if (
+          state.NTHSGroupActions.some(
+            ({ actionId }: { actionId: number }) => actionId === action.id
+          )
+        ) {
+          status = CheckboxStatus.Done
+        } else {
+          status = CheckboxStatus.NotDone
+        }
+
+        checklist.push({
+          ...control,
+          status,
+          actionId: action.id,
+          actionName: name,
+        })
+      }
 
       return checklist.every(({ status }) => status === CheckboxStatus.Done)
         ? []

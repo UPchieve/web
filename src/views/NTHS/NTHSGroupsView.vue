@@ -16,8 +16,6 @@ const code = computed(() => group.value?.groupInfo?.inviteCode)
 const isGroupAdmin = computed(
   () => group.value?.memberInfo?.roleName === 'admin'
 )
-const groupActions = computed(() => store.state.nths.NTHSGroupActions)
-const actions = computed(() => store.state.nths.NTHSActions ?? [])
 const checklist = computed(() => store.getters['nths/NTHSChecklist'])
 
 onBeforeMount(async () => {
@@ -91,8 +89,6 @@ function goToDashboard() {
         <Checklist
           v-if="isGroupAdmin && checklist.length"
           :groupId="group.groupInfo.id"
-          :actions="actions"
-          :groupActions="groupActions"
           :checklist="checklist"
         />
         <LargeButton

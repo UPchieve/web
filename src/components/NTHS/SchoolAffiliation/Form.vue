@@ -104,7 +104,7 @@ function onCantFindSchool() {
       :isRequired="true"
       v-model="formInputs.lastName"
       label="Last Name"
-      name="advisor-first-name"
+      name="advisor-last-name"
     />
     <FormEmail
       :disabled="props.submitting"
@@ -134,6 +134,7 @@ function onCantFindSchool() {
       <LargeButton
         :disabled="props.submitting"
         :showArrow="false"
+        data-testid="cancel-advisor-button"
         v-on:click="emit('cancel')"
         >Cancel</LargeButton
       >

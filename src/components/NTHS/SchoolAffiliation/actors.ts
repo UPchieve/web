@@ -1,17 +1,17 @@
 import { fromCallback, fromPromise } from 'xstate'
 import type {
   AdvisorInfo,
-  AffiliationStatus,
   SchoolAffiliationEvent,
   SchoolAffiliationEventType,
 } from './school-affiliation-machine'
-import type { NTHSSchoolAffiliationActionName } from '@/services/NTHSGroupService'
+import type {
+  AffiliationStatus,
+  NTHSSchoolAffiliationActionName,
+} from '@/services/NTHSGroupService'
 import NetworkService from '@/services/NetworkService'
 import store from '@/store'
 
-// UNAFFILIATED just means we already have school information for the chapter
-// from the application process. The president hasn't opted in or out of
-// seeking affiliation yet, so show the same starting panel as a chapter
+// UNAFFILIATED is not a decision, so it starts on the same panel as a chapter
 // with no affiliation row at all.
 export const stateToEventMap: Record<
   AffiliationStatus,
@@ -73,10 +73,17 @@ export const submitAdvisorInfo = fromPromise(
   }
 )
 
-// The machine tracks the chapter correctly while its component is alive, but
-// the props come from the group fetched on page load. Switching tabs remounts
-// from that copy and rewinds the card, so refetch the group once the server
-// has actually changed to keep the two in sync.
+// The props come from the group fetched on page load, so switching tabs remounts
+// from that copy and rewinds the card. Write the server's new answer back onto it.
+export function recordAffiliationStatus(
+  _: unknown,
+  params: { groupId: string; schoolAffiliationStatus: AffiliationStatus }
+) {
+  store.commit('nths/setNTHSGroupSchoolAffiliationStatus', params)
+}
+
+// Same staleness, but this response nests the new status under `action` rather
+// than returning it as the actor's output, so refetch instead.
 export function refetchGroup() {
   store.dispatch('nths/fetchNthsData')
 }

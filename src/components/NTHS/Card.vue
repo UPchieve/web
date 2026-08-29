@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h4 class="title"><slot name="header"></slot></h4>
+    <h4 class="title" data-testid="card-title"><slot name="header"></slot></h4>
     <div class="content">
       <slot />
     </div>

@@ -8,6 +8,8 @@ import { post } from './utils/network'
 // TODO: This is an overloaded utils file. Break out into
 // separate files.
 
+export type DbClient = Pool | PoolClient
+
 export const createPassword = (): string => {
   return faker.internet.password({
     length: 10,
@@ -59,7 +61,7 @@ export type VolunteerUser = {
 }
 
 export const createVolunteer = async (
-  dbClient: Pool,
+  dbClient: DbClient,
   userArgs = {},
   options: any
 ): Promise<VolunteerUser | undefined> => {
@@ -100,7 +102,7 @@ export const createVolunteer = async (
 }
 
 export const withCertifications = async (
-  dbClient: Pool,
+  dbClient: DbClient,
   args: { userId: string; certificationNames: string[] }
 ) => {
   const { rows: certificationIds } = await dbClient.query(
@@ -115,7 +117,7 @@ export const withCertifications = async (
   }
 }
 
-export const passUpchieve101 = async (dbClient: Pool, userId: string) => {
+export const passUpchieve101 = async (dbClient: DbClient, userId: string) => {
   const trainingCourseId = 1
   const trainingMaterialsCompleted = [
     '7b6a76',

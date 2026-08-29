@@ -45,56 +45,51 @@ async function onLeaveTeam() {
 
 <template>
   <div class="container">
-    <section class="section">
-      <Card v-if="isGroupAdmin" class="fit">
+    <div class="team">
+      <Card v-if="isGroupAdmin">
         <template v-slot:header>Edit</template>
         <EditableName
           :groupName="group.groupInfo?.name"
           :groupId="group.groupInfo.id"
         />
       </Card>
-      <SchoolAffiliation
-        v-if="isGroupAdmin && group.groupId"
-        :groupId="group.groupId"
-        :initialStatus="group.schoolAffiliationStatus"
-        :hasSchoolOnRecord="!!group.hasSchoolOnRecord"
-      />
-    </section>
-    <LargeButton
-      variant="danger"
-      @click="onLeaveTeam"
-      :showArrow="false"
-      class="shrink"
-      :disabled="isFetchingGroupMembers"
-      >{{ isFetchingGroupMembers ? '...Loading' : 'Leave Team' }}</LargeButton
-    >
+      <LargeButton
+        variant="danger"
+        @click="onLeaveTeam"
+        :showArrow="false"
+        :disabled="isFetchingGroupMembers"
+        data-testid="leave-team-button"
+        >{{ isFetchingGroupMembers ? '...Loading' : 'Leave Team' }}</LargeButton
+      >
+    </div>
+    <SchoolAffiliation
+      v-if="isGroupAdmin && group.groupId"
+      :groupId="group.groupId"
+      :initialStatus="group.schoolAffiliationStatus"
+      :hasSchoolOnRecord="!!group.hasSchoolOnRecord"
+    />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .container {
   display: flex;
-  gap: 24px;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: start;
-  flex-wrap: wrap;
+  gap: 24px;
   height: fit-content;
   overflow: visible;
-}
-.section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  flex: 1;
-}
-.shrink {
-  flex-shrink: 1;
-  flex-grow: 0;
-}
 
-.fit {
-  width: fit-content;
-  height: fit-content;
+  // Two columns only while the picker still fits its side-by-side panels;
+  // below that it wraps under the team column.
+  @include breakpoint-above('large') {
+    flex-direction: row;
+  }
+}
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 24px;
 }
 </style>

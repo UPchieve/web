@@ -4,8 +4,14 @@ import {
   setInitialState,
   submitAdvisorInfo,
   refetchGroup,
+  recordAffiliationStatus,
 } from './actors'
 import axios from 'axios'
+import {
+  OPTED_OUT_ACTION,
+  SCHOOL_AFFILIATION_ACTION,
+  type AffiliationStatus,
+} from '@/services/NTHSGroupService'
 
 export type AdvisorInfo = {
   // Null whenever the chapter's school is already on record, which is the
@@ -19,26 +25,27 @@ export type AdvisorInfo = {
   title: string
 }
 
-export type AffiliationStatus =
-  | 'PENDING_SCHOOL_AFFILIATION'
-  | 'PENDING_UPCHIEVE_VERIFICATION'
-  | 'AFFILIATED'
-  | 'DENIED'
-  | 'OPTED_OUT'
-  | 'UNAFFILIATED'
-
 export type SchoolAffiliationEvent =
   | { type: 'OPT_OUT' }
   | { type: 'OPT_IN' }
+  | { type: 'ADD_ADVISOR' }
   | { type: 'SUBMIT_ADVISOR_INFO'; advisorInfo: AdvisorInfo }
   | { type: 'SUBMITTED_ADVISOR_INFO' }
-  | { type: 'PENDING_UPCHIEVE_VERIFICATION' }
   | { type: 'APPROVE' }
   | { type: 'DENY' }
   | { type: 'WITHDRAW' }
   | { type: 'INERT' }
 
 export type SchoolAffiliationEventType = SchoolAffiliationEvent['type']
+
+const STATUS_UPDATE_ERROR = 'We could not save your choice. Please try again.'
+
+function errorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data?.err ?? fallback
+  }
+  return fallback
+}
 
 const config = setup({
   types: {
@@ -61,6 +68,7 @@ const config = setup({
   },
   actions: {
     refetchGroup,
+    recordAffiliationStatus,
   },
 })
 
@@ -75,6 +83,7 @@ export const SchoolAffiliationMachine = config.createMachine({
   initial: 'Initial',
   states: {
     Initial: {
+      tags: ['loading'],
       invoke: {
         src: 'setInitialState',
         input: ({ context }) => ({
@@ -82,7 +91,7 @@ export const SchoolAffiliationMachine = config.createMachine({
         }),
       },
       on: {
-        OPT_IN: { target: 'SeekingAffiliation' },
+        OPT_IN: { target: 'AwaitingAdvisorDetails' },
         INERT: { target: 'Undecided' },
         OPT_OUT: { target: 'OptedOut' },
         SUBMITTED_ADVISOR_INFO: {
@@ -104,30 +113,45 @@ export const SchoolAffiliationMachine = config.createMachine({
     },
     OptingIn: {
       tags: ['loading'],
+      entry: assign({ submitError: null }),
       invoke: {
         src: 'updateStatus',
         input: ({ context }) => ({
           groupId: context.groupId,
-          action: 'MARKED SCHOOL AFFILIATION IN PROGRESS',
+          action: SCHOOL_AFFILIATION_ACTION,
         }),
         onDone: {
-          target: 'SeekingAffiliation',
+          target: 'AddingAdvisorInfo',
           actions: [
             assign({
               schoolAffiliationStatus: ({ event }) => event.output,
             }),
-            'refetchGroup',
+            {
+              type: 'recordAffiliationStatus',
+              params: ({ context, event }) => ({
+                groupId: context.groupId,
+                schoolAffiliationStatus: event.output,
+              }),
+            },
           ],
+        },
+        onError: {
+          target: 'Initial',
+          actions: assign({
+            submitError: ({ event }) =>
+              errorMessage(event.error, STATUS_UPDATE_ERROR),
+          }),
         },
       },
     },
     OptingOut: {
       tags: ['loading'],
+      entry: assign({ submitError: null }),
       invoke: {
         src: 'updateStatus',
         input: ({ context }) => ({
           groupId: context.groupId,
-          action: 'OPTED OUT',
+          action: OPTED_OUT_ACTION,
         }),
         onDone: {
           target: 'OptedOut',
@@ -135,13 +159,41 @@ export const SchoolAffiliationMachine = config.createMachine({
             assign({
               schoolAffiliationStatus: ({ event }) => event.output,
             }),
-            'refetchGroup',
+            {
+              type: 'recordAffiliationStatus',
+              params: ({ context, event }) => ({
+                groupId: context.groupId,
+                schoolAffiliationStatus: event.output,
+              }),
+            },
           ],
+        },
+        onError: {
+          target: 'Initial',
+          actions: assign({
+            submitError: ({ event }) =>
+              errorMessage(event.error, STATUS_UPDATE_ERROR),
+          }),
         },
       },
     },
 
-    SeekingAffiliation: {
+    // The chapter is already marked PENDING_SCHOOL_AFFILIATION here; the
+    // president has only the advisor form left to fill in.
+    AwaitingAdvisorDetails: {
+      on: {
+        ADD_ADVISOR: {
+          target: 'AddingAdvisorInfo',
+          // A failed opt-out's error would otherwise follow the president into
+          // the form and read as the form's own.
+          actions: assign({ submitError: null }),
+        },
+        OPT_OUT: {
+          target: 'OptingOut',
+        },
+      },
+    },
+    AddingAdvisorInfo: {
       on: {
         SUBMIT_ADVISOR_INFO: {
           target: 'SubmittingAdvisorInfo',
@@ -150,8 +202,11 @@ export const SchoolAffiliationMachine = config.createMachine({
             submitError: null,
           }),
         },
+        // Backing out of the form records nothing. Only the community panel
+        // opts a chapter out.
         WITHDRAW: {
-          target: 'OptingOut',
+          target: 'AwaitingAdvisorDetails',
+          actions: assign({ submitError: null }),
         },
       },
     },
@@ -169,17 +224,10 @@ export const SchoolAffiliationMachine = config.createMachine({
           actions: ['refetchGroup'],
         },
         onError: {
-          target: 'SeekingAffiliation',
+          target: 'AddingAdvisorInfo',
           actions: assign({
-            submitError: ({ event }) => {
-              let message = 'An unknown error has occured'
-              if (axios.isAxiosError(event.error)) {
-                message =
-                  event.error.response?.data?.err ??
-                  'An unknown error has occured'
-              }
-              return message
-            },
+            submitError: ({ event }) =>
+              errorMessage(event.error, 'An unknown error has occured'),
           }),
         },
       },
@@ -193,9 +241,6 @@ export const SchoolAffiliationMachine = config.createMachine({
     },
     AwaitingUPchieveVerification: {
       on: {
-        WITHDRAW: {
-          target: 'OptingOut',
-        },
         APPROVE: {
           target: 'Approved',
         },
