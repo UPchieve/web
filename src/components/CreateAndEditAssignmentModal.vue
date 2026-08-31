@@ -170,6 +170,7 @@ import FileDialog from '@/components/FileDialog.vue'
 import PhotoUploadIcon from '@/assets/whiteboard_icons/photo-upload.svg'
 import ModalService from '@/services/ModalService'
 import { BYTES_PER_MEGABYTE, formatBytes } from '@/utils/bytes'
+import { processImage, isAllowedImageMime } from '@/utils/image-pipeline.js'
 
 export default {
   components: {
@@ -300,9 +301,13 @@ export default {
 
     async uploadDocument(eventData) {
       const files = eventData.files
-      files.forEach((file) => {
+      for (let file of files) {
+        if (isAllowedImageMime(file.type)) {
+          const processed = await processImage(file)
+          if (processed) file = processed
+        }
         this.files.push(file)
-      })
+      }
     },
 
     deleteFile(index) {
