@@ -135,28 +135,9 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="
-            isVolunteer &&
-            (isMemberOfNTHSGroup ||
-              showCreateNTHSGroupLink ||
-              showApplyForNTHSLink)
-          "
-          :to="
-            showCreateNTHSGroupLink
-              ? '/groups/create'
-              : showApplyForNTHSLink
-                ? '/groups/apply'
-                : '/groups'
-          "
-          :text="showApplyForNTHSLink ? 'Apply to NTHS' : 'NTHS'"
-          id="nths-group-sidebar-link"
-        >
-          <groups-icon class="icon" />
-        </sidebar-link>
-        <sidebar-link
-          v-if="isVolunteer && showAppliedForNTHSLink"
-          to="/groups/application-pending"
-          text="NTHS application"
+          v-if="isVolunteer && nthsSidebarLink"
+          :to="nthsSidebarLink.to"
+          :text="nthsSidebarLink.text"
           id="nths-group-sidebar-link"
         >
           <groups-icon class="icon" />
@@ -235,6 +216,11 @@ import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import BellIcon from '@/assets/BellIcon.svg'
 import { EVENTS } from '@/consts'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
+import {
+  nthsDestination,
+  NTHS_DESTINATION_LABELS,
+  NTHS_DESTINATION_PATHS,
+} from '@/views/NTHS/nths-route-helpers'
 import { defineAsyncComponent } from 'vue'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
@@ -276,10 +262,6 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       productFlags: (state) => state.productFlags.flags,
-      volunteersNTHSGroups: (state) => state.nths.NTHSGroups,
-      nthsCandidateApplicationStatus: (state) =>
-        state.nths.NTHSCandidateApplicationStatus,
-      canApplyForNTHSPresident: (state) => state.nths.canApplyForNTHSPresident,
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
@@ -295,7 +277,6 @@ export default {
         'featureFlags/isDisableStudentsJoinSlackCommunityEnabled',
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
-      isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
       shouldShowStudentToVolunteerHoursPage:
         'featureFlags/shouldShowStudentToVolunteerHoursPage',
       aiTutor: 'featureFlags/aiTutor',
@@ -312,28 +293,13 @@ export default {
       }
       return true
     },
-    isMemberOfNTHSGroup() {
-      return this.volunteersNTHSGroups.length > 0
-    },
-    showCreateNTHSGroupLink() {
-      return (
-        this.nthsCandidateApplicationStatus === 'approved' &&
-        this.volunteersNTHSGroups.length === 0
-      )
-    },
-    showAppliedForNTHSLink() {
-      return (
-        this.nthsCandidateApplicationStatus === 'applied' &&
-        this.volunteersNTHSGroups.length === 0
-      )
-    },
-    showApplyForNTHSLink() {
-      return (
-        this.isNTHSApplicationPageEnabled &&
-        this.canApplyForNTHSPresident &&
-        this.volunteersNTHSGroups.length === 0 &&
-        this.nthsCandidateApplicationStatus === undefined
-      )
+    nthsSidebarLink() {
+      const destination = nthsDestination(this.$store)
+      if (!destination) return
+      return {
+        to: NTHS_DESTINATION_PATHS[destination],
+        text: NTHS_DESTINATION_LABELS[destination],
+      }
     },
     isStandaloneAiEnabled() {
       return this.aiTutor && this.aiTutor.includes('stand-alone')

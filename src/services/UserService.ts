@@ -20,6 +20,7 @@ export default {
   async setProfile(data, store) {
     await NetworkService.setProfile(data)
     await store.dispatch('user/addToUser', data)
+    if (data.occupation) await store.dispatch('nths/refreshAfterProfileChange')
     AnalyticsService.captureEvent(EVENTS.PROFILE_UPDATED)
   },
 

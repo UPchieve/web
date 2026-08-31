@@ -1,4 +1,5 @@
 import NetworkService from '@/services/NetworkService'
+import LoggerService from '@/services/LoggerService'
 import { actionsCtaMap, CheckboxStatus } from '@/services/NTHSGroupService'
 
 export default {
@@ -80,6 +81,18 @@ export default {
       )
       return results.data.groups
     },
+    // Occupation decides eligibility, so the sidebar and route guards go stale on
+    // a profile save. Failure is swallowed because the profile itself saved.
+    async refreshAfterProfileChange({ dispatch }) {
+      try {
+        await dispatch('fetchNthsData')
+      } catch (err) {
+        LoggerService.noticeError(
+          err,
+          'Could not refresh NTHS data after a profile change'
+        )
+      }
+    },
     async fetchNTHSGroupMembers({ commit }, groupId) {
       const response = await NetworkService.getNTHSGroupMembers(groupId)
       const groupMembers = response.data?.members ?? []
@@ -103,12 +116,6 @@ export default {
   },
 
   getters: {
-    isEligibleToApply(state, _, __, rootGetters) {
-      return (
-        rootGetters['users/isVolunteerInHighSchool'] &&
-        state.NTHSGroups.length == 0
-      )
-    },
     NTHSChecklist: (state) => {
       const checklist = state.NTHSActions.reduce((list, action) => {
         const cta = actionsCtaMap[action.name]

@@ -55,6 +55,10 @@ const ADMIN_LINK = { to: '/admin', text: 'Admin' }
 const NTHS_APPLY_LINK = { to: '/groups/apply', text: 'Apply to NTHS' }
 const NTHS_CREATE_TEAM_LINK = { to: '/groups/create', text: 'NTHS' }
 const NTHS_TEAM_LINK = { to: '/groups', text: 'NTHS' }
+const NTHS_PENDING_LINK = {
+  to: '/groups/application-pending',
+  text: 'NTHS application',
+}
 
 // Links organized by route & user type. Array indices of the links are important.
 const links = {
@@ -351,6 +355,187 @@ describe('SidebarLinks', () => {
           )
         })
         expect(isTargetLinkPresent).toEqual(true)
+      })
+
+      it('Renders the "My Team" link, not "Apply Now", when the user is in a group but eligibility is still true', async () => {
+        const wrapper = getWrapper({
+          props: {
+            authenticated: true,
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              isTeacher: () => false,
+            },
+          },
+          featureFlags: {
+            getters: {
+              userIsApprovedNTHSPresident: () => false,
+              isNTHSApplicationPageEnabled: () => true,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [{ groupId: 123 }],
+              canApplyForNTHSPresident: true,
+            },
+          },
+        })
+        const sidebarLinks = wrapper.findAllComponents(SidebarLink)
+        const applyLinkPresent = sidebarLinks.some(
+          (link) =>
+            link.props('to') === NTHS_APPLY_LINK.to &&
+            link.props('text') === NTHS_APPLY_LINK.text
+        )
+        const teamLinkPresent = sidebarLinks.some(
+          (link) =>
+            link.props('to') === NTHS_TEAM_LINK.to &&
+            link.props('text') === NTHS_TEAM_LINK.text
+        )
+        expect(applyLinkPresent).toEqual(false)
+        expect(teamLinkPresent).toEqual(true)
+      })
+
+      it('Renders the "Apply Now" link whenever the server says eligible, whatever the status', async () => {
+        const wrapper = getWrapper({
+          props: {
+            authenticated: true,
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              isTeacher: () => false,
+            },
+          },
+          featureFlags: {
+            getters: {
+              isNTHSApplicationPageEnabled: () => true,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [],
+              canApplyForNTHSPresident: true,
+              NTHSCandidateApplicationStatus: 'denied',
+            },
+          },
+        })
+        const sidebarLinks = wrapper.findAllComponents(SidebarLink)
+        const applyLinkPresent = sidebarLinks.some(
+          (link) =>
+            link.props('to') === NTHS_APPLY_LINK.to &&
+            link.props('text') === NTHS_APPLY_LINK.text
+        )
+        expect(applyLinkPresent).toEqual(true)
+      })
+
+      it('Renders the "NTHS application" link while an application is under review', async () => {
+        const wrapper = getWrapper({
+          props: {
+            authenticated: true,
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              isTeacher: () => false,
+            },
+          },
+          featureFlags: {
+            getters: {
+              isNTHSApplicationPageEnabled: () => true,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [],
+              canApplyForNTHSPresident: false,
+              NTHSCandidateApplicationStatus: 'applied',
+            },
+          },
+        })
+        const sidebarLinks = wrapper.findAllComponents(SidebarLink)
+        const pendingLinkPresent = sidebarLinks.some(
+          (link) =>
+            link.props('to') === NTHS_PENDING_LINK.to &&
+            link.props('text') === NTHS_PENDING_LINK.text
+        )
+        const applyLinkPresent = sidebarLinks.some(
+          (link) => link.props('to') === NTHS_APPLY_LINK.to
+        )
+        expect(pendingLinkPresent).toEqual(true)
+        expect(applyLinkPresent).toEqual(false)
+      })
+
+      it('Renders the "NTHS application" link while the application page is flagged off', async () => {
+        const wrapper = getWrapper({
+          props: {
+            authenticated: true,
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              isTeacher: () => false,
+            },
+          },
+          featureFlags: {
+            getters: {
+              isNTHSApplicationPageEnabled: () => false,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [],
+              canApplyForNTHSPresident: false,
+              NTHSCandidateApplicationStatus: 'applied',
+            },
+          },
+        })
+        const sidebarLinks = wrapper.findAllComponents(SidebarLink)
+        const pendingLinkPresent = sidebarLinks.some(
+          (link) =>
+            link.props('to') === NTHS_PENDING_LINK.to &&
+            link.props('text') === NTHS_PENDING_LINK.text
+        )
+        expect(pendingLinkPresent).toEqual(true)
+      })
+
+      // Submitting commits 'applied' locally and only then refreshes
+      // eligibility, so canApplyForNTHSPresident still reads true until that
+      // lands — and stays true if it fails. The pending link has to win.
+      it('Renders only the pending link when the coach has applied but eligibility has not refreshed', async () => {
+        const wrapper = getWrapper({
+          props: {
+            authenticated: true,
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              isTeacher: () => false,
+            },
+          },
+          featureFlags: {
+            getters: {
+              isNTHSApplicationPageEnabled: () => true,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [],
+              canApplyForNTHSPresident: true,
+              NTHSCandidateApplicationStatus: 'applied',
+            },
+          },
+        })
+        const nthsLinks = wrapper
+          .findAllComponents(SidebarLink)
+          .filter((link) => link.props('to')?.startsWith('/groups'))
+        expect(nthsLinks).toHaveLength(1)
+        expect(nthsLinks[0].props('to')).toEqual(NTHS_PENDING_LINK.to)
       })
 
       it('Renders the "Create Team" link if the application was approved and the user has no group', async () => {

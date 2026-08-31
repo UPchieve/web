@@ -522,6 +522,7 @@ export default {
           gradeLevel: data.gradeLevel ?? this.user.gradeLevel ?? '',
         }
         await this.$store.dispatch('user/addToUser', update)
+        await this.$store.dispatch('nths/refreshAfterProfileChange')
       } catch (error) {
         LoggerService.noticeError(error)
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_ERROR, {

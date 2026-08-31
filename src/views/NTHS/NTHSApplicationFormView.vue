@@ -14,6 +14,7 @@ import Loader from '@/components/Loader.vue'
 import { getAcademicYear } from '@/utils/academic-year'
 import { EVENTS, STATES_WITH_ABBREVIATIONS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import {
   buildEmptyResponses,
@@ -143,11 +144,17 @@ async function submit() {
     optionalQuestionsAnswered: answeredOptionalQuestions(collected),
     secondsFromFormOpen: secondsSince(formOpenedAt),
   })
+
+  // The refresh below can fail; without this the guards still read the applicant
+  // as eligible and send them back to the apply page.
+  store.commit('nths/setNTHSCandidateApplicationStatus', 'applied')
+
   try {
     await store.dispatch('nths/fetchNthsData')
-  } finally {
-    router.replace('/groups/application-pending')
+  } catch (err) {
+    LoggerService.noticeError(err, 'Could not refresh NTHS data after applying')
   }
+  router.replace('/groups/application-pending')
 }
 
 // Nothing after the POST belongs in here: the application already exists, so a
@@ -178,7 +185,6 @@ async function postApplication(
     })
     error.value =
       err?.response?.data?.err ??
-      err?.message ??
       'We could not submit your application. Please try again.'
   }
 }

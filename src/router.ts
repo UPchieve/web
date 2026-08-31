@@ -109,11 +109,8 @@ const AdminEssayReviewDetail = () =>
   import('./views/Admin/AdminEssayReviewDetail.vue')
 
 import {
-  redirectBlockedApplicant,
-  shouldGoToApply,
-  shouldGoToCreate,
-  shouldGoToGroup,
-  shouldGoToPending,
+  resolveNthsRoute,
+  type NTHSDestination,
 } from './views/NTHS/nths-route-helpers'
 import Gleap from 'gleap'
 import NetworkService, { axiosInstance } from './services/NetworkService'
@@ -134,6 +131,14 @@ const autoflowRedirect: NavigationGuard = (_to, _from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
   else next()
 }
+
+const nthsRouteGuard =
+  (destination: NTHSDestination): NavigationGuard =>
+  async (to, _from, next) => {
+    const redirect = await resolveNthsRoute(store, destination, to.path)
+    return redirect ? next(redirect) : next()
+  }
+
 const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {
   if (store.getters['user/isVolunteer']) {
     next() // already volunteer, continue
@@ -940,84 +945,28 @@ const routes: RouteRecordRaw[] = [
     name: 'NTHSApplicationView',
     component: NTHSApplicationView,
     meta: { protected: true },
-    beforeEnter: [
-      switchToVolunteerOrCancel,
-      async (
-        to: RouteLocationNormalized,
-        _from: RouteLocationNormalized,
-        next: NavigationGuardNext
-      ) => {
-        if (await shouldGoToGroup(store)) return next('/groups')
-        if (shouldGoToCreate(store)) return next('/groups/create')
-        if (shouldGoToPending(store)) return next('/groups/application-pending')
-        if (shouldGoToApply(store)) return next()
-
-        return redirectBlockedApplicant(store, to, next)
-      },
-    ],
+    beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('apply')],
   },
   {
     path: '/groups/apply/form',
     name: 'NTHSApplicationFormView',
     component: NTHSApplicationFormView,
     meta: { protected: true },
-    beforeEnter: [
-      switchToVolunteerOrCancel,
-      async (
-        to: RouteLocationNormalized,
-        _from: RouteLocationNormalized,
-        next: NavigationGuardNext
-      ) => {
-        if (await shouldGoToGroup(store)) return next('/groups')
-        if (shouldGoToCreate(store)) return next('/groups/create')
-        if (shouldGoToPending(store)) return next('/groups/application-pending')
-        if (shouldGoToApply(store)) return next()
-
-        return redirectBlockedApplicant(store, to, next)
-      },
-    ],
+    beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('apply')],
   },
   {
     path: '/groups/application-pending',
     name: 'NTHSApplicationPending',
     component: NTHSApplicationPending,
     meta: { protected: true },
-    beforeEnter: [
-      switchToVolunteerOrCancel,
-      async (
-        to: RouteLocationNormalized,
-        _from: RouteLocationNormalized,
-        next: NavigationGuardNext
-      ) => {
-        if (await shouldGoToGroup(store)) return next('/groups')
-        if (shouldGoToCreate(store)) return next('/groups/create')
-        if (shouldGoToApply(store)) return next('/groups/apply')
-        if (shouldGoToPending(store)) return next()
-
-        return redirectBlockedApplicant(store, to, next)
-      },
-    ],
+    beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('pending')],
   },
   {
     path: '/groups/create',
     name: 'NTHSCreateGroupView',
     component: NTHSCreateGroupView,
     meta: { protected: true },
-    beforeEnter: [
-      switchToVolunteerOrCancel,
-      async (
-        to: RouteLocationNormalized,
-        _from: RouteLocationNormalized,
-        next: NavigationGuardNext
-      ) => {
-        if (await shouldGoToGroup(store)) return next('/groups')
-        if (shouldGoToApply(store)) return next('/groups/apply')
-        if (shouldGoToPending(store)) return next('/groups/application-pending')
-        if (shouldGoToCreate(store)) return next()
-
-        return redirectBlockedApplicant(store, to, next)
-      },
-    ],
+    beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('create')],
   },
 
   {
@@ -1038,21 +987,7 @@ const routes: RouteRecordRaw[] = [
         ],
       },
     },
-    beforeEnter: [
-      switchToVolunteerOrCancel,
-      async (
-        to: RouteLocationNormalized,
-        _from: RouteLocationNormalized,
-        next: NavigationGuardNext
-      ) => {
-        if (await shouldGoToGroup(store)) return next()
-        if (shouldGoToApply(store)) return next('/groups/apply')
-        if (shouldGoToPending(store)) return next('/groups/application-pending')
-        if (shouldGoToCreate(store)) return next('/groups/create')
-
-        return redirectBlockedApplicant(store, to, next)
-      },
-    ],
+    beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('group')],
     children: [
       {
         path: '/groups/dashboard',
