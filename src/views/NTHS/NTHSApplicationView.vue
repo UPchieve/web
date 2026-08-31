@@ -5,8 +5,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { onMounted } from 'vue'
 
-const learnMoreLink =
-  'https://docs.google.com/document/d/1UDxRRJZ4b_Pt3PfjzN_7hxb-ffaF-hGdn_e_q1RCqqs/preview'
+const learnMoreLink = 'https://nationaltutor.org/apply'
 
 function onClickedLearnMore() {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_CLICKED_LEARN_MORE)
@@ -24,16 +23,17 @@ onMounted(() => {
   <div class="page">
     <div class="container">
       <div class="content">
-        <h1 class="title">National Tutoring Honors Society</h1>
+        <h1 class="title">National Tutoring Honor Society</h1>
         <span>
-          UPchieve's National Tutoring Honor Society (NTHS) is a student-led
-          honor society where high schoolers lead chapters that recruit tutors,
-          build community, and promote educational equity.
+          National Tutoring Honor Society (NTHS) is a student-led honor society
+          where high schoolers lead chapters that recruit tutors, build
+          community, and make a real impact by tutoring peers across the
+          country.
           <br /><br />
-          Missed the Spring 2026 cohort deadline? We're inviting a select group
-          of student leaders to apply to start an NTHS chapter on a rolling
-          basis. Unlike cohort-based programs, this is a self-paced application
-          available year-round.
+          Are you interested in becoming a founding President and starting a
+          chapter in your community or school?
+          <br /><br />
+          Deadline to apply to start a chapter is Sep 15, 2026
         </span>
         <div class="actions">
           <a
@@ -45,15 +45,13 @@ onMounted(() => {
             ><strong>Learn more about NTHS & the president's role here</strong>
             <arrow-icon class="arrow-icon" />
           </a>
-          <span><em>Please only submit one application.</em></span>
-
           <LargeButton
             variant="primary-blue"
             class="apply-button"
             :show-arrow="false"
             routeTo="/groups/apply/form"
             @click="onClickedApplyNow"
-            >Apply to Start a Chapter</LargeButton
+            >Apply to Become a President</LargeButton
           >
         </div>
       </div>
