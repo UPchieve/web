@@ -71,6 +71,7 @@ function handleSave() {
 }
 
 function handleOptOut() {
+  AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPTED_OUT_OF_SHARE_INFO)
   selectedFields.value = []
   save([])
 }
