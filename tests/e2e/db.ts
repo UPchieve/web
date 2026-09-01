@@ -7,7 +7,7 @@ function buildClient(): Pool {
   const pool = new Pool({
     database: 'upchieve',
     user: 'admin',
-    password: 'Password123', // pragma: allowlist secret
+    password: 'Password123',
     port: process.env.CI ? 5432 : 5500,
     host: process.env.CI ? 'postgres' : 'localhost',
   })

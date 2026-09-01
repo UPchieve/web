@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Git runs this before sending anything to the remote. We get the name of the
+# remote in arg $1 and then one line per ref being pushed on stdin with args
+# in the following order:
+#   <local ref> <local oid> <remote ref> <remote oid>
+#
+# What is being pushed might have nothing to do with what is currently _checked out_,
+# so that stdin is the only reliable data to what is actually being pushed.
+#
+# Since the commit info is on stdin, we want to read it immediately and store what we
+# need in a variable or else the actual process that needs that data (i.e. secret
+# detection) might not get that data if another process reads from stdin before it has
+# the chance to.
+set -uo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
+
+remote="${1:-origin}"
+
+oids=()
+while read -r _local_ref local_oid _remote_ref _remote_oid; do
+  # An all-zero local oid means the branch is being deleted, which pushes no
+  # commits, so we can just skip those.
+  case "${local_oid:-}" in
+    *[!0]*) oids+=("$local_oid") ;;
+  esac
+done
+
+# Nothing but deletions, so there is nothing to scan.
+[ ${#oids[@]} -eq 0 ] && exit 0
+
+# Everything reachable from those refs being pushed, minus everything the remote
+# already has.
+commits=$(git rev-list "${oids[@]}" --not --remotes="$remote" | tr '\n' ' ') || exit 1
+
+# No commits being pushed!
+[ -z "$commits" ] && exit 0
+
+export PUSH_COMMITS="$commits"
+
+exec ./bin/run_git_hook.sh pre-push

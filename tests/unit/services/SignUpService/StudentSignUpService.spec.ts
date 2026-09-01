@@ -732,7 +732,7 @@ describe('StudentSignUpService', () => {
           firstName: 'MeowFirst',
           lastName: 'MeowLast',
           email: 'student@student.org',
-          password: 'Password123', // pragma: allowlist secret
+          password: 'Password123',
           gradeLevel: '10th',
           schoolId: 'school-id-000',
           zipCode: '00000',
@@ -795,7 +795,7 @@ describe('StudentSignUpService', () => {
           firstName: 'FriendsFirst',
           lastName: 'FriendsLast',
           email: 'referral@referral.com',
-          password: 'Password123', // pragma: allowlist secret
+          password: 'Password123',
         }
 
         await __test__.createAccount(data)
@@ -816,7 +816,7 @@ describe('StudentSignUpService', () => {
           firstName: 'ErrorFirst',
           lastName: 'ErrorLast',
           email: 'test@example.com',
-          password: 'Password123', // pragma: allowlist secret
+          password: 'Password123',
         }
 
         const result = await __test__.createAccount(data)
@@ -842,7 +842,7 @@ describe('StudentSignUpService', () => {
           firstName: 'Existing',
           lastName: 'Account',
           email: 'existing@account.com',
-          password: 'Password123', // pragma: allowlist secret
+          password: 'Password123',
         }
         const result = await __test__.createAccount(data)
 

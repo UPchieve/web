@@ -505,7 +505,6 @@ const ProfileSections = {
   CLEVER_SYNC: 'cleverSync',
   PREFERRED_LANGUAGE: 'preferredLanguage',
   TUTORING_LANGUAGES: 'tutoringLanguages',
-  // pragma: allowlist nextline secret
   RESET_PASSWORD: 'resetPassword',
   DELETE_ACCOUNT: 'deleteAccount',
   UNLOCKED_SUBJECTS: 'unlockedSubjects',

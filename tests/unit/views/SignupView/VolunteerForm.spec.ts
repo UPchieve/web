@@ -23,7 +23,6 @@ describe('VolunteerForm', () => {
 
   const VOLUNTEER = {
     email: 'volunteer@example.com',
-    // pragma: allowlist nextline secret
     password: 'password',
     terms: true,
     firstName: 'Example',

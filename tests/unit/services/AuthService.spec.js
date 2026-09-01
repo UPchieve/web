@@ -5,7 +5,7 @@ import AuthService from '@/services/AuthService'
 describe('AuthService', () => {
   const testLoginCreds = {
     email: 'testemail@gmail.com',
-    password: 'testAbc123!', // pragma: allowlist secret
+    password: 'testAbc123!',
   }
 
   beforeEach(() => {

@@ -97,7 +97,7 @@ function configureMathJax() {
   document.head.appendChild(script)
   appendScript('https://cdn.jsdelivr.net/npm/mathjax@4.1.1/tex-chtml.js', {
     integrity:
-      'sha384-8/IzH7C20FIP91bBUbmN23JwsmNckpAkZGjzGAxJzYajOczF8DfXQEwjsNpQXM7Q', //pragma: allowlist secret
+      'sha384-8/IzH7C20FIP91bBUbmN23JwsmNckpAkZGjzGAxJzYajOczF8DfXQEwjsNpQXM7Q',
     crossorigin: 'anonymous',
   })
 }

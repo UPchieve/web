@@ -46,6 +46,33 @@ You'll need read access to the `engineering` vault in 1Password, and to login to
 ### Package Manager
 This project uses [pnpm](https://pnpm.io/) instead of npm. Once [installed](https://pnpm.io/installation), use `pnpm install <dependency>` to install dependencies, and `pnpm run <script>` to run scripts.
 
+### Git Hooks
+We have both pre-commit and pre-push Git hooks. When you first run `pn install`, Git will point to `.githooks` (which we do commit), via the `core.hooksPath` setting, when running hooks, instead of `.git/hooks` (which is not committed).
+
+NEVER skip pre-push hooks. This runs the local secret scanner, and will save you from pushing a secret to our public repository. Not that you should have a secret in your local files anyways!
+
+ ### Detecting Secrets
+We use [Betterleaks](https://github.com/betterleaks/betterleaks) as part of pre-commit and pre-push steps to unsure we are not accidentally pushing secrets to our public repository.
+
+The scanner runs in Docker, so there is nothing to install beyond Docker itself. The image is pulled automatically on first use, but to fetch it ahead of time, run:
+```shell
+pn secrets:setup
+```
+
+- **pre-commit** scans your staged changes.
+- **pre-push** scans _every commit_ you are pushing that isn't on remote yet.
+  - Purposefully set-up so a secret added in one commit and deleted in a later one (which would still expose the secret on remote!) **is caught**.
+
+If the scanner detects a secret, don't just ignore or skip the command!
+
+1. Is it actually a secret? REMOVE IT, and ask yourself why you were copying secrets into your code in the first place. Is there a process to be improved?
+2. Is it not actually a secret? Add `// betterleaks:allow` as an in-line comment.
+
+#### Pre-Push with Alternative VCS
+**If you use an alternative VCS that does not support the Git pre-push hook, you are responsible for finding a solution.**
+
+If you use jj (the Right Choice 🌠), a solution has been created for you already! Check out `bin/jj_pre_push.sh` for the shim to add to your `.bashrc` or equivalent.
+
 ### App Dependencies
 
 As noted above you will also need the backend running on `localhost` on port `3000`

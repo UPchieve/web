@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "prepare": "if [ -z \"$CI\" ]; then ./bin/install_git_hooks.sh; fi",
     "serve": "op run --no-masking --env-file=./.env.op -- doppler run -- env VITE_CJS_TRACE=true vite",
     "build": "vite build",
     "build:analyze": "BUNDLE_ANALYZE=true pnpm run build",
@@ -22,16 +23,21 @@
     "test:e2e:ui": "pnpm playwright test --ui",
     "test:e2e:snapshots": "export INCLUDE_SNAPSHOT_TESTS=true && pnpm playwright test",
     "test:e2e:update-snapshots": "pnpm playwright test --update-snapshots",
+    "type-check": "vue-tsc --build --force",
     "setup:detect-secrets": "./scripts/setup-detect-secrets.sh",
-    "scan:add": "./scripts/wrap-detect-secrets.sh scan",
-    "scan:diff": "./scripts/wrap-detect-secrets.sh hook",
-    "scan:audit": "./scripts/wrap-detect-secrets.sh audit",
-    "type-check": "vue-tsc --build --force"
+    "secrets:check": "./bin/secret_detection.sh check-branch",
+    "secrets:check:staged": "./bin/secret_detection.sh check-staged"
   },
+  "pre-commit": [
+    "lint:dry"
+  ],
+  "pre-push": [
+    "secrets:check"
+  ],
   "dependencies": {
     "@ionic/vue": "^8.8.17",
-    "@mdi/js": "^7.4.47",
     "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
     "@neoconfetti/vue": "^2.2.1",
     "@rushstack/eslint-patch": "^1.10.3",
     "@tiptap/extension-mathematics": "^3.22.5",
@@ -86,7 +92,6 @@
     "@azure/static-web-apps-cli": "^2.0.10",
     "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^8.4.1",
-    "@fastify/pre-commit": "^2.2.1",
     "@playwright/test": "^1.42.1",
     "@statelyai/inspect": "^0.4.0",
     "@types/lodash-es": "^4.17.12",
@@ -124,10 +129,6 @@
     "vitest-browser-vue": "^2.0.1",
     "vue-tsc": "^3.1.1"
   },
-  "pre-commit": [
-    "scan:diff",
-    "lint:dry"
-  ],
   "browserslist": [
     "> 1%",
     "last 2 versions",

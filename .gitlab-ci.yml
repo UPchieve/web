@@ -147,7 +147,7 @@ e2e-test:
   variables:
     CI: 'true'
     POSTGRES_HOST: postgres
-    POSTGRES_PASSWORD: Password123 # pragma: allowlist secret
+    POSTGRES_PASSWORD: Password123
     POSTGRES_USER: admin
     POSTGRES_DB: upchieve
     # Services can only reached over _their_ native ports, so

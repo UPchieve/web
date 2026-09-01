@@ -38,7 +38,7 @@ export enum InputName {
   EMAIL = 'email',
   FIRST_NAME = 'firstName',
   LAST_NAME = 'lastName',
-  PASSWORD = 'password', // pragma: allowlist secret
+  PASSWORD = 'password',
   PHONE = 'phone',
   SIGNUP_SOURCE_ID = 'signupSourceId',
   TERMS = 'terms',
