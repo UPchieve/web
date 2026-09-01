@@ -86,7 +86,7 @@ async function loadEssayReviews() {
       currentPage.value = totalPages.value
     }
   } catch {
-    loadError.value = 'There was an issue loading essay reviews.'
+    loadError.value = 'There was an issue loading async reviews.'
   } finally {
     isLoading.value = false
   }
@@ -99,8 +99,8 @@ onMounted(loadEssayReviews)
   <main class="essay-review-list">
     <header class="page-header">
       <div>
-        <h1>Essay reviews</h1>
-        <p>Review submitted essays and track completed submissions.</p>
+        <h1>Async reviews</h1>
+        <p>Review student submissions and track completed feedback.</p>
       </div>
 
       <button
@@ -115,7 +115,7 @@ onMounted(loadEssayReviews)
 
     <section class="review-queue">
       <div class="queue-header">
-        <div class="status-filters" aria-label="Filter essay reviews">
+        <div class="status-filters" aria-label="Filter async reviews">
           <button
             v-for="statusOption in statusOptions"
             :key="statusOption.value"
@@ -145,10 +145,10 @@ onMounted(loadEssayReviews)
         {{ loadError }}
       </p>
 
-      <div v-if="isLoading" class="empty-state">Loading essay reviews…</div>
+      <div v-if="isLoading" class="empty-state">Loading async reviews…</div>
 
       <div v-else-if="!paginatedEssayReviews.length" class="empty-state">
-        <h2>No essay reviews found</h2>
+        <h2>No async reviews found</h2>
         <p>There are no submissions matching this filter.</p>
       </div>
 
@@ -158,7 +158,7 @@ onMounted(loadEssayReviews)
             <tr>
               <th scope="col">Submitted</th>
               <th scope="col">Student</th>
-              <th scope="col">Essay type</th>
+              <th scope="col">Submission type</th>
               <th scope="col">Words</th>
               <th scope="col">Status</th>
               <th scope="col"><span class="visually-hidden">Action</span></th>
@@ -182,7 +182,13 @@ onMounted(loadEssayReviews)
                 </strong>
                 <div class="student-email">{{ essayReview.studentEmail }}</div>
               </td>
-              <td>{{ essayReview.essayPurpose || 'Essay review' }}</td>
+              <td>
+                {{
+                  essayReview.subject === 'collegeList'
+                    ? 'College list'
+                    : 'Essay Review'
+                }}
+              </td>
               <td>{{ essayReview.wordCount.toLocaleString() }}</td>
               <td>
                 <span

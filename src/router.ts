@@ -102,7 +102,11 @@ const StandaloneBotChatView = () =>
 const Totp = () => import('./views/Totp/index.vue')
 const TotpEnroll = () => import('./views/Totp/Enroll.vue')
 const EssayReviewView = () => import('./views/EssayReviewView.vue')
-const VolunteerEssayReviews = () => import('./views/VolunteerEssayReviews.vue')
+const CollegeListReviewView = () => import('./views/CollegeListReviewView.vue')
+const VolunteerAsyncReviewListView = () =>
+  import('./views/VolunteerAsyncReviewListView.vue')
+const VolunteerAsyncReviewDetailView = () =>
+  import('./views/VolunteerAsyncReviewDetailView.vue')
 const AdminEssayReviewList = () =>
   import('./views/Admin/AdminEssayReviewList.vue')
 const AdminEssayReviewDetail = () =>
@@ -1038,15 +1042,21 @@ const routes: RouteRecordRaw[] = [
     meta: { protected: true },
   },
   {
+    path: '/college-list-review',
+    name: 'CollegeListReviewView',
+    component: CollegeListReviewView,
+    meta: { protected: true },
+  },
+  {
     path: '/volunteer/essay-reviews',
-    name: 'VolunteerEssayReviews',
-    component: VolunteerEssayReviews,
+    name: 'VolunteerAsyncReviewList',
+    component: VolunteerAsyncReviewListView,
     meta: { protected: true },
   },
   {
     path: '/volunteer/essay-reviews/:submissionId',
-    name: 'VolunteerEssayReviewDetail',
-    component: VolunteerEssayReviews,
+    name: 'VolunteerAsyncReviewDetail',
+    component: VolunteerAsyncReviewDetailView,
     meta: { protected: true },
   },
   {

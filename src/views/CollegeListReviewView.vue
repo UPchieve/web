@@ -2,19 +2,25 @@
 import { computed, onMounted, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { countWords } from '@/utils/word-count'
 
-const maxEssayLength = 50000
-const maxPromptLength = 5000
+const maxCollegeListLength = 50000
 const maxAdditionalContextLength = 2000
 const maxReviewReasons = 3
 
-const essay = ref('')
-const essayPurpose = ref('')
-const essayPrompt = ref('')
+const collegeList = ref('')
 const additionalContext = ref('')
 const reviewReasons = ref<string[]>([])
 const reviewEmail = ref('')
+const homeState = ref('')
+const gpa = ref('')
+const englishCourse = ref('')
+const mathCourse = ref('')
+const testScores = ref('')
+const intendedMajors = ref('')
+const collegePreferences = ref('')
+const affordabilityContext = ref('')
 
 const error = ref('')
 const pageTop = ref<HTMLElement | null>(null)
@@ -22,41 +28,37 @@ const isSubmitting = ref(false)
 const hasSubmitted = ref(false)
 
 const reviewReasonOptions = [
-  'Is my opening engaging?',
-  'Is my ending strong?',
-  'Structure and flow',
-  'Grammar and word choice',
-  'Does it answer the prompt?',
-  'Is it too long?',
+  'Academic fit',
+  'Financial fit',
+  'Reach, target, and likely balance',
+  'Additional schools to consider',
+  'Graduation outcomes',
   'Overall feedback',
 ]
 
 const router = useRouter()
+const store = useStore()
+const gradeLevel = computed(() => store.getters['user/gradeLevel'] || '')
+const normalizedCollegeList = computed(() => collegeList.value.trim())
 
-const normalizedEssay = computed(() => essay.value.trim())
-
-const wordCount = computed(() => countWords(normalizedEssay.value))
+const wordCount = computed(() => countWords(normalizedCollegeList.value))
 
 const isSubmitDisabled = computed(() => {
   return (
-    !normalizedEssay.value ||
+    !normalizedCollegeList.value ||
     !reviewEmail.value.trim() ||
-    normalizedEssay.value.length > maxEssayLength ||
+    normalizedCollegeList.value.length > maxCollegeListLength ||
     isSubmitting.value
   )
 })
 
 function validateSubmission(): string | null {
-  if (!normalizedEssay.value) {
-    return 'Please write or paste your essay before submitting it.'
+  if (!normalizedCollegeList.value) {
+    return 'Please add your current college list before submitting it.'
   }
 
-  if (normalizedEssay.value.length > maxEssayLength) {
-    return `Your essay must be ${maxEssayLength.toLocaleString()} characters or fewer.`
-  }
-
-  if (essayPrompt.value.length > maxPromptLength) {
-    return `The essay prompt must be ${maxPromptLength.toLocaleString()} characters or fewer.`
+  if (normalizedCollegeList.value.length > maxCollegeListLength) {
+    return `Your college list must be ${maxCollegeListLength.toLocaleString()} characters or fewer.`
   }
 
   if (additionalContext.value.length > maxAdditionalContextLength) {
@@ -104,12 +106,30 @@ async function handleSubmit() {
 
   isSubmitting.value = true
   try {
+    const collegeListContext = [
+      ['Grade level', gradeLevel.value],
+      ['Home state', homeState.value],
+      ['GPA', gpa.value],
+      ['Current English course', englishCourse.value],
+      ['Current math course', mathCourse.value],
+      ['SAT or ACT scores and plans', testScores.value],
+      ['Intended majors or interests', intendedMajors.value],
+      ['College preferences', collegePreferences.value],
+      [
+        'Affordability or financial aid considerations',
+        affordabilityContext.value,
+      ],
+      ['Anything else', additionalContext.value],
+    ]
+      .filter(([, value]) => value.trim())
+      .map(([label, value]) => `${label}: ${value.trim()}`)
+      .join('\n')
+
     await NetworkService.submitEssayReview({
-      subject: 'applicationEssays',
-      essay: normalizedEssay.value,
-      essayPurpose: essayPurpose.value.trim() || undefined,
-      essayPrompt: essayPrompt.value.trim() || undefined,
-      additionalContext: additionalContext.value.trim() || undefined,
+      subject: 'collegeList',
+      essay: normalizedCollegeList.value,
+      essayPurpose: 'College list review',
+      additionalContext: collegeListContext || undefined,
       reviewReasons: [...reviewReasons.value],
       reviewEmail: reviewEmail.value.trim(),
     })
@@ -117,7 +137,7 @@ async function handleSubmit() {
     hasSubmitted.value = true
   } catch {
     error.value =
-      'Something went wrong while submitting your essay. Please try again.'
+      'Something went wrong while submitting your college list. Please try again.'
   } finally {
     isSubmitting.value = false
   }
@@ -137,11 +157,11 @@ onMounted(() => {
     <header class="page-header">
       <span class="back-link" @click="goToDashboard">← Dashboard</span>
 
-      <h1>Get your essay reviewed</h1>
+      <h1>Get feedback on your college list</h1>
 
       <p>
-        Share your draft with 3 coaches and get written feedback within 24
-        hours.
+        Share your college list with 3 coaches and get written feedback within
+        24 hours.
       </p>
     </header>
 
@@ -149,34 +169,36 @@ onMounted(() => {
       <section class="form-card">
         <div class="section-heading">
           <span class="step-number" aria-hidden="true">1</span>
-          <h2>Add your essay</h2>
+          <h2>Add your college list</h2>
         </div>
 
         <div class="field-group">
-          <label for="essay">Write or paste your essay</label>
+          <label for="collegeList">
+            Which colleges are you currently considering?
+          </label>
 
           <textarea
-            id="essay"
-            v-model="essay"
+            id="collegeList"
+            v-model="collegeList"
             class="essay-input ph-no-capture"
-            name="essay"
+            name="collegeList"
             rows="14"
-            :maxlength="maxEssayLength"
-            aria-describedby="essay-help essay-count"
-            placeholder="Write or paste your essay here..."
+            :maxlength="maxCollegeListLength"
+            aria-describedby="college-list-help college-list-count"
+            placeholder="Add each college you are considering and anything you already know about why it is on your list..."
             required
             autocomplete="off"
           />
 
           <div class="field-metadata">
-            <span id="essay-help">
-              Write or paste your full draft or a section.
+            <span id="college-list-help">
+              Include every school currently on your list.
             </span>
 
-            <span id="essay-count">
+            <span id="college-list-count">
               {{ wordCount.toLocaleString() }} words ·
-              {{ essay.length.toLocaleString() }} /
-              {{ maxEssayLength.toLocaleString() }} characters
+              {{ collegeList.length.toLocaleString() }} /
+              {{ maxCollegeListLength.toLocaleString() }} characters
             </span>
           </div>
         </div>
@@ -189,40 +211,104 @@ onMounted(() => {
         </div>
 
         <div class="field-group">
-          <label for="essayPurpose">What is this essay for?</label>
-
+          <label for="homeState">What state do you live in?</label>
           <input
-            id="essayPurpose"
-            v-model="essayPurpose"
+            id="homeState"
+            v-model="homeState"
             type="text"
-            name="essayPurpose"
-            placeholder="For example, a college application or class assignment"
+            placeholder="For example, Florida"
             autocomplete="off"
           />
         </div>
 
         <div class="field-group">
-          <label for="essayPrompt">What prompt are you answering?</label>
-
-          <textarea
-            id="essayPrompt"
-            v-model="essayPrompt"
-            class="ph-no-capture"
-            name="essayPrompt"
-            rows="3"
-            :maxlength="maxPromptLength"
-            placeholder="Paste the essay prompt here..."
+          <label for="gpa">What is your current GPA?</label>
+          <input
+            id="gpa"
+            v-model="gpa"
+            type="text"
+            placeholder="Include whether it is weighted or unweighted if you know"
             autocomplete="off"
           />
-
-          <div class="field-metadata field-metadata-end">
-            <span>
-              {{ essayPrompt.length.toLocaleString() }} /
-              {{ maxPromptLength.toLocaleString() }} characters
-            </span>
-          </div>
         </div>
 
+        <div class="field-group">
+          <label for="englishCourse">What English course are you taking?</label>
+          <input
+            id="englishCourse"
+            v-model="englishCourse"
+            type="text"
+            placeholder="For example, AP English Literature"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="mathCourse">What math course are you taking?</label>
+          <input
+            id="mathCourse"
+            v-model="mathCourse"
+            type="text"
+            placeholder="For example, Precalculus"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="testScores">
+            SAT or ACT scores and plans
+            <span class="optionalLabel">Optional</span>
+          </label>
+          <input
+            id="testScores"
+            v-model="testScores"
+            type="text"
+            placeholder="Share scores or whether you plan to apply test optional"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="intendedMajors">
+            What majors or careers interest you?
+            <span class="optionalLabel">Optional</span>
+          </label>
+          <input
+            id="intendedMajors"
+            v-model="intendedMajors"
+            type="text"
+            placeholder="List any areas you are considering"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="collegePreferences">
+            What matters most to you in a college?
+            <span class="optionalLabel">Optional</span>
+          </label>
+          <textarea
+            id="collegePreferences"
+            v-model="collegePreferences"
+            rows="3"
+            placeholder="For example, location, campus size, programs, or student life"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="affordabilityContext">
+            What should we know about affordability or financial aid?
+            <span class="optionalLabel">Optional</span>
+          </label>
+          <textarea
+            id="affordabilityContext"
+            v-model="affordabilityContext"
+            rows="3"
+            placeholder="Share only what you are comfortable sharing"
+            autocomplete="off"
+          />
+        </div>
         <fieldset class="feedback-fieldset">
           <legend>
             What would you like help with?
@@ -259,7 +345,7 @@ onMounted(() => {
             name="additionalContext"
             rows="4"
             :maxlength="maxAdditionalContextLength"
-            placeholder="For example, share your deadline or anything you're unsure about..."
+            placeholder="Share your application goals, questions, or anything else that may help your reviewer..."
             autocomplete="off"
           />
 
@@ -311,13 +397,8 @@ onMounted(() => {
             data-testid="submit-feedback-btn"
             :disabled="isSubmitDisabled"
           >
-            {{ isSubmitting ? 'Submitting...' : 'Submit my essay' }}
+            {{ isSubmitting ? 'Submitting...' : 'Submit my college list' }}
           </button>
-
-          <p class="privacy-notice">
-            Only the UPchieve Academic Coaches and staff helping with your
-            review will see your essay.
-          </p>
         </div>
       </section>
     </form>
@@ -325,16 +406,16 @@ onMounted(() => {
 
   <div v-else class="essay-review">
     <div>
-      <h1>Your essay is on its way!</h1>
+      <h1>Your college list is on its way!</h1>
 
       <p>
-        3 coaches will review your essay and email your feedback within
+        3 coaches will review your college list and email your feedback within
         <strong>24 hours.</strong>
       </p>
 
       <p>
-        While you wait, you can keep working on your essay with a coach in a
-        live tutoring session.
+        While you wait, you can keep working on your college list with a coach
+        in a live tutoring session.
       </p>
 
       <router-link to="/dashboard"> Back to dashboard </router-link>
@@ -644,14 +725,6 @@ input {
     cursor: not-allowed;
     opacity: 0.55;
   }
-}
-
-.privacy-notice {
-  margin: 0;
-  color: var(--textMuted);
-  font-size: 0.78rem;
-  line-height: 1.5;
-  text-align: center;
 }
 
 @media (max-width: 560px) {

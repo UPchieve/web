@@ -21,7 +21,7 @@
         />
         <TaskCard
           v-if="shouldShowEssayReviewCard"
-          title="Review Application Essays"
+          title="Review Student Submissions"
           subtitle="Give students thoughtful, asynchronous feedback when it works for you."
           :actions="essayReviewActions"
         >
@@ -187,7 +187,6 @@ export default {
     TaskCard,
     DashboardBanner,
     PhotoUploadModal,
-    // eslint-disable-next-line vue/no-unused-components
     SquareTextIcon,
     VerificationIcon,
     RingingNotificationBellIcon,
@@ -290,14 +289,16 @@ export default {
         this.user.banType !== 'complete' &&
         this.user.banType !== 'shadow' &&
         this.isVolunteerAsyncEssayReviewEnabled &&
-        this.user.subjects?.includes('applicationEssays')
+        this.user.subjects?.some((subject) =>
+          ['applicationEssays', 'collegeList'].includes(subject)
+        )
       )
     },
     essayReviewActions() {
       return [
         {
-          title: 'See essays awaiting review',
-          subtitle: 'Open essay list',
+          title: 'See submissions awaiting review',
+          subtitle: 'Open review list',
           // Essay review is recurring, so this action never becomes complete
           status: 'not-started',
           onClick: this.openEssayReviews,

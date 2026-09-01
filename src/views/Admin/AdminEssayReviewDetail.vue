@@ -55,7 +55,7 @@ async function loadEssayReview() {
     finalReviews.value = response.data.essayReview.finalReviews ?? ['', '', '']
     previewReviewId.value = response.data.essayReview.reviews[0]?.id ?? ''
   } catch {
-    loadError.value = 'There was an issue loading this essay review.'
+    loadError.value = 'There was an issue loading this submission.'
   } finally {
     isLoading.value = false
   }
@@ -127,10 +127,10 @@ onMounted(loadEssayReview)
 <template>
   <main class="essay-review-detail">
     <button class="back-button" type="button" @click="goBack">
-      ← Back to essay reviews
+      ← Back to async reviews
     </button>
 
-    <div v-if="isLoading" class="loading-state">Loading essay review...</div>
+    <div v-if="isLoading" class="loading-state">Loading submission...</div>
     <p v-else-if="loadError" class="error-message" role="alert">
       {{ loadError }}
     </p>
@@ -152,7 +152,13 @@ onMounted(loadEssayReview)
             </span>
           </div>
 
-          <h1>{{ essayReview.essayPurpose || 'Essay review' }}</h1>
+          <h1>
+            {{
+              essayReview.subject === 'collegeList'
+                ? 'College list review'
+                : essayReview.essayPurpose || 'Essay review'
+            }}
+          </h1>
           <p class="submission-id">ID: {{ essayReview.id }}</p>
         </div>
 
@@ -176,7 +182,13 @@ onMounted(loadEssayReview)
       <div class="detail-layout">
         <div class="main-column">
           <section class="detail-card">
-            <h2 class="section-title">Essay</h2>
+            <h2 class="section-title">
+              {{
+                essayReview.subject === 'collegeList'
+                  ? 'Current college list'
+                  : 'Essay'
+              }}
+            </h2>
             <div class="essay-metadata">
               <span>{{ essayReview.wordCount.toLocaleString() }} words</span>
               <span>

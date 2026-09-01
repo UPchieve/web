@@ -97,7 +97,7 @@ export default {
     shouldShowEssayHelpModal() {
       return (
         this.isAsyncEssayReviewEnabled &&
-        this.selectedSubtopic === 'applicationEssays'
+        ['applicationEssays', 'collegeList'].includes(this.selectedSubtopic)
       )
     },
   },

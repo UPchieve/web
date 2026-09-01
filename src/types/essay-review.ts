@@ -1,7 +1,9 @@
 export type EssayReviewStatus = 'pending' | 'reviewed'
+export type AsyncReviewSubject = 'applicationEssays' | 'collegeList'
 
 export type EssayReviewSubmission = {
   id: string
+  subject: AsyncReviewSubject
   userId: string
   studentEmail: string
   studentFirstName?: string

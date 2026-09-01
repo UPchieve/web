@@ -17,6 +17,7 @@ import type {
   TutorBotTranscriptPublic,
 } from '@/types/bot-conversations'
 import type {
+  AsyncReviewSubject,
   EssayReviewStatus,
   EssayReviewSubmission,
   EssayReviewSubmissionForVolunteer,
@@ -1541,6 +1542,7 @@ export default {
     )
   },
   async submitEssayReview(data: {
+    subject: AsyncReviewSubject
     essay: string
     essayPurpose?: string
     essayPrompt?: string

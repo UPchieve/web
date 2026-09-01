@@ -107,7 +107,7 @@ async function startSession(journeyStep: JourneyStep, stepNumber: number) {
 
   if (
     isAsyncEssayReviewEnabled.value &&
-    sessionSubject === 'applicationEssays'
+    ['applicationEssays', 'collegeList'].includes(sessionSubject)
   ) {
     store.dispatch('app/modal/show', {
       component: 'EssayHelpModal',

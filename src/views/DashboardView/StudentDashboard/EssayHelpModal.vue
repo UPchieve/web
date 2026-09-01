@@ -28,6 +28,7 @@ const journeySessionData = computed(
 )
 
 const showSurvey = ref(false)
+const isCollegeList = computed(() => props.modalData.subject === 'collegeList')
 
 onMounted(() => {
   AnalyticsService.captureEvent(EVENTS.STUDENT_VIEWED_ESSAY_HELP_MODAL, {
@@ -75,7 +76,7 @@ function startEssayReview() {
     store.commit('session/setJourneySessionData', undefined)
   }
 
-  router.push('/essay-review')
+  router.push(isCollegeList.value ? '/college-list-review' : '/essay-review')
 }
 
 function onSurveyCompleted() {
@@ -136,7 +137,9 @@ defineExpose({
           <span class="essay-help-option-title">Chat with a coach</span>
 
           <span class="essay-help-option-description">
-            Work on your essay together in a live session.
+            Work on your
+            {{ isCollegeList ? 'college list' : 'essay' }} together in a live
+            session.
           </span>
         </button>
 
@@ -149,8 +152,8 @@ defineExpose({
           <span class="essay-help-option-title">Get written feedback</span>
 
           <span class="essay-help-option-description">
-            Submit your essay for review by 3 coaches and hear back within 24
-            hours.
+            Submit your {{ isCollegeList ? 'college list' : 'essay' }} for
+            review by 3 coaches and hear back within 24 hours.
           </span>
         </button>
       </div>
