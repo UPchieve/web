@@ -30,6 +30,8 @@ export class NTHSChapterPage {
       'choose-school-approved-button'
     )
     this.stayCommunityButton = page.getByTestId('stay-community-button')
+    this.tryAgainButton = page.getByTestId('try-school-approved-again-button')
+    this.denialNotice = page.getByTestId('school-approved-denial-notice')
     this.addAdvisorButton = page.getByTestId('add-advisor-button')
     this.switchToCommunityButton = page.getByTestId(
       'switch-to-community-button'
@@ -59,6 +61,15 @@ export class NTHSChapterPage {
     await expect(this.communityPath).toBeVisible()
     await expect(this.chooseSchoolApprovedButton).toBeVisible()
     await expect(this.stayCommunityButton).toBeVisible()
+  }
+
+  async openPathChooserAfterDenial() {
+    await this.schoolApprovalControl.click()
+    await this.page.waitForURL('**/groups/settings')
+    await expect(this.denialNotice).toBeVisible()
+    await expect(this.tryAgainButton).toBeVisible()
+    await expect(this.stayCommunityButton).toBeVisible()
+    await expect(this.chooseSchoolApprovedButton).toHaveCount(0)
   }
 
   async stayCommunity() {

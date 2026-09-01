@@ -44,7 +44,9 @@ const affiliationPathChosen: Record<AffiliationStatus, boolean> = {
   PENDING_SCHOOL_AFFILIATION: true,
   PENDING_UPCHIEVE_VERIFICATION: true,
   AFFILIATED: true,
-  DENIED: true,
+  // A denied chapter has to pick a path again, so the checklist reopens to send
+  // the president back to Settings.
+  DENIED: false,
   OPTED_OUT: true,
   // UNAFFILIATED means we already have school information for the chapter
   // from the application process, before the president opted in or out.

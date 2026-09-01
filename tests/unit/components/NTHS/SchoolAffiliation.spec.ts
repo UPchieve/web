@@ -26,7 +26,8 @@ const CANCEL_ADVISOR_BUTTON = '[data-testid="cancel-advisor-button"]'
 const AWAITING_VERIFICATION_PANEL =
   '[data-testid="awaiting-verification-panel"]'
 const APPROVED_PANEL = '[data-testid="approved-panel"]'
-const DENIED_PANEL = '[data-testid="denied-panel"]'
+const TRY_AGAIN_BUTTON = '[data-testid="try-school-approved-again-button"]'
+const DENIAL_NOTICE = '[data-testid="school-approved-denial-notice"]'
 const CARD_TITLE = '[data-testid="card-title"]'
 const CURRENT_PATH_CLASS = 'path-current'
 
@@ -63,6 +64,16 @@ function accessibleName(wrapper: VueWrapper, selector: string) {
 function unresolvedLabelIds(wrapper: VueWrapper, selector: string) {
   const { panel, ids } = labelledBy(wrapper, selector)
   return ids.filter((id) => !panel.ownerDocument.getElementById(id))
+}
+
+function describedByText(wrapper: VueWrapper, selector: string) {
+  const el = wrapper.find(selector).element
+  return (el.getAttribute('aria-describedby') ?? '')
+    .split(' ')
+    .filter(Boolean)
+    .map((id) => el.ownerDocument.getElementById(id)?.textContent?.trim())
+    .filter(Boolean)
+    .join(' ')
 }
 
 function labelledBy(wrapper: VueWrapper, selector: string) {
@@ -238,10 +249,92 @@ describe('SchoolAffiliation', () => {
     wrapper.unmount()
   })
 
+  it('offers a denied chapter both paths with a retry on the school path', async () => {
+    const wrapper = await getWrapper('DENIED')
+
+    expect(wrapper.find(CARD_TITLE).text()).toBe('Choose Your Chapter Type')
+    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(true)
+    expect(wrapper.find(COMMUNITY_PATH).exists()).toBe(true)
+    expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(true)
+    expect(describedByText(wrapper, TRY_AGAIN_BUTTON)).toBe(
+      wrapper.find(DENIAL_NOTICE).text()
+    )
+    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(false)
+    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
+    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
+    expect(wrapper.find(SCHOOL_APPROVED_BADGE).exists()).toBe(false)
+    expect(isHighlighted(wrapper, COMMUNITY_PATH)).toBe(true)
+    expect(accessibleName(wrapper, COMMUNITY_PATH)).toBe(
+      'Community chapter CURRENT'
+    )
+    expect(accessibleName(wrapper, SCHOOL_APPROVED_PATH)).toBe(
+      'School-approved'
+    )
+    expect(unresolvedLabelIds(wrapper, SCHOOL_APPROVED_PATH)).toEqual([])
+    expect(unresolvedLabelIds(wrapper, COMMUNITY_PATH)).toEqual([])
+
+    wrapper.unmount()
+  })
+
+  it('reopens the advisor form when a denied chapter tries again', async () => {
+    vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
+      data: { schoolAffiliationStatus: 'PENDING_SCHOOL_AFFILIATION' },
+    })
+    const wrapper = await getWrapper('DENIED')
+
+    await wrapper.find(TRY_AGAIN_BUTTON).trigger('click')
+    await flushPromises()
+
+    expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
+      GROUP_ID,
+      'MARKED SCHOOL AFFILIATION IN PROGRESS'
+    )
+    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(false)
+    expect(wrapper.text()).toContain('Chapter Advisor')
+    expectRecordedStatus('PENDING_SCHOOL_AFFILIATION')
+
+    wrapper.unmount()
+  })
+
+  it('opts a denied chapter out when it stays a community chapter', async () => {
+    const wrapper = await getWrapper('DENIED')
+
+    await wrapper.find(STAY_COMMUNITY_BUTTON).trigger('click')
+    await flushPromises()
+
+    expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
+      GROUP_ID,
+      'OPTED OUT'
+    )
+    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
+    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(false)
+    expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(false)
+    expectRecordedStatus('OPTED_OUT')
+
+    wrapper.unmount()
+  })
+
+  it('returns a denied chapter to the chooser when the community choice fails to save', async () => {
+    const wrapper = await getWrapper('DENIED')
+    failCreateAction()
+
+    await wrapper.find(STAY_COMMUNITY_BUTTON).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find(STATUS_ERROR).text()).toBe(
+      'We could not save your choice. Please try again.'
+    )
+    expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(true)
+    expect(wrapper.find(TRY_AGAIN_BUTTON).exists()).toBe(true)
+    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
+    expect(store.commit).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
   it.each([
     ['PENDING_UPCHIEVE_VERIFICATION' as const, AWAITING_VERIFICATION_PANEL],
     ['AFFILIATED' as const, APPROVED_PANEL],
-    ['DENIED' as const, DENIED_PANEL],
   ])('shows the %s panel instead of the chooser', async (status, panel) => {
     const wrapper = await getWrapper(status)
 

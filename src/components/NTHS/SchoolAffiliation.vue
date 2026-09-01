@@ -35,10 +35,13 @@ const isAddingAdvisorInfo = computed(
     snapshot.value.matches('SubmittingAdvisorInfo')
 )
 
+const isDenied = computed(() => snapshot.value.matches('Denied'))
+
 const isChoosingPath = computed(
   () =>
     snapshot.value.matches('Undecided') ||
     snapshot.value.matches('OptedOut') ||
+    isDenied.value ||
     isSeekingSchoolApproval.value
 )
 
@@ -49,7 +52,7 @@ const opensOnAffiliationHeader: Record<AffiliationStatus, boolean> = {
   PENDING_SCHOOL_AFFILIATION: false,
   PENDING_UPCHIEVE_VERIFICATION: true,
   AFFILIATED: true,
-  DENIED: true,
+  DENIED: false,
   OPTED_OUT: false,
   UNAFFILIATED: false,
 }
@@ -75,6 +78,7 @@ const schoolPathTitleId = `${uid}-school-approved-title`
 const schoolPathBadgeId = `${uid}-school-approved-badge`
 const communityPathTitleId = `${uid}-community-title`
 const communityPathBadgeId = `${uid}-community-badge`
+const schoolPathNoticeId = `${uid}-school-approved-notice`
 
 type PathButton = {
   label: string
@@ -107,21 +111,54 @@ const SWITCH_TO_COMMUNITY: PathButton = {
   testid: 'switch-to-community-button',
   event: { type: 'OPT_OUT' },
 }
+const TRY_SCHOOL_APPROVED_AGAIN: PathButton = {
+  label: 'Try again',
+  variant: 'primary-blue',
+  testid: 'try-school-approved-again-button',
+  event: { type: 'OPT_IN' },
+}
+
+const schoolApprovedButton = computed(() => {
+  if (isSeekingSchoolApproval.value) return ADD_ADVISOR
+  if (isDenied.value) return TRY_SCHOOL_APPROVED_AGAIN
+  return CHOOSE_SCHOOL_APPROVED
+})
 
 const communityButton = computed(() => {
   if (isSeekingSchoolApproval.value) return SWITCH_TO_COMMUNITY
+  if (snapshot.value.matches('Undecided') || isDenied.value)
+    return STAY_COMMUNITY
   // An opted-out chapter is already where this button would put it.
-  if (snapshot.value.matches('Undecided')) return STAY_COMMUNITY
   return undefined
 })
 
-const paths = computed(() => [
+type ChapterPath = {
+  testid: string
+  badgeTestid: string
+  titleId: string
+  badgeId: string
+  title: string
+  denialNotice?: { text: string; id: string; testid: string }
+  body: string
+  bullets: string[]
+  isCurrent: boolean
+  button?: PathButton
+}
+
+const paths = computed<ChapterPath[]>(() => [
   {
     testid: 'school-approved-path',
     badgeTestid: 'school-approved-current-badge',
     titleId: schoolPathTitleId,
     badgeId: schoolPathBadgeId,
     title: 'School-approved',
+    denialNotice: isDenied.value
+      ? {
+          text: "Your school didn't approve this chapter. You can try again with a new advisor at the same school.",
+          id: schoolPathNoticeId,
+          testid: 'school-approved-denial-notice',
+        }
+      : undefined,
     body: "A teacher or school staff member is a formal advisor. You follow your school's requirement for starting school clubs.",
     bullets: [
       "Use your school's name, meet in a school room, table at the club fair",
@@ -129,9 +166,7 @@ const paths = computed(() => [
       'We email your advisor for you and support you through school approval',
     ],
     isCurrent: isSeekingSchoolApproval.value,
-    button: isSeekingSchoolApproval.value
-      ? ADD_ADVISOR
-      : CHOOSE_SCHOOL_APPROVED,
+    button: schoolApprovedButton.value,
   },
   {
     testid: 'community-path',
@@ -196,6 +231,14 @@ const paths = computed(() => [
               >CURRENT</span
             >
           </div>
+          <p
+            v-if="path.denialNotice"
+            class="card-text path-notice"
+            :id="path.denialNotice.id"
+            :data-testid="path.denialNotice.testid"
+          >
+            {{ path.denialNotice.text }}
+          </p>
           <p class="card-text">{{ path.body }}</p>
           <ul class="card-text">
             <li v-for="bullet in path.bullets" :key="bullet">{{ bullet }}</li>
@@ -205,6 +248,7 @@ const paths = computed(() => [
               :variant="path.button.variant"
               :showArrow="false"
               :data-testid="path.button.testid"
+              :aria-describedby="path.denialNotice?.id"
               @click="send(path.button.event)"
             >
               {{ path.button.label }}
@@ -237,27 +281,6 @@ const paths = computed(() => [
         :submitting="snapshot.matches('SubmittingAdvisorInfo')"
         :schoolAlreadyKnown="hasSchoolOnRecord"
       />
-    </div>
-
-    <div
-      class="max-width status"
-      v-if="snapshot.matches('Denied')"
-      data-testid="denied-panel"
-    >
-      <div class="body">
-        <div class="header">Denied</div>
-        Your school has denied the affiliation request. You can try again with a
-        different school or contact the school administrators.
-      </div>
-      <div class="footer">
-        <LargeButton
-          variant="primary-blue"
-          :showArrow="false"
-          @click="send({ type: 'OPT_IN' })"
-        >
-          Try again
-        </LargeButton>
-      </div>
     </div>
 
     <div
@@ -315,13 +338,6 @@ const paths = computed(() => [
   padding: 1em;
   text-align: left;
 }
-.footer {
-  padding-top: 1em;
-  display: flex;
-  justify-content: end;
-  align-items: center;
-  gap: 12px;
-}
 .max-width {
   max-width: 400px;
 }
@@ -357,6 +373,13 @@ const paths = computed(() => [
 .path-footer {
   margin-top: auto;
   padding-top: 1em;
+}
+.path-notice {
+  border-radius: 8px;
+  background-color: $border-grey;
+  border: 1px solid rgb(184, 184, 184);
+  padding: 0.75em;
+  margin-bottom: 0.75em;
 }
 .badge {
   background-color: $c-success-green;

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { getClient } from '../db.ts'
 import {
   createNthsPresident,
+  denySchoolAffiliation,
   schoolAffiliationStatusOf,
 } from '../nths-utils.ts'
 import { Login } from '../page-object-models/login.js'
@@ -59,6 +60,21 @@ test.describe('NTHS school approval choice', () => {
     await chapterPage.schoolApprovalIsSettled()
     expect(await schoolAffiliationStatusOf(dbClient, chapter.groupId)).toBe(
       'PENDING_SCHOOL_AFFILIATION'
+    )
+  })
+
+  test('denied president switches to a community chapter', async () => {
+    await denySchoolAffiliation(dbClient, chapter.groupId)
+    await chapterPage.goto()
+
+    await chapterPage.schoolApprovalIsOutstanding()
+
+    await chapterPage.openPathChooserAfterDenial()
+    await chapterPage.stayCommunity()
+
+    await chapterPage.schoolApprovalIsSettled()
+    expect(await schoolAffiliationStatusOf(dbClient, chapter.groupId)).toBe(
+      'OPTED_OUT'
     )
   })
 

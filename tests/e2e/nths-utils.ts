@@ -63,6 +63,28 @@ export const createNthsPresident = async (
   return { president, chapter }
 }
 
+export const denySchoolAffiliation = async (
+  dbClient: DbClient,
+  groupId: string
+): Promise<void> => {
+  await dbClient.query(
+    `INSERT INTO nths_group_school_affiliation (nths_group_id, nths_school_affiliation_status_id)
+     SELECT $1, statuses.id
+       FROM nths_school_affiliation_statuses statuses
+      WHERE statuses.name = 'DENIED'
+     ON CONFLICT (nths_group_id)
+       DO UPDATE SET nths_school_affiliation_status_id = EXCLUDED.nths_school_affiliation_status_id`,
+    [groupId]
+  )
+  await dbClient.query(
+    `INSERT INTO nths_group_actions (nths_group_id, nths_action_id)
+     SELECT $1, actions.id
+       FROM nths_actions actions
+      WHERE actions.name = 'SCHOOL AFFILIATION DENIED'`,
+    [groupId]
+  )
+}
+
 export const schoolAffiliationStatusOf = async (
   dbClient: DbClient,
   groupId: string

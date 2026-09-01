@@ -139,13 +139,16 @@ describe('nths store NTHSChecklist getter', () => {
     ).toEqual(['MARKED SCHOOL AFFILIATION IN PROGRESS'])
   })
 
-  it('leaves the school approval item not done until a choice is recorded', () => {
-    const item = schoolApprovalItemIn(
-      checklistOf({ schoolAffiliationStatus: 'UNAFFILIATED' })
-    )
+  it.each(['UNAFFILIATED' as const, 'DENIED' as const])(
+    'leaves the school approval item not done while the chapter is %s',
+    (schoolAffiliationStatus) => {
+      const item = schoolApprovalItemIn(
+        checklistOf({ schoolAffiliationStatus })
+      )
 
-    expect(item.status).toBe(CheckboxStatus.NotDone)
-  })
+      expect(item.status).toBe(CheckboxStatus.NotDone)
+    }
+  )
 
   it('marks the school approval item done once a choice is recorded', () => {
     const item = schoolApprovalItemIn(

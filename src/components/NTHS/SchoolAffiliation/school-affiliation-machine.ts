@@ -257,6 +257,9 @@ export const SchoolAffiliationMachine = config.createMachine({
         OPT_IN: {
           target: 'OptingIn',
         },
+        OPT_OUT: {
+          target: 'OptingOut',
+        },
       },
     },
   },
