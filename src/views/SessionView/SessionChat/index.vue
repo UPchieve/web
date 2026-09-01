@@ -200,13 +200,19 @@
       >
         ∑
       </button>
+      <editor-content
+        v-if="isShowTipTapEditorEnabled"
+        class="message-composer"
+        :editor="editor"
+      />
+
       <textarea
         v-if="!isShowTipTapEditorEnabled"
         autocomplete="off"
         class="message-textarea"
-        :class="{ hidden: textMessageHidden }"
         data-testid="chat-textarea"
         autofocus
+        rows="1"
         @keydown="onTypingInChat"
         @input="resizeTextarea"
         v-model="newMessage"
@@ -214,18 +220,11 @@
         ref="textareaRef"
       />
 
-      <editor-content
-        class="message-composer"
-        :class="{ 'message-composer--empty': isComposerEmpty }"
-        :editor="editor"
-        @keydown="onComposerKeydown"
-      />
       <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
       <button
         type="button"
         :disabled="isSendMessageDisabled"
         class="send-button"
-        :class="{ hidden: textMessageHidden }"
         @click="sendMessage"
       >
         <SendMessage />
@@ -333,7 +332,6 @@ export default {
       receiveMessageAudio: new Audio(sound),
       failureReasons: null,
       waitingForModeration: false,
-      textMessageHidden: false,
       hasStartedTyping: false,
       isTutorJoiningForFirstTime: false,
       pendingTextMessages: [],
@@ -356,8 +354,8 @@ export default {
         Placeholder.configure({ placeholder: 'Type a message...' }),
       ],
       content: '',
-      onUpdate: () => {
-        this.onEditorInput()
+      editorProps: {
+        handleKeyDown: (_, event) => this.onTypingInChat(event),
       },
     })
 
@@ -373,6 +371,10 @@ export default {
   beforeUnmount() {
     if (!this.isShowTipTapEditorEnabled) return
     document.removeEventListener('click', this.mathClickOutsideHandler)
+    if (window.mathVirtualKeyboard) {
+      window.mathVirtualKeyboard?.hide()
+      window.mathVirtualKeyboard.container = null
+    }
     this.editor.destroy()
   },
   computed: {
@@ -550,20 +552,19 @@ export default {
       })
     },
 
-    async onTypingInChat(event) {
-      if (event.key == 'Enter' && event.shiftKey) {
-        // Allow-multi-line messages.
-        return
-      }
+    onTypingInChat(event) {
+      // Allow multi-line messages.
+      if (event.key === 'Enter' && event.shiftKey) return false
 
       // If key pressed is Enter, send the message.
       if (event.key === 'Enter') {
         event.preventDefault()
-        await this.sendMessage()
-        return
+        this.sendMessage()
+        return true
       }
 
       this.indicateStartTyping()
+      return false
     },
     async sendMessage() {
       const { text, isLatex } = this.isShowTipTapEditorEnabled
@@ -873,15 +874,6 @@ export default {
 
       AnalyticsService.captureEvent(EVENTS.USER_SENT_CELEBRATION)
     },
-    async onComposerKeydown(event) {
-      if (event.key === 'Enter' && event.shiftKey) return
-      if (event.key === 'Enter') {
-        event.preventDefault()
-        await this.sendMessage()
-        return
-      }
-    },
-
     focusEditor() {
       this.editor?.commands.focus()
     },
@@ -944,6 +936,7 @@ export default {
         }
       })
 
+      mathField.addEventListener('input', () => this.indicateStartTyping())
       mathField.addEventListener('change', () => commit(false))
 
       AnalyticsService.captureEvent(EVENTS.TIP_TAP_EDITOR_OPENED, {
@@ -974,9 +967,6 @@ export default {
       } else {
         this.focusEditor()
       }
-    },
-    onEditorInput() {
-      this.indicateStartTyping()
     },
     mathClickOutsideHandler(e) {
       if (this.isMathMode && !this.$el.contains(e.target)) {
@@ -1346,20 +1336,15 @@ export default {
 .message-textarea {
   width: 100%;
   border: none;
-  padding: 1em;
+  padding: 1.5em 1em;
   resize: none;
-  place-content: center;
   max-height: 250px;
   overflow-y: auto;
-  &.hidden {
-    display: none;
-  }
   &:focus {
     outline: none;
   }
 
   @include breakpoint-below('medium') {
-    height: 40px;
     border: 1px solid $c-border-grey;
     border-radius: 20px;
     padding: 0.6em 1em;
@@ -1392,8 +1377,7 @@ export default {
   flex: 1;
   max-height: 250px;
   overflow: auto;
-  padding: 0.6em;
-  margin-top: 0.5em;
+  padding: 1.5em 1em;
   line-height: 1.5;
   outline: none;
   word-break: break-word;
@@ -1402,6 +1386,10 @@ export default {
   :deep(.ProseMirror) {
     outline: none;
     min-height: 1.5em;
+
+    p {
+      margin-bottom: 0;
+    }
 
     p.is-editor-empty:first-child::before {
       content: attr(data-placeholder);
@@ -1430,11 +1418,12 @@ export default {
   @include breakpoint-below('medium') {
     border: 1px solid $c-border-grey;
     border-radius: 20px;
+    padding: 0.6em 1em;
   }
 }
 
 .math-toggle-button {
-  padding: 0 12px;
+  padding-left: 12px;
   font-size: 18px;
   background: none;
   border: none;
