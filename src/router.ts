@@ -1197,18 +1197,19 @@ router.afterEach((to, from) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    const is401 = error.request.status === 401
-    const isAuthenticatedRoute =
-      error.request.responseURL.indexOf('/api/') !== -1
+    if (!error.response) return Promise.reject(error)
+
+    const { request, status, config, data } = error.response
+    const is401 = status === 401
+    const isAuthenticatedRoute = request.responseURL.indexOf('/api/') !== -1
 
     const isGetUserAttempt =
-      error.request.responseURL.indexOf('/api/user') !== -1 &&
-      error.response.config.method === 'get'
+      request.responseURL.indexOf('/api/user') !== -1 && config.method === 'get'
 
     const isGetSessionAttempt =
-      error.request.responseURL.indexOf('/api/session/current') !== -1
+      request.responseURL.indexOf('/api/session/current') !== -1
     const isGetSubjectsAttempt =
-      error.request.responseURL.indexOf('/api/subjects') !== -1
+      request.responseURL.indexOf('/api/subjects') !== -1
 
     if (
       is401 &&
@@ -1225,8 +1226,8 @@ axiosInstance.interceptors.response.use(
         })
     }
 
-    const is403 = error.request.status === 403
-    const redirect = error.response.data.redirect
+    const is403 = status === 403
+    const redirect = data?.redirect
     if (is403 && redirect) {
       router.push({
         path: redirect,
