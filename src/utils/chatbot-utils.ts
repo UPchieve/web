@@ -1,4 +1,5 @@
 import katex from 'katex'
+import { escape } from 'lodash-es'
 
 export function getSessionEndDMsMessage(
   isSessionStudent: boolean,
@@ -18,10 +19,7 @@ export function getSessionEndedMessage(isSessionStudent: boolean) {
     : 'The session has ended. Thanks so much for picking up this session!'
 }
 
-export function renderLatex(
-  contents: string,
-  escapeHtml?: (s: string) => string
-) {
+export function renderLatex(contents: string) {
   const stripped = contents.startsWith('LATEX:') ? contents.slice(6) : contents
 
   return stripped
@@ -32,9 +30,7 @@ export function renderLatex(
             throwOnError: false,
             displayMode: false,
           })
-        : escapeHtml
-          ? escapeHtml(part)
-          : part
+        : escape(part)
     )
     .join('')
 }

@@ -95,7 +95,7 @@
                     message.isLatex ||
                     message.contents?.startsWith(this.latexPrefix)
                   "
-                  v-html="renderLatexContent(message.contents)"
+                  v-html="renderLatex(message.contents)"
                 >
                 </span>
                 <transcribed-message
@@ -504,6 +504,7 @@ export default {
   },
 
   methods: {
+    renderLatex,
     getModerationFailureReason(reasonKey) {
       switch (reasonKey.toLowerCase()) {
         case 'platform circumvention':
@@ -871,15 +872,6 @@ export default {
       })
 
       AnalyticsService.captureEvent(EVENTS.USER_SENT_CELEBRATION)
-    },
-    escapeHtml(contents) {
-      const node = document.createTextNode(contents)
-      const div = document.createElement('div')
-      div.appendChild(node)
-      return div.innerHTML
-    },
-    renderLatexContent(contents) {
-      return renderLatex(contents, this.escapeHtml)
     },
     async onComposerKeydown(event) {
       if (event.key === 'Enter' && event.shiftKey) return
