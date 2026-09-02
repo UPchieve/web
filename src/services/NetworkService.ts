@@ -1581,6 +1581,13 @@ export default {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
+  async getPendingAsyncReviewCount() {
+    try {
+      return await httpGet<{ count: number }>(`${API_ROOT}/essay-reviews/count`)
+    } catch (err) {
+      return this._axiosErrorHandler(err as AxiosError)
+    }
+  },
   async submitVolunteerEssayReview(submissionId: string, review: string) {
     try {
       return await httpPost<void>(

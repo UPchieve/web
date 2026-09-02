@@ -165,6 +165,7 @@ import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import NetworkService from '@/services/NetworkService'
 import TaskCard from '@/components/TaskCard.vue'
 import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessionsCard.vue'
 import JoinedTeamModal from './JoinedTeamModal.vue'
@@ -249,6 +250,7 @@ export default {
       nextTask: {},
       hasSeenShareInfoModal: false,
       essayReviewCardImpressionTracked: false,
+      pendingSubmissionCount: null,
     }
   },
   computed: {
@@ -296,9 +298,16 @@ export default {
       )
     },
     essayReviewActions() {
+      const title =
+        this.pendingSubmissionCount === null
+          ? 'See submissions awaiting review'
+          : `${this.pendingSubmissionCount} ${
+              this.pendingSubmissionCount === 1 ? 'submission' : 'submissions'
+            } awaiting review`
+
       return [
         {
-          title: 'See submissions awaiting review',
+          title,
           subtitle: 'Open review list',
           // Essay review is recurring, so this action never becomes complete
           status: 'not-started',
@@ -627,6 +636,10 @@ export default {
     shouldShowEssayReviewCard: {
       immediate: true,
       handler(isVisible) {
+        if (isVisible && this.pendingSubmissionCount === null) {
+          this.loadPendingAsyncReviewCount()
+        }
+
         if (isVisible && !this.essayReviewCardImpressionTracked) {
           this.essayReviewCardImpressionTracked = true
           AnalyticsService.captureEvent(
@@ -637,6 +650,14 @@ export default {
     },
   },
   methods: {
+    async loadPendingAsyncReviewCount() {
+      try {
+        const response = await NetworkService.getPendingAsyncReviewCount()
+        this.pendingSubmissionCount = response.data.count
+      } catch {
+        // Keep the default card copy if the count cannot be loaded
+      }
+    },
     openEssayReviews() {
       AnalyticsService.captureEvent(
         EVENTS.VOLUNTEER_ASYNC_ESSAY_REVIEW_DASHBOARD_CTA_CLICKED
