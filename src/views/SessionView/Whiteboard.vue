@@ -440,6 +440,7 @@ import {
 import ScreenShareToolbarButton from '@/components/ScreenShareToolbarButton.vue'
 
 const CENSORED_CONTENT_PLACEHOLDER = 'CONTENT CENSORED'
+const ACTIVITY_PING_INTERVAL_IN_MS = 120_000
 
 const TOOLS = {
   BRUSH: 'brush',
@@ -567,6 +568,7 @@ export default {
       lastSelectedShapeType: 'line',
       // Debounce sending cursor position.
       lastCursorBroadcastAt: 0,
+      lastWhiteboardActivityPingAt: 0,
     }
   },
   emits: ['toggleAiWidget', 'clickedShareScreen'],
@@ -756,6 +758,16 @@ export default {
         },
         false
       )
+    },
+    pingWhiteboardActivity() {
+      const now = Date.now()
+      if (
+        now - this.lastWhiteboardActivityPingAt <
+        ACTIVITY_PING_INTERVAL_IN_MS
+      )
+        return
+      this.lastWhiteboardActivityPingAt = now
+      socket.emit('transmitWhiteboardActivity', { sessionId: this.sessionId })
     },
     handlePointerLeave() {
       this.setSessionKey('isCursorOnCanvas', false, false)
@@ -1350,9 +1362,12 @@ export default {
         return false
       })
 
-      this.zwibblerCtx.on('document-changed', () => {
+      this.zwibblerCtx.on('document-changed', ({ remote }) => {
         if (this.showShapePicker) {
           this.showShapePicker = false
+        }
+        if (!remote) {
+          this.pingWhiteboardActivity()
         }
       })
 
