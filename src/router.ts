@@ -36,7 +36,6 @@ const BackgroundInfoView = () => import('./views/BackgroundInfoView.vue')
 const CalendarView = () => import('./views/CalendarView.vue')
 const ContactView = () => import('./views/ContactView.vue')
 const DashboardView = () => import('./views/DashboardView/index.vue')
-const FavoriteCoachesView = () => import('./views/FavoriteCoachesView.vue')
 const FeedbackView = () => import('./views/FeedbackView.vue')
 const JoinClassView = () => import('./views/JoinClassView.vue')
 const JoinNTHSGroupView = () => import('./views/JoinNTHSGroupView.vue')
@@ -111,6 +110,7 @@ const AdminEssayReviewList = () =>
   import('./views/Admin/AdminEssayReviewList.vue')
 const AdminEssayReviewDetail = () =>
   import('./views/Admin/AdminEssayReviewDetail.vue')
+const PastCoachesView = () => import('./views/PastCoachesView.vue')
 
 import {
   resolveNthsRoute,
@@ -258,7 +258,7 @@ const STUDENT_SIDEBAR_LINKED_VIEWS = [
   SessionHistoryView,
   ProgressReportsOverviewView,
   SessionView,
-  FavoriteCoachesView,
+  PastCoachesView,
   StudentClassesView,
   JourneysView,
 ]
@@ -653,9 +653,9 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: autoflowRedirect,
   },
   {
-    path: '/favorite-coaches',
-    name: 'FavoriteCoachesView',
-    component: FavoriteCoachesView,
+    path: '/past-coaches',
+    name: 'PastCoachesView',
+    component: PastCoachesView,
     meta: {
       protected: true,
       preloadViews: { student: STUDENT_SIDEBAR_LINKED_VIEWS },

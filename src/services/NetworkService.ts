@@ -1024,10 +1024,11 @@ export default {
       this._errorHandler
     )
   },
-  getFavoriteVolunteers(page) {
-    return httpGet(
-      `${API_ROOT}/students/favorite-volunteers?page=${page}`
-    ).then(this._successHandler, this._errorHandler)
+  getPastVolunteers() {
+    return httpGet(`${API_ROOT}/students/past-volunteers`).then(
+      this._successHandler,
+      this._errorHandler
+    )
   },
   getSessionRecap(sessionId) {
     return httpGet(`${API_ROOT}/sessions/${sessionId}/recap`).then(

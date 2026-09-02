@@ -187,6 +187,7 @@ export default {
     TaskCard,
     DashboardBanner,
     PhotoUploadModal,
+
     SquareTextIcon,
     VerificationIcon,
     RingingNotificationBellIcon,
