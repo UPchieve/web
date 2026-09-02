@@ -411,7 +411,8 @@ export default {
     this.filters.volunteerId = volunteerId ?? this.filters.volunteerId
     this.filters.firstName = firstName ?? this.filters.firstName
     this.filters.subjectName = subjectName ?? this.filters.subjectName
-    this.filters.hasUnreadDMs = hasUnreadDMs ?? this.filters.hasUnreadDMs
+    this.filters.hasUnreadDMs =
+      hasUnreadDMs === 'true' || this.filters.hasUnreadDMs
 
     await this.fetchSessionHistory()
   },
