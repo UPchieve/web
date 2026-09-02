@@ -151,8 +151,6 @@ export default {
       isSmsVerificationEnabled: 'featureFlags/isSmsVerificationEnabled', // Whether SMS verification is enabled across the app
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
-      isStudentsBecomeVolunteersEnabled:
-        'featureFlags/isStudentsBecomeVolunteersEnabled',
       isForceSmsVerificationEnabled:
         'featureFlags/isForceSmsVerificationEnabled',
       userType: 'user/userType',

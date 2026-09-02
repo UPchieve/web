@@ -69,8 +69,6 @@ export default {
       mobileMode: 'app/mobileMode',
       topicCards: 'subjects/quizTopicCards',
       hasCertification: 'user/hasASubjectCertification',
-      isStudentsBecomeVolunteersEnabled:
-        'featureFlags/isStudentsBecomeVolunteersEnabled',
       isStudentVolunteer: 'user/isStudentVolunteer',
     }),
   },

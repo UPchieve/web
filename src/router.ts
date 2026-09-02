@@ -165,6 +165,14 @@ const switchToTeacherOrCancel: NavigationGuard = async (_to, _from, next) => {
   }
 }
 
+const volunteerHoursFlagGuard: NavigationGuard = (_to, _from, next) => {
+  if (store.getters['featureFlags/shouldShowStudentToVolunteerHoursPage']) {
+    next()
+  } else {
+    next('/dashboard')
+  }
+}
+
 const ensureActiveRoleMatchesSessionRole: NavigationGuard = async (
   _to,
   _from,
@@ -943,6 +951,7 @@ const routes: RouteRecordRaw[] = [
         student: STUDENT_SIDEBAR_LINKED_VIEWS,
       },
     },
+    beforeEnter: [volunteerHoursFlagGuard],
   },
   {
     path: '/groups/apply',

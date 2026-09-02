@@ -87,10 +87,6 @@ export default {
         'Interested in becoming a volunteer tutor on UPchieve?',
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
-
-      [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: {
-        showCalculator: true,
-      },
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM]: null,
     },
@@ -262,10 +258,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE],
     shouldShowStudentToVolunteerHoursPage: (state: FeatureFlagState) =>
       state.toggleFlags[
-        POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE
-      ],
-    studentToVolunteerHoursPageVersion: (state: FeatureFlagState) =>
-      state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE
       ],
     isPresessionFakeDoorQuestionEnabled: (state: FeatureFlagState) =>
