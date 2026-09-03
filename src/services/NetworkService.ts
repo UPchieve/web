@@ -472,12 +472,6 @@ export default {
       source,
     }).then(this._successHandler, this._errorHandler)
   },
-  getSessionPhotoUploadUrl(sessionId) {
-    return httpGet(`${API_ROOT}/session/${sessionId}/photo-url`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
   uploadSessionImage({ sessionId, image }) {
     const formData = new FormData()
     formData.append('image', image)
