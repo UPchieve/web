@@ -3,6 +3,8 @@ import { computed, onMounted, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import { useRouter } from 'vue-router'
 import { countWords } from '@/utils/word-count'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const maxEssayLength = 50000
 const maxPromptLength = 5000
@@ -128,6 +130,10 @@ function goToDashboard() {
 }
 
 onMounted(() => {
+  AnalyticsService.captureEvent(
+    EVENTS.STUDENT_VIEWED_ASYNC_REVIEW_SUBMISSION_PAGE,
+    { subject: 'applicationEssays' }
+  )
   pageTop.value?.scrollIntoView()
 })
 </script>

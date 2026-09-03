@@ -4,6 +4,8 @@ import NetworkService from '@/services/NetworkService'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { countWords } from '@/utils/word-count'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const maxCollegeListLength = 50000
 const maxAdditionalContextLength = 2000
@@ -148,6 +150,10 @@ function goToDashboard() {
 }
 
 onMounted(() => {
+  AnalyticsService.captureEvent(
+    EVENTS.STUDENT_VIEWED_ASYNC_REVIEW_SUBMISSION_PAGE,
+    { subject: 'collegeList' }
+  )
   pageTop.value?.scrollIntoView()
 })
 </script>
