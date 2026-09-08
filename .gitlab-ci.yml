@@ -12,7 +12,7 @@ cache:
     - .pnpm-store
 
 .node_setup:
-  image: node:24.15.0-bullseye
+  image: node:24.15.0-trixie
   before_script:
     - corepack enable pnpm
     - pnpm config set store-dir .pnpm-store
@@ -30,7 +30,9 @@ cache:
       - dist/
   before_script:
     - !reference [.node_setup, before_script]
-    - apt update && apt install -y curl gnupg
+    # The Doppler installer verifies its download with gpgv, which Debian 13 only
+    # recommends from gnupg rather than depends on, so it is not installed by default.
+    - apt update && apt install -y curl gnupg gpgv
     - curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sh
     - export VUE_APP_GOOGLE_RECAPTCHA_KEY="$GOOGLE_RECAPTCHA_KEY"
   script:
