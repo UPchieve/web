@@ -42,7 +42,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_REQUEST_SPECIFIC_VOLUNTEER_SESSIONS]: false,
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: false,
-      [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
       [POSTHOG_FEATURE_FLAGS.REFERRAL_MODAL_REDESIGN]: false,
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
@@ -66,6 +65,11 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW]: false,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW_EMAIL_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO]: false,
+      // The following flags are for gating risky features, NOT features being
+      // experimented/slowly rolled out.
+      // They are never to be removed as part of a "launch".
+      [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: false,
+      [POSTHOG_FEATURE_FLAGS.BLOCK_SESSION_IMAGE_UPLOAD]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -228,8 +232,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
     getIncentiveBannerPayload: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
-    isForceSmsVerificationEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
     isDisableStudentSignupsEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION],
     isReferralModalRedesignEnabled: (state: FeatureFlagState) =>
@@ -290,5 +292,10 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO
       ],
+    // Risky features gates.
+    isForceSmsVerificationEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
+    blockSessionImageUpload: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_SESSION_IMAGE_UPLOAD],
   },
 }

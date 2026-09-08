@@ -1019,6 +1019,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO = 'show-volunteer-opt-in-to-share-info',
   VOLUNTEER_ASYNC_ESSAY_REVIEW = 'volunteer-async-essay-review',
   VOLUNTEER_ASYNC_ESSAY_REVIEW_EMAIL_NOTIFICATIONS = 'volunteer-async-essay-review-email-notifications',
+  BLOCK_SESSION_IMAGE_UPLOAD = 'block-session-image-upload',
 }
 
 export const ANALYTICS_REPORT_ROW = {

@@ -114,6 +114,7 @@
         <EraserIcon class="toolbar-icon" />
       </button>
       <button
+        v-if="allowSessionImageUpload"
         type="button"
         class="toolbar-item"
         title="Upload photo"
@@ -590,7 +591,11 @@ export default {
       partnerImageUploadError: 'socket/partnerImageUploadError',
       partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
       roleInCurrentSession: 'user/roleInCurrentSession',
+      blockSessionImageUpload: 'featureFlags/blockSessionImageUpload',
     }),
+    allowSessionImageUpload() {
+      return !this.blockSessionImageUpload
+    },
     isAiWidgetHidden() {
       return this.aiWidgetHidden
     },
@@ -1005,6 +1010,8 @@ export default {
       this.$refs.fileDialog.openFileDialog(event)
     },
     async uploadPhoto(uploadEvents) {
+      if (this.blockSessionImageUpload) return
+
       let file = uploadEvents.files[0]
 
       if (!this.isWhiteboardOpen && this.mobileMode) this.toggleWhiteboard()

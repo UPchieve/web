@@ -98,6 +98,10 @@ const isSessionConnectionAlive = computed(
 )
 const isConnected = computed(() => store.state.socket.isConnected)
 const isSessionEnded = computed(() => !!store.state.user.session?.endedAt)
+const blockSessionImageUpload = computed<boolean>(
+  () => store.getters['featureFlags/blockSessionImageUpload']
+)
+const allowSessionImageUpload = computed(() => !blockSessionImageUpload.value)
 const isSocketReadyToRequestForDoc = computed<[boolean, Uuid | undefined]>(
   () => [isConnected.value, currentSession.value?.id]
 )
@@ -160,6 +164,7 @@ async function onFileSelected(evt: FileSelectedEvent) {
 }
 
 async function processAndInsertImage(file: File) {
+  if (blockSessionImageUpload.value) return
   if (!isAllowedImageMime(file.type)) return onWrongFileType()
   if (file.size > MAX_IMAGE_FILE_SIZE_BYTES.value) return onFileTooLarge()
 
@@ -400,7 +405,7 @@ watch(isSocketReadyToRequestForDoc, ([connected, sessionId]) => {
       <button type="button" class="ql-italic" />
       <button type="button" class="ql-underline" />
       <button type="button" class="ql-strike" />
-      <button type="button" class="ql-image" />
+      <button v-show="allowSessionImageUpload" type="button" class="ql-image" />
       <select class="ql-color" autocomplete="off" />
       <select class="ql-background" autocomplete="off" />
       <button type="button" class="ql-list" value="ordered" />

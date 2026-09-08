@@ -112,6 +112,10 @@ const isSessionEnded = computed(() => !!store.state.user.session?.endedAt)
 const isStudent = computed<boolean>(() => store.getters['user/isStudent'])
 const isBanned = computed(() => store.getters['user/banType'])
 const userType = computed(() => store.getters['user/userType'])
+const blockSessionImageUpload = computed<boolean>(
+  () => store.getters['featureFlags/blockSessionImageUpload']
+)
+const allowSessionImageUpload = computed(() => !blockSessionImageUpload.value)
 
 const partnerImageUploadError = computed(
   () => store.getters['socket/partnerImageUploadError']
@@ -280,6 +284,7 @@ function onImageFailedModeration(
 }
 
 async function processAndInsertImage(file: File) {
+  if (blockSessionImageUpload.value) return
   if (!isAllowedImageMime(file.type)) return onWrongFileType()
   if (file.size > MAX_IMAGE_FILE_SIZE_BYTES.value) return onFileTooLarge()
 
@@ -508,7 +513,7 @@ watch(isSocketReadyToRequestForDoc, ([connected, sessionId]) => {
       <button type="button" class="ql-italic" />
       <button type="button" class="ql-underline" />
       <button type="button" class="ql-strike" />
-      <button type="button" class="ql-image" />
+      <button v-show="allowSessionImageUpload" type="button" class="ql-image" />
       <select class="ql-color" autocomplete="off"></select>
       <select class="ql-background" autocomplete="off"></select>
       <button type="button" class="ql-list" value="ordered" />
