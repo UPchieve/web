@@ -20,7 +20,7 @@
     ></div>
     <div id="partner-cursor" ref="partnerCursor"></div>
     <div id="toolbar" class="toolbar">
-      <div class="toolbar-item" tabindex="0">
+      <div v-if="allowScreenshare" class="toolbar-item" tabindex="0">
         <ScreenShareToolbarButton
           :hasMeetingEnded="!meetingHasNotEnded"
           :onClick="toggleScreenShareWindow"
@@ -592,9 +592,13 @@ export default {
       partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
       roleInCurrentSession: 'user/roleInCurrentSession',
       blockSessionImageUpload: 'featureFlags/blockSessionImageUpload',
+      blockScreenshare: 'featureFlags/blockScreenshare',
     }),
     allowSessionImageUpload() {
       return !this.blockSessionImageUpload
+    },
+    allowScreenshare() {
+      return !this.blockScreenshare
     },
     isAiWidgetHidden() {
       return this.aiWidgetHidden

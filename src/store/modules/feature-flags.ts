@@ -70,6 +70,7 @@ export default {
       // They are never to be removed as part of a "launch".
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.BLOCK_SESSION_IMAGE_UPLOAD]: false,
+      [POSTHOG_FEATURE_FLAGS.BLOCK_SCREENSHARE]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -297,5 +298,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
     blockSessionImageUpload: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_SESSION_IMAGE_UPLOAD],
+    blockScreenshare: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_SCREENSHARE],
   },
 }

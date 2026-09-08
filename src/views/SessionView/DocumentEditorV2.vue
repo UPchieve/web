@@ -116,6 +116,9 @@ const blockSessionImageUpload = computed<boolean>(
   () => store.getters['featureFlags/blockSessionImageUpload']
 )
 const allowSessionImageUpload = computed(() => !blockSessionImageUpload.value)
+const allowScreenshare = computed<boolean>(
+  () => !store.getters['featureFlags/blockScreenshare']
+)
 
 const partnerImageUploadError = computed(
   () => store.getters['socket/partnerImageUploadError']
@@ -527,7 +530,7 @@ watch(isSocketReadyToRequestForDoc, ([connected, sessionId]) => {
         <ActivityDot v-if="showHasAiMessageIndicator" class="activity-dot" />
       </button>
 
-      <div class="ql-ss">
+      <div v-if="allowScreenshare" class="ql-ss">
         <ScreenShareToolbarButton
           :hasMeetingEnded="hasLiveMediaMeetingEnded"
           :isViewingPartnerScreenShare="isViewingPartnerScreenShare"

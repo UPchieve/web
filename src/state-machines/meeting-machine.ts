@@ -183,6 +183,9 @@ export function create() {
       hasNotJoinedMediaRoom: ({ context }) => {
         return !context?.isMeetingJoined
       },
+      allowScreenshare: () => {
+        return !store.getters['featureFlags/blockScreenshare']
+      },
     },
   }).createMachine({
     id: 'MeetingMachine',
@@ -335,6 +338,7 @@ export function create() {
                 on: {
                   share_screen: {
                     target: 'FetchMediaRoom',
+                    guard: 'allowScreenshare',
                   },
                   partner_shared_screen: [
                     {
