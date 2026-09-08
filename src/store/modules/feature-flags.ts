@@ -71,6 +71,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.BLOCK_SESSION_IMAGE_UPLOAD]: false,
       [POSTHOG_FEATURE_FLAGS.BLOCK_SCREENSHARE]: false,
+      [POSTHOG_FEATURE_FLAGS.BLOCK_AUDIO_CALL]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -300,5 +301,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_SESSION_IMAGE_UPLOAD],
     blockScreenshare: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_SCREENSHARE],
+    blockAudioCall: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_AUDIO_CALL],
   },
 }

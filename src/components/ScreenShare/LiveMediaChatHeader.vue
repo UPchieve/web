@@ -52,6 +52,9 @@ const toggleMuteMic = async () => {
 }
 
 const hasConnectedToMediaRoom = computed(() => !props.unableToJoinMediaRoom)
+const allowAudioCall = computed<boolean>(
+  () => !store.getters['featureFlags/blockAudioCall']
+)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 </script>
 
@@ -79,6 +82,7 @@ render the session control buttons in here-->
         :isLoading="isLoadingSpeakerControl"
       ></SpeakerButton>
       <TalkButton
+        v-if="allowAudioCall"
         :isMicMuted="props.isMyMicMuted"
         :isSpeaking="props.isSpeaking"
         :micState="props.micState"

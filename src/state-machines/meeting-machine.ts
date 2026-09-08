@@ -186,6 +186,9 @@ export function create() {
       allowScreenshare: () => {
         return !store.getters['featureFlags/blockScreenshare']
       },
+      allowAudioCall: () => {
+        return !store.getters['featureFlags/blockAudioCall']
+      },
     },
   }).createMachine({
     id: 'MeetingMachine',
@@ -541,6 +544,7 @@ export function create() {
                 on: {
                   toggle_mute_self: {
                     target: 'FetchMediaRoom',
+                    guard: 'allowAudioCall',
                   },
                 },
               },
