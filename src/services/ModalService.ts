@@ -19,7 +19,8 @@ type ModalTemplateProps = {
 
 export type SessionErrorModalData = ModalTemplateProps & {
   onAccept?: () => void
-  error: string
+  errorMessage?: string
+  errorTitle?: string
 }
 
 export type ConfirmModalData = ModalTemplateProps & {
@@ -51,9 +52,16 @@ function show(
 }
 
 export default {
-  showSessionError(error: string, action?: () => void): void {
+  showSessionError(
+    {
+      errorMessage,
+      errorTitle,
+    }: { errorMessage?: string; errorTitle?: string } = {},
+    action?: () => void
+  ): void {
     show(SessionErrorModal, {
-      error,
+      errorMessage,
+      errorTitle,
       alertModal: true,
       acceptText: 'OK',
       onAccept: action,

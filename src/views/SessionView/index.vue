@@ -357,7 +357,6 @@ import PartnerAckScreenShareInfractionModal from '@/components/Moderation/Partne
 import AckPartnerIntiatedPotentialBan from '@/components/Moderation/AckPartnerIntiatedPotentialBan.vue'
 import ModerationInfractionToast from '@/components/Moderation/ModerationInfractionToast.vue'
 import ModerationDisclaimerModal from '@/views/SessionView/ModerationDisclaimerModal.vue'
-import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
 import {
   hasSeenScreenShareDisclaimerThisSession,
   setHasSeenScreenShareDisclaimerThisSession,
@@ -502,7 +501,10 @@ export default {
           )
         })
     } catch (err) {
-      ModalService.showSessionError(err.message)
+      ModalService.showSessionError({
+        errorMessage: err.clientMessage,
+        errorTitle: err.clientTitle,
+      })
       LoggerService.noticeError(err)
     }
   },
@@ -1107,9 +1109,12 @@ export default {
           clearTimeout(this.connectingMessageSlowTimeout)
           return
         }
-
-        ModalService.showSessionError(SessionErrorType.SESSION_CHAT_ERROR, () =>
-          this.$router.go(0)
+        ModalService.showSessionError(
+          {
+            errorMessage: `Uh oh, we were unable to connect you to the session's chat.\n Please refresh and try again!`,
+            errorTitle: 'Session Chat Error',
+          },
+          () => this.$router.go(0)
         )
         AnalyticsService.captureEvent(EVENTS.SOCKET_SESSION_JOIN_FAILED, {
           sessionId: this.session.id,

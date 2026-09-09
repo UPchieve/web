@@ -3,12 +3,15 @@ import router from '@/router'
 import store from '@/store'
 import AnalyticsService from './AnalyticsService'
 import NetworkService, { isNetworkError } from './NetworkService'
-import { SessionErrorType } from '@/views/SessionView/SessionErrorModal.vue'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
 import ModalService from './ModalService'
 import LoggerService from './LoggerService'
 
 export type Session = any
+
+class InvalidSubjectTopicError extends Error {
+  clientMessage = 'Whoops, that subject and topic combination is wrong!'
+}
 
 function isAbsentUser(session: Session) {
   const { student, volunteer } = session
@@ -46,7 +49,9 @@ export default {
       data: { isValid },
     } = await NetworkService.getIsSubjectValid(subTopic, topic)
     if (!isValid) {
-      throw new Error(SessionErrorType.INVALID_SUBJECT_TOPIC)
+      throw new InvalidSubjectTopicError(
+        `Invalid subject and topic: ${subTopic}, ${topic}`
+      )
     }
 
     if (sessionId) {

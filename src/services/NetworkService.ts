@@ -37,13 +37,26 @@ const FAULT_TOLERANT_HTTP_TIMEOUT = 10000
 const FAULT_TOLERANT_HTTP_MAX_RETRY_TIMEOUT = 100000
 const FAULT_TOLERANT_HTTP_MAX_RETRIES = 10
 
+// TODO: Rename. Calling this `NetworkError` is misleading because it's
+// not just network errors that it might be wrapping.
 export class NetworkError extends Error {
   status?: number
+  clientMessage?: string
+  clientTitle?: string
 
-  constructor(message: string, status?: number) {
+  constructor(
+    message: string,
+    {
+      status,
+      clientMessage,
+      clientTitle,
+    }: { status?: number; clientMessage?: string; clientTitle?: string } = {}
+  ) {
     super(message)
     this.name = 'NetworkError'
     this.status = status
+    this.clientMessage = clientMessage
+    this.clientTitle = clientTitle
   }
 }
 
@@ -142,12 +155,19 @@ export default {
     return Promise.reject(res)
   },
   _axiosErrorHandler(res: AxiosError): never {
+    const data = res.response?.data as
+      | { err?: string; clientMessage?: string; clientTitle?: string }
+      | undefined
     const message =
-      (res.response?.data as { err?: string })?.err ??
+      data?.clientMessage ??
+      data?.err ??
       res.message ??
-      'An unexpected network error occurred.'
-    const status = res.response?.status
-    throw new NetworkError(message, status)
+      'An unexpected error occurred.'
+    throw new NetworkError(message, {
+      status: res.response?.status,
+      clientMessage: data?.clientMessage,
+      clientTitle: data?.clientTitle,
+    })
   },
   _faultTolerantHttp<T>(
     method: 'get' | 'post',
