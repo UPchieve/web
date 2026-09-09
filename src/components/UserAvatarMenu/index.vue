@@ -32,20 +32,27 @@ const isStudentVolunteer = computed(
 const isS2VThemingEnabled = store.getters['featureFlags/isS2VThemingEnabled']
 
 // Menu
-function goTo(path: string) {
+function closeMenu() {
   isMenuOpen.value = false
+  // The router collapses the mobile drawer only when the route name changes, so it misses
+  // tapping Profile while already on Profile, and switching modes on the dashboard, which
+  // does not navigate at all.
+  store.dispatch('app/sidebar/collapse')
+}
+
+function goTo(path: string) {
+  closeMenu()
   router.push(path)
 }
 
 function logout() {
-  isMenuOpen.value = false
+  closeMenu()
   AuthService.logout({ $router: router, $store: store })
 }
 
 const emit = defineEmits<{
   (e: 'update:isMenuOpen', value: boolean): void
   (e: 'switchModeError', message: string): void
-  (e: 'changedOpenState'): void
 }>()
 const isMenuOpen = computed({
   get: () => props.isMenuOpen,
@@ -59,6 +66,7 @@ const isMenuOpen = computed({
 
 const animateAvatar = ref<boolean>(false)
 function onSwitchedMode() {
+  closeMenu()
   animateAvatar.value = true
   store.commit('app/setFadeInContent', true) // start animation
 }
@@ -94,7 +102,6 @@ function resetErrorMessage() {
       :buttonHeightPx="12"
       transition="slide-y-transition"
       :useS2vTheming="isS2VThemingEnabled"
-      @update:isOpen="emit('changedOpenState')"
     >
       <template v-slot:content>
         <div

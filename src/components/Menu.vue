@@ -41,11 +41,17 @@ const isMenuOpen = computed({
 
 <template>
   <div>
+    <!--
+      On mobile, Ionic moves the presented ion-modal out of the v-menu content and into <ion-app>,
+      so Vuetify would treat every tap inside the sheet as a click outside. Ionic owns dismissal there
+      (backdrop tap, swipe down), reported back through didDismiss.
+    -->
     <v-menu
       v-model="isMenuOpen"
       :location="props.location"
       :close-on-content-click="false"
       :scrim="false"
+      :persistent="isMobileMode"
       :offset="[props.offsetX, props.offsetY]"
       :transition="props.transition"
     >
@@ -79,7 +85,7 @@ const isMenuOpen = computed({
         :can-dismiss="true"
         presentation="sheet"
         :class="['menu-modal', { s2v: props.useS2vTheming }]"
-        @didDismiss="(e) => emit('update:isOpen', e)"
+        @didDismiss="emit('update:isOpen', false)"
       >
         <slot name="content" />
       </IonModal>

@@ -1,10 +1,11 @@
 import UserAvatarMenu from '@/components/UserAvatarMenu/index.vue'
-import { it, describe, expect, vi } from 'vitest'
-import { createStore } from 'vuex'
+import UserModeToggle from '@/components/UserAvatarMenu/UserModeToggle.vue'
+import { it, describe, expect, vi, afterEach } from 'vitest'
+import { createStore, type Store } from 'vuex'
 import vuetify from '@/plugins/vuetify'
 import { storeOptions } from '../../../../src/store'
 import router from '@/router'
-import { mount, DOMWrapper } from '@vue/test-utils'
+import { mount, DOMWrapper, VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
 
 describe('Navigation', () => {
@@ -20,6 +21,16 @@ describe('Navigation', () => {
     userType: () => 'student',
     isVolunteer: () => false,
   }
+
+  // Tests query the whole document, so a component left mounted by an earlier test would
+  // answer those queries too.
+  let mounted: VueWrapper | undefined
+
+  afterEach(() => {
+    mounted?.unmount()
+    mounted = undefined
+    vi.restoreAllMocks()
+  })
 
   function getWrapper(options = {}) {
     const store = createStore({
@@ -46,8 +57,9 @@ describe('Navigation', () => {
           },
         },
         app: {
-          namespaced: true,
+          ...storeOptions.modules.app,
           getters: {
+            ...storeOptions.modules.app.getters,
             mobileMode: () => options?.app?.getters?.mobileMode?.() ?? false,
           },
         },
@@ -63,6 +75,7 @@ describe('Navigation', () => {
         plugins: [store, router, vuetify],
       },
     })
+    mounted = wrapper
 
     /*
      * This is here to make testing the vuetify component work:
@@ -74,11 +87,22 @@ describe('Navigation', () => {
     return {
       setProps: (args: any) => wrapper.setProps(args),
       wrapper: new DOMWrapper(document.body),
+      component: wrapper,
+      store,
     }
   }
 
-  it('Can navigate to the profile page', async () => {
-    const { wrapper, setProps } = getWrapper()
+  const isDrawerCollapsed = (store: Store<any>) =>
+    store.state.app.sidebar.isCollapsed
+
+  async function expandDrawer(store: Store<any>) {
+    store.dispatch('app/sidebar/expand')
+    await nextTick()
+    expect(isDrawerCollapsed(store)).toBe(false)
+  }
+
+  it('Navigates to the profile page and closes the menu', async () => {
+    const { wrapper, setProps, component, store } = getWrapper()
 
     // Profile row should not be visible when the menu is closed
     expect(wrapper.find('[data-testid="menu-row-profile"]').exists()).toBe(
@@ -89,11 +113,32 @@ describe('Navigation', () => {
     await nextTick()
 
     expect(wrapper.find('[data-testid="menu-row-profile"]').exists()).toBe(true)
+    await expandDrawer(store)
 
-    const pushSpy = vi.spyOn(router, 'push')
+    const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
     await wrapper.find('[data-testid="menu-row-profile"]').trigger('click')
     await nextTick()
+
     expect(pushSpy).toHaveBeenCalledWith('/profile')
+    expect(component.emitted('update:isMenuOpen')).toContainEqual([false])
+    expect(isDrawerCollapsed(store)).toBe(true)
+  })
+
+  it('Closes the menu and collapses the drawer after switching modes', async () => {
+    const { component, store } = getWrapper({
+      isMenuOpen: true,
+      app: { getters: { mobileMode: () => true } },
+      user: { getters: { isStudentVolunteer: () => true } },
+    })
+    const modeToggle = () => component.findComponent(UserModeToggle)
+    await vi.waitFor(() => expect(modeToggle().exists()).toBe(true))
+    await expandDrawer(store)
+
+    modeToggle().vm.$emit('switchedMode')
+    await nextTick()
+
+    expect(isDrawerCollapsed(store)).toBe(true)
+    expect(component.emitted('update:isMenuOpen')).toContainEqual([false])
   })
 
   it('Can log out', async () => {

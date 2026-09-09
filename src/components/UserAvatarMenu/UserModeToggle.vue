@@ -31,7 +31,7 @@ async function switchMode() {
       'Failed to switch account modes via UserModeToggle',
       err
     )
-    const errorMessage = `Couldn't switch to to ${targetMode} mode. Try refreshing the page.`
+    const errorMessage = `Couldn't switch to ${targetMode} mode. Try refreshing the page.`
     emit('switchModeError', errorMessage)
   }
 }

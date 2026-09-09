@@ -27,8 +27,7 @@ function toggleIsUserMenuOpen() {
         id="user-avatar-menu"
         :showSessionStatusLabel="false"
         :showAccountModeLabel="true"
-        :isMenuOpen="isUserMenuOpen"
-        @changedOpenState="toggleIsUserMenuOpen"
+        v-model:isMenuOpen="isUserMenuOpen"
       />
     </div>
     <hr class="ml-2 mr-2" />
