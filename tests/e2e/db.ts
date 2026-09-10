@@ -1,14 +1,15 @@
 import { Pool, type PoolClient } from 'pg'
+import { postgresPort } from './utils/ports'
 
 let client: Pool
 
 function buildClient(): Pool {
-  // TODO: Pull from environment variables instead.
+  // TODO: Pull the credentials from environment variables too.
   const pool = new Pool({
     database: 'upchieve',
     user: 'admin',
     password: 'Password123',
-    port: process.env.CI ? 5432 : 5500,
+    port: process.env.CI ? 5432 : Number(postgresPort),
     host: process.env.CI ? 'postgres' : 'localhost',
   })
   pool.on('connect', async (client: PoolClient) => {

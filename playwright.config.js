@@ -1,6 +1,10 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test'
 
+import { subwayPort, highLinePort } from './tests/e2e/utils/ports'
+
+const highLineUrl = `http://localhost:${highLinePort}`
+
 const localProjects = [
   {
     name: 'setup subway',
@@ -57,7 +61,7 @@ const localServers = [
   {
     command: `cd ${process.env.SUBWAY_REPO_PATH} && pnpm run e2e:destroy && pnpm run e2e:create && pnpm run e2e:backend`,
     name: 'SUBWAY',
-    url: 'http://localhost:3001/healthz',
+    url: `http://localhost:${subwayPort}/healthz`,
     reuseExistingServer: false,
     timeout: 60000,
     stdout: 'pipe',
@@ -71,9 +75,9 @@ const localServers = [
     },
   },
   {
-    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port 8081`,
+    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port ${highLinePort}`,
     name: 'HIGH-LINE SERVE',
-    url: 'http://localhost:8081',
+    url: highLineUrl,
     reuseExistingServer: false,
     stdout: 'pipe',
     stderr: 'pipe',
@@ -90,9 +94,9 @@ const localServers = [
 
 const ciServers = [
   {
-    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port 8081 > high-line.log 2>&1`,
+    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port ${highLinePort} > high-line.log 2>&1`,
     name: 'HIGH-LINE SERVE',
-    url: 'http://localhost:8081',
+    url: highLineUrl,
     reuseExistingServer: false,
     stdout: 'pipe',
     stderr: 'pipe',
@@ -125,7 +129,7 @@ module.exports = defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:8081',
+    baseURL: highLineUrl,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
