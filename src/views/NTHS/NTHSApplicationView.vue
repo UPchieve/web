@@ -33,7 +33,7 @@ onMounted(() => {
           Are you interested in becoming a founding President and starting a
           chapter in your community or school?
           <br /><br />
-          Deadline to apply to start a chapter is Sep 15, 2026
+          Deadline to apply to start a chapter is Sep 30, 2026
         </span>
         <div class="actions">
           <a
