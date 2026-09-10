@@ -34,7 +34,7 @@
       </transition>
       <transition name="chat-warning">
         <loading-message
-          message="Attempting to connect the chat"
+          :message="connectingMessage"
           class="chat-warning chat-warning--connection"
           v-show="showConnectingToChatMessage"
         />
@@ -311,6 +311,10 @@ export default {
     currentSession: { type: Object, required: true },
     isInRecap: { type: Boolean, default: false },
     isSocketSessionRoomConnected: { type: Boolean, required: true },
+    connectingMessage: {
+      type: String,
+      default: 'Attempting to connect the chat',
+    },
     isSessionAlive: { type: Boolean, required: true },
     isFetchingIsSessionRecapEligible: { type: Boolean, default: false },
     isSessionRecapEligible: { type: Boolean, default: false },

@@ -239,6 +239,7 @@
           :shouldHideChatSection="shouldHideChatSection"
           :setHasSeenNewMessage="setHasSeenNewMessage"
           :isSocketSessionRoomConnected="isSocketSessionRoomConnected"
+          :connectingMessage="`${connectingMessage} ${attempts}`"
           :isSessionAlive="isSessionAlive"
           :sessionHasEnded="sessionHasEnded"
           :isExclusiveSession="!!exclusiveVolunteerId && !session?.volunteerId"
@@ -522,9 +523,8 @@ export default {
   },
 
   beforeUnmount() {
-    if (this.joinSocketSessionAbortController) {
-      this.joinSocketSessionAbortController.abort()
-    }
+    this.isJoiningSocket = false
+    clearTimeout(this.connectingMessageSlowTimeout)
     clearTimeout(this.breakoutPromptTimeout)
     socket.emit('sessions:leave', {
       sessionId: this.sessionId,
@@ -569,10 +569,13 @@ export default {
       showModerationInfractionModal: false,
       showModerationInfractionToast: false,
       showScreenShareDisclaimer: false,
-      joinSocketSessionAbortController: null,
       isSocketSessionRoomConnected: false,
       isZwibserveSession: false,
       breakoutPromptTimeout: null,
+      connectingMessage: 'Attempting to connect the chat',
+      maxAttempts: 4,
+      attemptNumber: 0,
+      isJoiningSocket: false,
     }
   },
   computed: {
@@ -611,6 +614,9 @@ export default {
       isLiveMediaBanned: 'liveMedia/isBannedFromLiveMedia',
       isPartnerLiveMediaBanned: 'liveMedia/isPartnerBannedFromLiveMedia',
     }),
+    attempts() {
+      return `${this.attemptNumber}/${this.maxAttempts}`
+    },
     micState() {
       if (
         this.meetingActor.snapshot.matches(
@@ -862,9 +868,17 @@ export default {
     },
     isSocketConnected(curr, prev) {
       if (curr && !prev) {
-        if (this.sessionId) {
+        /**
+         * isJoiningSocket
+         * only start a new joinSocketSession back-off-retry
+         * cycle if one isn't running. if it's already running
+         * and we get disconnected and reconnected, let the
+         * existing one finish
+         */
+        if (this.sessionId && !this.isJoiningSocket) {
           this.joinSocketSession()
         }
+
         AnalyticsService.captureEvent(
           EVENTS.USER_SOCKET_IS_CONNECTED_IN_SESSION,
           {
@@ -1035,30 +1049,33 @@ export default {
       if (this.shouldHideAuxiliarySection) this.hasSeenNewMessage = true
     },
     async joinSocketSession() {
-      this.joinSocketSessionAbortController = new AbortController()
+      /**
+       * only start a new back-off-retry cycle if one isn't running. if it's
+       * already running and we get disconnected and reconnected, let the
+       * existing one finish
+       */
+      if (this.isJoiningSocket) return
+      this.isJoiningSocket = true
 
+      clearTimeout(this.connectingMessageSlowTimeout)
+      this.connectingMessage = 'Attempting to connect the chat'
+      this.connectingMessageSlowTimeout = setTimeout(() => {
+        this.connectingMessage = 'Taking longer than usual'
+      }, 7000)
+
+      this.attemptNumber = 0
+      let terminalFailureReason = null
       try {
         await backOff(
           async () => {
-            const { success, retry } = await socket
-              .timeout(2000)
+            ++this.attemptNumber
+            const { success, reason } = await socket
+              .timeout(10000)
               .emitWithAck('sessions:join', {
                 sessionId: this.sessionId,
               })
-
-            if (retry) {
-              AnalyticsService.captureEvent(EVENTS.SOCKET_SESSION_JOIN_RETRY, {
-                sessionId: this.session.id,
-              })
-              const msg =
-                'Received retry signal, try joining socket session room again.'
-              LoggerService.log(msg, {
-                sessionId: this.session.id,
-              })
-              throw new Error(msg)
-            }
-
             if (success) {
+              this.isJoiningSocket = false
               this.isSocketSessionRoomConnected = true
 
               if (this.isVolunteer) {
@@ -1071,24 +1088,38 @@ export default {
                   )
                 )
               }
+            } else {
+              terminalFailureReason = reason ?? 'unknown'
+              throw new Error(
+                'Server rejected the session join without a retry signal.'
+              )
             }
           },
           {
-            retry: () => !this.joinSocketSessionAbortController.signal.aborted,
+            retry: () => this.isJoiningSocket,
+            numOfAttempts: this.maxAttempts,
+            jitter: 'full',
+            timeMultiple: 7,
           }
         )
       } catch (err) {
-        if (this.joinSocketSessionAbortController.signal.aborted) {
+        if (this.isJoiningSocket === false) {
+          clearTimeout(this.connectingMessageSlowTimeout)
           return
         }
+
         ModalService.showSessionError(SessionErrorType.SESSION_CHAT_ERROR, () =>
           this.$router.go(0)
         )
         AnalyticsService.captureEvent(EVENTS.SOCKET_SESSION_JOIN_FAILED, {
           sessionId: this.session.id,
+          reason: terminalFailureReason ?? err.message,
         })
         LoggerService.noticeError(err)
       }
+
+      clearTimeout(this.connectingMessageSlowTimeout)
+      this.isJoiningSocket = false
     },
     setHasSeenNewMessage(value) {
       this.hasSeenNewMessage = value
