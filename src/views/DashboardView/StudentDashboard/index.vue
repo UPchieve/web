@@ -10,7 +10,7 @@
       />
     </div>
     <dashboard-banner
-      v-else
+      v-else-if="!isVolunteerRelevantExperienceFakeDoorEnabled"
       :subheader="
         showDashboardRedesign ? `What can we help you with today?` : ``
       "
@@ -67,6 +67,10 @@
       @permanentlyDismissed="setPermanentlyDismissedSecondaryEmailModal"
     />
 
+    <volunteer-relevant-experience-widget
+      v-if="isVolunteerRelevantExperienceFakeDoorEnabled"
+    />
+
     <subject-selection />
 
     <onboarding-modal
@@ -117,6 +121,7 @@ import {
 } from '@/utils/secondary-email-modal-utils'
 import { defineAsyncComponent } from 'vue'
 import GradeLevelTask from '@/views/GradeLevelTask.vue'
+import VolunteerRelevantExperienceWidget from './VolunteerRelevantExperienceWidget.vue'
 
 const ImpactStudySurveyModal = defineAsyncComponent(
   () => import('./ImpactStudySurveyModal.vue')
@@ -129,6 +134,7 @@ export default {
   name: 'student-dashboard',
   components: {
     GradeLevelTask,
+    VolunteerRelevantExperienceWidget,
     SecondaryEmailModal,
     DashboardBanner,
     SubjectSelection,
@@ -275,6 +281,8 @@ export default {
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
       volunteerSubjectPresenceVariant:
         'featureFlags/volunteerSubjectPresenceVariant',
+      isVolunteerRelevantExperienceFakeDoorEnabled:
+        'featureFlags/isVolunteerRelevantExperienceFakeDoorEnabled',
       isStudent: 'user/isStudent',
       hasVolunteerRole: 'user/hasVolunteerRole',
     }),

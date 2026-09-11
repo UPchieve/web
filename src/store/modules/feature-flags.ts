@@ -65,6 +65,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW]: false,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_ASYNC_ESSAY_REVIEW_EMAIL_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO]: false,
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR]: false,
       // The following flags are for gating risky features, NOT features being
       // experimented/slowly rolled out.
       // They are never to be removed as part of a "launch".
@@ -95,6 +96,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM]: null,
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR]: {},
     },
   },
   mutations: {
@@ -282,6 +284,14 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.S2V_THEMING],
     isDashboardAlgorithmEnabled: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_ALGORITHM],
+    isVolunteerRelevantExperienceFakeDoorEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR
+      ],
+    volunteerRelevantExperienceFakeDoorPayload: (state: FeatureFlagState) =>
+      state.payloadFlags[
+        POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR
+      ],
     isAsyncEssayReviewEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW],
     isVolunteerAsyncEssayReviewEnabled: (state: FeatureFlagState) =>

@@ -111,6 +111,8 @@ const AdminEssayReviewList = () =>
 const AdminEssayReviewDetail = () =>
   import('./views/Admin/AdminEssayReviewDetail.vue')
 const PastCoachesView = () => import('./views/PastCoachesView.vue')
+const VolunteerRelevantExperienceThanksView = () =>
+  import('./views/VolunteerRelevantExperienceThanksView.vue')
 
 import {
   resolveNthsRoute,
@@ -544,6 +546,16 @@ const routes: RouteRecordRaw[] = [
         component: StudentAssignmentView,
       },
     ],
+  },
+  {
+    path: '/volunteer-relevant-experience/thanks',
+    name: 'VolunteerRelevantExperienceThanksView',
+    component: VolunteerRelevantExperienceThanksView,
+    meta: { protected: true },
+    beforeEnter: (_to, _from, next) => {
+      if (!store.getters['user/isStudent']) return next('/dashboard')
+      return next()
+    },
   },
   {
     path: '/session/:topic/:subTopic/:sessionId?',
