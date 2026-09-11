@@ -86,6 +86,16 @@ class AnalyticsService {
     }
   }
 
+  static async setContactCustomData(
+    userId: string,
+    customData: Record<string, unknown>
+  ) {
+    await loadLibraries()
+    if (Gleap) {
+      Gleap.identify(userId, { customData })
+    }
+  }
+
   static async captureEvent(name: string, properties = {}) {
     await loadLibraries()
     if (posthog) {
@@ -139,6 +149,14 @@ class DevAnalyticsService {
   static updateUser(update) {
     // eslint-disable-next-line no-console
     console.info('AnalyticsService.updateUser', update)
+  }
+
+  static setContactCustomData(
+    userId: string,
+    customData: Record<string, unknown>
+  ) {
+    // eslint-disable-next-line no-console
+    console.info('AnalyticsService.setContactCustomData', userId, customData)
   }
 
   static captureEvent(name: string, properties = {}) {

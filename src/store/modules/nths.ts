@@ -1,5 +1,10 @@
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
+import AnalyticsService from '@/services/AnalyticsService'
+import {
+  nthsDestination,
+  type NTHSDestinationSource,
+} from '@/views/NTHS/nths-route-helpers'
 import {
   checklistControls,
   CheckboxStatus,
@@ -9,6 +14,27 @@ import {
   type ChecklistItem,
   type NTHSAction,
 } from '@/services/NTHSGroupService'
+
+// Views like NTHSCreateGroupView commit NTHS state without going through
+// fetchNthsData, so the attribute can lag by a page load. Gleap sends each
+// outbound message once, so the nudge still retires on time.
+function syncNTHSStatusToGleap(
+  rootState: NTHSDestinationSource['state'] & {
+    user?: { user?: { id?: string } }
+  },
+  rootGetters: NTHSDestinationSource['getters']
+) {
+  const destination = nthsDestination({
+    state: rootState,
+    getters: rootGetters,
+  })
+  // every signed-in user runs this, not just coaches
+  if (!destination) return
+
+  const userId = rootState.user?.user?.id
+  if (!userId) return
+  AnalyticsService.setContactCustomData(userId, { nthsStatus: destination })
+}
 
 export default {
   namespaced: true,
@@ -83,7 +109,7 @@ export default {
     setNTHSCandidateApplicationStatus: (state, status) => {
       state.NTHSCandidateApplicationStatus = status
     },
-    async fetchNthsData({ commit }) {
+    async fetchNthsData({ commit, rootState, rootGetters }) {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
       commit(
@@ -97,6 +123,8 @@ export default {
         'setNTHSApplicationIneligibilityReasons',
         eligibility.data.reasons ?? []
       )
+
+      syncNTHSStatusToGleap(rootState, rootGetters)
       return results.data.groups
     },
     // Occupation decides eligibility, so the sidebar and route guards go stale on

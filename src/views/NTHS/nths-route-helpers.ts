@@ -36,8 +36,13 @@ export async function loadNTHSData(store: Store<any>): Promise<boolean> {
   }
 }
 
+export type NTHSDestinationSource = {
+  state: { nths: Record<string, any> }
+  getters: Record<string, any>
+}
+
 export function nthsDestination(
-  store: Store<any>
+  store: NTHSDestinationSource
 ): NTHSDestination | undefined {
   const {
     NTHSGroups,
