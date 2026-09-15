@@ -226,9 +226,7 @@
               v-model="selectedGradeLevel"
               :modelValue="selectedGradeLevel"
               @update:modelValue="saveGradeLevel"
-              :placeholder="
-                user.gradeLevel ? user.gradeLevel + ' grade' : 'Grade level'
-              "
+              placeholder="Grade level"
             />
           </div>
 

@@ -2,7 +2,7 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { GRADES, EVENTS } from '@/consts'
+import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
 import FeatureFlagService from '@/services/FeatureFlagService'
@@ -11,9 +11,10 @@ import FormEmail from '@/components/FormEmail.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
-import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 import Loader from '@/components/Loader.vue'
 import useVuelidate from '@vuelidate/core'
+import { getAcademicYear } from '@/utils/academic-year'
 
 const $store = useStore()
 const $route = useRoute()
@@ -203,16 +204,11 @@ async function addStudentToClass(_, overrideEvent?: string) {
         testid="input-email"
       />
 
-      <FormSelect
+      <GradeLevelSelect
         class="mt-3"
         v-model="gradeLevel"
-        name="gradeLevel"
-        label="Grade in 2025-2026"
-        placeholder="Grade in 2025-2026"
-        :options="GRADES"
-        :reduce="(option: string) => option.split(' ')[0]"
-        :blur-event="EVENTS.STUDENT_SELECTED_GRADE_ON_JOIN_CLASS"
-        testid="select-grade"
+        :label="`Grade in ${getAcademicYear().asString}`"
+        :placeholder="`Grade in ${getAcademicYear().asString}`"
       />
 
       <button

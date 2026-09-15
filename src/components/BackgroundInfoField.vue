@@ -235,7 +235,7 @@ function updateHighSchool(name: string) {
       <div v-if="shouldShowGradeLevel" class="occupation-field__grade-level">
         <GradeLevelSelect
           v-model="gradeLevel"
-          :placeholder="gradeLevel ? gradeLevel + ' grade' : 'Grade level'"
+          placeholder="Grade level"
           :label="`What grade will you be in during the ${getAcademicYear().asString} academic year?*`"
         />
       </div>
