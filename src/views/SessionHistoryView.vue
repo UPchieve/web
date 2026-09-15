@@ -395,65 +395,38 @@ export default {
     },
   },
   async created() {
-    const {
-      query: {
-        page,
-        firstName,
-        subjectName,
-        studentId,
-        volunteerId,
-        hasUnreadDMs,
-      },
-    } = this.$route
-
-    this.page = parseInt(page ?? this.page)
-    this.filters.studentId = studentId ?? this.filters.studentId
-    this.filters.volunteerId = volunteerId ?? this.filters.volunteerId
-    this.filters.firstName = firstName ?? this.filters.firstName
-    this.filters.subjectName = subjectName ?? this.filters.subjectName
-    this.filters.hasUnreadDMs =
-      hasUnreadDMs === 'true' || this.filters.hasUnreadDMs
-
+    this.setStateFromQuery(this.$route.query)
     await this.fetchSessionHistory()
   },
   methods: {
-    goToNextPage() {
-      if (this.isLastPage) return
-
-      AnalyticsService.captureEvent(
-        EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE
-      )
-
-      this.page++
-      this.paginate()
+    setStateFromQuery(query) {
+      this.page = parseInt(query.page) || 1
+      this.filters.firstName = query.firstName || ''
+      this.filters.subjectName = query.subjectName || ''
+      this.filters.studentId = query.studentId || ''
+      this.filters.volunteerId = query.volunteerId || ''
+      this.filters.hasUnreadDMs = query.hasUnreadDMs === 'true'
     },
-    goToPreviousPage() {
-      if (this.page === 0) return
-
-      AnalyticsService.captureEvent(
-        EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE
-      )
-      this.page--
-      this.paginate()
+    navigateTo(query = {}) {
+      this.$router
+        .push({
+          query: {
+            page: query.page ?? this.page,
+            firstName: query.firstName ?? this.filters.firstName,
+            subjectName: query.subjectName ?? this.filters.subjectName,
+            studentId: query.studentId ?? this.filters.studentId,
+            volunteerId: query.volunteerId ?? this.filters.volunteerId,
+            hasUnreadDMs: String(
+              query.hasUnreadDMs ?? this.filters.hasUnreadDMs
+            ),
+          },
+        })
+        .catch(() => {})
     },
-    clearFilters() {
-      this.filters.firstName = ''
-      this.filters.subjectName = ''
-      this.filters.studentId = ''
-      this.filters.volunteerId = ''
-      this.filters.hasUnreadDMs = false
-      this.page = 1
-
-      this.filter()
-    },
-    filter() {
-      this.$router.push({
-        query: { page: this.page, ...this.filters },
-      })
-
-      const { firstName, subjectName, studentId, volunteerId } = this.filters
-
-      const filtered = this.allSessions.filter((session) => {
+    applyFilter() {
+      const { firstName, subjectName, studentId, volunteerId, hasUnreadDMs } =
+        this.filters
+      this.filteredSessions = this.allSessions.filter((session) => {
         const matchesName =
           !firstName ||
           session[
@@ -463,33 +436,51 @@ export default {
         const matchesStudent = !studentId || session.studentId === studentId
         const matchesVolunteer =
           !volunteerId || session.volunteerId === volunteerId
-
-        const hasUnreadDMs =
-          !this.filters.hasUnreadDMs ||
+        const matchesUnreadDMs =
+          !hasUnreadDMs ||
           (this.sessionsWithUnreadDMs.includes(session.id) &&
             this.isShowDMNotificationsEnabled)
-
         return (
           matchesName &&
           matchesSubject &&
           matchesStudent &&
           matchesVolunteer &&
-          hasUnreadDMs
+          matchesUnreadDMs
         )
       })
-
-      this.filteredSessions = filtered
-      this.page = 1
-      this.paginate()
     },
-    paginate() {
-      this.$router.push({
-        query: { page: this.page, ...this.filters },
-      })
+    goToNextPage() {
+      if (this.isLastPage) return
 
+      AnalyticsService.captureEvent(
+        EVENTS.USER_CLICKED_NEXT_SESSION_HISTORY_PAGE
+      )
+      this.navigateTo({ page: this.page + 1 })
+    },
+    goToPreviousPage() {
+      if (this.isFirstPage) return
+
+      AnalyticsService.captureEvent(
+        EVENTS.USER_CLICKED_PREVIOUS_SESSION_HISTORY_PAGE
+      )
+      this.navigateTo({ page: this.page - 1 })
+    },
+    filter() {
+      this.navigateTo({ page: 1 })
+    },
+    clearFilters() {
+      this.filters.firstName = ''
+      this.filters.subjectName = ''
+      this.filters.studentId = ''
+      this.filters.volunteerId = ''
+      this.filters.hasUnreadDMs = false
+      this.page = 1
+      this.filter()
+    },
+
+    paginate() {
       const start = (this.page - 1) * this.sessionLimitPerPage
       const end = this.page * this.sessionLimitPerPage
-
       this.isLastPage = end >= this.filteredSessions.length
       this.sessions = this.filteredSessions.slice(start, end)
     },
@@ -508,7 +499,8 @@ export default {
         } = await NetworkService.getSessionHistory(queryFilters)
         this.allSessions = pastSessions
 
-        this.filter()
+        this.applyFilter()
+        this.paginate()
       } catch (error) {
         LoggerService.noticeError(error.response.data.err)
         this.error =
@@ -595,6 +587,15 @@ export default {
           sessionArgs: { requestedVolunteerId: session.volunteerId },
         },
       })
+    },
+  },
+  watch: {
+    '$route.query': {
+      handler(query) {
+        this.setStateFromQuery(query)
+        this.applyFilter()
+        this.paginate()
+      },
     },
   },
 }
