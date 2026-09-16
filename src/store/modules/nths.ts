@@ -162,6 +162,11 @@ export default {
   },
 
   getters: {
+    memberRole: (state) =>
+      state.NTHSGroups.length ? state.NTHSGroups[0].memberInfo?.roleName : null,
+    hasAdminRole: (state, getters) => getters.memberRole === 'admin',
+    isGroupMemberOnly: (state, getters) =>
+      !getters.isPresident && state.NTHSGroups.length > 0,
     NTHSChecklist: (state) => {
       if (state.NTHSActions.length === 0) return []
 

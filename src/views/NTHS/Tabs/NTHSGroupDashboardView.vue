@@ -17,7 +17,7 @@ const isLoaded = ref(false)
       title="NTHS Group Dashboard"
       class="iframe"
       :class="isLoaded ? '' : 'hide'"
-      :src="`${config.NTHSRetoolDashboardUrl}?groupId=${group.groupInfo.id}`"
+      :src="`${config.nths.NTHSRetoolDashboardUrl}?groupId=${group.groupInfo.id}`"
       width="100%"
       height="100%"
       loading="lazy"

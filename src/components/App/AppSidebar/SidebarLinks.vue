@@ -175,13 +175,22 @@
           <hand-wave-icon class="icon hand-wave-icon" />
         </sidebar-link>
         <sidebar-link
-          v-if="isVolunteer && showSlackButton"
+          v-if="isVolunteer && !getNthsCommunityLink && showSlackButton"
           to="https://join.slack.com/t/upchieveaccommunity/shared_invite/zt-3nvx15why-tqrpngIfqRkNKl2Ih7twDA"
           text="Community"
           :openNewTab="true"
           id="community-sidebar-link"
         >
           <slack-logo-icon class="icon keep-original-color" />
+        </sidebar-link>
+        <sidebar-link
+          v-if="isVolunteer && getNthsCommunityLink"
+          :to="getNthsCommunityLink"
+          text="NTHS Community"
+          :openNewTab="true"
+          id="community-sidebar-link"
+        >
+          <circle-community-icon class="icon keep-original-color" />
         </sidebar-link>
       </div>
     </div>
@@ -207,6 +216,7 @@ import HomeIcon from '@/assets/icons/home_icon.svg'
 import ReferFriendIcon from '@/assets/icons/refer_friend_icon.svg'
 import GroupsIcon from '@/assets/icons/groups_icon.svg'
 import SlackLogoIcon from '@/assets/slack-logo-icon.svg'
+import CircleCommunityIcon from '@/assets/circle-community-icon.svg'
 import YourProgressIcon from '@/assets/icons/trending_up_icon.svg'
 import RewardsSidebarIcon from '@/assets/icons/star_icon.svg'
 import CompassIcon from '@/assets/compass.svg'
@@ -225,6 +235,7 @@ import { defineAsyncComponent } from 'vue'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
+import config from '@/config.js'
 
 export default {
   components: {
@@ -239,6 +250,7 @@ export default {
     HomeIcon,
     ReferFriendIcon,
     SlackLogoIcon,
+    CircleCommunityIcon,
     YourProgressIcon,
     RewardsSidebarIcon,
     ActivityDot,
@@ -282,6 +294,10 @@ export default {
       aiTutor: 'featureFlags/aiTutor',
       hasUnreadDMs: 'user/hasUnreadDMs',
       isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
+      isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
+      isNthsPresident: 'nths/isPresident',
+      isNthsGroupMemberOnly: 'nths/isGroupMemberOnly',
+      hasNthsAdminRole: 'nths/hasAdminRole',
     }),
     hasSeenCalculator() {
       if (this.shouldShowStudentToVolunteerHoursPage) {
@@ -312,6 +328,15 @@ export default {
         !this.isDisableStudentsJoinSlackCommunityEnabled &&
         !this.isDisabledSlackButtonForUnapprovedVolunteersEnabled
       )
+    },
+    getNthsCommunityLink() {
+      if (this.hasNthsAdminRole) {
+        return config.nths.presidentCircleCommunity
+      } else if (this.isNthsGroupMemberOnly) {
+        return config.nths.membersOnlyCircleCommunity
+      }
+
+      return undefined
     },
   },
   data() {

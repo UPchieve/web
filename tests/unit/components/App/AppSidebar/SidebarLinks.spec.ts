@@ -377,7 +377,7 @@ describe('SidebarLinks', () => {
           },
           nths: {
             state: {
-              NTHSGroups: [{ groupId: 123 }],
+              NTHSGroups: [{ groupId: 123, memberInfo: { roleName: 'admin' } }],
               canApplyForNTHSPresident: true,
             },
           },
@@ -623,7 +623,9 @@ describe('SidebarLinks', () => {
             },
             nths: {
               state: {
-                NTHSGroups: [{ groupId: 123 }],
+                NTHSGroups: [
+                  { groupId: 123, memberInfo: { roleName: 'admin' } },
+                ],
               },
             },
           })

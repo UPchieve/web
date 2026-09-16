@@ -20,5 +20,12 @@ config.langfuseBaseUrl = import.meta.env.VUE_APP_LANGFUSE_BASEURL
 const partnerKeysThatRequirePhotoId =
   import.meta.env.VUE_APP_PARTNER_KEYS_THAT_REQUIRE_PHOTO_ID || ''
 config.partnerKeysThatRequirePhotoId = partnerKeysThatRequirePhotoId.split(',')
-config.NTHSRetoolDashboardUrl = import.meta.env.VUE_NTHS_RETOOL_DASHBOARD_URL
+
+config.nths = {
+  NTHSRetoolDashboardUrl: import.meta.env.VUE_NTHS_RETOOL_DASHBOARD_URL,
+  presidentCircleCommunity:
+    'https://upchieve-coach-community.circle.so/join?invitation_token=c0540e4ef459d5ba80d725363ed1ca422d66128c-519f02f3-e383-4689-b32a-4775442e5fe6', // betterleaks:allow
+  membersOnlyCircleCommunity:
+    'https://upchieve-coach-community.circle.so/join?invitation_token=20929743c5bb3d92b5b78cf914b0c362dc0e2846-06a2b8a3-597a-448d-bfc8-8c45427c37b4', // betterleaks:allow
+}
 export default config
