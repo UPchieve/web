@@ -3,6 +3,7 @@ import type { ShareInfoFieldKey } from '@/consts'
 
 const HAS_SEEN_VOLUNTEER_HOURS = 'has-seen-volunteer-calculator'
 const SHARE_INFO_OPT_IN = 'volunteer-share-info-opt-in'
+const HAS_SEEN_SHOW_ONLINE_STATUS_MODAL = 'has-seen-show-online-status-modal'
 
 function get(key: string, storage: Storage = localStorage) {
   const r = storage.getItem(key)
@@ -53,4 +54,13 @@ export function getShareInfoFields(
 export function hasAnsweredShareInfoOptIn(userId: string): boolean {
   const answers = get(SHARE_INFO_OPT_IN) ?? {}
   return Object.hasOwn(answers, userId)
+}
+
+export function setHasSeenShowOnlineStatusModal(userId: string) {
+  const ids = get(HAS_SEEN_SHOW_ONLINE_STATUS_MODAL) ?? []
+  set(HAS_SEEN_SHOW_ONLINE_STATUS_MODAL, [...ids, userId])
+}
+
+export function hasSeenShowOnlineStatusModal(userId: string): boolean {
+  return (get(HAS_SEEN_SHOW_ONLINE_STATUS_MODAL) ?? []).includes(userId)
 }

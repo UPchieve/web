@@ -140,6 +140,11 @@
       :numStudentsTutored="volunteerInfo.numStudentsTutored"
       :totalHoursTutored="volunteerInfo.totalHoursTutored"
     />
+
+    <show-online-status-modal
+      v-if="showOnlineStatusModal"
+      :closeModal="closeOnlineStatusModal"
+    />
   </div>
 </template>
 
@@ -172,7 +177,12 @@ import JoinedTeamModal from './JoinedTeamModal.vue'
 import { quizRoute } from '@/utils/quiz-route'
 import ImpactSummaryCard from '@/components/ImpactSummaryCard.vue'
 import VolunteerShareInfoModal from './VolunteerShareInfoModal.vue'
-import { hasAnsweredShareInfoOptIn } from '@/services/BrowserStorageService'
+import ShowOnlineStatusModal from './ShowOnlineStatusModal.vue'
+import {
+  hasAnsweredShareInfoOptIn,
+  hasSeenShowOnlineStatusModal,
+  setHasSeenShowOnlineStatusModal,
+} from '@/services/BrowserStorageService'
 
 const ETA = {
   BACKGROUND_INFO: 1,
@@ -201,6 +211,7 @@ export default {
     NextTaskModal,
     ImpactSummaryCard,
     VolunteerShareInfoModal,
+    ShowOnlineStatusModal,
   },
   directives: {
     tooltip: vTooltip,
@@ -221,6 +232,7 @@ export default {
       localStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
 
     this.hasSeenShareInfoModal = hasAnsweredShareInfoOptIn(this.user.id)
+    this.hasSeenOnlineStatusModal = hasSeenShowOnlineStatusModal(this.user.id)
 
     if (localStorage.getItem('isSSOSignUpRedirect')) {
       AnalyticsService.registerVolunteer(this.user)
@@ -249,6 +261,7 @@ export default {
       joinedTeamCode: '',
       nextTask: {},
       hasSeenShareInfoModal: false,
+      hasSeenOnlineStatusModal: false,
       essayReviewCardImpressionTracked: false,
       pendingSubmissionCount: null,
     }
@@ -278,6 +291,8 @@ export default {
       isShowInfoOptInEnabled: 'featureFlags/isShowInfoOptInEnabled',
       isVolunteerAsyncEssayReviewEnabled:
         'featureFlags/isVolunteerAsyncEssayReviewEnabled',
+      isVolunteerShowOnlineStatusFakeDoorEnabled:
+        'featureFlags/isVolunteerShowOnlineStatusFakeDoorEnabled',
     }),
     shouldShowNotificationsCard() {
       return (
@@ -622,6 +637,12 @@ export default {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_SAW_SHARE_INFO_MODAL)
       return !this.hasSeenShareInfoModal && this.isShowInfoOptInEnabled
     },
+    showOnlineStatusModal() {
+      return (
+        !this.hasSeenOnlineStatusModal &&
+        this.isVolunteerShowOnlineStatusFakeDoorEnabled
+      )
+    },
     volunteerInfo() {
       return {
         // Volunteers can select multiple occupations
@@ -778,6 +799,10 @@ export default {
     },
     toggleShareInfoModal() {
       this.hasSeenShareInfoModal = true
+    },
+    closeOnlineStatusModal() {
+      setHasSeenShowOnlineStatusModal(this.user.id)
+      this.hasSeenOnlineStatusModal = true
     },
     clickCertificationAction() {
       this.$router.push('/training')

@@ -73,6 +73,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.BLOCK_SESSION_IMAGE_UPLOAD]: false,
       [POSTHOG_FEATURE_FLAGS.BLOCK_SCREENSHARE]: false,
       [POSTHOG_FEATURE_FLAGS.BLOCK_AUDIO_CALL]: false,
+      [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR]: false,
     },
     multivariantFlags: {
       [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
@@ -303,6 +304,10 @@ export default {
     isShowInfoOptInEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO
+      ],
+    isVolunteerShowOnlineStatusFakeDoorEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR
       ],
     // Risky features gates.
     isForceSmsVerificationEnabled: (state: FeatureFlagState) =>
