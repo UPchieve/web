@@ -33,6 +33,7 @@
       </template>
       <template v-else-if="isCombinedOnboardingChecklistEnabled">
         <ListSessionsCard
+          v-if="user.isApproved"
           :notificationsCardWasDismissed="notificationsCardWasDismissed"
           :sessionClickOverride="sessionClickDialog"
         />

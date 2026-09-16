@@ -188,7 +188,8 @@ export default {
     },
     emitList({ retryCount = 0, maxRetries = 5 }) {
       let isAcknowledged = false
-      let timeoutId
+      let timeoutId = null
+
       socket.emit('list', null, (response) => {
         if (response.status === 200) {
           isAcknowledged = true
@@ -197,25 +198,35 @@ export default {
             context: this,
             sessions: response.sessions,
           })
+          return
+        }
+
+        LoggerService.noticeError(
+          `Unable to fetch list of sessions for user ${this.user.id}: server responded ${response.status}`
+        )
+
+        // Don't bother retrying if the user is unauthorized.
+        if (response.status === 403) {
+          isAcknowledged = true
+          clearTimeout(timeoutId)
         }
       })
 
-      if (retryCount < maxRetries) {
-        // simple exponential backoff
-        const delay = Math.pow(2, retryCount) * 500
-        timeoutId = setTimeout(() => {
-          if (!isAcknowledged) {
-            this.emitList({
-              retryCount: retryCount + 1,
-              maxRetries,
-            })
-          }
-        }, delay)
-      } else {
-        LoggerService.noticeError(
-          `Max retry attempts reached, unable to fetch list of sessions for user: ${this.user.id}`
-        )
-      }
+      const delay = Math.pow(2, retryCount) * 500
+      timeoutId = setTimeout(() => {
+        if (isAcknowledged) return
+
+        if (retryCount < maxRetries) {
+          this.emitList({
+            retryCount: retryCount + 1,
+            maxRetries,
+          })
+        } else {
+          LoggerService.noticeError(
+            `Max retry attempts reached, unable to fetch list of sessions for user: ${this.user.id}`
+          )
+        }
+      }, delay)
     },
   },
   computed: {
@@ -250,7 +261,13 @@ export default {
       return this.$route.name !== 'SessionView'
     },
     isSocketReadyToGetWaitingStudents() {
-      return [this.isConnected, this.isVolunteer]
+      return (
+        this.isConnected &&
+        this.isVolunteer &&
+        !!this.user.isApproved &&
+        this.user.banType !== 'complete' &&
+        this.user.banType !== 'shadow'
+      )
     },
   },
   watch: {
@@ -348,9 +365,8 @@ export default {
         )
       }
     },
-    isSocketReadyToGetWaitingStudents(currentVal) {
-      const [isConnected, isVolunteer] = currentVal
-      if (isConnected && isVolunteer) {
+    isSocketReadyToGetWaitingStudents(isReady) {
+      if (isReady) {
         this.emitList({ retryCount: 0, maxRetries: 5 })
       }
     },
