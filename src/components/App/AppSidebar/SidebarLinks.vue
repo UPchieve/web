@@ -188,6 +188,7 @@
           :to="getNthsCommunityLink"
           text="NTHS Community"
           :openNewTab="true"
+          :onClick="circleCommunityClickedEvent"
           id="circle-community-sidebar-link"
         >
           <circle-community-icon class="icon keep-original-color" />
@@ -203,6 +204,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { defineAsyncComponent } from 'vue'
 import SidebarLink from './SidebarLink.vue'
 import BookIcon from '@/assets/icons/open_book_icon.svg'
 import CalendarIcon from '@/assets/icons/calendar_icon.svg'
@@ -231,7 +233,6 @@ import {
   NTHS_DESTINATION_LABELS,
   NTHS_DESTINATION_PATHS,
 } from '@/views/NTHS/nths-route-helpers'
-import { defineAsyncComponent } from 'vue'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
@@ -348,6 +349,11 @@ export default {
     }
   },
   methods: {
+    circleCommunityClickedEvent() {
+      AnalyticsService.captureEvent(EVENTS.NTHS_CIRCLE_COMMUNITY_LINK_CLICKED, {
+        isNthsAdmin: hasNthsAdminRole,
+      })
+    },
     openReferFriendModal() {
       AnalyticsService.captureEvent(
         EVENTS.USER_CLICKED_REFER_A_FRIEND_SIDEBAR_LINK,
