@@ -188,7 +188,7 @@
           :to="getNthsCommunityLink"
           text="NTHS Community"
           :openNewTab="true"
-          id="community-sidebar-link"
+          id="circle-community-sidebar-link"
         >
           <circle-community-icon class="icon keep-original-color" />
         </sidebar-link>
@@ -330,6 +330,9 @@ export default {
       )
     },
     getNthsCommunityLink() {
+      if (!this.user.isApproved) {
+        return
+      }
       if (this.hasNthsAdminRole) {
         return config.nths.presidentCircleCommunity
       } else if (this.isNthsGroupMemberOnly) {
