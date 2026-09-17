@@ -47,6 +47,7 @@ export default {
     NTHSCandidateApplicationStatus: undefined,
     canApplyForNTHSPresident: false,
     NTHSApplicationIneligibilityReasons: [],
+    NTHSApplyPreview: undefined,
   },
   mutations: {
     setNTHSGroups: (state, groups) => {
@@ -95,6 +96,9 @@ export default {
     setNTHSApplicationIneligibilityReasons(state, reasons) {
       state.NTHSApplicationIneligibilityReasons = reasons
     },
+    setNTHSApplyPreview(state, applyPreview) {
+      state.NTHSApplyPreview = applyPreview
+    },
   },
   actions: {
     appendToChecksInFlight({ commit, state }, id) {
@@ -123,6 +127,7 @@ export default {
         'setNTHSApplicationIneligibilityReasons',
         eligibility.data.reasons ?? []
       )
+      commit('setNTHSApplyPreview', eligibility.data.applyPreview)
 
       syncNTHSStatusToGleap(rootState, rootGetters)
       return results.data.groups

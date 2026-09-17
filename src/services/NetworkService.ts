@@ -5,7 +5,10 @@ import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
 import type { NTHSActionName } from './NTHSGroupService'
-import type { NTHSUnlistedSchool } from './NTHSApplicationService'
+import type {
+  NTHSApplyPreview,
+  NTHSUnlistedSchool,
+} from './NTHSApplicationService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
 import type { DateString, Uuid } from '@/types/shared'
@@ -1495,6 +1498,7 @@ export default {
       eligible: boolean
       reasons?: string[]
       currentGradeName?: string
+      applyPreview?: NTHSApplyPreview
     }>(`${API_ROOT}/nths-application/eligibility`)
   },
   submitNTHSApplication(data: {

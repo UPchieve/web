@@ -12,6 +12,7 @@ export type GroupMember = {
   lastInitial: string
 }
 
+export const NTHS_APPLY_URL = 'https://nationaltutor.org/apply'
 export const NTHS_ORIENTATION_URL = 'https://nationaltutor.org/orientation'
 export const NTHS_RESOURCES_URL = 'https://nationaltutor.org/resources'
 export const SCHOOL_AFFILIATION_ACTION =

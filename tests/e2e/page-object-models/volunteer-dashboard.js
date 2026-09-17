@@ -46,6 +46,14 @@ export class VolunteerDashboard {
     await this.trainingLink.click()
   }
 
+  async clickSidebarLink(selector) {
+    if (this.isMobile) {
+      await this.mobileMenu.click()
+    }
+
+    await this.page.click(selector)
+  }
+
   async safetyScreeningIsReady() {
     await expect(this.safetyScreening).toBeVisible()
     await expect(this.backgroundInformationAccountAction).toBeVisible()

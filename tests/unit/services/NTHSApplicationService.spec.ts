@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import {
   buildEmptyResponses,
   collectResponses,
+  daysLeftToApply,
   NTHS_APPLICATION_QUESTIONS,
   HIGH_SCHOOL_GRADES,
 } from '@/services/NTHSApplicationService'
@@ -112,5 +113,23 @@ describe('collectResponses', () => {
     } as never)
 
     expect('somethingElse' in collected).toBe(false)
+  })
+})
+
+describe('daysLeftToApply', () => {
+  const CLOSES_AT = new Date(2026, 8, 30, 23, 59).toISOString()
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it.each([
+    ['on the close date', 0, new Date(2026, 8, 30, 12)],
+    ['the day before', 1, new Date(2026, 8, 29, 23, 59)],
+    ['Sep 15', 15, new Date(2026, 8, 15, 12)],
+    ['after the close date', 0, new Date(2026, 9, 2, 12)],
+  ])('counts %s as %i', (_, days, now) => {
+    vi.useFakeTimers().setSystemTime(now)
+    expect(daysLeftToApply(CLOSES_AT)).toBe(days)
   })
 })

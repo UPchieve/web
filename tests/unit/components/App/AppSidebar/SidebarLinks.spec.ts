@@ -59,6 +59,7 @@ const NTHS_PENDING_LINK = {
   to: '/groups/application-pending',
   text: 'NTHS application',
 }
+const NTHS_PREVIEW_LINK = { to: '/groups/apply-preview', text: 'Apply to NTHS' }
 
 // Links organized by route & user type. Array indices of the links are important.
 const links = {
@@ -355,6 +356,44 @@ describe('SidebarLinks', () => {
           )
         })
         expect(isTargetLinkPresent).toEqual(true)
+      })
+
+      it('Renders the preview link, not "Apply Now", for a coach with a requirement outstanding', async () => {
+        const wrapper = getWrapper({
+          props: {
+            authenticated: true,
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              isTeacher: () => false,
+            },
+          },
+          featureFlags: {
+            getters: {
+              isNTHSApplicationPageEnabled: () => true,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [],
+              canApplyForNTHSPresident: false,
+              NTHSApplyPreview: {
+                requirements: {
+                  training: 'done',
+                  safetyReview: 'inReview',
+                  firstSession: 'outstanding',
+                },
+              },
+            },
+          },
+        })
+        const nthsLinks = wrapper
+          .findAllComponents(SidebarLink)
+          .filter((link) => link.props('to')?.startsWith('/groups'))
+        expect(nthsLinks).toHaveLength(1)
+        expect(nthsLinks[0].props('to')).toEqual(NTHS_PREVIEW_LINK.to)
       })
 
       it('Renders the "My Team" link, not "Apply Now", when the user is in a group but eligibility is still true', async () => {

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker'
 import {
+  createStudent,
   createVolunteer,
   withCertifications,
   type DbClient,
@@ -39,22 +40,48 @@ export const createNthsChapter = async (
   return { groupId, name }
 }
 
-export const createNthsPresident = async (
+export const createHighSchoolCoach = async (
   dbClient: DbClient
-): Promise<{ president: VolunteerUser; chapter: NTHSChapter }> => {
-  const president = await createVolunteer(dbClient, {}, {})
-  if (!president) throw new Error('Failed to create the NTHS president')
+): Promise<VolunteerUser> => {
+  const coach = await createVolunteer(dbClient, {}, {})
+  if (!coach) throw new Error('Failed to create the high school coach')
 
   // A volunteer with no certifications is an autoflow user, who never reaches
   // the dashboard the login helper waits for.
   await withCertifications(dbClient, {
-    userId: president.id,
+    userId: coach.id,
     certificationNames: ['prealgebra'],
   })
   await dbClient.query(
     `INSERT INTO volunteer_occupations (user_id, occupation) VALUES ($1, $2)`,
-    [president.id, VolunteerOccupations.HIGH_SCHOOL_STUDENT]
+    [coach.id, VolunteerOccupations.HIGH_SCHOOL_STUDENT]
   )
+
+  return coach
+}
+
+// Eligibility only counts a session with time_tutored above zero.
+export const createTutoredSession = async (
+  dbClient: DbClient,
+  args: { volunteerId: string }
+): Promise<void> => {
+  const student = await createStudent(dbClient)
+  if (!student) throw new Error('Failed to create the student for the session')
+
+  await dbClient.query(
+    `INSERT INTO sessions (id, student_id, volunteer_id, subject_id, time_tutored,
+                           volunteer_joined_at, ended_at, shadowbanned)
+     SELECT gen_random_uuid(), $1, $2, subjects.id, 1200000, NOW(), NOW(), false
+       FROM subjects
+      LIMIT 1`,
+    [student.id, args.volunteerId]
+  )
+}
+
+export const createNthsPresident = async (
+  dbClient: DbClient
+): Promise<{ president: VolunteerUser; chapter: NTHSChapter }> => {
+  const president = await createHighSchoolCoach(dbClient)
 
   const chapter = await createNthsChapter(dbClient, {
     presidentId: president.id,

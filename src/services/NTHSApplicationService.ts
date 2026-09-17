@@ -1,3 +1,5 @@
+import { dayjs } from '@/utils/time-utils'
+
 export const HIGH_SCHOOL_GRADES = [
   '9th grade',
   '10th grade',
@@ -115,4 +117,22 @@ export function collectResponses(
         typeof answer === 'string' ? answer.trim() : answer
     return collected
   }, {} as NTHSApplicationResponses)
+}
+
+// Mirrors subway's NTHSApplyPreview.
+export type NTHSApplyRequirementStatus = 'done' | 'outstanding' | 'inReview'
+
+export type NTHSApplyPreview = {
+  closesAt: string
+  requirements: Record<
+    'training' | 'safetyReview' | 'firstSession',
+    NTHSApplyRequirementStatus
+  >
+}
+
+export function daysLeftToApply(closesAt: string): number {
+  return Math.max(
+    0,
+    dayjs(closesAt).startOf('day').diff(dayjs().startOf('day'), 'day')
+  )
 }

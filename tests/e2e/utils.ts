@@ -26,7 +26,7 @@ export type StudentUser = {
   verified: boolean
 }
 export const createStudent = async (
-  dbClient: PoolClient,
+  dbClient: DbClient,
   args = {}
 ): Promise<StudentUser | undefined> => {
   const params = {

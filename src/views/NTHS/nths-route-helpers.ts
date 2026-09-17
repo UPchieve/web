@@ -3,13 +3,19 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
 
-export type NTHSDestination = 'group' | 'create' | 'pending' | 'apply'
+export type NTHSDestination =
+  | 'group'
+  | 'create'
+  | 'pending'
+  | 'apply'
+  | 'preview'
 
 export const NTHS_DESTINATION_PATHS: Record<NTHSDestination, string> = {
   group: '/groups',
   create: '/groups/create',
   pending: '/groups/application-pending',
   apply: '/groups/apply',
+  preview: '/groups/apply-preview',
 }
 
 // Lives here rather than in SidebarLinks so the Record keeps a new destination
@@ -20,6 +26,7 @@ export const NTHS_DESTINATION_LABELS: Record<NTHSDestination, string> = {
   create: 'NTHS',
   pending: 'NTHS application',
   apply: 'Apply to NTHS',
+  preview: 'Apply to NTHS',
 }
 
 // A rejection here would abort the navigation and leave every NTHS route
@@ -48,6 +55,7 @@ export function nthsDestination(
     NTHSGroups,
     NTHSCandidateApplicationStatus,
     canApplyForNTHSPresident,
+    NTHSApplyPreview,
   } = store.state.nths
 
   if (NTHSGroups.length > 0) return 'group'
@@ -56,6 +64,9 @@ export function nthsDestination(
 
   if (!store.getters['featureFlags/isNTHSApplicationPageEnabled']) return
   if (canApplyForNTHSPresident) return 'apply'
+  // Below the application-page gate: the preview points at the application, so
+  // it hides whenever that page is off.
+  if (NTHSApplyPreview) return 'preview'
 }
 
 // Every NTHS route asks the same question, so they all defer to nthsDestination.

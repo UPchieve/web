@@ -96,6 +96,8 @@ const NTHSApplicationFormView = () =>
   import('@/views/NTHS/NTHSApplicationFormView.vue')
 const NTHSApplicationPending = () =>
   import('./views/NTHS/NTHSApplicationPending.vue')
+const NTHSApplyPreviewView = () =>
+  import('@/views/NTHS/NTHSApplyPreviewView.vue')
 const StandaloneBotChatView = () =>
   import('./views/BotConversationsView/StandaloneBotChatView.vue')
 const Totp = () => import('./views/Totp/index.vue')
@@ -978,6 +980,13 @@ const routes: RouteRecordRaw[] = [
     component: NTHSApplicationFormView,
     meta: { protected: true },
     beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('apply')],
+  },
+  {
+    path: '/groups/apply-preview',
+    name: 'NTHSApplyPreviewView',
+    component: NTHSApplyPreviewView,
+    meta: { protected: true },
+    beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('preview')],
   },
   {
     path: '/groups/application-pending',

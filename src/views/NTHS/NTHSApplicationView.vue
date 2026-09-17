@@ -4,8 +4,9 @@ import ArrowIcon from '@/assets/arrow.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { onMounted } from 'vue'
+import { NTHS_APPLY_URL } from '@/services/NTHSGroupService'
 
-const learnMoreLink = 'https://nationaltutor.org/apply'
+const learnMoreLink = NTHS_APPLY_URL
 
 function onClickedLearnMore() {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_CLICKED_LEARN_MORE)
