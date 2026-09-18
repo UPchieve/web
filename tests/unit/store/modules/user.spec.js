@@ -16,6 +16,7 @@ describe('User store module', () => {
     occupation: ['High school student'],
     isSchoolPartner: true,
     schoolName: 'Test School',
+    schoolId: 'school-123',
     isOnboarded: false,
     isApproved: false,
     certifications: [],
@@ -186,6 +187,22 @@ describe('User store module', () => {
       )
     })
 
+    it('Omits school partner props when the school is not a partner', () => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              isSchoolPartner: false,
+            },
+          },
+        },
+      })
+      const actual = store.getters['user/getUserPropsForAnalytics']()
+      expect(actual).not.toHaveProperty('schoolPartner')
+      expect(actual).not.toHaveProperty('partnerSchoolId')
+      expect(actual).not.toHaveProperty('partnerSchoolName')
+    })
+
     it('Includes props from different roles', () => {
       const store = getStore({
         user: {
@@ -214,6 +231,8 @@ describe('User store module', () => {
           // Student-specific fields
           // isSchoolPartner: baseUser.isSchoolPartner,
           schoolPartner: baseUser.schoolName,
+          partnerSchoolId: baseUser.schoolId,
+          partnerSchoolName: baseUser.schoolName,
           gradeLevel: baseUser.gradeLevel,
           // usesGoogle: baseUser.usesGoogle,
 

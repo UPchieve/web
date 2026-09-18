@@ -762,7 +762,11 @@ export default {
         if (!userProps.partner) delete userProps.partner
 
         if (state.user.isSchoolPartner) {
+          // schoolPartner duplicates partnerSchoolName and stays only because existing PostHog
+          // flags, cohorts or insights may filter on it. Remove it once they've moved over.
           userProps.schoolPartner = state.user.schoolName
+          userProps.partnerSchoolId = state.user.schoolId
+          userProps.partnerSchoolName = state.user.schoolName
         }
 
         if (state.user?.ratings) {
