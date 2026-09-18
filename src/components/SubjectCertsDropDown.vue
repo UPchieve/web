@@ -49,20 +49,28 @@
           <arrow-icon class="action-btns__review-link--arrow-icon" />
         </router-link>
 
-        <large-button
-          primary
-          :showArrow="false"
-          :routeTo="
-            !isComplete(cert.key) || hasUnlockedSubject(cert.key)
-              ? certQuizLink(cert.key)
-              : null
-          "
-          class="action-btns__quiz-btn"
-          :disabled="isComplete(cert.key)"
-          :data-testid="`start-quiz-btn-${cert.key}`"
-        >
-          <span>{{ actionButtonText(cert.key) }}</span>
-        </large-button>
+        <div class="actions">
+          <large-button
+            primary
+            :showArrow="false"
+            :routeTo="
+              !isComplete(cert.key) || hasUnlockedSubject(cert.key)
+                ? certQuizLink(cert.key)
+                : null
+            "
+            class="action-btns__quiz-btn"
+            :disabled="isComplete(cert.key)"
+            :data-testid="`start-quiz-btn-${cert.key}`"
+          >
+            <span>{{ actionButtonText(cert.key) }}</span>
+          </large-button>
+          <div
+            v-if="isComplete(cert.key) || hasUnlockedSubject(cert.key)"
+            class="date-passed"
+          >
+            <span>{{ certUnlockedDate(cert.key) }}</span>
+          </div>
+        </div>
       </div>
 
       <div class="training__row-border" />
@@ -77,6 +85,7 @@ import { quizRoute } from '@/utils/quiz-route'
 import CheckMark from '@/components/CheckMark.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
+import { dayjs } from '@/utils/time-utils'
 
 export default {
   name: 'SubjectCertsDropDown',
@@ -134,6 +143,11 @@ export default {
       if (this.isComplete(cert)) return 'Completed'
       else return 'Start quiz'
     },
+    certUnlockedDate(cert) {
+      const dateUnlocked = this.user.certifications[cert].lastAttemptedAt
+      if (!dateUnlocked) return ''
+      return `Unlocked on ${dayjs(dateUnlocked).format('MM/DD/YYYY')}`
+    },
   },
 }
 </script>
@@ -143,5 +157,14 @@ a {
   color: inherit;
   text-decoration: none;
   cursor: pointer;
+}
+
+.actions {
+  @include flex-container(column, center, center);
+}
+
+.date-passed {
+  font-size: 12px;
+  margin-top: 6px;
 }
 </style>
