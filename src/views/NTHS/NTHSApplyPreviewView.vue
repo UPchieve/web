@@ -4,6 +4,7 @@ import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import CheckIcon from '@/assets/check.svg'
+import CheckCircledIcon from '@/assets/check-circled.svg'
 import CollegeIcon from '@/assets/nths/benefit-college.svg'
 import RecommendationLettersIcon from '@/assets/nths/benefit-recommendation-letters.svg'
 import VolunteerHoursIcon from '@/assets/nths/benefit-volunteer-hours.svg'
@@ -26,8 +27,8 @@ const REQUIREMENTS: {
 }[] = [
   {
     key: 'training',
-    label: 'Finish UPchieve tutor training',
-    link: { to: '/training', text: 'Go to Training' },
+    label: 'Finish tutor training',
+    link: { to: '/training', text: 'Go to training' },
   },
   {
     key: 'safetyReview',
@@ -36,7 +37,7 @@ const REQUIREMENTS: {
   },
   {
     key: 'firstSession',
-    label: 'Complete one tutoring session on UPchieve',
+    label: 'Tutor one student',
     link: { to: '/dashboard', text: 'Help a student now' },
   },
 ]
@@ -45,26 +46,26 @@ const BENEFITS = [
   {
     key: 'college',
     icon: CollegeIcon,
-    title: 'Increase College Competitiveness',
-    body: 'Strengthen college applications with verified leadership and service experience.',
+    title: 'Stand out on college apps',
+    body: 'Founding a chapter of a national movement is impressive.',
   },
   {
     key: 'recommendation-letters',
     icon: RecommendationLettersIcon,
-    title: 'Recommendation Letters',
-    body: 'Earn letters from UPchieve program staff who know your work.',
+    title: 'Recommendation letters',
+    body: 'Earn letters from UPchieve staff who know your work.',
   },
   {
     key: 'volunteer-hours',
     icon: VolunteerHoursIcon,
-    title: 'Volunteer Hours',
-    body: 'Complete meaningful service hours through tutoring on your own schedule.',
+    title: 'Volunteer hours',
+    body: 'Tutoring and running your chapter both count as service hours.',
   },
   {
     key: 'spotlight',
     icon: SpotlightIcon,
-    title: 'National Spotlight',
-    body: 'Exceptional members can be featured on NTHS and UPchieve social media.',
+    title: 'National recognition',
+    body: 'Signed, nationally recognized certificates for members.',
   },
 ]
 
@@ -114,15 +115,26 @@ onMounted(() => {
   <div class="page" data-testid="nths-apply-preview">
     <div class="card">
       <p v-if="countdown" class="countdown">{{ countdown }}</p>
-      <h1 class="title">Apply to National Tutoring Honor Society</h1>
+      <div class="heading">
+        <img class="crest" src="@/assets/nths/nths-logo.svg?url" alt="" />
+        <h1 class="title">National Tutoring Honor Society</h1>
+      </div>
       <p class="body">
-        National Tutoring Honor Society (NTHS) is a student-led honor society
-        where high schoolers lead chapters that recruit tutors, build community,
-        and make a real impact by tutoring peers across the country.
+        The National Tutoring Honor Society (NTHS) is a student-led honor
+        society powered by UPchieve. Get your friends tutoring, and you run the
+        chapter.
+      </p>
+      <p v-if="closesOn" class="deadline">
+        Applications close <strong>{{ closesOn }}</strong
+        >.
+      </p>
+      <p class="no-approval">
+        <check-circled-icon class="no-approval-check" aria-hidden="true" />
+        No school approval required
       </p>
 
       <div class="benefits">
-        <h2 class="eyebrow">Benefits</h2>
+        <h2 class="eyebrow">Why start a chapter?</h2>
         <ul class="benefit-list">
           <li
             v-for="benefit in BENEFITS"
@@ -140,13 +152,8 @@ onMounted(() => {
         </ul>
       </div>
 
-      <p class="body">
-        Prospective chapter presidents can apply after they demonstrate their
-        commitment to tutoring!
-      </p>
-
       <div class="requirements">
-        <h2 class="eyebrow">Requirements to unlock the application</h2>
+        <h2 class="eyebrow">Before you can apply</h2>
         <ul class="requirement-list">
           <li
             v-for="requirement in REQUIREMENTS"
@@ -181,18 +188,13 @@ onMounted(() => {
         </ul>
       </div>
 
-      <p v-if="closesOn" class="deadline">
-        Applications for founding presidents close
-        <strong>{{ closesOn }}</strong
-        >.
-      </p>
       <a
         class="learn-more-link"
         :href="NTHS_APPLY_URL"
         target="_blank"
         rel="noopener noreferrer"
         @click="onClickedLearnMore"
-        ><strong>Learn more about NTHS &amp; the president's role here</strong>
+        >Learn more about NTHS &amp; the president's role here
         <arrow-icon class="arrow-icon" aria-hidden="true" />
       </a>
 
@@ -241,13 +243,47 @@ onMounted(() => {
   padding: 5px 10px;
   margin: 0 0 14px;
 }
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.crest {
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
 .title {
   @include font-category('display-small');
+  margin: 0;
 }
 .body {
   @include font-category('body');
   color: $c-default-grey;
   margin-top: 16px;
+}
+.deadline {
+  @include font-category('body');
+  color: $c-default-grey;
+  margin: 12px 0 0;
+}
+.no-approval {
+  @include font-category('helper-text');
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: color-mix(in oklab, $c-success-green, black 55%);
+  background-color: color-mix(in oklab, $c-success-green, white 94%);
+  border: 1px solid color-mix(in oklab, $c-success-green, white 75%);
+  border-radius: $radius-lg;
+  padding: 6px 12px;
+  margin: 12px 0 0;
+  width: fit-content;
+}
+.no-approval-check {
+  width: 16px;
+  height: 16px;
+  flex: none;
 }
 .eyebrow {
   @include font-category('caption');
@@ -267,7 +303,9 @@ $benefit-accents: (
 );
 
 .benefits {
+  border-top: 1px solid $c-border-grey;
   margin-top: 22px;
+  padding-top: 22px;
 }
 .benefit-list {
   list-style: none;
@@ -371,19 +409,14 @@ $benefit-accents: (
   white-space: nowrap;
 }
 
-.deadline {
-  @include font-category('helper-text');
-  color: $c-default-grey;
-  margin-top: 20px;
-}
 .learn-more-link {
   @include font-category('subheading');
   display: inline-block;
-  color: $c-success-green;
+  color: $c-information-blue;
   margin-top: 14px;
 }
 .arrow-icon {
-  fill: $c-success-green;
+  fill: $c-information-blue;
   height: 16px;
   width: 16px;
   margin-left: 8px;
