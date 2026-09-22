@@ -135,7 +135,7 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer && nthsSidebarLink"
+          v-if="nthsSidebarLink"
           :to="nthsSidebarLink.to"
           :text="nthsSidebarLink.text"
           id="nths-group-sidebar-link"
@@ -275,6 +275,7 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       productFlags: (state) => state.productFlags.flags,
+      isSidebarCollapsed: (state) => state.app.sidebar.isCollapsed,
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
@@ -284,6 +285,7 @@ export default {
       isTeacher: 'user/isTeacher',
       isAdmin: 'user/isAdmin',
       userType: 'user/userType',
+      mobileMode: 'app/mobileMode',
       isBecomeAnAmbassadorCtaEnabled:
         'featureFlags/isBecomeAnAmbassadorCtaEnabled',
       isDisableStudentsJoinSlackCommunityEnabled:
@@ -310,8 +312,19 @@ export default {
       }
       return true
     },
+    nthsSidebarDestination() {
+      if (!this.isVolunteer) return
+      return nthsDestination(this.$store)
+    },
+    shownNthsApplyDestination() {
+      if (this.mobileMode && this.isSidebarCollapsed) return undefined
+      const destination = this.nthsSidebarDestination
+      return destination === 'apply' || destination === 'preview'
+        ? destination
+        : undefined
+    },
     nthsSidebarLink() {
-      const destination = nthsDestination(this.$store)
+      const destination = this.nthsSidebarDestination
       if (!destination) return
       return {
         to: NTHS_DESTINATION_PATHS[destination],
@@ -386,6 +399,15 @@ export default {
         AnalyticsService.captureEvent(
           EVENTS.PROGRESS_REPORT_SIDEBAR_INDICATOR_SHOWN
         )
+    },
+    shownNthsApplyDestination: {
+      handler(destination) {
+        if (destination)
+          AnalyticsService.captureEvent(EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN, {
+            destination,
+          })
+      },
+      immediate: true,
     },
   },
 }

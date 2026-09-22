@@ -1,8 +1,11 @@
 import { shallowMount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -356,6 +359,81 @@ describe('SidebarLinks', () => {
           )
         })
         expect(isTargetLinkPresent).toEqual(true)
+      })
+
+      describe('apply link shown event', () => {
+        const DESKTOP_WIDTH = 1024
+        const PHONE_WIDTH = 375
+
+        const mountCoach = (nthsState, windowWidth) => {
+          storeOptions.modules.app.state.windowWidth = windowWidth
+          return getWrapper({
+            props: { authenticated: true },
+            user: {
+              getters: {
+                isStudent: () => false,
+                isVolunteer: () => true,
+                isTeacher: () => false,
+              },
+            },
+            featureFlags: {
+              getters: { isNTHSApplicationPageEnabled: () => true },
+            },
+            nths: { state: { NTHSGroups: [], ...nthsState } },
+          })
+        }
+
+        afterEach(() => {
+          storeOptions.modules.app.state.windowWidth = 0
+          storeOptions.modules.app.modules.sidebar.state.isCollapsed = true
+          vi.restoreAllMocks()
+        })
+
+        it.each([
+          {
+            name: 'apply on desktop',
+            nthsState: { canApplyForNTHSPresident: true },
+            windowWidth: DESKTOP_WIDTH,
+            expected: [
+              [EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN, { destination: 'apply' }],
+            ],
+          },
+          {
+            name: 'preview on desktop',
+            nthsState: { NTHSApplyPreview: { requirements: {} } },
+            windowWidth: DESKTOP_WIDTH,
+            expected: [
+              [
+                EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN,
+                { destination: 'preview' },
+              ],
+            ],
+          },
+          {
+            name: 'apply behind the collapsed phone sidebar',
+            nthsState: { canApplyForNTHSPresident: true },
+            windowWidth: PHONE_WIDTH,
+            expected: [],
+          },
+        ])('$name', ({ nthsState, windowWidth, expected }) => {
+          const captureEvent = vi.spyOn(AnalyticsService, 'captureEvent')
+          mountCoach(nthsState, windowWidth)
+          expect(captureEvent.mock.calls).toEqual(expected)
+        })
+
+        it('fires when the phone sidebar opens', async () => {
+          const captureEvent = vi.spyOn(AnalyticsService, 'captureEvent')
+          const wrapper = mountCoach(
+            { canApplyForNTHSPresident: true },
+            PHONE_WIDTH
+          )
+          await wrapper.vm.$store.dispatch('app/sidebar/expand')
+          await nextTick()
+          expect(captureEvent).toHaveBeenCalledWith(
+            EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN,
+            { destination: 'apply' }
+          )
+        })
       })
 
       it('Renders the preview link, not "Apply Now", for a coach with a requirement outstanding', async () => {
