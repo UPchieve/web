@@ -68,9 +68,9 @@
 
         <sidebar-link
           v-if="isStudent"
-          to="/past-coaches"
-          text="Past Coaches"
-          id="past-coaches-sidebar-link"
+          to="/my-coaches"
+          text="My Coaches"
+          id="my-coaches-sidebar-link"
         >
           <star-icon class="icon star-icon" />
         </sidebar-link>

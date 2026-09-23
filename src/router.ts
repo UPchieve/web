@@ -112,7 +112,7 @@ const AdminEssayReviewList = () =>
   import('./views/Admin/AdminEssayReviewList.vue')
 const AdminEssayReviewDetail = () =>
   import('./views/Admin/AdminEssayReviewDetail.vue')
-const PastCoachesView = () => import('./views/PastCoachesView.vue')
+const MyCoachesView = () => import('./views/MyCoachesView.vue')
 const VolunteerRelevantExperienceThanksView = () =>
   import('./views/VolunteerRelevantExperienceThanksView.vue')
 
@@ -270,7 +270,7 @@ const STUDENT_SIDEBAR_LINKED_VIEWS = [
   SessionHistoryView,
   ProgressReportsOverviewView,
   SessionView,
-  PastCoachesView,
+  MyCoachesView,
   StudentClassesView,
   JourneysView,
 ]
@@ -675,9 +675,9 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: autoflowRedirect,
   },
   {
-    path: '/past-coaches',
-    name: 'PastCoachesView',
-    component: PastCoachesView,
+    path: '/my-coaches',
+    name: 'MyCoachesView',
+    component: MyCoachesView,
     meta: {
       protected: true,
       preloadViews: { student: STUDENT_SIDEBAR_LINKED_VIEWS },

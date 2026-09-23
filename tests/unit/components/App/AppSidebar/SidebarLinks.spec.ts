@@ -16,9 +16,9 @@ const SESSION_HISTORY_LINK = {
   to: '/sessions/history',
   text: 'Session History',
 }
-const PAST_COACHES_LINK = {
-  to: '/past-coaches',
-  text: 'Past Coaches',
+const MY_COACHES_LINK = {
+  to: '/my-coaches',
+  text: 'My Coaches',
 }
 const MY_CLASSES_LINK = {
   to: '/classes',
@@ -73,7 +73,7 @@ const links = {
       PROGRESS_REPORTS,
       MY_CLASSES_LINK,
       MY_JOURNEYS_LINK,
-      PAST_COACHES_LINK,
+      MY_COACHES_LINK,
       SESSION_HISTORY_LINK,
       CONTACT_LINK,
     ],
