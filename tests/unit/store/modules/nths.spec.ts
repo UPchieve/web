@@ -61,6 +61,7 @@ const getStore = (
     NTHSGroupActions?: { actionId: number }[]
     checksInFlight?: number[]
     schoolAffiliationStatus?: string | null
+    NTHSGroups?: object[]
   } = {}
 ) => {
   const {
@@ -68,6 +69,7 @@ const getStore = (
     NTHSGroupActions = [],
     checksInFlight = [],
     schoolAffiliationStatus = null,
+    NTHSGroups = [{ groupInfo: { id: 'group-1' }, schoolAffiliationStatus }],
   } = state
 
   return createStore({
@@ -77,9 +79,7 @@ const getStore = (
         ...storeOptions.modules.nths,
         state: {
           ...storeOptions.modules.nths.state,
-          NTHSGroups: [
-            { groupInfo: { id: 'group-1' }, schoolAffiliationStatus },
-          ],
+          NTHSGroups,
           NTHSActions,
           NTHSGroupActions,
           checksInFlight,
@@ -232,6 +232,16 @@ describe('nths store NTHSChecklist getter', () => {
       CheckboxStatus.NotDone
     )
     expect(statusIn(checklist, NAMED_YOUR_TEAM.name)).toBe(CheckboxStatus.Done)
+  })
+})
+
+describe('nths store isGroupMemberOnly getter', () => {
+  it.each([
+    { roleName: 'admin', expected: false },
+    { roleName: 'member', expected: true },
+  ])('is $expected for a group $roleName', ({ roleName, expected }) => {
+    const store = getStore({ NTHSGroups: [{ memberInfo: { roleName } }] })
+    expect(store.getters['nths/isGroupMemberOnly']).toBe(expected)
   })
 })
 

@@ -298,7 +298,6 @@ export default {
       hasUnreadDMs: 'user/hasUnreadDMs',
       isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
-      isNthsPresident: 'nths/isPresident',
       isNthsGroupMemberOnly: 'nths/isGroupMemberOnly',
       hasNthsAdminRole: 'nths/hasAdminRole',
     }),
@@ -364,7 +363,7 @@ export default {
   methods: {
     circleCommunityClickedEvent() {
       AnalyticsService.captureEvent(EVENTS.NTHS_CIRCLE_COMMUNITY_LINK_CLICKED, {
-        isNthsAdmin: hasNthsAdminRole,
+        isNthsAdmin: this.hasNthsAdminRole,
       })
     },
     openReferFriendModal() {

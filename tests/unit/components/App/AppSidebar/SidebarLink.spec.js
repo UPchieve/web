@@ -46,4 +46,16 @@ describe('SidebarLink', () => {
     wrapper.find('.SidebarLink').trigger('click')
     expect(collapse).toHaveBeenCalled()
   })
+
+  it('runs onClick for a link that opens in a new tab', () => {
+    const onClick = vi.fn()
+    const wrapper = getWrapper({
+      to: 'https://example.com',
+      text: 'Community',
+      openNewTab: true,
+      onClick,
+    })
+    wrapper.find('a').trigger('click')
+    expect(onClick).toHaveBeenCalled()
+  })
 })

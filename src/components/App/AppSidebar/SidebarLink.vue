@@ -1,6 +1,11 @@
 <template>
   <div>
-    <a v-if="openNewTab" :href="to" target="_blank" :class="parentClass"
+    <a
+      v-if="openNewTab"
+      :href="to"
+      target="_blank"
+      :class="parentClass"
+      @click="onClick"
       ><slot></slot>
       <p>{{ text }}</p></a
     >
