@@ -3,27 +3,16 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
-import { secondsInMs } from '@/utils/time-utils'
-import { intersection } from 'lodash-es'
-import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '@/consts'
 
 export default {
   namespaced: true,
   state: {
     newWaitingStudentAudioElement: null,
     allOpenSessions: [],
-    delayedSessions: new Map(),
     tickIntervalId: null,
     ticks: 0,
   },
   mutations: {
-    addDelayedSession: (state, session) => {
-      state.delayedSessions.set(session.id, session)
-    },
-    removeDelayedSession: (state, session) => {
-      state.delayedSessions.delete(session.id)
-    },
     setNewWaitingStudentAudioElement: (state, element) =>
       (state.newWaitingStudentAudioElement = element),
     setAllOpenSessions: (state, allOpenSessions) =>
@@ -39,40 +28,6 @@ export default {
     },
   },
   actions: {
-    delaySession({ state, commit, dispatch }, { context, session, delayMs }) {
-      if (state.delayedSessions.has(session.id)) {
-        return
-      }
-      commit('addDelayedSession', session)
-      AnalyticsService.captureEvent(EVENTS.SESSION_DELAYED, {
-        sessionId: session.id,
-        subject: session.subTopic,
-      })
-      setTimeout(() => {
-        commit('removeDelayedSession', session)
-        const currentSession = state.allOpenSessions.find(
-          (sess) => sess.id === session.id
-        )
-        if (currentSession) {
-          AnalyticsService.captureEvent(EVENTS.SESSION_SHOWN_AFTER_DELAY, {
-            sessionId: currentSession.id,
-            subject: currentSession.subTopic,
-          })
-          /*
-           * Remove the session from `allOpenSessions` and re-process the open
-           * sessions so the delayed session is treated as brand new. This lets
-           * the full new-session alert flow in `handleIncomingSessions` run AND
-           * still triggers the Presence rule around missing an session request while
-           * being passive
-           */
-          commit('removeSession', currentSession.id)
-          dispatch('handleIncomingSessions', {
-            context,
-            sessions: [...state.allOpenSessions, currentSession],
-          })
-        }
-      }, delayMs)
-    },
     gotoSession({ dispatch }, { context, session }) {
       const { type, subTopic, id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
@@ -187,8 +142,6 @@ export default {
       { context, sessions }
     ) {
       const user = this.state.user.user
-      const dashboardAlgorithm =
-        this.getters['featureFlags/isDashboardAlgorithmEnabled']
 
       /*
        * EXPERIMENT: we have a new combined onboarding checklist that shows all available sessions
@@ -246,33 +199,6 @@ export default {
         if (!isMuted) {
           eligibleSessions.push(session)
         }
-
-        /*
-         * Experiment: Delay showing low-priority sessions to high-priority volunteers.
-         */
-        if (dashboardAlgorithm) {
-          const totalDelayMs = dashboardAlgorithm?.delayMs ?? secondsInMs(30)
-          const highPrioritySubjects = dashboardAlgorithm?.subjects ?? []
-          const isHighPriorityCoach =
-            intersection(user.subjects, highPrioritySubjects).length && !isMuted
-          const isHighPrioritySession = highPrioritySubjects.includes(subTopic)
-          // Only delay the session if it hasn't already been waiting for at least `totalDelayMs`
-          const sessionAge = new Date(session.createdAt).getTime()
-          const currentTime = new Date().getTime()
-          const remainingDelay = totalDelayMs - (currentTime - sessionAge)
-
-          if (
-            isHighPriorityCoach &&
-            !isHighPrioritySession &&
-            remainingDelay > 0
-          ) {
-            dispatch('delaySession', {
-              session,
-              delayMs: remainingDelay,
-              context,
-            })
-          }
-        }
       }
 
       const prevOpenSessions = state.allOpenSessions
@@ -301,7 +227,7 @@ export default {
       // available.
       const oldSessionIds = prevOpenSessions.map((s) => s.id)
       const newSessions = eligibleSessions.filter(
-        (s) => !oldSessionIds.includes(s.id) && !state.delayedSessions.has(s.id)
+        (s) => !oldSessionIds.includes(s.id)
       )
       const newSession = newSessions.length
         ? newSessions[newSessions.length - 1]
@@ -353,9 +279,7 @@ export default {
         const unlockedSubjects = rootState.user.user.subjects ?? []
         return state.allOpenSessions.filter(
           (session) =>
-            unlockedSubjects.includes(session.subTopic) &&
-            !session.isExclusive &&
-            !state.delayedSessions.has(session.id)
+            unlockedSubjects.includes(session.subTopic) && !session.isExclusive
         )
       } else {
         return []
