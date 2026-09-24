@@ -86,11 +86,13 @@ const JourneysView = () => import('./views/JourneysView.vue')
 const VolunteerHoursView = () => import('@/components/VolunteerHours.vue')
 const NTHSGroupsView = () => import('./views/NTHS/NTHSGroupsView.vue')
 const NTHSCreateGroupView = () => import('./views/NTHS/NTHSCreateGroupView.vue')
-const NTHSGroupDashboardView = () =>
-  import('./views/NTHS/Tabs/NTHSGroupDashboardView.vue')
-const NTHSManageTeamView = () =>
-  import('./views/NTHS/Tabs/NTHSManageTeamView.vue')
-const NTHSSettingsView = () => import('./views/NTHS/Tabs/NTHSSettingsView.vue')
+const NTHSHomeView = () => import('./views/NTHS/Tabs/NTHSHomeView.vue')
+const NTHSToDoView = () => import('./views/NTHS/Tabs/NTHSToDoView.vue')
+const NTHSMembersView = () => import('./views/NTHS/Tabs/NTHSMembersView.vue')
+const NTHSResourcesView = () =>
+  import('./views/NTHS/Tabs/NTHSResourcesView.vue')
+const NTHSChapterSetupView = () =>
+  import('./views/NTHS/Tabs/NTHSChapterSetupView.vue')
 const NTHSApplicationView = () => import('@/views/NTHS/NTHSApplicationView.vue')
 const NTHSApplicationFormView = () =>
   import('@/views/NTHS/NTHSApplicationFormView.vue')
@@ -146,6 +148,13 @@ const nthsRouteGuard =
     const redirect = await resolveNthsRoute(store, destination, to.path)
     return redirect ? next(redirect) : next()
   }
+
+// The tab strip hides To do from a member; this keeps a typed URL or an old
+// bookmark from rendering a view whose endpoints would 403.
+const nthsAdminOnly: NavigationGuard = (_to, _from, next) => {
+  if (store.getters['nths/hasAdminRole']) next()
+  else next('/groups/home')
+}
 
 const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {
   if (store.getters['user/isVolunteer']) {
@@ -1011,9 +1020,11 @@ const routes: RouteRecordRaw[] = [
       protected: true,
       preloadViews: {
         volunteer: [
-          NTHSGroupDashboardView,
-          NTHSManageTeamView,
-          NTHSSettingsView,
+          NTHSHomeView,
+          NTHSToDoView,
+          NTHSMembersView,
+          NTHSResourcesView,
+          NTHSChapterSetupView,
           NTHSApplicationView,
           NTHSCreateGroupView,
           NTHSApplicationPending,
@@ -1024,21 +1035,35 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('group')],
     children: [
       {
-        path: '/groups/dashboard',
-        name: 'NTHSGroupDashboardView',
-        component: NTHSGroupDashboardView,
+        path: '/groups/home',
+        name: 'NTHSHomeView',
+        component: NTHSHomeView,
       },
       {
-        path: '/groups/manage-team',
-        name: 'NTHSManageTeamView',
-        component: NTHSManageTeamView,
+        path: '/groups/to-do',
+        name: 'NTHSToDoView',
+        component: NTHSToDoView,
+        beforeEnter: [nthsAdminOnly],
       },
       {
-        path: '/groups/settings',
-        name: 'NTHSSettingsView',
-        component: NTHSSettingsView,
+        path: '/groups/members',
+        name: 'NTHSMembersView',
+        component: NTHSMembersView,
       },
-      { path: '', redirect: '/groups/dashboard' },
+      {
+        path: '/groups/resources',
+        name: 'NTHSResourcesView',
+        component: NTHSResourcesView,
+      },
+      {
+        path: '/groups/setup',
+        name: 'NTHSChapterSetupView',
+        component: NTHSChapterSetupView,
+      },
+      { path: '', redirect: '/groups/home' },
+      { path: '/groups/dashboard', redirect: '/groups/home' },
+      { path: '/groups/manage-team', redirect: '/groups/members' },
+      { path: '/groups/settings', redirect: '/groups/setup' },
     ],
   },
   {

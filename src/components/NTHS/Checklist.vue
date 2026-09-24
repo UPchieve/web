@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Spinner from '../Spinner.vue'
 import {
   type ChecklistItem,
@@ -8,8 +8,7 @@ import {
 } from '@/services/NTHSGroupService'
 import { RouterLink } from 'vue-router'
 import ExternalPage from '@/assets/ExternalPage.svg'
-import Gear from '@/assets/gear.svg'
-import Card from './Card.vue'
+import HQSection from './HQ/HQSection.vue'
 
 const props = defineProps<{
   groupId: string
@@ -18,6 +17,15 @@ const props = defineProps<{
 
 const checkboxDimensions = 20
 const checkboxSize = `${checkboxDimensions}px`
+
+const doneCount = computed(
+  () =>
+    props.checklist.filter(({ status }) => status === CheckboxStatus.Done)
+      .length
+)
+const allDone = computed(
+  () => props.checklist.length > 0 && doneCount.value === props.checklist.length
+)
 
 const tooltipId = ({ actionName }: ChecklistItem) =>
   `checklist-tooltip-${actionName.replaceAll(' ', '-')}`
@@ -58,92 +66,128 @@ function onToggle(item: ChecklistItem) {
 </script>
 
 <template>
-  <Card>
-    <template v-slot:header>Onboarding Checklist</template>
-    <div
-      v-for="item in checklist"
-      :key="item.actionName"
-      class="row"
-      :data-testid="`checklist-item-${item.actionName}`"
-    >
+  <HQSection eyebrow="Set up">
+    <template v-slot:header-end>
+      <span class="count" :class="{ complete: allDone }">
+        {{ allDone ? 'Done ✓' : `${doneCount} of ${checklist.length} done` }}
+      </span>
+    </template>
+
+    <h2 class="card-title" data-testid="card-title">Set up your chapter</h2>
+
+    <div class="list">
       <div
-        class="anchor"
-        @mouseenter="onRowEnter(item)"
-        @mouseleave="hoveredRow = undefined"
+        v-for="item in checklist"
+        :key="item.actionName"
+        class="row"
+        :data-testid="`checklist-item-${item.actionName}`"
       >
-        <label class="item">
-          <Spinner
-            :container-width="checkboxDimensions"
-            :container-height="checkboxDimensions"
-            :width="checkboxDimensions"
-            :height="checkboxDimensions"
-            :thickness="4"
-            class="checkbox"
-            v-if="item.status === CheckboxStatus.Saving"
-          />
-          <input
-            v-else
-            class="checkbox"
-            :class="{ locked: item.locked }"
-            type="checkbox"
-            :data-testid="`checklist-checkbox-${item.actionName}`"
-            :checked="item.status === CheckboxStatus.Done"
-            :disabled="!item.locked && item.status === CheckboxStatus.Done"
-            :aria-disabled="item.locked ? 'true' : undefined"
-            :aria-describedby="item.locked ? tooltipId(item) : undefined"
-            @click="onCheckboxClick(item, $event)"
-            @focus="onCheckboxFocus(item)"
-            @blur="focusedRow = undefined"
-            @input="onToggle(item)"
-          />
-          {{ item.text }}
-        </label>
-
-        <span
-          v-if="item.locked"
-          class="tooltip"
-          :class="{ open: tooltipOpen(item) }"
-          role="tooltip"
-          :id="tooltipId(item)"
-          :data-testid="`checklist-tooltip-${item.actionName}`"
-          >{{ item.lockedTooltip }}</span
+        <div
+          class="anchor"
+          @mouseenter="onRowEnter(item)"
+          @mouseleave="hoveredRow = undefined"
         >
+          <label class="item">
+            <Spinner
+              :container-width="checkboxDimensions"
+              :container-height="checkboxDimensions"
+              :width="checkboxDimensions"
+              :height="checkboxDimensions"
+              :thickness="4"
+              class="checkbox"
+              v-if="item.status === CheckboxStatus.Saving"
+            />
+            <input
+              v-else
+              class="checkbox"
+              :class="{ locked: item.locked }"
+              type="checkbox"
+              :data-testid="`checklist-checkbox-${item.actionName}`"
+              :checked="item.status === CheckboxStatus.Done"
+              :aria-disabled="item.locked ? 'true' : undefined"
+              :aria-describedby="item.locked ? tooltipId(item) : undefined"
+              @click="onCheckboxClick(item, $event)"
+              @focus="onCheckboxFocus(item)"
+              @blur="focusedRow = undefined"
+              @input="onToggle(item)"
+            />
+            <span
+              class="title"
+              :class="{ done: item.status === CheckboxStatus.Done }"
+              >{{ item.text }}</span
+            >
+          </label>
+
+          <p v-if="item.help" class="help">{{ item.help }}</p>
+
+          <span
+            v-if="item.locked"
+            class="tooltip"
+            :class="{ open: tooltipOpen(item) }"
+            role="tooltip"
+            :id="tooltipId(item)"
+            :data-testid="`checklist-tooltip-${item.actionName}`"
+            >{{ item.lockedTooltip }}</span
+          >
+        </div>
+
+        <RouterLink
+          v-if="item.routeTo"
+          class="control"
+          :to="item.routeTo"
+          :data-testid="`checklist-control-${item.actionName}`"
+        >
+          {{ item.controlText }}
+          <ExternalPage class="icon" aria-hidden="true" />
+        </RouterLink>
+
+        <a
+          v-else-if="item.url"
+          class="control"
+          :href="item.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          :data-testid="`checklist-control-${item.actionName}`"
+        >
+          {{ item.controlText }}
+          <ExternalPage class="icon" aria-hidden="true" />
+        </a>
       </div>
-
-      <RouterLink
-        v-if="item.routeTo"
-        class="control control-button"
-        :to="item.routeTo"
-        :data-testid="`checklist-control-${item.actionName}`"
-      >
-        <Gear class="icon" aria-hidden="true" />
-        {{ item.controlText }}
-      </RouterLink>
-
-      <a
-        v-else-if="item.url"
-        class="control control-external"
-        :href="item.url"
-        target="_blank"
-        rel="noopener noreferrer"
-        :data-testid="`checklist-control-${item.actionName}`"
-      >
-        {{ item.controlText }}
-        <ExternalPage class="icon" aria-hidden="true" />
-      </a>
     </div>
-  </Card>
+  </HQSection>
 </template>
 
 <style scoped lang="scss">
+.count {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: $c-secondary-grey;
+  white-space: nowrap;
+}
+.count.complete {
+  color: $c-nths-deep-teal;
+}
+.card-title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 8px;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+}
 .row {
-  padding: 0.4em 1em;
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  column-gap: 8px;
-  row-gap: 2px;
+  column-gap: 14px;
+  row-gap: 8px;
+  padding: 13px 0;
+  border-top: 1px solid $c-nths-track;
 }
 .anchor {
   position: relative;
@@ -152,20 +196,48 @@ function onToggle(item: ChecklistItem) {
 .item {
   display: flex;
   justify-content: start;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 14px;
   margin: 0;
+  text-align: left;
+}
+.title {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.title.done {
+  color: $c-secondary-grey;
+  text-decoration: line-through;
+}
+.help {
+  margin: 3px 0 0 calc(v-bind(checkboxSize) + 14px);
+  font-size: 13px;
+  line-height: 1.5;
+  color: $c-secondary-grey;
   text-align: left;
 }
 .checkbox {
   width: v-bind(checkboxSize);
   height: v-bind(checkboxSize);
   flex-shrink: 0;
-  accent-color: $c-information-blue;
-  color: white;
+  margin: 1px 0 0;
+  appearance: none;
+  background: $upchieve-white;
+  border: 2px solid $border-grey;
+  border-radius: 4px;
 }
-.checkbox.locked {
-  // aria-disabled has no disabled styling, so add back the :disabled gray.
+.checkbox:checked {
+  background-color: $c-nths-navy;
+  border-color: $c-nths-navy;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M1.5 6.3 4.4 9.2 10.5 3' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+}
+// aria-disabled has no disabled styling, so add back the :disabled gray. A
+// checked locked box keeps the navy fill, or it reads as not done.
+.checkbox.locked:not(:checked) {
   filter: grayscale(1) opacity(0.3);
 }
 .checkbox.loader :deep(div) {
@@ -176,22 +248,18 @@ function onToggle(item: ChecklistItem) {
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  background: $c-nths-sky;
+  border-radius: 4px;
+  padding: 5px 10px;
   color: $c-information-blue;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
   white-space: nowrap;
+  text-decoration: none;
 }
-.control-button {
-  border: 1px solid $c-border-grey;
-  border-radius: 16px;
-  padding: 4px 12px;
-
-  &:hover {
-    border-color: $c-information-blue;
-    background: $c-background-grey;
-  }
-}
-.control-external {
-  text-decoration: underline;
+.control:hover {
+  color: $button-primary-bg-hover;
 }
 .icon {
   width: 14px;

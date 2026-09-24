@@ -22,7 +22,6 @@ const partnerKeysThatRequirePhotoId =
 config.partnerKeysThatRequirePhotoId = partnerKeysThatRequirePhotoId.split(',')
 
 config.nths = {
-  NTHSRetoolDashboardUrl: import.meta.env.VUE_NTHS_RETOOL_DASHBOARD_URL,
   presidentCircleCommunity:
     'https://upchieve-coach-community.circle.so/join?invitation_token=c0540e4ef459d5ba80d725363ed1ca422d66128c-519f02f3-e383-4689-b32a-4775442e5fe6', // betterleaks:allow
   membersOnlyCircleCommunity:

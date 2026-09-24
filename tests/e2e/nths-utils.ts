@@ -126,3 +126,44 @@ export const schoolAffiliationStatusOf = async (
   )
   return rows[0]?.name
 }
+
+export type NthsMemberOptions = {
+  groupId: string
+  roleName?: 'admin' | 'member'
+}
+
+// getGroupMembers and the roster both need the role row, so a member without
+// one is invisible to the API.
+export const addNthsMember = async (
+  dbClient: DbClient,
+  options: NthsMemberOptions
+): Promise<VolunteerUser> => {
+  const member = await createVolunteer(
+    dbClient,
+    {},
+    { onboarded: true, approved: true }
+  )
+  if (!member) throw new Error('Failed to create the NTHS member')
+
+  await withCertifications(dbClient, {
+    userId: member.id,
+    certificationNames: ['prealgebra'],
+  })
+  await dbClient.query(
+    `INSERT INTO volunteer_occupations (user_id, occupation) VALUES ($1, $2)`,
+    [member.id, VolunteerOccupations.HIGH_SCHOOL_STUDENT]
+  )
+  const joinedAt = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  await dbClient.query(
+    `INSERT INTO nths_group_members (nths_group_id, user_id, title, joined_at)
+       VALUES ($1, $2, 'Member', $3)`,
+    [options.groupId, member.id, joinedAt.toISOString()]
+  )
+  await dbClient.query(
+    `INSERT INTO nths_group_member_roles (user_id, nths_group_id, role_id)
+     SELECT $1, $2, roles.id FROM nths_group_roles roles WHERE roles.name = $3`,
+    [member.id, options.groupId, options.roleName ?? 'member']
+  )
+
+  return member
+}

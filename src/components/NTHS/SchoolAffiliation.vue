@@ -9,7 +9,7 @@ import SchoolForm from './SchoolAffiliation/Form.vue'
 import { useMachine } from '@xstate/vue'
 import LargeButton from '../LargeButton.vue'
 import Spinner from '../Spinner.vue'
-import Card from './Card.vue'
+import HQSection from './HQ/HQSection.vue'
 import { computed, useId } from 'vue'
 
 const props = defineProps<{
@@ -45,7 +45,7 @@ const isChoosingPath = computed(
     isSeekingSchoolApproval.value
 )
 
-const CHOOSER_HEADER = 'Choose Your Chapter Type'
+const CHOOSER_HEADER = 'Choose your chapter type'
 const AFFILIATION_HEADER = 'School Affiliation: Optional'
 
 const opensOnAffiliationHeader: Record<AffiliationStatus, boolean> = {
@@ -187,8 +187,8 @@ const paths = computed<ChapterPath[]>(() => [
 </script>
 
 <template>
-  <Card class="card">
-    <template v-slot:header>{{ cardHeader }}</template>
+  <HQSection>
+    <h2 class="card-title" data-testid="card-title">{{ cardHeader }}</h2>
     <Spinner class="spinner" v-if="snapshot.hasTag('loading')" />
 
     <p
@@ -200,7 +200,7 @@ const paths = computed<ChapterPath[]>(() => [
     </p>
 
     <div class="chooser" v-if="isChoosingPath">
-      <p class="card-text">
+      <p class="card-text chooser-explainer">
         There are two types of official NTHS chapters: school-approved and
         community. Getting your school to officially approve NTHS as a club is a
         bonus, it unlocks meeting space and school announcements, but it isn't
@@ -306,13 +306,13 @@ const paths = computed<ChapterPath[]>(() => [
         here.
       </div>
     </div>
-  </Card>
+  </HQSection>
 </template>
 
 <style lang="scss" scoped>
-.card {
-  width: fit-content;
-  height: fit-content;
+.card-title {
+  @include nths-card-title;
+  margin-bottom: 12px;
 }
 .form {
   min-width: 400px;
@@ -322,6 +322,9 @@ const paths = computed<ChapterPath[]>(() => [
 }
 .card-text {
   text-align: left;
+}
+.chooser-explainer {
+  @include nths-page-subtitle;
 }
 .error-text {
   color: $c-error-red;
@@ -342,7 +345,8 @@ const paths = computed<ChapterPath[]>(() => [
   max-width: 400px;
 }
 .chooser {
-  max-width: 720px;
+  display: flex;
+  flex-direction: column;
 }
 .paths {
   display: flex;

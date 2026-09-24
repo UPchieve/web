@@ -252,7 +252,7 @@ describe('SchoolAffiliation', () => {
   it('offers a denied chapter both paths with a retry on the school path', async () => {
     const wrapper = await getWrapper('DENIED')
 
-    expect(wrapper.find(CARD_TITLE).text()).toBe('Choose Your Chapter Type')
+    expect(wrapper.find(CARD_TITLE).text()).toBe('Choose your chapter type')
     expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(true)
     expect(wrapper.find(COMMUNITY_PATH).exists()).toBe(true)
     expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(true)
@@ -369,7 +369,7 @@ describe('SchoolAffiliation', () => {
   it('marks school-approved current for a chapter that already opted in', async () => {
     const wrapper = await getWrapper('PENDING_SCHOOL_AFFILIATION')
 
-    expect(wrapper.find(CARD_TITLE).text()).toBe('Choose Your Chapter Type')
+    expect(wrapper.find(CARD_TITLE).text()).toBe('Choose your chapter type')
     expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(true)
     expect(wrapper.find(SCHOOL_APPROVED_BADGE).text()).toBe('CURRENT')
     expect(wrapper.find(COMMUNITY_BADGE).exists()).toBe(false)

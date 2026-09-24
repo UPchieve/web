@@ -31,21 +31,13 @@ function closeModal() {
 
 <template>
   <div class="main-container">
-    <h1>Remove team member</h1>
     <Loader v-if="props.isLoading" />
     <RemoveMemberConfirmation
       v-else
       :memberToRemove="props.memberToRemove!"
-      @removed="onCancelRemoveMember"
-      @cancel="onRemovedMember"
+      @removed="onRemovedMember"
+      @cancel="onCancelRemoveMember"
       :isRemovingSelf="false"
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-h1 {
-  @include font-category('display-small');
-  padding-bottom: 24px;
-}
-</style>

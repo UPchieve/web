@@ -4,11 +4,16 @@ import config from '../config'
 import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
-import type { NTHSActionName } from './NTHSGroupService'
+import type {
+  NTHSActionName,
+  NTHSChapterImpactResponse,
+  NTHSChapterRosterResponse,
+} from './NTHSGroupService'
 import type {
   NTHSApplyPreview,
   NTHSUnlistedSchool,
 } from './NTHSApplicationService'
+import type { RosterPeriod } from './NTHSRosterService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
 import type { DateString, Uuid } from '@/types/shared'
@@ -1477,6 +1482,31 @@ export default {
       this._errorHandler
     )
   },
+  getNTHSChapterImpact(groupId: string, monthStartsAt?: Date) {
+    return httpGet<NTHSChapterImpactResponse>(
+      `${API_ROOT}/nths-groups/${groupId}/impact`,
+      monthStartsAt
+        ? { params: { monthStartsAt: monthStartsAt.toISOString() } }
+        : undefined
+    ).catch(this._axiosErrorHandler)
+  },
+  getNTHSChapterRoster(
+    groupId: string,
+    periodStarts?: Record<RosterPeriod, Date>
+  ) {
+    return httpGet<NTHSChapterRosterResponse>(
+      `${API_ROOT}/nths-groups/${groupId}/roster`,
+      periodStarts
+        ? {
+            params: {
+              weekStartsAt: periodStarts.thisWeek.toISOString(),
+              lastTwoWeeksStartsAt: periodStarts.lastTwoWeeks.toISOString(),
+              monthStartsAt: periodStarts.thisMonth.toISOString(),
+            },
+          }
+        : undefined
+    ).catch(this._axiosErrorHandler)
+  },
   getActionsForNTHSGroup(groupId: string) {
     return httpGet(`${API_ROOT}/nths-groups/${groupId}/actions`).catch(
       this._axiosErrorHandler
@@ -1486,6 +1516,11 @@ export default {
     return httpPost(`${API_ROOT}/nths-groups/${groupId}/actions`, {
       action,
     }).then(this._successHandler, this._errorHandler)
+  },
+  deleteActionForNTHSGroup(groupId: string, action: NTHSActionName) {
+    return httpDelete(
+      `${API_ROOT}/nths-groups/${groupId}/actions/${encodeURIComponent(action)}`
+    ).then(this._successHandler, this._errorHandler)
   },
   submitSchoolAffiliation(groupId: string, advisorInfo: AdvisorInfo) {
     return httpPost(

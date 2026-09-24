@@ -3,7 +3,7 @@ import { expect } from '@playwright/test'
 const SCHOOL_APPROVAL_ACTION = 'MARKED SCHOOL AFFILIATION IN PROGRESS'
 
 const itemTestId = (actionName) => `checklist-item-${actionName}`
-const checkboxTestId = (actionName) => `checklist-checkbox-${actionName}`
+export const checkboxTestId = (actionName) => `checklist-checkbox-${actionName}`
 const controlTestId = (actionName) => `checklist-control-${actionName}`
 
 export class NTHSChapterPage {
@@ -41,8 +41,8 @@ export class NTHSChapterPage {
   }
 
   async goto() {
-    await this.page.goto('/groups')
-    await this.page.waitForURL('**/groups/dashboard')
+    await this.page.goto('/groups/to-do')
+    await this.page.waitForURL('**/groups/to-do')
   }
 
   async schoolApprovalIsOutstanding() {
@@ -50,13 +50,19 @@ export class NTHSChapterPage {
     await expect(this.schoolApprovalCheckbox).not.toBeChecked()
   }
 
+  // The checklist lives on To do and the chooser on Chapter setup, so this hops
+  // tabs and comes back: callers assert on setup elements straight afterwards.
   async schoolApprovalIsSettled() {
+    await this.page.goto('/groups/to-do')
+    await this.page.waitForURL('**/groups/to-do')
     await expect(this.schoolApprovalCheckbox).toBeChecked()
+    await this.page.goto('/groups/setup')
+    await this.page.waitForURL('**/groups/setup')
   }
 
   async openPathChooser() {
     await this.schoolApprovalControl.click()
-    await this.page.waitForURL('**/groups/settings')
+    await this.page.waitForURL('**/groups/setup')
     await expect(this.schoolApprovedPath).toBeVisible()
     await expect(this.communityPath).toBeVisible()
     await expect(this.chooseSchoolApprovedButton).toBeVisible()
@@ -65,7 +71,7 @@ export class NTHSChapterPage {
 
   async openPathChooserAfterDenial() {
     await this.schoolApprovalControl.click()
-    await this.page.waitForURL('**/groups/settings')
+    await this.page.waitForURL('**/groups/setup')
     await expect(this.denialNotice).toBeVisible()
     await expect(this.tryAgainButton).toBeVisible()
     await expect(this.stayCommunityButton).toBeVisible()

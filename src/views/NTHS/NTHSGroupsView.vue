@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import InviteLink from '@/components/NTHS/InviteLink.vue'
-import { computed, onBeforeMount } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import Checklist from '@/components/NTHS/Checklist.vue'
-import { NTHS_RESOURCES_URL } from '@/services/NTHSGroupService'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import LargeButton from '@/components/LargeButton.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
@@ -12,15 +9,17 @@ import Callout from '@/components/Callout.vue'
 const store = useStore()
 const router = useRouter()
 const group = computed(() => store.state.nths.NTHSGroups?.[0])
-const code = computed(() => group.value?.groupInfo?.inviteCode)
-const isGroupAdmin = computed(
-  () => group.value?.memberInfo?.roleName === 'admin'
-)
-const checklist = computed(() => store.getters['nths/NTHSChecklist'])
+const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
 
-onBeforeMount(async () => {
-  await store.dispatch('nths/fetchNTHSGroupActions', group.value.groupInfo.id)
-})
+const tabs = computed(() =>
+  [
+    { to: '/groups/home', label: 'Home' },
+    { to: '/groups/to-do', label: 'To do', adminOnly: true },
+    { to: '/groups/members', label: 'Members' },
+    { to: '/groups/resources', label: 'Resources' },
+    { to: '/groups/setup', label: 'Chapter setup' },
+  ].filter(({ adminOnly }) => !adminOnly || isGroupAdmin.value)
+)
 
 const hidePageContentReason = computed(function ():
   | 'not ready to tutor'
@@ -52,184 +51,164 @@ const hidePageContentMessage = computed(() => {
 function goToDashboard() {
   router.push('/dashboard')
 }
+
+// The tab strip scrolls horizontally below ~1100px. Landing directly on a tab
+// route (e.g. from the checklist's "Edit in Chapter setup") mounts the active
+// tab already off the visible strip, with no scroll event to reveal it.
+const tabsNav = ref<HTMLElement | null>(null)
+function revealActiveTab() {
+  tabsNav.value
+    ?.querySelector('.tab.active')
+    ?.scrollIntoView({ inline: 'nearest', block: 'nearest' })
+}
+watch(
+  () => router.currentRoute.value.path,
+  async () => {
+    await nextTick()
+    revealActiveTab()
+    // Work Sans usually finishes loading after mount and widens every tab, which
+    // pushes the active one back out of view.
+    await document.fonts?.ready
+    revealActiveTab()
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
-  <div class="container">
-    <div class="header shrink center">
-      <div class="header-main-info">
-        <span class="name">{{ group.groupInfo?.name }}</span>
+  <div class="chapter-hq">
+    <div class="band">
+      <div class="identity">
+        <img class="logo" src="@/assets/nths/nths-logo.svg?url" alt="" />
+        <div class="identity-text">
+          <p class="band-eyebrow">National Tutoring Honor Society</p>
+          <p class="chapter-name">{{ group?.groupInfo?.name }}</p>
+        </div>
       </div>
-      <div class="link" v-if="!hidePageContentReason">
-        <InviteLink v-if="code" :code="code" />
-      </div>
-    </div>
-    <div
-      v-if="hidePageContentReason"
-      class="grow center hide-content-container"
-    >
-      <Callout variant="warning">
-        <template v-slot:content>
-          <div class="callout-content">
-            {{ hidePageContentMessage }}
-            <LargeButton
-              v-if="hidePageContentReason === 'not ready to tutor'"
-              variant="primary-blue"
-              :showArrow="false"
-              @click="goToDashboard"
-            >
-              Continue Onboarding
-            </LargeButton>
-          </div>
-        </template>
-      </Callout>
-    </div>
-    <div v-else class="container">
-      <div class="actions row shrink center">
-        <Checklist
-          v-if="isGroupAdmin && checklist.length"
-          :groupId="group.groupInfo.id"
-          :checklist="checklist"
-        />
-        <LargeButton
-          v-if="isGroupAdmin"
-          target="_blank"
-          rel="noopener noreferrer"
-          :routeTo="NTHS_RESOURCES_URL"
-          >Review NTHS Resources
-        </LargeButton>
-      </div>
-      <nav class="tabs shrink center">
-        <RouterLink class="tab" activeClass="active" to="/groups/dashboard">
-          Dashboard
-        </RouterLink>
+      <nav
+        class="tabs"
+        ref="tabsNav"
+        v-if="!hidePageContentReason"
+        aria-label="Chapter sections"
+      >
         <RouterLink
-          v-if="isGroupAdmin"
-          activeClass="active"
+          v-for="tab in tabs"
+          :key="tab.to"
           class="tab"
-          to="/groups/manage-team"
+          activeClass="active"
+          :to="tab.to"
         >
-          Manage Team
-        </RouterLink>
-        <RouterLink class="tab" activeClass="active" to="/groups/settings">
-          Settings
+          {{ tab.label }}
         </RouterLink>
       </nav>
-      <div class="grow tab-content center">
-        <RouterView />
+    </div>
+
+    <div class="content">
+      <div
+        v-if="hidePageContentReason"
+        class="hide-content-container"
+        data-testid="hide-page-content"
+      >
+        <Callout variant="warning">
+          <template v-slot:content>
+            <div class="callout-content">
+              {{ hidePageContentMessage }}
+              <LargeButton
+                v-if="hidePageContentReason === 'not ready to tutor'"
+                variant="primary-blue"
+                :showArrow="false"
+                @click="goToDashboard"
+              >
+                Continue Onboarding
+              </LargeButton>
+            </div>
+          </template>
+        </Callout>
       </div>
+      <RouterView v-else />
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.container {
-  --spacing: 1em;
+.chapter-hq {
   width: 100%;
   height: 100%;
-  margin: auto;
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: start;
-  gap: var(--spacing);
   overflow: auto;
+  background: $c-background-grey;
+  color: $c-soft-black;
+  text-align: left;
 }
-.hide-content-container {
-  padding: 0px 16px 0px 16px;
-  width: 80%;
+.band {
+  background: $c-nths-navy;
+  color: $upchieve-white;
+  padding: clamp(18px, 3vw, 26px) clamp(16px, 4vw, 36px) 0;
 }
-.center {
-  max-width: 1200px;
-  margin: auto;
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 22px;
+}
+.logo {
+  height: 56px;
+  width: 56px;
+  flex: none;
+  background: $c-nths-cream;
+  border-radius: 9999px;
+  padding: 5px;
+}
+.identity-text {
+  flex: 1;
+}
+.band-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $c-college;
+}
+.chapter-name {
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin-top: 5px;
 }
 .tabs {
-  flex-shrink: 1;
-  width: 100%;
-  z-index: 1;
-  border-bottom: 4px solid $border-grey;
-  gap: 1em;
   display: flex;
-  padding-left: var(--spacing);
-  padding-right: var(--spacing);
+  gap: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .tab {
-  display: inline-block;
-  padding-bottom: 0.8em;
-  margin-bottom: -4px;
-  color: black;
-}
-.tab-content {
-  width: 100%;
-  padding: var(--spacing);
-}
-.active {
+  padding: 11px 16px;
+  border-radius: 8px 8px 0 0;
+  flex: none;
+  white-space: nowrap;
+  font-size: 15px;
   font-weight: 500;
-  border-bottom: 4px solid $c-success-green;
+  line-height: 1.2;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
 }
-
-.spinner-container {
-  flex-grow: 1;
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
+// The active tab takes the page background so it reads as a folder tab
+// joined to the content below.
+.tab.active {
+  background: $c-background-grey;
+  color: $c-nths-navy;
 }
-
-.row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  padding: 24px;
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: clamp(20px, 3vw, 30px) clamp(16px, 4vw, 36px) 40px;
 }
-
-.actions {
-  flex-wrap: wrap-reverse;
-  gap: 24px;
-}
-
-.check-list-container {
-  display: grid;
-  gap: 8px;
-}
-.header {
-  width: 100%;
-  padding: 1em 1em 0 1em;
-  gap: 24px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-.header-main-info {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  align-items: center;
-}
-.link {
-  flex-grow: 1;
-}
-.team-action-button {
-  margin-left: auto;
-}
-.buttons {
-  display: flex;
-  justify-content: end;
-  gap: 12px;
-}
-
-.grow {
-  flex-grow: 1;
-}
-.shrink {
-  flex-shrink: 1;
-}
-.name {
-  font-size: 24px;
-  font-weight: 800;
-  padding: 0 0 0 4px;
-  margin-right: 8px;
+.hide-content-container {
+  width: 80%;
 }
 .callout-content {
   display: flex;

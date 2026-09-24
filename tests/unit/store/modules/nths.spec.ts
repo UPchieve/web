@@ -121,10 +121,10 @@ describe('nths store NTHSChecklist getter', () => {
     expect(checklistOf({ NTHSActions: [] })).toEqual([])
   })
 
-  it('routes the school approval item to the settings tab instead of an external url', () => {
+  it('routes the school approval item to Chapter setup instead of an external url', () => {
     const item = schoolApprovalItemIn(checklistOf())
 
-    expect(item.routeTo).toBe('/groups/settings')
+    expect(item.routeTo).toBe('/groups/setup')
     expect(item.url).toBeUndefined()
     expect(item.actionId).toBeUndefined()
   })
@@ -202,7 +202,9 @@ describe('nths store NTHSChecklist getter', () => {
     expect(schoolApprovalItemIn(checklist).status).toBe(CheckboxStatus.NotDone)
   })
 
-  it('returns an empty list once every item is done', () => {
+  // The checklist has its own nav tab, so a finished chapter still sees every
+  // row there, ticked.
+  it('keeps every item once they are all done', () => {
     const checklist = checklistOf({
       NTHSGroupActions: [
         NAMED_YOUR_TEAM,
@@ -213,7 +215,10 @@ describe('nths store NTHSChecklist getter', () => {
       schoolAffiliationStatus: 'OPTED_OUT',
     })
 
-    expect(checklist).toEqual([])
+    expect(namesIn(checklist)).toHaveLength(ALL_ACTIONS.length)
+    expect(
+      checklist.every(({ status }) => status === CheckboxStatus.Done)
+    ).toBe(true)
   })
 
   it('keeps the checklist visible while only the school approval item is outstanding', () => {
@@ -242,6 +247,28 @@ describe('nths store isGroupMemberOnly getter', () => {
   ])('is $expected for a group $roleName', ({ roleName, expected }) => {
     const store = getStore({ NTHSGroups: [{ memberInfo: { roleName } }] })
     expect(store.getters['nths/isGroupMemberOnly']).toBe(expected)
+  })
+})
+
+describe('nths store removeNTHSGroupAction', () => {
+  it('removes every group action entry for the given action id', () => {
+    const store = getStore({
+      NTHSGroupActions: [
+        { actionId: NAMED_YOUR_TEAM.id },
+        { actionId: NAMED_YOUR_TEAM.id },
+        { actionId: REVIEWED_RESOURCES.id },
+      ],
+    })
+
+    store.dispatch('nths/removeNTHSGroupAction', NAMED_YOUR_TEAM.id)
+
+    const checklist = store.getters['nths/NTHSChecklist']
+    expect(statusIn(checklist, NAMED_YOUR_TEAM.name)).toBe(
+      CheckboxStatus.NotDone
+    )
+    expect(statusIn(checklist, REVIEWED_RESOURCES.name)).toBe(
+      CheckboxStatus.Done
+    )
   })
 })
 

@@ -6,6 +6,7 @@ import NetworkService from '@/services/NetworkService'
 import {
   CheckboxStatus,
   NTHS_ORIENTATION_URL,
+  NTHS_RECRUITMENT_SPRINT_URL,
   NTHS_RESOURCES_URL,
   type ChecklistItem,
 } from '@/services/NTHSGroupService'
@@ -17,9 +18,9 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 const GROUP_ID = 'group-123'
 
 const NAME_ITEM: ChecklistItem = {
-  text: 'Name your team',
-  controlText: 'Edit in Settings',
-  routeTo: '/groups/settings',
+  text: 'Name your chapter',
+  controlText: 'Edit in Chapter setup',
+  routeTo: '/groups/setup',
   status: CheckboxStatus.NotDone,
   actionId: 1,
   actionName: 'NAMED YOUR TEAM',
@@ -36,7 +37,7 @@ const RESOURCES_ITEM: ChecklistItem = {
 
 const ORIENTATION_ITEM: ChecklistItem = {
   text: 'Complete orientation',
-  controlText: 'Open orientation',
+  controlText: 'Orientation',
   url: NTHS_ORIENTATION_URL,
   status: CheckboxStatus.NotDone,
   actionId: 3,
@@ -45,16 +46,19 @@ const ORIENTATION_ITEM: ChecklistItem = {
 
 const AFFILIATION_ITEM: ChecklistItem = {
   text: 'Choose your chapter type',
-  controlText: 'Choose in Settings',
-  routeTo: '/groups/settings',
+  controlText: 'Choose in Chapter setup',
+  routeTo: '/groups/setup',
   locked: true,
-  lockedTooltip: 'Choose your chapter type in Settings and this ticks itself.',
+  lockedTooltip:
+    'Choose your chapter type in Chapter setup and this ticks itself.',
   status: CheckboxStatus.NotDone,
   actionName: 'MARKED SCHOOL AFFILIATION IN PROGRESS',
 }
 
 const SPRINT_ITEM: ChecklistItem = {
   text: 'Complete the recruitment sprint',
+  controlText: 'Recruitment Sprint',
+  url: NTHS_RECRUITMENT_SPRINT_URL,
   status: CheckboxStatus.NotDone,
   actionId: 5,
   actionName: 'RECRUITMENT SPRINT',
@@ -85,7 +89,7 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     { path: '/', component: { template: '<div />' } },
-    { path: '/groups/settings', component: { template: '<div />' } },
+    { path: '/groups/setup', component: { template: '<div />' } },
   ],
 })
 
@@ -128,6 +132,7 @@ describe('Checklist', () => {
     NetworkService.createActionForNTHSGroup = vi
       .fn()
       .mockResolvedValue({ data: { action: {} } })
+    NetworkService.deleteActionForNTHSGroup = vi.fn().mockResolvedValue({})
   })
 
   it('leaves every item label as plain text', async () => {
@@ -148,7 +153,7 @@ describe('Checklist', () => {
       const wrapper = await getWrapper(ALL_ITEMS)
 
       const link = wrapper.find(control(item.actionName))
-      expect(link.attributes('href')).toBe('/groups/settings')
+      expect(link.attributes('href')).toBe('/groups/setup')
       expect(link.attributes('target')).toBeUndefined()
       expect(link.attributes('rel')).toBeUndefined()
 
@@ -159,6 +164,7 @@ describe('Checklist', () => {
   it.each([
     { item: RESOURCES_ITEM, url: NTHS_RESOURCES_URL },
     { item: ORIENTATION_ITEM, url: NTHS_ORIENTATION_URL },
+    { item: SPRINT_ITEM, url: NTHS_RECRUITMENT_SPRINT_URL },
   ])('opens $item.actionName in a new tab', async ({ item, url }) => {
     const wrapper = await getWrapper(ALL_ITEMS)
 
@@ -170,15 +176,6 @@ describe('Checklist', () => {
     wrapper.unmount()
   })
 
-  it('gives the recruitment sprint no trailing control', async () => {
-    const wrapper = await getWrapper(ALL_ITEMS)
-
-    expect(wrapper.find(control('RECRUITMENT SPRINT')).exists()).toBe(false)
-    expect(wrapper.find(`${row('RECRUITMENT SPRINT')} a`).exists()).toBe(false)
-
-    wrapper.unmount()
-  })
-
   it('names the locked checkbox after its item and describes it with the tooltip', async () => {
     const { wrapper, input } = await getLockedRow()
 
@@ -186,7 +183,7 @@ describe('Checklist', () => {
     await expect
       .element(input)
       .toHaveAccessibleDescription(
-        'Choose your chapter type in Settings and this ticks itself.'
+        'Choose your chapter type in Chapter setup and this ticks itself.'
       )
 
     wrapper.unmount()
@@ -226,19 +223,28 @@ describe('Checklist', () => {
     wrapper.unmount()
   })
 
-  it('refuses a click on the locked checkbox', async () => {
-    const { wrapper, input } = await getLockedRow()
+  it.each([
+    { status: CheckboxStatus.NotDone, checked: false },
+    { status: CheckboxStatus.Done, checked: true },
+  ])(
+    'refuses a click on a locked checkbox ($status)',
+    async ({ status, checked }) => {
+      const wrapper = await getWrapper([{ ...AFFILIATION_ITEM, status }])
+      const input = wrapper.find(checkbox(AFFILIATION))
+        .element as HTMLInputElement
 
-    // Playwright treats aria-disabled as disabled and would wait out its
-    // actionability check.
-    await userEvent.click(input, { force: true })
-    await flushPromises()
+      // Playwright treats aria-disabled as disabled and would wait out its
+      // actionability check.
+      await userEvent.click(input, { force: true })
+      await flushPromises()
 
-    expect(input.checked).toBe(false)
-    expect(NetworkService.createActionForNTHSGroup).not.toHaveBeenCalled()
+      expect(input.checked).toBe(checked)
+      expect(NetworkService.createActionForNTHSGroup).not.toHaveBeenCalled()
+      expect(NetworkService.deleteActionForNTHSGroup).not.toHaveBeenCalled()
 
-    wrapper.unmount()
-  })
+      wrapper.unmount()
+    }
+  )
 
   it('shows the tooltip on hover and on focus', async () => {
     const { wrapper, input, label, tip } = await getLockedRow()
@@ -316,43 +322,87 @@ describe('Checklist', () => {
     wrapper.unmount()
   })
 
-  it('logs a failed toggle and clears the saving state', async () => {
-    vi.mocked(NetworkService.createActionForNTHSGroup).mockRejectedValue(
-      new Error('save failed')
-    )
-    const noticeError = vi
-      .spyOn(LoggerService, 'noticeError')
-      .mockImplementation(() => {})
+  it.each([
+    {
+      status: CheckboxStatus.NotDone,
+      assert: () =>
+        expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
+          GROUP_ID,
+          ORIENTATION
+        ),
+    },
+    {
+      status: CheckboxStatus.Done,
+      assert: (dispatch: ReturnType<typeof vi.spyOn>) => {
+        expect(NetworkService.deleteActionForNTHSGroup).toHaveBeenCalledWith(
+          GROUP_ID,
+          ORIENTATION
+        )
+        expect(NetworkService.createActionForNTHSGroup).not.toHaveBeenCalled()
+        expect(dispatch).toHaveBeenCalledWith(
+          'nths/removeNTHSGroupAction',
+          ORIENTATION_ITEM.actionId
+        )
+      },
+    },
+  ])('toggles an unlocked item from $status', async ({ status, assert }) => {
     const dispatch = vi.spyOn(store, 'dispatch')
-    const wrapper = await getWrapper([ORIENTATION_ITEM])
+    const wrapper = await getWrapper([{ ...ORIENTATION_ITEM, status }])
 
     await wrapper.find(checkbox(ORIENTATION)).trigger('input')
     await flushPromises()
 
-    expect(noticeError).toHaveBeenCalled()
-    expect(dispatch).toHaveBeenCalledWith(
-      'nths/removeFromChecksInFlight',
-      ORIENTATION_ITEM.actionId
-    )
+    assert(dispatch)
 
-    noticeError.mockRestore()
     dispatch.mockRestore()
     wrapper.unmount()
   })
 
-  it('still toggles an unlocked item', async () => {
-    const wrapper = await getWrapper(ALL_ITEMS)
+  it.each([
+    {
+      status: CheckboxStatus.NotDone,
+      fail: () =>
+        vi
+          .mocked(NetworkService.createActionForNTHSGroup)
+          .mockRejectedValue(new Error('save failed')),
+      committedAction: 'nths/addNTHSGroupAction',
+    },
+    {
+      status: CheckboxStatus.Done,
+      fail: () =>
+        vi
+          .mocked(NetworkService.deleteActionForNTHSGroup)
+          .mockRejectedValue(new Error('delete failed')),
+      committedAction: 'nths/removeNTHSGroupAction',
+    },
+  ])(
+    'logs a failed toggle from $status and clears the saving state',
+    async ({ status, fail, committedAction }) => {
+      fail()
+      const noticeError = vi
+        .spyOn(LoggerService, 'noticeError')
+        .mockImplementation(() => {})
+      const dispatch = vi.spyOn(store, 'dispatch')
+      const wrapper = await getWrapper([{ ...ORIENTATION_ITEM, status }])
 
-    await wrapper.find(checkbox(ORIENTATION)).trigger('input')
-    await flushPromises()
+      await wrapper.find(checkbox(ORIENTATION)).trigger('input')
+      await flushPromises()
 
-    expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
-      GROUP_ID,
-      ORIENTATION
-    )
+      expect(noticeError).toHaveBeenCalled()
+      expect(dispatch).not.toHaveBeenCalledWith(
+        committedAction,
+        ORIENTATION_ITEM.actionId
+      )
+      expect(dispatch).toHaveBeenCalledWith(
+        'nths/removeFromChecksInFlight',
+        ORIENTATION_ITEM.actionId
+      )
 
-    wrapper.unmount()
-  })
+      noticeError.mockRestore()
+      dispatch.mockRestore()
+      wrapper.unmount()
+    }
+  )
 
   it('swaps the checkbox for a spinner while saving', async () => {
     const wrapper = await getWrapper([

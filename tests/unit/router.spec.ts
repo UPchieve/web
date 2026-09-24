@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 import axios from 'axios'
 import router from '@/router'
+import store from '@/store'
 import NetworkService, { axiosInstance } from '@/services/NetworkService'
 
 const subjects = {
@@ -34,14 +35,22 @@ const visit = async (path: string) => {
   return router.currentRoute.value.path
 }
 
+const nthsGroupWithRole = (roleName: 'admin' | 'member') => [
+  {
+    groupInfo: { id: 'nths-group-1' },
+    memberInfo: { roleName },
+  },
+]
+
+beforeEach(() => {
+  NetworkService.authStatus = vi
+    .fn()
+    .mockResolvedValue({ data: { authenticated: true } })
+  NetworkService.user = vi.fn().mockResolvedValue({ data: { user: volunteer } })
+})
+
 describe('quiz route alias redirect', () => {
   beforeEach(() => {
-    NetworkService.authStatus = vi
-      .fn()
-      .mockResolvedValue({ data: { authenticated: true } })
-    NetworkService.user = vi
-      .fn()
-      .mockResolvedValue({ data: { user: volunteer } })
     NetworkService.getSubjects = vi
       .fn()
       .mockResolvedValue({ data: { subjects } })
@@ -123,5 +132,36 @@ describe('response interceptor', () => {
       isAxiosError: true,
       response: { status: 200 },
     })
+  })
+})
+
+describe('nthsAdminOnly route guard', () => {
+  it('redirects a plain member away from the to-do tab but lets them reach members', async () => {
+    store.commit('nths/setNTHSGroups', nthsGroupWithRole('member'))
+
+    expect(await visit('/groups/to-do')).toBe('/groups/home')
+    expect(await visit('/groups/members')).toBe('/groups/members')
+  })
+
+  it('lets an admin reach the to-do tab', async () => {
+    store.commit('nths/setNTHSGroups', nthsGroupWithRole('admin'))
+
+    expect(await visit('/groups/to-do')).toBe('/groups/to-do')
+  })
+})
+
+describe('legacy NTHS tab redirects', () => {
+  beforeEach(() => {
+    // Any NTHS group, of either role, satisfies the parent /groups route
+    // guard (nthsRouteGuard('group')) so these redirects can land at all.
+    store.commit('nths/setNTHSGroups', nthsGroupWithRole('member'))
+  })
+
+  it.each([
+    { from: '/groups/dashboard', to: '/groups/home' },
+    { from: '/groups/manage-team', to: '/groups/members' },
+    { from: '/groups/settings', to: '/groups/setup' },
+  ])('sends $from to $to', async ({ from, to }) => {
+    expect(await visit(from)).toBe(to)
   })
 })

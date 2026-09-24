@@ -2,9 +2,8 @@
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import { isErrorWithResponse } from '@/utils/error-utils'
-import { nextTick, ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import LargeButton from '../LargeButton.vue'
 
 const store = useStore()
 const props = defineProps<{
@@ -12,164 +11,152 @@ const props = defineProps<{
   groupId: string
 }>()
 
-const isEditingName = ref(false)
-const newGroupName = ref(props.groupName)
-const nameInput = ref()
+const name = ref(props.groupName)
 const errorMessage = ref('')
-const isSaving = ref(false)
+const status = ref<'idle' | 'saving' | 'saved'>('idle')
+// A rejected value is re-sent on every later blur unless it's remembered here -
+// the field keeps the text but isn't touched again until it changes.
+const lastRejectedValue = ref<string>()
 
-function cancel() {
-  isEditingName.value = false
-  newGroupName.value = props.groupName
+watch(
+  () => props.groupName,
+  (saved) => {
+    name.value = saved
+  }
+)
+
+function onInput() {
+  errorMessage.value = ''
+  status.value = 'idle'
+  lastRejectedValue.value = undefined
+}
+
+function revert() {
+  name.value = props.groupName
   errorMessage.value = ''
 }
 
-function editGroupName() {
-  isEditingName.value = true
-  newGroupName.value = props.groupName
-  nextTick(() => {
-    nameInput.value.focus()
-  })
+function revertOnEscape() {
+  // The in-flight save will commit and overwrite this anyway, so reverting
+  // here would just flash the old name before the save resolves.
+  if (status.value === 'saving') return
+  revert()
 }
 
-async function saveGroupName() {
-  isSaving.value = true
+function blurOnEnter(event: KeyboardEvent) {
+  ;(event.target as HTMLInputElement).blur()
+}
+
+async function save() {
+  if (status.value === 'saving') return
+  const trimmed = name.value.trim()
+  if (trimmed === props.groupName) {
+    name.value = props.groupName
+    return
+  }
+  if (!trimmed) {
+    revert()
+    errorMessage.value = 'Your chapter needs a name.'
+    return
+  }
+  if (trimmed === lastRejectedValue.value) return
+
+  status.value = 'saving'
   try {
     const result = await NetworkService.editNTHSGroup({
       groupId: props.groupId,
-      name: newGroupName.value,
+      name: trimmed,
     })
-
     store.commit('nths/setNTHSGroupName', {
       groupId: props.groupId,
       groupName: result.data.group.name,
     })
-    isEditingName.value = false
+    status.value = 'saved'
   } catch (e) {
-    if (isErrorWithResponse(e)) {
-      if (e.response.data.err.includes('Team name must be unique')) {
-        errorMessage.value = e.response.data.err
-      } else {
-        errorMessage.value = `Unknown error, please try again: ${e.response.data.err}`
-        LoggerService.noticeError(e.response.data.err)
-      }
+    status.value = 'idle'
+    if (
+      isErrorWithResponse(e) &&
+      e.response.data?.err?.includes('Team name must be unique')
+    ) {
+      errorMessage.value = e.response.data.err
+      lastRejectedValue.value = trimmed
     } else {
+      // Raw server text isn't fit for presidents to read. A proxy 502/504 sends an
+      // HTML body, so data.err can be missing.
       errorMessage.value = 'Unknown error, please try again'
-      LoggerService.noticeError(e)
+      LoggerService.noticeError(
+        isErrorWithResponse(e) ? (e.response.data?.err ?? e) : e
+      )
     }
-  } finally {
-    isSaving.value = false
   }
 }
 </script>
 
 <template>
   <div class="editable-name">
-    <label class="label">Team name</label>
-    <form
-      class="name-form"
-      @keydown.esc="cancel"
-      @submit.prevent="saveGroupName"
+    <label class="label" for="nths-group-name">Chapter name</label>
+    <input
+      id="nths-group-name"
+      v-model="name"
+      class="name-input"
+      type="text"
       autocomplete="off"
-    >
-      <input
-        ref="nameInput"
-        id="nths-group-name"
-        :disabled="isSaving || !isEditingName"
-        class="name-input"
-        v-model="newGroupName"
-        type="text"
-        @input="errorMessage = ''"
-        autocomplete="off"
-      />
-      <div class="buttons">
-        <LargeButton
-          v-if="isEditingName"
-          :disabled="isSaving"
-          type="button"
-          :show-arrow="false"
-          variant="text"
-          @click="cancel"
-        >
-          cancel
-        </LargeButton>
-        <LargeButton
-          v-if="isEditingName"
-          :disabled="isSaving"
-          type="submit"
-          variant="primary-blue"
-          :show-arrow="false"
-        >
-          save
-        </LargeButton>
-        <LargeButton
-          v-if="!isEditingName"
-          @click="editGroupName"
-          type="button"
-          variant="text"
-          :show-arrow="false"
-          class="edit-button"
-        >
-          edit
-        </LargeButton>
-      </div>
-    </form>
-    <div class="error" v-if="errorMessage.length">{{ errorMessage }}</div>
+      placeholder="NTHS at Lincoln High School"
+      :readonly="status === 'saving'"
+      :aria-invalid="!!errorMessage"
+      :aria-describedby="errorMessage ? 'nths-group-name-error' : undefined"
+      @input="onInput"
+      @blur="save"
+      @keydown.enter.prevent="blurOnEnter"
+      @keydown.esc="revertOnEscape"
+    />
+    <p class="feedback" aria-live="polite" data-testid="name-feedback">
+      <span v-if="errorMessage" id="nths-group-name-error" class="error">
+        {{ errorMessage }}
+      </span>
+      <span v-else-if="status === 'saving'">Saving…</span>
+      <span v-else-if="status === 'saved'">Saved</span>
+    </p>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .editable-name {
-  --size: 18px;
-  --weight: 500;
-  --spacing: 8px;
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: start;
+  align-items: stretch;
+  text-align: left;
 }
-.name-container {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-}
+// The setup card's question is the visible label for this input.
 .label {
-  flex-grow: 0;
-  flex-shrink: 0;
-  margin-right: var(--spacing);
-}
-.name {
-  font-size: var(--size);
-  font-weight: var(--weight);
-  padding: 11px 18px;
-  margin-right: var(--spacing);
-  line-height: 1;
-}
-.name-form {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  width: 100%;
-  flex-direction: column;
-  gap: 8px;
-}
-.buttons {
-  display: flex;
-  justify-content: end;
-  width: 100%;
-}
-.edit-button {
-  // keep from from jumping
-  border: 2px solid transparent;
+  @include visually-hidden;
 }
 .name-input {
-  font-size: var(--size);
-  font-weight: var(--weight);
-  border: none;
-  padding: 9px 18px;
-  margin-right: var(--spacing);
-  field-sizing: content;
-  line-height: 1;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid $border-grey;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: $c-soft-black;
+  background: $upchieve-white;
+}
+.name-input:focus {
+  border-color: $c-information-blue;
+  outline: none;
+}
+.name-input::placeholder {
+  color: $c-disabled-grey;
+}
+// Reserves a line so the card does not jump when a message appears.
+.feedback {
+  min-height: 20px;
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: $c-secondary-grey;
 }
 .error {
   color: $c-error-red;

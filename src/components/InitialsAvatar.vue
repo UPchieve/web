@@ -1,13 +1,16 @@
 <script lang="ts" setup>
 const C_SUCCESS_GREEN = '#16d2aa'
+const C_UPCHIEVE_WHITE = '#fff'
 const {
   bgColor = C_SUCCESS_GREEN,
+  fgColor = C_UPCHIEVE_WHITE,
   initials,
   widthPx = 50,
 } = defineProps<{
   initials: string
   widthPx?: number
   bgColor?: string
+  fgColor?: string
 }>()
 </script>
 
@@ -28,7 +31,7 @@ const {
       font-family="Inter, system-ui, sans-serif"
       font-weight="400"
       font-size="48"
-      fill="white"
+      :fill="fgColor"
     >
       {{ initials }}
     </text>

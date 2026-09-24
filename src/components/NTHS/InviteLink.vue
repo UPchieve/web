@@ -5,10 +5,9 @@ import { computed, ref } from 'vue'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
-import ReferFriendIcon from '@/assets/icons/refer_friend_icon.svg'
 
 const props = defineProps<{ code: string }>()
-const copyMessage = ref('Copy Invite Link')
+const copyMessage = ref('Copy link')
 const link = computed(() => `${config.appRoot}/join-team/${props.code}`)
 
 function copyURL() {
@@ -21,60 +20,75 @@ function copyURL() {
   })
 
   setTimeout(() => {
-    copyMessage.value = 'Copy Invite Link'
+    copyMessage.value = 'Copy link'
   }, 1000)
 }
 </script>
 
 <template>
   <div class="link-container">
-    <refer-friend-icon class="icon" />
-    <input type="text" autocomplete="off" class="link" :value="link" disabled />
+    <span class="link" data-testid="invite-link-url">{{ link }}</span>
     <div class="button-container">
       <LargeButton
         @click="copyURL"
         class="button-text"
         :show-arrow="false"
-        variant="link"
+        variant="primary-blue"
       >
         <span>{{ copyMessage }}</span>
       </LargeButton>
+      <slot />
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.icon {
-  width: 32px;
-  height: 32px;
-}
 .link {
-  font-size: large;
-  padding: 0.5em 1em;
-  background-color: white;
-  border: 1px solid rgb(224, 224, 224);
-  border-radius: 4px;
+  display: block;
+  font-size: 15px;
+  line-height: 1.3;
+  padding: 12px 14px;
+  color: $c-default-grey;
+  background-color: $upchieve-white;
+  border: 1px solid $c-border-grey;
+  border-radius: 8px;
+  word-break: break-all;
   flex-grow: 1;
   flex-shrink: 1;
-  max-width: 100%;
+  max-width: 380px;
+  min-width: 180px;
 }
 
 .link-container {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: start;
   align-items: center;
   width: 100%;
   @include breakpoint-above('medium') {
-    justify-content: end;
+    justify-content: space-between;
   }
 }
 .button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   flex-shrink: 0;
   flex-grow: 0;
+
+  // On a phone the link box and the button would otherwise overflow the
+  // card that hosts this component.
+  @include breakpoint-below('medium') {
+    flex-grow: 1;
+
+    > * {
+      width: 100%;
+    }
+  }
 }
 .button-text {
-  /* set width to keep form from jumping when text changes */
-  color: #1855d1;
+  padding: 11px 22px;
+  font-size: 15px;
 }
 </style>

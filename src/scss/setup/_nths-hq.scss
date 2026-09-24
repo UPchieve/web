@@ -1,0 +1,91 @@
+@use 'colors' as *;
+
+// Tokens for the NTHS Chapter HQ surfaces. Only the values that have no
+// equivalent in _colors.scss live here; everything else reuses that file.
+// Variables and mixins only: a bare rule in this file is copied into every
+// compiled component, because all.scss is injected into every SFC.
+
+$c-nths-navy: #31538f;
+$c-nths-sky: #f1f8fe;
+$c-nths-track: #eef1f5;
+$c-nths-cream: #fff7df;
+$c-nths-gold-fg: #5c4e17;
+$c-nths-deep-teal: #0a5f50;
+$c-nths-warm-bg: #fff1ea;
+$c-nths-warm-fg: #8a3d14;
+
+@mixin nths-card($padding: 24px 26px) {
+  background: $upchieve-white;
+  border: 1px solid $c-border-grey;
+  border-radius: 8px;
+  padding: $padding;
+}
+
+@mixin nths-card-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@mixin nths-section-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@mixin nths-card-title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+@mixin nths-page-title {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 0;
+}
+
+@mixin nths-page-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: $c-default-grey;
+  margin: 5px 0 0;
+}
+
+@mixin nths-badge {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+@mixin nths-tab-column($max-width) {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: $max-width;
+  text-align: left;
+}
+
+// A page-level status message: load failed, empty state, etc.
+@mixin nths-notice {
+  @include nths-card(22px 24px);
+  @include nths-page-subtitle;
+  margin: 0;
+}
+
+@mixin nths-error-box {
+  border: 1px solid $c-error-red;
+  border-radius: 8px;
+  background: lighten($c-error-red, 30%);
+  padding: 16px;
+}

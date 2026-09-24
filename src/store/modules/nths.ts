@@ -84,6 +84,11 @@ export default {
     appendNTHSGroupAction: (state, action) => {
       state.NTHSGroupActions = [...state.NTHSGroupActions, action]
     },
+    removeNTHSGroupAction: (state, actionId) => {
+      state.NTHSGroupActions = state.NTHSGroupActions.filter(
+        (action) => action.actionId !== actionId
+      )
+    },
     setChecksInFlight(state, checksInFlight) {
       state.checksInFlight = checksInFlight
     },
@@ -218,9 +223,7 @@ export default {
         })
       }
 
-      return checklist.every(({ status }) => status === CheckboxStatus.Done)
-        ? []
-        : checklist
+      return checklist
     },
   },
 }
