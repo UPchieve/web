@@ -17,7 +17,11 @@
       :placeholder="placeholder"
       :search="autocompleteSchool"
       :get-result-value="getSchoolDisplayName"
-      :default-value="defaultValue"
+      :default-value="
+        cannotFindSchool
+          ? getSchoolDisplayName({ cannotFindSchool: true })
+          : defaultValue
+      "
       :debounce-time="500"
       @submit="handleSelectSchool"
       @blur="onBlur"
@@ -111,6 +115,10 @@ export default {
     },
     defaultValue: {
       type: String,
+    },
+    cannotFindSchool: {
+      type: Boolean,
+      default: false,
     },
     // Typed text that was never picked leaves the box looking answered, so a
     // caller can say what is actually missing instead of a bare "Required".

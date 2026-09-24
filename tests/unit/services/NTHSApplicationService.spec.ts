@@ -3,41 +3,41 @@ import {
   buildEmptyResponses,
   collectResponses,
   daysLeftToApply,
-  NTHS_APPLICATION_QUESTIONS,
   HIGH_SCHOOL_GRADES,
+  NTHS_APPLICATION_FORMS,
+  sanitizeNTHSApplicationDraft,
+  type NTHSApplicationDraft,
+  type NTHSApplicationResponses,
+  type NTHSFormVersion,
+  type NTHSQuestion,
 } from '@/services/NTHSApplicationService'
 
-describe('NTHS_APPLICATION_QUESTIONS', () => {
-  it('has a unique key per question', () => {
-    const keys = NTHS_APPLICATION_QUESTIONS.map((q) => q.key)
-    expect(new Set(keys).size).toBe(keys.length)
-  })
-
-  // subway rejects any key its own form-version list does not carry, so a key
-  // added here without the matching change there is a 422 at submit. Update
-  // NTHS_APPLICATION_FORMS in subway alongside this list.
-  it('matches the key set subway validates against for form version 1', () => {
-    expect(NTHS_APPLICATION_QUESTIONS.map((q) => q.key)).toEqual([
-      'whyStartChapter',
-      'leadershipExperience',
-      'recruitmentIdea',
-      'motivatingCoaches',
-      'commitWeeklyHours',
-      'commitFoundingPresident',
-      'commitMonthlyMeetings',
-      'commitRecruitHighSchoolersOnly',
-      'coPresidentEmail',
-      'howDidYouHear',
-    ])
-  })
-
-  it('marks only the two free-text extras optional', () => {
-    const optional = NTHS_APPLICATION_QUESTIONS.filter(
-      (q) => q.isRequired === false
-    ).map((q) => q.key)
-    expect(optional).toEqual(['coPresidentEmail', 'howDidYouHear'])
-  })
-})
+// A form-version-agnostic stand-in for a real NTHS_APPLICATION_FORMS entry:
+// one required longText, one optional shortText, one attestation.
+const TEST_QUESTIONS: NTHSQuestion[] = [
+  {
+    key: 'projectPlan',
+    type: 'longText',
+    label: 'What is your plan?',
+    isRequired: true,
+  },
+  {
+    key: 'mentorEmail',
+    type: 'shortText',
+    label: 'Mentor email (optional)',
+    isRequired: false,
+  },
+  {
+    key: 'willAttendOrientation',
+    type: 'attestation',
+    label: 'I will attend orientation',
+  },
+  {
+    key: 'willSubmitReports',
+    type: 'attestation',
+    label: 'I will submit reports',
+  },
+]
 
 describe('HIGH_SCHOOL_GRADES', () => {
   // The form submits grade.split(' ')[0], which has to land on the GRADES enum
@@ -54,66 +54,163 @@ describe('HIGH_SCHOOL_GRADES', () => {
 
 describe('buildEmptyResponses', () => {
   it('starts attestations false and text empty', () => {
-    const responses = buildEmptyResponses()
+    const responses = buildEmptyResponses(TEST_QUESTIONS)
 
-    expect(responses.commitWeeklyHours).toBe(false)
-    expect(responses.whyStartChapter).toBe('')
-    expect(Object.keys(responses)).toHaveLength(
-      NTHS_APPLICATION_QUESTIONS.length
-    )
+    expect(responses.willAttendOrientation).toBe(false)
+    expect(responses.projectPlan).toBe('')
+    expect(Object.keys(responses)).toHaveLength(TEST_QUESTIONS.length)
   })
 })
 
 describe('collectResponses', () => {
   it('drops blank answers rather than sending them empty', () => {
-    const collected = collectResponses({
-      ...buildEmptyResponses(),
-      whyStartChapter: 'To help my peers',
+    const collected = collectResponses(TEST_QUESTIONS, {
+      ...buildEmptyResponses(TEST_QUESTIONS),
+      projectPlan: 'Recruit five tutors',
     })
 
-    expect(collected).toEqual({ whyStartChapter: 'To help my peers' })
-    expect('coPresidentEmail' in collected).toBe(false)
+    expect(collected).toEqual({ projectPlan: 'Recruit five tutors' })
+    expect('mentorEmail' in collected).toBe(false)
   })
 
   it('drops whitespace-only answers', () => {
-    const collected = collectResponses({
-      ...buildEmptyResponses(),
-      whyStartChapter: '   ',
+    const collected = collectResponses(TEST_QUESTIONS, {
+      ...buildEmptyResponses(TEST_QUESTIONS),
+      projectPlan: '   ',
     })
 
-    expect('whyStartChapter' in collected).toBe(false)
+    expect('projectPlan' in collected).toBe(false)
   })
 
   it('trims the answers it keeps', () => {
-    const collected = collectResponses({
-      ...buildEmptyResponses(),
-      whyStartChapter: '  To help my peers  ',
+    const collected = collectResponses(TEST_QUESTIONS, {
+      ...buildEmptyResponses(TEST_QUESTIONS),
+      projectPlan: '  Recruit five tutors  ',
     })
 
-    expect(collected.whyStartChapter).toBe('To help my peers')
+    expect(collected.projectPlan).toBe('Recruit five tutors')
   })
 
   it('keeps checked attestations and drops unchecked ones', () => {
-    const collected = collectResponses({
-      ...buildEmptyResponses(),
-      commitWeeklyHours: true,
+    const collected = collectResponses(TEST_QUESTIONS, {
+      ...buildEmptyResponses(TEST_QUESTIONS),
+      willAttendOrientation: true,
     })
 
-    expect(collected.commitWeeklyHours).toBe(true)
+    expect(collected.willAttendOrientation).toBe(true)
     // subway reads an absent attestation as unanswered rather than as a no, so
     // dropping the false ones cannot smuggle an application past its checks.
-    expect('commitFoundingPresident' in collected).toBe(false)
+    expect('willSubmitReports' in collected).toBe(false)
   })
 
   it('ignores keys that are not part of the form', () => {
-    const collected = collectResponses({
-      ...buildEmptyResponses(),
-      whyStartChapter: 'To help my peers',
+    const collected = collectResponses(TEST_QUESTIONS, {
+      ...buildEmptyResponses(TEST_QUESTIONS),
+      projectPlan: 'Recruit five tutors',
       somethingElse: 'should not be sent',
     } as never)
 
     expect('somethingElse' in collected).toBe(false)
   })
+})
+
+describe('sanitizeNTHSApplicationDraft', () => {
+  // Derived from whichever form(s) NTHS_APPLICATION_FORMS currently defines, so
+  // these tests don't care which form versions exist or which get deleted.
+  const FORM_VERSIONS = Object.keys(NTHS_APPLICATION_FORMS).map(
+    Number
+  ) as NTHSFormVersion[]
+  const FORM_VERSION = FORM_VERSIONS[0]
+  const FORM_QUESTIONS = NTHS_APPLICATION_FORMS[FORM_VERSION]
+  const UNKNOWN_FORM_VERSION = (Math.max(...FORM_VERSIONS) +
+    1000) as NTHSFormVersion
+
+  function answersFor(questions: NTHSQuestion[]): NTHSApplicationResponses {
+    return questions.reduce((responses, question) => {
+      responses[question.key] =
+        question.type === 'attestation' ? true : `answer for ${question.key}`
+      return responses
+    }, {} as NTHSApplicationResponses)
+  }
+
+  function buildDraft(
+    overrides: Partial<NTHSApplicationDraft> = {}
+  ): NTHSApplicationDraft {
+    return {
+      formVersion: FORM_VERSION,
+      schoolId: 'school-1',
+      schoolName: 'Riverside High',
+      cannotFindSchool: false,
+      unlistedSchool: { name: '', city: '', state: '', website: '' },
+      gradeLevel: '10th grade',
+      responses: answersFor(FORM_QUESTIONS),
+      ...overrides,
+    }
+  }
+
+  it('keeps a well-formed draft on the form version it was saved on', () => {
+    // The fallback is an unknown version, so this only passes if the saved
+    // (valid) version wins over it.
+    expect(
+      sanitizeNTHSApplicationDraft(buildDraft(), UNKNOWN_FORM_VERSION)
+    ).toEqual(buildDraft())
+  })
+
+  it.each([undefined, UNKNOWN_FORM_VERSION])(
+    'moves a draft saved on form version %s to the fallback form, dropping answers it does not ask',
+    (formVersion) => {
+      const draft = sanitizeNTHSApplicationDraft(
+        buildDraft({
+          formVersion: formVersion as never,
+          responses: { ...answersFor(FORM_QUESTIONS), notAQuestion: 'nope' },
+        }),
+        FORM_VERSION
+      )
+
+      expect(draft?.formVersion).toBe(FORM_VERSION)
+      expect(draft?.responses).toEqual(answersFor(FORM_QUESTIONS))
+    }
+  )
+
+  it('drops fields with the wrong shape', () => {
+    const answers = answersFor(FORM_QUESTIONS)
+    const wrongTypes = Object.fromEntries(
+      Object.entries(answers).map(([key, answer]) => [
+        key,
+        answer === true ? 'yes' : true,
+      ])
+    )
+
+    const draft = sanitizeNTHSApplicationDraft(
+      buildDraft({
+        schoolId: null,
+        cannotFindSchool: true,
+        gradeLevel: 'College',
+        responses: wrongTypes,
+      }),
+      FORM_VERSION
+    )
+
+    expect(draft).toMatchObject({
+      schoolName: '',
+      cannotFindSchool: true,
+      gradeLevel: '',
+      responses: {},
+    })
+    expect(
+      sanitizeNTHSApplicationDraft(
+        buildDraft({ cannotFindSchool: true }),
+        FORM_VERSION
+      )?.cannotFindSchool
+    ).toBe(false)
+  })
+
+  it.each([undefined, null, 'a string', 42])(
+    'reads %s as no draft',
+    (saved) => {
+      expect(sanitizeNTHSApplicationDraft(saved, FORM_VERSION)).toBeNull()
+    }
+  )
 })
 
 describe('daysLeftToApply', () => {

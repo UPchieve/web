@@ -2,12 +2,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import LoggerService from '@/services/LoggerService'
+import NetworkService from '@/services/NetworkService'
+import {
+  getNTHSApplicationDraft,
+  setNTHSApplicationDraft,
+} from '@/services/BrowserStorageService'
+import {
+  NTHS_APPLICATION_FORMS,
+  type NTHSFormVersion,
+} from '@/services/NTHSApplicationService'
 import { CheckboxStatus, type ChecklistItem } from '@/services/NTHSGroupService'
 
 vi.mock('../../../../src/services/NetworkService')
 vi.mock('@/services/LoggerService', () => ({
   default: { noticeError: vi.fn() },
 }))
+vi.mock('@/services/AnalyticsService')
 
 const refreshAfterProfileChange = (storeOptions.modules as any).nths.actions
   .refreshAfterProfileChange
@@ -35,6 +45,45 @@ describe('nths/refreshAfterProfileChange', () => {
       'Could not refresh NTHS data after a profile change'
     )
   })
+})
+
+describe('nths/fetchNthsData', () => {
+  const USER_ID = 'coach-1'
+  const [FORM_VERSION] = Object.keys(NTHS_APPLICATION_FORMS).map(
+    Number
+  ) as NTHSFormVersion[]
+
+  beforeEach(() => localStorage.clear())
+
+  it.each([
+    { candidateApplicationStatus: 'applied', keepsDraft: false },
+    { candidateApplicationStatus: undefined, keepsDraft: true },
+  ])(
+    'with application status $candidateApplicationStatus keeps the draft: $keepsDraft',
+    async ({ candidateApplicationStatus, keepsDraft }) => {
+      vi.mocked(NetworkService.getNTHSGroupsForUser).mockResolvedValue({
+        data: { groups: [], candidateApplicationStatus },
+      } as never)
+      vi.mocked(NetworkService.getNTHSApplicationEligibility).mockResolvedValue(
+        { data: { eligible: false } } as never
+      )
+      const store = getStore({ NTHSGroups: [] })
+      store.commit('user/setUser', { id: USER_ID })
+      setNTHSApplicationDraft(USER_ID, {
+        formVersion: FORM_VERSION,
+        schoolId: 'school-1',
+        schoolName: 'Riverside High',
+        cannotFindSchool: false,
+        unlistedSchool: { name: '', city: '', state: '', website: '' },
+        gradeLevel: '10th grade',
+        responses: {},
+      })
+
+      await store.dispatch('nths/fetchNthsData')
+
+      expect(getNTHSApplicationDraft(USER_ID) !== undefined).toBe(keepsDraft)
+    }
+  )
 })
 
 const NAMED_YOUR_TEAM = { id: 1, name: 'NAMED YOUR TEAM' }

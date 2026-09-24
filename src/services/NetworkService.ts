@@ -11,6 +11,7 @@ import type {
 } from './NTHSGroupService'
 import type {
   NTHSApplyPreview,
+  NTHSFormVersion,
   NTHSUnlistedSchool,
 } from './NTHSApplicationService'
 import type { CalendarRosterPeriod } from './NTHSRosterService'
@@ -1541,6 +1542,7 @@ export default {
     unlistedSchool?: NTHSUnlistedSchool
     gradeLevel: string
     responses: Record<string, string | boolean>
+    formVersion: NTHSFormVersion
   }) {
     return httpPost(`${API_ROOT}/nths-application`, data).then(
       this._successHandler,

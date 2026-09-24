@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import useVuelidate from '@vuelidate/core'
@@ -20,10 +20,18 @@ import {
   buildEmptyResponses,
   collectResponses,
   HIGH_SCHOOL_GRADES,
-  NTHS_APPLICATION_QUESTIONS,
+  NTHS_APPLICATION_FORMS,
+  nthsFormVersionForVariant,
+  sanitizeNTHSApplicationDraft,
+  type NTHSApplicationDraft,
   type NTHSApplicationResponses,
   type NTHSQuestion,
 } from '@/services/NTHSApplicationService'
+import {
+  clearNTHSApplicationDraft,
+  getNTHSApplicationDraft,
+  setNTHSApplicationDraft,
+} from '@/services/BrowserStorageService'
 
 const router = useRouter()
 const store = useStore()
@@ -44,14 +52,30 @@ const school = reactive({
 })
 const gradeLevel = ref<string>(store.getters['user/gradeLevel'])
 
-const responses = reactive(buildEmptyResponses())
+const userId: string | undefined = store.state.user.user?.id
+
+// Read once: a later flag reload must not swap the form under a coach who is
+// partway through it. A draft keeps the form it was started on, since right
+// after an in-app sign-in the flag can still hold the anonymous visitor's
+// variant until PostHog reloads flags.
+const flaggedFormVersion = nthsFormVersionForVariant(
+  store.getters['featureFlags/nthsShortApplicationVariant']
+)
+const draft = sanitizeNTHSApplicationDraft(
+  getNTHSApplicationDraft(userId),
+  flaggedFormVersion
+)
+const formVersion = draft?.formVersion ?? flaggedFormVersion
+const questions = NTHS_APPLICATION_FORMS[formVersion]
+
+const responses = reactive(buildEmptyResponses(questions))
 
 const academicYear = getAcademicYear().asString
 
-// Seeds the search box with the school already on file so the applicant can
-// confirm it rather than retype it. Read once: FormSchoolSearch passes this
-// straight to the autocomplete's default-value, which it only reads on mount.
 const profileSchoolName = store.state.user.user?.schoolName ?? ''
+// The autocomplete reads default-value only on mount, so this tracks what the
+// search box shows for when Back remounts step one.
+const selectedSchoolName = ref(draft ? draft.schoolName : profileSchoolName)
 
 // The applicant must name a school one way or the other: the server rejects an
 // application with neither, and a row with no school holds neither dedup index.
@@ -68,8 +92,6 @@ const canLeaveSchoolStep = computed(() => hasSchool.value && !!gradeLevel.value)
 // use the bare GRADES value.
 const submittedGradeLevel = computed(() => gradeLevel.value.split(' ')[0])
 
-const questions = NTHS_APPLICATION_QUESTIONS
-
 const formOpenedAt = Date.now()
 let stepStartedAt = Date.now()
 
@@ -81,13 +103,15 @@ const isQuestionsStepIncomplete = computed(
 
 onMounted(async () => {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_FORM_VIEWED, {
+    formVersion,
     hadPrefilledSchool: !!profileSchoolName,
     hadGradeOnFile: !!gradeLevel.value,
   })
   try {
     // Submitting rewrites users_schools, so an untouched prefill has to resolve
     // to the same school it displays.
-    if (profileSchoolName) school.schoolId = store.state.user.user.schoolId
+    if (draft) restoreDraft(draft)
+    else if (profileSchoolName) school.schoolId = store.state.user.user.schoolId
     // currentGradeName is advanced by academic year, so a coach who signed up
     // as a freshman three years ago sees 12th rather than 9th. It is absent for
     // anyone with no grade on file, and College or Other for anyone past high
@@ -101,12 +125,42 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
+  watch([school, gradeLevel, responses], saveDraft, { deep: true })
 })
+
+function restoreDraft(draft: NTHSApplicationDraft) {
+  school.schoolId = draft.schoolId
+  school.cannotFindSchool = draft.cannotFindSchool
+  Object.assign(school, draft.unlistedSchool)
+  if (draft.gradeLevel) gradeLevel.value = draft.gradeLevel
+  Object.assign(responses, draft.responses)
+}
+
+function saveDraft() {
+  // fetchNthsData can learn of an application (say, from another tab) while
+  // this form is open and clears the draft; saving would bring it back.
+  if (store.state.nths.NTHSCandidateApplicationStatus) return
+  setNTHSApplicationDraft(userId, {
+    formVersion,
+    schoolId: school.schoolId,
+    schoolName: school.schoolId ? selectedSchoolName.value : '',
+    cannotFindSchool: school.cannotFindSchool,
+    unlistedSchool: {
+      name: school.name,
+      city: school.city,
+      state: school.state,
+      website: school.website,
+    },
+    gradeLevel: gradeLevel.value,
+    responses: { ...responses },
+  })
+}
 
 function goToQuestions() {
   if (!canLeaveSchoolStep.value) return
   error.value = ''
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_STEP_COMPLETED, {
+    formVersion,
     step: 'school',
     usedUnlistedSchool: !school.schoolId,
     gradeLevel: submittedGradeLevel.value,
@@ -130,12 +184,15 @@ async function submit() {
   isSubmitting.value = true
   error.value = ''
 
-  const collected = collectResponses(responses)
+  const collected = collectResponses(questions, responses)
   const application = await postApplication(collected)
   if (!application) {
     isSubmitting.value = false
     return
   }
+
+  // fetchNthsData clears the draft too, but the refresh below can fail.
+  clearNTHSApplicationDraft(userId)
 
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_SUBMITTED, {
     formVersion: application.formVersion,
@@ -175,6 +232,7 @@ async function postApplication(
           },
       gradeLevel: submittedGradeLevel.value,
       responses: collected,
+      formVersion,
     })
     return response.data.application
   } catch (err: any) {
@@ -199,6 +257,7 @@ function secondsSince(startedAt: number) {
 
 function questionAnsweredProperties(question: NTHSQuestion) {
   return {
+    formVersion,
     questionKey: question.key,
     questionType: question.type,
     answerLength: String(responses[question.key]).length,
@@ -240,7 +299,6 @@ function submitErrorClass(httpStatus?: number) {
           <p class="step-label">Step 1 of 2</p>
           <p class="help">
             We need your school and grade before the rest of the application.
-            Everything is required unless marked optional.
           </p>
 
           <FormSchoolSearch
@@ -248,12 +306,13 @@ function submitErrorClass(httpStatus?: number) {
             label="What high school do you currently attend?"
             :isRequired="true"
             requiredMessage="Pick your school from the list"
-            :defaultValue="profileSchoolName"
+            :defaultValue="selectedSchoolName"
             :startSearchEvent="EVENTS.NTHS_APPLICATION_SCHOOL_SEARCHED"
             :cannotFindSchoolEvent="EVENTS.NTHS_APPLICATION_CANNOT_FIND_SCHOOL"
             :selectedEvent="EVENTS.NTHS_APPLICATION_SCHOOL_SELECTED"
             v-model="school.schoolId"
             v-model:cannotFindSchool="school.cannotFindSchool"
+            @selected-school-name="selectedSchoolName = $event"
           />
 
           <template v-if="school.cannotFindSchool">
@@ -313,7 +372,6 @@ function submitErrorClass(httpStatus?: number) {
 
         <form v-else @submit.prevent="submit" autocomplete="off">
           <p class="step-label">Step 2 of 2</p>
-          <p class="help">Everything is required unless marked optional.</p>
 
           <template v-for="question in questions" :key="question.key">
             <FormTextArea

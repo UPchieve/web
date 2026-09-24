@@ -1,9 +1,12 @@
 import store from '@/store'
 import type { ShareInfoFieldKey } from '@/consts'
+import { getUserCacheKey } from '@/utils/cache-keys'
+import type { NTHSApplicationDraft } from '@/services/NTHSApplicationService'
 
 const HAS_SEEN_VOLUNTEER_HOURS = 'has-seen-volunteer-calculator'
 const SHARE_INFO_OPT_IN = 'volunteer-share-info-opt-in'
 const HAS_SEEN_SHOW_ONLINE_STATUS_MODAL = 'has-seen-show-online-status-modal'
+const NTHS_APPLICATION_DRAFT = 'nths-application-draft'
 
 function get(key: string, storage: Storage = localStorage) {
   const r = storage.getItem(key)
@@ -63,4 +66,36 @@ export function setHasSeenShowOnlineStatusModal(userId: string) {
 
 export function hasSeenShowOnlineStatusModal(userId: string): boolean {
   return (get(HAS_SEEN_SHOW_ONLINE_STATUS_MODAL) ?? []).includes(userId)
+}
+
+// Private browsing, a full quota, or storage blocked by the browser all make
+// localStorage throw, and none of that may stop the coach from applying.
+export function getNTHSApplicationDraft(userId: string | undefined): unknown {
+  if (!userId) return undefined
+  try {
+    return get(getUserCacheKey(NTHS_APPLICATION_DRAFT, userId))
+  } catch {
+    return undefined
+  }
+}
+
+export function setNTHSApplicationDraft(
+  userId: string | undefined,
+  draft: NTHSApplicationDraft
+): void {
+  if (!userId) return
+  try {
+    set(getUserCacheKey(NTHS_APPLICATION_DRAFT, userId), draft)
+  } catch {
+    // best effort, as in getNTHSApplicationDraft
+  }
+}
+
+export function clearNTHSApplicationDraft(userId: string | undefined): void {
+  if (!userId) return
+  try {
+    localStorage.removeItem(getUserCacheKey(NTHS_APPLICATION_DRAFT, userId))
+  } catch {
+    // best effort, as in getNTHSApplicationDraft
+  }
 }

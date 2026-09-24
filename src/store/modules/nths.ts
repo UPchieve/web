@@ -1,6 +1,7 @@
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
+import { clearNTHSApplicationDraft } from '@/services/BrowserStorageService'
 import {
   nthsDestination,
   type NTHSDestinationSource,
@@ -125,6 +126,8 @@ export default {
         'setNTHSCandidateApplicationStatus',
         results.data.candidateApplicationStatus
       )
+      if (results.data.candidateApplicationStatus)
+        clearNTHSApplicationDraft(rootState.user?.user?.id)
 
       const eligibility = await NetworkService.getNTHSApplicationEligibility()
       commit('setCanApplyForNTHSPresident', eligibility.data.eligible)

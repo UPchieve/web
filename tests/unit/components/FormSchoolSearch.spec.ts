@@ -77,6 +77,18 @@ describe('FormSchoolSearch', () => {
     wrapper.unmount()
   })
 
+  it('shows the cannot-find-school option when mounted with it already chosen', () => {
+    const wrapper = getWrapper({
+      allowCannotFindSchool: true,
+      cannotFindSchool: true,
+      defaultValue: 'Central High School',
+    })
+
+    expect(wrapper.find('input').element.value).toBe("I can't find my school")
+
+    wrapper.unmount()
+  })
+
   it('leaves the field valid after picking the cannot-find-school option', async () => {
     const wrapper = getWrapper({
       allowCannotFindSchool: true,

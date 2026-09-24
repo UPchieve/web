@@ -80,6 +80,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE]: '', // tutor-count-shown | tutor-count-hidden
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY]: '', // completed-first-hour-of-tutoring | tutored-first-three-students
+      [POSTHOG_FEATURE_FLAGS.NTHS_SHORT_APPLICATION]: '', // control | short
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
@@ -232,6 +233,8 @@ export default {
       state.multivariantFlags[
         POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY
       ],
+    nthsShortApplicationVariant: (state: FeatureFlagState) =>
+      state.multivariantFlags[POSTHOG_FEATURE_FLAGS.NTHS_SHORT_APPLICATION],
     isIncentiveBannerEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER],
     getIncentiveBannerPayload: (state: FeatureFlagState) =>
