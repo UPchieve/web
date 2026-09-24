@@ -138,7 +138,7 @@ export default {
     },
 
     async handleIncomingSessions(
-      { commit, dispatch, state },
+      { commit, dispatch, state, getters },
       { context, sessions }
     ) {
       const user = this.state.user.user
@@ -223,34 +223,25 @@ export default {
 
       commit('setAllOpenSessions', eligibleSessions)
 
-      // We will send volunteers a notification if new session(s) have come in and they are
-      // available.
       const oldSessionIds = prevOpenSessions.map((s) => s.id)
-      const newSessions = eligibleSessions.filter(
+      const alertableSessions = getters.availableSessions.filter(
         (s) => !oldSessionIds.includes(s.id)
       )
-      const newSession = newSessions.length
-        ? newSessions[newSessions.length - 1]
+
+      // Only alert for sessions the volunteer is qualified to join
+      const newSession = alertableSessions.length
+        ? alertableSessions[alertableSessions.length - 1]
         : null
 
       const volunteerIsNotInSession = !this.getters['user/isSessionAlive']
       if (volunteerIsNotInSession && newSession) {
-        const isCertifiedInSubject = user.subjects.includes(newSession.subTopic)
-        if (isCertifiedInSubject) {
-          // Avoid sending out notifications to coaches that were not explicitly requested
-          if (
-            newSession.isExclusive &&
-            user.id !== newSession.requestedVolunteerId
-          )
-            return
-          /*
-           * ping subway with this; if the user is currently PASSIVE_ON_SITE,
-           * subway will set a countdown for marking them as INACTIVE_ON_SITE.
-           * when the countdown reaches 0, if they are still passive, mark them as inactive.
-           */
-          PresenceService.checkForInactivity()
-          dispatch('alertVolunteer', { context, session: newSession })
-        }
+        /*
+         * ping subway with this; if the user is currently PASSIVE_ON_SITE,
+         * subway will set a countdown for marking them as INACTIVE_ON_SITE.
+         * when the countdown reaches 0, if they are still passive, mark them as inactive.
+         */
+        PresenceService.checkForInactivity()
+        dispatch('alertVolunteer', { context, session: newSession })
       }
 
       if (
