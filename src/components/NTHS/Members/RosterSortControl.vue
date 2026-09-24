@@ -2,14 +2,13 @@
 import {
   nextRosterSort,
   ROSTER_SORT_KEYS,
+  ROSTER_SORT_LABELS,
   ROSTER_SORT_TOGGLE_LABELS,
-  rosterSortLabel,
-  type RosterPeriod,
   type RosterSort,
   type RosterSortKey,
 } from '@/services/NTHSRosterService'
 
-const props = defineProps<{ modelValue: RosterSort; period: RosterPeriod }>()
+const props = defineProps<{ modelValue: RosterSort }>()
 const emit = defineEmits<{ (e: 'update:modelValue', sort: RosterSort): void }>()
 
 function selectKey(event: Event) {
@@ -30,7 +29,7 @@ function selectKey(event: Event) {
       @change="selectKey"
     >
       <option v-for="key in ROSTER_SORT_KEYS" :key="key" :value="key">
-        {{ rosterSortLabel(key, period) }}
+        {{ ROSTER_SORT_LABELS[key] }}
       </option>
     </select>
     <button

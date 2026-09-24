@@ -14,12 +14,22 @@ export const ROSTER_PERIODS: RosterPeriod[] = [
   'thisWeek',
   'lastTwoWeeks',
   'thisMonth',
+  'thisSchoolYear',
+  'allTime',
 ]
+
+// The server computes the school-year and all-time windows itself.
+export type CalendarRosterPeriod = Extract<
+  RosterPeriod,
+  'thisWeek' | 'lastTwoWeeks' | 'thisMonth'
+>
 
 export const ROSTER_PERIOD_LABELS: Record<RosterPeriod, string> = {
   thisWeek: 'This week',
   lastTwoWeeks: 'Last 2 weeks',
   thisMonth: 'This month',
+  thisSchoolYear: 'This school year',
+  allTime: 'All time',
 }
 
 // Completes "<N> of <M> members have tutored ...".
@@ -27,12 +37,16 @@ export const ROSTER_PERIOD_PHRASES: Record<RosterPeriod, string> = {
   thisWeek: 'this week',
   lastTwoWeeks: 'in the last 2 weeks',
   thisMonth: 'this month',
+  thisSchoolYear: 'this school year',
+  allTime: 'since joining',
 }
 
 const ROSTER_PERIOD_NOT_TUTORED_LABELS: Record<RosterPeriod, string> = {
   thisWeek: "Hasn't tutored this week",
   lastTwoWeeks: "Hasn't tutored in 2 weeks",
   thisMonth: "Hasn't tutored this month",
+  thisSchoolYear: "Hasn't tutored this school year",
+  allTime: "Hasn't tutored since joining",
 }
 
 // A device clock far enough off gets a 422 on the period starts; callers retry
@@ -43,7 +57,9 @@ export function isPeriodStartRejection(err: unknown): boolean {
 
 // Periods are calendar periods in the viewer's local time, so a president
 // checking in every Thursday sees the week reset on their own Monday.
-export function rosterPeriodStarts(now: Date): Record<RosterPeriod, Date> {
+export function rosterPeriodStarts(
+  now: Date
+): Record<CalendarRosterPeriod, Date> {
   const date = dayjs(now)
   const monday = date.subtract((date.day() + 6) % 7, 'day')
   return {
@@ -53,8 +69,8 @@ export function rosterPeriodStarts(now: Date): Record<RosterPeriod, Date> {
   }
 }
 
-// Whether a member CAN tutor, never whether they HAVE - the period column,
-// Sessions, Last active and the filter chips already cover activity.
+// Whether a member CAN tutor, never whether they HAVE - Sessions, Hours,
+// Last active and the filter chips already cover activity.
 export type RosterStatus =
   | 'account-closed'
   | 'training-incomplete'
@@ -89,14 +105,12 @@ export type RosterFilter =
   | 'all'
   | 'training-incomplete'
   | 'safety-incomplete'
-  | 'not-tutoring-yet'
   | 'not-tutored-in-period'
 
 export const ROSTER_FILTERS: RosterFilter[] = [
   'all',
   'training-incomplete',
   'safety-incomplete',
-  'not-tutoring-yet',
   'not-tutored-in-period',
 ]
 
@@ -107,7 +121,6 @@ const ROSTER_FILTER_LABELS: Record<
   all: 'All members',
   'training-incomplete': 'Training incomplete',
   'safety-incomplete': 'Safety approval incomplete',
-  'not-tutoring-yet': 'Not tutoring yet',
 }
 
 export function rosterFilterLabel(
@@ -130,8 +143,6 @@ const filterPredicates: Record<
   // meaningful sense, so it only ever shows under "All".
   'training-incomplete': (m) => !m.accountClosed && !m.trainingComplete,
   'safety-incomplete': (m) => !m.accountClosed && !m.safetyApproved,
-  'not-tutoring-yet': (m) => !m.accountClosed && m.sessionsThisYear === 0,
-  // Overlaps "Not tutoring yet" on purpose: both are people to nudge.
   'not-tutored-in-period': (m, period) =>
     !m.accountClosed && hasNotTutoredIn(m, period),
 }
@@ -160,9 +171,8 @@ export function rosterFilterCounts(
 export type RosterSortKey =
   | 'name'
   | 'status'
-  | 'periodHours'
-  | 'sessionsThisYear'
-  | 'hoursThisYear'
+  | 'sessions'
+  | 'hours'
   | 'lastActive'
 
 type RosterSortDirection = 'asc' | 'desc'
@@ -172,11 +182,13 @@ export type RosterSort = { key: RosterSortKey; direction: RosterSortDirection }
 export const ROSTER_SORT_KEYS: RosterSortKey[] = [
   'name',
   'status',
-  'periodHours',
-  'sessionsThisYear',
-  'hoursThisYear',
+  'sessions',
+  'hours',
   'lastActive',
 ]
+
+// The columns whose header names the selected period.
+export const PERIOD_SORT_KEYS: RosterSortKey[] = ['sessions', 'hours']
 
 export const DEFAULT_ROSTER_SORT: RosterSort = { key: 'name', direction: 'asc' }
 
@@ -188,27 +200,17 @@ const ROSTER_SORT_NATURAL_DIRECTIONS: Record<
 > = {
   name: 'asc',
   status: 'asc',
-  periodHours: 'desc',
-  sessionsThisYear: 'desc',
-  hoursThisYear: 'desc',
+  sessions: 'desc',
+  hours: 'desc',
   lastActive: 'desc',
 }
 
-const ROSTER_SORT_LABELS: Record<
-  Exclude<RosterSortKey, 'periodHours'>,
-  string
-> = {
+export const ROSTER_SORT_LABELS: Record<RosterSortKey, string> = {
   name: 'Member',
   status: 'Status',
-  sessionsThisYear: 'Sessions',
-  hoursThisYear: 'Hours',
+  sessions: 'Sessions',
+  hours: 'Hours',
   lastActive: 'Last active',
-}
-
-export function rosterSortLabel(key: RosterSortKey, period: RosterPeriod) {
-  return key === 'periodHours'
-    ? ROSTER_PERIOD_LABELS[period]
-    : ROSTER_SORT_LABELS[key]
 }
 
 // Keyed by the CURRENT direction, but names the switch a press performs
@@ -254,12 +256,10 @@ function rosterSortValue(
       const status = rosterStatus(member)
       return status === 'account-closed' ? undefined : STATUS_SORT_RANK[status]
     }
-    case 'periodHours':
+    case 'sessions':
+      return member.periodSessions[period] || undefined
+    case 'hours':
       return member.periodHours[period] || undefined
-    case 'sessionsThisYear':
-      return member.sessionsThisYear || undefined
-    case 'hoursThisYear':
-      return member.hoursThisYear || undefined
     case 'lastActive': {
       if (!member.lastActiveAt) return undefined
       const time = new Date(member.lastActiveAt).getTime()
@@ -301,39 +301,65 @@ export function sortRoster(
   })
 }
 
-const ROSTER_PERIOD_CSV_HEADERS: Record<RosterPeriod, string> = {
-  thisWeek: 'Hours (this week)',
-  lastTwoWeeks: 'Hours (last 2 weeks)',
-  thisMonth: 'Hours (this month)',
+// Names the start date because a file opened next month can no longer say
+// which week "this week" was.
+function csvPeriodLabel(
+  period: CalendarRosterPeriod,
+  periodStarts: Record<CalendarRosterPeriod, Date>
+): string {
+  const from = dayjs(periodStarts[period]).format('MMM D, YYYY')
+  return `${ROSTER_PERIOD_LABELS[period].toLowerCase()}, from ${from}`
 }
 
 // A local calendar date rather than the table's relative "Today"/"3 days ago"
 // wording, which would read wrong once the file is opened later.
-function csvLastActiveDate(value: string | undefined): string {
+function csvCalendarDate(value: string | undefined): string {
   if (!value) return ''
   const date = dayjs(value)
   return date.isValid() ? date.format('YYYY-MM-DD') : ''
 }
 
+type RosterCsvOptions = {
+  period: RosterPeriod
+  periodStarts: Record<CalendarRosterPeriod, Date>
+  schoolYearLabel: string
+}
+
 // Takes the already-filtered rows, so the export cannot disagree with the table.
 export function downloadRosterCsv(
   rows: NTHSRosterMemberPublic[],
-  period: RosterPeriod
+  { period, periodStarts, schoolYearLabel }: RosterCsvOptions
 ): void {
   exportToCsv(
     'nths-chapter-members.csv',
-    rows.map((member) => ({
-      Name: memberDisplayName(member),
-      Role: roleLabel(member),
-      Training: member.trainingComplete ? 'Complete' : 'Incomplete',
-      'Safety approval': member.safetyApproved ? 'Approved' : 'Not approved',
+    rows.map((member) => {
+      let periodColumns: Record<string, number> = {}
+      if (period !== 'thisSchoolYear') {
+        const label =
+          period === 'allTime'
+            ? 'since joining'
+            : csvPeriodLabel(period, periodStarts)
+        periodColumns = {
+          [`Sessions (${label})`]: member.periodSessions[period],
+          [`Hours (${label})`]: member.periodHours[period],
+        }
+      }
       // Sessions and hours stay numeric so a spreadsheet can total them; the
       // table's em dash for zero would not sum.
-      Sessions: member.sessionsThisYear,
-      Hours: member.hoursThisYear,
-      [ROSTER_PERIOD_CSV_HEADERS[period]]: member.periodHours[period],
-      'Last active': csvLastActiveDate(member.lastActiveAt),
-    })),
+      return {
+        Name: memberDisplayName(member),
+        Role: roleLabel(member),
+        Training: member.trainingComplete ? 'Complete' : 'Incomplete',
+        'Safety approval': member.safetyApproved ? 'Approved' : 'Not approved',
+        Joined: csvCalendarDate(member.joinedAt),
+        [`Sessions (${schoolYearLabel} school year)`]:
+          member.periodSessions.thisSchoolYear,
+        [`Hours (${schoolYearLabel} school year)`]:
+          member.periodHours.thisSchoolYear,
+        ...periodColumns,
+        'Last active': csvCalendarDate(member.lastActiveAt),
+      }
+    }),
     // First names are user-entered.
     { guardFormulas: true, bom: true, lineEnding: '\r\n' }
   )
@@ -416,22 +442,9 @@ export function formatHours(hours: number): string {
   return hours === 0 ? EM_DASH : hrs(hours)
 }
 
-const PERIOD_HOURS_ZERO_LABEL = 'None'
+const NO_PERIOD_ACTIVITY_LABEL = 'None'
 
-export function formatPeriodHours(hours: number): string {
-  return hours === 0 ? PERIOD_HOURS_ZERO_LABEL : hrs(hours)
-}
-
-const NO_SESSIONS_THIS_YEAR_LABEL = 'No sessions this school year'
-
-export function formatActivity(member: NTHSRosterMemberPublic): string {
-  if (member.sessionsThisYear === 0) {
-    // lastActiveAt set means they tutored in a prior school year, so "yet"
-    // would misdescribe a member who has already tutored.
-    return member.lastActiveAt
-      ? NO_SESSIONS_THIS_YEAR_LABEL
-      : NEVER_ACTIVE_LABEL
-  }
-  const sessions = member.sessionsThisYear
-  return `${sessions} ${plural(sessions, 'session')} · ${hrs(member.hoursThisYear)}`
+export function formatPeriodActivity(sessions: number, hours: number): string {
+  if (sessions === 0) return NO_PERIOD_ACTIVITY_LABEL
+  return `${sessions} ${plural(sessions, 'session')} · ${hrs(hours)}`
 }

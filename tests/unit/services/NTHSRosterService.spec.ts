@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import {
   downloadRosterCsv,
-  formatActivity,
+  filterRoster,
   formatHours,
   formatLastActive,
+  formatPeriodActivity,
   formatSessions,
   hoursLabel,
-  formatPeriodHours,
   rosterFilterCounts,
   rosterPeriodStarts,
   rosterStatus,
@@ -15,13 +15,15 @@ import {
   roleTagLabel,
   DEFAULT_ROSTER_SORT,
   nextRosterSort,
+  PERIOD_SORT_KEYS,
   ROSTER_PERIODS,
   ROSTER_SORT_KEYS,
   sortRoster,
   type RosterPeriod,
   type RosterSort,
+  type RosterSortKey,
 } from '@/services/NTHSRosterService'
-import { member } from '../fixtures/nths'
+import { member, NO_PERIOD_ACTIVITY } from '../fixtures/nths'
 
 const exportToCsv = vi.fn()
 vi.mock('@/utils/export-to-csv', () => ({
@@ -30,13 +32,43 @@ vi.mock('@/utils/export-to-csv', () => ({
 
 beforeEach(() => exportToCsv.mockReset())
 
+// Thursday September 24th, local time.
+const CSV_PERIOD_STARTS = rosterPeriodStarts(new Date(2026, 8, 24, 15))
+const SCHOOL_YEAR_LABEL = '2026–27'
+
 function csvRows(
   rows: NTHSRosterMemberPublic[],
   period: RosterPeriod
 ): Record<string, string | number>[] {
   exportToCsv.mockClear()
-  downloadRosterCsv(rows, period)
+  downloadRosterCsv(rows, {
+    period,
+    periodStarts: CSV_PERIOD_STARTS,
+    schoolYearLabel: SCHOOL_YEAR_LABEL,
+  })
   return exportToCsv.mock.calls[0][1]
+}
+
+function onlyIn(
+  period: RosterPeriod,
+  inPeriod: number,
+  elsewhere: number
+): NTHSRosterMemberPublic['periodHours'] {
+  const values = { ...NO_PERIOD_ACTIVITY }
+  for (const other of ROSTER_PERIODS) values[other] = elsewhere
+  values[period] = inPeriod
+  return values
+}
+
+const PERIOD_FIELDS = {
+  sessions: 'periodSessions',
+  hours: 'periodHours',
+} as const satisfies Partial<
+  Record<RosterSortKey, keyof NTHSRosterMemberPublic>
+>
+
+function periodField(key: RosterSortKey) {
+  return PERIOD_FIELDS[key as keyof typeof PERIOD_FIELDS]
 }
 
 const NOW = new Date('2026-10-15T00:00:00.000Z')
@@ -80,7 +112,7 @@ describe('rosterStatus', () => {
   it.each([
     [
       'ranks training ahead of every other gap',
-      { trainingComplete: false, safetyApproved: false, sessionsThisYear: 0 },
+      { trainingComplete: false, safetyApproved: false },
       'training-incomplete',
     ],
     [
@@ -91,8 +123,8 @@ describe('rosterStatus', () => {
     [
       'is ready to tutor once training and safety are done and they have never tutored',
       {
-        sessionsThisYear: 0,
-        periodHours: { thisWeek: 0, lastTwoWeeks: 0, thisMonth: 0 },
+        periodSessions: NO_PERIOD_ACTIVITY,
+        periodHours: NO_PERIOD_ACTIVITY,
         lastActiveAt: undefined,
       },
       'ready-to-tutor',
@@ -108,18 +140,23 @@ describe('rosterStatus', () => {
 })
 
 describe('rosterFilterCounts', () => {
-  it('counts each chip, with a never-tutored member matching two chips', () => {
+  it('counts each chip, with a member matching both the training and safety chips', () => {
     const members = [
       member({ userId: 'a', trainingComplete: false, safetyApproved: false }),
       member({
         userId: 'b',
-        sessionsThisYear: 0,
         lastActiveAt: undefined,
-        periodHours: { thisWeek: 0, lastTwoWeeks: 0, thisMonth: 0 },
+        periodSessions: NO_PERIOD_ACTIVITY,
+        periodHours: NO_PERIOD_ACTIVITY,
       }),
       member({
         userId: 'c',
-        periodHours: { thisWeek: 0, lastTwoWeeks: 0, thisMonth: 2 },
+        periodHours: {
+          ...NO_PERIOD_ACTIVITY,
+          thisMonth: 2,
+          thisSchoolYear: 2,
+          allTime: 2,
+        },
       }),
       member({ userId: 'd' }),
     ]
@@ -129,12 +166,27 @@ describe('rosterFilterCounts', () => {
     // One member matches both the training and the safety chip.
     expect(counts['training-incomplete']).toBe(1)
     expect(counts['safety-incomplete']).toBe(1)
-    expect(counts['not-tutoring-yet']).toBe(1)
     expect(counts['not-tutored-in-period']).toBe(2)
     expect(
       rosterFilterCounts(members, 'thisMonth')['not-tutored-in-period']
     ).toBe(1)
   })
+
+  it.each(ROSTER_PERIODS)(
+    'counts and shows a member as not tutored in %s exactly when their hours in it are zero',
+    (period) => {
+      const members = [
+        member({ userId: 'idle', periodHours: onlyIn(period, 0, 1) }),
+        member({ userId: 'active', periodHours: onlyIn(period, 1, 0) }),
+      ]
+      const shown = filterRoster(members, 'not-tutored-in-period', period)
+
+      expect(shown.map((m) => m.userId)).toEqual(['idle'])
+      expect(rosterFilterCounts(members, period)['not-tutored-in-period']).toBe(
+        shown.length
+      )
+    }
+  )
 
   it('counts a closed account only under All, even though it would match every other chip', () => {
     const closed = member({
@@ -142,22 +194,21 @@ describe('rosterFilterCounts', () => {
       accountClosed: true,
       trainingComplete: false,
       safetyApproved: false,
-      sessionsThisYear: 0,
-      periodHours: { thisWeek: 0, lastTwoWeeks: 0, thisMonth: 0 },
+      periodSessions: NO_PERIOD_ACTIVITY,
+      periodHours: NO_PERIOD_ACTIVITY,
     })
     const counts = rosterFilterCounts([closed], 'thisWeek')
 
     expect(counts.all).toBe(1)
     expect(counts['training-incomplete']).toBe(0)
     expect(counts['safety-incomplete']).toBe(0)
-    expect(counts['not-tutoring-yet']).toBe(0)
     expect(counts['not-tutored-in-period']).toBe(0)
   })
 })
 
 describe('downloadRosterCsv', () => {
   it('downloads the roster file with the formula guard and a UTF-8 BOM', () => {
-    downloadRosterCsv([member()], 'thisWeek')
+    csvRows([member()], 'thisWeek')
     expect(exportToCsv).toHaveBeenCalledWith(
       'nths-chapter-members.csv',
       expect.any(Array),
@@ -165,79 +216,102 @@ describe('downloadRosterCsv', () => {
     )
   })
 
-  it('writes one row per member in the order given, in a fixed column order', () => {
+  it('writes one row per member in the order given, keeping zero numeric', () => {
     const rows = csvRows(
       [
         member({ userId: 'a', firstName: 'Alex' }),
-        member({ userId: 'b', firstName: 'Sam', sessionsThisYear: 0 }),
+        member({
+          userId: 'b',
+          firstName: 'Sam',
+          periodSessions: {
+            thisWeek: 2,
+            lastTwoWeeks: 2,
+            thisMonth: 3,
+            thisSchoolYear: 0,
+            allTime: 5,
+          },
+        }),
       ],
-      'thisWeek'
+      'thisSchoolYear'
     )
 
-    expect(rows).toHaveLength(2)
-    expect(Object.values(rows[0]).slice(0, -1)).toEqual([
-      'Alex R.',
-      'Member',
-      'Complete',
-      'Approved',
-      3,
-      2.5,
-      1,
-    ])
-    expect(rows[1].Sessions).toBe(0)
+    expect(rows.map((row) => row.Name)).toEqual(['Alex R.', 'Sam R.'])
+    expect(rows[1][`Sessions (${SCHOOL_YEAR_LABEL} school year)`]).toBe(0)
   })
 
-  it('adds the selected period hours after Hours', () => {
-    const row = member({
-      periodHours: { thisWeek: 0, lastTwoWeeks: 0.25, thisMonth: 3.75 },
-    })
-    const periodColumn = (period: RosterPeriod) => {
+  const PERIOD_CSV_HEADERS: Record<RosterPeriod, string[]> = {
+    thisWeek: [
+      'Sessions (this week, from Sep 21, 2026)',
+      'Hours (this week, from Sep 21, 2026)',
+    ],
+    lastTwoWeeks: [
+      'Sessions (last 2 weeks, from Sep 14, 2026)',
+      'Hours (last 2 weeks, from Sep 14, 2026)',
+    ],
+    thisMonth: [
+      'Sessions (this month, from Sep 1, 2026)',
+      'Hours (this month, from Sep 1, 2026)',
+    ],
+    thisSchoolYear: [],
+    allTime: ['Sessions (since joining)', 'Hours (since joining)'],
+  }
+
+  it.each(ROSTER_PERIODS)(
+    'always carries Joined and the school year, and adds %s sessions and hours under headers naming the period and its start',
+    (period) => {
+      const row = member({
+        joinedAt: new Date(2026, 7, 1, 12).toISOString(),
+        lastActiveAt: undefined,
+        periodSessions: {
+          thisWeek: 1,
+          lastTwoWeeks: 2,
+          thisMonth: 3,
+          thisSchoolYear: 4,
+          allTime: 5,
+        },
+        periodHours: {
+          thisWeek: 0.5,
+          lastTwoWeeks: 1.5,
+          thisMonth: 2.5,
+          thisSchoolYear: 3.5,
+          allTime: 4.5,
+        },
+      })
       const [csvRow] = csvRows([row], period)
-      const keys = Object.keys(csvRow)
-      const key = keys[keys.indexOf('Hours') + 1]
-      return { key, value: csvRow[key] }
-    }
+      const periodValues =
+        period === 'thisSchoolYear'
+          ? []
+          : [row.periodSessions[period], row.periodHours[period]]
 
-    const month = periodColumn('thisMonth')
-    const twoWeeks = periodColumn('lastTwoWeeks')
-    expect(month.value).toBe(3.75)
-    expect(twoWeeks.value).toBe(0.25)
-    expect(month.key).not.toBe(twoWeeks.key)
-  })
+      expect(Object.entries(csvRow)).toEqual([
+        ['Name', 'Alex R.'],
+        ['Role', 'Member'],
+        ['Training', 'Complete'],
+        ['Safety approval', 'Approved'],
+        ['Joined', '2026-08-01'],
+        [`Sessions (${SCHOOL_YEAR_LABEL} school year)`, 4],
+        [`Hours (${SCHOOL_YEAR_LABEL} school year)`, 3.5],
+        ...PERIOD_CSV_HEADERS[period].map((header, i) => [
+          header,
+          periodValues[i],
+        ]),
+        ['Last active', ''],
+      ])
+    }
+  )
 
   it('writes Last active as a local calendar date, blank for a member with none', () => {
     const lastNightLocal = new Date(2026, 9, 14, 20, 0).toISOString()
     const [active, neverActive] = csvRows(
       [
         member({ lastActiveAt: lastNightLocal }),
-        member({ userId: 'b', sessionsThisYear: 0, lastActiveAt: undefined }),
+        member({ userId: 'b', lastActiveAt: undefined }),
       ],
       'thisWeek'
     )
 
     expect(active['Last active']).toBe('2026-10-14')
     expect(neverActive['Last active']).toBe('')
-  })
-})
-
-describe('formatActivity', () => {
-  it('reports sessions and hours when the member has tutored this year', () => {
-    expect(formatActivity(member())).toBe('3 sessions · 2.5 hrs')
-  })
-
-  it('distinguishes never having tutored from having none yet this school year', () => {
-    const neverTutored = member({
-      sessionsThisYear: 0,
-      lastActiveAt: undefined,
-    })
-    const returningMember = member({
-      sessionsThisYear: 0,
-      lastActiveAt: YESTERDAY,
-    })
-    expect(formatActivity(neverTutored)).toBe(formatLastActive(undefined, NOW))
-    expect(formatActivity(neverTutored)).not.toBe(
-      formatActivity(returningMember)
-    )
   })
 })
 
@@ -248,11 +322,20 @@ describe('column formatting', () => {
     [formatHours, 0, '—'],
     [formatHours, 1, '1 hr'],
     [formatHours, 12.5, '12.5 hrs'],
-    [formatPeriodHours, 0, 'None'],
-    [formatPeriodHours, 0.02, '<0.1 hrs'],
   ])('%o(%s) is %s', (fn, hours, expected) => {
     expect(fn(hours)).toBe(expected)
   })
+
+  it.each([
+    [0, 0, 'None'],
+    [1, 0.02, '1 session · <0.1 hrs'],
+    [3, 2.5, '3 sessions · 2.5 hrs'],
+  ])(
+    'writes %i sessions and %f hours in a period as %s',
+    (sessions, hours, expected) => {
+      expect(formatPeriodActivity(sessions, hours)).toBe(expected)
+    }
+  )
 
   it.each([
     [0.02, '<0.1'],
@@ -351,40 +434,58 @@ describe('sortRoster', () => {
     ).toEqual(['ready', 'safety', 'training', 'closed'])
   })
 
-  it('sorts the selected period hours, keeping members with none last in both directions', () => {
-    const roster = [
-      member({
-        userId: 'none',
-        firstName: 'Ann',
-        periodHours: { thisWeek: 0, lastTwoWeeks: 9, thisMonth: 9 },
-      }),
-      member({
-        userId: 'low',
-        firstName: 'Bo',
-        periodHours: { thisWeek: 1, lastTwoWeeks: 1, thisMonth: 1 },
-      }),
-      member({
-        userId: 'high',
-        firstName: 'Cy',
-        periodHours: { thisWeek: 3, lastTwoWeeks: 3, thisMonth: 3 },
-      }),
-    ]
-    expect(
-      ids(sortRoster(roster, { key: 'periodHours', direction: 'desc' }, period))
-    ).toEqual(['high', 'low', 'none'])
-    expect(
-      ids(sortRoster(roster, { key: 'periodHours', direction: 'asc' }, period))
-    ).toEqual(['low', 'high', 'none'])
-    expect(
-      ids(
-        sortRoster(
-          roster,
-          { key: 'periodHours', direction: 'desc' },
-          'lastTwoWeeks'
-        )
-      )
-    ).toEqual(['none', 'high', 'low'])
-  })
+  it.each(PERIOD_SORT_KEYS)(
+    'sorts the selected period %s, keeping members with none last in both directions',
+    (key) => {
+      const field = periodField(key)
+      const roster = [
+        member({
+          userId: 'none',
+          firstName: 'Ann',
+          [field]: onlyIn(period, 0, 9),
+        }),
+        member({
+          userId: 'low',
+          firstName: 'Bo',
+          [field]: onlyIn(period, 1, 0),
+        }),
+        member({
+          userId: 'high',
+          firstName: 'Cy',
+          [field]: onlyIn(period, 3, 0),
+        }),
+      ]
+      expect(
+        ids(sortRoster(roster, { key, direction: 'desc' }, period))
+      ).toEqual(['high', 'low', 'none'])
+      expect(
+        ids(sortRoster(roster, { key, direction: 'asc' }, period))
+      ).toEqual(['low', 'high', 'none'])
+    }
+  )
+
+  it.each(PERIOD_SORT_KEYS)(
+    'sorts %s by whichever period is selected, not just the default',
+    (key) => {
+      const field = periodField(key)
+      const selected = 'allTime'
+      const roster = [
+        member({
+          userId: 'low',
+          firstName: 'Ann',
+          [field]: onlyIn(selected, 1, 9),
+        }),
+        member({
+          userId: 'high',
+          firstName: 'Bo',
+          [field]: onlyIn(selected, 3, 0),
+        }),
+      ]
+      expect(
+        ids(sortRoster(roster, { key, direction: 'desc' }, selected))
+      ).toEqual(['high', 'low'])
+    }
+  )
 
   it('puts the most recently active first and never-active members last', () => {
     const roster = [
@@ -402,12 +503,12 @@ describe('sortRoster', () => {
 
   it('breaks ties by name whichever direction the column points', () => {
     const roster = [
-      member({ userId: 'b', firstName: 'Bo', sessionsThisYear: 2 }),
-      member({ userId: 'a', firstName: 'Al', sessionsThisYear: 2 }),
+      member({ userId: 'b', firstName: 'Bo' }),
+      member({ userId: 'a', firstName: 'Al' }),
     ]
     for (const direction of ['asc', 'desc'] as const) {
       expect(
-        ids(sortRoster(roster, { key: 'sessionsThisYear', direction }, period))
+        ids(sortRoster(roster, { key: 'sessions', direction }, period))
       ).toEqual(['a', 'b'])
     }
   })
@@ -424,9 +525,8 @@ describe('sortRoster', () => {
       member({
         userId: 'idle',
         firstName: 'Bea',
-        sessionsThisYear: 0,
-        hoursThisYear: 0,
-        periodHours: { thisWeek: 0, lastTwoWeeks: 0, thisMonth: 0 },
+        periodHours: NO_PERIOD_ACTIVITY,
+        periodSessions: NO_PERIOD_ACTIVITY,
         lastActiveAt: undefined,
       }),
       member({ userId: 'training', firstName: 'Cal', trainingComplete: false }),
@@ -458,12 +558,7 @@ describe('nextRosterSort', () => {
       direction: 'desc',
     })
     expect(nextRosterSort(from, 'name').direction).toBe('asc')
-    for (const key of [
-      'periodHours',
-      'sessionsThisYear',
-      'hoursThisYear',
-      'lastActive',
-    ] as const) {
+    for (const key of ['sessions', 'hours', 'lastActive'] as const) {
       expect(nextRosterSort(DEFAULT_ROSTER_SORT, key).direction).toBe('desc')
     }
   })

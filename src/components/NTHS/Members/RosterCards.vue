@@ -5,10 +5,9 @@ import type {
   RosterRowEmits,
   RosterRowProps,
 } from '@/components/NTHS/Members/roster-row'
-import RosterPeriodHours from '@/components/NTHS/Members/RosterPeriodHours.vue'
+import RosterPeriodActivity from '@/components/NTHS/Members/RosterPeriodActivity.vue'
 import RosterStatusTag from '@/components/NTHS/Members/RosterStatusTag.vue'
 import {
-  formatActivity,
   formatLastActive,
   ROSTER_PERIOD_LABELS,
   rosterStatus,
@@ -44,21 +43,16 @@ defineEmits<RosterRowEmits>()
         <RosterStatusTag :status="rosterStatus(member)" />
         <span class="period">
           {{ ROSTER_PERIOD_LABELS[period] }}
-          <RosterPeriodHours :hours="member.periodHours[period]" />
+          <RosterPeriodActivity
+            :sessions="member.periodSessions[period]"
+            :hours="member.periodHours[period]"
+          />
         </span>
-        <!-- One inline run, so the separator wraps with the text before it. -->
-        <span class="activity-line">
-          <span
-            class="activity"
-            :class="{ muted: member.sessionsThisYear === 0 }"
-            >{{ formatActivity(member) }}</span
-          ><template v-if="member.lastActiveAt"
-            >&nbsp;·
-            <span class="last-active">{{
-              formatLastActive(member.lastActiveAt, now)
-            }}</span></template
-          >
-        </span>
+        <span
+          class="last-active"
+          :class="{ 'never-active': !member.lastActiveAt }"
+          >{{ formatLastActive(member.lastActiveAt, now) }}</span
+        >
       </div>
     </article>
   </div>
@@ -101,13 +95,10 @@ defineEmits<RosterRowEmits>()
   gap: 6px;
   color: $c-secondary-grey;
 }
-.activity {
-  color: $c-soft-black;
-}
-.activity.muted {
-  color: $c-nths-warm-fg;
-}
 .last-active {
   color: $c-soft-black;
+}
+.last-active.never-active {
+  color: $c-nths-warm-fg;
 }
 </style>

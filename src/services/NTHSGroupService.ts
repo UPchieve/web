@@ -57,7 +57,14 @@ export type NTHSRosterMemberPublic = {
   accountClosed: boolean
   sessionsThisYear: number
   hoursThisYear: number
-  periodHours: { thisWeek: number; lastTwoWeeks: number; thisMonth: number }
+  periodHours: {
+    thisWeek: number
+    lastTwoWeeks: number
+    thisMonth: number
+    thisSchoolYear: number
+    allTime: number
+  }
+  periodSessions: NTHSRosterMemberPublic['periodHours']
   lastActiveAt?: DateString
 }
 export type NTHSTopTutorPublic = {

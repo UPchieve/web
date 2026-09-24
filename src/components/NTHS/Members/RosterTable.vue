@@ -5,15 +5,16 @@ import type {
   RosterRowEmits,
   RosterRowProps,
 } from '@/components/NTHS/Members/roster-row'
-import RosterPeriodHours from '@/components/NTHS/Members/RosterPeriodHours.vue'
 import RosterStatusTag from '@/components/NTHS/Members/RosterStatusTag.vue'
 import {
   formatHours,
   formatLastActive,
   formatSessions,
+  PERIOD_SORT_KEYS,
+  ROSTER_PERIOD_LABELS,
   rosterStatus,
-  rosterSortLabel,
   ROSTER_SORT_KEYS,
+  ROSTER_SORT_LABELS,
   type RosterSortKey,
 } from '@/services/NTHSRosterService'
 
@@ -30,12 +31,11 @@ function ariaSort(key: RosterSortKey) {
   <div class="table-scroll" data-testid="roster-table">
     <table class="roster">
       <colgroup>
-        <col style="width: 24%" />
-        <col style="width: 20%" />
+        <col style="width: 26%" />
+        <col style="width: 22%" />
         <col style="width: 14%" />
-        <col style="width: 11%" />
-        <col style="width: 12%" />
-        <col style="width: 15%" />
+        <col style="width: 14%" />
+        <col style="width: 16%" />
         <col v-if="canManage" style="width: 56px" />
       </colgroup>
       <thead>
@@ -45,11 +45,7 @@ function ariaSort(key: RosterSortKey) {
             :key="key"
             scope="col"
             :aria-sort="ariaSort(key)"
-            :data-testid="
-              key === 'periodHours'
-                ? 'roster-period-head'
-                : `roster-head-${key}`
-            "
+            :data-testid="`roster-head-${key}`"
           >
             <button
               type="button"
@@ -57,7 +53,7 @@ function ariaSort(key: RosterSortKey) {
               :data-testid="`roster-sort-${key}`"
               @click="$emit('sort', key)"
             >
-              {{ rosterSortLabel(key, period) }}
+              {{ ROSTER_SORT_LABELS[key] }}
               <span
                 v-if="sort.key === key"
                 class="sort-arrow"
@@ -65,6 +61,9 @@ function ariaSort(key: RosterSortKey) {
                 >{{ sort.direction === 'asc' ? '↑' : '↓' }}</span
               >
             </button>
+            <span v-if="PERIOD_SORT_KEYS.includes(key)" class="head-period">{{
+              ROSTER_PERIOD_LABELS[period]
+            }}</span>
           </th>
           <th v-if="canManage" scope="col" data-testid="roster-head-actions">
             <span class="sr-only">Actions</span>
@@ -85,14 +84,17 @@ function ariaSort(key: RosterSortKey) {
           <td>
             <RosterStatusTag :status="rosterStatus(member)" />
           </td>
-          <td>
-            <RosterPeriodHours :hours="member.periodHours[period]" />
+          <td
+            :class="{ muted: member.periodSessions[period] === 0 }"
+            data-testid="roster-sessions"
+          >
+            {{ formatSessions(member.periodSessions[period]) }}
           </td>
-          <td :class="{ muted: member.sessionsThisYear === 0 }">
-            {{ formatSessions(member.sessionsThisYear) }}
-          </td>
-          <td :class="{ muted: member.hoursThisYear === 0 }">
-            {{ formatHours(member.hoursThisYear) }}
+          <td
+            :class="{ muted: member.periodHours[period] === 0 }"
+            data-testid="roster-hours"
+          >
+            {{ formatHours(member.periodHours[period]) }}
           </td>
           <td :class="{ 'never-active': !member.lastActiveAt }">
             {{ formatLastActive(member.lastActiveAt, now) }}
@@ -182,6 +184,13 @@ td {
 }
 .sort-arrow {
   color: $c-soft-black;
+}
+.head-period {
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
 }
 .sr-only {
   @include visually-hidden;

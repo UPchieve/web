@@ -8,6 +8,7 @@ import LargeButton from '@/components/LargeButton.vue'
 
 const props = defineProps<{ code: string }>()
 const copyMessage = ref('Copy link')
+const linkElement = ref<HTMLElement>()
 const link = computed(() => `${config.appRoot}/join-team/${props.code}`)
 
 function copyURL() {
@@ -23,11 +24,25 @@ function copyURL() {
     copyMessage.value = 'Copy link'
   }, 1000)
 }
+
+// useClipboard is created here on each click, so its async permission check
+// hasn't resolved yet and it always copies through a hidden textarea; copy
+// first, since that textarea would clear a selection made before it.
+function selectAndCopyURL() {
+  copyURL()
+  window.getSelection()?.selectAllChildren(linkElement.value!)
+}
 </script>
 
 <template>
   <div class="link-container">
-    <span class="link" data-testid="invite-link-url">{{ link }}</span>
+    <span
+      ref="linkElement"
+      class="link"
+      data-testid="invite-link-url"
+      @click="selectAndCopyURL"
+      >{{ link }}</span
+    >
     <div class="button-container">
       <LargeButton
         @click="copyURL"
@@ -55,8 +70,8 @@ function copyURL() {
   word-break: break-all;
   flex-grow: 1;
   flex-shrink: 1;
-  max-width: 380px;
   min-width: 180px;
+  cursor: pointer;
 }
 
 .link-container {

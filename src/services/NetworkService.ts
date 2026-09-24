@@ -13,7 +13,7 @@ import type {
   NTHSApplyPreview,
   NTHSUnlistedSchool,
 } from './NTHSApplicationService'
-import type { RosterPeriod } from './NTHSRosterService'
+import type { CalendarRosterPeriod } from './NTHSRosterService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
 import type { DateString, Uuid } from '@/types/shared'
@@ -1492,7 +1492,7 @@ export default {
   },
   getNTHSChapterRoster(
     groupId: string,
-    periodStarts?: Record<RosterPeriod, Date>
+    periodStarts?: Record<CalendarRosterPeriod, Date>
   ) {
     return httpGet<NTHSChapterRosterResponse>(
       `${API_ROOT}/nths-groups/${groupId}/roster`,

@@ -6,6 +6,14 @@ import type {
   NTHSTopTutorPublic,
 } from '@/services/NTHSGroupService'
 
+export const NO_PERIOD_ACTIVITY: NTHSRosterMemberPublic['periodHours'] = {
+  thisWeek: 0,
+  lastTwoWeeks: 0,
+  thisMonth: 0,
+  thisSchoolYear: 0,
+  allTime: 0,
+}
+
 export function member(
   overrides: Partial<NTHSRosterMemberPublic> = {}
 ): NTHSRosterMemberPublic {
@@ -20,7 +28,20 @@ export function member(
     accountClosed: false,
     sessionsThisYear: 3,
     hoursThisYear: 2.5,
-    periodHours: { thisWeek: 1, lastTwoWeeks: 1.5, thisMonth: 2 },
+    periodHours: {
+      thisWeek: 1,
+      lastTwoWeeks: 1.5,
+      thisMonth: 2,
+      thisSchoolYear: 2.5,
+      allTime: 4,
+    },
+    periodSessions: {
+      thisWeek: 2,
+      lastTwoWeeks: 2,
+      thisMonth: 3,
+      thisSchoolYear: 3,
+      allTime: 5,
+    },
     lastActiveAt: '2026-10-14T00:00:00.000Z',
     ...overrides,
   }

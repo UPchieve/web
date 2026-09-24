@@ -11,13 +11,13 @@ import RosterTable from '@/components/NTHS/Members/RosterTable.vue'
 import TopTutorCard from '@/components/NTHS/TopTutorCard.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
+import { useRosterPreferences } from '@/composables/useRosterPreferences'
 import LoggerService from '@/services/LoggerService'
 import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import { formatProgressHours } from '@/services/NTHSImpactService'
 import {
-  DEFAULT_ROSTER_SORT,
   downloadRosterCsv,
   filterRoster,
   nextRosterSort,
@@ -25,10 +25,10 @@ import {
   ROSTER_PERIOD_PHRASES,
   ROSTER_PERIODS,
   rosterFilterCounts,
+  rosterPeriodStarts,
   sortRoster,
   type RosterFilter,
   type RosterPeriod,
-  type RosterSort,
   type RosterSortKey,
 } from '@/services/NTHSRosterService'
 import { plural } from '@/utils/plural'
@@ -41,6 +41,7 @@ const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
 
 const {
   members,
+  schoolYear,
   topTutorThisMonth,
   isLoading,
   loadFailed,
@@ -62,8 +63,9 @@ const {
 const now = new Date()
 
 const activeFilter = ref<RosterFilter>('all')
-const activePeriod = ref<RosterPeriod>('thisWeek')
-const activeSort = ref<RosterSort>(DEFAULT_ROSTER_SORT)
+const { period: activePeriod, sort: activeSort } = useRosterPreferences(
+  currentUserId.value
+)
 const openMenuUserId = ref<string>()
 const busyUserIds = ref(new Set<string>())
 const errorMessage = ref('')
@@ -143,6 +145,14 @@ function selectFilter(filter: RosterFilter) {
 
 function sortBy(key: RosterSortKey) {
   activeSort.value = nextRosterSort(activeSort.value, key)
+}
+
+function downloadCsv() {
+  downloadRosterCsv(visibleMembers.value, {
+    period: activePeriod.value,
+    periodStarts: rosterPeriodStarts(now),
+    schoolYearLabel: schoolYear.value!.label,
+  })
 }
 
 function toggleMenu(userId: string) {
@@ -244,7 +254,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
           {{ ROSTER_PERIOD_PHRASES[activePeriod] }}.
         </p>
       </div>
-      <div class="periods" role="group" aria-label="Hours period">
+      <div class="periods" role="group" aria-label="Period">
         <button
           v-for="period in ROSTER_PERIODS"
           :key="period"
@@ -286,11 +296,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
           :period="activePeriod"
           @update:modelValue="selectFilter"
         />
-        <RosterSortControl
-          v-if="isStacked"
-          v-model="activeSort"
-          :period="activePeriod"
-        />
+        <RosterSortControl v-if="isStacked" v-model="activeSort" />
       </div>
 
       <div ref="rosterAreaRef" class="roster-area">
@@ -340,7 +346,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
           variant="secondary"
           :showArrow="false"
           data-testid="download-csv"
-          @click="downloadRosterCsv(visibleMembers, activePeriod)"
+          @click="downloadCsv"
         >
           Download CSV
         </LargeButton>
@@ -372,6 +378,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
 }
 .periods {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 .period {

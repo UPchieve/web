@@ -2,13 +2,25 @@ import NTHSMembersView from '@/views/NTHS/Tabs/NTHSMembersView.vue'
 import LoggerService from '@/services/LoggerService'
 import {
   DEFAULT_ROSTER_SORT,
+  formatHours,
+  formatPeriodActivity,
+  formatSessions,
   roleTagLabel,
   ROSTER_FILTERS,
+  ROSTER_PERIOD_LABELS,
+  ROSTER_PERIODS,
   ROSTER_SORT_KEYS,
   rosterPeriodStarts,
   sortRoster,
+  type RosterPeriod,
 } from '@/services/NTHSRosterService'
-import { impact, member, rosterResponse, topTutor } from '../../fixtures/nths'
+import {
+  impact,
+  member,
+  NO_PERIOD_ACTIVITY,
+  rosterResponse,
+  topTutor,
+} from '../../fixtures/nths'
 import {
   enableAutoUnmount,
   flushPromises,
@@ -75,14 +87,25 @@ const MEMBERS = [
   member({
     userId: 'jordan',
     firstName: 'Jordan',
-    sessionsThisYear: 0,
-    periodHours: { thisWeek: 0, lastTwoWeeks: 0, thisMonth: 0 },
+    periodHours: NO_PERIOD_ACTIVITY,
+    periodSessions: NO_PERIOD_ACTIVITY,
     lastActiveAt: undefined,
   }),
   member({
     userId: 'riley',
     firstName: 'Riley',
-    periodHours: { thisWeek: 0, lastTwoWeeks: 0, thisMonth: 2.5 },
+    periodHours: {
+      ...NO_PERIOD_ACTIVITY,
+      thisMonth: 2.5,
+      thisSchoolYear: 2.5,
+      allTime: 4,
+    },
+    periodSessions: {
+      ...NO_PERIOD_ACTIVITY,
+      thisMonth: 2,
+      thisSchoolYear: 3,
+      allTime: 4,
+    },
     lastActiveAt: '2026-10-02T00:00:00.000Z',
   }),
 ]
@@ -133,6 +156,7 @@ async function getWrapper({
 }
 
 beforeEach(() => {
+  localStorage.clear()
   vi.setSystemTime(NOW)
   getNTHSChapterRoster.mockReset()
   getNTHSChapterImpact.mockReset()
@@ -160,16 +184,20 @@ function expanded(wrapper: ReturnType<typeof mount>, userId: string) {
     .attributes('aria-expanded')
 }
 
-function periodHoursFor(wrapper: ReturnType<typeof mount>, userId: string) {
+function rowCell(
+  wrapper: ReturnType<typeof mount>,
+  userId: string,
+  testId: string
+) {
   return wrapper
     .find(`[data-testid="roster-row-${userId}"]`)
-    .find('[data-testid="roster-period-hours"]')
+    .find(`[data-testid="${testId}"]`)
     .text()
 }
 
 async function selectPeriod(
   wrapper: ReturnType<typeof mount>,
-  period: 'thisWeek' | 'lastTwoWeeks' | 'thisMonth'
+  period: RosterPeriod
 ) {
   await wrapper.find(`[data-testid="roster-period-${period}"]`).trigger('click')
 }
@@ -413,20 +441,49 @@ describe('NTHSMembersView', () => {
       ).toBe('false')
     })
 
-    it('switching period updates the period column and not-tutored chip, and a selected filter survives the switch with its rows updated', async () => {
+    it("shows each member's sessions and hours for the selected period in the table, under headers naming it", async () => {
       const wrapper = await getWrapper()
-      const periodHead = () =>
-        wrapper.find('[data-testid="roster-period-head"]').text()
+      const riley = MEMBERS.find((m) => m.userId === 'riley')!
+
+      for (const period of ROSTER_PERIODS) {
+        await selectPeriod(wrapper, period)
+        expect(rowCell(wrapper, 'riley', 'roster-sessions')).toBe(
+          formatSessions(riley.periodSessions[period])
+        )
+        expect(rowCell(wrapper, 'riley', 'roster-hours')).toBe(
+          formatHours(riley.periodHours[period])
+        )
+        for (const key of ['sessions', 'hours']) {
+          expect(
+            wrapper.find(`[data-testid="roster-head-${key}"]`).text()
+          ).toContain(ROSTER_PERIOD_LABELS[period])
+        }
+      }
+    })
+
+    it("shows each member's sessions and hours for the selected period on the cards", async () => {
+      const wrapper = await getWrapper({ widthPx: 600 })
+      const riley = MEMBERS.find((m) => m.userId === 'riley')!
+
+      for (const period of ROSTER_PERIODS) {
+        await selectPeriod(wrapper, period)
+        expect(rowCell(wrapper, 'riley', 'roster-period-activity')).toBe(
+          formatPeriodActivity(
+            riley.periodSessions[period],
+            riley.periodHours[period]
+          )
+        )
+      }
+    })
+
+    it('switching period updates the not-tutored chip, and a selected filter survives the switch with its rows updated', async () => {
+      const wrapper = await getWrapper()
 
       expect(notTutoredChip(wrapper).text()).toMatch(/\(2\)$/)
-      const weekHeader = periodHead()
-      const weekRileyHours = periodHoursFor(wrapper, 'riley')
 
       await selectPeriod(wrapper, 'thisMonth')
 
-      expect(periodHead()).not.toBe(weekHeader)
       expect(notTutoredChip(wrapper).text()).toMatch(/\(1\)$/)
-      expect(periodHoursFor(wrapper, 'riley')).not.toBe(weekRileyHours)
 
       await notTutoredChip(wrapper).trigger('click')
       expect(rowIds(wrapper)).toEqual(['jordan'])
@@ -468,7 +525,7 @@ describe('NTHSMembersView', () => {
     it('sorts rows by the clicked column for the selected period', async () => {
       const wrapper = await getWrapper()
       await selectPeriod(wrapper, 'thisMonth')
-      await sortTable(wrapper, 'periodHours')
+      await sortTable(wrapper, 'hours')
       expect(rowIds(wrapper)).toEqual([
         'riley',
         'president',
@@ -476,7 +533,7 @@ describe('NTHSMembersView', () => {
         'taylor',
         'jordan',
       ])
-      expect(header(wrapper, 'periodHours').getAttribute('aria-sort')).toBe(
+      expect(header(wrapper, 'hours').getAttribute('aria-sort')).toBe(
         'descending'
       )
     })
@@ -515,12 +572,29 @@ describe('NTHSMembersView', () => {
         'jordan',
       ])
     })
+
+    it('restores the chosen period and sort after unmounting and remounting', async () => {
+      const wrapper = await getWrapper()
+      await selectPeriod(wrapper, 'thisMonth')
+      await sortTable(wrapper, 'hours')
+      wrapper.unmount()
+
+      const remounted = await getWrapper()
+      expect(
+        remounted.find('[data-testid="roster-period-thisMonth"]').attributes()[
+          'aria-pressed'
+        ]
+      ).toBe('true')
+      expect(header(remounted, 'hours').getAttribute('aria-sort')).toBe(
+        'descending'
+      )
+    })
   })
 
   describe('CSV export', () => {
     beforeEach(() => downloadRosterCsv.mockReset())
 
-    it('downloads the filtered, sorted rows for the active period', async () => {
+    it('downloads the filtered, sorted rows for the active period, with its start and the school year', async () => {
       const wrapper = await getWrapper()
 
       await notTutoredChip(wrapper).trigger('click')
@@ -529,9 +603,13 @@ describe('NTHSMembersView', () => {
       await wrapper.find('[data-testid="download-csv"]').trigger('click')
 
       expect(downloadRosterCsv).toHaveBeenCalledTimes(1)
-      const [rows, period] = downloadRosterCsv.mock.calls[0]
+      const [rows, options] = downloadRosterCsv.mock.calls[0]
       expect(rows.map((m: { userId: string }) => m.userId)).toEqual(['jordan'])
-      expect(period).toBe('thisMonth')
+      expect(options).toEqual({
+        period: 'thisMonth',
+        periodStarts: rosterPeriodStarts(NOW),
+        schoolYearLabel: rosterResponse([]).data.roster.schoolYear.label,
+      })
     })
 
     it('hides the download button when the filter matches nobody', async () => {

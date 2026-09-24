@@ -3,6 +3,7 @@ import NetworkService from '@/services/NetworkService'
 import type {
   NTHSChapterRosterPublic,
   NTHSRosterMemberPublic,
+  NTHSSchoolYearPublic,
   NTHSTopTutorPublic,
 } from '@/services/NTHSGroupService'
 import LoggerService from '@/services/LoggerService'
@@ -13,6 +14,7 @@ import {
 
 export function useChapterRoster() {
   const members = ref<NTHSRosterMemberPublic[]>([])
+  const schoolYear = ref<NTHSSchoolYearPublic>()
   const topTutorThisMonth = ref<NTHSTopTutorPublic>()
   const isLoading = ref(true)
   const loadFailed = ref(false)
@@ -31,6 +33,7 @@ export function useChapterRoster() {
 
   function applyRoster(roster: NTHSChapterRosterPublic) {
     members.value = roster.members
+    schoolYear.value = roster.schoolYear
     topTutorThisMonth.value = roster.topTutorThisMonth
   }
 
@@ -79,6 +82,7 @@ export function useChapterRoster() {
 
   return {
     members,
+    schoolYear,
     topTutorThisMonth,
     isLoading,
     loadFailed,
