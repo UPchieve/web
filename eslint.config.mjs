@@ -43,5 +43,13 @@ export default defineConfigWithVueTs([
       'vue/no-deprecated-model-definition': 'off',
     },
   },
+  {
+    // @vue/eslint-config-typescript turns no-undef off for .vue files and leaves
+    // undefined names to vue-tsc, which CI doesn't run.
+    files: ['**/*.vue'],
+    rules: {
+      'no-undef': 'error',
+    },
+  },
   globalIgnores(['**/node_modules/', 'tests/setup.js']),
 ])

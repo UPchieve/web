@@ -242,7 +242,6 @@ export default {
       })
 
       localStorage.removeItem('isSSOSignUpRedirect')
-      store.dispatch('user/firstDashboardVisit', true)
     }
 
     const joinedTeamCode = localStorage.getItem('joinedTeamCode')

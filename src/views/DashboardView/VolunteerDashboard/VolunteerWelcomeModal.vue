@@ -13,7 +13,7 @@
       <div class="volunteer-welcome-modal-title-container">
         <h1 class="volunteer-welcome-modal-title">Way to go!</h1>
         <p class="volunteer-welcome-modal-text">
-          We're thrilled to have join our volunteer <br />
+          We're thrilled to have you join our volunteer <br />
           community!
         </p>
         <p class="volunteer-welcome-modal-text">

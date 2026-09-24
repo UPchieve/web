@@ -88,12 +88,18 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 function listen(active: boolean) {
-  const method = active ? 'addEventListener' : 'removeEventListener'
-  document[method]('click', onDocumentClick as EventListener)
-  document[method]('keydown', onKeydown as EventListener)
-  // Capture, so a scroll of the table's own container repositions it too.
-  window[method]('scroll', place, true)
-  window[method]('resize', place)
+  if (active) {
+    document.addEventListener('click', onDocumentClick)
+    document.addEventListener('keydown', onKeydown)
+    // Capture, so a scroll of the table's own container repositions it too.
+    window.addEventListener('scroll', place, true)
+    window.addEventListener('resize', place)
+  } else {
+    document.removeEventListener('click', onDocumentClick)
+    document.removeEventListener('keydown', onKeydown)
+    window.removeEventListener('scroll', place, true)
+    window.removeEventListener('resize', place)
+  }
 }
 
 watch(
