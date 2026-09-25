@@ -6,6 +6,7 @@
     "preinstall": "npx only-allow pnpm",
     "prepare": "if [ -z \"$CI\" ]; then ./bin/install_git_hooks.sh; fi",
     "serve": "op run --no-masking --env-file=./.env.op -- doppler run -- env VITE_CJS_TRACE=true vite",
+    "serve:local-whiteboard": "op run --env-file=./.env.op -- doppler run -- env VUE_APP_MAIN_WEBSOCKET_ROOT=ws://localhost:4545 VITE_CJS_TRACE=true vite",
     "build": "vite build",
     "build:analyze": "BUNDLE_ANALYZE=true pnpm run build",
     "preview": "vite preview",

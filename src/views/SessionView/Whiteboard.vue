@@ -538,6 +538,9 @@ export default {
   },
   data() {
     return {
+      heartBeatConnection: null,
+      pendingHeartBeatId: null,
+      heartBeatTimeout: null,
       EVENTS,
       // Zwibbler.
       zwibblerCtx: null,
@@ -642,6 +645,114 @@ export default {
     this.loadZwibbler()
   },
   methods: {
+    initZwibserveHeartBeat(zwibblerWsConnection) {
+      this.clearHeartBeat()
+      this.heartBeatConnection = zwibblerWsConnection
+
+      const originalOnMessage = zwibblerWsConnection.onmessage
+
+      zwibblerWsConnection.onmessage = (event) => {
+        if (typeof event.data === 'string' && event.data.startsWith('pong:')) {
+          if (event.data === `pong:${this.pendingHeartBeatId}`) {
+            clearTimeout(this.heartBeatTimeout)
+            this.heartBeatTimeout = null
+            this.pendingHeartBeatId = null
+          }
+          return
+        }
+        originalOnMessage?.call(zwibblerWsConnection, event)
+      }
+
+      const originalOnClose = zwibblerWsConnection.onclose
+      zwibblerWsConnection.onclose = (event) => {
+        if (this.heartBeatConnection === zwibblerWsConnection) {
+          this.clearHeartBeat()
+          this.isConnected = false
+          this.zwibblerCtx?.setConfig('readOnly', true)
+        }
+        originalOnClose?.call(zwibblerWsConnection, event)
+      }
+
+      this.pingPongInterval = setInterval(
+        () => this.sendHeartBeat(zwibblerWsConnection),
+        secondsInMs(20)
+      )
+      this.sendHeartBeat(zwibblerWsConnection)
+    },
+
+    initNonZwibserveHeartBeat(zwibblerWsConnection) {
+      const zwibblerOnMessage = zwibblerWsConnection.onmessage
+      const zwibblerOnClose = zwibblerWsConnection.onclose
+
+      // Intercept Zwibbler's websocket message handler
+      zwibblerWsConnection.onmessage = (messageEvent) => {
+        // Forward message to Zwibbler unless it's our "pong" response
+        if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
+      }
+
+      // Intercept Zwibbler's websocket close handler to throw custom error
+      zwibblerWsConnection.onclose = (closeEvent) => {
+        // The onclose callback is called _after_ calling `onDestroy`,
+        // which we do before unmount of the component. If there is
+        // no Zwibbler ctx, it means we are simply leaving the component.
+        if (this.zwibblerCtx) {
+          // TODO: This isn't technically always an error - for
+          // example if we are deploying the backend, the connection
+          // will close. Is there a way to not log if it's expected closure?
+          LoggerService.noticeError(
+            'Zwibbler: Unexpectedly closing WS connection',
+            {
+              sessionId: this.sessionId,
+              userType: this.userType,
+              isZwibserveSession: this.isZwibserveSession,
+            }
+          )
+        }
+
+        zwibblerOnClose(closeEvent)
+      }
+
+      // Ping server every 45 seconds to keep the connection open.
+      this.pingPongInterval = window.setInterval(() => {
+        zwibblerWsConnection.send('p1ng')
+      }, secondsInMs(45))
+    },
+    sendHeartBeat(zwibblerWsConnection) {
+      if (
+        this.heartBeatConnection !== zwibblerWsConnection ||
+        this.pendingHeartBeatId != null ||
+        zwibblerWsConnection.readyState !== WebSocket.OPEN
+      ) {
+        return
+      }
+
+      this.pendingHeartBeatId = crypto.randomUUID()
+
+      this.heartBeatTimeout = setTimeout(() => {
+        if (this.heartBeatConnection !== zwibblerWsConnection) {
+          return
+        }
+        this.heartBeatTimeout = null
+        this.pendingHeartBeatId = null
+        clearInterval(this.pingPongInterval)
+        this.pingPongInterval = null
+
+        this.isConnected = false
+        this.loadingText = null
+        this.zwibblerCtx.setConfig('readOnly', true)
+      }, secondsInMs(10))
+
+      zwibblerWsConnection.send(`ping:${this.pendingHeartBeatId}`)
+    },
+    clearHeartBeat() {
+      clearInterval(this.pingPongInterval)
+      clearTimeout(this.heartBeatTimeout)
+
+      this.pingPongInterval = null
+      this.heartBeatTimeout = null
+      this.pendingHeartBeatId = null
+      this.heartBeatConnection = null
+    },
     async maybeHandleTextNodeInfraction(nodeIds) {
       const moderationResults = await this.moderateTextNodes(nodeIds)
       const failures = moderationResults.filter((result) => !!result)
@@ -1258,52 +1369,24 @@ export default {
           sessionId: this.sessionId,
           isZwibserveSession: this.isZwibserveSession,
         })
+
         // TODO: _Is_ there a way to access the WS connection in a less sketchy way?
         // The Zwibbler WS connection is on different properties depending on the build you are using.
         // In order, try:
         // - public/static/zwibbler-demo.js
         // - (CDN) march2024/zwibbler2.js
         // - (CDN) june2021/zwibbler2.js
-        if (!this.isZwibserveSession) {
-          const zwibblerWsConnection =
-            this.zwibblerCtx?.zc?.Pb?.Pb ??
-            this.zwibblerCtx?.kc?.Ac?.Ac ??
-            this.zwibblerCtx?.Ec?.rc?.rc
-          const zwibblerOnMessage = zwibblerWsConnection.onmessage
-          const zwibblerOnClose = zwibblerWsConnection.onclose
+        const zwibblerWsConnection =
+          this.zwibblerCtx?.zc?.Pb?.Pb ??
+          this.zwibblerCtx?.kc?.Ac?.Ac ??
+          this.zwibblerCtx?.Ec?.rc?.rc
 
-          // Intercept Zwibbler's websocket message handler
-          zwibblerWsConnection.onmessage = (messageEvent) => {
-            // Forward message to Zwibbler unless it's our "pong" response
-            if (messageEvent.data !== 'p0ng') zwibblerOnMessage(messageEvent)
+        if (zwibblerWsConnection) {
+          if (this.isZwibserveSession) {
+            this.initZwibserveHeartBeat(zwibblerWsConnection)
+          } else {
+            this.initNonZwibserveHeartBeat(zwibblerWsConnection)
           }
-
-          // Intercept Zwibbler's websocket close handler to throw custom error
-          zwibblerWsConnection.onclose = (closeEvent) => {
-            // The onclose callback is called _after_ calling `onDestroy`,
-            // which we do before unmount of the component. If there is
-            // no Zwibbler ctx, it means we are simply leaving the component.
-            if (this.zwibblerCtx) {
-              // TODO: This isn't technically always an error - for
-              // example if we are deploying the backend, the connection
-              // will close. Is there a way to not log if it's expected closure?
-              LoggerService.noticeError(
-                'Zwibbler: Unexpectedly closing WS connection',
-                {
-                  sessionId: this.sessionId,
-                  userType: this.userType,
-                  isZwibserveSession: this.isZwibserveSession,
-                }
-              )
-            }
-
-            zwibblerOnClose(closeEvent)
-          }
-
-          // Ping server every 45 seconds to keep the connection open.
-          this.pingPongInterval = window.setInterval(() => {
-            zwibblerWsConnection.send('p1ng')
-          }, secondsInMs(45))
         }
 
         // Set brush tool to default tool.
@@ -1345,7 +1428,7 @@ export default {
       this.zwibblerCtx.on('connect-error', () => {
         this.isConnected = false
         this.loadingText = null
-        window.clearInterval(this.pingPongInterval)
+        this.clearHeartBeat()
         this.zwibblerCtx.setConfig('readOnly', true)
         LoggerService.noticeError('Zwibbler: Received connect-error.', {
           sessionId: this.sessionId,
@@ -1498,7 +1581,7 @@ export default {
   async beforeUnmount() {
     await this.$store.dispatch('socket/resetPartnerImageUploadStatus')
     this.removeListeners()
-    window.clearInterval(this.pingPongInterval)
+    this.clearHeartBeat()
     // Zwibbler cleanup.
     // This method doesn't exist in zwibbler-demo.js
     if (this.zwibblerCtx?.leaveSharedSession) {
