@@ -40,11 +40,13 @@ function selectAndCopyURL() {
       ref="linkElement"
       class="link"
       data-testid="invite-link-url"
+      v-ph:nthshq="'home.invite.link'"
       @click="selectAndCopyURL"
       >{{ link }}</span
     >
     <div class="button-container">
       <LargeButton
+        v-ph:nthshq="'home.invite.copy'"
         @click="copyURL"
         class="button-text"
         :show-arrow="false"

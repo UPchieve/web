@@ -147,6 +147,7 @@ function choose(action: () => void) {
       :aria-expanded="open"
       :aria-controls="open ? `member-menu-${member.userId}` : undefined"
       :data-testid="`member-actions-${member.userId}`"
+      v-ph:nthshq="'members.row_menu'"
       @click="onTriggerClick"
     >
       &#8943;
@@ -168,6 +169,7 @@ function choose(action: () => void) {
           role="menuitem"
           tabindex="-1"
           :data-testid="`member-make-admin-${member.userId}`"
+          v-ph:nthshq="'members.make_admin'"
           @click="choose(() => emit('changeRole', 'admin'))"
         >
           Make admin
@@ -179,6 +181,7 @@ function choose(action: () => void) {
           role="menuitem"
           tabindex="-1"
           :data-testid="`member-remove-admin-${member.userId}`"
+          v-ph:nthshq="'members.remove_admin'"
           @click="choose(() => emit('changeRole', 'member'))"
         >
           Remove admin
@@ -190,6 +193,7 @@ function choose(action: () => void) {
         role="menuitem"
         tabindex="-1"
         :data-testid="`member-remove-${member.userId}`"
+        v-ph:nthshq="'members.remove'"
         @click="choose(() => emit('remove'))"
       >
         Remove

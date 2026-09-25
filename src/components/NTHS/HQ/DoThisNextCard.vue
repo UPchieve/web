@@ -101,6 +101,7 @@ async function markDone() {
           target="_blank"
           rel="noopener noreferrer"
           data-testid="do-this-next-resource"
+          v-ph:nthshq="`home.do_next.link.${item.actionName}`"
         >
           {{ item.controlText }}
         </a>
@@ -109,6 +110,7 @@ async function markDone() {
           class="action resource"
           :to="item.routeTo"
           data-testid="do-this-next-resource"
+          v-ph:nthshq="`home.do_next.link.${item.actionName}`"
         >
           {{ item.controlText }}
         </RouterLink>
@@ -118,6 +120,7 @@ async function markDone() {
           class="action mark-done"
           :aria-disabled="isSaving || undefined"
           data-testid="do-this-next-mark-done"
+          v-ph:nthshq="'home.do_next.mark_done'"
           @click="markDone"
         >
           {{ isSaving ? 'Saving…' : 'Mark as done' }}
@@ -126,6 +129,7 @@ async function markDone() {
           class="to-do"
           to="/groups/to-do"
           data-testid="do-this-next-to-do"
+          v-ph:nthshq="'home.do_next.see_checklist'"
         >
           See the full checklist
         </RouterLink>

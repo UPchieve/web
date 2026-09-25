@@ -13,11 +13,11 @@ const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
 
 const tabs = computed(() =>
   [
-    { to: '/groups/home', label: 'Home' },
-    { to: '/groups/to-do', label: 'To do', adminOnly: true },
-    { to: '/groups/members', label: 'Members' },
-    { to: '/groups/resources', label: 'Resources' },
-    { to: '/groups/setup', label: 'Chapter setup' },
+    { to: '/groups/home', name: 'home', label: 'Home' },
+    { to: '/groups/to-do', name: 'to_do', label: 'To do', adminOnly: true },
+    { to: '/groups/members', name: 'members', label: 'Members' },
+    { to: '/groups/resources', name: 'resources', label: 'Resources' },
+    { to: '/groups/setup', name: 'setup', label: 'Chapter setup' },
   ].filter(({ adminOnly }) => !adminOnly || isGroupAdmin.value)
 )
 
@@ -97,6 +97,7 @@ watch(
           class="tab"
           activeClass="active"
           :to="tab.to"
+          v-ph:nthshq="`tab.${tab.name}`"
         >
           {{ tab.label }}
         </RouterLink>
@@ -117,6 +118,7 @@ watch(
                 v-if="hidePageContentReason === 'not ready to tutor'"
                 variant="primary-blue"
                 :showArrow="false"
+                v-ph:nthshq="'go_to_dashboard'"
                 @click="goToDashboard"
               >
                 Continue Onboarding

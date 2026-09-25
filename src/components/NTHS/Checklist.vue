@@ -103,6 +103,7 @@ function onToggle(item: ChecklistItem) {
               :class="{ locked: item.locked }"
               type="checkbox"
               :data-testid="`checklist-checkbox-${item.actionName}`"
+              v-ph:nthshq="`todo.checkbox.${item.actionName}`"
               :checked="item.status === CheckboxStatus.Done"
               :aria-disabled="item.locked ? 'true' : undefined"
               :aria-describedby="item.locked ? tooltipId(item) : undefined"
@@ -136,6 +137,7 @@ function onToggle(item: ChecklistItem) {
           class="control"
           :to="item.routeTo"
           :data-testid="`checklist-control-${item.actionName}`"
+          v-ph:nthshq="`todo.link.${item.actionName}`"
         >
           {{ item.controlText }}
           <ExternalPage class="icon" aria-hidden="true" />
@@ -148,6 +150,7 @@ function onToggle(item: ChecklistItem) {
           target="_blank"
           rel="noopener noreferrer"
           :data-testid="`checklist-control-${item.actionName}`"
+          v-ph:nthshq="`todo.link.${item.actionName}`"
         >
           {{ item.controlText }}
           <ExternalPage class="icon" aria-hidden="true" />

@@ -14,6 +14,7 @@ import VueDraggableResizable from 'vue-draggable-resizable'
 import { initActivityTracking } from './services/PresenceService'
 import vuetify from './plugins/vuetify'
 import { loadThirdPartyScripts } from '@/utils/third-party-loader'
+import { vPh } from './directives/ph'
 
 LoggerService.init()
 
@@ -45,6 +46,7 @@ async function main() {
     app.use(IonicVue)
     app.use(router)
     app.use(vuetify)
+    app.directive('ph', vPh)
     // Set up vue-select
     app.component('v-select-legacy', vSelect)
     // Set up vue-star-rating

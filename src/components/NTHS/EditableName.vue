@@ -102,6 +102,7 @@ async function save() {
       type="text"
       autocomplete="off"
       placeholder="NTHS at Lincoln High School"
+      v-ph:nthshq="'setup.rename'"
       :readonly="status === 'saving'"
       :aria-invalid="!!errorMessage"
       :aria-describedby="errorMessage ? 'nths-group-name-error' : undefined"

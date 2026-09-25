@@ -13,6 +13,7 @@ const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
 
 const allResources = [
   {
+    key: 'orientation',
     icon: GraduationCap,
     title: 'President orientation',
     body: 'The walkthrough of what running an NTHS chapter asks of you.',
@@ -21,6 +22,7 @@ const allResources = [
     adminOnly: true,
   },
   {
+    key: 'library',
     icon: OpenBook,
     title: 'NTHS resource library',
     body: 'Guides, templates and recruiting material for your chapter.',
@@ -51,6 +53,7 @@ const resources = computed(() =>
           :href="resource.url"
           target="_blank"
           rel="noopener noreferrer"
+          v-ph:nthshq="`resources.link.${resource.key}`"
         >
           <span class="icon-disc">
             <component :is="resource.icon" class="icon" aria-hidden="true" />

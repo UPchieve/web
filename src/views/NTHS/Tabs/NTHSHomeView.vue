@@ -58,6 +58,7 @@ onBeforeMount(async () => {
           target="_blank"
           rel="noopener noreferrer"
           data-testid="invite-scripts"
+          v-ph:nthshq="'home.recruitment_templates'"
         >
           Invite scripts
         </a>
@@ -95,6 +96,7 @@ onBeforeMount(async () => {
         class="members-button"
         variant="secondary"
         :showArrow="false"
+        v-ph:nthshq="'home.view_members'"
         @click="router.push('/groups/members')"
       >
         See all members

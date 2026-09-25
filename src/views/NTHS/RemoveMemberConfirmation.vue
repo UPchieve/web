@@ -136,6 +136,7 @@ function onCancel() {
         :showArrow="false"
         variant="danger"
         data-testid="confirm-remove-self"
+        v-ph:nthshq="'setup.leave_team.confirm'"
         :disabled="isRemoving"
         @click="removeTeamMember"
         class="main-button"
@@ -145,6 +146,7 @@ function onCancel() {
       <LargeButton
         :showArrow="false"
         variant="secondary"
+        v-ph:nthshq="'setup.leave_team.cancel'"
         @click="onCancel"
         class="main-button"
         >Cancel</LargeButton
@@ -164,13 +166,18 @@ function onCancel() {
         rejoin the chapter.
       </p>
       <div class="actions">
-        <LargeButton :showArrow="false" variant="secondary" @click="onCancel"
+        <LargeButton
+          :showArrow="false"
+          variant="secondary"
+          v-ph:nthshq="'remove.cancel'"
+          @click="onCancel"
           >Cancel</LargeButton
         >
         <LargeButton
           :showArrow="false"
           variant="danger"
           data-testid="confirm-remove-member"
+          v-ph:nthshq="'remove.confirm'"
           :disabled="isRemoving"
           @click="removeTeamMember"
           >Remove member</LargeButton

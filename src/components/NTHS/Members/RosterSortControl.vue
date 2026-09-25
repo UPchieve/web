@@ -26,6 +26,7 @@ function selectKey(event: Event) {
       :value="modelValue.key"
       autocomplete="off"
       data-testid="roster-sort-key"
+      v-ph:nthshq="'members.sort_select'"
       @change="selectKey"
     >
       <option v-for="key in ROSTER_SORT_KEYS" :key="key" :value="key">
@@ -37,6 +38,7 @@ function selectKey(event: Event) {
       class="sort-direction"
       :aria-label="ROSTER_SORT_TOGGLE_LABELS[modelValue.direction]"
       data-testid="roster-sort-direction"
+      v-ph:nthshq="'members.sort_direction'"
       @click="
         $emit('update:modelValue', nextRosterSort(modelValue, modelValue.key))
       "

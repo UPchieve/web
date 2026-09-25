@@ -133,6 +133,7 @@ const communityButton = computed(() => {
 })
 
 type ChapterPath = {
+  type: 'school_approved' | 'community'
   testid: string
   badgeTestid: string
   titleId: string
@@ -147,6 +148,7 @@ type ChapterPath = {
 
 const paths = computed<ChapterPath[]>(() => [
   {
+    type: 'school_approved',
     testid: 'school-approved-path',
     badgeTestid: 'school-approved-current-badge',
     titleId: schoolPathTitleId,
@@ -169,6 +171,7 @@ const paths = computed<ChapterPath[]>(() => [
     button: schoolApprovedButton.value,
   },
   {
+    type: 'community',
     testid: 'community-path',
     badgeTestid: 'community-current-badge',
     titleId: communityPathTitleId,
@@ -248,6 +251,7 @@ const paths = computed<ChapterPath[]>(() => [
               :variant="path.button.variant"
               :showArrow="false"
               :data-testid="path.button.testid"
+              v-ph:nthshq="`setup.chapter_type.${path.type}`"
               :aria-describedby="path.denialNotice?.id"
               @click="send(path.button.event)"
             >

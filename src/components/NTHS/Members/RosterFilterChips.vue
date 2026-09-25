@@ -25,6 +25,7 @@ defineEmits<{ (e: 'update:modelValue', filter: RosterFilter): void }>()
       :class="{ active: filter === modelValue }"
       :aria-pressed="filter === modelValue"
       :data-testid="`roster-chip-${filter}`"
+      v-ph:nthshq="`members.filter.${filter}`"
       @click="$emit('update:modelValue', filter)"
     >
       {{ rosterFilterLabel(filter, period) }} ({{ counts[filter] }})

@@ -263,6 +263,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
           :class="{ active: period === activePeriod }"
           :aria-pressed="period === activePeriod"
           :data-testid="`roster-period-${period}`"
+          v-ph:nthshq="`members.period.${period}`"
           @click="selectPeriod(period)"
         >
           {{ ROSTER_PERIOD_LABELS[period] }}
@@ -346,6 +347,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
           variant="secondary"
           :showArrow="false"
           data-testid="download-csv"
+          v-ph:nthshq="'members.download_csv'"
           @click="downloadCsv"
         >
           Download CSV

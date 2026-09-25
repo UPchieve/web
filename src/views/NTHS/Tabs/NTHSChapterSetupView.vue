@@ -91,6 +91,7 @@ async function onLeaveTeam() {
         :showArrow="false"
         :disabled="isFetchingGroupMembers"
         data-testid="leave-team-button"
+        v-ph:nthshq="'setup.leave_team'"
         >{{ isFetchingGroupMembers ? '...Loading' : 'Leave Team' }}</LargeButton
       >
     </div>

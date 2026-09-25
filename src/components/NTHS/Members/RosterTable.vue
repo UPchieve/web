@@ -51,6 +51,7 @@ function ariaSort(key: RosterSortKey) {
               type="button"
               class="sort-button"
               :data-testid="`roster-sort-${key}`"
+              v-ph:nthshq="`members.column_sort.${key}`"
               @click="$emit('sort', key)"
             >
               {{ ROSTER_SORT_LABELS[key] }}
