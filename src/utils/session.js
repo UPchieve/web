@@ -47,3 +47,20 @@ export function setHasSeenScreenShareDisclaimerThisSession() {
     'true'
   )
 }
+
+function getActiveHolds(session) {
+  const now = new Date()
+  return (session?.holds ?? []).filter(
+    (hold) => new Date(hold.startsAt) <= now && new Date(hold.endsAt) > now
+  )
+}
+
+export function sessionHasActiveHold(session) {
+  const activeHolds = getActiveHolds(session)
+  return activeHolds.length > 0
+}
+
+export function maybeGetActiveSessionHoldForUser(session, forUserId) {
+  const activeHolds = getActiveHolds(session)
+  return activeHolds.find((hold) => hold.coachId === forUserId)
+}

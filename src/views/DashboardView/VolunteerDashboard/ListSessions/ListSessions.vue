@@ -96,10 +96,10 @@
 
 <script lang="ts" setup>
 import { useStore } from 'vuex'
-import Case from 'case'
 import { quizRoute } from '@/utils/quiz-route'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import SessionService from '@/services/SessionService'
 import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
@@ -215,14 +215,7 @@ function closeAmbassadorReferralModal() {
 }
 
 function gotoSession(session: any) {
-  const { type, subTopic, id } = session
-  const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
-
-  if (type && subTopic && id) {
-    router.push(path)
-  } else {
-    store.dispatch('user/clearSession')
-  }
+  SessionService.goToSession(session)
 }
 
 function goToSubjectCert(session: any) {

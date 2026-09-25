@@ -6,10 +6,14 @@ const props = withDefaults(
     tickLengthMs: number
     totalTicks: number
     countDirection: 'up' | 'down'
+    size: number
+    width: number
   }>(),
   {
     tickLengthMs: 1000,
     countDirection: 'down',
+    size: 50,
+    width: 5,
   }
 )
 const emit = defineEmits(['end'])
@@ -40,6 +44,9 @@ function updateTicks() {
   }
 }
 
+const GREEN = '#16d2aa'
+const ORANGE = '#ff8c5f'
+
 onMounted(() => {
   maxTicks.value = props.totalTicks // props.totalTick might be reactive; save the initial value.
   intervalId.value = setInterval(updateTicks, props.tickLengthMs)
@@ -52,18 +59,58 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="countdown">
-    <VProgressCircular :modelValue="progress" color="green" />
-    <span>
-      <strong>{{ displayNumber }}</strong> seconds
-    </span>
+    <VProgressCircular
+      :size="props.size"
+      :width="props.width"
+      :modelValue="progress"
+      :color="progress > 50 ? GREEN : ORANGE"
+    >
+      <template v-slot:default>
+        <div class="countdown-label">
+          <span
+            :class="[
+              'count-text',
+              { green: progress > 50 },
+              { orange: progress <= 50 },
+            ]"
+            >{{ displayNumber }}</span
+          >
+          <span class="seconds-text">seconds</span>
+        </div>
+      </template>
+    </VProgressCircular>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .countdown {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+}
+
+.countdown-label {
+  display: flex;
+  flex-direction: column;
+
+  .count-text {
+    @include font-category('heading');
+    font-weight: $font-weight-bold;
+  }
+
+  .seconds-text {
+    z-index: 3;
+    @include font-category('caption');
+    color: $c-secondary-grey;
+  }
+
+  .orange {
+    color: $c-warning-orange;
+  }
+
+  .green {
+    color: $c-success-green;
+  }
 }
 </style>

@@ -36,6 +36,12 @@ export async function trackPassivity() {
     return NetworkService.trackPresencePassive(clientUUID)
   }
 }
+
+/**
+ * Pings subway such that: if the user is currently PASSIVE_ON_SITE,
+ * subway will set a countdown for marking them as INACTIVE_ON_SITE.
+ * when the countdown reaches 0, if they are still passive, mark them as inactive.
+ */
 export async function checkForInactivity() {
   return NetworkService.trackPresenceCheckForInactivity(getClientUUID())
 }

@@ -6,6 +6,7 @@ import NetworkService, { isNetworkError } from './NetworkService'
 import errorFromHttpResponse from '../utils/error-from-http-response.js'
 import ModalService from './ModalService'
 import LoggerService from './LoggerService'
+import Case from 'case'
 
 export type Session = any
 
@@ -37,6 +38,17 @@ function isAbsentUser(session: Session) {
 }
 
 export default {
+  async goToSession(session: { id: string; subTopic: string; type: string }) {
+    const { type, subTopic, id } = session
+    const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
+
+    if (type && subTopic && id) {
+      await router.push(path)
+    } else {
+      await store.dispatch('user/clearSession')
+    }
+  },
+
   async createOrJoinSession(
     topic: string,
     subTopic: string,

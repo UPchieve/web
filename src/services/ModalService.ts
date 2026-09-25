@@ -3,6 +3,7 @@ import store from '@/store'
 import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
 import type { RemoveTeamMemberModalProps } from '@/components/NTHS/RemoveTeamMemberModal.vue'
 import type { RemoveMemberConfirmationProps } from '@/views/NTHS/RemoveMemberConfirmation.vue'
+import SessionHoldAlert from '@/views/SessionHolds/SessionHoldAlert.vue'
 
 type ModalTemplateProps = {
   acceptText?: string
@@ -19,6 +20,7 @@ type ModalTemplateProps = {
 
 export type SessionErrorModalData = ModalTemplateProps & {
   onAccept?: () => void
+  // Note: These get passed in from subway
   errorMessage?: string
   errorTitle?: string
 }
@@ -52,6 +54,9 @@ function show(
 }
 
 export default {
+  async hide() {
+    await store.dispatch('app/modal/hide')
+  },
   showSessionError(
     {
       errorMessage,
@@ -139,6 +144,13 @@ export default {
         onConfirm: () => resolve(),
         onCancel: () => resolve(),
       })
+    })
+  },
+  showSessionHoldAlert() {
+    show(SessionHoldAlert, {
+      showAccept: true,
+      showSeparator: false,
+      showTemplateButtons: false,
     })
   },
 }

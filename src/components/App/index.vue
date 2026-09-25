@@ -57,6 +57,7 @@ import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS } from '@/consts'
 import RouteLoadingIndicator from '../RouteLoadingIndicator.vue'
 import AppTheme from './AppTheme.vue'
+import ModalService from '@/services/ModalService'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
@@ -246,6 +247,7 @@ export default {
       isConnected: (state) => state.socket.isConnected,
       messageData: (state) => state.socket.messageData,
       fadeInContent: (state) => state.app.fadeInContent,
+      hideSessionHoldAlert: (state) => state.volunteer.hideSessionHoldAlert,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -256,6 +258,8 @@ export default {
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       isReadyToTutor: 'volunteer/isReadyToTutor',
       isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
+      currentSessionHold: 'volunteer/currentSessionHold',
+      isSessionAlive: 'user/isSessionAlive',
     }),
     doMountRefreshAppAlert() {
       return this.$route.name !== 'SessionView'
@@ -269,8 +273,40 @@ export default {
         this.user.banType !== 'shadow'
       )
     },
+    sessionHoldData() {
+      return {
+        hold: this.currentSessionHold,
+        hideAlert: this.hideSessionHoldAlert,
+        isVolunteer: this.isVolunteer,
+        isInSession: this.isSessionAlive,
+      }
+    },
   },
   watch: {
+    sessionHoldData: {
+      handler(current, previous) {
+        if (current.hideAlert && !current.hold) {
+          // Now that there is no hold coming back from subway,
+          // set the force hide flag back to false in case a new hold comes in.
+          this.$store.commit('volunteer/setHideSessionHoldAlert', false)
+        }
+        if (current.hold && !current.hideAlert) {
+          if (!current.isVolunteer || current.isInSession) {
+            return
+          }
+          ModalService.showSessionHoldAlert({
+            sessionId: current.id,
+            subTopic: current.subTopic,
+            studentFirstName: current.studentFirstName,
+            type: current.type,
+            holdEndsAt: current.hold.endsAt,
+          })
+        } else if (previous.hold && !current.hold) {
+          ModalService.hide()
+        }
+      },
+      deep: true,
+    },
     async user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue.id && !previousUserValue.id
       if (nowLoggedIn) {
