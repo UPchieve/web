@@ -82,8 +82,10 @@ export const STATES = [
   'Wyoming',
 ]
 
+export const US_COUNTRY = 'United States of America'
+
 export const COUNTRIES = [
-  'United States of America',
+  US_COUNTRY,
   'Afghanistan',
   'Albania',
   'Algeria',

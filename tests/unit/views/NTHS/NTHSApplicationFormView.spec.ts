@@ -5,9 +5,10 @@ import store from '@/store'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import NTHSApplicationFormView from '@/views/NTHS/NTHSApplicationFormView.vue'
-import { POSTHOG_FEATURE_FLAGS } from '@/consts'
+import { POSTHOG_FEATURE_FLAGS, US_COUNTRY } from '@/consts'
 import {
   NTHS_APPLICATION_FORMS,
+  NTHS_LONG_FORM_VERSION,
   type NTHSFormVersion,
 } from '@/services/NTHSApplicationService'
 import {
@@ -73,7 +74,9 @@ describe('NTHSApplicationFormView submit', () => {
         unlistedSchool: {
           name: 'Riverside High',
           city: 'Riverside',
+          country: 'United States of America',
           state: 'CA',
+          region: '',
           website: '',
         },
         gradeLevel: '11th grade',
@@ -185,5 +188,140 @@ describe('NTHSApplicationFormView submit', () => {
     // Left set so the form stays locked until the redirect unmounts it.
     expect(vm.isSubmitting).toBe(true)
     expect(getNTHSApplicationDraft(USER_ID)).toBeUndefined()
+  })
+})
+
+describe('NTHSApplicationFormView unlisted school', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    store.commit('nths/setNTHSCandidateApplicationStatus', undefined)
+    setVariant('')
+    localStorage.clear()
+  })
+
+  async function mountForm(country?: string) {
+    store.commit('user/setUser', { id: USER_ID, country })
+    const wrapper = mount(NTHSApplicationFormView, {
+      global: { plugins: [store, router] },
+    })
+    await flushPromises()
+    const vm = wrapper.vm as any
+    vm.school.cannotFindSchool = true
+    vm.gradeLevel = '10th grade'
+    return vm
+  }
+
+  it.each([
+    ['Canada', 'Canada'],
+    [undefined, US_COUNTRY],
+  ])(
+    'starts the country on profile country %s as %s',
+    async (country, expected) => {
+      const vm = await mountForm(country)
+      expect(vm.school.country).toBe(expected)
+    }
+  )
+
+  it.each([
+    ['Canada', US_COUNTRY, 'Canada'],
+    [undefined, 'Canada', 'Canada'],
+  ])(
+    'restores a draft with country %s onto profile country %s as %s',
+    async (draftCountry, profileCountry, expected) => {
+      store.commit('user/setUser', { id: USER_ID, country: profileCountry })
+      setNTHSApplicationDraft(USER_ID, {
+        formVersion: NTHS_LONG_FORM_VERSION,
+        schoolId: null,
+        schoolName: '',
+        cannotFindSchool: true,
+        unlistedSchool: {
+          name: 'Riverside High',
+          city: 'Riverside',
+          country: draftCountry,
+          state: '',
+          region: '',
+          website: '',
+        } as never,
+        gradeLevel: '',
+        responses: {},
+      })
+
+      const wrapper = mount(NTHSApplicationFormView, {
+        global: { plugins: [store, router] },
+      })
+      await flushPromises()
+      const vm = wrapper.vm as any
+
+      expect(vm.school.country).toBe(expected)
+    }
+  )
+
+  it.each([
+    [US_COUNTRY, { state: '' }, false],
+    [US_COUNTRY, { state: 'CA' }, true],
+    ['Canada', { state: '', region: '' }, true],
+    ['Canada', { country: '' }, false],
+  ])(
+    'lets a school in %s with %o leave step one: %s',
+    async (country, overrides, canLeave) => {
+      const vm = await mountForm(country)
+      Object.assign(vm.school, {
+        name: 'Riverside High',
+        city: 'Riverside',
+        region: '',
+        ...overrides,
+      })
+      expect(vm.canLeaveSchoolStep).toBe(canLeave)
+    }
+  )
+
+  it.each([
+    [
+      US_COUNTRY,
+      { state: 'CA', region: 'Ontario' },
+      { country: US_COUNTRY, state: 'CA' },
+    ],
+    [
+      'Canada',
+      { state: 'CA', region: ' Ontario ' },
+      { country: 'Canada', region: 'Ontario' },
+    ],
+    ['Canada', { state: '', region: '  ' }, { country: 'Canada' }],
+  ])(
+    'sends a school in %s with %o as %o',
+    async (country, fields, expected) => {
+      const submitSpy = vi
+        .spyOn(NetworkService, 'submitNTHSApplication')
+        .mockRejectedValue({})
+      store.commit('user/setUser', { id: USER_ID, country })
+      const vm = await mountAtQuestions()
+      Object.assign(vm.school, {
+        schoolId: null,
+        cannotFindSchool: true,
+        name: 'Riverside High',
+        city: 'Riverside',
+        ...fields,
+      })
+
+      await vm.submit()
+
+      expect(submitSpy.mock.calls[0][0].unlistedSchool).toEqual({
+        name: 'Riverside High',
+        city: 'Riverside',
+        ...expected,
+      })
+    }
+  )
+
+  it('keeps the country and region in the saved draft', async () => {
+    const vm = await mountForm(US_COUNTRY)
+    Object.assign(vm.school, { country: 'Canada', region: 'Ontario' })
+    await flushPromises()
+
+    const saved = getNTHSApplicationDraft(USER_ID) as any
+    expect(saved.unlistedSchool).toMatchObject({
+      country: 'Canada',
+      region: 'Ontario',
+    })
   })
 })

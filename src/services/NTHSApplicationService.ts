@@ -1,3 +1,4 @@
+import { COUNTRIES, US_COUNTRY } from '@/consts'
 import { dayjs } from '@/utils/time-utils'
 
 export const HIGH_SCHOOL_GRADES = [
@@ -12,7 +13,9 @@ export const HIGH_SCHOOL_GRADES = [
 export type NTHSUnlistedSchool = {
   name: string
   city: string
-  state: string
+  country: string
+  state?: string
+  region?: string
   website?: string
 }
 
@@ -164,7 +167,14 @@ export type NTHSApplicationDraft = {
   schoolId: string | null
   schoolName: string
   cannotFindSchool: boolean
-  unlistedSchool: { name: string; city: string; state: string; website: string }
+  unlistedSchool: {
+    name: string
+    city: string
+    country: string
+    state: string
+    region: string
+    website: string
+  }
   gradeLevel: string
   responses: NTHSApplicationResponses
 }
@@ -200,6 +210,14 @@ export function sanitizeNTHSApplicationDraft(
 
   const unlisted = saved.unlistedSchool ?? {}
   const schoolId = asString(saved.schoolId) || null
+  const savedState = asString(unlisted.state)
+  // A draft with a state and no known country predates the country field, when
+  // every unlisted school was in the US.
+  const country = COUNTRIES.includes(unlisted.country)
+    ? unlisted.country
+    : savedState
+      ? US_COUNTRY
+      : ''
   return {
     formVersion,
     schoolId,
@@ -208,7 +226,9 @@ export function sanitizeNTHSApplicationDraft(
     unlistedSchool: {
       name: asString(unlisted.name),
       city: asString(unlisted.city),
-      state: asString(unlisted.state),
+      country,
+      state: savedState,
+      region: asString(unlisted.region),
       website: asString(unlisted.website),
     },
     gradeLevel: HIGH_SCHOOL_GRADES.includes(saved.gradeLevel)

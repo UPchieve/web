@@ -5,6 +5,7 @@ import { useStore } from 'vuex'
 import useVuelidate from '@vuelidate/core'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormTextArea from '@/components/FormTextArea.vue'
 import FormCheckBox from '@/components/FormCheckBox.vue'
@@ -12,7 +13,12 @@ import FormErrors from '@/components/FormErrors.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
 import { getAcademicYear } from '@/utils/academic-year'
-import { EVENTS, STATES_WITH_ABBREVIATIONS } from '@/consts'
+import {
+  COUNTRIES,
+  EVENTS,
+  STATES_WITH_ABBREVIATIONS,
+  US_COUNTRY,
+} from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
@@ -42,14 +48,18 @@ const isLoading = ref(true)
 const isSubmitting = ref(false)
 const error = ref<string>('')
 
+const profileCountry = store.state.user.user?.country
 const school = reactive({
   schoolId: null as string | null,
   cannotFindSchool: false,
   name: '',
   city: '',
+  country: COUNTRIES.includes(profileCountry) ? profileCountry : US_COUNTRY,
   state: '',
+  region: '',
   website: '',
 })
+const isSchoolInUS = computed(() => school.country === US_COUNTRY)
 const gradeLevel = ref<string>(store.getters['user/gradeLevel'])
 
 const userId: string | undefined = store.state.user.user?.id
@@ -84,7 +94,10 @@ const selectedSchoolName = ref(draft ? draft.schoolName : profileSchoolName)
 const hasSchool = computed(
   () =>
     !!school.schoolId ||
-    (!!school.name.trim() && !!school.city.trim() && !!school.state)
+    (!!school.name.trim() &&
+      !!school.city.trim() &&
+      !!school.country &&
+      (!isSchoolInUS.value || !!school.state))
 )
 const canLeaveSchoolStep = computed(() => hasSchool.value && !!gradeLevel.value)
 
@@ -131,7 +144,9 @@ onMounted(async () => {
 function restoreDraft(draft: NTHSApplicationDraft) {
   school.schoolId = draft.schoolId
   school.cannotFindSchool = draft.cannotFindSchool
-  Object.assign(school, draft.unlistedSchool)
+  const { country, ...unlistedSchool } = draft.unlistedSchool
+  Object.assign(school, unlistedSchool)
+  if (country) school.country = country
   if (draft.gradeLevel) gradeLevel.value = draft.gradeLevel
   Object.assign(responses, draft.responses)
 }
@@ -148,7 +163,9 @@ function saveDraft() {
     unlistedSchool: {
       name: school.name,
       city: school.city,
+      country: school.country,
       state: school.state,
+      region: school.region,
       website: school.website,
     },
     gradeLevel: gradeLevel.value,
@@ -227,7 +244,11 @@ async function postApplication(
         : {
             name: school.name.trim(),
             city: school.city.trim(),
-            state: school.state,
+            country: school.country,
+            state: isSchoolInUS.value ? school.state : undefined,
+            region: isSchoolInUS.value
+              ? undefined
+              : school.region.trim() || undefined,
             website: school.website.trim() || undefined,
           },
       gradeLevel: submittedGradeLevel.value,
@@ -326,14 +347,15 @@ function submitErrorClass(httpStatus?: number) {
               label="What is your school called?"
               placeholder="Enter your school's full name"
             />
-            <FormInput
-              v-model="school.city"
+            <FormSearchableSelect
+              v-model="school.country"
+              name="school-country"
+              :options="COUNTRIES"
               :isRequired="true"
-              name="school-city"
-              label="What city is it in?"
-              placeholder="Enter the city"
+              label="What country is it in?"
             />
             <FormSelect
+              v-if="isSchoolInUS"
               v-model="school.state"
               name="school-state"
               :options="STATES_WITH_ABBREVIATIONS"
@@ -341,6 +363,21 @@ function submitErrorClass(httpStatus?: number) {
               :reduce="(option: { value: string }) => option.value"
               placeholder="State"
               label="What state is it in?"
+            />
+            <FormInput
+              v-else
+              v-model="school.region"
+              :isRequired="false"
+              name="school-region"
+              :maxLength="200"
+              label="State, province, or region (optional)"
+            />
+            <FormInput
+              v-model="school.city"
+              :isRequired="true"
+              name="school-city"
+              label="What city or town is it in?"
+              placeholder="Enter the city"
             />
             <FormInput
               v-model="school.website"

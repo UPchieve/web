@@ -11,6 +11,7 @@ import {
   type NTHSFormVersion,
   type NTHSQuestion,
 } from '@/services/NTHSApplicationService'
+import { US_COUNTRY } from '@/consts'
 
 // A form-version-agnostic stand-in for a real NTHS_APPLICATION_FORMS entry:
 // one required longText, one optional shortText, one attestation.
@@ -141,7 +142,14 @@ describe('sanitizeNTHSApplicationDraft', () => {
       schoolId: 'school-1',
       schoolName: 'Riverside High',
       cannotFindSchool: false,
-      unlistedSchool: { name: '', city: '', state: '', website: '' },
+      unlistedSchool: {
+        name: '',
+        city: '',
+        country: 'Canada',
+        state: '',
+        region: 'Ontario',
+        website: '',
+      },
       gradeLevel: '10th grade',
       responses: answersFor(FORM_QUESTIONS),
       ...overrides,
@@ -204,6 +212,37 @@ describe('sanitizeNTHSApplicationDraft', () => {
       )?.cannotFindSchool
     ).toBe(false)
   })
+
+  it.each([
+    [
+      'a state and an unknown country',
+      { state: 'CA', country: 'Narnia' },
+      US_COUNTRY,
+    ],
+    [
+      'a state and a known country',
+      { state: 'CA', country: 'Canada' },
+      'Canada',
+    ],
+    ['no state and no country', { state: '' }, ''],
+  ])(
+    'reads the country of a draft with %s as %o',
+    (_label, fields, country) => {
+      const draft = sanitizeNTHSApplicationDraft(
+        buildDraft({
+          unlistedSchool: {
+            name: 'Riverside High',
+            city: 'Riverside',
+            website: '',
+            ...fields,
+          } as never,
+        }),
+        FORM_VERSION
+      )
+
+      expect(draft?.unlistedSchool.country).toBe(country)
+    }
+  )
 
   it.each([undefined, null, 'a string', 42])(
     'reads %s as no draft',
