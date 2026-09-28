@@ -200,6 +200,11 @@ export default {
         'app/updateWebPageVisibility',
         this.docHiddenProperty
       )
+
+      // recheck to work around throttled or frozen timers while tab was hidden
+      if (!document[this.docHiddenProperty]) {
+        this.$store.dispatch('americaCountsVolunteer/maybeJoin')
+      }
     },
     emitList({ retryCount = 0, maxRetries = 5 }) {
       let isAcknowledged = false

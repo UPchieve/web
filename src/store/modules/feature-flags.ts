@@ -71,6 +71,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR]: {},
       [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: {},
+      [POSTHOG_FEATURE_FLAGS.AMERICA_COUNTS_AUTO_JOIN_DELAY]: 1000 * 60 * 3,
     },
   },
   mutations: {
@@ -239,5 +240,7 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_SCREENSHARE],
     blockAudioCall: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_AUDIO_CALL],
+    americaCountsAutoJoinDelayPayload: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.AMERICA_COUNTS_AUTO_JOIN_DELAY],
   },
 }

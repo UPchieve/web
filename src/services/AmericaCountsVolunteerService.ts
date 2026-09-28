@@ -7,6 +7,9 @@ import { EVENTS } from '@/consts'
 
 const THREE_MINUTES = 1000 * 60 * 3
 export const MINIMUM_TIME_BETWEEN_SESSIONS = THREE_MINUTES
+const AUTO_JOIN_DELAY_FLAG = 'featureFlags/americaCountsAutoJoinDelayPayload'
+export const DEFAULT_AUTO_JOIN_DELAY = THREE_MINUTES
+const MINIMUM_RECHECK_DELAY = 1000
 
 export const AMERICA_COUNTS_SUBTOPICS = [
   '6thGradeMath',
@@ -36,7 +39,7 @@ export function isEligibleSession({
 }
 
 function getOldestSession(sessions: Session[]) {
-  return sessions.sort(
+  return [...sessions].sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
   )[0]
 }
@@ -55,6 +58,66 @@ function joinSession(session: Session) {
   }
 }
 
+function getSessionAgeInMs(session: Session, now = Date.now()) {
+  const createdAt = new Date(session.createdAt).getTime()
+  if (!Number.isFinite(createdAt)) return null
+  return now - createdAt
+}
+
+function getSessionsWithWaitTime(sessions: Session[], now = Date.now()) {
+  const sessionsWithWaitTime: { session: Session; age: number }[] = []
+  for (const session of sessions ?? []) {
+    const age = getSessionAgeInMs(session, now)
+    if (age !== null) sessionsWithWaitTime.push({ session, age })
+  }
+  return sessionsWithWaitTime
+}
+
+let recheckTimeoutId: ReturnType<typeof setTimeout> | null = null
+
+function clearRecheck() {
+  if (recheckTimeoutId) {
+    clearTimeout(recheckTimeoutId)
+    recheckTimeoutId = null
+  }
+}
+
+function scheduleRecheck(delayInMs: number) {
+  clearRecheck()
+  const delay = Number.isFinite(delayInMs)
+    ? Math.max(delayInMs, MINIMUM_RECHECK_DELAY)
+    : MINIMUM_RECHECK_DELAY
+  recheckTimeoutId = setTimeout(() => {
+    recheckTimeoutId = null
+    store.dispatch('americaCountsVolunteer/maybeJoin')
+  }, delay)
+}
+
+function getAutoJoinDelayInMs() {
+  const payload = store.getters[AUTO_JOIN_DELAY_FLAG]
+
+  if (payload === null || payload === undefined || payload === '') {
+    return DEFAULT_AUTO_JOIN_DELAY
+  }
+
+  const delayInMs = Number(payload)
+  return Number.isFinite(delayInMs) && delayInMs >= 0
+    ? delayInMs
+    : DEFAULT_AUTO_JOIN_DELAY
+}
+
+function getCooldownId() {
+  const americaCountsVolunteer = (
+    store.state as unknown as {
+      americaCountsVolunteer?: {
+        cooldownId: ReturnType<typeof setTimeout> | null
+      }
+    }
+  ).americaCountsVolunteer
+
+  return americaCountsVolunteer?.cooldownId ?? null
+}
+
 /*
   America Counts sessions are sessions that are automatically
   joined by the volunteer when they are accepted into the session.
@@ -69,6 +132,9 @@ function joinSession(session: Session) {
         NOTE: this check is `isEligibleSession` fn above which is called
         in volunteer/handleIncomingSessions method since we also don't want
         to display them on the dashboard
+    6. the student has been waiting for at least the auto-join delay
+        (featureFlags/americaCountsAutoJoinDelayPayload, which falls back to
+        DEFAULT_AUTO_JOIN_DELAY)
 
     If all of these conditions are met, we can automatically join the session.
 
@@ -76,14 +142,36 @@ function joinSession(session: Session) {
   if there are, we should join the one that has been waiting the longest.
 */
 export async function maybeAutoJoinOldestSession(sessions: Session[]) {
+  clearRecheck()
+
+  const sessionsWithWaitTime = getSessionsWithWaitTime(sessions)
+  if (sessionsWithWaitTime.length === 0) return
+
+  const minSessionWaitTime = getAutoJoinDelayInMs()
+
+  const joinableSessions = sessionsWithWaitTime
+    .filter(({ age }) => age >= minSessionWaitTime)
+    .map(({ session }) => session)
+
+  if (joinableSessions.length === 0) {
+    // Nothing has waited long enough yet. Check again when the oldest
+    // session crosses the wait threshold.
+    const longestWaitTime = sessionsWithWaitTime.reduce(
+      (longest, { age }) => Math.max(longest, age),
+      0
+    )
+    scheduleRecheck(minSessionWaitTime - longestWaitTime)
+    return
+  }
+
   const currentSession = await SessionService.getCurrentSession()
   const isInASession = currentSession.sessionData.id
   const isReady = await shouldAutoJoin()
 
-  if (sessions.length > 0 && !isInASession && isReady) {
-    AnalyticsService.captureEvent(EVENTS.AUTO_JOINED_SESSION)
-    joinOldestSession(sessions)
-  }
+  if (isInASession || !isReady) return
+
+  AnalyticsService.captureEvent(EVENTS.AUTO_JOINED_SESSION)
+  joinOldestSession(joinableSessions)
 }
 
 async function shouldAutoJoin() {
@@ -108,7 +196,7 @@ async function shouldAutoJoin() {
     !isOnAutoJoinDisabledPage() &&
     store.getters['volunteer/isReadyToTutor'] &&
     store.getters['americaCountsVolunteer/isAmericaCountsVolunteer'] &&
-    store.state.americaCountsVolunteer.cooldownId === null
+    getCooldownId() === null
   )
 }
 
