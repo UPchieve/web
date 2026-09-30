@@ -35,10 +35,6 @@ function getWrapper() {
 
 enableAutoUnmount(afterEach)
 
-afterEach(() => {
-  vi.restoreAllMocks()
-})
-
 describe('NTHSToDoView', () => {
   it.each([
     [

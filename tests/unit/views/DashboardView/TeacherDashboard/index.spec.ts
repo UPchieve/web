@@ -156,7 +156,6 @@ describe('Teacher Dashboard', () => {
   ]
 
   beforeEach(async () => {
-    vi.restoreAllMocks()
     await router.push(`/dashboard/teacher`)
     NetworkService.getTopics = vi.fn().mockResolvedValue({ data: { topics } })
   })
@@ -200,7 +199,6 @@ describe('Teacher Dashboard', () => {
 
   describe('breadcrumbs', () => {
     beforeEach(async () => {
-      vi.restoreAllMocks()
       NetworkService.getTopics = vi.fn().mockResolvedValue({ data: { topics } })
       NetworkService.getTeacherClasses = vi
         .fn()

@@ -25,7 +25,6 @@ describe('ChatBot', () => {
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
     vi.useRealTimers()
   })
 

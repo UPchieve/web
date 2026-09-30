@@ -33,7 +33,6 @@ describe('JourneysView', () => {
   let routerPushSpy: MockInstance
 
   beforeEach(() => {
-    vi.restoreAllMocks()
     commitSpy = vi.spyOn(store, 'commit')
     routerPushSpy = vi.spyOn(router, 'push')
   })

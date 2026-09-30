@@ -1,7 +1,7 @@
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import LoggerService from '@/services/LoggerService'
 import { rosterPeriodStarts } from '@/services/NTHSRosterService'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { member, rosterResponse, topTutor } from '../fixtures/nths'
 
 const getNTHSChapterRoster = vi.fn()
@@ -22,9 +22,6 @@ function periodStartRejection() {
 beforeEach(() => {
   getNTHSChapterRoster.mockReset()
   vi.spyOn(LoggerService, 'noticeError').mockImplementation(() => {})
-})
-afterEach(() => {
-  vi.restoreAllMocks()
 })
 
 describe('useChapterRoster', () => {

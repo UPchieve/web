@@ -1,9 +1,7 @@
 import InviteLink from '@/components/NTHS/InviteLink.vue'
 import config from '@/config'
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-
-afterEach(() => vi.restoreAllMocks())
+import { describe, expect, it, vi } from 'vitest'
 
 describe('InviteLink', () => {
   it('copies the link and leaves it selected when the link itself is clicked', async () => {

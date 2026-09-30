@@ -29,7 +29,6 @@ describe('Navigation', () => {
   afterEach(() => {
     mounted?.unmount()
     mounted = undefined
-    vi.restoreAllMocks()
   })
 
   function getWrapper(options = {}) {

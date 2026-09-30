@@ -692,7 +692,6 @@ describe('NTHSMembersView', () => {
       expect(error.text()).not.toContain(raw.message)
       expect(noticeError).toHaveBeenCalledTimes(1)
       expect(noticeError.mock.calls[0][0]).toBe(raw)
-      noticeError.mockRestore()
     })
 
     it('keeps each pending role change busy until its own request settles', async () => {

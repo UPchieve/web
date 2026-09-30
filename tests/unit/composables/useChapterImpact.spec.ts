@@ -1,6 +1,6 @@
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import LoggerService from '@/services/LoggerService'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { impact } from '../fixtures/nths'
 
 const getNTHSChapterImpact = vi.fn()
@@ -29,9 +29,6 @@ function periodStartRejection() {
 
 beforeEach(() => {
   getNTHSChapterImpact.mockReset()
-})
-afterEach(() => {
-  vi.restoreAllMocks()
 })
 
 describe('useChapterImpact', () => {

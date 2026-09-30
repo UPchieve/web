@@ -42,7 +42,6 @@ describe('EditableName', () => {
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
     setNTHSGroupName.mockClear()
   })
 

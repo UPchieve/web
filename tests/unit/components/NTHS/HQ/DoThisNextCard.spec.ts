@@ -146,8 +146,6 @@ beforeEach(() => {
   vi.spyOn(LoggerService, 'noticeError').mockImplementation(() => {})
 })
 
-afterEach(() => vi.restoreAllMocks())
-
 describe('DoThisNextCard', () => {
   it('shows the first item that is not done, in checklist order', async () => {
     respondWithDone(ORIENTATION, RESOURCES)

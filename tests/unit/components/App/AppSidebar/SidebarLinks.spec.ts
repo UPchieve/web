@@ -386,7 +386,6 @@ describe('SidebarLinks', () => {
         afterEach(() => {
           storeOptions.modules.app.state.windowWidth = 0
           storeOptions.modules.app.modules.sidebar.state.isCollapsed = true
-          vi.restoreAllMocks()
         })
 
         it.each([

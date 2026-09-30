@@ -354,7 +354,6 @@ describe('Checklist', () => {
 
     assert(dispatch)
 
-    dispatch.mockRestore()
     wrapper.unmount()
   })
 
@@ -398,8 +397,6 @@ describe('Checklist', () => {
         ORIENTATION_ITEM.actionId
       )
 
-      noticeError.mockRestore()
-      dispatch.mockRestore()
       wrapper.unmount()
     }
   )

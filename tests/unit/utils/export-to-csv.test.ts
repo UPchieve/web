@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import exportToCsv from '@/utils/export-to-csv'
 
 let blobs: Blob[] = []
@@ -10,10 +10,6 @@ beforeEach(() => {
     return 'blob:test'
   })
   vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
-})
-
-afterEach(() => {
-  vi.restoreAllMocks()
 })
 
 async function csvFrom(

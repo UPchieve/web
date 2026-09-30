@@ -12,7 +12,6 @@ vi.mock('@/services/PresenceService')
 let wrapper: VueWrapper
 
 beforeEach(() => {
-  vi.restoreAllMocks()
   localStorage.clear()
 })
 

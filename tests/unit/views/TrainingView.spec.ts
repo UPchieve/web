@@ -46,8 +46,6 @@ function getWrapper(user = CERTIFIED_VOLUNTEER) {
 
 describe('TrainingView certificate', () => {
   beforeEach(() => {
-    vi.restoreAllMocks()
-
     NetworkService.getTrainingSubjects = vi
       .fn()
       .mockResolvedValue({ data: { training: {} } })

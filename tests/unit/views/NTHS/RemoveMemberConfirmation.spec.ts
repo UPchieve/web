@@ -3,7 +3,7 @@ import LoggerService from '@/services/LoggerService'
 import type { GroupMember } from '@/services/NTHSGroupService'
 import { NetworkError } from '@/services/NetworkService'
 import { flushPromises, mount } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
 
 vi.mock('@/store', () => ({ default: { dispatch: vi.fn() } }))
@@ -82,8 +82,6 @@ beforeEach(() => {
     .spyOn(LoggerService, 'noticeError')
     .mockImplementation(() => {})
 })
-
-afterEach(() => noticeError.mockRestore())
 
 describe('RemoveMemberConfirmation', () => {
   it.each([

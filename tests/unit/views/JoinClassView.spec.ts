@@ -36,7 +36,6 @@ describe('JoinClassView', () => {
   let routerPushSpy: MockInstance
 
   beforeEach(async () => {
-    vi.restoreAllMocks()
     routerPushSpy = vi.spyOn(router, 'push')
     NetworkService.user = vi.fn().mockResolvedValue({
       data: {
@@ -83,8 +82,6 @@ describe('JoinClassView', () => {
     expect(routerPushSpy).toHaveBeenCalledWith(
       `/dashboard?classCode=${classCode}`
     )
-
-    routerPushSpy.mockRestore()
   })
 
   test('redirect student to login with query params when there is an account', async () => {

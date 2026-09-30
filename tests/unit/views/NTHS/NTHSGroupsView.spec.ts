@@ -2,7 +2,7 @@ import NTHSGroupsView from '@/views/NTHS/NTHSGroupsView.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createStore } from 'vuex'
 import { h } from 'vue'
 
@@ -73,10 +73,6 @@ async function getWrapper(
   await flushPromises()
   return wrapper
 }
-
-afterEach(() => {
-  vi.restoreAllMocks()
-})
 
 describe('NTHSGroupsView', () => {
   it.each([

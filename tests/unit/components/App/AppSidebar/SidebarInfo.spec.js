@@ -48,7 +48,6 @@ describe('user menu', () => {
 
   afterEach(() => {
     wrapper.unmount()
-    vi.restoreAllMocks()
   })
 
   const getMountedWrapper = async () => {

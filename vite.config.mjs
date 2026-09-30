@@ -151,6 +151,7 @@ export default defineConfig({
     ],
   },
   test: {
+    restoreMocks: true,
     globals: true,
     exclude: ['**/tests/e2e/**', '**/node_modules/**'],
     projects: [

@@ -8,7 +8,6 @@ const STORAGE_KEY = `${USER_ID}-nths-roster-view`
 
 beforeEach(() => localStorage.clear())
 afterEach(() => {
-  vi.restoreAllMocks()
   localStorage.clear()
 })
 

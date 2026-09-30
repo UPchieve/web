@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { dayjs } from '@/utils/time-utils'
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
@@ -141,10 +141,6 @@ function buildStudentAssignment(
 }
 
 describe('StudentClassesView', () => {
-  beforeEach(async () => {
-    vi.restoreAllMocks()
-  })
-
   test('shows a list of the student classes', async () => {
     const fakeClasses = [buildStudentClass(), buildStudentClass()]
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({

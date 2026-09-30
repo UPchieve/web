@@ -312,7 +312,7 @@ describe('StudentSignUpService', () => {
 
         test('BigFuture', () => {
           const bfIntroCopy = 'Something for BF here.'
-          const storeSpy = vi.spyOn(store, 'getters', 'get').mockReturnValue({
+          vi.spyOn(store, 'getters', 'get').mockReturnValue({
             'featureFlags/bfIntroCopy': bfIntroCopy,
           })
 
@@ -336,8 +336,6 @@ describe('StudentSignUpService', () => {
             (e) => e.element === 'p'
           )
           expect(subheader?.formElement.content).toBe(bfIntroCopy)
-
-          storeSpy.mockRestore()
         })
       })
     })
@@ -853,8 +851,6 @@ describe('StudentSignUpService', () => {
         expect(result[1]).toBe(
           'The email address you entered is already in use'
         )
-
-        routerReplaceSpy.mockRestore()
       })
     })
   })

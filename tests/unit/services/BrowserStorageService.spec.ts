@@ -26,7 +26,6 @@ const DRAFT: NTHSApplicationDraft = {
 
 describe('NTHS application draft storage', () => {
   afterEach(() => {
-    vi.restoreAllMocks()
     localStorage.clear()
   })
 

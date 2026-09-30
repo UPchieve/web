@@ -52,7 +52,6 @@ function setVariant(variant: string) {
 
 describe('NTHSApplicationFormView submit', () => {
   beforeEach(() => {
-    vi.restoreAllMocks()
     vi.mocked(LoggerService.noticeError).mockClear()
     store.commit('nths/setNTHSCandidateApplicationStatus', undefined)
     store.commit('user/setUser', { id: USER_ID })
@@ -193,7 +192,6 @@ describe('NTHSApplicationFormView submit', () => {
 
 describe('NTHSApplicationFormView unlisted school', () => {
   beforeEach(() => {
-    vi.restoreAllMocks()
     store.commit('nths/setNTHSCandidateApplicationStatus', undefined)
     setVariant('')
     localStorage.clear()
