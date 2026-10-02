@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createStore } from 'vuex'
 import { RouterLink } from 'vue-router'
 import router from '@/router'
-import store from '@/store'
+import { storeOptions } from '@/store'
 import NTHSApplyPreviewView from '@/views/NTHS/NTHSApplyPreviewView.vue'
+import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 
 vi.mock('@/services/AnalyticsService')
 
@@ -13,11 +15,27 @@ const REQUIREMENTS = {
   firstSession: 'outstanding',
 }
 
-function mountWith(requirements: Record<string, string>) {
-  store.commit('nths/setNTHSApplyPreview', {
-    closesAt: '2026-10-01T03:59:00.000Z',
-    requirements,
+function storeWith(closesAt?: string) {
+  const { featureFlags } = storeOptions.modules
+  return createStore({
+    modules: {
+      ...storeOptions.modules,
+      featureFlags: {
+        ...featureFlags,
+        state: {
+          ...featureFlags.state,
+          payloadFlags: {
+            ...featureFlags.state.payloadFlags,
+            [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: { closesAt },
+          },
+        },
+      },
+    },
   })
+}
+
+function mountWith(requirements: Record<string, string>, store = storeWith()) {
+  store.commit('nths/setNTHSApplyPreview', { requirements })
   return mount(NTHSApplyPreviewView, {
     global: { plugins: [store, router] },
   })
@@ -35,6 +53,35 @@ function markersFor(wrapper: ReturnType<typeof mountWith>, key: string) {
 describe('NTHSApplyPreviewView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers({ toFake: ['Date'] }).setSystemTime(
+      new Date(2026, 9, 20, 12)
+    )
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it.each([
+    ['2026-10-31', '11 days left to apply', 'Oct 31, 2026'],
+    ['2026-10-21', '1 day left to apply', 'Oct 21, 2026'],
+    ['2026-10-20', 'Last day to apply', 'Oct 20, 2026'],
+  ])('shows a %s close date as "%s"', (closesAt, countdown, closesOn) => {
+    const wrapper = mountWith(REQUIREMENTS, storeWith(closesAt))
+
+    expect(wrapper.find('.countdown').text()).toBe(countdown)
+    expect(wrapper.find('.deadline').text()).toContain(closesOn)
+  })
+
+  it('drops a close date that passed while the app stayed open', () => {
+    const store = storeWith('2026-10-20')
+    expect(mountWith(REQUIREMENTS, store).find('.deadline').exists()).toBe(true)
+
+    vi.setSystemTime(new Date(2026, 9, 21, 9))
+
+    expect(mountWith(REQUIREMENTS, store).find('.deadline').exists()).toBe(
+      false
+    )
   })
 
   it.each([

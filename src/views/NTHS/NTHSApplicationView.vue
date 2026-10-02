@@ -3,8 +3,17 @@ import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
 import { NTHS_APPLY_URL } from '@/services/NTHSGroupService'
+import { upcomingApplicationDeadline } from '@/services/NTHSApplicationService'
+
+const store = useStore()
+const deadline = computed(() =>
+  upcomingApplicationDeadline(
+    store.getters['featureFlags/nthsApplicationsCloseAt']
+  )
+)
 
 const learnMoreLink = NTHS_APPLY_URL
 
@@ -33,8 +42,13 @@ onMounted(() => {
           <br /><br />
           Are you interested in becoming a founding President and starting a
           chapter in your community or school?
-          <br /><br />
-          Deadline to apply to start a chapter is Sep 30, 2026
+          <template v-if="deadline">
+            <br /><br />
+            <span data-testid="nths-application-deadline"
+              >Deadline to apply to start a chapter is
+              {{ deadline.closesOn }}</span
+            >
+          </template>
         </span>
         <div class="actions">
           <a

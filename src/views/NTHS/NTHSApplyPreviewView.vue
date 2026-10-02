@@ -13,10 +13,9 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import { NTHS_APPLY_URL } from '@/services/NTHSGroupService'
 import {
-  daysLeftToApply,
+  upcomingApplicationDeadline,
   type NTHSApplyPreview,
 } from '@/services/NTHSApplicationService'
-import { dayjs } from '@/utils/time-utils'
 
 type RequirementKey = keyof NTHSApplyPreview['requirements']
 
@@ -76,16 +75,18 @@ const preview = computed(
 )
 const requirements = computed(() => preview.value?.requirements)
 
+const deadline = computed(() =>
+  upcomingApplicationDeadline(
+    store.getters['featureFlags/nthsApplicationsCloseAt']
+  )
+)
+
 const countdown = computed(() => {
-  if (!preview.value) return
-  const days = daysLeftToApply(preview.value.closesAt)
+  if (!deadline.value) return
+  const days = deadline.value.daysLeft
   if (days === 0) return 'Last day to apply'
   return `${days} ${days === 1 ? 'day' : 'days'} left to apply`
 })
-
-const closesOn = computed(
-  () => preview.value && dayjs(preview.value.closesAt).format('MMM D, YYYY')
-)
 
 function showsLink(key: RequirementKey): boolean {
   const status = requirements.value
@@ -124,8 +125,8 @@ onMounted(() => {
         society powered by UPchieve. Get your friends tutoring, and you run the
         chapter.
       </p>
-      <p v-if="closesOn" class="deadline">
-        Applications close <strong>{{ closesOn }}</strong
+      <p v-if="deadline" class="deadline">
+        Applications close <strong>{{ deadline.closesOn }}</strong
         >.
       </p>
       <p class="no-approval">

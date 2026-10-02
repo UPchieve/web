@@ -2,7 +2,6 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import {
   buildEmptyResponses,
   collectResponses,
-  daysLeftToApply,
   HIGH_SCHOOL_GRADES,
   NTHS_APPLICATION_FORMS,
   sanitizeNTHSApplicationDraft,
@@ -10,6 +9,7 @@ import {
   type NTHSApplicationResponses,
   type NTHSFormVersion,
   type NTHSQuestion,
+  upcomingApplicationDeadline,
 } from '@/services/NTHSApplicationService'
 import { US_COUNTRY } from '@/consts'
 
@@ -252,7 +252,7 @@ describe('sanitizeNTHSApplicationDraft', () => {
   )
 })
 
-describe('daysLeftToApply', () => {
+describe('upcomingApplicationDeadline', () => {
   const CLOSES_AT = new Date(2026, 8, 30, 23, 59).toISOString()
 
   afterEach(() => {
@@ -263,9 +263,31 @@ describe('daysLeftToApply', () => {
     ['on the close date', 0, new Date(2026, 8, 30, 12)],
     ['the day before', 1, new Date(2026, 8, 29, 23, 59)],
     ['Sep 15', 15, new Date(2026, 8, 15, 12)],
-    ['after the close date', 0, new Date(2026, 9, 2, 12)],
-  ])('counts %s as %i', (_, days, now) => {
+  ])('shows the close date %s, %i days left', (_, daysLeft, now) => {
     vi.useFakeTimers().setSystemTime(now)
-    expect(daysLeftToApply(CLOSES_AT)).toBe(days)
+    expect(upcomingApplicationDeadline(CLOSES_AT)).toEqual({
+      closesOn: 'Sep 30, 2026',
+      daysLeft,
+    })
+  })
+
+  it.each([
+    ['all day', new Date(2026, 8, 30, 23, 59, 58), true],
+    ['the next day', new Date(2026, 9, 1, 0, 0), false],
+  ])('keeps a close date with no time open %s', (_, now, shown) => {
+    vi.useFakeTimers().setSystemTime(now)
+    expect(upcomingApplicationDeadline('2026-09-30')).toEqual(
+      shown ? { closesOn: 'Sep 30, 2026', daysLeft: 0 } : undefined
+    )
+  })
+
+  it.each([
+    ['no close date', undefined],
+    ['a close date that is not a date', 'end of September'],
+    ['a close date that is not a string', 1790000000000],
+    ['a close date that has passed', CLOSES_AT],
+  ])('shows nothing for %s', (_, closesAt) => {
+    vi.useFakeTimers().setSystemTime(new Date(2026, 9, 1, 0, 0))
+    expect(upcomingApplicationDeadline(closesAt)).toBeUndefined()
   })
 })

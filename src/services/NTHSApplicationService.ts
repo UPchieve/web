@@ -242,16 +242,24 @@ export function sanitizeNTHSApplicationDraft(
 export type NTHSApplyRequirementStatus = 'done' | 'outstanding' | 'inReview'
 
 export type NTHSApplyPreview = {
-  closesAt: string
   requirements: Record<
     'training' | 'safetyReview' | 'firstSession',
     NTHSApplyRequirementStatus
   >
 }
 
-export function daysLeftToApply(closesAt: string): number {
-  return Math.max(
-    0,
-    dayjs(closesAt).startOf('day').diff(dayjs().startOf('day'), 'day')
-  )
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
+
+export function upcomingApplicationDeadline(
+  closesAt: unknown
+): { closesOn: string; daysLeft: number } | undefined {
+  if (typeof closesAt !== 'string') return
+  const close = DATE_ONLY.test(closesAt)
+    ? dayjs(closesAt).endOf('day')
+    : dayjs(closesAt)
+  if (!close.isValid() || !close.isAfter(dayjs())) return
+  return {
+    closesOn: close.format('MMM D, YYYY'),
+    daysLeft: close.startOf('day').diff(dayjs().startOf('day'), 'day'),
+  }
 }

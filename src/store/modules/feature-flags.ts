@@ -95,6 +95,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR]: {},
+      [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: {},
     },
   },
   mutations: {
@@ -258,6 +259,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY],
     isNTHSApplicationPageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE],
+    nthsApplicationsCloseAt: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]?.closesAt,
     shouldShowStudentToVolunteerHoursPage: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE
