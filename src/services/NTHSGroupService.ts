@@ -4,10 +4,28 @@ import LoggerService from './LoggerService'
 import type { DateString, Uuid } from '@/types/shared'
 
 export type Role = 'admin' | 'member'
+
+// Mirrors server/constants/nths-titles.ts in subway; 'Member' means no title.
+export type NTHSTitle =
+  | 'President'
+  | 'Vice President'
+  | 'Executive Board Member'
+  | 'Member'
+export const LEADERSHIP_TITLES: readonly NTHSTitle[] = [
+  'President',
+  'Vice President',
+]
+
+export type NTHSMemberUpdate = {
+  role?: Role
+  title?: NTHSTitle
+  isActive?: false
+}
+
 export type GroupMember = {
   userId: string
   nthsGroupId: string
-  title: string | null
+  title: NTHSTitle
   roleName: Role
   firstName: string
   lastInitial: string
@@ -36,7 +54,7 @@ export type NTHSChapterImpactPublic = {
 }
 // From the request's monthStartsAt (or the UTC 1st of the month) to now.
 export type NTHSChapterMonthPublic = {
-  // Omitted when no current member other than the president qualifies.
+  // Omitted when no current member tutored a counted session this month.
   topTutorThisMonth?: NTHSTopTutorPublic
   // Only ever the requester's own hours.
   viewerHoursThisMonth: number
@@ -50,7 +68,7 @@ export type NTHSRosterMemberPublic = {
   firstName: string
   lastInitial: string
   roleName: Role
-  title?: string
+  title: NTHSTitle
   joinedAt: DateString
   trainingComplete: boolean
   safetyApproved: boolean
@@ -78,8 +96,8 @@ export type NTHSChapterRosterPublic = {
   groupId: Uuid
   schoolYear: NTHSSchoolYearPublic
   members: NTHSRosterMemberPublic[]
-  // Absent when no current member (other than the president) tutored a
-  // counted session since the monthStartsAt the request sent.
+  // Absent when no current member tutored a counted session since the
+  // monthStartsAt the request sent.
   topTutorThisMonth?: NTHSTopTutorPublic
 }
 export type NTHSChapterRosterResponse = { roster: NTHSChapterRosterPublic }

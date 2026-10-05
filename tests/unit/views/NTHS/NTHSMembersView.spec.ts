@@ -5,6 +5,7 @@ import {
   formatHours,
   formatPeriodActivity,
   formatSessions,
+  roleLabel,
   roleTagLabel,
   ROSTER_FILTERS,
   ROSTER_PERIOD_LABELS,
@@ -12,6 +13,7 @@ import {
   ROSTER_SORT_KEYS,
   rosterPeriodStarts,
   sortRoster,
+  titleChoices,
   type RosterPeriod,
 } from '@/services/NTHSRosterService'
 import {
@@ -58,10 +60,15 @@ vi.mock('@/services/NetworkService', () => ({
 }))
 
 const showNthsUserManagementModal = vi.fn()
+const showNthsMemberTitleModal = vi.fn()
+const showConfirm = vi.fn()
 vi.mock('@/services/ModalService', () => ({
   default: {
     showNthsUserManagementModal: (props: unknown) =>
       showNthsUserManagementModal(props),
+    showNthsMemberTitleModal: (props: unknown) =>
+      showNthsMemberTitleModal(props),
+    showConfirm: (...args: unknown[]) => showConfirm(...args),
   },
 }))
 
@@ -162,6 +169,9 @@ beforeEach(() => {
   getNTHSChapterImpact.mockReset()
   updateNTHSGroupMember.mockReset()
   showNthsUserManagementModal.mockReset()
+  showNthsMemberTitleModal.mockReset()
+  showNthsMemberTitleModal.mockResolvedValue('Member')
+  showConfirm.mockReset()
   getNTHSChapterRoster.mockResolvedValue(rosterResponse(MEMBERS))
   getNTHSChapterImpact.mockResolvedValue({ data: { impact: IMPACT } })
 })
@@ -606,6 +616,7 @@ describe('NTHSMembersView', () => {
       const [rows, options] = downloadRosterCsv.mock.calls[0]
       expect(rows.map((m: { userId: string }) => m.userId)).toEqual(['jordan'])
       expect(options).toEqual({
+        roster: MEMBERS,
         period: 'thisMonth',
         periodStarts: rosterPeriodStarts(NOW),
         schoolYearLabel: rosterResponse([]).data.roster.schoolYear.label,
@@ -625,8 +636,9 @@ describe('NTHSMembersView', () => {
   })
 
   describe('row actions', () => {
-    it('changes a role through the row menu, patches the row immediately, and refreshes roster and impact in the background', async () => {
+    it('makes a member an admin with the title chosen in the same step, patches the row immediately, and refreshes the roster in the background', async () => {
       updateNTHSGroupMember.mockResolvedValue(undefined)
+      showNthsMemberTitleModal.mockResolvedValue('Vice President')
       const wrapper = await getWrapper()
       const sam = MEMBERS.find((m) => m.userId === 'sam')!
 
@@ -639,19 +651,129 @@ describe('NTHSMembersView', () => {
         .trigger('click')
       await flushPromises()
 
+      expect(showNthsMemberTitleModal.mock.calls[0][0].choices).toEqual(
+        titleChoices(sam, MEMBERS, true)
+      )
       expect(updateNTHSGroupMember).toHaveBeenCalledWith('group-123', 'sam', {
         role: 'admin',
+        title: 'Vice President',
       })
+      const promoted = {
+        ...sam,
+        roleName: 'admin' as const,
+        title: 'Vice President' as const,
+      }
       expect(wrapper.find('[data-testid="roster-row-sam"]').text()).toContain(
-        roleTagLabel({ ...sam, roleName: 'admin' })
+        roleTagLabel(promoted, [promoted])
       )
       expect(chipCount(wrapper, 'all')).toBe(5)
 
       expect(getNTHSChapterRoster).toHaveBeenCalledTimes(2)
-      expect(getNTHSChapterImpact).toHaveBeenCalledTimes(2)
       expect(wrapper.find('[data-testid="roster-load-error"]').exists()).toBe(
         false
       )
+    })
+
+    it('sends nothing when the title choice is cancelled', async () => {
+      showNthsMemberTitleModal.mockResolvedValue(undefined)
+      const wrapper = await getWrapper()
+
+      await wrapper.find('[data-testid="member-actions-sam"]').trigger('click')
+      await wrapper
+        .find('[data-testid="member-make-admin-sam"]')
+        .trigger('click')
+      await flushPromises()
+
+      expect(updateNTHSGroupMember).not.toHaveBeenCalled()
+    })
+
+    it("changes a plain member's title from the choices a plain member can hold", async () => {
+      updateNTHSGroupMember.mockResolvedValue(undefined)
+      showNthsMemberTitleModal.mockResolvedValue('Executive Board Member')
+      const wrapper = await getWrapper()
+      const sam = MEMBERS.find((m) => m.userId === 'sam')!
+
+      await wrapper.find('[data-testid="member-actions-sam"]').trigger('click')
+      await wrapper
+        .find('[data-testid="member-change-title-sam"]')
+        .trigger('click')
+      await flushPromises()
+
+      expect(showNthsMemberTitleModal.mock.calls[0][0].choices).toEqual(
+        titleChoices(sam, MEMBERS, false)
+      )
+      expect(updateNTHSGroupMember).toHaveBeenCalledWith('group-123', 'sam', {
+        title: 'Executive Board Member',
+      })
+    })
+
+    describe('removing admin', () => {
+      it.each([
+        ['President', true, 'Member'],
+        ['Executive Board Member', false, 'Executive Board Member'],
+      ] as const)(
+        'from a %s admin asks to confirm the title loss: %s, leaving %s',
+        async (title, confirms, titleAfter) => {
+          const admin = member({
+            userId: 'casey',
+            firstName: 'Casey',
+            roleName: 'admin',
+            title,
+          })
+          const roster = [...MEMBERS, admin]
+          getNTHSChapterRoster.mockResolvedValue(rosterResponse(roster))
+          updateNTHSGroupMember.mockResolvedValue(undefined)
+          showConfirm.mockResolvedValue(true)
+          const wrapper = await getWrapper()
+          getNTHSChapterRoster.mockReturnValueOnce(new Promise(() => {}))
+
+          await wrapper
+            .find('[data-testid="member-actions-casey"]')
+            .trigger('click')
+          await wrapper
+            .find('[data-testid="member-remove-admin-casey"]')
+            .trigger('click')
+          await flushPromises()
+
+          expect(showConfirm).toHaveBeenCalledTimes(confirms ? 1 : 0)
+          expect(updateNTHSGroupMember).toHaveBeenCalledWith(
+            'group-123',
+            'casey',
+            { role: 'member' }
+          )
+          const demoted = {
+            ...admin,
+            roleName: 'member' as const,
+            title: titleAfter,
+          }
+          expect(
+            wrapper.find('[data-testid="roster-row-casey"]').text()
+          ).toContain(roleLabel(demoted, [demoted]))
+        }
+      )
+
+      it('changes nothing when the confirmation is cancelled', async () => {
+        const president = member({
+          userId: 'casey',
+          roleName: 'admin',
+          title: 'President',
+        })
+        getNTHSChapterRoster.mockResolvedValue(
+          rosterResponse([...MEMBERS, president])
+        )
+        showConfirm.mockResolvedValue(false)
+        const wrapper = await getWrapper()
+
+        await wrapper
+          .find('[data-testid="member-actions-casey"]')
+          .trigger('click')
+        await wrapper
+          .find('[data-testid="member-remove-admin-casey"]')
+          .trigger('click')
+        await flushPromises()
+
+        expect(updateNTHSGroupMember).not.toHaveBeenCalled()
+      })
     })
 
     it('drops the row immediately and refreshes roster and impact in the background once the remove modal reports the member gone', async () => {
@@ -740,14 +862,16 @@ describe('NTHSMembersView', () => {
   })
 
   describe('permissions', () => {
-    it('gives the president no actions on their own row', async () => {
+    it('offers an admin only a title change on their own row', async () => {
       const wrapper = await getWrapper()
+      await wrapper
+        .find('[data-testid="member-actions-president"]')
+        .trigger('click')
       expect(
-        wrapper.find('[data-testid="member-actions-president"]').exists()
-      ).toBe(false)
-      expect(wrapper.find('[data-testid="member-actions-sam"]').exists()).toBe(
-        true
-      )
+        wrapper
+          .findAll('[role="menuitem"]')
+          .map((item) => item.attributes('data-testid'))
+      ).toEqual(['member-change-title-president'])
     })
 
     it.each([

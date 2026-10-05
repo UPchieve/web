@@ -8,6 +8,7 @@ import type {
   NTHSActionName,
   NTHSChapterImpactResponse,
   NTHSChapterRosterResponse,
+  NTHSMemberUpdate,
 } from './NTHSGroupService'
 import type {
   NTHSApplyPreview,
@@ -1448,7 +1449,11 @@ export default {
       this._axiosErrorHandler
     )
   },
-  updateNTHSGroupMember(groupId: string, userId: string, data: any) {
+  updateNTHSGroupMember(
+    groupId: string,
+    userId: string,
+    data: NTHSMemberUpdate
+  ) {
     return httpPut(
       `${API_ROOT}/nths-groups/${groupId}/members/${userId}`,
       data

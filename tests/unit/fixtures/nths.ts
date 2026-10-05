@@ -22,6 +22,7 @@ export function member(
     firstName: 'Alex',
     lastInitial: 'R',
     roleName: 'member',
+    title: 'Member',
     joinedAt: '2026-08-01T00:00:00.000Z',
     trainingComplete: true,
     safetyApproved: true,

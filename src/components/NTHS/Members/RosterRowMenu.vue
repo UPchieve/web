@@ -1,20 +1,24 @@
 <script setup lang="ts">
 // Not built on Menu.vue: on mobile that always opens as a full IonModal
-// bottom sheet, too heavy for a two- or three-item row action menu that
+// bottom sheet, too heavy for a short row action menu that
 // needs to stay anchored next to its trigger inside a scrolling table.
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import {
+  ROSTER_MEMBER_ACTION_LABELS,
+  type RosterMemberAction,
+} from '@/services/NTHSRosterService'
 
 const props = defineProps<{
   member: NTHSRosterMemberPublic
+  actions: RosterMemberAction[]
   open: boolean
   busy?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'toggle'): void
   (e: 'close'): void
-  (e: 'changeRole', roleName: 'admin' | 'member'): void
-  (e: 'remove'): void
+  (e: 'act', action: RosterMemberAction): void
 }>()
 
 const POPOVER_WIDTH = 230
@@ -128,9 +132,9 @@ function onTriggerClick() {
   if (!props.busy) emit('toggle')
 }
 
-function choose(action: () => void) {
+function choose(action: RosterMemberAction) {
   button.value?.focus()
-  action()
+  emit('act', action)
 }
 </script>
 
@@ -161,42 +165,19 @@ function choose(action: () => void) {
       :style="{ top: `${coords?.top ?? 0}px`, left: `${coords?.left ?? 0}px` }"
       role="menu"
     >
-      <template v-if="!member.accountClosed">
-        <button
-          v-if="member.roleName === 'member'"
-          type="button"
-          class="item"
-          role="menuitem"
-          tabindex="-1"
-          :data-testid="`member-make-admin-${member.userId}`"
-          v-ph:nthshq="'members.make_admin'"
-          @click="choose(() => emit('changeRole', 'admin'))"
-        >
-          Make admin
-        </button>
-        <button
-          v-else
-          type="button"
-          class="item"
-          role="menuitem"
-          tabindex="-1"
-          :data-testid="`member-remove-admin-${member.userId}`"
-          v-ph:nthshq="'members.remove_admin'"
-          @click="choose(() => emit('changeRole', 'member'))"
-        >
-          Remove admin
-        </button>
-      </template>
       <button
+        v-for="action in actions"
+        :key="action"
         type="button"
-        class="item danger"
+        class="item"
+        :class="{ danger: action === 'remove' }"
         role="menuitem"
         tabindex="-1"
-        :data-testid="`member-remove-${member.userId}`"
-        v-ph:nthshq="'members.remove'"
-        @click="choose(() => emit('remove'))"
+        :data-testid="`member-${action.replaceAll('_', '-')}-${member.userId}`"
+        v-ph:nthshq="`members.${action}`"
+        @click="choose(action)"
       >
-        Remove
+        {{ ROSTER_MEMBER_ACTION_LABELS[action] }}
       </button>
     </div>
   </div>

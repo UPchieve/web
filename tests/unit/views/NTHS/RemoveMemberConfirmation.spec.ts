@@ -26,7 +26,7 @@ vi.mock('@/services/NetworkService', async (importOriginal) => ({
 const MEMBER = {
   userId: 'sam',
   nthsGroupId: 'group-123',
-  title: null,
+  title: 'Member' as const,
   roleName: 'member' as const,
   firstName: 'Sam',
   lastInitial: 'Q',

@@ -15,11 +15,18 @@ import { useRosterPreferences } from '@/composables/useRosterPreferences'
 import LoggerService from '@/services/LoggerService'
 import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import {
+  LEADERSHIP_TITLES,
+  type NTHSMemberUpdate,
+  type NTHSRosterMemberPublic,
+  type NTHSTitle,
+} from '@/services/NTHSGroupService'
 import { formatProgressHours } from '@/services/NTHSImpactService'
 import {
+  displayTitle,
   downloadRosterCsv,
   filterRoster,
+  memberDisplayName,
   nextRosterSort,
   ROSTER_PERIOD_LABELS,
   ROSTER_PERIOD_PHRASES,
@@ -27,7 +34,9 @@ import {
   rosterFilterCounts,
   rosterPeriodStarts,
   sortRoster,
+  titleChoices,
   type RosterFilter,
+  type RosterMemberAction,
   type RosterPeriod,
   type RosterSortKey,
 } from '@/services/NTHSRosterService'
@@ -149,6 +158,7 @@ function sortBy(key: RosterSortKey) {
 
 function downloadCsv() {
   downloadRosterCsv(visibleMembers.value, {
+    roster: members.value,
     period: activePeriod.value,
     periodStarts: rosterPeriodStarts(now),
     schoolYearLabel: schoolYear.value!.label,
@@ -165,43 +175,115 @@ function closeMenu(userId: string) {
   if (openMenuUserId.value === userId) openMenuUserId.value = undefined
 }
 
-// Top tutor eligibility depends on role and membership, so a change can move
-// the card and the summary counts.
 function refreshAfterMembershipChange() {
   refreshRoster(groupId.value, now)
   refreshImpact(groupId.value, now)
 }
 
-async function changeRole(
+async function updateMember(
   member: NTHSRosterMemberPublic,
-  roleName: 'admin' | 'member'
+  update: NTHSMemberUpdate,
+  patch: Partial<NTHSRosterMemberPublic>,
+  failureMessage: string
 ) {
-  openMenuUserId.value = undefined
   busyUserIds.value.add(member.userId)
   errorMessage.value = ''
   try {
-    await NetworkService.updateNTHSGroupMember(groupId.value, member.userId, {
-      role: roleName,
-    })
-    patchMember(member.userId, { roleName })
-    refreshAfterMembershipChange()
+    await NetworkService.updateNTHSGroupMember(
+      groupId.value,
+      member.userId,
+      update
+    )
+    patchMember(member.userId, patch)
+    refreshRoster(groupId.value, now)
   } catch (err) {
     LoggerService.noticeError(err)
-    errorMessage.value = `Something went wrong while updating ${member.firstName}'s role. Please refresh the page and try again.`
+    errorMessage.value = failureMessage
   } finally {
     busyUserIds.value.delete(member.userId)
   }
 }
 
-function removeMember(member: NTHSRosterMemberPublic) {
+function roleFailureMessage(member: NTHSRosterMemberPublic) {
+  return `Something went wrong while updating ${member.firstName}'s role. Please refresh the page and try again.`
+}
+
+async function makeAdmin(member: NTHSRosterMemberPublic) {
+  const title = await ModalService.showNthsMemberTitleModal({
+    heading: `Make ${memberDisplayName(member)} an admin`,
+    choices: titleChoices(member, members.value, true),
+    current: member.title,
+    acceptText: 'Make admin',
+  })
+  if (!title) return
+  await updateMember(
+    member,
+    { role: 'admin', title },
+    { roleName: 'admin', title },
+    roleFailureMessage(member)
+  )
+}
+
+async function changeTitle(member: NTHSRosterMemberPublic) {
+  const title = await ModalService.showNthsMemberTitleModal({
+    heading: `Change ${memberDisplayName(member)}'s title`,
+    choices: titleChoices(member, members.value, member.roleName === 'admin'),
+    current: member.title,
+    acceptText: 'Save',
+  })
+  if (!title || title === member.title) return
+  await updateMember(
+    member,
+    { title },
+    { title },
+    `Something went wrong while updating ${member.firstName}'s title. Please refresh the page and try again.`
+  )
+}
+
+async function removeAdmin(member: NTHSRosterMemberPublic) {
+  const losesTitle = LEADERSHIP_TITLES.includes(member.title)
+  if (losesTitle) {
+    const confirmed = await ModalService.showConfirm(
+      `Remove ${memberDisplayName(member)} as admin?`,
+      `They'll lose their ${displayTitle(member, members.value) ?? member.title} title, since only admins can hold it.`,
+      { acceptText: 'Remove admin', backText: 'Cancel' }
+    )
+    if (!confirmed) return
+  }
+  const title: NTHSTitle = losesTitle ? 'Member' : member.title
+  await updateMember(
+    member,
+    { role: 'member' },
+    { roleName: 'member', title },
+    roleFailureMessage(member)
+  )
+}
+
+function onMemberAction(
+  member: NTHSRosterMemberPublic,
+  action: RosterMemberAction
+) {
   openMenuUserId.value = undefined
+  switch (action) {
+    case 'make_admin':
+      return makeAdmin(member)
+    case 'change_title':
+      return changeTitle(member)
+    case 'remove_admin':
+      return removeAdmin(member)
+    case 'remove':
+      return removeMember(member)
+  }
+}
+
+function removeMember(member: NTHSRosterMemberPublic) {
   errorMessage.value = ''
   ModalService.showNthsUserManagementModal({
     isLoading: false,
     memberToRemove: {
       userId: member.userId,
       nthsGroupId: groupId.value,
-      title: member.title ?? null,
+      title: member.title,
       roleName: member.roleName,
       firstName: member.firstName,
       lastInitial: member.lastInitial,
@@ -311,6 +393,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
         <RosterCards
           v-else-if="isStacked"
           :members="visibleMembers"
+          :roster="members"
           :now="now"
           :period="activePeriod"
           :currentUserId="currentUserId"
@@ -321,12 +404,12 @@ function removeMember(member: NTHSRosterMemberPublic) {
           @sort="sortBy"
           @toggleMenu="toggleMenu"
           @closeMenu="closeMenu"
-          @changeRole="changeRole"
-          @remove="removeMember"
+          @act="onMemberAction"
         />
         <RosterTable
           v-else
           :members="visibleMembers"
+          :roster="members"
           :now="now"
           :period="activePeriod"
           :currentUserId="currentUserId"
@@ -337,8 +420,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
           @sort="sortBy"
           @toggleMenu="toggleMenu"
           @closeMenu="closeMenu"
-          @changeRole="changeRole"
-          @remove="removeMember"
+          @act="onMemberAction"
         />
       </div>
 

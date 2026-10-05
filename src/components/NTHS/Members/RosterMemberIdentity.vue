@@ -7,8 +7,14 @@ import {
   roleLabel,
   roleTagLabel,
 } from '@/services/NTHSRosterService'
+import { computed } from 'vue'
 
-defineProps<{ member: NTHSRosterMemberPublic }>()
+const props = defineProps<{
+  member: NTHSRosterMemberPublic
+  roster: NTHSRosterMemberPublic[]
+}>()
+
+const tag = computed(() => roleTagLabel(props.member, props.roster))
 </script>
 
 <template>
@@ -22,13 +28,13 @@ defineProps<{ member: NTHSRosterMemberPublic }>()
     <div class="member-name-row">
       <span class="member-name">{{ memberDisplayName(member) }}</span>
       <span
-        v-if="roleTagLabel(member)"
+        v-if="tag"
         class="role-tag"
-        :class="{ president: roleTagLabel(member) === 'President' }"
-        >{{ roleTagLabel(member) }}</span
+        :class="{ president: tag === 'President' || tag === 'Co-President' }"
+        >{{ tag }}</span
       >
     </div>
-    <span class="member-role">{{ roleLabel(member) }}</span>
+    <span class="member-role">{{ roleLabel(member, roster) }}</span>
   </div>
 </template>
 

@@ -12,6 +12,7 @@ import {
   formatSessions,
   PERIOD_SORT_KEYS,
   ROSTER_PERIOD_LABELS,
+  rosterMemberActions,
   rosterStatus,
   ROSTER_SORT_KEYS,
   ROSTER_SORT_LABELS,
@@ -79,7 +80,7 @@ function ariaSort(key: RosterSortKey) {
         >
           <td>
             <div class="member">
-              <RosterMemberIdentity :member="member" />
+              <RosterMemberIdentity :member="member" :roster="roster" />
             </div>
           </td>
           <td>
@@ -102,14 +103,13 @@ function ariaSort(key: RosterSortKey) {
           </td>
           <td v-if="canManage" class="actions">
             <RosterRowMenu
-              v-if="member.userId !== currentUserId"
               :member="member"
+              :actions="rosterMemberActions(member, currentUserId)"
               :open="openMenuUserId === member.userId"
               :busy="busyUserIds.has(member.userId)"
               @toggle="$emit('toggleMenu', member.userId)"
               @close="$emit('closeMenu', member.userId)"
-              @changeRole="(role) => $emit('changeRole', member, role)"
-              @remove="$emit('remove', member)"
+              @act="(action) => $emit('act', member, action)"
             />
           </td>
         </tr>

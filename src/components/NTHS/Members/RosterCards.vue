@@ -10,6 +10,7 @@ import RosterStatusTag from '@/components/NTHS/Members/RosterStatusTag.vue'
 import {
   formatLastActive,
   ROSTER_PERIOD_LABELS,
+  rosterMemberActions,
   rosterStatus,
 } from '@/services/NTHSRosterService'
 
@@ -26,16 +27,16 @@ defineEmits<RosterRowEmits>()
       :data-testid="`roster-row-${member.userId}`"
     >
       <div class="card-top">
-        <RosterMemberIdentity :member="member" />
+        <RosterMemberIdentity :member="member" :roster="roster" />
         <RosterRowMenu
-          v-if="canManage && member.userId !== currentUserId"
+          v-if="canManage"
           :member="member"
+          :actions="rosterMemberActions(member, currentUserId)"
           :open="openMenuUserId === member.userId"
           :busy="busyUserIds.has(member.userId)"
           @toggle="$emit('toggleMenu', member.userId)"
           @close="$emit('closeMenu', member.userId)"
-          @changeRole="(role) => $emit('changeRole', member, role)"
-          @remove="$emit('remove', member)"
+          @act="(action) => $emit('act', member, action)"
         />
       </div>
 

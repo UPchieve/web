@@ -10,9 +10,10 @@ import {
   hoursLabel,
   rosterFilterCounts,
   rosterPeriodStarts,
+  rosterMemberActions,
   rosterStatus,
   roleLabel,
-  roleTagLabel,
+  titleChoices,
   DEFAULT_ROSTER_SORT,
   nextRosterSort,
   PERIOD_SORT_KEYS,
@@ -38,10 +39,12 @@ const SCHOOL_YEAR_LABEL = '2026–27'
 
 function csvRows(
   rows: NTHSRosterMemberPublic[],
-  period: RosterPeriod
+  period: RosterPeriod,
+  roster = rows
 ): Record<string, string | number>[] {
   exportToCsv.mockClear()
   downloadRosterCsv(rows, {
+    roster,
     period,
     periodStarts: CSV_PERIOD_STARTS,
     schoolYearLabel: SCHOOL_YEAR_LABEL,
@@ -207,6 +210,19 @@ describe('rosterFilterCounts', () => {
 })
 
 describe('downloadRosterCsv', () => {
+  it('names a co-president from the whole roster when the filter hides the other one', () => {
+    const shown = member({ userId: 'a', roleName: 'admin', title: 'President' })
+    const hidden = member({
+      userId: 'b',
+      roleName: 'admin',
+      title: 'President',
+    })
+    const [row] = csvRows([shown], 'thisWeek', [shown, hidden])
+    const [alone] = csvRows([shown], 'thisWeek')
+    expect(row.Role).toBe(roleLabel(shown, [shown, hidden]))
+    expect(row.Role).not.toBe(alone.Role)
+  })
+
   it('downloads the roster file with the formula guard and a UTF-8 BOM', () => {
     csvRows([member()], 'thisWeek')
     expect(exportToCsv).toHaveBeenCalledWith(
@@ -382,22 +398,33 @@ describe('column formatting', () => {
   })
 })
 
-describe('roleLabel and roleTagLabel', () => {
-  const plainAdmin = member({ roleName: 'admin' })
-  const plainMember = member({ roleName: 'member' })
-
-  it('calls a titled admin something other than a plain admin', () => {
-    const president = member({ roleName: 'admin', title: 'President' })
-    expect(roleLabel(president)).not.toBe(roleLabel(plainAdmin))
-    expect(roleTagLabel(president)).not.toBe(roleTagLabel(plainAdmin))
+describe('rosterMemberActions', () => {
+  it.each([
+    ['a plain member', {}, ['make_admin', 'change_title', 'remove']],
+    [
+      'an admin',
+      { roleName: 'admin' as const },
+      ['remove_admin', 'change_title', 'remove'],
+    ],
+    ['a closed account', { accountClosed: true }, ['remove']],
+    ["the viewer's own row", { userId: 'viewer' }, ['change_title']],
+  ])('offers %s these actions', (_label, overrides, expected) => {
+    expect(rosterMemberActions(member(overrides), 'viewer')).toEqual(expected)
   })
+})
 
-  it('treats a founder demoted to member like any other member, title and all', () => {
-    const demoted = member({ roleName: 'member', title: 'President' })
-    expect(roleLabel(demoted)).toBe(roleLabel(plainMember))
-    expect(roleTagLabel(demoted)).toBeUndefined()
-    const [row, plainRow] = csvRows([demoted, plainMember], 'thisWeek')
-    expect(row.Role).toBe(plainRow.Role)
+describe('titleChoices', () => {
+  const titles = (asAdmin: boolean) =>
+    titleChoices(member(), [member()], asAdmin).map((choice) => choice.title)
+
+  it('offers an admin every title and a plain member only the board or none', () => {
+    expect(titles(true)).toEqual([
+      'President',
+      'Vice President',
+      'Executive Board Member',
+      'Member',
+    ])
+    expect(titles(false)).toEqual(['Executive Board Member', 'Member'])
   })
 })
 

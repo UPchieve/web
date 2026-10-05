@@ -1,5 +1,6 @@
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import type {
+  RosterMemberAction,
   RosterPeriod,
   RosterSort,
   RosterSortKey,
@@ -9,6 +10,8 @@ import type {
 // to one can't silently drift from the other.
 export type RosterRowProps = {
   members: NTHSRosterMemberPublic[]
+  // The unfiltered roster, which titles are counted against.
+  roster: NTHSRosterMemberPublic[]
   now: Date
   period: RosterPeriod
   currentUserId: string
@@ -21,11 +24,6 @@ export type RosterRowProps = {
 export type RosterRowEmits = {
   (e: 'toggleMenu', userId: string): void
   (e: 'closeMenu', userId: string): void
-  (
-    e: 'changeRole',
-    member: NTHSRosterMemberPublic,
-    role: 'admin' | 'member'
-  ): void
-  (e: 'remove', member: NTHSRosterMemberPublic): void
+  (e: 'act', member: NTHSRosterMemberPublic, action: RosterMemberAction): void
   (e: 'sort', key: RosterSortKey): void
 }

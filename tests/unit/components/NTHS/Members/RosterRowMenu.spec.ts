@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { member } from '../../../fixtures/nths'
 
 const MEMBER = member({ userId: 'sam', firstName: 'Sam', lastInitial: 'Q' })
+const ACTIONS = ['make_admin', 'change_title', 'remove'] as const
 
 enableAutoUnmount(afterEach)
 
@@ -12,12 +13,12 @@ describe('RosterRowMenu', () => {
 
   it('points aria-controls at the open popover id, and at nothing while closed', async () => {
     const closed = mount(RosterRowMenu, {
-      props: { member: MEMBER, open: false },
+      props: { member: MEMBER, actions: [...ACTIONS], open: false },
     })
     expect(closed.find(TRIGGER).attributes('aria-controls')).toBeUndefined()
 
     const wrapper = mount(RosterRowMenu, {
-      props: { member: MEMBER, open: true },
+      props: { member: MEMBER, actions: [...ACTIONS], open: true },
     })
     await flushPromises()
 
@@ -28,7 +29,12 @@ describe('RosterRowMenu', () => {
 
   it('does not emit toggle from a trigger click while busy', async () => {
     const wrapper = mount(RosterRowMenu, {
-      props: { member: MEMBER, open: false, busy: true },
+      props: {
+        member: MEMBER,
+        actions: [...ACTIONS],
+        open: false,
+        busy: true,
+      },
     })
 
     await wrapper.find(TRIGGER).trigger('click')
@@ -37,60 +43,38 @@ describe('RosterRowMenu', () => {
   })
 
   describe('row actions', () => {
-    it.each([
-      ['member', 'member-make-admin', 'admin'],
-      ['admin', 'member-remove-admin', 'member'],
-    ] as const)(
-      'a %s row emits changeRole %s from its role action and returns focus to the trigger',
-      async (roleName, testidPrefix, nextRole) => {
+    it.each(ACTIONS)(
+      'emits act %s from its item and returns focus to the trigger',
+      async (action) => {
         const wrapper = mount(RosterRowMenu, {
-          props: { member: { ...MEMBER, roleName }, open: true },
+          props: { member: MEMBER, actions: [...ACTIONS], open: true },
           attachTo: document.body,
         })
         await flushPromises()
 
         await wrapper
-          .find(`[data-testid="${testidPrefix}-${MEMBER.userId}"]`)
+          .find(
+            `[data-testid="member-${action.replaceAll('_', '-')}-${MEMBER.userId}"]`
+          )
           .trigger('click')
 
-        expect(wrapper.emitted('changeRole')?.[0]).toEqual([nextRole])
+        expect(wrapper.emitted('act')).toEqual([[action]])
         expect(document.activeElement).toBe(wrapper.find(TRIGGER).element)
       }
     )
 
-    it.each(['member', 'admin'] as const)(
-      'a closed-account %s row offers only Remove, focused on open',
-      async (roleName) => {
-        const wrapper = mount(RosterRowMenu, {
-          props: {
-            member: { ...MEMBER, roleName, accountClosed: true },
-            open: true,
-          },
-          attachTo: document.body,
-        })
-        await flushPromises()
-
-        const items = wrapper.findAll('[role="menuitem"]')
-        expect(items.map((item) => item.attributes('data-testid'))).toEqual([
-          `member-remove-${MEMBER.userId}`,
-        ])
-        expect(document.activeElement).toBe(items[0].element)
-      }
-    )
-
-    it('emits remove from the Remove action and returns focus to the trigger', async () => {
+    it('lists exactly the actions it is given, focusing the first on open', async () => {
       const wrapper = mount(RosterRowMenu, {
-        props: { member: MEMBER, open: true },
+        props: { member: MEMBER, actions: ['remove'], open: true },
         attachTo: document.body,
       })
       await flushPromises()
 
-      await wrapper
-        .find(`[data-testid="member-remove-${MEMBER.userId}"]`)
-        .trigger('click')
-
-      expect(wrapper.emitted('remove')).toHaveLength(1)
-      expect(document.activeElement).toBe(wrapper.find(TRIGGER).element)
+      const items = wrapper.findAll('[role="menuitem"]')
+      expect(items.map((item) => item.attributes('data-testid'))).toEqual([
+        `member-remove-${MEMBER.userId}`,
+      ])
+      expect(document.activeElement).toBe(items[0].element)
     })
   })
 
@@ -99,7 +83,7 @@ describe('RosterRowMenu', () => {
     // events dispatched inside the live document, so mount there directly.
     async function openMenu() {
       const wrapper = mount(RosterRowMenu, {
-        props: { member: MEMBER, open: true },
+        props: { member: MEMBER, actions: [...ACTIONS], open: true },
         attachTo: document.body,
       })
       await flushPromises()

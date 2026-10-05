@@ -1,4 +1,7 @@
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type {
+  NTHSRosterMemberPublic,
+  NTHSTitle,
+} from '@/services/NTHSGroupService'
 import {
   formatDecimalHours,
   isUnderOneTenth,
@@ -320,6 +323,9 @@ function csvCalendarDate(value: string | undefined): string {
 }
 
 type RosterCsvOptions = {
+  // Unfiltered, so a co-president the filter hides still makes the other one
+  // read as co-president.
+  roster: NTHSRosterMemberPublic[]
   period: RosterPeriod
   periodStarts: Record<CalendarRosterPeriod, Date>
   schoolYearLabel: string
@@ -328,7 +334,7 @@ type RosterCsvOptions = {
 // Takes the already-filtered rows, so the export cannot disagree with the table.
 export function downloadRosterCsv(
   rows: NTHSRosterMemberPublic[],
-  { period, periodStarts, schoolYearLabel }: RosterCsvOptions
+  { roster, period, periodStarts, schoolYearLabel }: RosterCsvOptions
 ): void {
   exportToCsv(
     'nths-chapter-members.csv',
@@ -348,7 +354,7 @@ export function downloadRosterCsv(
       // table's em dash for zero would not sum.
       return {
         Name: memberDisplayName(member),
-        Role: roleLabel(member),
+        Role: roleLabel(member, roster),
         Training: member.trainingComplete ? 'Complete' : 'Incomplete',
         'Safety approval': member.safetyApproved ? 'Approved' : 'Not approved',
         Joined: csvCalendarDate(member.joinedAt),
@@ -374,24 +380,110 @@ export function memberDisplayName(
     : member.firstName
 }
 
-const PRESIDENT_TITLE = 'President'
+type NTHSDisplayTitle =
+  | 'President'
+  | 'Co-President'
+  | 'Vice President'
+  | 'Executive Board Member'
 
-// The title stays on a founder after another admin demotes them, so the role
-// has to agree before the roster still calls them president.
-function isPresident(member: NTHSRosterMemberPublic): boolean {
-  return member.title === PRESIDENT_TITLE && member.roleName === 'admin'
+type PresidencyLabel = Extract<NTHSDisplayTitle, 'President' | 'Co-President'>
+
+function isCurrentPresident(member: NTHSRosterMemberPublic): boolean {
+  return member.title === 'President' && !member.accountClosed
+}
+
+function presidencyLabel(presidentCount: number): PresidencyLabel {
+  return presidentCount >= 2 ? 'Co-President' : 'President'
+}
+
+export function displayTitle(
+  member: NTHSRosterMemberPublic,
+  roster: NTHSRosterMemberPublic[]
+): NTHSDisplayTitle | undefined {
+  if (member.accountClosed) return undefined
+  if (member.title === 'President')
+    return presidencyLabel(roster.filter(isCurrentPresident).length)
+  return member.title === 'Member' ? undefined : member.title
+}
+
+// Leaves out the member being edited, so a sole president editing their own
+// title is offered "President".
+export function presidencyChoiceLabel(
+  roster: NTHSRosterMemberPublic[],
+  editingUserId: string
+): PresidencyLabel {
+  const others = roster.filter(
+    (m) => m.userId !== editingUserId && isCurrentPresident(m)
+  )
+  return presidencyLabel(others.length + 1)
 }
 
 export function roleTagLabel(
-  member: NTHSRosterMemberPublic
+  member: NTHSRosterMemberPublic,
+  roster: NTHSRosterMemberPublic[]
 ): string | undefined {
-  if (isPresident(member)) return 'President'
-  return member.roleName === 'admin' ? 'Admin' : undefined
+  const title = displayTitle(member, roster)
+  if (title) return title
+  return member.roleName === 'admin' && !member.accountClosed
+    ? 'Admin'
+    : undefined
 }
 
-export function roleLabel(member: NTHSRosterMemberPublic): string {
-  if (isPresident(member)) return 'Chapter president'
-  return member.roleName === 'admin' ? 'Chapter admin' : 'Member'
+export function roleLabel(
+  member: NTHSRosterMemberPublic,
+  roster: NTHSRosterMemberPublic[]
+): string {
+  const title = displayTitle(member, roster)
+  if (title) return title
+  return member.roleName === 'admin' && !member.accountClosed
+    ? 'Chapter admin'
+    : 'Member'
+}
+
+export type TitleChoice = { title: NTHSTitle; label: string }
+
+export function titleChoices(
+  member: NTHSRosterMemberPublic,
+  roster: NTHSRosterMemberPublic[],
+  asAdmin: boolean
+): TitleChoice[] {
+  const leadership: TitleChoice[] = asAdmin
+    ? [
+        {
+          title: 'President',
+          label: presidencyChoiceLabel(roster, member.userId),
+        },
+        { title: 'Vice President', label: 'Vice President' },
+      ]
+    : []
+  return [
+    ...leadership,
+    { title: 'Executive Board Member', label: 'Executive Board Member' },
+    { title: 'Member', label: 'No title' },
+  ]
+}
+
+export type RosterMemberAction =
+  | 'make_admin'
+  | 'change_title'
+  | 'remove_admin'
+  | 'remove'
+
+export const ROSTER_MEMBER_ACTION_LABELS: Record<RosterMemberAction, string> = {
+  make_admin: 'Make admin',
+  change_title: 'Change title',
+  remove_admin: 'Remove admin',
+  remove: 'Remove',
+}
+
+export function rosterMemberActions(
+  member: NTHSRosterMemberPublic,
+  viewerId: string
+): RosterMemberAction[] {
+  if (member.accountClosed) return ['remove']
+  if (member.userId === viewerId) return ['change_title']
+  const roleAction = member.roleName === 'admin' ? 'remove_admin' : 'make_admin'
+  return [roleAction, 'change_title', 'remove']
 }
 
 const NEVER_ACTIVE_LABEL = 'No sessions yet'

@@ -2,6 +2,10 @@ import type { Component } from 'vue'
 import store from '@/store'
 import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
 import type { RemoveTeamMemberModalProps } from '@/components/NTHS/RemoveTeamMemberModal.vue'
+import MemberTitleModal, {
+  type MemberTitleModalProps,
+} from '@/components/NTHS/MemberTitleModal.vue'
+import type { NTHSTitle } from '@/services/NTHSGroupService'
 import type { RemoveMemberConfirmationProps } from '@/views/NTHS/RemoveMemberConfirmation.vue'
 import SessionHoldAlert from '@/views/SessionHolds/SessionHoldAlert.vue'
 
@@ -90,6 +94,22 @@ export default {
       },
       props
     )
+  },
+
+  showNthsMemberTitleModal(
+    props: Omit<MemberTitleModalProps, 'resolveTitle'>
+  ): Promise<NTHSTitle | undefined> {
+    return new Promise((resolve) => {
+      show(
+        MemberTitleModal,
+        {
+          showAccept: false,
+          showSeparator: false,
+          showTemplateButtons: false,
+        },
+        { ...props, resolveTitle: resolve }
+      )
+    })
   },
 
   showLeaveTeamModal(props: RemoveMemberConfirmationProps) {

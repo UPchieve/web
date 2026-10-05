@@ -69,9 +69,11 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       const promoted = members[0]
       await hq.openMemberMenu(promoted.id)
       await page.getByTestId(`member-make-admin-${promoted.id}`).click()
-      await expect(hq.memberRow(promoted.id)).toContainText('Admin')
+      await page.getByTestId('title-choice-Vice President').click()
+      await page.getByTestId('title-choice-save').click()
+      await expect(hq.memberRow(promoted.id)).toContainText('Vice President')
       await page.reload()
-      await expect(hq.memberRow(promoted.id)).toContainText('Admin')
+      await expect(hq.memberRow(promoted.id)).toContainText('Vice President')
     })
 
     await test.step('Remove a member, from Members', async () => {
