@@ -114,3 +114,66 @@ describe('submitPhoto', () => {
     )
   })
 })
+
+describe('ID photo size limit', () => {
+  const maxSize = 4 * 1000000
+  const makeFile = (size: number) =>
+    new File([new Uint8Array(size)], 'photo.png', { type: 'image/png' })
+
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  it('rejects a selected photo one byte over 4 MB', async () => {
+    const wrapper = getWrapper()
+    await wrapper.vm.addPhoto({ target: { files: [makeFile(maxSize + 1)] } })
+
+    expect(wrapper.vm.error).toBe('Photo must be 4 MB or smaller.')
+    expect(wrapper.vm.photo).toBe('')
+    expect(wrapper.vm.file).toBeUndefined()
+    expect(NetworkService.uploadVolunteerPhoto).not.toHaveBeenCalled()
+  })
+
+  it('accepts a selected photo exactly at 4 MB', async () => {
+    const wrapper = getWrapper()
+    const file = makeFile(maxSize)
+    await wrapper.vm.addPhoto({ target: { files: [file] } })
+
+    expect(wrapper.vm.error).toBe('')
+    expect(wrapper.vm.file).toBe(file)
+    expect(wrapper.vm.photo).toBeTruthy()
+    URL.revokeObjectURL(wrapper.vm.photo)
+  })
+
+  it('rejects a photo that exceeds 4 MB after conversion', async () => {
+    const wrapper = getWrapper()
+    wrapper.vm.file = makeFile(100)
+    wrapper.vm.photo = 'blob:preview'
+    vi.mocked(ImagePipeline.processImage).mockResolvedValue(
+      makeFile(maxSize + 1)
+    )
+
+    await wrapper.vm.submitPhoto()
+
+    expect(wrapper.vm.error).toBe(
+      'This photo is too large to upload. Please try a smaller photo, preferably in JPEG or PNG format (4 MB or less).'
+    )
+    expect(NetworkService.uploadVolunteerPhoto).not.toHaveBeenCalled()
+    expect(wrapper.vm.user.photoIdStatus).toBeNull()
+  })
+
+  it('uploads a processed photo exactly at 4 MB', async () => {
+    const wrapper = getWrapper()
+    wrapper.vm.file = makeFile(100)
+    wrapper.vm.photo = 'blob:preview'
+    const processed = makeFile(maxSize)
+    vi.mocked(ImagePipeline.processImage).mockResolvedValue(processed)
+    vi.mocked(NetworkService.uploadVolunteerPhoto).mockRejectedValue(
+      new Error('Network Error')
+    )
+
+    await wrapper.vm.submitPhoto()
+
+    expect(NetworkService.uploadVolunteerPhoto).toHaveBeenCalledWith(processed)
+  })
+})

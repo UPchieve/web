@@ -3,9 +3,7 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
-import {
-  maybeGetActiveSessionHoldForUser,
-} from '@/utils/session'
+import { maybeGetActiveSessionHoldForUser } from '@/utils/session'
 import { union } from 'lodash-es'
 
 export default {

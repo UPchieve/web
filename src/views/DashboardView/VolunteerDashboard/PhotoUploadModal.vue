@@ -46,6 +46,7 @@
             must be clearly visible
           </li>
           <li>Acceptable image formats: jpeg, png</li>
+          <li>Please upload a photo less than 25mb.</li>
         </ul>
 
         <span v-if="user.photoIdStatus !== 'REJECTED'" data-testid="help-text">
@@ -124,6 +125,9 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import Link from '@/components/Link.vue'
 import { processImage } from '@/utils/image-pipeline'
+import { mbToBytes } from '@/utils/bytes'
+
+const MAX_ID_PHOTO_SIZE_BYTES = mbToBytes(4)
 
 export default {
   name: 'volunteer-dashboard',
@@ -165,10 +169,8 @@ export default {
     async addPhoto(event) {
       const { files } = event.target
       const file = files[0]
-      const twentyFiveMegaBytes = 25 * 1000000
-      if (file.size > twentyFiveMegaBytes) {
-        this.error =
-          'This photo is too large. Please upload a photo less than 25mb.'
+      if (file.size > MAX_ID_PHOTO_SIZE_BYTES) {
+        this.error = 'Photo must be 4 MB or smaller.'
         return
       }
 
@@ -190,6 +192,11 @@ export default {
       this.error = ''
 
       const file = await processImage(this.file)
+      if (file.size > MAX_ID_PHOTO_SIZE_BYTES) {
+        this.error =
+          'This photo is too large to upload. Please try a smaller photo, preferably in JPEG or PNG format (4 MB or less).'
+        return
+      }
 
       try {
         await NetworkService.uploadVolunteerPhoto(file)
