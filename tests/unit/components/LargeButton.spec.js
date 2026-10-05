@@ -4,9 +4,6 @@ it.skip('Fix tests')
 
 // import LargeButton from '@/src/components/LargeButton.vue'
 
-//👇 Imports a specific story for the test
-// import { Primary, Vanilla } from '../../../src/stories/LargeButton.stories'
-
 // it.skip('renders the button in the primary state', () => {
 //   const wrapper = shallowMount(LargeButton, {
 //     // @ts-ignore

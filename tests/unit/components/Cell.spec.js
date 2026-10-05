@@ -1,29 +1,33 @@
 import { mount } from '@vue/test-utils'
 
 import Cell from '../../../src/components/AvailabilityGrid/Cell.vue'
-import {
-  Unselectable,
-  Selectable_Unselected,
-  Selectable_Selected,
-} from '../../../src/stories/Cell.stories'
 
 it('renders the cell in the unselectable state', () => {
   const wrapper = mount(Cell, {
-    props: Unselectable.args,
+    props: {
+      selectable: false,
+      content: 'Cell content',
+    },
   })
   expect(wrapper.classes()).toContain('Cell-unselectable')
 })
 
 it('renders the cell in the selectable + unselected state', () => {
   const wrapper = mount(Cell, {
-    props: Selectable_Unselected.args,
+    props: {
+      selectable: true,
+      selected: false,
+    },
   })
   expect(wrapper.classes()).toContain('Cell-selectable')
 })
 
 it('renders the cell in the selectable + selected state', () => {
   const wrapper = mount(Cell, {
-    props: Selectable_Selected.args,
+    props: {
+      selectable: true,
+      selected: true,
+    },
   })
   expect(wrapper.classes()).toContain('Cell-selectable--selected')
 })
