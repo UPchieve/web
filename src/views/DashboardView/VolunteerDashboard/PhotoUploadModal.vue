@@ -46,7 +46,7 @@
             must be clearly visible
           </li>
           <li>Acceptable image formats: jpeg, png</li>
-          <li>Please upload a photo less than 25mb.</li>
+          <li>Please upload a photo less than 4mb.</li>
         </ul>
 
         <span v-if="user.photoIdStatus !== 'REJECTED'" data-testid="help-text">
