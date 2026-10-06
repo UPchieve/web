@@ -32,6 +32,7 @@ import type {
   EssayReviewSubmission,
   EssayReviewSubmissionForVolunteer,
 } from '@/types/essay-review'
+import type { FeatureFlagResponse } from '@/contracts/analytics'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -143,6 +144,73 @@ export async function httpDelete<T>(path: string, config?: AxiosRequestConfig) {
   return axiosInstance.delete<T>(path, config)
 }
 
+export function toNetworkError(err: unknown): NetworkError {
+  if (isNetworkError(err)) {
+    return err
+  }
+
+  if (axios.isAxiosError(err)) {
+    const status = err.response?.status
+    const clientMessage = err.response?.data?.clientMessage
+    const clientTitle = err.response?.data?.clientTitle
+    const message =
+      clientMessage ??
+      err.response?.data?.err ??
+      err.message ??
+      'An unexpected error occurred.'
+    return new NetworkError(message, { status, clientMessage, clientTitle })
+  }
+
+  return new NetworkError(err instanceof Error ? err.message : 'Unknown error')
+}
+
+export async function httpGetV2<T>(path: string, config?: AxiosRequestConfig) {
+  try {
+    const response = await axiosInstance.get<T>(path, config)
+    return response.data
+  } catch (error) {
+    throw toNetworkError(error)
+  }
+}
+
+export async function httpPostV2<TResponse, TRequest = object>(
+  path: string,
+  body: TRequest,
+  config?: AxiosRequestConfig
+) {
+  try {
+    const response = await axiosInstance.post<TResponse>(path, body, config)
+    return response.data
+  } catch (error) {
+    throw toNetworkError(error)
+  }
+}
+
+export async function httpPutV2<TResponse, TRequest = object>(
+  path: string,
+  body: TRequest,
+  config?: AxiosRequestConfig
+): Promise<TResponse> {
+  try {
+    const response = await axiosInstance.put<TResponse>(path, body, config)
+    return response.data
+  } catch (error) {
+    throw toNetworkError(error)
+  }
+}
+
+export async function httpDeleteV2<T>(
+  path: string,
+  config?: AxiosRequestConfig
+) {
+  try {
+    const response = await axiosInstance.delete<T>(path, config)
+    return response.data
+  } catch (error) {
+    throw toNetworkError(error)
+  }
+}
+
 /*
  * Axios uses xhr by default (rather than fetch).
  * We need to use their fetch adapter to take advantage of the new-ish `keepalive`
@@ -163,6 +231,10 @@ export async function httpPostKeepAlive<T>(path: string, data: object) {
       keepalive: true,
     },
   })
+}
+
+export function getBootstrappedFeatureFlags() {
+  return httpGetV2<FeatureFlagResponse>(`${API_PUBLIC_ROOT}/feature-flags`)
 }
 
 export default {
@@ -243,14 +315,7 @@ export default {
       }
     )
   },
-
-  // Server route defintions
-  async getBootstrappedFeatureFlags() {
-    return httpGet(`${API_PUBLIC_ROOT}/feature-flags`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
+  getBootstrappedFeatureFlags,
   authStatus() {
     return httpGet(`${AUTH_ROOT}/status`).then(
       this._successHandler,

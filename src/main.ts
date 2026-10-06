@@ -33,12 +33,16 @@ async function main() {
     axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = crypto.randomUUID()
     const featureFlagsResult =
       await NetworkService.getBootstrappedFeatureFlags()
-    await FeatureFlagService.init(
-      featureFlagsResult?.data?.id,
-      featureFlagsResult?.data?.featureFlags,
-      featureFlagsResult?.data?.featureFlagPayloads,
-      featureFlagsResult?.data?.personProperties
-    )
+    if ('featureFlags' in featureFlagsResult) {
+      await FeatureFlagService.init(
+        featureFlagsResult.id,
+        featureFlagsResult.featureFlags,
+        featureFlagsResult.featureFlagPayloads,
+        featureFlagsResult.personProperties
+      )
+    } else {
+      await FeatureFlagService.init(featureFlagsResult.id)
+    }
 
     // Create Vue instance
     const app = createApp(App)
