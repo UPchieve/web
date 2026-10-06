@@ -179,13 +179,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id
-              .toString()
-              .split('node_modules/')[1]
-              .split('/')[0]
-              .toString()
-          }
+          if (id.includes('commonjsHelpers')) return 'cjs-helpers'
+          if (!id.includes('node_modules')) return
+          const [pkg] = id.split('node_modules/').pop().split('/')
+          return pkg
         },
       },
     },
