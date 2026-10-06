@@ -53,6 +53,7 @@ export class NetworkError extends Error {
   status?: number
   clientMessage?: string
   clientTitle?: string
+  code?: string
 
   constructor(
     message: string,
@@ -60,13 +61,20 @@ export class NetworkError extends Error {
       status,
       clientMessage,
       clientTitle,
-    }: { status?: number; clientMessage?: string; clientTitle?: string } = {}
+      code,
+    }: {
+      status?: number
+      clientMessage?: string
+      clientTitle?: string
+      code?: string
+    } = {}
   ) {
     super(message)
     this.name = 'NetworkError'
     this.status = status
     this.clientMessage = clientMessage
     this.clientTitle = clientTitle
+    this.code = code
   }
 }
 
@@ -166,7 +174,12 @@ export default {
   },
   _axiosErrorHandler(res: AxiosError): never {
     const data = res.response?.data as
-      | { err?: string; clientMessage?: string; clientTitle?: string }
+      | {
+          err?: string
+          clientMessage?: string
+          clientTitle?: string
+          code?: string
+        }
       | undefined
     const message =
       data?.clientMessage ??
@@ -177,6 +190,7 @@ export default {
       status: res.response?.status,
       clientMessage: data?.clientMessage,
       clientTitle: data?.clientTitle,
+      code: data?.code,
     })
   },
   _faultTolerantHttp<T>(

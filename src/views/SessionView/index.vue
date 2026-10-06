@@ -313,7 +313,9 @@ import { mapState, mapGetters } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
-import SessionService from '@/services/SessionService'
+import SessionService, {
+  SESSION_ENDED_ERROR_CODE,
+} from '@/services/SessionService'
 import SessionChatHeader from './SessionChatHeader.vue'
 import SessionChat from './SessionChat/index.vue'
 import AiWidgetTool from './AiWidgetTool/index.vue'
@@ -501,6 +503,10 @@ export default {
           )
         })
     } catch (err) {
+      if (err.code === SESSION_ENDED_ERROR_CODE) {
+        await SessionService.leaveEndedSession(this.$route.params.sessionId)
+        return
+      }
       ModalService.showSessionError({
         errorMessage: err.clientMessage,
         errorTitle: err.clientTitle,
@@ -525,9 +531,11 @@ export default {
   },
 
   beforeUnmount() {
+    this.isUnmounted = true
     this.isJoiningSocket = false
     clearTimeout(this.connectingMessageSlowTimeout)
     clearTimeout(this.breakoutPromptTimeout)
+    socket.off('sessions/recap:joined', this.onEndedSessionRoomJoined)
     socket.emit('sessions:leave', {
       sessionId: this.sessionId,
     })
@@ -574,6 +582,7 @@ export default {
       isSocketSessionRoomConnected: false,
       isZwibserveSession: false,
       breakoutPromptTimeout: null,
+      isUnmounted: false,
       connectingMessage: 'Attempting to connect the chat',
       maxAttempts: 4,
       attemptNumber: 0,
@@ -877,7 +886,9 @@ export default {
          * and we get disconnected and reconnected, let the
          * existing one finish
          */
-        if (this.sessionId && !this.isJoiningSocket) {
+        if (this.sessionId && this.isSessionOver) {
+          this.showEndedSessionInPlace()
+        } else if (this.sessionId && !this.isJoiningSocket) {
           this.joinSocketSession()
         }
 
@@ -1067,11 +1078,12 @@ export default {
 
       this.attemptNumber = 0
       let terminalFailureReason = null
+      let refusedAsEnded = false
       try {
         await backOff(
           async () => {
             ++this.attemptNumber
-            const { success, reason } = await socket
+            const { success, reason, code } = await socket
               .timeout(10000)
               .emitWithAck('sessions:join', {
                 sessionId: this.sessionId,
@@ -1092,13 +1104,14 @@ export default {
               }
             } else {
               terminalFailureReason = reason ?? 'unknown'
+              refusedAsEnded = code === SESSION_ENDED_ERROR_CODE
               throw new Error(
                 'Server rejected the session join without a retry signal.'
               )
             }
           },
           {
-            retry: () => this.isJoiningSocket,
+            retry: () => this.isJoiningSocket && !refusedAsEnded,
             numOfAttempts: this.maxAttempts,
             jitter: 'full',
             timeMultiple: 7,
@@ -1109,22 +1122,48 @@ export default {
           clearTimeout(this.connectingMessageSlowTimeout)
           return
         }
-        ModalService.showSessionError(
-          {
-            errorMessage: `Uh oh, we were unable to connect you to the session's chat.\n Please refresh and try again!`,
-            errorTitle: 'Session Chat Error',
-          },
-          () => this.$router.go(0)
-        )
         AnalyticsService.captureEvent(EVENTS.SOCKET_SESSION_JOIN_FAILED, {
           sessionId: this.session.id,
           reason: terminalFailureReason ?? err.message,
         })
-        LoggerService.noticeError(err)
+        if (refusedAsEnded) {
+          this.showEndedSessionInPlace()
+        } else {
+          ModalService.showSessionError(
+            {
+              errorMessage: `Uh oh, we were unable to connect you to the session's chat.\n Please refresh and try again!`,
+              errorTitle: 'Session Chat Error',
+            },
+            () => this.$router.go(0)
+          )
+          LoggerService.noticeError(err)
+        }
       }
 
       clearTimeout(this.connectingMessageSlowTimeout)
       this.isJoiningSocket = false
+    },
+    async showEndedSessionInPlace() {
+      try {
+        const session = await SessionService.fetchEndedSession(this.sessionId)
+        if (this.isUnmounted) return
+        await this.$store.dispatch('user/updateSession', session)
+        this.joinEndedSessionRoom()
+      } catch (err) {
+        LoggerService.noticeError(err)
+        if (!this.isUnmounted) this.$router.replace('/')
+      }
+    },
+    // sessions:join refuses an ended session; the recap room join is the one
+    // that still lets participants send follow-up messages.
+    joinEndedSessionRoom() {
+      if (this.isUnmounted) return
+      socket.off('sessions/recap:joined', this.onEndedSessionRoomJoined)
+      socket.once('sessions/recap:joined', this.onEndedSessionRoomJoined)
+      socket.emit('sessions/recap:join', { sessionId: this.sessionId })
+    },
+    onEndedSessionRoomJoined() {
+      this.isSocketSessionRoomConnected = true
     },
     setHasSeenNewMessage(value) {
       this.hasSeenNewMessage = value

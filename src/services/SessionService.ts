@@ -1,3 +1,4 @@
+import { backOff } from 'exponential-backoff'
 import { EVENTS } from '../consts'
 import router from '@/router'
 import store from '@/store'
@@ -9,6 +10,8 @@ import LoggerService from './LoggerService'
 import Case from 'case'
 
 export type Session = any
+
+export const SESSION_ENDED_ERROR_CODE = 'SESSION_ENDED'
 
 class InvalidSubjectTopicError extends Error {
   clientMessage = 'Whoops, that subject and topic combination is wrong!'
@@ -175,11 +178,40 @@ export default {
     }
   },
 
+  // replace keeps the ended session's URL out of history, so Back from
+  // /feedback does not reload it and bounce straight back to /feedback.
   postSessionRedirect(session: Session) {
     // Redirect to the home page if there is an absent user
     // or if the student was not paired with a tutor.
-    if (isAbsentUser(session)) return router.push('/')
-    router.push(`/feedback/${session.id}`)
+    if (isAbsentUser(session)) return router.replace('/')
+    return router.replace(`/feedback/${session.id}`)
+  },
+
+  // A 4xx means this user can't see the session, so retrying won't help.
+  async fetchEndedSession(sessionId: string): Promise<Session> {
+    const result = await backOff(() => this.getRecapSessionForDms(sessionId), {
+      numOfAttempts: 3,
+      startingDelay: 500,
+      retry: (err) => {
+        const status = err?.response?.status
+        return !status || status >= 500
+      },
+    })
+    if (!result) throw new Error('Ended session response is incomplete')
+    return result.sessionData
+  },
+
+  async leaveEndedSession(sessionId: string) {
+    const isStillOnSession = () =>
+      router.currentRoute.value.name === 'SessionView' &&
+      router.currentRoute.value.params.sessionId === sessionId
+    try {
+      const session = await this.fetchEndedSession(sessionId)
+      if (isStillOnSession()) return this.postSessionRedirect(session)
+    } catch (err) {
+      LoggerService.noticeError(err)
+      if (isStillOnSession()) return router.replace('/')
+    }
   },
 
   getCurrentSession() {

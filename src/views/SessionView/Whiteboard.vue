@@ -1688,7 +1688,7 @@ export default {
     },
     isSessionOver(isSessionOver, oldIsSessionOver) {
       if (isSessionOver && !oldIsSessionOver) {
-        this.zwibblerCtx.setConfig('readOnly', true)
+        this.zwibblerCtx?.setConfig('readOnly', true)
         this.removeListeners()
       }
     },
