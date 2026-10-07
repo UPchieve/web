@@ -3,7 +3,7 @@ import type {
   RouteLocation,
   RouteLocationNormalized,
 } from 'vue-router'
-import NetworkService from '@/services/NetworkService'
+import NetworkService, { isNetworkError } from '@/services/NetworkService'
 import { SignUpPage, UserType } from '@/services/SignUpService/types'
 import {
   getRow,
@@ -24,6 +24,7 @@ import store from '@/store'
 import { SsoProvider } from '@/services/SsoService'
 import * as SignUpService from '@/services/SignUpService'
 import AnalyticsService from '@/services/AnalyticsService'
+import LoggerService from '@/services/LoggerService'
 
 const RoutePath = {
   account: `/sign-up/volunteer/account`,
@@ -87,8 +88,16 @@ async function continueToSignUp(
     })
 
     return getSubmitResponse(SignUpPage.about)
-  } catch (err) {
-    return getSubmitResponse(null, null, err)
+  } catch (error: unknown) {
+    if (!isNetworkError(error)) {
+      LoggerService.noticeError(error)
+      return getSubmitResponse(null, null, 'Failed: Please try again.')
+    }
+
+    if (error.status !== 409 && error.status !== 422) {
+      LoggerService.noticeError(error)
+    }
+    return getSubmitResponse(null, null, error)
   }
 }
 

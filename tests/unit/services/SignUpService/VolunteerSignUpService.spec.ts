@@ -1,7 +1,10 @@
 import { vi, beforeEach, describe, it, expect, afterEach } from 'vitest'
 import * as VolunteerSignUpService from '../../../../src/services/SignUpService/VolunteerSignUpService'
-import NetworkService from '../../../../src/services/NetworkService'
+import NetworkService, {
+  NetworkError,
+} from '../../../../src/services/NetworkService'
 import { faker } from '@faker-js/faker'
+import LoggerService from '../../../../src/services/LoggerService'
 
 vi.mock('../../../../src/services/NetworkService')
 
@@ -47,5 +50,52 @@ describe('createAccount', () => {
         })
       )
     })
+  })
+})
+
+describe('checkRegister error handling', () => {
+  const accountRoute = {
+    path: '/sign-up/volunteer/account',
+    fullPath: '/sign-up/volunteer/account',
+    query: {},
+  } as any
+  const accountData = {
+    email: 'volunteer@example.com',
+    password: 'password',
+  }
+
+  it.each([409, 422])(
+    'shows an expected %s error without logging it',
+    async (status) => {
+      const error = new NetworkError('Invalid credentials', { status })
+      mockedNetworkService.checkRegister.mockRejectedValue(error)
+      const logError = vi
+        .spyOn(LoggerService, 'noticeError')
+        .mockImplementation(() => {})
+      const pageDetails =
+        await VolunteerSignUpService.getPageDetails(accountRoute)
+
+      await expect(pageDetails.submitAction(accountData)).resolves.toEqual([
+        null,
+        error.message,
+      ])
+      expect(logError).not.toHaveBeenCalled()
+    }
+  )
+
+  it('logs an unexpected network error', async () => {
+    const error = new NetworkError('Server error', { status: 500 })
+    mockedNetworkService.checkRegister.mockRejectedValue(error)
+    const logError = vi
+      .spyOn(LoggerService, 'noticeError')
+      .mockImplementation(() => {})
+    const pageDetails =
+      await VolunteerSignUpService.getPageDetails(accountRoute)
+
+    await expect(pageDetails.submitAction(accountData)).resolves.toEqual([
+      null,
+      error.message,
+    ])
+    expect(logError).toHaveBeenCalledWith(error)
   })
 })

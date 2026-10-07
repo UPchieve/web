@@ -33,8 +33,12 @@ import type {
   EssayReviewSubmissionForVolunteer,
 } from '@/types/essay-review'
 import type { FeatureFlagResponse } from '@/contracts/analytics'
-import type { LoginResponse, AuthStatusResponse } from '@/contracts/auth'
-import type { AuthPayload } from '@/contracts/auth'
+import type {
+  LoginResponse,
+  AuthStatusResponse,
+  CheckCredentialResponse,
+  AuthPayload,
+} from '@/contracts/auth'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -261,6 +265,13 @@ export function logout() {
   return httpGet<void>(`${AUTH_ROOT}/logout`)
 }
 
+export function checkRegister(data: AuthPayload) {
+  return httpPost<CheckCredentialResponse>(
+    `${AUTH_ROOT}/register/checkcred`,
+    data
+  )
+}
+
 export default {
   _successHandler(res) {
     return Promise.resolve(res)
@@ -343,19 +354,7 @@ export default {
   authStatus,
   login,
   logout,
-  checkRegister(data) {
-    return httpPostDeprecated(`${AUTH_ROOT}/register/checkcred`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
-  checkStudentPartnerSignupCode(partnerSignupCode) {
-    return httpGetDeprecated(
-      `${AUTH_ROOT}/partner/student/code?partnerSignupCode=${encodeURIComponent(
-        partnerSignupCode
-      )}`
-    ).then(this._successHandler, this._errorHandler)
-  },
+  checkRegister,
   getVolunteerPartner(partnerId) {
     return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(

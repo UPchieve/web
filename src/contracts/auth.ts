@@ -10,6 +10,10 @@ export type LoginResponse = {
   user: LegacyUserPublic
 }
 
+export type CheckCredentialResponse = {
+  checked: boolean
+}
+
 export type AuthPayload = {
   email: string
   password: string
