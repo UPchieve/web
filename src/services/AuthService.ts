@@ -49,46 +49,12 @@ export default {
     return loginResponse.data
   },
 
-  async registerOpenVolunteer(signupData: any) {
-    return NetworkService.registerOpenVolunteer(signupData)
-      .then((res) => {
-        const data = { ...res.data }
-        if (!data) {
-          throw new Error('No user returned from auth service')
-        }
-        AnalyticsService.registerVolunteer(data.user)
-      })
-      .catch((res) => {
-        throw errorFromHttpResponse(res)
-      })
-  },
-
-  async registerPartnerVolunteer(signupData: any) {
-    return NetworkService.registerPartnerVolunteer(signupData)
-      .then((res) => {
-        const data = { ...res.data }
-        if (!data) {
-          throw new Error('No user returned from auth service')
-        }
-        AnalyticsService.registerVolunteer(data.user)
-      })
-      .catch((res) => {
-        throw errorFromHttpResponse(res)
-      })
-  },
-
   async registerStudent(signupData: any) {
     try {
       await NetworkService.registerStudent(signupData)
     } catch (e) {
       throw errorFromHttpResponse(e)
     }
-  },
-
-  async checkRegister(creds: any) {
-    return NetworkService.checkRegister(creds).catch((res) => {
-      throw errorFromHttpResponse(res)
-    })
   },
 
   async sendReset(

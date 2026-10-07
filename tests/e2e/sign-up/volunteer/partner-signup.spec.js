@@ -1,28 +1,48 @@
-import { test } from '@playwright/test'
-import { VolunteerPartnerSignup } from '../../page-object-models/volunteer-partner-signup'
+import { test, expect } from '@playwright/test'
 import { faker } from '@faker-js/faker'
+import { getClient } from '../../db.ts'
 import { createPassword } from '../../utils'
-test.describe('Volunteer partner signup', async () => {
-  const PARTNER = {
-    key: 'big-telecom',
-    name: 'Big Telecom',
-    domain: 'mailtrap.com',
-  }
+import { VolunteerSignUp } from '../../page-object-models/volunteer-sign-up.js'
 
-  test.skip('Can sign up as part of a volunteer partner organization', async ({
-    // Flaky on Mobile Chrome
+const PARTNER = {
+  key: 'big-telecom',
+  name: 'Big Telecom',
+  requiredEmailDomain: 'mailtrap.com',
+}
+
+test.describe('Volunteer partner sign-up', () => {
+  let dbClient
+
+  test.beforeAll(async () => {
+    dbClient = await getClient().connect()
+  })
+
+  test.afterAll(async () => {
+    await dbClient.release()
+  })
+
+  test('signs up from a partner link as a volunteer of that partner', async ({
     page,
   }) => {
-    await page.goto(`/signup/volunteer/${PARTNER.key}`)
-    const volunteerPartnerSignup = new VolunteerPartnerSignup(page)
-    await volunteerPartnerSignup.step1IsReady(PARTNER.name)
+    const email = faker.internet
+      .email({ provider: PARTNER.requiredEmailDomain })
+      .toLowerCase()
+    const volunteerSignUp = new VolunteerSignUp(page)
 
-    const email = faker.internet.email({
-      provider: PARTNER.domain,
-    })
-    const password = createPassword()
-    await volunteerPartnerSignup.completeStep1(email, password)
-    await volunteerPartnerSignup.step2IsReady()
-    await volunteerPartnerSignup.completeStep2()
+    await volunteerSignUp.gotoPartnerLink(PARTNER.key)
+    await volunteerSignUp.accountStepIsReadyFor(PARTNER.name)
+    await volunteerSignUp.completeAccountStep(email, createPassword())
+    await volunteerSignUp.completeAboutStep()
+
+    const { rows } = await dbClient.query(
+      `SELECT volunteer_partner_orgs.key
+       FROM users
+       JOIN volunteer_profiles ON volunteer_profiles.user_id = users.id
+       LEFT JOIN volunteer_partner_orgs
+         ON volunteer_partner_orgs.id = volunteer_profiles.volunteer_partner_org_id
+       WHERE users.email = $1`,
+      [email]
+    )
+    expect(rows).toEqual([{ key: PARTNER.key }])
   })
 })

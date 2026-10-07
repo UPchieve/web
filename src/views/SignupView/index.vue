@@ -13,23 +13,12 @@
   <div v-else-if="this.userSelection === UserType.teacher" class="h-full">
     <sign-up-forms :getPageDetails="getTeacherPageDetails" />
   </div>
-  <div
-    v-else-if="
-      this.userSelection === UserType.volunteer &&
-      isNewVolunteerSignUpFlowEnabled
-    "
-    class="h-full"
-  >
+  <div v-else-if="this.userSelection === UserType.volunteer" class="h-full">
     <sign-up-forms :getPageDetails="getVolunteerPageDetails" />
   </div>
   <form-page-template v-else :formCardMaxWidth="'660px'">
     <div class="uc-form">
-      <volunteer-form
-        v-if="
-          this.userSelection === 'volunteer' && !isNewVolunteerSignUpFlowEnabled
-        "
-      />
-      <student-form v-else-if="this.userSelection === 'student'" />
+      <student-form v-if="this.userSelection === 'student'" />
 
       <loader
         v-else-if="isCheckingReferral"
@@ -37,60 +26,12 @@
       ></loader>
       <div v-else>
         <h1 class="uc-form-header">{{ welcomeMessage }}</h1>
-        <p v-if="userSelection === 'student'" class="uc-form-text">
-          UPchieve is a nonprofit that provides 100% free online tutoring and
-          college counseling, available 24/7! Check if you are eligible!
-        </p>
-        <p v-else-if="userSelection === 'volunteer'" class="uc-form-text">
-          UPchieve is a nonprofit that provides 100% free online tutoring and
-          college counseling to low income students in the U.S.
-          <br /><br />
-          Sign up as a tutor to help low income students succeed in school and
-          beyond!
-        </p>
-        <p v-else class="uc-form-text">
+        <p class="uc-form-text">
           We are a nonprofit that provides free, online tutoring and college
           counseling to eligible middle and high school students.
         </p>
 
-        <div v-if="userSelection === 'student'" class="uc-column items-center">
-          <button
-            class="uc-form-button"
-            type="submit"
-            @click.prevent="selectStudent()"
-          >
-            Check my eligibility
-          </button>
-
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link"
-            href="https://upchieve.org/students"
-            >Tell me more about UPchieve first
-          </a>
-        </div>
-        <div
-          v-else-if="userSelection === 'volunteer'"
-          class="uc-column items-center"
-        >
-          <button
-            class="uc-form-button"
-            type="submit"
-            @click.prevent="selectVolunteer()"
-          >
-            I'm ready to tutor!
-          </button>
-
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link"
-            href="https://upchieve.org/volunteer-with-us"
-            >Tell me more about UPchieve first
-          </a>
-        </div>
-        <div v-else>
+        <div>
           <p class="uc-form-text bold">I want to sign up as a...</p>
           <div class="btn-card-container">
             <button
@@ -148,7 +89,6 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import Loader from '@/components/Loader.vue'
 import SignUpForms from './SignUpForms.vue'
 import StudentForm from './StudentForm.vue'
-import VolunteerForm from './VolunteerForm.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import NetworkService from '@/services/NetworkService'
 import { UserType } from '@/services/SignUpService/types'
@@ -167,7 +107,6 @@ export default {
     Loader,
     SignUpForms,
     StudentForm,
-    VolunteerForm,
     StudentAvatar,
     VolunteerAvatar,
     TeacherAvatar,
@@ -228,8 +167,6 @@ export default {
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       isDisableStudentSignupsEnabled:
         'featureFlags/isDisableStudentSignupsEnabled',
-      isNewVolunteerSignUpFlowEnabled:
-        'featureFlags/isNewVolunteerSignUpFlowEnabled',
     }),
     welcomeMessage() {
       if (this.referredBy?.firstName)
@@ -350,19 +287,6 @@ export default {
     padding: 10px;
     margin: 0;
     width: 100%;
-  }
-}
-
-a.link {
-  color: $c-information-blue;
-  font-size: 18px;
-  font-weight: 500;
-  margin: 20px 0 50px 0;
-  text-align: center;
-
-  &:hover {
-    color: #103a90;
-    text-decoration: none;
   }
 }
 

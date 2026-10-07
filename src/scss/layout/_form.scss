@@ -513,18 +513,6 @@
   }
 }
 
-.uc-form-header-link {
-  $className: &;
-
-  color: #73737a;
-  font-weight: 600;
-
-  &--active {
-    @extend #{$className};
-    color: $c-accent;
-  }
-}
-
 .uc-form-checkbox {
   @include flex-container(row, flex-start, baseline);
 

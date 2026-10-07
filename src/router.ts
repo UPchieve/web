@@ -58,8 +58,6 @@ const StudentPartnerSignupView = () =>
 const TrainingView = () => import('./views/TrainingView.vue')
 const TrainingCourseView = () => import('@/views/TrainingCourseView/index.vue')
 const VerificationView = () => import('./views/VerificationView/index.vue')
-const VolunteerPartnerSignupView = () =>
-  import('./views/VolunteerPartnerSignupView.vue')
 const SessionHistoryView = () => import('./views/SessionHistoryView.vue')
 const SessionRecapView = () => import('./views/SessionRecapView.vue')
 const AdminTestAudience = () => import('./views/Admin/AdminTestAudience.vue')
@@ -441,28 +439,17 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/signup/student/:partnerId',
+    path: '/signup/student/:partnerKey',
     name: 'StudentPartnerSignupView',
     component: StudentPartnerSignupView,
     meta: { loggedOutOnly: true, hideNavigation: true },
   },
   {
-    path: '/signup/volunteer/:partnerId',
-    name: 'VolunteerPartnerSignupView',
-    component: VolunteerPartnerSignupView,
-    meta: { loggedOutOnly: true, hideNavigation: true },
-    beforeEnter: async (
-      to: RouteLocationNormalized,
-      _from: RouteLocationNormalized,
-      next: NavigationGuardNext
-    ) => {
-      if (store.getters['featureFlags/isNewVolunteerSignUpFlowEnabled']) {
-        const partner = to.params.partnerId
-        next(`sign-up/volunteer?partnerId=${partner}`)
-      } else {
-        next()
-      }
-    },
+    path: '/signup/volunteer/:partnerKey',
+    redirect: (to) => ({
+      path: '/sign-up/volunteer',
+      query: { partnerId: to.params.partnerKey },
+    }),
   },
   {
     path: '/sessions/history',

@@ -522,16 +522,16 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    const partnerId = to.params.partnerId
+    const partnerKey = to.params.partnerKey
 
-    NetworkService.getStudentPartner(partnerId)
+    NetworkService.getStudentPartner(partnerKey)
       .then((res) => {
         const studentPartner = res.data.studentPartner
         if (!studentPartner) return next('/sign-up')
         if (studentPartner.deactivated) {
           AnalyticsService.captureEvent(
             EVENTS.STUDENT_VISITED_DEACTIVATED_PARTNER,
-            { partner: partnerId }
+            { partner: partnerKey }
           )
           return next('/sign-up')
         }
@@ -711,7 +711,7 @@ export default {
       return Array.from(this.studentPartner.sites).sort()
     },
     partner() {
-      return this.$route.params.partnerId
+      return this.$route.params.partnerKey
     },
     isCollegeBoardSearch() {
       return this.partner === 'college-board-search'
@@ -852,7 +852,7 @@ export default {
         password: this.formData.password,
         schoolId: this.formData.schoolId,
         signupSourceId: this.formData.signupSourceId,
-        studentPartnerOrgKey: this.$route.params.partnerId,
+        studentPartnerOrgKey: this.$route.params.partnerKey,
         studentPartnerOrgSiteName: this.formData.partnerSite,
         gradeLevel: this.trimGradeLevel,
       })

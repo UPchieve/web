@@ -49,7 +49,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS]: false,
-      [POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.USER_IS_APPROVED_NTHS_PRESIDENT]: false,
       [POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY]: false,
       [POSTHOG_FEATURE_FLAGS.NTHS_APPLICATION_PAGE]: false,
@@ -253,8 +252,6 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS
       ],
-    isNewVolunteerSignUpFlowEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.NEW_VOLUNTEER_SIGN_UP_FLOW],
     isSessionSummaryEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.GET_SESSION_SUMMARY],
     isNTHSApplicationPageEnabled: (state: FeatureFlagState) =>
