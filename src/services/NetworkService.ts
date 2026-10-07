@@ -33,7 +33,8 @@ import type {
   EssayReviewSubmissionForVolunteer,
 } from '@/types/essay-review'
 import type { FeatureFlagResponse } from '@/contracts/analytics'
-import type { AuthStatusResponse } from '@/contracts/auth'
+import type { LoginResponse, AuthStatusResponse } from '@/contracts/auth'
+import type { AuthPayload } from '@/contracts/auth'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -252,6 +253,10 @@ export function authStatus() {
   return httpGet<AuthStatusResponse>(`${AUTH_ROOT}/status`)
 }
 
+export function login(data: AuthPayload) {
+  return httpPost<LoginResponse>(`${AUTH_ROOT}/login`, data)
+}
+
 export default {
   _successHandler(res) {
     return Promise.resolve(res)
@@ -332,12 +337,7 @@ export default {
   },
   getBootstrappedFeatureFlags,
   authStatus,
-  login(data) {
-    return httpPostDeprecated(`${AUTH_ROOT}/login`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
+  login,
   logout() {
     return httpGetDeprecated(`${AUTH_ROOT}/logout`).then(
       this._successHandler,

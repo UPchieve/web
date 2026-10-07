@@ -4,6 +4,7 @@ import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
 import NetworkService from './NetworkService'
 import { socket } from '@/socket'
+import type { AuthPayload } from '@/contracts/auth'
 
 export async function logout(
   context: { $store: any; $router: any },
@@ -36,17 +37,17 @@ function resetServices() {
 }
 
 export default {
-  async login(creds: { email: string; password: string }) {
+  async login(creds: AuthPayload) {
     const { email, password } = creds
     if (!email || !password || !isEmail(email) || password.length < 1) {
       return Promise.reject('Invalid login form submission')
     }
 
-    const loginResponse = await NetworkService.login(creds)
-    if (!('data' in loginResponse)) {
+    const { user } = await NetworkService.login(creds)
+    if (!user) {
       throw new Error('No user returned from auth service')
     }
-    return loginResponse.data
+    return user
   },
 
   async registerStudent(signupData: any) {

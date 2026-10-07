@@ -1,3 +1,124 @@
+<script setup lang="ts">
+import { computed, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import AnalyticsService from '@/services/AnalyticsService'
+import AuthService from '@/services/AuthService'
+import LoggerService from '@/services/LoggerService'
+import { SsoProvider } from '@/services/SsoService'
+import FormEmail from '@/components/FormEmail.vue'
+import FormPassword from '@/components/FormPassword.vue'
+import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import LineDivider from '@/components/LineDivider.vue'
+import SsoButton from '@/components/SsoButton.vue'
+import Spinner from '@/components/Spinner.vue'
+import { EVENTS } from '@/consts'
+import config from '../config'
+import { getQueryString } from '@/utils/router-utils'
+
+const route = useRoute()
+const router = useRouter()
+const store = useStore()
+const query = route.query
+const provider = getQueryString(query.provider)
+
+const error = ref<string>()
+const message = ref(getQueryString(query.message))
+const isLoggingIn = ref(false)
+const hasLoginError = ref(false)
+const credentials = reactive({
+  email: getQueryString(query.email),
+  password: '',
+})
+
+const useNewSignUpFlow = computed<boolean>(
+  () => store.getters['featureFlags/useNewSignUpFlow']
+)
+const isClassLinkSsoEnabled = computed<boolean>(
+  () => store.getters['featureFlags/isClassLinkSsoEnabled']
+)
+const formPageTemplateLayout = computed(() =>
+  useNewSignUpFlow.value ? 'panel-left-50p' : 'card'
+)
+const isValidForm = computed(() =>
+  Boolean(credentials.email && credentials.password)
+)
+
+localStorage.removeItem('isSSOSignUpRedirect')
+
+if (query['401'] === 'true') {
+  error.value = 'Your session has expired. Please log in again.'
+}
+if (query['400'] === 'true') {
+  if (provider === SsoProvider.GOOGLE) {
+    AnalyticsService.captureEvent(
+      EVENTS.USER_DOES_NOT_HAVE_LINKED_GOOGLE_ACCOUNT
+    )
+  }
+  if (provider === SsoProvider.CLEVER) {
+    AnalyticsService.captureEvent(
+      EVENTS.USER_DOES_NOT_HAVE_LINKED_CLEVER_ACCOUNT
+    )
+  }
+  error.value = provider
+    ? `Your ${provider} account is not associated with this account.`
+    : 'Something went wrong. Please verify your login method and try again.'
+  LoggerService.noticeError(`${provider} error: ${error.value}`)
+}
+
+async function signIn(): Promise<void> {
+  if (!isValidForm.value) return
+  isLoggingIn.value = true
+  hasLoginError.value = false
+  try {
+    const user = await AuthService.login({
+      email: credentials.email,
+      password: credentials.password,
+    })
+    store.commit('user/setUser', user)
+  } catch {
+    hasLoginError.value = true
+    isLoggingIn.value = false
+    return
+  }
+
+  const redirect = getQueryString(route.query.redirect) || '/'
+  try {
+    await router.push(redirect)
+  } catch {
+    // Login worked, so try a full page load if navigation fails
+    window.location.assign(router.resolve(redirect).href)
+  } finally {
+    isLoggingIn.value = false
+  }
+}
+
+function signInWithSso(provider: SsoProvider): void {
+  isLoggingIn.value = true
+  captureSsoClickEvent(provider)
+  const params = new URLSearchParams({
+    provider,
+    isLogin: 'true',
+    redirect: getQueryString(route.query.redirect),
+    errorRedirect: '/login',
+  })
+  window.location.replace(`${config.serverRoot}/auth/sso?${params.toString()}`)
+  isLoggingIn.value = false
+}
+
+function captureSsoClickEvent(provider: SsoProvider): void {
+  if (provider === SsoProvider.GOOGLE) {
+    AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_GOOGLE)
+  }
+  if (provider === SsoProvider.CLEVER) {
+    AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_CLEVER)
+  }
+  if (provider === SsoProvider.CLASSLINK) {
+    AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_CLASSLINK)
+  }
+}
+</script>
+
 <template>
   <form-page-template
     :layout="formPageTemplateLayout"
@@ -55,7 +176,7 @@
           data-testid="loginButton"
           type="submit"
           @click.prevent="signIn"
-          :disabled="!isValidForm || isLoggingIn ? true : null"
+          :disabled="!isValidForm || isLoggingIn"
         >
           <Spinner
             v-if="isLoggingIn"
@@ -79,14 +200,14 @@
         />
         <div class="sso-container">
           <SsoButton
-            @click="signInWithSso('google')"
+            @click="signInWithSso(SsoProvider.GOOGLE)"
             class="sso-button"
             data-testid="googleSsoButton"
             :buttonText="'Google'"
             :ssoMethod="SsoProvider.GOOGLE"
           />
           <SsoButton
-            @click="signInWithSso('clever')"
+            @click="signInWithSso(SsoProvider.CLEVER)"
             class="sso-button"
             data-testid="cleverSsoButton"
             buttonText="Clever"
@@ -94,7 +215,7 @@
           />
           <SsoButton
             v-if="isClassLinkSsoEnabled"
-            @click="signInWithSso('classlink')"
+            @click="signInWithSso(SsoProvider.CLASSLINK)"
             class="sso-button"
             data-testid="classLinkSsoButton"
             buttonText="ClassLink"
@@ -109,133 +230,6 @@
     </div>
   </form-page-template>
 </template>
-
-<script>
-import { mapGetters } from 'vuex'
-import AnalyticsService from '@/services/AnalyticsService'
-import AuthService from '@/services/AuthService'
-import LoggerService from '@/services/LoggerService'
-import { SsoProvider } from '@/services/SsoService'
-import FormEmail from '@/components/FormEmail.vue'
-import FormPassword from '@/components/FormPassword.vue'
-import FormPageTemplate from '@/components/FormPageTemplate.vue'
-import LineDivider from '@/components/LineDivider.vue'
-import SsoButton from '@/components/SsoButton.vue'
-import { EVENTS } from '@/consts'
-import config from '../config'
-import Spinner from '@/components/Spinner.vue'
-
-export default {
-  components: {
-    FormEmail,
-    FormPassword,
-    FormPageTemplate,
-    LineDivider,
-    SsoButton,
-    Spinner,
-  },
-  setup() {
-    return { SsoProvider }
-  },
-  created() {
-    localStorage.removeItem('isSSOSignUpRedirect')
-    this.formPageTemplateLayout = this.useNewSignUpFlow
-      ? 'panel-left-50p'
-      : 'card'
-  },
-  computed: {
-    ...mapGetters({
-      useNewSignUpFlow: 'featureFlags/useNewSignUpFlow',
-      isClassLinkSsoEnabled: 'featureFlags/isClassLinkSsoEnabled',
-    }),
-    isValidForm() {
-      const { email, password } = this.credentials
-      return email && password
-    },
-  },
-  data() {
-    let error
-    const query = this.$route?.query ?? {}
-
-    if (query['401'] === 'true') {
-      error = 'Your session has expired. Please log in again.'
-    }
-    if (query['400'] === 'true') {
-      const provider = query['provider']
-      if (provider === 'google') {
-        AnalyticsService.captureEvent(
-          EVENTS.USER_DOES_NOT_HAVE_LINKED_GOOGLE_ACCOUNT
-        )
-      }
-      if (provider === 'clever') {
-        AnalyticsService.captureEvent(
-          EVENTS.USER_DOES_NOT_HAVE_LINKED_CLEVER_ACCOUNT
-        )
-      }
-      error = provider
-        ? `Your ${provider} account is not associated with this account.`
-        : `Something went wrong. Please verify your login method and try again.`
-      LoggerService.noticeError(`${provider} error: ${error}`)
-    }
-    return {
-      credentials: {
-        email: query.email ?? '',
-        password: '',
-      },
-      error,
-      message: query.message ?? '',
-      isLoggingIn: false,
-      hasLoginError: false,
-    }
-  },
-  methods: {
-    signIn() {
-      if (!this.isValidForm) return
-      this.isLoggingIn = true
-      AuthService.login({
-        email: this.credentials.email,
-        password: this.credentials.password,
-      })
-        .then((data) => {
-          this.$store.commit('user/setUser', data.user)
-          this.$router.push(this.$route.query.redirect || '/')
-        })
-        .catch(() => {
-          this.hasLoginError = true
-        })
-        .finally(() => {
-          this.isLoggingIn = false
-        })
-    },
-    signInWithSso(provider) {
-      this.isLoggingIn = true
-      this.captureSsoClickEvent(provider)
-      const params = new URLSearchParams({
-        provider,
-        isLogin: true,
-        redirect: this.$route.query.redirect ?? '',
-        errorRedirect: '/login',
-      })
-      const url = `${config.serverRoot}/auth/sso?${params.toString()}`
-      window.location.replace(url)
-      this.isLoggingIn = false
-    },
-    captureSsoClickEvent(provider) {
-      if (provider === SsoProvider.GOOGLE) {
-        AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_GOOGLE)
-      }
-      if (provider === SsoProvider.CLEVER) {
-        AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_IN_WITH_CLEVER)
-      }
-      if (provider === SsoProvider.CLASSLINK) {
-        AnalyticsService.captureEvent(
-          EVENTS.USER_CLICKED_SIGN_IN_WITH_CLASSLINK
-        )
-      }
-    },
-  },
-}
-</script>
 
 <style lang="scss" scoped>
 .alert {
