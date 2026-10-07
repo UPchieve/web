@@ -34,6 +34,10 @@ onMounted(() => {
     <div class="container">
       <div class="content">
         <h1 class="title">National Tutoring Honor Society</h1>
+        <strong data-testid="nths-high-school-only"
+          >NTHS chapters are currently only open to high school
+          students.</strong
+        >
         <span>
           National Tutoring Honor Society (NTHS) is a student-led honor society
           where high schoolers lead chapters that recruit tutors, build

@@ -156,6 +156,9 @@ describe('NTHSApplicationFormView submit', () => {
     } as never)
     const boom = new Error('network down')
     vi.spyOn(store, 'dispatch').mockRejectedValue(boom)
+    vi.spyOn(NetworkService, 'user').mockResolvedValue({
+      data: { user: { id: USER_ID } },
+    } as never)
     const replace = vi.spyOn(router, 'replace').mockResolvedValue()
 
     const vm = await mountAtQuestions()
@@ -176,18 +179,44 @@ describe('NTHSApplicationFormView submit', () => {
       data: { application: { formVersion: 1 } },
     } as never)
     vi.spyOn(store, 'dispatch').mockResolvedValue([] as never)
+    vi.spyOn(NetworkService, 'user').mockResolvedValue({
+      data: { user: { id: USER_ID, occupation: ['A high school student'] } },
+    } as never)
     const replace = vi.spyOn(router, 'replace').mockResolvedValue()
+    const commit = vi.spyOn(store, 'commit')
 
     const vm = await mountAtQuestions()
     await vm.submit()
     await flushPromises()
 
     expect(vm.error).toEqual('')
+    expect(commit).toHaveBeenCalledWith('user/updateUser', {
+      id: USER_ID,
+      occupation: ['A high school student'],
+    })
     expect(replace).toHaveBeenCalledWith('/groups/application-pending')
     // Left set so the form stays locked until the redirect unmounts it.
     expect(vm.isSubmitting).toBe(true)
     expect(getNTHSApplicationDraft(USER_ID)).toBeUndefined()
   })
+
+  it.each([
+    ['10th grade', true],
+    ['College', false],
+    ['', false],
+  ])(
+    'enables Continue on step one with the grade %j: %s',
+    async (grade, enabled) => {
+      const wrapper = mount(NTHSApplicationFormView, {
+        global: { plugins: [store, router] },
+      })
+      await flushPromises()
+      const vm = wrapper.vm as any
+      vm.school.schoolId = 'school-1'
+      vm.gradeLevel = grade
+      expect(vm.canLeaveSchoolStep).toBe(enabled)
+    }
+  )
 })
 
 describe('NTHSApplicationFormView unlisted school', () => {

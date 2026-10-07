@@ -134,11 +134,13 @@
           <refer-friend-icon class="icon" />
         </sidebar-link>
 
+        <!-- A plain @click binds SidebarLink's onClick prop, which renders a div in place of the router link. -->
         <sidebar-link
           v-if="nthsSidebarLink"
           :to="nthsSidebarLink.to"
           :text="nthsSidebarLink.text"
           id="nths-group-sidebar-link"
+          @click.capture="nthsSidebarLinkClicked"
         >
           <groups-icon class="icon" />
         </sidebar-link>
@@ -281,6 +283,7 @@ export default {
       isAutoFlowUser: 'user/isAutoFlowUser',
       hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
       isVolunteer: 'user/isVolunteer',
+      hasVolunteerRole: 'user/hasVolunteerRole',
       isStudent: 'user/isStudent',
       isTeacher: 'user/isTeacher',
       isAdmin: 'user/isAdmin',
@@ -312,7 +315,7 @@ export default {
       return true
     },
     nthsSidebarDestination() {
-      if (!this.isVolunteer) return
+      if (!this.hasVolunteerRole) return
       return nthsDestination(this.$store)
     },
     shownNthsApplyDestination() {
@@ -361,6 +364,14 @@ export default {
     }
   },
   methods: {
+    // Fires before the route switches a student-mode user to coach mode, so
+    // userType is the role they clicked from.
+    nthsSidebarLinkClicked() {
+      AnalyticsService.captureEvent(EVENTS.NTHS_SIDEBAR_LINK_CLICKED, {
+        destination: this.nthsSidebarDestination,
+        userType: this.userType,
+      })
+    },
     circleCommunityClickedEvent() {
       AnalyticsService.captureEvent(EVENTS.NTHS_CIRCLE_COMMUNITY_LINK_CLICKED, {
         isNthsAdmin: this.hasNthsAdminRole,
@@ -401,10 +412,12 @@ export default {
     },
     shownNthsApplyDestination: {
       handler(destination) {
-        if (destination)
+        if (destination) {
           AnalyticsService.captureEvent(EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN, {
             destination,
+            userType: this.userType,
           })
+        }
       },
       immediate: true,
     },

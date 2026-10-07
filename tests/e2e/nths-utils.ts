@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker'
 import {
-  createStudent,
   createVolunteer,
   withCertifications,
   type DbClient,
@@ -40,11 +39,12 @@ export const createNthsChapter = async (
   return { groupId, name }
 }
 
-export const createHighSchoolCoach = async (
-  dbClient: DbClient
+export const createCoach = async (
+  dbClient: DbClient,
+  profile = {}
 ): Promise<VolunteerUser> => {
-  const coach = await createVolunteer(dbClient, {}, {})
-  if (!coach) throw new Error('Failed to create the high school coach')
+  const coach = await createVolunteer(dbClient, {}, profile)
+  if (!coach) throw new Error('Failed to create the coach')
 
   // A volunteer with no certifications is an autoflow user, who never reaches
   // the dashboard the login helper waits for.
@@ -52,30 +52,20 @@ export const createHighSchoolCoach = async (
     userId: coach.id,
     certificationNames: ['prealgebra'],
   })
+
+  return coach
+}
+
+export const createHighSchoolCoach = async (
+  dbClient: DbClient
+): Promise<VolunteerUser> => {
+  const coach = await createCoach(dbClient)
   await dbClient.query(
     `INSERT INTO volunteer_occupations (user_id, occupation) VALUES ($1, $2)`,
     [coach.id, VolunteerOccupations.HIGH_SCHOOL_STUDENT]
   )
 
   return coach
-}
-
-// Eligibility only counts a session with time_tutored above zero.
-export const createTutoredSession = async (
-  dbClient: DbClient,
-  args: { volunteerId: string }
-): Promise<void> => {
-  const student = await createStudent(dbClient)
-  if (!student) throw new Error('Failed to create the student for the session')
-
-  await dbClient.query(
-    `INSERT INTO sessions (id, student_id, volunteer_id, subject_id, time_tutored,
-                           volunteer_joined_at, ended_at, shadowbanned)
-     SELECT gen_random_uuid(), $1, $2, subjects.id, 1200000, NOW(), NOW(), false
-       FROM subjects
-      LIMIT 1`,
-    [student.id, args.volunteerId]
-  )
 }
 
 export const createNthsPresident = async (

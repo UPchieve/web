@@ -140,8 +140,8 @@ export default {
       syncNTHSStatusToGleap(rootState, rootGetters)
       return results.data.groups
     },
-    // Occupation decides eligibility, so the sidebar and route guards go stale on
-    // a profile save. Failure is swallowed because the profile itself saved.
+    // A profile save can remove the coach from their chapters, so the sidebar and
+    // route guards go stale. Failure is swallowed because the profile itself saved.
     async refreshAfterProfileChange({ dispatch }) {
       try {
         await dispatch('fetchNthsData')

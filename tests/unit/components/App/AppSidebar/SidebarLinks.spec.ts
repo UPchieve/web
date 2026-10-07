@@ -117,6 +117,7 @@ const getWrapper = (options = {}) => {
         isTeacher: () => false,
         isAdmin: () => false,
         isVolunteer: () => false,
+        hasVolunteerRole: () => false,
         hasCertification: () => false,
         isAutoFlowUser: () => false,
       },
@@ -227,6 +228,7 @@ describe('SidebarLinks', () => {
         user: {
           getters: {
             isVolunteer: () => true,
+            hasVolunteerRole: () => true,
             isStudent: () => false,
             hasCertification: () => true,
           },
@@ -244,6 +246,7 @@ describe('SidebarLinks', () => {
         user: {
           getters: {
             isVolunteer: () => true,
+            hasVolunteerRole: () => true,
             isStudent: () => false,
             hasCertification: () => false,
             isAutoFlowUser: () => true,
@@ -271,6 +274,7 @@ describe('SidebarLinks', () => {
           getters: {
             hasCertification: () => false,
             isVolunteer: () => true,
+            hasVolunteerRole: () => true,
             isStudent: () => false,
           },
         },
@@ -283,6 +287,7 @@ describe('SidebarLinks', () => {
         user: {
           getters: {
             isVolunteer: () => true,
+            hasVolunteerRole: () => true,
             isStudent: () => false,
           },
         },
@@ -297,6 +302,7 @@ describe('SidebarLinks', () => {
           getters: {
             isAdmin: () => true,
             isVolunteer: () => true,
+            hasVolunteerRole: () => true,
             isStudent: () => false,
             hasCertification: () => true,
           },
@@ -332,6 +338,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -361,6 +368,38 @@ describe('SidebarLinks', () => {
         expect(isTargetLinkPresent).toEqual(true)
       })
 
+      it.each(['student', 'volunteer'])(
+        'Renders the apply link for a dual-role user in %s mode, and a click reports that mode',
+        async (userType) => {
+          const captureEvent = vi.spyOn(AnalyticsService, 'captureEvent')
+          const wrapper = getWrapper({
+            props: { authenticated: true },
+            user: {
+              getters: {
+                isStudent: () => userType === 'student',
+                isVolunteer: () => userType === 'volunteer',
+                hasVolunteerRole: () => true,
+                userType: () => userType,
+              },
+            },
+            featureFlags: {
+              getters: { isNTHSApplicationPageEnabled: () => true },
+            },
+            nths: {
+              state: { NTHSGroups: [], canApplyForNTHSPresident: true },
+            },
+          })
+          const link = wrapper.findComponent('#nths-group-sidebar-link')
+          expect(link.props('to')).toEqual(NTHS_APPLY_LINK.to)
+
+          await link.trigger('click')
+          expect(captureEvent).toHaveBeenCalledWith(
+            EVENTS.NTHS_SIDEBAR_LINK_CLICKED,
+            { destination: 'apply', userType }
+          )
+        }
+      )
+
       describe('apply link shown event', () => {
         const DESKTOP_WIDTH = 1024
         const PHONE_WIDTH = 375
@@ -373,7 +412,9 @@ describe('SidebarLinks', () => {
               getters: {
                 isStudent: () => false,
                 isVolunteer: () => true,
+                hasVolunteerRole: () => true,
                 isTeacher: () => false,
+                userType: () => 'volunteer',
               },
             },
             featureFlags: {
@@ -394,7 +435,10 @@ describe('SidebarLinks', () => {
             nthsState: { canApplyForNTHSPresident: true },
             windowWidth: DESKTOP_WIDTH,
             expected: [
-              [EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN, { destination: 'apply' }],
+              [
+                EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN,
+                { destination: 'apply', userType: 'volunteer' },
+              ],
             ],
           },
           {
@@ -404,7 +448,7 @@ describe('SidebarLinks', () => {
             expected: [
               [
                 EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN,
-                { destination: 'preview' },
+                { destination: 'preview', userType: 'volunteer' },
               ],
             ],
           },
@@ -430,7 +474,7 @@ describe('SidebarLinks', () => {
           await nextTick()
           expect(captureEvent).toHaveBeenCalledWith(
             EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN,
-            { destination: 'apply' }
+            { destination: 'apply', userType: 'volunteer' }
           )
         })
       })
@@ -444,6 +488,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -482,6 +527,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -522,6 +568,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -556,6 +603,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -594,6 +642,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -631,6 +680,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -663,6 +713,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -699,6 +750,7 @@ describe('SidebarLinks', () => {
             getters: {
               isStudent: () => false,
               isVolunteer: () => true,
+              hasVolunteerRole: () => true,
               isTeacher: () => false,
             },
           },
@@ -728,6 +780,7 @@ describe('SidebarLinks', () => {
               getters: {
                 isStudent: () => false,
                 isVolunteer: () => true,
+                hasVolunteerRole: () => true,
                 isTeacher: () => false,
               },
             },

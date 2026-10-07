@@ -99,7 +99,9 @@ const hasSchool = computed(
       !!school.country &&
       (!isSchoolInUS.value || !!school.state))
 )
-const canLeaveSchoolStep = computed(() => hasSchool.value && !!gradeLevel.value)
+const canLeaveSchoolStep = computed(
+  () => hasSchool.value && HIGH_SCHOOL_GRADES.includes(gradeLevel.value)
+)
 
 // The dropdown labels read '11th grade'; the API and the server's own events
 // use the bare GRADES value.
@@ -224,7 +226,15 @@ async function submit() {
   store.commit('nths/setNTHSCandidateApplicationStatus', 'applied')
 
   try {
-    await store.dispatch('nths/fetchNthsData')
+    // user/fetchUser blanks the user on failure, so fetch directly and let errors reach the catch.
+    await Promise.all([
+      store.dispatch('nths/fetchNthsData'),
+      NetworkService.user().then((res) => {
+        if (res.data.user) {
+          store.commit('user/updateUser', res.data.user)
+        }
+      }),
+    ])
   } catch (err) {
     LoggerService.noticeError(err, 'Could not refresh NTHS data after applying')
   }
@@ -318,6 +328,10 @@ function submitErrorClass(httpStatus?: number) {
           autocomplete="off"
         >
           <p class="step-label">Step 1 of 2</p>
+          <strong data-testid="nths-high-school-only"
+            >NTHS chapters are currently only open to high school
+            students.</strong
+          >
           <p class="help">
             We need your school and grade before the rest of the application.
           </p>
@@ -391,6 +405,7 @@ function submitErrorClass(httpStatus?: number) {
           <FormSelect
             v-model="gradeLevel"
             name="grade level"
+            data-testid="nths-grade-select"
             :options="HIGH_SCHOOL_GRADES"
             placeholder="Grade level"
             :label="`What grade will you be in during the ${academicYear} academic year?`"

@@ -33,4 +33,14 @@ describe('NTHSApplicationView', () => {
       wrapper.find('[data-testid="nths-application-deadline"]').text()
     ).toBe('Deadline to apply to start a chapter is Oct 31, 2026')
   })
+
+  it('tells every coach NTHS is only for high school students', () => {
+    const wrapper = mount(NTHSApplicationView, {
+      global: { plugins: [createStore(storeOptions), router] },
+    })
+
+    expect(
+      wrapper.find('[data-testid="nths-high-school-only"]').text()
+    ).not.toBe('')
+  })
 })
