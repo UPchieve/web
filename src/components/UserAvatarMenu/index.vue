@@ -47,7 +47,7 @@ function goTo(path: string) {
 
 function logout() {
   closeMenu()
-  AuthService.logout({ $router: router, $store: store })
+  AuthService.logout({ router, store })
 }
 
 const emit = defineEmits<{

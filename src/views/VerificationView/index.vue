@@ -275,7 +275,10 @@ export default {
       if (error.status !== 422) LoggerService.noticeError(error.response?.data)
     },
     logout() {
-      AuthService.logout(this)
+      AuthService.logout({
+        router: this.$router,
+        store: this.$store,
+      })
     },
   },
 }

@@ -5,11 +5,16 @@ import LoggerService from './LoggerService'
 import NetworkService from './NetworkService'
 import { socket } from '@/socket'
 import type { AuthPayload } from '@/contracts/auth'
+import type { Store } from 'vuex'
+import type { RootState } from '@/store'
+import type { Router } from 'vue-router'
 
-export async function logout(
-  context: { $store: any; $router: any },
-  logoutRoute: string
-) {
+type LogoutContext = {
+  router: Router
+  store: Store<RootState>
+}
+
+export async function logout(context: LogoutContext, logoutRoute?: string) {
   try {
     await NetworkService.logout()
   } finally {
@@ -18,13 +23,14 @@ export async function logout(
 }
 
 export async function handleLogout(
-  context: { $store: any; $router: any },
-  logoutRoute: string
+  context: LogoutContext,
+  logoutRoute?: string
 ) {
-  await context.$store.dispatch('user/clear')
+  const { router, store } = context
+  await store.dispatch('user/clear')
   resetServices()
   socket.disconnect()
-  await context.$router.push(logoutRoute ?? '/logout')
+  await router.push(logoutRoute ?? '/logout')
 }
 
 export function getStatus() {

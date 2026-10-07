@@ -38,7 +38,7 @@ async function onAccept() {
     return
   }
 
-  await handleLogout({ $router, $store }, '/logout?deleted=true')
+  await handleLogout({ router: $router, store: $store }, '/logout?deleted=true')
 }
 
 defineExpose({

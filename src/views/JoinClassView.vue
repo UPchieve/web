@@ -57,8 +57,8 @@ function removeClass() {
 async function removeUser() {
   await AuthService.logout(
     {
-      $router,
-      $store,
+      router: $router,
+      store: $store,
     },
     `/join-class/${classCode.value ?? ''}`
   )

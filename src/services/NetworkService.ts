@@ -257,6 +257,10 @@ export function login(data: AuthPayload) {
   return httpPost<LoginResponse>(`${AUTH_ROOT}/login`, data)
 }
 
+export function logout() {
+  return httpGet<void>(`${AUTH_ROOT}/logout`)
+}
+
 export default {
   _successHandler(res) {
     return Promise.resolve(res)
@@ -338,12 +342,7 @@ export default {
   getBootstrappedFeatureFlags,
   authStatus,
   login,
-  logout() {
-    return httpGetDeprecated(`${AUTH_ROOT}/logout`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
+  logout,
   checkRegister(data) {
     return httpPostDeprecated(`${AUTH_ROOT}/register/checkcred`, data).then(
       this._successHandler,
