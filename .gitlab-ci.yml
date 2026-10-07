@@ -4,6 +4,9 @@ stages:
   - deploy
   - post-deploy
 
+include:
+  - local: .gitlab/ci/e2e.yml
+
 cache:
   key:
     files:
@@ -140,85 +143,13 @@ test:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
 e2e-test:
-  stage: test
-  extends: .node_setup
-  image: mcr.microsoft.com/playwright:v1.59.1-jammy
-  services:
-    - postgres:15.17
-    - redis:6.2.1
+  extends: .e2e_base
   variables:
-    CI: 'true'
-    POSTGRES_HOST: postgres
-    POSTGRES_PASSWORD: Password123
-    POSTGRES_USER: admin
-    POSTGRES_DB: upchieve
-    # Services can only reached over _their_ native ports, so
-    # the 5500/5501 database ports in we typically use in subway
-    # for the databases will not work..
-    POSTGRES_PORT: 5432
-    REDIS_HOST: redis
-    REDIS_PORT: 6379
-    NODE_ENV: test_e2e_ci
+    HIGH_LINE_DIR: $CI_PROJECT_DIR
+    SUBWAY_DIR: $CI_PROJECT_DIR/subway
   before_script:
-    - echo 'Set up high-line...'
-    - !reference [.node_setup, before_script]
-    - echo 'Install Chrome to test against the branded browser...'
-    - pnpm exec playwright install chrome
-    - echo 'Set up subway...'
-    - git clone --depth=1 https://gitlab.com/upchieve/subway.git
-    - cd subway
-    - echo 'Subway commit version'
-    - echo $(git rev-parse HEAD)
-    # TODO: Figure out a way to cache subway node_modules.
-    - pnpm install --frozen-lockfile
-    - echo 'Verify Postgres is running and seed database...'
-    - apt-get update && apt-get install -y postgresql-client
-    - export PGPASSWORD=$POSTGRES_PASSWORD
-    - psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -c "SELECT 'OK' AS status;"
-    - |
-      for file in database/db_init/{schema,auth,local_auth,test_seeds,seed_migrations}.sql; do
-        PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -f $file
-      done
-    - echo 'Verify Redis is running...'
-    - apt-get install -y redis-tools
-    - redis-cli -h $REDIS_HOST -p $REDIS_PORT PING
-    - echo 'Set environment variables we do not want defaults...'
-    # These env variables will take precedence over the variables in .env file.
-    - export SUBWAY_POSTGRES_HOST=$POSTGRES_HOST
-    - export SUBWAY_POSTGRES_RO_HOST=$POSTGRES_HOST
-    - export SUBWAY_POSTGRES_ANALYTICS_HOST=$POSTGRES_HOST
-    - export SUBWAY_POSTGRES_PORT=$POSTGRES_PORT
-    - export SUBWAY_REDIS_HOST=$REDIS_HOST
-    - export SUBWAY_REDIS_PORT=$REDIS_PORT
-    - export SUBWAY_SERVER_HOST=localhost:8081
-    - export VUE_APP_GOOGLE_RECAPTCHA_KEY=$GOOGLE_RECAPTCHA_KEY
-    - echo 'Start subway server...'
-    - pnpm run e2e:backend > ../subway.log 2>&1 &
-    - |
-      for i in {1..30}; do
-        if curl -f http://localhost:3001/healthz 2>/dev/null; then
-          echo ' Subway is up!'
-          break
-        fi
-        if [ $i -eq 30 ]; then
-          echo 'Subway never started.'
-          exit 1
-        fi
-        echo "Attempt $i/30 to start subway. Waiting..."
-        sleep 2
-      done
-    - cd $CI_PROJECT_DIR
-    - echo 'e2e environment ready!'
-  script:
-    - pnpm run test:e2e
-  artifacts:
-    access: developer
-    when: always
-    paths:
-      - subway.log
-      - high-line.log
-      - playwright-report/
-    expire_in: 7 days
+    - git clone --depth=1 https://gitlab.com/upchieve/subway.git $SUBWAY_DIR
+    - !reference [.e2e_base, before_script]
   rules:
     - if: '$TEST_DISABLED'
       when: never

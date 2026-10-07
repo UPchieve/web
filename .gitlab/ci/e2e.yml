@@ -1,0 +1,94 @@
+# Template job to run E2E tests in CI.
+# The E2E tests are defined here in high-line but the job to run them
+# may be initiated from either high-line or subway.
+# Just provide the subway and high-line checkouts
+# via HIGH_LINE_DIR and SUBWAY_DIR variables.
+.e2e_base:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.59.1-jammy
+  services:
+    - postgres:15.17
+    - redis:6.2.1
+  variables:
+    CI: 'true'
+    POSTGRES_HOST: postgres
+    POSTGRES_PASSWORD: Password123
+    POSTGRES_USER: admin
+    POSTGRES_DB: upchieve
+    # Services can only be reached over _their_ native ports, so
+    # the 5500/5501 database ports we typically use in subway
+    # for the databases will not work.
+    POSTGRES_PORT: 5432
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+    NODE_ENV: test_e2e_ci
+  before_script:
+    - echo 'Set up high-line...'
+    - corepack enable pnpm
+    - pnpm config set store-dir $CI_PROJECT_DIR/.pnpm-store
+    - cd $HIGH_LINE_DIR
+    - 'echo "High-line commit version: $(git rev-parse HEAD)"'
+    - pnpm install --frozen-lockfile
+    - echo 'Install Chrome to test against the branded browser...'
+    - pnpm exec playwright install chrome
+    - echo 'Set up subway...'
+    - cd $SUBWAY_DIR
+    - 'echo "Subway commit version: $(git rev-parse HEAD)"'
+    # TODO: Figure out a way to cache subway node_modules.
+    - pnpm install --frozen-lockfile
+    - echo 'Verify Postgres is running and seed database...'
+    - apt-get update && apt-get install -y postgresql-client
+    - export PGPASSWORD=$POSTGRES_PASSWORD
+    - psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -c "SELECT 'OK' AS status;"
+    - |
+      for file in database/db_init/{schema,auth,local_auth,test_seeds,seed_migrations}.sql; do
+        PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -p $POSTGRES_PORT -f $file
+      done
+    - echo 'Verify Redis is running...'
+    - apt-get install -y redis-tools
+    - redis-cli -h $REDIS_HOST -p $REDIS_PORT PING
+    - echo 'Set environment variables we do not want defaults...'
+    # These env variables will take precedence over the variables in .env file.
+    - export SUBWAY_POSTGRES_HOST=$POSTGRES_HOST
+    - export SUBWAY_POSTGRES_RO_HOST=$POSTGRES_HOST
+    - export SUBWAY_POSTGRES_ANALYTICS_HOST=$POSTGRES_HOST
+    - export SUBWAY_POSTGRES_PORT=$POSTGRES_PORT
+    - export SUBWAY_REDIS_HOST=$REDIS_HOST
+    - export SUBWAY_REDIS_PORT=$REDIS_PORT
+    - export SUBWAY_SERVER_HOST=localhost:8081
+    - export VUE_APP_GOOGLE_RECAPTCHA_KEY=$GOOGLE_RECAPTCHA_KEY
+    - echo 'Start subway server...'
+    - pnpm run e2e:backend > $CI_PROJECT_DIR/subway.log 2>&1 &
+    - |
+      for i in {1..30}; do
+        if curl -f http://localhost:3001/healthz 2>/dev/null; then
+          echo ' Subway is up!'
+          break
+        fi
+        if [ $i -eq 30 ]; then
+          echo 'Subway never started.'
+          exit 1
+        fi
+        echo "Attempt $i/30 to start subway. Waiting..."
+        sleep 2
+      done
+    - cd $HIGH_LINE_DIR
+    - echo 'e2e environment ready!'
+  script:
+    - pnpm run test:e2e
+  after_script:
+    # Artifact paths are relative to $CI_PROJECT_DIR. When high-line is
+    # cloned into a subdirectory (i.e. in subway), copy its outputs up.
+    - |
+      if [ "$HIGH_LINE_DIR" != "$CI_PROJECT_DIR" ]; then
+        cp -r "$HIGH_LINE_DIR/playwright-report" "$CI_PROJECT_DIR/" 2>/dev/null || true
+        cp "$HIGH_LINE_DIR/high-line.log" "$CI_PROJECT_DIR/" 2>/dev/null || true
+      fi
+  artifacts:
+    access: developer
+    when: always
+    paths:
+      - subway.log
+      - high-line.log
+      - playwright-report/
+    expire_in: 7 days
