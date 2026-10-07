@@ -86,6 +86,8 @@ test.describe('Training', async () => {
     await volunteerTraining.reviewAnswers()
     await volunteerTraining.retakeQuiz()
     await volunteerTraining.startQuiz()
+    await volunteerTraining.completeQuiz('pass')
+    await volunteerTraining.checkResults('You passed!')
   })
 
   test('fail prealgebra quiz, review answers, review concepts, retake quiz', async ({
