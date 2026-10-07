@@ -177,31 +177,10 @@ Note: You don't need to start the backend or frontend servers yourself. Playwrig
 
 ### CI debugging tips
 
-CI can be a bit harder to debug because, without UI mode, you can't see browser logs or UI replays.
-
-Some things to keep in mind with CI:
-- You can adjust the `test:e2e` script in package.json to just run the test(s) you care about
-- Take note of how many workers are running in CI vs. local.
-- Try to write tests that aren't dependent on each other / share some user state
-
-You can also forward browser logs to the CI job by adding the following in your test file:
-
-```ts
-test.beforeEach(async ({ page }) => {
-  page.on('console', msg => {
-    console.log(`[browser:${msg.type()}] ${msg.text()}`)
-  })
-})
-```
-
-You might also print the inner HTML at whatever point in time in your failing test you need to "see" what is in the DOM. You can open the output into an HTML viewer:
-
-```ts
-  const innerHtml = await page.innerHTML('.my-class')
-  console.log(innerHtml)
-```
-
-Each E2E CI job also outputs log artifacts that you can look at. When the test completes, look for the "Artifacts" button on the right side and download `high-line.log` and `subway.log`.
+Each E2E CI job also outputs artifacts that you can look at. When the test run completes, look for the "Artifacts" button on the right side in GitLab and download the artifacts. These include:
+- High-line and subway logs
+- The playwright HTML report (a nice GUI to view the test results)
+  - Importantly, from here, you can open the full trace for any test. Just follow instructions in the GUI.
 
 ### Adding test data
 
