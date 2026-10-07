@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { EVENTS } from '@/consts'
-import HyperlinkButton from '@/components/HyperlinkButton.vue'
+import LargeButton from '@/components/LargeButton.vue'
 import { onMounted, ref } from 'vue'
 import { getAcademicYear } from '@/utils/academic-year'
 import LoggerService from '@/services/LoggerService'
@@ -79,15 +79,20 @@ const emit = defineEmits(['dismissed'])
       v-if="!updated"
       autocomplete="off"
     >
-      <GradeLevelSelect v-model="selectedGradeLevel" />
-      <HyperlinkButton
+      <!-- The heading already names the academic year, so keep the field label short. -->
+      <GradeLevelSelect
+        v-model="selectedGradeLevel"
+        label="Grade level"
+        placeholder="Select your grade"
+      />
+      <LargeButton
         v-if="!isSaving"
+        variant="primary-blue"
         :disabled="!selectedGradeLevel"
         class="save-button"
         buttonType="submit"
         :showArrow="false"
-        type="submit"
-        >Confirm</HyperlinkButton
+        >Save</LargeButton
       >
       <Loader :height="40" :width="40" v-else />
     </form>
@@ -108,10 +113,14 @@ const emit = defineEmits(['dismissed'])
 .grade-level-form {
   display: flex;
   flex-direction: row;
+  gap: 8px;
 }
 
 .save-button {
+  // `center` aligns against the select's label + input and rides high, so anchor
+  // to the bottom and lift by half the input/button height difference instead.
   align-self: flex-end;
+  margin-bottom: 5px;
 }
 
 h1 {

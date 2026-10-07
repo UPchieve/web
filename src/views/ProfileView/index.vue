@@ -222,11 +222,13 @@
             <div class="description">
               This helps us tailor your UPchieve experience to you.
             </div>
+            <!-- The prompt above already names the academic year, so keep the field label short. -->
             <GradeLevelSelect
               v-model="selectedGradeLevel"
               :modelValue="selectedGradeLevel"
               @update:modelValue="saveGradeLevel"
-              placeholder="Grade level"
+              label="Grade level"
+              placeholder="Select your grade"
             />
           </div>
 
