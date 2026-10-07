@@ -43,9 +43,7 @@ const nthsGroupWithRole = (roleName: 'admin' | 'member') => [
 ]
 
 beforeEach(() => {
-  NetworkService.authStatus = vi
-    .fn()
-    .mockResolvedValue({ data: { authenticated: true } })
+  NetworkService.authStatus = vi.fn().mockResolvedValue({ authenticated: true })
   NetworkService.user = vi.fn().mockResolvedValue({ data: { user: volunteer } })
 })
 

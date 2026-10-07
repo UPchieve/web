@@ -5,7 +5,7 @@ export enum GRADES {
   NINTH = '9th',
   TENTH = '10th',
   ELEVENTH = '11th',
-  TWELVETH = '12th',
+  TWELFTH = '12th',
   COLLEGE = 'College',
   OTHER = 'Other',
 }

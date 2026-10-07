@@ -233,7 +233,7 @@ async function getAuthStatus(
     // When we are already authenticated, let's re-fetch in the background
     // that way we don't block the route transition.
     if (isAuthenticated && !isBlockingRoute) {
-      getStatus().then(async ({ data }) => {
+      getStatus().then(async (data) => {
         if (data.authenticated) {
           store.dispatch('user/fetchUser')
         } else {
@@ -252,7 +252,7 @@ async function getAuthStatus(
       // When we are not authenticated or we definitely want to know the status of
       //  the user before navigating to the page (like admin pages), block route
       // transitions until we hear back.
-      const { data } = await getStatus()
+      const data = await getStatus()
       if (data.authenticated) {
         await store.dispatch('user/fetchUser')
       }

@@ -33,6 +33,7 @@ import type {
   EssayReviewSubmissionForVolunteer,
 } from '@/types/essay-review'
 import type { FeatureFlagResponse } from '@/contracts/analytics'
+import type { AuthStatusResponse } from '@/contracts/auth'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -109,14 +110,14 @@ async function getAdditionalConfig(action: string) {
   return { headers: { 'g-recaptcha-response': token } }
 }
 
-export async function httpGet<T>(path: string, config?: object) {
+export async function httpGetDeprecated<T>(path: string, config?: object) {
   return axiosInstance.get<T>(path, config)
 }
 
 // TODO: Use generics instead of Object.
 // TODO: Move NetworkError conversion into these helpers instead of
 // the handling the error through `_errorHandler` and `_axiosErrorHandler`
-export async function httpPost<T>(
+export async function httpPostDeprecated<T>(
   path: string,
   data: object,
   config?: AxiosRequestConfig
@@ -124,7 +125,7 @@ export async function httpPost<T>(
   return axiosInstance.post<T>(path, data, config)
 }
 
-export async function httpPut<T>(
+export async function httpPutDeprecated<T>(
   path: string,
   data: object,
   config?: AxiosRequestConfig
@@ -132,7 +133,7 @@ export async function httpPut<T>(
   return axiosInstance.put<T>(path, data, config)
 }
 
-export async function httpPatch<T>(
+export async function httpPatchDeprecated<T>(
   path: string,
   data: object,
   config?: AxiosRequestConfig
@@ -140,7 +141,10 @@ export async function httpPatch<T>(
   return axiosInstance.patch<T>(path, data, config)
 }
 
-export async function httpDelete<T>(path: string, config?: AxiosRequestConfig) {
+export async function httpDeleteDeprecated<T>(
+  path: string,
+  config?: AxiosRequestConfig
+) {
   return axiosInstance.delete<T>(path, config)
 }
 
@@ -153,18 +157,24 @@ export function toNetworkError(err: unknown): NetworkError {
     const status = err.response?.status
     const clientMessage = err.response?.data?.clientMessage
     const clientTitle = err.response?.data?.clientTitle
+    const code = err.response?.data?.code
     const message =
       clientMessage ??
       err.response?.data?.err ??
       err.message ??
       'An unexpected error occurred.'
-    return new NetworkError(message, { status, clientMessage, clientTitle })
+    return new NetworkError(message, {
+      status,
+      clientMessage,
+      clientTitle,
+      code,
+    })
   }
 
   return new NetworkError(err instanceof Error ? err.message : 'Unknown error')
 }
 
-export async function httpGetV2<T>(path: string, config?: AxiosRequestConfig) {
+export async function httpGet<T>(path: string, config?: AxiosRequestConfig) {
   try {
     const response = await axiosInstance.get<T>(path, config)
     return response.data
@@ -173,7 +183,7 @@ export async function httpGetV2<T>(path: string, config?: AxiosRequestConfig) {
   }
 }
 
-export async function httpPostV2<TResponse, TRequest = object>(
+export async function httpPost<TResponse, TRequest = object>(
   path: string,
   body: TRequest,
   config?: AxiosRequestConfig
@@ -186,7 +196,7 @@ export async function httpPostV2<TResponse, TRequest = object>(
   }
 }
 
-export async function httpPutV2<TResponse, TRequest = object>(
+export async function httpPut<TResponse, TRequest = object>(
   path: string,
   body: TRequest,
   config?: AxiosRequestConfig
@@ -199,10 +209,7 @@ export async function httpPutV2<TResponse, TRequest = object>(
   }
 }
 
-export async function httpDeleteV2<T>(
-  path: string,
-  config?: AxiosRequestConfig
-) {
+export async function httpDelete<T>(path: string, config?: AxiosRequestConfig) {
   try {
     const response = await axiosInstance.delete<T>(path, config)
     return response.data
@@ -223,7 +230,11 @@ export async function httpDeleteV2<T>(
  * we could switch our default axios instance to use the `fetch` adapter but
  * it seems a little risky and out of scope for this current change.
  */
-export async function httpPostKeepAlive<T>(path: string, data: object) {
+// TODO: Update to follow new HTTP pattern
+export async function httpPostDeprecatedKeepAlive<T>(
+  path: string,
+  data: object
+) {
   return axiosFetchInstance.post<T>(path, data, {
     headers: axiosInstance.defaults.headers.common,
     fetchOptions: {
@@ -234,7 +245,11 @@ export async function httpPostKeepAlive<T>(path: string, data: object) {
 }
 
 export function getBootstrappedFeatureFlags() {
-  return httpGetV2<FeatureFlagResponse>(`${API_PUBLIC_ROOT}/feature-flags`)
+  return httpGet<FeatureFlagResponse>(`${API_PUBLIC_ROOT}/feature-flags`)
+}
+
+export function authStatus() {
+  return httpGet<AuthStatusResponse>(`${AUTH_ROOT}/status`)
 }
 
 export default {
@@ -316,65 +331,61 @@ export default {
     )
   },
   getBootstrappedFeatureFlags,
-  authStatus() {
-    return httpGet(`${AUTH_ROOT}/status`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
+  authStatus,
   login(data) {
-    return httpPost(`${AUTH_ROOT}/login`, data).then(
+    return httpPostDeprecated(`${AUTH_ROOT}/login`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   logout() {
-    return httpGet(`${AUTH_ROOT}/logout`).then(
+    return httpGetDeprecated(`${AUTH_ROOT}/logout`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   checkRegister(data) {
-    return httpPost(`${AUTH_ROOT}/register/checkcred`, data).then(
+    return httpPostDeprecated(`${AUTH_ROOT}/register/checkcred`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   checkStudentPartnerSignupCode(partnerSignupCode) {
-    return httpGet(
+    return httpGetDeprecated(
       `${AUTH_ROOT}/partner/student/code?partnerSignupCode=${encodeURIComponent(
         partnerSignupCode
       )}`
     ).then(this._successHandler, this._errorHandler)
   },
   getVolunteerPartner(partnerId) {
-    return httpGet(
+    return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(
         partnerId
       )}`
     ).then(this._successHandler, this._errorHandler)
   },
   getStudentPartner(partnerKey: string) {
-    return httpGet(
+    return httpGetDeprecated(
       `${AUTH_ROOT}/partner/student?partnerId=${encodeURIComponent(partnerKey)}`
     ).then(this._successHandler, this._axiosErrorHandler)
   },
   checkHealth() {
-    return httpGet(`${VERSION_ROOT}/version.json`).then(
+    return httpGetDeprecated(`${VERSION_ROOT}/version.json`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   async registerOpenVolunteer(data: any) {
     const config = await getAdditionalConfig('registerVolunteer')
-    return httpPost(`${AUTH_ROOT}/register/volunteer/open`, data, config).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${AUTH_ROOT}/register/volunteer/open`,
+      data,
+      config
+    ).then(this._successHandler, this._errorHandler)
   },
   async registerPartnerVolunteer(data: any) {
     const config = await getAdditionalConfig('registerVolunteer')
-    return httpPost(
+    return httpPostDeprecated(
       `${AUTH_ROOT}/register/volunteer/partner`,
       data,
       config
@@ -382,101 +393,102 @@ export default {
   },
   async registerStudent(data: any) {
     const config = await getAdditionalConfig('registerStudent')
-    return httpPost(`${AUTH_ROOT}/register/student`, data, config).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${AUTH_ROOT}/register/student`,
+      data,
+      config
+    ).then(this._successHandler, this._errorHandler)
   },
   async registerTeacher(data: any) {
     const config = await getAdditionalConfig('registerTeacher')
-    return httpPost(`${AUTH_ROOT}/register/teacher`, data, config).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${AUTH_ROOT}/register/teacher`,
+      data,
+      config
+    ).then(this._successHandler, this._errorHandler)
   },
   async sendReset(data: any) {
     const config = await getAdditionalConfig('sendReset')
-    return httpPost(`${AUTH_ROOT}/reset/send`, data, config).then(
+    return httpPostDeprecated(`${AUTH_ROOT}/reset/send`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
   async confirmReset(data) {
     const config = await getAdditionalConfig('resetPassword')
-    return httpPost(`${AUTH_ROOT}/reset/confirm`, data, config).then(
+    return httpPostDeprecated(`${AUTH_ROOT}/reset/confirm`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
   user() {
-    return httpGet(`${API_ROOT}/user`).then(
+    return httpGetDeprecated(`${API_ROOT}/user`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   userGlobal() {
-    return httpGet(`${API_ROOT}/user`).then(
+    return httpGetDeprecated(`${API_ROOT}/user`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   async sendVerification(data) {
     const config = await getAdditionalConfig('sendVerification')
-    return httpPost(`${API_ROOT}/verify/v2/send`, data, config).then(
+    return httpPostDeprecated(`${API_ROOT}/verify/v2/send`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
   confirmVerification(data) {
-    return httpPost(`${API_ROOT}/verify/confirm`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/verify/confirm`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   sendContact(data) {
-    return httpPost(`${CONTACT_API_ROOT}/send`, data).then(
+    return httpPostDeprecated(`${CONTACT_API_ROOT}/send`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   setProfile(data) {
-    return httpPut(`${API_ROOT}/user`, data).then(
+    return httpPutDeprecated(`${API_ROOT}/user`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   deletePhone() {
-    return httpDelete(`${API_ROOT}/user/phone`)
+    return httpDeleteDeprecated(`${API_ROOT}/user/phone`)
   },
   deleteAccount() {
-    return httpDelete(`${API_ROOT}/user`)
+    return httpDeleteDeprecated(`${API_ROOT}/user`)
   },
   getVolunteersAvailability(data) {
-    return httpGet(`${API_ROOT}/volunteers/availability/${data}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/volunteers/availability/${data}`
+    ).then(this._successHandler, this._errorHandler)
   },
   getVolunteers() {
-    return httpGet(`${API_ROOT}/volunteers`).then(
+    return httpGetDeprecated(`${API_ROOT}/volunteers`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getVolunteerLastUpdated() {
-    return httpGet(`${API_ROOT}/volunteers/hours-last-updated`).then(
+    return httpGetDeprecated(`${API_ROOT}/volunteers/hours-last-updated`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getReferredFriends() {
-    return httpGet(`${API_ROOT}/user/referred-friends`).then(
+    return httpGetDeprecated(`${API_ROOT}/user/referred-friends`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getReferredBy(referralCode) {
-    return httpGet(`${REFERRAL_API_ROOT}/${referralCode}`).then(
+    return httpGetDeprecated(`${REFERRAL_API_ROOT}/${referralCode}`).then(
       this._successHandler,
       this._errorHandler
     )
@@ -498,7 +510,7 @@ export default {
     }
   }) {
     try {
-      return await httpPost<{
+      return await httpPostDeprecated<{
         sessionId: Uuid
         session: CurrentSessionPublic
         isZwibserveSession: boolean
@@ -509,7 +521,7 @@ export default {
   },
   async breakoutSession(sessionId: string) {
     try {
-      return await httpPost<{
+      return await httpPostDeprecated<{
         sessionId: Uuid
         session: CurrentSessionPublic
       }>(`${API_ROOT}/session/${sessionId}/breakout`, {})
@@ -519,7 +531,7 @@ export default {
   },
   async joinSession(data: { sessionId: string; joinedFrom?: string }) {
     try {
-      return await httpPost<{
+      return await httpPostDeprecated<{
         session: CurrentSessionPublic
         isZwibserveSession: boolean
         exclusiveVolunteerId?: string
@@ -530,7 +542,7 @@ export default {
   },
   async endSession(data) {
     try {
-      return await httpPost<{
+      return await httpPostDeprecated<{
         sessionId: Uuid
         session: CurrentSessionPublic
       }>(`${API_ROOT}/session/end`, data)
@@ -548,7 +560,7 @@ export default {
   },
   async currentSession() {
     try {
-      return await httpPost<{
+      return await httpPostDeprecated<{
         sessionId: Uuid
         data: CurrentSessionPublic
       }>(`${API_ROOT}/session/current`, {})
@@ -557,25 +569,25 @@ export default {
     }
   },
   getRecapSessionForDms(data) {
-    return httpPost(`${API_ROOT}/session/recap-dms`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/session/recap-dms`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   latestSession() {
-    return httpPost(`${API_ROOT}/session/latest`).then(
+    return httpPostDeprecated(`${API_ROOT}/session/latest`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getSession(sessionId) {
-    return httpGet(`${API_ROOT}/session/${sessionId}`).then(
+    return httpGetDeprecated(`${API_ROOT}/session/${sessionId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   reportSession({ sessionId, reportReason, reportMessage, source }) {
-    return httpPost(`${API_ROOT}/session/${sessionId}/report`, {
+    return httpPostDeprecated(`${API_ROOT}/session/${sessionId}/report`, {
       reportReason,
       reportMessage,
       source,
@@ -585,22 +597,21 @@ export default {
     const formData = new FormData()
     formData.append('image', image)
 
-    return httpPut(`${API_ROOT}/session/${sessionId}/image`, formData).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPutDeprecated(
+      `${API_ROOT}/session/${sessionId}/image`,
+      formData
+    ).then(this._successHandler, this._errorHandler)
   },
   async getAssignmentDocuments(assignmentId) {
-    return httpGet(`${API_ROOT}/assignment/${assignmentId}/documents`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/assignment/${assignmentId}/documents`
+    ).then(this._successHandler, this._errorHandler)
   },
   timedOutSession(sessionId, data) {
-    return httpPost(`${API_ROOT}/session/${sessionId}/timed-out`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${API_ROOT}/session/${sessionId}/timed-out`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetSessions({
     page,
@@ -631,54 +642,53 @@ export default {
       isReported,
     }).toString()
 
-    return httpGet(`${API_ROOT}/sessions?${queryParams}`).then(
+    return httpGetDeprecated(`${API_ROOT}/sessions?${queryParams}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminGetSession(sessionId) {
-    return httpGet(`${API_ROOT}/session/${sessionId}/admin`).then(
+    return httpGetDeprecated(`${API_ROOT}/session/${sessionId}/admin`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminReviewPendingVolunteer({ volunteerId, data }) {
-    return httpPost(`${API_ROOT}/volunteers/review/${volunteerId}`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${API_ROOT}/volunteers/review/${volunteerId}`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetVolunteersToReview(page) {
-    return httpGet(`${API_ROOT}/volunteers/review?page=${page}`).then(
+    return httpGetDeprecated(`${API_ROOT}/volunteers/review?page=${page}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminGetSessionNotifications(sessionId) {
-    return httpGet(`${API_ROOT}/session/${sessionId}/notifications`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/session/${sessionId}/notifications`
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetSessionsToReview(page, studentFirstName) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/session/review?page=${page}&studentFirstName=${studentFirstName}`
     ).then(this._successHandler, this._errorHandler)
   },
   adminUpdateSession(sessionId, data) {
-    return httpPut(`${API_ROOT}/session/${sessionId}`, data).then(
+    return httpPutDeprecated(`${API_ROOT}/session/${sessionId}`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminGetUser(userId, page) {
-    return httpGet(`${API_ROOT}/user/${userId}?page=${page}`).then(
+    return httpGetDeprecated(`${API_ROOT}/user/${userId}?page=${page}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminUpdateUser(userId, data) {
-    return httpPut(`${API_ROOT}/user/${userId}`, data).then(
+    return httpPutDeprecated(`${API_ROOT}/user/${userId}`, data).then(
       this._successHandler,
       this._errorHandler
     )
@@ -702,18 +712,18 @@ export default {
       school,
     }).toString()
 
-    return httpGet(`${API_ROOT}/users?${queryParams}`).then(
+    return httpGetDeprecated(`${API_ROOT}/users?${queryParams}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminGetIneligibleStudents(page) {
-    return httpGet(
+    return httpGetDeprecated(
       `${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`
     ).then(this._successHandler, this._errorHandler)
   },
   adminGetSchool(schoolId) {
-    return httpGet(`${ADMIN_ROOT}/school/${schoolId}`).then(
+    return httpGetDeprecated(`${ADMIN_ROOT}/school/${schoolId}`).then(
       this._successHandler,
       this._errorHandler
     )
@@ -727,43 +737,43 @@ export default {
       isPartner,
       page,
     }).toString()
-    return httpGet(`${ADMIN_ROOT}/schools?${queryParams}`).then(
+    return httpGetDeprecated(`${ADMIN_ROOT}/schools?${queryParams}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminUpdateSchool(schoolId, data) {
-    return httpPut(`${ELIGIBILITY_API_ROOT}/school/${schoolId}`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPutDeprecated(
+      `${ELIGIBILITY_API_ROOT}/school/${schoolId}`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   adminUpdateSchoolApproval(data) {
-    return httpPost(`${ELIGIBILITY_API_ROOT}/school/approval`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${ELIGIBILITY_API_ROOT}/school/approval`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   adminUpdateSchoolPartnerStatus(data) {
-    return httpPost(`${ELIGIBILITY_API_ROOT}/school/partner`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${ELIGIBILITY_API_ROOT}/school/partner`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetPartnerSchools() {
-    return httpGet(`${ADMIN_ROOT}/schools/partner-schools`).then(
+    return httpGetDeprecated(`${ADMIN_ROOT}/schools/partner-schools`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminUploadRosterStudents(data) {
-    return httpPost(`${ADMIN_ROOT}/roster-students`, data).then(
+    return httpPostDeprecated(`${ADMIN_ROOT}/roster-students`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminCleverRoster(districtId: string) {
-    return httpPost(`${ADMIN_ROOT}/clever/roster`, {
+    return httpPostDeprecated(`${ADMIN_ROOT}/clever/roster`, {
       districtId,
     }).then(this._successHandler, this._errorHandler)
   },
@@ -771,7 +781,7 @@ export default {
     cleverSchoolId: string,
     upchieveSchoolId: string
   ) {
-    return httpPost(`${ADMIN_ROOT}/clever/school`, {
+    return httpPostDeprecated(`${ADMIN_ROOT}/clever/school`, {
       cleverSchoolId,
       upchieveSchoolId,
     }).then(this._successHandler, this._errorHandler)
@@ -796,9 +806,12 @@ export default {
       studentPartnerSite,
       sponsorOrg,
     }).toString()
-    return httpGet(`${API_ROOT}/reports/session-report?${queryParams}`, {
-      timeout: 300000,
-    }).then(this._successHandler, this._errorHandler)
+    return httpGetDeprecated(
+      `${API_ROOT}/reports/session-report?${queryParams}`,
+      {
+        timeout: 300000,
+      }
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetUsageReport({
     joinedBefore,
@@ -820,9 +833,12 @@ export default {
       studentPartnerSite,
       sponsorOrg,
     }).toString()
-    return httpGet(`${API_ROOT}/reports/usage-report?${queryParams}`, {
-      timeout: 300000,
-    }).then(this._successHandler, this._errorHandler)
+    return httpGetDeprecated(
+      `${API_ROOT}/reports/usage-report?${queryParams}`,
+      {
+        timeout: 300000,
+      }
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetVolunteerTelecomReport({ startDate, endDate, partnerOrg }) {
     const queryParams = new URLSearchParams({
@@ -830,7 +846,7 @@ export default {
       endDate,
       partnerOrg,
     }).toString()
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/reports/volunteer-telecom-report?${queryParams}`,
       {
         timeout: 300000,
@@ -843,7 +859,7 @@ export default {
       endDate,
       partnerOrg,
     }).toString()
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/reports/partner-analytics-report?${queryParams}`,
       {
         timeout: 300000,
@@ -857,92 +873,93 @@ export default {
     ).then(this._successHandler, this._errorHandler)
   },
   adminGetStudentPartners() {
-    return httpGet(`${AUTH_ROOT}/partner/student-partners`).then(
+    return httpGetDeprecated(`${AUTH_ROOT}/partner/student-partners`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminGetVolunteerPartners() {
-    return httpGet(`${AUTH_ROOT}/partner/volunteer-partners`).then(
+    return httpGetDeprecated(`${AUTH_ROOT}/partner/volunteer-partners`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminGetSponsorOrgs() {
-    return httpGet(`${AUTH_ROOT}/partner/sponsor-orgs`).then(
+    return httpGetDeprecated(`${AUTH_ROOT}/partner/sponsor-orgs`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminGetZipCodes(zipCode) {
-    return httpGet(`${ELIGIBILITY_API_ROOT}/zip-codes/${zipCode}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${ELIGIBILITY_API_ROOT}/zip-codes/${zipCode}`
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetUserIdFromEmail(email) {
-    return httpGet(`${API_ROOT}/user/email/${email}`).then(
+    return httpGetDeprecated(`${API_ROOT}/user/email/${email}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   adminNTHSAffiliateWithSchool(data: { chapterIds: string[] }) {
-    return httpPost(`${ADMIN_ROOT}/nths/school-affiliation`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${ADMIN_ROOT}/nths/school-affiliation`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   getQuestions(data) {
-    return httpPost(`${API_ROOT}/training/questions`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/training/questions`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getQuizScore(data) {
-    return httpPost(`${API_ROOT}/training/score`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/training/score`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getReviewMaterials(data) {
-    return httpGet(`${API_ROOT}/training/review/${data}`).then(
+    return httpGetDeprecated(`${API_ROOT}/training/review/${data}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getTrainingCourse(courseKey) {
-    return httpGet(`${API_ROOT}/training/course/${courseKey}`).then(
+    return httpGetDeprecated(`${API_ROOT}/training/course/${courseKey}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   recordTrainingCourseProgress(courseKey, materialKey) {
-    return httpPost(`${API_ROOT}/training/course/${courseKey}/progress`, {
-      materialKey,
-    }).then(this._successHandler, this._errorHandler)
+    return httpPostDeprecated(
+      `${API_ROOT}/training/course/${courseKey}/progress`,
+      {
+        materialKey,
+      }
+    ).then(this._successHandler, this._errorHandler)
   },
   updateSchedule(data) {
-    return httpPost(`${API_ROOT}/calendar/save`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/calendar/save`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getWaitTimes() {
-    return httpGet(`${API_ROOT}/stats/volunteer/heatmap`).then(
+    return httpGetDeprecated(`${API_ROOT}/stats/volunteer/heatmap`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   searchSchool({ query }) {
-    return httpGet(
+    return httpGetDeprecated(
       `${ELIGIBILITY_API_ROOT}/school/search?q=${encodeURIComponent(query)}`
     ).then(this._successHandler, this._errorHandler)
   },
   checkZipCode({ zipCode }) {
-    return httpGet(`${ELIGIBILITY_API_ROOT}/check-zip-code/${zipCode}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${ELIGIBILITY_API_ROOT}/check-zip-code/${zipCode}`
+    ).then(this._successHandler, this._errorHandler)
   },
   checkStudentEligibility({
     email,
@@ -957,7 +974,7 @@ export default {
     schoolId?: string
     zipCode: string
   }) {
-    return httpPost(`${ELIGIBILITY_API_ROOT}/check`, {
+    return httpPostDeprecated(`${ELIGIBILITY_API_ROOT}/check`, {
       email,
       gradeLevel,
       referredByCode,
@@ -967,313 +984,299 @@ export default {
   },
   checkTeacherEligibility({ schoolId }: { schoolId: string }) {
     const queryParams = new URLSearchParams({ schoolId }).toString()
-    return httpGet(`${ELIGIBILITY_API_ROOT}/check/teacher?${queryParams}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${ELIGIBILITY_API_ROOT}/check/teacher?${queryParams}`
+    ).then(this._successHandler, this._errorHandler)
   },
   checkIpAddress() {
-    return httpGet(`${ELIGIBILITY_API_ROOT}/ip-check`).then(
+    return httpGetDeprecated(`${ELIGIBILITY_API_ROOT}/ip-check`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   checkIfMessageIsClean(data) {
-    return httpPost(`${API_ROOT}/moderate/message`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/moderate/message`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   checkIfImageIsClean(data) {
-    return httpPost(`${API_ROOT}/moderate/image`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/moderate/image`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   checkIfVideoFrameIsClean(data) {
-    return httpPost(`${API_ROOT}/moderate/video-frame`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/moderate/video-frame`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   feedback(data) {
-    return httpPost(`${API_ROOT}/feedback`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/feedback`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   checkReference(referenceId) {
-    return httpGet(`${REFERENCE_API_ROOT}/${referenceId}`).then(
+    return httpGetDeprecated(`${REFERENCE_API_ROOT}/${referenceId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   saveReferenceForm(referenceId, data) {
-    return httpPost(`${REFERENCE_API_ROOT}/${referenceId}/submit`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${REFERENCE_API_ROOT}/${referenceId}/submit`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   uploadVolunteerPhoto(file) {
     const formData = new FormData()
     formData.append('file', file)
-    return httpPut(`${API_ROOT}/user/volunteer-approval/photo`, formData).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPutDeprecated(
+      `${API_ROOT}/user/volunteer-approval/photo`,
+      formData
+    ).then(this._successHandler, this._errorHandler)
   },
   addBackgroundInfo(data) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/user/volunteer-approval/background-information`,
       data
     ).then(this._successHandler, this._errorHandler)
   },
   submitSurvey(survey) {
-    return httpPost(`${API_ROOT}/survey/save`, survey).then(
+    return httpPostDeprecated(`${API_ROOT}/survey/save`, survey).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getPresessionSurveyForFeedback(sessionId) {
-    return httpGet(`${API_ROOT}/survey/presession/${sessionId}`).then(
+    return httpGetDeprecated(`${API_ROOT}/survey/presession/${sessionId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getStudentsPresessionGoal(sessionId) {
-    return httpGet(`${API_ROOT}/survey/presession/${sessionId}/goal`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/survey/presession/${sessionId}/goal`
+    ).then(this._successHandler, this._errorHandler)
   },
   getSurveyById(surveyId: number) {
-    return httpGet(`${API_ROOT}/surveys/${surveyId}`).then(
+    return httpGetDeprecated(`${API_ROOT}/surveys/${surveyId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getPresessionSurvey(subjectName) {
-    return httpGet(`${API_ROOT}/survey/presession?subject=${subjectName}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/survey/presession?subject=${subjectName}`
+    ).then(this._successHandler, this._errorHandler)
   },
   getPresessionSurveyResponse(sessionId) {
-    return httpGet(`${API_ROOT}/survey/presession/response/${sessionId}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/survey/presession/response/${sessionId}`
+    ).then(this._successHandler, this._errorHandler)
   },
   getPostsessionSurvey(subjectName, sessionId, role) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/survey/postsession?subject=${subjectName}&sessionId=${sessionId}&role=${role}`
     ).then(this._successHandler, this._errorHandler)
   },
   getPostsessionSurveyResponse(sessionId, role) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/survey/postsession/response?sessionId=${sessionId}&role=${role}`
     ).then(this._successHandler, this._errorHandler)
   },
   getImpactStudySurvey() {
-    return httpGet(`${API_ROOT}/survey/impact-study`).then(
+    return httpGetDeprecated(`${API_ROOT}/survey/impact-study`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getImpactStudySurveyResponses() {
-    return httpGet(`${API_ROOT}/survey/impact-study/responses`).then(
+    return httpGetDeprecated(`${API_ROOT}/survey/impact-study/responses`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getUserProductFlags() {
-    return httpGet(`${API_ROOT}/product-flags`).then(
+    return httpGetDeprecated(`${API_ROOT}/product-flags`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   updateFavoriteVolunteerStatus(volunteerId, data) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/students/favorite-volunteers/${volunteerId}`,
       data
     ).then(this._successHandler, this._errorHandler)
   },
   getRemainingFavoriteVolunteers() {
-    return httpGet(`${API_ROOT}/students/remaining-favorite-volunteers`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/students/remaining-favorite-volunteers`
+    ).then(this._successHandler, this._errorHandler)
   },
   checkIsFavoriteVolunteer(volunteerId) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/students/favorite-volunteers/${volunteerId}`
     ).then(this._successHandler, this._errorHandler)
   },
   getSessionHistory(filter) {
     const queryParams = new URLSearchParams(filter).toString()
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/sessions/history${queryParams.length ? `?${queryParams}` : ''}`
     ).then(this._successHandler, this._errorHandler)
   },
   getTotalSessionHistory(filter) {
     const queryParams = new URLSearchParams(filter).toString()
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/sessions/history/total${queryParams.length ? `?${queryParams}` : ''}`
     ).then(this._successHandler, this._errorHandler)
   },
   getVolunteerFirstSessionDate() {
-    return httpGet(`${API_ROOT}/sessions/first-session-date`).then(
+    return httpGetDeprecated(`${API_ROOT}/sessions/first-session-date`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getPastVolunteers() {
-    return httpGet(`${API_ROOT}/students/past-volunteers`).then(
+    return httpGetDeprecated(`${API_ROOT}/students/past-volunteers`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getSessionRecap(sessionId) {
-    return httpGet(`${API_ROOT}/sessions/${sessionId}/recap`).then(
+    return httpGetDeprecated(`${API_ROOT}/sessions/${sessionId}/recap`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getStudentSignupSources() {
-    return httpGet(`${ELIGIBILITY_API_ROOT}/signup-sources/students`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${ELIGIBILITY_API_ROOT}/signup-sources/students`
+    ).then(this._successHandler, this._errorHandler)
   },
   adminGetActivePartnersForStudent(studentId) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/students/partners/active?student=${studentId}`
     ).then(this._successHandler, this._errorHandler)
   },
   getSubjects() {
-    return httpGet(`${API_ROOT}/subjects`).then(
+    return httpGetDeprecated(`${API_ROOT}/subjects`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getIsSubjectValid(subject, topic) {
-    return httpGet<{ isValid: boolean }>(
+    return httpGetDeprecated<{ isValid: boolean }>(
       `${API_ROOT}/subjects/is-valid?subject=${subject}&topic=${topic}`
     ).then(this._successHandler, this._errorHandler)
   },
   getTrainingSubjects() {
-    return httpGet(`${API_ROOT}/subjects/training`).then(
+    return httpGetDeprecated(`${API_ROOT}/subjects/training`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   isSessionRecapEligible(sessionId, data) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/sessions/history/${sessionId}/eligible`,
       data
     ).then(this._successHandler, this._errorHandler)
   },
   getProgressReportForSession(sessionId) {
-    return httpGet(`${API_ROOT}/progress-reports/sessions/${sessionId}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/progress-reports/sessions/${sessionId}`
+    ).then(this._successHandler, this._errorHandler)
   },
   getProgressReportsForSubject(subject, page) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/progress-reports/subjects/${subject}?page=${page}`
     ).then(this._successHandler, this._errorHandler)
   },
   getProgressReportSummariesForSubject(subject) {
-    return httpGet(`${API_ROOT}/progress-reports/summaries/${subject}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/progress-reports/summaries/${subject}`
+    ).then(this._successHandler, this._errorHandler)
   },
   getLatestProgressReportOverviewForSubject(subject) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/progress-reports/summaries/${subject}/latest`
     ).then(this._successHandler, this._errorHandler)
   },
   updateProgressReportsReadStatus(reportIds) {
-    return httpPost(`${API_ROOT}/progress-reports/read`, { reportIds }).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(`${API_ROOT}/progress-reports/read`, {
+      reportIds,
+    }).then(this._successHandler, this._errorHandler)
   },
   getUnreadProgressReports() {
-    return httpGet(`${API_ROOT}/progress-reports/overview/stats`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/progress-reports/overview/stats`
+    ).then(this._successHandler, this._errorHandler)
   },
   getLatestProgressReportOverviewSubject() {
-    return httpGet(`${API_ROOT}/progress-reports/overview/latest/subject`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/progress-reports/overview/latest/subject`
+    ).then(this._successHandler, this._errorHandler)
   },
   getProgressReportSurvey() {
-    return httpGet(`${API_ROOT}/survey/progress-report`).then(
+    return httpGetDeprecated(`${API_ROOT}/survey/progress-report`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getProgressReportSurveyResponses(progressReportId) {
-    return httpGet(
+    return httpGetDeprecated(
       `${API_ROOT}/survey/progress-report/${progressReportId}/response`
     ).then(this._successHandler, this._errorHandler)
   },
   getTeacherClasses() {
-    return httpGet(`${API_ROOT}/teachers/classes`).then(
+    return httpGetDeprecated(`${API_ROOT}/teachers/classes`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   createTeacherClass(className, topicId) {
-    return httpPost(`${API_ROOT}/teachers/class`, { className, topicId }).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(`${API_ROOT}/teachers/class`, {
+      className,
+      topicId,
+    }).then(this._successHandler, this._errorHandler)
   },
   getStudentsInTeacherClass(classId) {
-    return httpGet(`${API_ROOT}/teachers/class/${classId}/students`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/teachers/class/${classId}/students`
+    ).then(this._successHandler, this._errorHandler)
   },
   getTeacherClassByClassCode(classCode) {
-    return httpGet(`${API_ROOT}/teachers/class/?classCode=${classCode}`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/teachers/class/?classCode=${classCode}`
+    ).then(this._successHandler, this._errorHandler)
   },
   getTeacherClassById(classId) {
-    return httpGet(`${API_ROOT}/teachers/class/${classId}`).then(
+    return httpGetDeprecated(`${API_ROOT}/teachers/class/${classId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getStudentSessionDetails(studentId) {
-    return httpGet(`${API_ROOT}/sessions/student/${studentId}`).then(
+    return httpGetDeprecated(`${API_ROOT}/sessions/student/${studentId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getTopics() {
-    return httpGet(`${API_ROOT}/topics`).then(
+    return httpGetDeprecated(`${API_ROOT}/topics`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   saveBigFutureEmailForStudy(email) {
-    return httpPost(`${ELIGIBILITY_API_ROOT}/big-future/email`, { email }).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(`${ELIGIBILITY_API_ROOT}/big-future/email`, {
+      email,
+    }).then(this._successHandler, this._errorHandler)
   },
   addStudentToClass({ email, classCode, gradeLevel }) {
-    return httpPost(`${API_PUBLIC_ROOT}/students/class`, {
+    return httpPostDeprecated(`${API_PUBLIC_ROOT}/students/class`, {
       email,
       classCode,
       gradeLevel,
@@ -1281,7 +1284,7 @@ export default {
   },
   async getAllMessagesForBotConversation(conversationId: Uuid) {
     try {
-      return await httpGet<TutorBotTranscriptPublic>(
+      return await httpGetDeprecated<TutorBotTranscriptPublic>(
         `${API_ROOT}/tutor-bot/conversations/${conversationId}`
       )
     } catch (err) {
@@ -1289,7 +1292,7 @@ export default {
     }
   },
   getOrCreateTutorBotConversationWithMessagesBySessionId(sessionId: Uuid) {
-    return httpPut(
+    return httpPutDeprecated(
       `${API_ROOT}/session/${sessionId}/tutor-bot-conversation`,
       {}
     ).then(this._successHandler, this._errorHandler)
@@ -1316,7 +1319,7 @@ export default {
         form.append('snapshot', snapshotBlob, 'whiteboard.jpg')
       }
 
-      return await httpPost<TutorBotAddMessageResponsePublic>(
+      return await httpPostDeprecated<TutorBotAddMessageResponsePublic>(
         `${API_ROOT}/tutor-bot/conversations/${conversationId}/message`,
         form
       )
@@ -1325,7 +1328,7 @@ export default {
     }
   },
   enrollStudentInIncentiveProgram(proxyEmail) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`,
       {
         proxyEmail,
@@ -1333,171 +1336,172 @@ export default {
     ).then(this._successHandler, this._errorHandler)
   },
   deniedIncentiveProgramEnrollment() {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/product-flags/fall-incentive-enrollment/denied`
     ).then(this._successHandler, this._errorHandler)
   },
   getStudentClasses() {
-    return httpGet(`${API_ROOT}/students/classes`).then(
+    return httpGetDeprecated(`${API_ROOT}/students/classes`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getStudentAssignments() {
-    return httpGet(`${API_ROOT}/students/assignments`).then(
+    return httpGetDeprecated(`${API_ROOT}/students/assignments`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getAssignmentById(assignmentId: string) {
-    return httpGet(`${API_ROOT}/assignment/${assignmentId}`).then(
+    return httpGetDeprecated(`${API_ROOT}/assignment/${assignmentId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   upsertAssignment(formData: FormData) {
-    return httpPut(`${API_ROOT}/teachers/assignment`, formData).then(
+    return httpPutDeprecated(`${API_ROOT}/teachers/assignment`, formData).then(
       this._successHandler,
       this._errorHandler
     )
   },
   createAssignments(formData: FormData) {
-    return httpPost(`${API_ROOT}/teachers/assignments`, formData).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${API_ROOT}/teachers/assignments`,
+      formData
+    ).then(this._successHandler, this._errorHandler)
   },
   getAssignmentsByClassId(classId: string) {
-    return httpGet(`${API_ROOT}/teachers/class/${classId}/assignments`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/teachers/class/${classId}/assignments`
+    ).then(this._successHandler, this._errorHandler)
   },
   getStudentAssignmentCompletion(assignmentId) {
-    return httpGet(`${API_ROOT}/assignment/${assignmentId}/students`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/assignment/${assignmentId}/students`
+    ).then(this._successHandler, this._errorHandler)
   },
   getAllAssignmentsForTeacher() {
-    return httpGet(`${API_ROOT}/teachers/assignments`).then(
+    return httpGetDeprecated(`${API_ROOT}/teachers/assignments`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getAssignmentForSession(sessionId) {
-    return httpGet(`${API_ROOT}/session/${sessionId}/assignment`).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/session/${sessionId}/assignment`
+    ).then(this._successHandler, this._errorHandler)
   },
   deleteAssignment(assignmentId) {
-    return httpDelete(`${API_ROOT}/assignment/${assignmentId}`).then(
+    return httpDeleteDeprecated(`${API_ROOT}/assignment/${assignmentId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   updateTeacherClass({ classData }) {
-    return httpPost(`${API_ROOT}/teachers/class/update`, classData).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(
+      `${API_ROOT}/teachers/class/update`,
+      classData
+    ).then(this._successHandler, this._errorHandler)
   },
   deactivateTeacherClass(id) {
-    return httpPost(`${API_ROOT}/teachers/class/deactivate`, id).then(
+    return httpPostDeprecated(`${API_ROOT}/teachers/class/deactivate`, id).then(
       this._successHandler,
       this._errorHandler
     )
   },
   removeStudentFromClass({ studentId, classId }) {
-    return httpDelete(
+    return httpDeleteDeprecated(
       `${API_ROOT}/teachers/class/${classId}/student/${studentId}/remove`
     ).then(this._successHandler, this._errorHandler)
   },
   getUserRewards(offset) {
-    return httpGet(`${API_ROOT}/rewards?offset=${offset}`).then(
+    return httpGetDeprecated(`${API_ROOT}/rewards?offset=${offset}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   getOrCreateSessionMeeting(sessionId) {
-    return httpPost(`${API_ROOT}/sessions/${sessionId}/meeting`).then(
+    return httpPostDeprecated(`${API_ROOT}/sessions/${sessionId}/meeting`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   startSessionMeetingTranscription(sessionId) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/sessions/${sessionId}/meeting/start-transcription`
     ).then(this._successHandler, this._errorHandler)
   },
   startSessionRecording(sessionId: string) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/sessions/${sessionId}/meeting/start-recording`
     ).then(this._successHandler, this._errorHandler)
   },
   endSessionMeeting(sessionId) {
-    return httpPut(`${API_ROOT}/sessions/${sessionId}/meeting}`).then(
+    return httpPutDeprecated(`${API_ROOT}/sessions/${sessionId}/meeting}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   addVolunteerRoleForStudent() {
-    return httpPost(`${API_ROOT}/user/roles/volunteer`).then(
+    return httpPostDeprecated(`${API_ROOT}/user/roles/volunteer`).then(
       this._successHandler,
       this._errorHandler
     )
   },
   switchActiveRole(activeRole: 'student' | 'volunteer') {
-    return httpPut(`${API_ROOT}/user/roles/active`, { activeRole }).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPutDeprecated(`${API_ROOT}/user/roles/active`, {
+      activeRole,
+    }).then(this._successHandler, this._errorHandler)
   },
   getVolunteerPresence() {
-    return httpGet(`${API_ROOT}/volunteers/presence`, {}).catch(
+    return httpGetDeprecated(`${API_ROOT}/volunteers/presence`, {}).catch(
       this._axiosErrorHandler
     )
   },
   updateUserPreferredLanguage(preferredLanguage: string) {
-    return httpPost<void>(`${API_ROOT}/user/preferred-language`, {
+    return httpPostDeprecated<void>(`${API_ROOT}/user/preferred-language`, {
       preferredLanguage,
     }).catch(this._axiosErrorHandler)
   },
   async upsertImpactStudyCampaign(campaign: ImpactStudyCampaign) {
     try {
-      return await httpPost<{ impactStudyEnrollmentAt?: Date }>(
+      return await httpPostDeprecated<{ impactStudyEnrollmentAt?: Date }>(
         `${API_ROOT}/product-flags/impact-study-campaigns`,
         { campaign }
       )
     } catch (err) {
-      //  TODO: Error handling and throwing will probably need to be centralized in the `http*` methods (httpGet, httpPost, etc.)
+      //  TODO: Error handling and throwing will probably need to be centralized in the `http*` methods (httpGetDeprecated, httpPostDeprecated, etc.)
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
   sendReferralText(phoneNumber: string) {
-    return httpPost(`${API_ROOT}/send-referral-text`, { phoneNumber }).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPostDeprecated(`${API_ROOT}/send-referral-text`, {
+      phoneNumber,
+    }).then(this._successHandler, this._errorHandler)
   },
   trackPresenceActive(clientUUID: string) {
-    return httpPost(`${API_ROOT}/user/track-presence/active`, {
+    return httpPostDeprecated(`${API_ROOT}/user/track-presence/active`, {
       clientUUID,
     }).then(this._successHandler, this._errorHandler)
   },
   trackPresenceInactive(clientUUID: string) {
-    return httpPostKeepAlive(`${API_ROOT}/user/track-presence/inactive`, {
-      clientUUID,
-    }).then(this._successHandler, this._errorHandler)
+    return httpPostDeprecatedKeepAlive(
+      `${API_ROOT}/user/track-presence/inactive`,
+      {
+        clientUUID,
+      }
+    ).then(this._successHandler, this._errorHandler)
   },
   trackPresencePassive(clientUUID: string) {
-    return httpPostKeepAlive(`${API_ROOT}/user/track-presence/passive`, {
-      clientUUID,
-    }).then(this._successHandler, this._errorHandler)
+    return httpPostDeprecatedKeepAlive(
+      `${API_ROOT}/user/track-presence/passive`,
+      {
+        clientUUID,
+      }
+    ).then(this._successHandler, this._errorHandler)
   },
   trackPresenceCheckForInactivity(clientUUID: string) {
-    return httpPostKeepAlive(
+    return httpPostDeprecatedKeepAlive(
       `${API_ROOT}/user/track-presence/check-for-inactivity`,
       { clientUUID }
     ).then(this._successHandler, this._errorHandler)
@@ -1510,38 +1514,42 @@ export default {
     signupSourceId: number
     otherSignupSource?: string
   }) {
-    return httpPut(`${API_ROOT}/user/volunteer/complete-sso-signup`, data).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPutDeprecated(
+      `${API_ROOT}/user/volunteer/complete-sso-signup`,
+      data
+    ).then(this._successHandler, this._errorHandler)
   },
   getNTHSGroupsForUser() {
-    return httpGet(`${API_ROOT}/nths-groups`, {}).catch(this._axiosErrorHandler)
+    return httpGetDeprecated(`${API_ROOT}/nths-groups`, {}).catch(
+      this._axiosErrorHandler
+    )
   },
   getNTHSGroupByCode(code: string) {
-    return httpGet(`${API_PUBLIC_ROOT}/nths-groups/${code}`, {}).catch(
-      this._axiosErrorHandler
-    )
+    return httpGetDeprecated(
+      `${API_PUBLIC_ROOT}/nths-groups/${code}`,
+      {}
+    ).catch(this._axiosErrorHandler)
   },
   getNTHSGroupMembers(groupId: string) {
-    return httpGet(`${API_ROOT}/nths-groups/${groupId}/members`).catch(
-      this._axiosErrorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/nths-groups/${groupId}/members`
+    ).catch(this._axiosErrorHandler)
   },
   updateNTHSGroupMember(
     groupId: string,
     userId: string,
     data: NTHSMemberUpdate
   ) {
-    return httpPut(
+    return httpPutDeprecated(
       `${API_ROOT}/nths-groups/${groupId}/members/${userId}`,
       data
     ).catch(this._axiosErrorHandler)
   },
   leaveNthsChapter(groupId: string) {
-    return httpDelete(`${API_ROOT}/nths-groups/${groupId}/leave`, {}).catch(
-      this._axiosErrorHandler
-    )
+    return httpDeleteDeprecated(
+      `${API_ROOT}/nths-groups/${groupId}/leave`,
+      {}
+    ).catch(this._axiosErrorHandler)
   },
   joinVolunteerToNTHSGroup({
     email,
@@ -1550,25 +1558,24 @@ export default {
     email: string
     inviteCode: string
   }) {
-    return httpPost(`${API_PUBLIC_ROOT}/nths-groups/join`, {
+    return httpPostDeprecated(`${API_PUBLIC_ROOT}/nths-groups/join`, {
       email,
       inviteCode,
     }).then(this._successHandler, this._errorHandler)
   },
   createNTHSGroup() {
-    return httpPost(`${API_ROOT}/nths-groups/new`, {}).then(
+    return httpPostDeprecated(`${API_ROOT}/nths-groups/new`, {}).then(
       this._successHandler,
       this._errorHandler
     )
   },
   editNTHSGroup({ groupId, name }: { groupId: string; name: string }) {
-    return httpPut(`${API_ROOT}/nths-groups/${groupId}`, { name }).then(
-      this._successHandler,
-      this._errorHandler
-    )
+    return httpPutDeprecated(`${API_ROOT}/nths-groups/${groupId}`, {
+      name,
+    }).then(this._successHandler, this._errorHandler)
   },
   getNTHSChapterImpact(groupId: string, monthStartsAt?: Date) {
-    return httpGet<NTHSChapterImpactResponse>(
+    return httpGetDeprecated<NTHSChapterImpactResponse>(
       `${API_ROOT}/nths-groups/${groupId}/impact`,
       monthStartsAt
         ? { params: { monthStartsAt: monthStartsAt.toISOString() } }
@@ -1579,7 +1586,7 @@ export default {
     groupId: string,
     periodStarts?: Record<CalendarRosterPeriod, Date>
   ) {
-    return httpGet<NTHSChapterRosterResponse>(
+    return httpGetDeprecated<NTHSChapterRosterResponse>(
       `${API_ROOT}/nths-groups/${groupId}/roster`,
       periodStarts
         ? {
@@ -1593,28 +1600,28 @@ export default {
     ).catch(this._axiosErrorHandler)
   },
   getActionsForNTHSGroup(groupId: string) {
-    return httpGet(`${API_ROOT}/nths-groups/${groupId}/actions`).catch(
-      this._axiosErrorHandler
-    )
+    return httpGetDeprecated(
+      `${API_ROOT}/nths-groups/${groupId}/actions`
+    ).catch(this._axiosErrorHandler)
   },
   createActionForNTHSGroup(groupId: string, action: NTHSActionName) {
-    return httpPost(`${API_ROOT}/nths-groups/${groupId}/actions`, {
+    return httpPostDeprecated(`${API_ROOT}/nths-groups/${groupId}/actions`, {
       action,
     }).then(this._successHandler, this._errorHandler)
   },
   deleteActionForNTHSGroup(groupId: string, action: NTHSActionName) {
-    return httpDelete(
+    return httpDeleteDeprecated(
       `${API_ROOT}/nths-groups/${groupId}/actions/${encodeURIComponent(action)}`
     ).then(this._successHandler, this._errorHandler)
   },
   submitSchoolAffiliation(groupId: string, advisorInfo: AdvisorInfo) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/nths-groups/${groupId}/submit-school-affiliation`,
       advisorInfo
     ).then(this._successHandler, this._errorHandler)
   },
   getNTHSApplicationEligibility() {
-    return httpGet<{
+    return httpGetDeprecated<{
       eligible: boolean
       reasons?: string[]
       currentGradeName?: string
@@ -1628,14 +1635,14 @@ export default {
     responses: Record<string, string | boolean>
     formVersion: NTHSFormVersion
   }) {
-    return httpPost(`${API_ROOT}/nths-application`, data).then(
+    return httpPostDeprecated(`${API_ROOT}/nths-application`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
   async createTutorBotSession(data: TutorBotCreateConvoPayload) {
     try {
-      return await httpPost<TutorBotNewConversationPublic>(
+      return await httpPostDeprecated<TutorBotNewConversationPublic>(
         `${API_ROOT}/tutor-bot/conversations`,
         data
       )
@@ -1648,7 +1655,7 @@ export default {
     sessionId: Uuid
   ) {
     try {
-      await httpPatch<void>(
+      await httpPatchDeprecated<void>(
         `${API_ROOT}/tutor-bot/conversations/${conversationId}`,
         {
           sessionId,
@@ -1659,24 +1666,27 @@ export default {
     }
   },
   totpEnroll() {
-    return httpPost<{ qrUrl: string }>(`${API_ROOT}/totp/enroll`, {}).then(
-      this._successHandler,
-      this._axiosErrorHandler
-    )
+    return httpPostDeprecated<{ qrUrl: string }>(
+      `${API_ROOT}/totp/enroll`,
+      {}
+    ).then(this._successHandler, this._axiosErrorHandler)
   },
   totpVerify(token: string) {
-    return httpPost<{ verified: boolean }>(`${API_ROOT}/totp/verify`, {
-      token,
-    }).then(this._successHandler, this._axiosErrorHandler)
+    return httpPostDeprecated<{ verified: boolean }>(
+      `${API_ROOT}/totp/verify`,
+      {
+        token,
+      }
+    ).then(this._successHandler, this._axiosErrorHandler)
   },
   updateSessionLastSeen(sessionId: Uuid, userId: Uuid) {
-    return httpPost(
+    return httpPostDeprecated(
       `${API_ROOT}/session/${sessionId}/recap/${userId}/update-last-seen`,
       {}
     ).then(this._successHandler, this._errorHandler)
   },
   checkForUnreadDMs() {
-    return httpGet(`${API_ROOT}/sessions/unread-dms`).then(
+    return httpGetDeprecated(`${API_ROOT}/sessions/unread-dms`).then(
       this._successHandler,
       this._errorHandler
     )
@@ -1691,7 +1701,7 @@ export default {
     reviewEmail: string
   }) {
     try {
-      return await httpPost<{
+      return await httpPostDeprecated<{
         essayReview: {
           id: Uuid
           status: EssayReviewStatus
@@ -1704,7 +1714,7 @@ export default {
   },
   async adminGetEssayReviews() {
     try {
-      return await httpGet<{ essayReviews: EssayReviewSubmission[] }>(
+      return await httpGetDeprecated<{ essayReviews: EssayReviewSubmission[] }>(
         `${ADMIN_ROOT}/essay-reviews`
       )
     } catch (err) {
@@ -1713,7 +1723,7 @@ export default {
   },
   async getEssayReviewsForVolunteer() {
     try {
-      return await httpGet<{
+      return await httpGetDeprecated<{
         essayReviews: EssayReviewSubmissionForVolunteer[]
       }>(`${API_ROOT}/essay-reviews/list`)
     } catch (err) {
@@ -1722,14 +1732,16 @@ export default {
   },
   async getPendingAsyncReviewCount() {
     try {
-      return await httpGet<{ count: number }>(`${API_ROOT}/essay-reviews/count`)
+      return await httpGetDeprecated<{ count: number }>(
+        `${API_ROOT}/essay-reviews/count`
+      )
     } catch (err) {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
   async submitVolunteerEssayReview(submissionId: string, review: string) {
     try {
-      return await httpPost<void>(
+      return await httpPostDeprecated<void>(
         `${API_ROOT}/essay-reviews/volunteer/${submissionId}/reviews`,
         { review }
       )
@@ -1739,7 +1751,7 @@ export default {
   },
   async getEssayReviewEmailPreference() {
     try {
-      return await httpGet<{ optedIn: boolean }>(
+      return await httpGetDeprecated<{ optedIn: boolean }>(
         `${API_ROOT}/essay-reviews/volunteer/email-preference`
       )
     } catch (err) {
@@ -1748,7 +1760,7 @@ export default {
   },
   async updateEssayReviewEmailPreference(optedIn: boolean) {
     try {
-      return await httpPost<void>(
+      return await httpPostDeprecated<void>(
         `${API_ROOT}/essay-reviews/volunteer/email-preference`,
         { optedIn }
       )
@@ -1758,7 +1770,7 @@ export default {
   },
   async adminGetEssayReview(submissionId: string) {
     try {
-      return await httpGet<{ essayReview: EssayReviewSubmission }>(
+      return await httpGetDeprecated<{ essayReview: EssayReviewSubmission }>(
         `${ADMIN_ROOT}/essay-reviews/${submissionId}`
       )
     } catch (err) {
@@ -1770,7 +1782,7 @@ export default {
     status: EssayReviewStatus
   ) {
     try {
-      return await httpPost<{ essayReview: EssayReviewSubmission }>(
+      return await httpPostDeprecated<{ essayReview: EssayReviewSubmission }>(
         `${ADMIN_ROOT}/essay-reviews/${submissionId}`,
         { status }
       )
@@ -1780,7 +1792,7 @@ export default {
   },
   async adminSendEssayReviews(submissionId: Uuid, finalReviews: string[]) {
     try {
-      return await httpPost<{ essayReview: EssayReviewSubmission }>(
+      return await httpPostDeprecated<{ essayReview: EssayReviewSubmission }>(
         `${ADMIN_ROOT}/essay-reviews/${submissionId}/send`,
         { finalReviews }
       )
