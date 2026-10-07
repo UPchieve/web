@@ -70,6 +70,7 @@ async function addStudentToClass() {
       AnalyticsService.captureEvent(EVENTS.STUDENT_JOINED_CLASS, {
         classCode: classCode.value,
       })
+      await $router.replace(`/classes/${response.data.teacherClass.id}`)
       return $router.go(0)
     }
   } catch (err: any) {

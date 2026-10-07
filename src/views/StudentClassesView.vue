@@ -13,7 +13,6 @@ import TaskBadge from '@/assets/task-badge.svg'
 import UpdogCrying from '@/assets/updog-crying.svg'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
-import ActivityDot from '@/components/ActivityDot.vue'
 import JoinClassModal from '@/views/JoinClassModal.vue'
 
 const $store = useStore()
@@ -30,6 +29,7 @@ type TeacherClass = {
   active: boolean
   name: string
   topicId: number
+  createdAt: string
   assignments: Assignment[]
   pastAssignments: Assignment[]
 }
@@ -126,7 +126,11 @@ function getClassesWithAssignments(
     )
   }
 
-  return Array.from(classesMap.values())
+  return Array.from(classesMap.values()).sort(
+    (a, b) =>
+      dayjs(b.createdAt).diff(dayjs(a.createdAt)) ||
+      a.name.localeCompare(b.name, undefined, { numeric: true })
+  )
 }
 
 function isFutureAssignment(a: Assignment) {
@@ -172,10 +176,19 @@ function updateCurrentClassSelected() {
   $router.replace(`/classes/${currentClass.value.id}`)
 }
 
-function viewClass(selectedClass: TeacherClass) {
-  currentClass.value = selectedClass
-  $router.replace(`/classes/${selectedClass.id}`)
+function optionLabel(teacherClass: TeacherClass) {
+  return teacherClass.assignments.length
+    ? `${teacherClass.name} (open to-dos)`
+    : teacherClass.name
 }
+
+const selectedClassId = computed({
+  get: () => currentClass.value?.id,
+  set: (classId?: string) => {
+    currentClass.value = allStudentClasses.value.find((c) => c.id === classId)
+    $router.replace(`/classes/${classId}`)
+  },
+})
 
 function hasAnyAssignments(teacherClass?: TeacherClass) {
   if (!teacherClass) return false
@@ -277,27 +290,21 @@ function joinClass() {
         </button>
       </div>
       <div v-else class="uc-column h-full">
-        <div class="uc-row tabs-container">
-          <div
-            v-for="(teacherClass, index) in allStudentClasses"
+        <select
+          v-model="selectedClassId"
+          class="class-select"
+          autocomplete="off"
+          aria-label="Class"
+          data-testid="class-select"
+        >
+          <option
+            v-for="teacherClass in allStudentClasses"
             :key="teacherClass.id"
-            class="tabs"
-            data-testid="student-class"
-            :class="{
-              selected: teacherClass.id === currentClass?.id,
-              'first-child': index === 0,
-            }"
-            @click="viewClass(teacherClass)"
-            role="button"
+            :value="teacherClass.id"
           >
-            <h2 data-testid="student-class-name">{{ teacherClass.name }}</h2>
-            <activity-dot
-              v-if="teacherClass.assignments.length"
-              class="tabs__notification"
-            ></activity-dot>
-          </div>
-          <div class="divider"></div>
-        </div>
+            {{ optionLabel(teacherClass) }}
+          </option>
+        </select>
         <section>
           <div v-if="hasAnyAssignments(currentClass)">
             <div class="uc-row items-center">
@@ -438,40 +445,13 @@ h1 {
     background-color: darken($c-success-green, 10%);
   }
 }
-h2 {
-  font-size: 20px;
-  font-weight: 400;
-  margin-bottom: 0;
-}
-
-.tabs-container {
-  position: relative;
-}
-
-.tabs {
-  padding: 12px 24px;
-  @include flex-container(row, center, center);
-
-  &.selected {
-    border-bottom: 4px solid #61ceac;
-  }
-
-  &.first-child {
-    margin-left: $padding-horizontal;
-  }
-
-  &__notification {
-    margin-left: 0.4em;
-  }
-}
-
-.divider {
-  background-color: #d8dee5;
-  bottom: 0;
-  height: 4px;
-  position: absolute;
-  width: 100%;
-  z-index: -1;
+.class-select {
+  @include font-category('subheading');
+  margin: 0 $padding-horizontal $spacing-sm;
+  padding: $spacing-sm;
+  border: 1px solid $border-grey;
+  border-radius: $radius-md;
+  color: $c-soft-black;
 }
 
 section {

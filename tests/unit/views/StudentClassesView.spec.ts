@@ -67,8 +67,7 @@ function getWrapper() {
 
 function getElements(wrapper: VueWrapper) {
   return {
-    studentClasses: wrapper.findAll('[data-testid="student-class"]'),
-    studentClassNames: wrapper.findAll('[data-testid="student-class-name"]'),
+    studentClasses: wrapper.findAll('[data-testid="class-select"] option'),
     noClassesContainer: wrapper.find('[data-testid="no-classes-container"]'),
     errorMessageContainer: wrapper.find(
       '[data-testid="error-message-container"]'
@@ -99,12 +98,16 @@ function getElements(wrapper: VueWrapper) {
   }
 }
 
-function buildStudentClass() {
+function buildStudentClass({
+  createdAt = new Date('2026-09-01'),
+  name = faker.lorem.words(2),
+} = {}) {
   return {
     id: faker.string.uuid(),
     active: true,
-    name: faker.lorem.words(2),
+    name,
     topicId: 1,
+    createdAt: createdAt.toISOString(),
   }
 }
 
@@ -160,15 +163,15 @@ describe('StudentClassesView', () => {
     const wrapper = getWrapper()
     await flushPromises()
 
-    const { studentClassNames } = getElements(wrapper)
-    expect(studentClassNames.length).toBe(fakeClasses.length)
+    const { studentClasses } = getElements(wrapper)
+    expect(studentClasses.length).toBe(fakeClasses.length)
 
-    const firstClass = studentClassNames.find(
-      (c) => c.element.innerHTML === fakeClasses[0].name
+    const firstClass = studentClasses.find(
+      (c) => c.text() === fakeClasses[0].name
     )
     expect(firstClass).toBeTruthy()
-    const secondClass = studentClassNames.find(
-      (c) => c.element.innerHTML === fakeClasses[1].name
+    const secondClass = studentClasses.find(
+      (c) => c.text() === fakeClasses[1].name
     )
     expect(secondClass).toBeTruthy()
   })
@@ -176,9 +179,9 @@ describe('StudentClassesView', () => {
   test('updates the URL to include the class id', async () => {
     const routerReplaceSpy = vi.spyOn(router, 'replace')
     const fakeClasses = [
-      buildStudentClass(),
-      buildStudentClass(),
-      buildStudentClass(),
+      buildStudentClass({ name: 'Class A' }),
+      buildStudentClass({ name: 'Class B' }),
+      buildStudentClass({ name: 'Class C' }),
     ]
     NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
       data: {
@@ -199,21 +202,48 @@ describe('StudentClassesView', () => {
 
     const { studentClasses } = getElements(wrapper)
 
-    await studentClasses[1].trigger('click')
-    expect(routerReplaceSpy).toHaveBeenCalledWith(
+    await studentClasses[1].setValue()
+    expect(routerReplaceSpy).toHaveBeenLastCalledWith(
       `/classes/${fakeClasses[1].id}`
     )
 
-    await studentClasses[2].trigger('click')
-    expect(routerReplaceSpy).toHaveBeenCalledWith(
+    await studentClasses[2].setValue()
+    expect(routerReplaceSpy).toHaveBeenLastCalledWith(
       `/classes/${fakeClasses[2].id}`
     )
 
-    await studentClasses[0].trigger('click')
-    expect(routerReplaceSpy).toHaveBeenCalledWith(
+    await studentClasses[0].setValue()
+    expect(routerReplaceSpy).toHaveBeenLastCalledWith(
       `/classes/${fakeClasses[0].id}`
     )
 
+    routerReplaceSpy.mockReset()
+  })
+
+  test('lists classes newest first, then by name, and opens on the newest', async () => {
+    const routerReplaceSpy = vi.spyOn(router, 'replace')
+    const older = buildStudentClass({ createdAt: new Date('2025-09-01') })
+    const period10 = buildStudentClass({ name: 'Period 10' })
+    const period2 = buildStudentClass({ name: 'Period 2' })
+    NetworkService.getStudentClasses = vi.fn().mockResolvedValue({
+      data: { classes: [older, period10, period2] },
+    })
+    NetworkService.getStudentAssignments = vi.fn().mockResolvedValue({
+      data: { assignments: [buildStudentAssignment(older.id)] },
+    })
+    NetworkService.getAssignmentDocuments = vi.fn().mockResolvedValue({
+      data: { assignmentDocuments: [] },
+    })
+
+    const wrapper = getWrapper()
+    await flushPromises()
+
+    expect(getElements(wrapper).studentClasses.map((c) => c.text())).toEqual([
+      'Period 2',
+      'Period 10',
+      `${older.name} (open to-dos)`,
+    ])
+    expect(routerReplaceSpy).toHaveBeenCalledWith(`/classes/${period2.id}`)
     routerReplaceSpy.mockReset()
   })
 
@@ -292,9 +322,9 @@ describe('StudentClassesView', () => {
   })
 
   test('shows the assignments with their due dates for each class', async () => {
-    const class0 = buildStudentClass()
-    const class1 = buildStudentClass()
-    const class2 = buildStudentClass()
+    const class0 = buildStudentClass({ name: 'Class A' })
+    const class1 = buildStudentClass({ name: 'Class B' })
+    const class2 = buildStudentClass({ name: 'Class C' })
     const class0Assignments = [
       buildStudentAssignment(class0.id),
       buildStudentAssignment(class0.id),
@@ -335,12 +365,12 @@ describe('StudentClassesView', () => {
     let combinedAssignments = currentAssignments.concat(pastAssignments)
     expect(combinedAssignments.length).toBe(class0Assignments.length)
 
-    await studentClasses[1].trigger('click')
+    await studentClasses[1].setValue()
     ;({ currentAssignments, pastAssignments } = getElements(wrapper))
     combinedAssignments = currentAssignments.concat(pastAssignments)
     expect(combinedAssignments.length).toBe(class1Assignments.length)
 
-    await studentClasses[2].trigger('click')
+    await studentClasses[2].setValue()
     ;({ currentAssignments, pastAssignments } = getElements(wrapper))
     combinedAssignments = currentAssignments.concat(pastAssignments)
     expect(combinedAssignments.length).toBe(class2Assignments.length)
