@@ -19,11 +19,16 @@ test.describe('Volunteer partner sign-up', () => {
     const email = faker.internet
       .email({ provider: PARTNER.requiredEmailDomain })
       .toLowerCase()
+    const password = createPassword()
     const volunteerSignUp = new VolunteerSignUp(page)
 
     await volunteerSignUp.gotoPartnerLink(PARTNER.key)
     await volunteerSignUp.accountStepIsReadyFor(PARTNER.name)
-    await volunteerSignUp.completeAccountStep(email, createPassword())
+    await volunteerSignUp.completeAccountStep(email, password)
+
+    await page.reload()
+    await volunteerSignUp.accountStepIsReadyFor(PARTNER.name)
+    await volunteerSignUp.completeAccountStep(email, password)
     await volunteerSignUp.completeAboutStep()
 
     const { rows } = await dbClient.query(

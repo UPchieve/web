@@ -451,7 +451,7 @@ const routes: RouteRecordRaw[] = [
     path: '/signup/volunteer/:partnerKey',
     redirect: (to) => ({
       path: '/sign-up/volunteer',
-      query: { partnerId: to.params.partnerKey },
+      query: { partnerKey: to.params.partnerKey },
     }),
   },
   {

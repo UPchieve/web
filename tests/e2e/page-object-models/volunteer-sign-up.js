@@ -37,7 +37,7 @@ export class VolunteerSignUp {
     await this.passwordInput.fill(password)
     await expect(this.continueButton).toBeEnabled()
     await this.continueButton.click()
-    await this.page.waitForURL('**/sign-up/volunteer/about')
+    await this.page.waitForURL(/\/sign-up\/volunteer\/about(\?|$)/)
   }
 
   async completeAboutStep() {

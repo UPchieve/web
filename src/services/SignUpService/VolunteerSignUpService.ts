@@ -1,4 +1,5 @@
 import type {
+  LocationQuery,
   NavigationGuardNext,
   RouteLocation,
   RouteLocationNormalized,
@@ -29,7 +30,7 @@ const RoutePath = {
   account: `/sign-up/volunteer/account`,
   about: '/sign-up/volunteer/about',
   verify: `/${SignUpPage.verify}`,
-  partnerSignup: `/sign-up/volunteer?partnerId`,
+  partnerSignup: '/sign-up/volunteer',
 }
 
 // The following values are used as the `name` attribute on form elements,
@@ -56,9 +57,8 @@ export type VolunteerAccountFormData = {
   [InputName.TERMS]?: boolean
   [InputName.INVITE_CODE]?: string
   [InputName.REFERRED_BY_CODE]?: string | null
+  partnerKey?: string
 }
-
-let partnerId: string = ''
 
 export async function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.account }
@@ -66,11 +66,8 @@ export async function getPageDetails(
 export async function getPageDetails(
   to: RouteLocation & { path: typeof RoutePath.about }
 ): Promise<PageDetailsUnion<VolunteerAccountFormData>> {
-  if (isAccountRoute(to)) {
-    return await getLogInDetails()
-  } else if (isPartnerSignup(to)) {
-    partnerId = to.query.partnerId as string
-    return await getLogInDetails(true)
+  if (isAccountRoute(to) || isPartnerSignup(to)) {
+    return await getLogInDetails(getPartnerKey(to.query))
   }
   return getAboutDetails()
 }
@@ -84,7 +81,16 @@ async function continueToSignUp(
       password: data.password,
     })
 
-    return getSubmitResponse(SignUpPage.about)
+    return [
+      {
+        params: { step: SignUpPage.about },
+        query: {
+          partnerKey: getPartnerKey(data),
+          inviteCode: data.inviteCode,
+        },
+      },
+      null,
+    ]
   } catch (error: unknown) {
     if (!isNetworkError(error)) {
       LoggerService.noticeError(error)
@@ -102,16 +108,34 @@ function isAccountRoute(to: RouteLocation) {
   return to.path === RoutePath.account
 }
 
+// Older partner links and bookmarks carry ?partnerId.
+function getPartnerKey(
+  source: Record<string, unknown> | LocationQuery
+): string | undefined {
+  const key = [source.partnerKey, source.partnerId].find(
+    (k) => typeof k === 'string' && k
+  )
+  return key as string | undefined
+}
+
+function firstStepLocation(partnerKey?: string, inviteCode?: string) {
+  return {
+    path: partnerKey ? RoutePath.partnerSignup : RoutePath.account,
+    query: { partnerKey, inviteCode },
+  }
+}
+
 function isPartnerSignup(to: RouteLocation) {
-  return to.fullPath.includes(RoutePath.partnerSignup)
+  return !to.params.step && !!getPartnerKey(to.query)
 }
 
 async function getLogInDetails(
-  isPartnerSignup: boolean = false
+  partnerKey?: string
 ): Promise<PageDetail<VolunteerAccountFormData>> {
+  const isPartnerSignup = !!partnerKey
   let volunteerPartnerName: string = ''
   if (isPartnerSignup) {
-    const { data } = await NetworkService.getVolunteerPartner(partnerId)
+    const { data } = await NetworkService.getVolunteerPartner(partnerKey)
     volunteerPartnerName = data.volunteerPartner.name
   }
 
@@ -160,6 +184,13 @@ async function getLogInDetails(
 export async function createAccount( // exported for testing
   data: VolunteerAccountFormData
 ): Promise<SubmitActionResponse> {
+  const partnerKey = getPartnerKey(data)
+  // beforeEnter doesn't run for back/forward within /sign-up, which can
+  // land here after the form state is gone.
+  if (!data.email || !data.password) {
+    return [firstStepLocation(partnerKey, data.inviteCode), null]
+  }
+
   try {
     const options = {
       [InputName.INVITE_CODE]: data.inviteCode,
@@ -173,10 +204,10 @@ export async function createAccount( // exported for testing
         window.localStorage.getItem('upcReferredByCode'),
     }
 
-    const result = partnerId
+    const result = partnerKey
       ? await NetworkService.registerPartnerVolunteer({
           ...options,
-          volunteerPartnerOrg: partnerId,
+          volunteerPartnerOrg: partnerKey,
         })
       : await NetworkService.registerOpenVolunteer({
           ...options,
@@ -342,10 +373,25 @@ export async function beforeEnter(
   from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) {
+  // Email and password live only in component state, so entering a later
+  // step from another route restarts the sign-up.
+  const isFirstStep =
+    to.params.step === SignUpPage.account || isPartnerSignup(to)
+  if (!isFirstStep) {
+    return next({
+      path: getPartnerKey(to.query)
+        ? RoutePath.partnerSignup
+        : RoutePath.account,
+      query: to.query,
+    })
+  }
+
   if (to.query.inviteCode) {
     to.params.inviteCode = to.query.inviteCode as string
-    to.params.email = to.query.email as string
     delete to.query.inviteCode
+  }
+  if (to.query.email) {
+    to.params.email = to.query.email as string
     delete to.query.email
   }
   return next()
