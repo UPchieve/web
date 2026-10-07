@@ -1,13 +1,12 @@
 import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
-import header from './header'
 import sidebar from './sidebar'
 import modal from './modal'
 import banner from './banner'
+import { useAppHeaderStore } from '@/stores/app/header'
 
 export default {
   namespaced: true,
   modules: {
-    header,
     sidebar,
     modal,
     banner,
@@ -37,12 +36,12 @@ export default {
     setFadeInContent: (state, val) => (state.fadeInContent = val),
   },
   actions: {
-    showNavigation: ({ commit, dispatch }) => {
-      commit('header/setIsShown', true)
+    showNavigation: ({ dispatch }) => {
+      useAppHeaderStore().setIsShown(true)
       dispatch('sidebar/show')
     },
-    hideNavigation: ({ commit, dispatch }) => {
-      commit('header/setIsShown', false)
+    hideNavigation: ({ dispatch }) => {
+      useAppHeaderStore().setIsShown(false)
       dispatch('sidebar/hide')
     },
 

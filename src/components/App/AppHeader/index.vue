@@ -18,6 +18,8 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import { mapActions } from 'pinia'
+import { useAppHeaderStore } from '@/stores/app/header'
 import ActivityDot from '@/components/ActivityDot.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
@@ -41,10 +43,12 @@ export default {
     VerificationHeader,
     WaitingPeriodHeader,
   },
+  methods: {
+    ...mapActions(useAppHeaderStore, ['setIsShown']),
+  },
   computed: {
     ...mapState({
       user: (state) => state.user.user,
-      showHeader: (state) => state.app.header.isShown,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
@@ -64,10 +68,7 @@ export default {
       }
 
       if (this.showInSessionHeader) {
-        this.$store.commit(
-          'app/header/setIsShown',
-          this.isSessionView ? !this.mobileMode : true
-        )
+        this.setIsShown(this.isSessionView ? !this.mobileMode : true)
         return 'session-header'
       }
 

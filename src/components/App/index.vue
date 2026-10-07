@@ -35,6 +35,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { mapState as mapPiniaState } from 'pinia'
+import { useAppHeaderStore } from '@/stores/app/header.js'
 import { IonApp, IonContent } from '@ionic/vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
@@ -231,8 +233,8 @@ export default {
     },
   },
   computed: {
+    ...mapPiniaState(useAppHeaderStore, { showHeader: 'isShown' }),
     ...mapState({
-      showHeader: (state) => state.app.header.isShown,
       showSidebar: (state) => state.app.sidebar.isShown,
       showModal: (state) => state.app.modal.isShown,
       showBanner: (state) => state.app.banner.isShown,

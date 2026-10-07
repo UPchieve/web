@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { pinia } from './stores'
 import vSelect from 'vue-select'
 import VueStarRating from 'vue-star-rating'
 import App from './components/App/index.vue'
@@ -46,6 +47,7 @@ async function main() {
 
     // Create Vue instance
     const app = createApp(App)
+    app.use(pinia)
     app.use(store)
     app.use(IonicVue)
     app.use(router)

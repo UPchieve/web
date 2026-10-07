@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
+import { useAppHeaderStore } from '@/stores/app/header'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
@@ -21,6 +22,7 @@ const getWrapper = (params) => {
     routeName: 'LoginView',
     ...params,
   }
+
   const store = createStore({
     modules: {
       app: {
@@ -105,7 +107,7 @@ test.each([
 
     const c = wrapper.findComponent(SessionHeader)
     expect(c.exists()).toBe(true)
-    expect(wrapper.vm.$store.state.app.header.isShown).toBe(isShown)
+    expect(useAppHeaderStore().isShown).toBe(isShown)
   }
 )
 
@@ -123,7 +125,7 @@ test.each([true, false])(
 
     const c = wrapper.findComponent(SessionHeader)
     expect(c.exists()).toBe(true)
-    expect(wrapper.vm.$store.state.app.header.isShown).toBe(true)
+    expect(useAppHeaderStore().isShown).toBe(true)
   }
 )
 

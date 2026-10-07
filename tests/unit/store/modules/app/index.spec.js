@@ -1,15 +1,18 @@
 import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import appModule from '@/store/modules/app'
-import headerModule from '@/store/modules/app/header'
 import sidebarModule from '@/store/modules/app/sidebar'
 import modalModule from '@/store/modules/app/modal'
-import { vi } from 'vitest'
+import { useAppHeaderStore } from '@/stores/app/header'
+import { beforeEach, vi } from 'vitest'
 
 const { modules, state, mutations, actions, getters } = appModule
 
 describe('`app` store module', () => {
+  beforeEach(() => {
+    useAppHeaderStore().setIsShown(false)
+  })
+
   it('modules', () => {
-    expect(modules.header).toBe(headerModule)
     expect(modules.sidebar).toBe(sidebarModule)
     expect(modules.modal).toBe(modalModule)
   })
@@ -55,19 +58,18 @@ describe('`app` store module', () => {
   describe('actions', () => {
     it('showNavigation', () => {
       expect(typeof actions.showNavigation).toBe('function')
-      const commit = vi.fn()
       const dispatch = vi.fn()
-      actions.showNavigation({ commit, dispatch })
-      expect(commit).toHaveBeenCalledWith('header/setIsShown', true)
+      actions.showNavigation({ dispatch })
+      expect(useAppHeaderStore().isShown).toBe(true)
       expect(dispatch).toHaveBeenCalledWith('sidebar/show')
     })
 
     it('hideNavigation', () => {
       expect(typeof actions.hideNavigation).toBe('function')
-      const commit = vi.fn()
       const dispatch = vi.fn()
-      actions.hideNavigation({ commit, dispatch })
-      expect(commit).toHaveBeenCalledWith('header/setIsShown', false)
+      useAppHeaderStore().setIsShown(true)
+      actions.hideNavigation({ dispatch })
+      expect(useAppHeaderStore().isShown).toBe(false)
       expect(dispatch).toHaveBeenCalledWith('sidebar/hide')
     })
 

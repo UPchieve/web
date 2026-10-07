@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
+import { useAppHeaderStore } from '@/stores/app/header'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
 import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
@@ -15,12 +16,13 @@ const getWrapper = (options = {}) => {
     ...options,
   }
 
+  useAppHeaderStore().setIsShown(options.showHeader)
+
   const store = createStore(
     merge({}, storeOptions, {
       modules: {
         app: {
           modules: {
-            header: { state: { isShown: options.showHeader } },
             sidebar: { state: { isCollapsed: options.isSidebarCollapsed } },
           },
           getters: { mobileMode: () => options.mobileMode },
