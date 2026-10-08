@@ -221,7 +221,10 @@ test.describe('Session', async () => {
     // The ended screen can render before the chat room join finishes, and
     // sendMessage only waits out the connecting banner of a live session.
     const followUp = `thanks from ${volunteer.firstName}`
-    await volunteerPage.getByTestId('chat-textarea').fill(followUp)
+    await volunteerPage
+      .getByTestId('chat-composer')
+      .locator('[contenteditable]')
+      .pressSequentially(followUp)
     await expect(volunteerPage.locator('.send-button')).toBeEnabled()
     await volunteerPage.keyboard.press('Enter')
     await volunteerSessionView.hasMessage(followUp)

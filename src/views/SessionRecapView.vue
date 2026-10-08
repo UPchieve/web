@@ -312,7 +312,6 @@ export default {
       mobileMode: 'app/mobileMode',
       exclusiveSessions: 'volunteer/exclusiveSessions',
       isSessionSummaryEnabled: 'featureFlags/isSessionSummaryEnabled',
-      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
       isStudentRequestSpecificVolunteerSessionsEnabled:
         'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
       hasCooldown: 'session/hasCooldown',
@@ -320,7 +319,6 @@ export default {
     canRequestSessionWithSameTutor() {
       return (
         this.isStudent &&
-        this.isStudentsInitiateDmsEnabled &&
         this.isStudentRequestSpecificVolunteerSessionsEnabled &&
         !!this.session?.volunteerId &&
         !this.currentSession.id &&

@@ -43,7 +43,7 @@
           group="subjects"
           @update:modelValue="filter"
         />
-        <div class="unread-dms-checkbox" v-if="isShowDMNotificationsEnabled">
+        <div class="unread-dms-checkbox">
           <label>
             <input
               type="checkbox"
@@ -131,15 +131,10 @@
                   @click="
                     routeToSessionRecap(
                       session.id,
-                      sessionsWithUnreadDMs.includes(session.id) &&
-                        isShowDMNotificationsEnabled
+                      sessionsWithUnreadDMs.includes(session.id)
                     )
                   "
-                  ><span
-                    v-if="
-                      sessionsWithUnreadDMs.includes(session.id) &&
-                      isShowDMNotificationsEnabled
-                    "
+                  ><span v-if="sessionsWithUnreadDMs.includes(session.id)"
                     ><bell-icon class="bell-icon" />New Message</span
                   ><span v-else>Session Recap</span></large-button
                 >
@@ -198,8 +193,7 @@
               @click="
                 routeToSessionRecap(
                   session.id,
-                  sessionsWithUnreadDMs.includes(session.id) &&
-                    isShowDMNotificationsEnabled
+                  sessionsWithUnreadDMs.includes(session.id)
                 )
               "
             >
@@ -343,8 +337,6 @@ export default {
       sessionPartner: 'user/sessionPartner',
       subjectsByTopics: 'subjects/subjectsByTopics',
       sessionsWithUnreadDMs: 'user/sessionsWithUnreadDMs',
-      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
-      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
       isStudentRequestSpecificVolunteerSessionsEnabled:
         'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
       hasCooldown: 'session/hasCooldown',
@@ -437,9 +429,7 @@ export default {
         const matchesVolunteer =
           !volunteerId || session.volunteerId === volunteerId
         const matchesUnreadDMs =
-          !hasUnreadDMs ||
-          (this.sessionsWithUnreadDMs.includes(session.id) &&
-            this.isShowDMNotificationsEnabled)
+          !hasUnreadDMs || this.sessionsWithUnreadDMs.includes(session.id)
         return (
           matchesName &&
           matchesSubject &&
@@ -539,7 +529,6 @@ export default {
     canRequestSessionWith(session) {
       return (
         this.isStudent &&
-        this.isStudentsInitiateDmsEnabled &&
         this.isStudentRequestSpecificVolunteerSessionsEnabled &&
         !!session.volunteerId &&
         !!session.volunteerFirstName &&

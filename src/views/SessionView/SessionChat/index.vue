@@ -51,11 +51,7 @@
           @new-bot-message="handleNewMessageScrollPosition"
         />
         <chat-bot
-          v-if="
-            isStudent &&
-            isDisplayVolunteerLanguagesEnabled &&
-            isTutorJoiningForFirstTime
-          "
+          v-if="isStudent && isTutorJoiningForFirstTime"
           :isInRecap="isInRecap"
           :isDisplayingLanguagesSpoken="true"
           :currentSession="currentSession"
@@ -145,10 +141,7 @@
         </div>
 
         <chat-bot
-          v-if="
-            sessionHasEnded &&
-            (isVolunteer || (isStudent && isStudentsInitiateDmsEnabled))
-          "
+          v-if="sessionHasEnded && (isVolunteer || isStudent)"
           :currentSession="currentSession"
           :isInRecap="isInRecap"
           @recap-eligible="toggleEligibleForSessionRecapChat"
@@ -158,7 +151,7 @@
           v-if="
             isInRecap &&
             currentSession.messages &&
-            (isVolunteer || (isStudent && isStudentsInitiateDmsEnabled)) &&
+            (isVolunteer || isStudent) &&
             !tutorSentMessageAfterSessionEnded
           "
           :isInRecap="isInRecap"
@@ -191,7 +184,6 @@
     </div>
     <div class="message-input" :class="{ 'math-active': isMathMode }">
       <button
-        v-if="isShowTipTapEditorEnabled"
         type="button"
         class="math-toggle-button"
         :class="{ active: isMathMode }"
@@ -201,23 +193,9 @@
         ∑
       </button>
       <editor-content
-        v-if="isShowTipTapEditorEnabled"
         class="message-composer"
+        data-testid="chat-composer"
         :editor="editor"
-      />
-
-      <textarea
-        v-if="!isShowTipTapEditorEnabled"
-        autocomplete="off"
-        class="message-textarea"
-        data-testid="chat-textarea"
-        autofocus
-        rows="1"
-        @keydown="onTypingInChat"
-        @input="resizeTextarea"
-        v-model="newMessage"
-        placeholder="Type a message..."
-        ref="textareaRef"
       />
 
       <CelebrationButton v-if="showCelebrateButton" @click="celebrate" />
@@ -230,11 +208,7 @@
         <SendMessage />
       </button>
     </div>
-    <div
-      v-if="isShowTipTapEditorEnabled"
-      class="math-keyboard-container"
-      ref="mathKeyboardContainer"
-    ></div>
+    <div class="math-keyboard-container" ref="mathKeyboardContainer"></div>
   </div>
 </template>
 
@@ -326,7 +300,6 @@ export default {
 
   data() {
     return {
-      newMessage: '',
       moderationWarningIsShown: false,
       typingTimeout: null,
       typingIndicatorShown: false,
@@ -350,7 +323,6 @@ export default {
       this.scrollToBottom()
       this.updateSessionLastSeen()
     })
-    if (!this.isShowTipTapEditorEnabled) return
     this.editor = new Editor({
       extensions: [
         StarterKit,
@@ -373,7 +345,6 @@ export default {
     })
   },
   beforeUnmount() {
-    if (!this.isShowTipTapEditorEnabled) return
     document.removeEventListener('click', this.mathClickOutsideHandler)
     if (window.mathVirtualKeyboard) {
       window.mathVirtualKeyboard?.hide()
@@ -412,15 +383,10 @@ export default {
       isStudent: 'user/isStudent',
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
-      isDisplayVolunteerLanguagesEnabled:
-        'featureFlags/isDisplayVolunteerLanguagesEnabled',
       sessionPartner: 'user/sessionPartner',
       isConfettiCelebrationEnabled: 'featureFlags/isConfettiCelebrationEnabled',
       isPendingMessagesEnabled: 'featureFlags/isPendingMessagesEnabled',
-      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
-      isShowTipTapEditorEnabled: 'featureFlags/isShowTipTapEditorEnabled',
       hasUnreadDMs: 'user/hasUnreadDMs',
-      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
     }),
     showMyInProgressCaptionMessage() {
       return this.myInProgressCaptionMessage?.text?.length > 0
@@ -478,15 +444,8 @@ export default {
       )
     },
     isSendMessageDisabled() {
-      if (this.isShowTipTapEditorEnabled) {
-        return (
-          this.isComposerEmpty ||
-          !this.isSocketSessionRoomConnected ||
-          this.waitingForModeration
-        )
-      }
       return (
-        this.newMessage.length === 0 ||
+        this.isComposerEmpty ||
         !this.isSocketSessionRoomConnected ||
         this.waitingForModeration
       )
@@ -571,9 +530,7 @@ export default {
       return false
     },
     async sendMessage() {
-      const { text, isLatex } = this.isShowTipTapEditorEnabled
-        ? this.getTipTapMessageText()
-        : { text: this.newMessage.trim(), isLatex: false }
+      const { text, isLatex } = this.getTipTapMessageText()
 
       if (!text || this.isSendMessageDisabled) return
 
@@ -620,16 +577,8 @@ export default {
     },
 
     resetComposer() {
-      if (this.isShowTipTapEditorEnabled) {
-        this.editor.commands.clearContent(true)
-        this.focusEditor()
-      } else {
-        this.newMessage = ''
-        this.$nextTick(() => {
-          this.resizeTextarea({ target: this.$refs.textareaRef })
-          this.$refs.textareaRef.focus()
-        })
-      }
+      this.editor.commands.clearContent(true)
+      this.focusEditor()
     },
 
     async moderateMessage(message) {
@@ -681,10 +630,9 @@ export default {
     },
 
     removePendingMessage(message) {
-      const normalizedMessage =
-        this.isShowTipTapEditorEnabled && message.startsWith(this.latexPrefix)
-          ? message.slice(this.latexPrefix.length)
-          : message
+      const normalizedMessage = message.startsWith(this.latexPrefix)
+        ? message.slice(this.latexPrefix.length)
+        : message
 
       const index = this.pendingTextMessages.findIndex((m) => {
         return m.contents === normalizedMessage && m.emitted
@@ -767,7 +715,7 @@ export default {
 
       this.isAutoscrolling = this.isAtBottom
 
-      if (this.isShowDMNotificationsEnabled && this.isAtBottom && this.hasDMs) {
+      if (this.isAtBottom && this.hasDMs) {
         this.updateSessionLastSeen()
       }
     },
@@ -785,12 +733,6 @@ export default {
       messagesBox.scrollTop =
         (messagesBox.lastElementChild?.offsetTop ?? 0) +
         (messagesBox.lastElementChild?.offsetHeight ?? 0)
-    },
-
-    resizeTextarea(event) {
-      const textarea = event.target
-      textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + 'px'
     },
 
     async triggerAlert(data) {
@@ -1337,31 +1279,6 @@ export default {
   border-top: none;
   column-gap: 0.75em;
 }
-.message-textarea {
-  width: 100%;
-  border: none;
-  padding: 1.5em 1em;
-  resize: none;
-  max-height: 250px;
-  overflow-y: auto;
-  &:focus {
-    outline: none;
-  }
-
-  @include breakpoint-below('medium') {
-    border: 1px solid $c-border-grey;
-    border-radius: 20px;
-    padding: 0.6em 1em;
-    line-height: 18px;
-  }
-
-  &--recap {
-    @include breakpoint-below('medium') {
-      width: 100%;
-    }
-  }
-}
-
 .send-button {
   padding-right: 18px;
   @include breakpoint-below('medium') {

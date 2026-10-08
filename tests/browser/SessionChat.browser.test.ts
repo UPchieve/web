@@ -1,11 +1,14 @@
 import { render } from 'vitest-browser-vue'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { page } from '@vitest/browser/context'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import {
   createVoiceChatMockStore,
   createVoiceChatMockSession,
 } from './SessionChat.fixtures'
+
+vi.mock('mathlive', () => ({}))
+;(window as any).mathVirtualKeyboard = { container: null, hide: vi.fn() }
 
 test('voice chat in-progress captions render correctly', async () => {
   const store = createVoiceChatMockStore()

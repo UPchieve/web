@@ -38,13 +38,6 @@ describe('ChatBot', () => {
     const store = createStore({
       modules: {
         ...storeOptions.modules,
-        featureFlags: {
-          ...storeOptions.modules.featureFlags,
-          getters: {
-            ...storeOptions.modules.featureFlags.getters,
-            ...(overrides?.featureFlags?.getters ?? {}),
-          },
-        },
         user: {
           ...storeOptions.modules.user,
           state: {
@@ -86,11 +79,6 @@ describe('ChatBot', () => {
       const userId = currentSession.volunteer.id
       const session = { ...currentSession, endedAt: new Date() }
       getWrapper({
-        featureFlags: {
-          getters: {
-            isStudentsInitiateDmsEnabled: () => true,
-          },
-        },
         user: {
           state: {
             recapSession: { messages: [] },
@@ -140,11 +128,6 @@ describe('ChatBot', () => {
         endedAt: new Date(),
       }
       getWrapper({
-        featureFlags: {
-          getters: {
-            isStudentsInitiateDmsEnabled: () => true,
-          },
-        },
         user: {
           state: {
             recapSession: {
@@ -208,11 +191,6 @@ describe('ChatBot', () => {
         ],
       }
       getWrapper({
-        featureFlags: {
-          getters: {
-            isStudentsInitiateDmsEnabled: () => true,
-          },
-        },
         user: {
           state: {
             recapSession: {
@@ -264,9 +242,6 @@ describe('ChatBot', () => {
         .fn()
         .mockResolvedValue({ data: { isEligible: false } })
       getWrapper({
-        featureFlags: {
-          getters: { isStudentsInitiateDmsEnabled: () => true },
-        },
         user: {
           state: {
             recapSession: { messages: [] },

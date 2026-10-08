@@ -84,12 +84,9 @@ export default {
       firstName: 'user/firstName',
       isStudent: 'user/isStudent',
       isVolunteer: 'user/isVolunteer',
-      isStudentsInitiateDmsEnabled: 'featureFlags/isStudentsInitiateDmsEnabled',
     }),
     canSendDms() {
-      const canInitiateDmsAsStudent =
-        this.isStudent && this.isStudentsInitiateDmsEnabled
-      return this.isVolunteer || canInitiateDmsAsStudent
+      return this.isVolunteer || this.isStudent
     },
     isSessionOver() {
       return !!this.currentSession?.endedAt

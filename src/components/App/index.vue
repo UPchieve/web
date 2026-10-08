@@ -259,7 +259,6 @@ export default {
       isTeacher: 'user/isTeacher',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       isReadyToTutor: 'volunteer/isReadyToTutor',
-      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
       currentSessionHold: 'volunteer/currentSessionHold',
       isSessionAlive: 'user/isSessionAlive',
     }),
@@ -360,8 +359,7 @@ export default {
           })
         }
 
-        if (this.isShowDMNotificationsEnabled)
-          this.$store.dispatch('user/fetchUnreadDMs')
+        this.$store.dispatch('user/fetchUnreadDMs')
       } else if (currentUserValue.id) {
         const userProps = this.getUserPropsForAnalytics()
         AnalyticsService.updateUser(userProps)

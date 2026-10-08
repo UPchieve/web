@@ -101,10 +101,7 @@
           id="session-history-sidebar-link"
         >
           <clock-icon class="icon" />
-          <bell-icon
-            v-if="hasUnreadDMs && isShowDMNotificationsEnabled"
-            class="SidebarLinks__bell-icon"
-          />
+          <bell-icon v-if="hasUnreadDMs" class="SidebarLinks__bell-icon" />
         </sidebar-link>
 
         <sidebar-link
@@ -299,7 +296,6 @@ export default {
         'featureFlags/shouldShowStudentToVolunteerHoursPage',
       aiTutor: 'featureFlags/aiTutor',
       hasUnreadDMs: 'user/hasUnreadDMs',
-      isShowDMNotificationsEnabled: 'featureFlags/isShowDMNotificationsEnabled',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
       isNthsGroupMemberOnly: 'nths/isGroupMemberOnly',
       hasNthsAdminRole: 'nths/hasAdminRole',

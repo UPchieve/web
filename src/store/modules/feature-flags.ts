@@ -18,7 +18,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE]: false,
       [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW]: false,
@@ -29,7 +28,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
-      [POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES]: false,
       [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
       [POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE]: false,
@@ -38,7 +36,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS]: false,
       [POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES]: false,
       [POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO]: false,
-      [POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_REQUEST_SPECIFIC_VOLUNTEER_SESSIONS]: false,
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
@@ -55,8 +52,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.PRESESSION_FAKE_DOOR_QUESTION]: false,
       [POSTHOG_FEATURE_FLAGS.UPBOT_SESSION_EDITOR_CONTEXT]: false,
       [POSTHOG_FEATURE_FLAGS.COMBINED_ONBOARDING_CHECKLIST]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: true,
       [POSTHOG_FEATURE_FLAGS.S2V_THEMING]: false,
       [POSTHOG_FEATURE_FLAGS.ASYNC_ESSAY_REVIEW]: false,
@@ -147,8 +142,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY],
     useNewSignUpFlow: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW],
-    isSessionPresenceActive: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SESSION_PRESENCE],
     isAboutThisSessionSurveyActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY],
     isBigFutureEmailFirstFlowActive: (state: FeatureFlagState) =>
@@ -194,8 +187,6 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT],
     isTeacherGuidanceExperimentActive: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT],
-    isDisplayVolunteerLanguagesEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.DISPLAY_VOLUNTEER_LANGUAGES],
     isSecondaryEmailOnProfilePageEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE],
     isConfettiCelebrationEnabled: (state: FeatureFlagState) =>
@@ -214,8 +205,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES],
     isClassLinkSsoEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO],
-    isStudentsInitiateDmsEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.STUDENTS_INITIATE_DMS],
     isStudentRequestSpecificVolunteerSessionsEnabled: (
       state: FeatureFlagState
     ) =>
@@ -272,10 +261,6 @@ export default {
       state.payloadFlags[
         POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT
       ],
-    isShowTipTapEditorEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR],
-    isShowDMNotificationsEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_DM_NOTIFICATIONS],
     isS2VThemingEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.S2V_THEMING],
     isVolunteerRelevantExperienceFakeDoorEnabled: (state: FeatureFlagState) =>

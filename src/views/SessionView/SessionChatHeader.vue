@@ -17,7 +17,7 @@
           />
           <div v-else-if="isSessionInProgress" class="volunteer-info">
             <span class="volunteer-name">{{ sessionPartner.firstname }}</span>
-            <div class="partner-status" v-if="isSessionPresenceActive">
+            <div class="partner-status">
               <activity-dot
                 :class="{
                   'partner-status__icon--online': isPartnerOnline,
@@ -28,7 +28,6 @@
                 {{ isPartnerOnline ? 'In session' : 'Away' }}
               </p>
             </div>
-            <span class="in-session-label" v-else>In Session</span>
           </div>
           <div class="session-ended" v-else-if="isSessionOver">
             Session ended
@@ -129,7 +128,6 @@ export default {
       isSessionEnding: 'user/isSessionEnding',
       isSessionInProgress: 'user/isSessionInProgress',
       isSessionOver: 'user/isSessionOver',
-      isSessionPresenceActive: 'featureFlags/isSessionPresenceActive',
       mobileMode: 'app/mobileMode',
     }),
 
@@ -260,12 +258,6 @@ h1 {
 .volunteer-name {
   font-weight: 600;
   font-size: 18px;
-}
-
-.in-session-label {
-  font-weight: 400;
-  font-size: 12px;
-  display: block;
 }
 
 .session-header.inactive {

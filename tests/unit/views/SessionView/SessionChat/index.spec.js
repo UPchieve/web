@@ -6,6 +6,9 @@ import { storeOptions } from '@/store'
 import ModerationService from '@/services/ModerationService'
 
 vi.mock('../../../../../services/ModerationService')
+vi.mock('mathlive', () => ({}))
+window.mathVirtualKeyboard = { container: null, hide: vi.fn() }
+
 describe('SessionChat', () => {
   const currentSession = {
     messages: [],
@@ -76,15 +79,15 @@ describe('SessionChat', () => {
   }
 
   async function sendMessage(wrapper) {
-    const textArea = wrapper.get('[data-testid="chat-textarea"]')
     const message = 'a message'
+    const { editor } = wrapper.vm
 
-    await textArea.setValue(message)
-    expect(textArea.element.value).toEqual(message)
+    editor.commands.setContent(message)
+    expect(editor.getText()).toEqual(message)
 
-    await textArea.trigger('keydown', {
-      key: 'Enter', // Send message
-    })
+    editor.view.dom.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter' })
+    )
 
     return message
   }
@@ -376,8 +379,6 @@ describe('SessionChat', () => {
     await flushPromises()
 
     expect(ModerationService.checkIfMessageIsClean).not.toHaveBeenCalled()
-    expect(wrapper.get('[data-testid="chat-textarea"]').element.value).toBe(
-      message
-    )
+    expect(wrapper.vm.editor.getText()).toBe(message)
   })
 })

@@ -5,9 +5,7 @@ import {
   endSessionsFor,
   loginStudent,
   requestSession,
-  setFeatureFlags,
 } from '../utils'
-import { POSTHOG_FEATURE_FLAGS } from '../../../src/consts'
 
 // The layout switcher is MathLive's own markup, so these are its class names
 // rather than our test ids.
@@ -97,18 +95,10 @@ test.describe('Session math keyboard', async () => {
       browser,
       studentUser
     )
-    await setFeatureFlags(studentPage, {
-      [POSTHOG_FEATURE_FLAGS.SHOW_TIP_TAP_EDITOR]: true,
-    })
-
-    const { sessionId } = await requestSession(studentDashboard, {
+    await requestSession(studentDashboard, {
       topic: 'prealgebra',
       subject: 'math',
     })
-
-    // The composer reads the flag in mounted(), so it needs a full load with
-    // the stubbed flags in place rather than the router push above.
-    await studentPage.goto(`/session/math/prealgebra/${sessionId}`)
 
     await openMathKeyboard(studentPage)
     await expect(studentPage.locator(KEYBOARD)).toBeVisible()
