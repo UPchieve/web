@@ -155,6 +155,8 @@ e2e-test:
       when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+      variables:
+        E2E_CACHE_POLICY: pull-push
 
 lint:
   stage: test
