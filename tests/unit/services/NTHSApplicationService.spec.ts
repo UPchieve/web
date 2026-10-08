@@ -260,14 +260,13 @@ describe('upcomingApplicationDeadline', () => {
   })
 
   it.each([
-    ['on the close date', 0, new Date(2026, 8, 30, 12)],
-    ['the day before', 1, new Date(2026, 8, 29, 23, 59)],
-    ['Sep 15', 15, new Date(2026, 8, 15, 12)],
-  ])('shows the close date %s, %i days left', (_, daysLeft, now) => {
+    ['on the close date', new Date(2026, 8, 30, 12)],
+    ['the day before', new Date(2026, 8, 29, 23, 59)],
+    ['Sep 15', new Date(2026, 8, 15, 12)],
+  ])('shows the close date %s', (_, now) => {
     vi.useFakeTimers().setSystemTime(now)
     expect(upcomingApplicationDeadline(CLOSES_AT)).toEqual({
       closesOn: 'Sep 30, 2026',
-      daysLeft,
     })
   })
 
@@ -277,7 +276,7 @@ describe('upcomingApplicationDeadline', () => {
   ])('keeps a close date with no time open %s', (_, now, shown) => {
     vi.useFakeTimers().setSystemTime(now)
     expect(upcomingApplicationDeadline('2026-09-30')).toEqual(
-      shown ? { closesOn: 'Sep 30, 2026', daysLeft: 0 } : undefined
+      shown ? { closesOn: 'Sep 30, 2026' } : undefined
     )
   })
 

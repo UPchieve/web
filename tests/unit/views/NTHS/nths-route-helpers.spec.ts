@@ -21,15 +21,6 @@ type StoreShape = {
   applicationPageOn?: boolean
   canApply?: boolean
   reasons?: string[]
-  applyPreview?: unknown
-}
-
-const PREVIEW = {
-  requirements: {
-    training: 'done',
-    safetyReview: 'inReview',
-    firstSession: 'outstanding',
-  },
 }
 
 // Only the fields nthsDestination reads, so a change to any of them is visible
@@ -40,7 +31,6 @@ function fakeStore({
   applicationPageOn = true,
   canApply = true,
   reasons = [],
-  applyPreview = undefined,
 }: StoreShape) {
   return {
     state: {
@@ -49,7 +39,6 @@ function fakeStore({
         NTHSCandidateApplicationStatus: status,
         canApplyForNTHSPresident: canApply,
         NTHSApplicationIneligibilityReasons: reasons,
-        NTHSApplyPreview: applyPreview,
       },
     },
     getters: { 'featureFlags/isNTHSApplicationPageEnabled': applicationPageOn },
@@ -141,30 +130,6 @@ describe('nthsDestination', () => {
       ).toBeUndefined()
     }
   )
-
-  it('sends a coach the server gave a preview to the preview page', () => {
-    expect(
-      nthsDestination(fakeStore({ canApply: false, applyPreview: PREVIEW }))
-    ).toBe('preview')
-  })
-
-  it('prefers the application over a preview left in the store', () => {
-    expect(
-      nthsDestination(fakeStore({ canApply: true, applyPreview: PREVIEW }))
-    ).toBe('apply')
-  })
-
-  it('has no destination for a preview while the application page is flagged off', () => {
-    expect(
-      nthsDestination(
-        fakeStore({
-          canApply: false,
-          applyPreview: PREVIEW,
-          applicationPageOn: false,
-        })
-      )
-    ).toBeUndefined()
-  })
 })
 
 describe('loadNTHSData', () => {
@@ -204,13 +169,13 @@ describe('redirectBlockedApplicant', () => {
 
   it('reports the server reasons and the route that was refused', () => {
     const redirect = redirectBlockedApplicant(
-      fakeStore({ canApply: false, reasons: ['notApproved'] }),
+      fakeStore({ canApply: false, reasons: ['banned'] }),
       '/groups/apply'
     )
 
     expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
       EVENTS.NTHS_APPLICATION_BLOCKED,
-      { reasons: ['notApproved'], attemptedRoute: '/groups/apply' }
+      { reasons: ['banned'], attemptedRoute: '/groups/apply' }
     )
     expect(redirect).toBe('/dashboard')
   })
@@ -227,7 +192,6 @@ describe('resolveNthsRoute', () => {
   const ROUTES = [
     ['/groups/apply', 'apply'],
     ['/groups/apply/form', 'apply'],
-    ['/groups/apply-preview', 'preview'],
     ['/groups/application-pending', 'pending'],
     ['/groups/create', 'create'],
     ['/groups', 'group'],
@@ -235,7 +199,6 @@ describe('resolveNthsRoute', () => {
 
   const STORE_FOR = {
     apply: { status: undefined },
-    preview: { canApply: false, applyPreview: PREVIEW },
     pending: { status: 'applied' },
     create: { status: 'approved' },
     group: { groups: [{ groupId: 123 }] },
@@ -275,14 +238,14 @@ describe('resolveNthsRoute', () => {
   it('sends a coach with no NTHS destination to the dashboard', async () => {
     await expect(
       resolveNthsRoute(
-        fakeStore({ canApply: false, reasons: ['notApproved'] }),
+        fakeStore({ canApply: false, reasons: ['banned'] }),
         'apply',
         '/groups/apply'
       )
     ).resolves.toBe('/dashboard')
     expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
       EVENTS.NTHS_APPLICATION_BLOCKED,
-      { reasons: ['notApproved'], attemptedRoute: '/groups/apply' }
+      { reasons: ['banned'], attemptedRoute: '/groups/apply' }
     )
   })
 
@@ -310,28 +273,5 @@ describe('resolveNthsRoute', () => {
     await expect(
       resolveNthsRoute(store, 'apply', '/groups/apply')
     ).resolves.toBeUndefined()
-  })
-
-  it('turns the application form away from a coach with a requirement outstanding', async () => {
-    await expect(
-      resolveNthsRoute(
-        fakeStore({ canApply: false, applyPreview: PREVIEW }),
-        'apply',
-        '/groups/apply/form'
-      )
-    ).resolves.toBe('/groups/apply-preview')
-  })
-
-  it('forwards a coach who became eligible from the preview to the application', async () => {
-    const store = fakeStore({ canApply: false, applyPreview: PREVIEW })
-    ;(store as any).dispatch = vi.fn().mockImplementation(async () => {
-      ;(store as any).state.nths.canApplyForNTHSPresident = true
-      ;(store as any).state.nths.NTHSApplyPreview = undefined
-      return []
-    })
-
-    await expect(
-      resolveNthsRoute(store, 'preview', '/groups/apply-preview')
-    ).resolves.toBe('/groups/apply')
   })
 })

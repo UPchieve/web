@@ -314,12 +314,9 @@ export default {
       if (!this.hasVolunteerRole) return
       return nthsDestination(this.$store)
     },
-    shownNthsApplyDestination() {
-      if (this.mobileMode && this.isSidebarCollapsed) return undefined
-      const destination = this.nthsSidebarDestination
-      return destination === 'apply' || destination === 'preview'
-        ? destination
-        : undefined
+    isNthsApplyLinkShown() {
+      if (this.mobileMode && this.isSidebarCollapsed) return false
+      return this.nthsSidebarDestination === 'apply'
     },
     nthsSidebarLink() {
       const destination = this.nthsSidebarDestination
@@ -406,11 +403,11 @@ export default {
           EVENTS.PROGRESS_REPORT_SIDEBAR_INDICATOR_SHOWN
         )
     },
-    shownNthsApplyDestination: {
-      handler(destination) {
-        if (destination) {
+    isNthsApplyLinkShown: {
+      handler(isShown) {
+        if (isShown) {
           AnalyticsService.captureEvent(EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN, {
-            destination,
+            destination: 'apply',
             userType: this.userType,
           })
         }

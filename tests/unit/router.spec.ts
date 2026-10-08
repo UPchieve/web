@@ -159,6 +159,7 @@ describe('legacy NTHS tab redirects', () => {
     { from: '/groups/dashboard', to: '/groups/home' },
     { from: '/groups/manage-team', to: '/groups/members' },
     { from: '/groups/settings', to: '/groups/setup' },
+    { from: '/groups/apply-preview', to: '/groups/home' },
   ])('sends $from to $to', async ({ from, to }) => {
     expect(await visit(from)).toBe(to)
   })

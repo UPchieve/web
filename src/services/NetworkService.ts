@@ -11,7 +11,6 @@ import type {
   NTHSMemberUpdate,
 } from './NTHSGroupService'
 import type {
-  NTHSApplyPreview,
   NTHSFormVersion,
   NTHSUnlistedSchool,
 } from './NTHSApplicationService'
@@ -1623,7 +1622,6 @@ export default {
       eligible: boolean
       reasons?: string[]
       currentGradeName?: string
-      applyPreview?: NTHSApplyPreview
     }>(`${API_ROOT}/nths-application/eligibility`)
   },
   submitNTHSApplication(data: {
