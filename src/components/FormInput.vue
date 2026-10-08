@@ -1,38 +1,22 @@
 <template>
-  <div class="uc-form-element w-full">
-    <div class="uc-row justify-between">
-      <label
-        :for="name"
-        :class="{
-          error: hasValidationError(customError),
-        }"
-        >{{ label }}</label
-      >
-      <div v-if="hasValidationError(customError)" class="error-caption">
-        {{ getValidationErrors(customError) }}
-      </div>
-    </div>
-    <input
-      :id="name"
-      :name="name"
-      :data-testid="testid"
-      autocomplete="off"
-      class="uc-form-text-input"
-      :class="{
-        'uc-form-text-input-invalid': hasValidationError(customError),
-      }"
-      :type="type"
-      :placeholder="placeholder"
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-      @blur="onBlur"
-      :required="isRequired"
-      :max="maxValue"
-      :min="minValue"
-      :disabled="readOnly"
-      v-bind="$attrs"
-    />
-  </div>
+  <TextField
+    :id="name"
+    :name="name"
+    :placeholder="placeholder"
+    :data-testid="testid"
+    :type="type"
+    :model-value="textFieldValue"
+    @update:model-value="$emit('update:modelValue', String($event))"
+    @blur="onBlur"
+    :required="isRequired"
+    :max="maxValue"
+    :min="minValue"
+    :disabled="readOnly"
+    :label="label"
+    :error-message="
+      hasValidationError(customError) ? getValidationErrors(customError) : ''
+    "
+  />
 </template>
 
 <script>
@@ -46,8 +30,10 @@ import {
 } from '@vuelidate/validators'
 import AnalyticsService from '@/services/AnalyticsService'
 import { useInputValidation } from '@/composables/InputValidation'
+import TextField from '@/components/PresentationComponents/TextField.vue'
 
 export default {
+  components: { TextField },
   props: {
     blurEvent: {
       type: String,
@@ -148,6 +134,16 @@ export default {
     return {
       modelValue: textValidations,
     }
+  },
+
+  computed: {
+    // v-model casts number inputs to number, but we want to emit strings here
+    // if the value is a number, then we want to stringify it
+    textFieldValue() {
+      if (this.type !== 'number') return this.modelValue
+      const num = parseFloat(this.modelValue)
+      return isNaN(num) ? this.modelValue : num
+    },
   },
 
   methods: {
