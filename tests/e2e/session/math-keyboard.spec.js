@@ -53,29 +53,6 @@ async function expectLayoutTabIsClickable(page, tabLabel) {
   }).toPass({ timeout: 5000 })
 }
 
-/**
- * Open the math keyboard, clearing anything that lands on top of the composer.
- *
- * SessionView opens the notifications modal when the browser reports the
- * permission as 'default', and only after getSessionContext() resolves — so it
- * arrives at an unpredictable moment. Headless Chromium reports 'denied' and
- * never shows it, while CI's branded Chrome does, which is how a single
- * dismissal passed locally and hung CI. Dismissing on a retry covers both,
- * along with the download-app banner on mobile viewports.
- */
-async function openMathKeyboard(page) {
-  await expect(async () => {
-    for (const testId of [
-      'close-notification-modal',
-      'download-app-close-button',
-    ]) {
-      const closer = page.getByTestId(testId)
-      if (await closer.isVisible()) await closer.click({ timeout: 2000 })
-    }
-    await page.getByTitle('Insert math').click({ timeout: 2000 })
-  }).toPass({ timeout: 25000 })
-}
-
 let dbClient
 test.describe('Session math keyboard', async () => {
   let studentUser
@@ -93,14 +70,23 @@ test.describe('Session math keyboard', async () => {
   test('can switch back from the abc layout', async ({ browser }) => {
     const { studentPage, studentDashboard } = await loginStudent(
       browser,
-      studentUser
+      studentUser,
+      // SessionView opens the notifications modal once its session context
+      // loads, which can land mid-test and close the keyboard. A granted
+      // permission keeps it from opening.
+      { permissions: ['notifications'] }
     )
+    // The e2e bundle's Zwibbler demo build alert()s on every whiteboard mount.
+    // Without a listener, Playwright's server dismisses it without catching a
+    // failure (server/dialog.js), and CI failed with "No dialog is showing".
+    studentPage.on('dialog', (dialog) => dialog.dismiss().catch(() => {}))
+
     await requestSession(studentDashboard, {
       topic: 'prealgebra',
       subject: 'math',
     })
 
-    await openMathKeyboard(studentPage)
+    await studentPage.getByTitle('Insert math').click()
     await expect(studentPage.locator(KEYBOARD)).toBeVisible()
 
     const switcher = studentPage.locator(`${TOOLBAR} .left`)

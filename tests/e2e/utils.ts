@@ -161,9 +161,10 @@ export const endSessionsFor = async (dbClient: Pool, userId: string) => {
 
 export const loginStudent = async (
   browser: Browser,
-  studentUser: { email: string; password: string }
+  studentUser: { email: string; password: string },
+  { permissions }: { permissions?: string[] } = {}
 ) => {
-  const studentContext = await browser.newContext()
+  const studentContext = await browser.newContext({ permissions })
   const studentPage = await studentContext.newPage()
   const studentDashboard = new StudentDashboard(studentPage)
   const studentLogin = new Login(studentPage)
