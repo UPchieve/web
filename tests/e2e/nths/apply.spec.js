@@ -26,7 +26,7 @@ test.describe('NTHS president application', () => {
     const coach = await createCoach(dbClient, {
       onboarded: false,
       approved: false,
-      passedUpchieve101: false,
+      completedUpchieveTraining: false,
     })
 
     const login = new Login(page)

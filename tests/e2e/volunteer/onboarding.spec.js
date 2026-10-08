@@ -3,6 +3,9 @@ import { getClient } from '../db.ts'
 import { createVolunteer, loginVolunteer } from '../utils.ts'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard'
 import { BackgroundInformation } from '../page-object-models/background-information'
+import { TrainingCourse } from '../page-object-models/training-course'
+import { VolunteerTraining } from '../page-object-models/volunteer-training'
+import { Login } from '../page-object-models/login'
 import path from 'path'
 
 test.describe('Volunteer onboarding', () => {
@@ -16,6 +19,42 @@ test.describe('Volunteer onboarding', () => {
     await dbClient.release()
   })
 
+  test('Volunteer is onboarded after Intro to UPchieve and a subject quiz', async ({
+    page,
+  }) => {
+    const volunteer = await createVolunteer(
+      dbClient,
+      {},
+      { onboarded: false, approved: true, completedUpchieveTraining: false }
+    )
+    const login = new Login(page)
+    await login.goto()
+    await login.loginWith(volunteer)
+    await page.waitForURL('**/welcome')
+
+    const volunteerTraining = new VolunteerTraining(page)
+    await volunteerTraining.chooseSubjectFromWelcome({
+      topicTitle: 'Math',
+      subject: 'prealgebra',
+      subjectName: 'Prealgebra',
+    })
+    await volunteerTraining.startQuiz()
+    await volunteerTraining.completeQuiz('pass')
+    await volunteerTraining.checkResults('You passed!')
+
+    await page.goto('/dashboard')
+    await page.getByTestId('Complete Intro to UPchieve').click()
+    const trainingCourse = new TrainingCourse(page)
+    await trainingCourse.completeCourse({ knowledgeChecks: 4 })
+    const {
+      rows: [profile],
+    } = await dbClient.query(
+      'SELECT onboarded FROM volunteer_profiles WHERE user_id = $1',
+      [volunteer.id]
+    )
+    expect(profile.onboarded).toBe(true)
+  })
+
   test.describe('Safety screening', () => {
     let volunteer
 
@@ -26,7 +65,7 @@ test.describe('Volunteer onboarding', () => {
         {
           onboarded: true,
           approved: false,
-          passedUpchieve101: true,
+          completedUpchieveTraining: true,
         }
       )
     })

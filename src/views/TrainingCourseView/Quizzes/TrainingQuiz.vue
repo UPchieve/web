@@ -235,7 +235,10 @@ async function submitQuiz() {
         v-else-if="currentStep === 'takingQuiz'"
         class="training-quiz-content"
       >
-        <span class="question-counter">
+        <span
+          class="question-counter"
+          data-testid="training-quiz-question-counter"
+        >
           Question {{ currentQuestionIndex + 1 }} of {{ quizQuestions.length }}
         </span>
         <QuizQuestionView
@@ -260,6 +263,7 @@ async function submitQuiz() {
             <div
               v-if="quizResults?.didPass"
               class="quiz-results-callout--passed"
+              data-testid="training-quiz-passed"
             >
               Great job! You passed the quiz and completed the module!
               <button type="button" class="quick-next-button" @click="next">

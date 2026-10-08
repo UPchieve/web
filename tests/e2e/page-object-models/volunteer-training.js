@@ -34,6 +34,22 @@ export class VolunteerTraining {
     await subjectQuizButton.click()
   }
 
+  get isMobile() {
+    return this.page.viewportSize().width < 767
+  }
+
+  async chooseSubjectFromWelcome({ topicTitle, subject, subjectName }) {
+    await this.page
+      .getByRole('heading', { name: topicTitle, exact: true })
+      .click()
+    if (this.isMobile) {
+      await this.page.getByTestId(`start-session-${subject}`).click()
+    } else {
+      await this.page.getByText(subjectName, { exact: true }).click()
+      await this.page.getByRole('button', { name: 'Start quiz' }).click()
+    }
+  }
+
   async startQuiz() {
     await expect(this.startQuizBtn).toBeVisible()
     await this.startQuizBtn.click()

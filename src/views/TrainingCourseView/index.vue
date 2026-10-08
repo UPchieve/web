@@ -353,7 +353,7 @@ function onClickGoToDashboard() {
       >
         <template v-slot:main-content>
           <NationallyCertifiedTutorBanner class="banner banner--congrats" />
-          <div class="congrats-content">
+          <div class="congrats-content" data-testid="training-course-finished">
             <span class="congrats-heading">
               Congratulations on completing the Intro to UPchieve Course!
             </span>

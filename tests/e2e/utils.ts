@@ -79,7 +79,7 @@ export const createVolunteer = async (
     const opts = {
       approved: true,
       onboarded: true,
-      passedUpchieve101: true,
+      completedUpchieveTraining: true,
       ...options,
     }
 
@@ -92,7 +92,8 @@ export const createVolunteer = async (
       `UPDATE volunteer_profiles SET approved = $1, onboarded = $2 WHERE user_id = '${user.id}'`,
       [opts.approved, opts.onboarded]
     )
-    if (opts.passedUpchieve101) await passUpchieve101(dbClient, user.id)
+    if (opts.completedUpchieveTraining)
+      await completeUpchieveTraining(dbClient, user.id)
 
     return { ...params, id: user.id }
   } catch (e) {
@@ -117,24 +118,39 @@ export const withCertifications = async (
   }
 }
 
-export const passUpchieve101 = async (dbClient: DbClient, userId: string) => {
-  const trainingCourseId = 1
-  const trainingMaterialsCompleted = [
-    '7b6a76',
-    'jsn832',
-    'ps87f9',
-    'jgu55k',
-    'fj8tzq',
+export const completeUpchieveTraining = async (
+  dbClient: DbClient,
+  userId: string
+) => {
+  const trainingNames = [
+    'coachingStrategies',
+    'academicIntegrity',
+    'dei',
+    'communitySafety',
   ]
-  const quizId = 22
-  await dbClient.query(
-    `INSERT INTO users_training_courses (user_id, training_course_id, complete, completed_materials, progress) VALUES ($1, $2, $3, $4, $5)`,
-    [userId, trainingCourseId, true, trainingMaterialsCompleted, 100]
+  const completedMaterials = [
+    'UPCHIEVE_TRAINING-INTRODUCTION',
+    'UPCHIEVE_TRAINING-IMPLEMENTING_EFFECTIVE_COACHING_STRATEGIES',
+    'UPCHIEVE_TRAINING-ACADEMIC_INTEGRITY',
+    'UPCHIEVE_TRAINING-DEI',
+    'UPCHIEVE_TRAINING-COMMUNITY_SAFETY',
+  ]
+  const course = await dbClient.query(
+    `INSERT INTO users_training_courses (user_id, training_course_id, complete, completed_materials, progress)
+     SELECT $1, id, true, $2, 100 FROM training_courses WHERE name = 'upchieveTraining'`,
+    [userId, completedMaterials]
   )
-  await dbClient.query(
-    `INSERT INTO users_quizzes (user_id, quiz_id, attempts, passed) VALUES ($1, $2, $3, $4)`,
-    [userId, quizId, 1, true]
+  const quizzes = await dbClient.query(
+    `INSERT INTO users_quizzes (user_id, quiz_id, attempts, passed)
+     SELECT $1, id, 1, true FROM quizzes WHERE name = ANY ($2)`,
+    [userId, trainingNames]
   )
+  if (course.rowCount !== 1 || quizzes.rowCount !== trainingNames.length)
+    throw new Error('Intro to UPchieve course or quizzes missing from the seed')
+  await withCertifications(dbClient, {
+    userId,
+    certificationNames: trainingNames,
+  })
 }
 
 export const endSessionsFor = async (dbClient: Pool, userId: string) => {
