@@ -371,6 +371,19 @@ describe('SessionChat', () => {
     })
   })
 
+  it('Sends a message when Enter comes right after typing', async () => {
+    const wrapper = getWrapper()
+    // Render first, so isComposerEmpty has cached the empty composer.
+    await flushPromises()
+    const message = await sendMessage(wrapper)
+    await flushPromises()
+
+    expect(ModerationService.checkIfMessageIsClean).toHaveBeenCalledWith({
+      message,
+      sessionId: currentSession.id,
+    })
+  })
+
   it('Disables sending chat message if not connected to the socket session room', async () => {
     const wrapper = getWrapper({ isSocketSessionRoomConnected: false })
     const message = await sendMessage(wrapper)

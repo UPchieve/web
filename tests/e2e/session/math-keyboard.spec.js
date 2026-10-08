@@ -97,4 +97,40 @@ test.describe('Session math keyboard', async () => {
       /selected/
     )
   })
+
+  test('Enter in the math field inserts without sending', async ({
+    browser,
+  }) => {
+    const student = await createStudent(dbClient)
+    const { studentContext, studentPage, studentDashboard } =
+      await loginStudent(browser, student, { permissions: ['notifications'] })
+
+    await requestSession(studentDashboard, {
+      topic: 'prealgebra',
+      subject: 'math',
+    })
+    await expect(
+      studentPage.getByText('Attempting to connect the chat')
+    ).toBeHidden()
+
+    await studentPage.getByTitle('Insert math').click()
+    await expect(studentPage.getByTestId('inline-math-field')).toBeFocused()
+    await studentPage.keyboard.type('x^2')
+    await studentPage.keyboard.press('Enter')
+    // TipTap focuses the composer on the next animation frame in desktop Chrome.
+    await expect(
+      studentPage.getByTestId('chat-composer').getByRole('textbox')
+    ).toBeFocused()
+    await studentPage.keyboard.type('is the answer')
+    await studentPage.keyboard.press('Enter')
+
+    await expect(
+      studentPage
+        .getByTestId(`message-from-user-id-${student.id}`)
+        .filter({ has: studentPage.locator('.katex') })
+    ).toContainText('is the answer')
+
+    await endSessionsFor(dbClient, student.id)
+    await studentContext.close()
+  })
 })

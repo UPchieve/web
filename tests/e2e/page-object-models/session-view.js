@@ -21,7 +21,9 @@ export class SessionView {
 
   async hasMessage(message) {
     await expect(
-      this.page.getByText(message),
+      this.page
+        .getByTestId(/^message-from-user-id-/)
+        .filter({ hasText: message }),
       'message was sent successfully'
     ).toBeVisible()
   }

@@ -91,6 +91,7 @@
                     message.isLatex ||
                     message.contents?.startsWith(this.latexPrefix)
                   "
+                  :data-testid="`message-from-user-id-${message.user}`"
                   v-html="renderLatex(message.contents)"
                 >
                 </span>
@@ -443,12 +444,11 @@ export default {
         this.currentSession?.messages?.length > 20
       )
     },
+    isSendBlocked() {
+      return !this.isSocketSessionRoomConnected || this.waitingForModeration
+    },
     isSendMessageDisabled() {
-      return (
-        this.isComposerEmpty ||
-        !this.isSocketSessionRoomConnected ||
-        this.waitingForModeration
-      )
+      return this.isComposerEmpty || this.isSendBlocked
     },
     hasDMs() {
       const messages = this.currentSession?.messages ?? []
@@ -525,7 +525,9 @@ export default {
     async sendMessage() {
       const { text, isLatex } = this.getTipTapMessageText()
 
-      if (!text || this.isSendMessageDisabled) return
+      // Checks the text read above rather than isComposerEmpty, which TipTap's
+      // Vue editor updates two animation frames after an edit.
+      if (!text || this.isSendBlocked) return
 
       clearTimeout(this.typingTimeout)
       this.notTyping()
@@ -557,8 +559,7 @@ export default {
     },
 
     getTipTapMessageText() {
-      if (!this.editor || this.isComposerEmpty)
-        return { text: '', isLatex: false }
+      if (!this.editor) return { text: '', isLatex: false }
       const text = this.editor
         .getText({
           textSerializers: {
@@ -836,29 +837,26 @@ export default {
       const mathField = document.createElement('math-field')
       mathField.setAttribute('math-virtual-keyboard-policy', 'manual')
       mathField.classList.add('active-math-input')
+      mathField.dataset.testid = 'inline-math-field'
       this.$refs.mathKeyboardContainer.insertAdjacentElement(
         'beforebegin',
         mathField
       )
 
       let committed = false
-      const commit = (andSend = false) => {
+      const commit = () => {
         if (committed) return
         committed = true
         this.commitMathField(mathField)
-        if (andSend) this.sendMessage()
       }
 
       mathField.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+        // Enter only inserts the formula. Messages often go on after a
+        // formula, and a sent message can't be taken back.
+        if (e.key === 'Enter' || e.key === 'Tab') {
           e.preventDefault()
           e.stopPropagation()
-          commit(true)
-        }
-        if (e.key === 'Tab') {
-          e.preventDefault()
-          e.stopPropagation()
-          commit(false)
+          commit()
         }
         if (e.key === 'Escape') {
           e.preventDefault()
@@ -868,7 +866,7 @@ export default {
       })
 
       mathField.addEventListener('input', () => this.indicateStartTyping())
-      mathField.addEventListener('change', () => commit(false))
+      mathField.addEventListener('change', commit)
 
       AnalyticsService.captureEvent(EVENTS.TIP_TAP_EDITOR_OPENED, {
         userType: this.isStudent ? 'student' : 'volunteer',
