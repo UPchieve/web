@@ -583,17 +583,9 @@ export default {
       getters.isVolunteerReferralAmbassador ||
       getters.isVolunteerProgramAmbassador,
     showAmbassadorTitle: (
-      state: UserStoreState,
-      getters: UserStoreGetterValues,
-      _rootState: RootState,
-      rootGetters: RootGetters
-    ) => {
-      return (
-        rootGetters['featureFlags/isShowAmbassadorTitleEnabled'] &&
-        getters.hasVolunteerRole &&
-        getters.isAmbassador
-      )
-    },
+      _state: UserStoreState,
+      getters: UserStoreGetterValues
+    ) => getters.hasVolunteerRole && getters.isAmbassador,
 
     isAuthenticated: (state: UserStoreState) => !!(state.user && state.user.id),
 

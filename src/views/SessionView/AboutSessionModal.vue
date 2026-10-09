@@ -69,10 +69,7 @@
         </div>
       </div>
       <div v-else class="session-info">No goal found for this session</div>
-      <about-this-session-survey
-        data-testid="about-this-session-survey"
-        v-if="isAboutThisSessionSurveyEnabled"
-      />
+      <about-this-session-survey data-testid="about-this-session-survey" />
     </div>
   </modal>
 </template>
@@ -106,8 +103,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isAboutThisSessionSurveyEnabled:
-        'featureFlags/isAboutThisSessionSurveyActive',
       isVolunteer: 'user/isVolunteer',
     }),
     ...mapState({

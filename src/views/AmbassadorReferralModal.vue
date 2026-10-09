@@ -27,13 +27,6 @@ defineProps({
   closeModal: { type: Function, required: true },
 })
 
-const isTextReferralLinksEnabled = computed(
-  () => store.getters['featureFlags/isTextReferralLinksEnabled']
-)
-
-const isReferralModalRedesignEnabled = computed(
-  () => store.getters['featureFlags/isReferralModalRedesignEnabled']
-)
 const user = computed(() => store.state.user.user)
 const firstName = computed(() => store.getters['user/firstName'])
 const copyText = ref('Copy')
@@ -83,11 +76,7 @@ function referralLink({ isQrCode = false } = {}) {
 }
 
 const onCopiedReferralLink = () => {
-  if (isTextReferralLinksEnabled.value) {
-    AnalyticsService.captureEvent(EVENTS.STUDY_USER_CLICKED_COPY_REFERRAL_LINK)
-  } else {
-    AnalyticsService.captureEvent(EVENTS.AMBASSADOR_REFERRAL_CLICKED_COPY)
-  }
+  AnalyticsService.captureEvent(EVENTS.STUDY_USER_CLICKED_COPY_REFERRAL_LINK)
   copyLink()
 }
 
@@ -222,7 +211,7 @@ onMounted(() => {
             </button>
           </div>
         </div>
-        <div v-if="isTextReferralLinksEnabled" class="referral-link-input-div">
+        <div class="referral-link-input-div">
           <p class="send-text"><strong>Send Text</strong></p>
           <div class="phone-number-input-container">
             <maz-phone-number-input
@@ -239,10 +228,7 @@ onMounted(() => {
             </button>
           </div>
         </div>
-        <div
-          class="referral-link-input-div"
-          v-if="isReferralModalRedesignEnabled"
-        >
+        <div class="referral-link-input-div">
           <p class="send-text"><strong>Share via</strong></p>
           <div class="share-via-input-container">
             <button

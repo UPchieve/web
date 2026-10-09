@@ -13,7 +13,7 @@ import vuetify from '@/plugins/vuetify'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 
 describe('ProfileView', () => {
-  let DEFAULT_FLAGS_GETTERS, DEFAULT_USER
+  let DEFAULT_USER
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -25,9 +25,6 @@ describe('ProfileView', () => {
       .mockResolvedValue({ removedFromNTHS: false })
     storeOptions.modules.user.actions.addToUser = vi.fn().mockResolvedValue()
 
-    DEFAULT_FLAGS_GETTERS = {
-      isFilterActiveSubjectsActive: () => true,
-    }
     DEFAULT_USER = {
       email: 'test@gmail.com',
       phone: '+18187774439',
@@ -62,7 +59,6 @@ describe('ProfileView', () => {
           ...storeOptions.modules.featureFlags,
           getters: {
             ...storeOptions.modules.featureFlags.getters,
-            ...DEFAULT_FLAGS_GETTERS,
             ...(overrides.featureFlags?.getters ?? {}),
           },
         },

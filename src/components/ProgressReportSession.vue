@@ -13,7 +13,6 @@
           <p>{{ gradeDescription(progressReport.summary.overallGrade) }}</p>
         </div>
         <progress-report-survey
-          v-if="isProgressReportsSurveyActive"
           :progressReportId="progressReport.id"
           class="progress-report__survey"
         />
@@ -74,7 +73,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import GradeBars from '@/components/GradeBars.vue'
 import { gradeLabel, gradeDescription } from '@/utils/grades'
 import ProgressReportSurvey from '@/components/ProgressReportSurvey.vue'
@@ -96,10 +94,6 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      isProgressReportsSurveyActive:
-        'featureFlags/isProgressReportsSurveyActive',
-    }),
     summaryForRecommendations() {
       return this.getSummaryForFocusAreaAndInfoType(
         this.progressReport.summary,

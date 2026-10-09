@@ -626,7 +626,6 @@ export default {
       isTeacher: 'user/isTeacher',
       showNationalPhoneNumbersOnly: 'user/showNationalPhoneNumbersOnly',
       allSubtopics: 'subjects/allSubtopics',
-      isFilterActiveSubjectsActive: 'featureFlags/isFilterActiveSubjectsActive',
       hasStudentOccupation: 'user/hasStudentOccupation',
       isSecondaryEmailOnProfilePageEnabled:
         'featureFlags/isSecondaryEmailOnProfilePageEnabled',
@@ -645,10 +644,7 @@ export default {
       return VERIFICATION_METHOD
     },
     userSubjects() {
-      const user = this.user
-      const userSubjects = this.isFilterActiveSubjectsActive
-        ? user.activeSubjects
-        : user.subjects
+      const userSubjects = this.user.activeSubjects
 
       const subjects = this.subjects
       if (Object.keys(subjects).length === 0) {

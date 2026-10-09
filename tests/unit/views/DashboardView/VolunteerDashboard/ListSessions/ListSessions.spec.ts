@@ -92,11 +92,6 @@ const getWrapper = async (overrides = {}) => {
             isReadyToTutor: () => true,
           },
         },
-        featureFlags: {
-          getters: {
-            ...(overrides.featureFlags?.getters ?? {}),
-          },
-        },
         subjects: {
           getters: {
             isComputedUnlockSubject: () => () => false,
@@ -180,23 +175,6 @@ describe('Dashboard with banned students', () => {
 })
 
 describe('Empty state', () => {
-  it('Should show a special message when there are no students waiting', async () => {
-    wrapper = await getWrapper({
-      sessions: [],
-      featureFlags: {
-        getters: {
-          isBecomeAnAmbassadorCtaEnabled: () => false,
-        },
-      },
-    })
-    expect(
-      wrapper.find('[data-testid="no-students-waiting-message"]').exists()
-    ).toBeTruthy()
-    expect(
-      wrapper.find('[data-testid="no-students-ambassador-message"]').exists()
-    ).toBeFalsy()
-  })
-
   it('Should show the Become an Ambassador CTA when there are no students waiting', async () => {
     wrapper = await getWrapper({
       user: {
@@ -206,11 +184,6 @@ describe('Empty state', () => {
         },
       },
       sessions: [],
-      featureFlags: {
-        getters: {
-          isBecomeAnAmbassadorCtaEnabled: () => true,
-        },
-      },
     })
     expect(
       wrapper.find('[data-testid="no-students-waiting-message"]').exists()
@@ -219,6 +192,30 @@ describe('Empty state', () => {
       wrapper.find('[data-testid="no-students-ambassador-message"]').exists()
     ).toBeTruthy()
   })
+
+  it.each([
+    { isVolunteer: true, isAmbassador: true },
+    { isVolunteer: false, isAmbassador: false },
+  ])(
+    'Should not show the Become an Ambassador CTA for %o',
+    async ({ isVolunteer, isAmbassador }) => {
+      wrapper = await getWrapper({
+        user: {
+          getters: {
+            isVolunteer: () => isVolunteer,
+            isAmbassador: () => isAmbassador,
+          },
+        },
+        sessions: [],
+      })
+      expect(
+        wrapper.find('[data-testid="no-students-waiting-message"]').exists()
+      ).toBeTruthy()
+      expect(
+        wrapper.find('[data-testid="no-students-ambassador-message"]').exists()
+      ).toBeFalsy()
+    }
+  )
 })
 
 describe('Locked sessions', () => {

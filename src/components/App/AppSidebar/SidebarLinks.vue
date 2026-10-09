@@ -114,18 +114,9 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer && isBecomeAnAmbassadorCtaEnabled"
+          v-if="isVolunteer"
           :onClick="openAmbassadorReferralModal"
           text="Level Up Impact"
-          id="volunteer-referral-sidebar-link"
-        >
-          <refer-friend-icon class="icon" />
-        </sidebar-link>
-
-        <sidebar-link
-          v-if="isVolunteer && !isBecomeAnAmbassadorCtaEnabled"
-          :onClick="openReferFriendModal"
-          text="Invite a Friend"
           id="volunteer-referral-sidebar-link"
         >
           <refer-friend-icon class="icon" />
@@ -286,8 +277,6 @@ export default {
       isAdmin: 'user/isAdmin',
       userType: 'user/userType',
       mobileMode: 'app/mobileMode',
-      isBecomeAnAmbassadorCtaEnabled:
-        'featureFlags/isBecomeAnAmbassadorCtaEnabled',
       isDisableStudentsJoinSlackCommunityEnabled:
         'featureFlags/isDisableStudentsJoinSlackCommunityEnabled',
       isDisabledSlackButtonForUnapprovedVolunteersEnabled:
@@ -368,20 +357,6 @@ export default {
     circleCommunityClickedEvent() {
       AnalyticsService.captureEvent(EVENTS.NTHS_CIRCLE_COMMUNITY_LINK_CLICKED, {
         isNthsAdmin: this.hasNthsAdminRole,
-      })
-    },
-    openReferFriendModal() {
-      AnalyticsService.captureEvent(
-        EVENTS.USER_CLICKED_REFER_A_FRIEND_SIDEBAR_LINK,
-        {
-          userType: this.userType,
-        }
-      )
-      this.$store.dispatch('app/modal/show', {
-        component: 'ReferralModal',
-        data: {
-          showAccept: false,
-        },
       })
     },
     openAmbassadorReferralModal() {

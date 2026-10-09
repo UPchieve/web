@@ -36,14 +36,6 @@ describe('AboutSessionModal', () => {
             },
           },
         },
-        featureFlags: {
-          ...storeOptions.modules.featureFlags,
-          getters: {
-            ...storeOptions.modules.featureFlags.getters,
-            isAboutThisSessionSurveyActive: () =>
-              overrides.featureFlags?.isAboutThisSessionSurveyActive ?? false,
-          },
-        },
       },
     })
 
@@ -147,19 +139,12 @@ describe('AboutSessionModal', () => {
   })
 
   describe('About This Session survey', () => {
-    it.each([false, true])(
-      'Should only render the survey if the FF is on',
-      (surveyEnabled) => {
-        const wrapper = getWrapper({
-          featureFlags: {
-            isAboutThisSessionSurveyActive: surveyEnabled,
-          },
-        })
-        expect(
-          wrapper.find('[data-testid="about-this-session-survey"]').exists()
-        ).toEqual(surveyEnabled)
-      }
-    )
+    it('Should render the survey', () => {
+      const wrapper = getWrapper()
+      expect(
+        wrapper.find('[data-testid="about-this-session-survey"]').exists()
+      ).toBe(true)
+    })
   })
 
   describe('About This Session student session count', () => {

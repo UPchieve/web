@@ -44,9 +44,9 @@ const TRAINING_LINK = {
   to: '/training',
   text: 'Training',
 }
-const INVITE_FRIEND_LINK = {
+const LEVEL_UP_IMPACT_LINK = {
   onClick: () => {},
-  text: 'Invite a Friend',
+  text: 'Level Up Impact',
 }
 const COMMUNITY_LINK = {
   // This link changes. Just match the consistent portion.
@@ -81,7 +81,7 @@ const links = {
       TRAINING_LINK,
       CALENDAR_LINK,
       SESSION_HISTORY_LINK,
-      INVITE_FRIEND_LINK,
+      LEVEL_UP_IMPACT_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],
@@ -90,7 +90,7 @@ const links = {
       TRAINING_LINK,
       CALENDAR_LINK,
       SESSION_HISTORY_LINK,
-      INVITE_FRIEND_LINK,
+      LEVEL_UP_IMPACT_LINK,
       ADMIN_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,

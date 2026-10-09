@@ -70,9 +70,7 @@
       data-testid="no-students-waiting-message"
     >
       Currently there are no students waiting for help.
-      <div
-        v-if="isBecomeAnAmbassadorCtaEnabled && isVolunteer && !isAmbassador"
-      >
+      <div v-if="isVolunteer && !isAmbassador">
         <div
           id="no-students-ambassador-message"
           data-testid="no-students-ambassador-message"
@@ -120,9 +118,6 @@ const props = defineProps<{
 }>()
 
 const user = computed(() => store.state.user.user)
-const isBecomeAnAmbassadorCtaEnabled = computed(
-  () => store.getters['featureFlags/isBecomeAnAmbassadorCtaEnabled']
-)
 const isVolunteer = computed(() => store.getters['user/isVolunteer'])
 const isAmbassador = computed(() => store.getters['user/isAmbassador'])
 

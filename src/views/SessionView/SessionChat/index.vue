@@ -384,7 +384,6 @@ export default {
       isSessionWaitingForVolunteer: 'user/isSessionWaitingForVolunteer',
       numberOfUnreadChatMessages: 'user/numberOfUnreadChatMessages',
       sessionPartner: 'user/sessionPartner',
-      isConfettiCelebrationEnabled: 'featureFlags/isConfettiCelebrationEnabled',
       isPendingMessagesEnabled: 'featureFlags/isPendingMessagesEnabled',
       hasUnreadDMs: 'user/hasUnreadDMs',
     }),
@@ -437,7 +436,6 @@ export default {
     },
     showCelebrateButton() {
       return (
-        this.isConfettiCelebrationEnabled &&
         this.isVolunteer &&
         !this.isInRecap &&
         this.currentSession?.messages?.length > 20
