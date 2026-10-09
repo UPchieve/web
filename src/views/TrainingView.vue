@@ -74,12 +74,12 @@
         that subject.
       </p>
       <loader
-        v-if="isLoadingTrainingCourse"
+        v-if="isLoadingTrainingCourse || isFetchingTraining"
         class="loader--center"
         :height="40"
         :width="40"
       />
-      <p v-else-if="fetchingTrainingError" class="error">
+      <p v-else-if="fetchingTrainingError || !currentSubject" class="error">
         We had trouble loading the training material. Please try refreshing the
         page.
       </p>
