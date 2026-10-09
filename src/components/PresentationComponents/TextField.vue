@@ -1,5 +1,5 @@
 <template>
-  <div class="uc-form-element w-full" :class="$attrs.class">
+  <div class="uc-form-element w-full" v-bind="wrapperAttrs()">
     <div class="uc-row justify-between">
       <label :for="inputId()" :class="{ error: errorMessage }">
         <slot name="label">{{ label }}</slot>
@@ -31,8 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAttrs } from 'vue'
-import { omit } from 'lodash-es'
+import { useInputAttrs } from '@/composables/useInputAttrs'
 
 defineOptions({ inheritAttrs: false })
 
@@ -44,18 +43,10 @@ defineProps<{
   metadata?: string
 }>()
 
-const attrs = useAttrs()
-
-function inputAttrs() {
-  return omit(attrs, ['class', 'type'])
-}
+const { attrs, wrapperAttrs, inputAttrs, inputId } = useInputAttrs(['type'])
 
 function inputType() {
   return (attrs.type as string) ?? 'text'
-}
-
-function inputId() {
-  return attrs.id as string
 }
 </script>
 

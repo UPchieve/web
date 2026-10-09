@@ -1,9 +1,6 @@
 <template>
-  <div class="w-full" :class="$attrs.class">
-    <TextField
-      v-bind="textFieldAttrs()"
-      :type="isVisible ? 'text' : 'password'"
-    >
+  <div class="w-full" v-bind="wrapperAttrs()">
+    <TextField v-bind="inputAttrs()" :type="isVisible ? 'text' : 'password'">
       <template #append>
         <button
           type="button"
@@ -36,10 +33,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, useAttrs } from 'vue'
-import { omit } from 'lodash-es'
+import { ref } from 'vue'
 import { mdiEye, mdiEyeOff } from '@mdi/js'
 import TextField from '@/components/PresentationComponents/TextField.vue'
+import { useInputAttrs } from '@/composables/useInputAttrs'
 
 defineOptions({ inheritAttrs: false })
 
@@ -47,12 +44,8 @@ defineProps<{
   requirements?: { label: string; hasBeenMet: boolean }[]
 }>()
 
-const attrs = useAttrs()
+const { wrapperAttrs, inputAttrs } = useInputAttrs(['type'])
 const isVisible = ref(false)
-
-function textFieldAttrs() {
-  return omit(attrs, ['class', 'type'])
-}
 </script>
 
 <style lang="scss" scoped>
