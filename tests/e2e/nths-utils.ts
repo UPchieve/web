@@ -3,9 +3,10 @@ import {
   createVolunteer,
   withCertifications,
   type DbClient,
+  type VolunteerOptions,
   type VolunteerUser,
 } from './utils'
-import { VolunteerOccupations } from '../../src/services/VolunteerService'
+import { VolunteerOccupations } from '@/services/VolunteerService'
 
 export type NTHSChapter = {
   groupId: string
@@ -41,10 +42,9 @@ export const createNthsChapter = async (
 
 export const createCoach = async (
   dbClient: DbClient,
-  profile = {}
+  profile: VolunteerOptions = {}
 ): Promise<VolunteerUser> => {
-  const coach = await createVolunteer(dbClient, {}, profile)
-  if (!coach) throw new Error('Failed to create the coach')
+  const coach = await createVolunteer(dbClient, profile)
 
   // A volunteer with no certifications is an autoflow user, who never reaches
   // the dashboard the login helper waits for.
@@ -128,12 +128,10 @@ export const addNthsMember = async (
   dbClient: DbClient,
   options: NthsMemberOptions
 ): Promise<VolunteerUser> => {
-  const member = await createVolunteer(
-    dbClient,
-    {},
-    { onboarded: true, approved: true }
-  )
-  if (!member) throw new Error('Failed to create the NTHS member')
+  const member = await createVolunteer(dbClient, {
+    onboarded: true,
+    approved: true,
+  })
 
   await withCertifications(dbClient, {
     userId: member.id,

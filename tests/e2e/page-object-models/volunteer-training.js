@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test'
+import { isMobileViewport } from '../utils/viewport'
 
 export class VolunteerTraining {
   page
@@ -35,7 +36,7 @@ export class VolunteerTraining {
   }
 
   get isMobile() {
-    return this.page.viewportSize().width < 767
+    return isMobileViewport(this.page)
   }
 
   async chooseSubjectFromWelcome({ topicTitle, subject, subjectName }) {

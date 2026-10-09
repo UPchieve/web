@@ -4,6 +4,7 @@ import { Login } from './page-object-models/login'
 import { Pool, type PoolClient } from 'pg'
 import type { Browser, Page } from '@playwright/test'
 import { post } from './utils/network'
+import type { AuthPayload } from '@/contracts/auth'
 
 // TODO: This is an overloaded utils file. Break out into
 // separate files.
@@ -28,7 +29,7 @@ export type StudentUser = {
 export const createStudent = async (
   dbClient: DbClient,
   args = {}
-): Promise<StudentUser | undefined> => {
+): Promise<StudentUser> => {
   const params = {
     email: faker.internet.email(),
     firstName: faker.person.firstName(),
@@ -37,17 +38,11 @@ export const createStudent = async (
     verified: true,
     ...args,
   }
-  try {
-    const { user } = await post(`/auth/register/student/`, params)
-    await dbClient.query(
-      `UPDATE users SET verified = true WHERE id = '${user.id}'`
-    )
-    return { ...params, id: user.id }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.dir(e, { depth: null })
-    // TODO: We might actually want to throw errors here etc.
-  }
+  const { user } = await post(`/auth/register/student/`, params)
+  await dbClient.query(
+    `UPDATE users SET verified = true WHERE id = '${user.id}'`
+  )
+  return { ...params, id: user.id }
 }
 
 export type VolunteerUser = {
@@ -60,46 +55,45 @@ export type VolunteerUser = {
   terms: boolean
 }
 
+export type VolunteerOptions = {
+  approved?: boolean
+  onboarded?: boolean
+  completedUpchieveTraining?: boolean
+}
+
 export const createVolunteer = async (
   dbClient: DbClient,
-  userArgs = {},
-  options: any
-): Promise<VolunteerUser | undefined> => {
-  try {
-    const params = {
-      email: faker.internet.email(),
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      password: createPassword(),
-      phone: `+${faker.string.numeric('###########')}`,
-      terms: true,
-      ...userArgs,
-    }
-
-    const opts = {
-      approved: true,
-      onboarded: true,
-      completedUpchieveTraining: true,
-      ...options,
-    }
-
-    const { user } = await post(`/auth/register/volunteer/open`, params)
-
-    await dbClient.query(
-      `UPDATE users SET verified = true WHERE id = '${user.id}'`
-    )
-    await dbClient.query(
-      `UPDATE volunteer_profiles SET approved = $1, onboarded = $2 WHERE user_id = '${user.id}'`,
-      [opts.approved, opts.onboarded]
-    )
-    if (opts.completedUpchieveTraining)
-      await completeUpchieveTraining(dbClient, user.id)
-
-    return { ...params, id: user.id }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.dir(e, { depth: null })
+  options: VolunteerOptions = {}
+): Promise<VolunteerUser> => {
+  const params = {
+    email: faker.internet.email(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    password: createPassword(),
+    phone: `+${faker.string.numeric('###########')}`,
+    terms: true,
   }
+
+  const opts = {
+    approved: true,
+    onboarded: true,
+    completedUpchieveTraining: true,
+    ...options,
+  }
+
+  const { user } = await post(`/auth/register/volunteer/open`, params)
+
+  await dbClient.query(
+    `UPDATE users SET verified = true WHERE id = '${user.id}'`
+  )
+  await dbClient.query(
+    `UPDATE volunteer_profiles SET approved = $1, onboarded = $2 WHERE user_id = '${user.id}'`,
+    [opts.approved, opts.onboarded]
+  )
+  if (opts.completedUpchieveTraining)
+    await completeUpchieveTraining(dbClient, user.id)
+
+  return { ...params, id: user.id }
 }
 
 export const withCertifications = async (
@@ -159,18 +153,30 @@ export const endSessionsFor = async (dbClient: Pool, userId: string) => {
   )
 }
 
+export const loginAs = async (
+  page: Page,
+  user: AuthPayload,
+  landingUrl = '**/dashboard'
+) => {
+  // The e2e build's Zwibbler demo calls alert() on each whiteboard mount. With no
+  // listener, Playwright dismisses it without catching a failed dismiss, which
+  // fails the test with "No dialog is showing".
+  page.on('dialog', (dialog) => dialog.dismiss().catch(() => {}))
+  const login = new Login(page)
+  await login.goto()
+  await login.loginWith(user)
+  await page.waitForURL(landingUrl)
+}
+
 export const loginStudent = async (
   browser: Browser,
-  studentUser: { email: string; password: string },
+  studentUser: AuthPayload,
   { permissions }: { permissions?: string[] } = {}
 ) => {
   const studentContext = await browser.newContext({ permissions })
   const studentPage = await studentContext.newPage()
   const studentDashboard = new StudentDashboard(studentPage)
-  const studentLogin = new Login(studentPage)
-  await studentLogin.goto()
-  await studentLogin.loginWith(studentUser)
-  await studentPage.waitForURL('**/dashboard')
+  await loginAs(studentPage, studentUser)
   if (studentDashboard.isMobile) {
     await studentPage.getByTestId('download-app-close-button').click()
   }
@@ -195,14 +201,11 @@ export const requestSession = async (
 
 export const loginVolunteer = async (
   browser: Browser,
-  volunteerUser: { email: string; password: string }
+  volunteerUser: AuthPayload
 ) => {
   const volunteerContext = await browser.newContext()
   const volunteerPage = await volunteerContext.newPage()
-  const volunteerLogin = new Login(volunteerPage)
-  await volunteerLogin.goto()
-  await volunteerLogin.loginWith(volunteerUser)
-  await volunteerPage.waitForURL('**/dashboard')
+  await loginAs(volunteerPage, volunteerUser)
 
   return {
     volunteerContext,

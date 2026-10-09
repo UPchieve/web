@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test'
+import { isMobileViewport } from '../utils/viewport'
 
 export class StudentDashboard {
   page
@@ -8,7 +9,7 @@ export class StudentDashboard {
   }
 
   get isMobile() {
-    return this.page.viewportSize().width < 767
+    return isMobileViewport(this.page)
   }
 
   async dismissNotificationModal() {

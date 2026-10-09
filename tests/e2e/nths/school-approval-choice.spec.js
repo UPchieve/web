@@ -1,34 +1,23 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db.ts'
+import { loginAs } from '../utils.ts'
 import {
   createNthsPresident,
   denySchoolAffiliation,
   schoolAffiliationStatusOf,
 } from '../nths-utils.ts'
-import { Login } from '../page-object-models/login.js'
 import { NTHSChapterPage } from '../page-object-models/nths-chapter.js'
 
 test.describe('NTHS school approval choice', () => {
-  let dbClient
+  const dbClient = getClient()
   let president
   let chapter
   let chapterPage
 
-  test.beforeAll(async () => {
-    dbClient = await getClient().connect()
-  })
-
-  test.afterAll(async () => {
-    await dbClient.release()
-  })
-
   test.beforeEach(async ({ page }) => {
     ;({ president, chapter } = await createNthsPresident(dbClient))
 
-    const login = new Login(page)
-    await login.goto()
-    await login.loginWith(president)
-    await page.waitForURL('**/dashboard')
+    await loginAs(page, president)
 
     chapterPage = new NTHSChapterPage(page)
     await chapterPage.goto()

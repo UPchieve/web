@@ -1,21 +1,12 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db.ts'
-import { setFeatureFlags } from '../utils.ts'
+import { loginAs, setFeatureFlags } from '../utils.ts'
 import { createCoach } from '../nths-utils.ts'
-import { Login } from '../page-object-models/login.js'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard.js'
-import { POSTHOG_FEATURE_FLAGS } from '../../../src/consts'
+import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 
 test.describe('NTHS president application', () => {
-  let dbClient
-
-  test.beforeAll(async () => {
-    dbClient = await getClient().connect()
-  })
-
-  test.afterAll(async () => {
-    await dbClient.release()
-  })
+  const dbClient = getClient()
 
   test('a coach with no training or tutored session applies', async ({
     page,
@@ -29,11 +20,8 @@ test.describe('NTHS president application', () => {
       completedUpchieveTraining: false,
     })
 
-    const login = new Login(page)
     const dashboard = new VolunteerDashboard(page)
-    await login.goto()
-    await login.loginWith(coach)
-    await page.waitForURL('**/dashboard')
+    await loginAs(page, coach)
 
     if (dashboard.isMobile) await dashboard.mobileMenu.click()
     const nthsLink = page.locator('#nths-group-sidebar-link')

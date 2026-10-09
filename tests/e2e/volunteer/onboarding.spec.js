@@ -1,36 +1,24 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db.ts'
-import { createVolunteer, loginVolunteer } from '../utils.ts'
+import { createVolunteer, loginAs, loginVolunteer } from '../utils.ts'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard'
 import { BackgroundInformation } from '../page-object-models/background-information'
 import { TrainingCourse } from '../page-object-models/training-course'
 import { VolunteerTraining } from '../page-object-models/volunteer-training'
-import { Login } from '../page-object-models/login'
 import path from 'path'
 
 test.describe('Volunteer onboarding', () => {
-  let dbClient
-
-  test.beforeAll(async () => {
-    dbClient = await getClient().connect()
-  })
-
-  test.afterAll(async () => {
-    await dbClient.release()
-  })
+  const dbClient = getClient()
 
   test('Volunteer is onboarded after Intro to UPchieve and a subject quiz', async ({
     page,
   }) => {
-    const volunteer = await createVolunteer(
-      dbClient,
-      {},
-      { onboarded: false, approved: true, completedUpchieveTraining: false }
-    )
-    const login = new Login(page)
-    await login.goto()
-    await login.loginWith(volunteer)
-    await page.waitForURL('**/welcome')
+    const volunteer = await createVolunteer(dbClient, {
+      onboarded: false,
+      approved: true,
+      completedUpchieveTraining: false,
+    })
+    await loginAs(page, volunteer, '**/welcome')
 
     const volunteerTraining = new VolunteerTraining(page)
     await volunteerTraining.chooseSubjectFromWelcome({
@@ -59,15 +47,11 @@ test.describe('Volunteer onboarding', () => {
     let volunteer
 
     test.beforeAll(async () => {
-      volunteer = await createVolunteer(
-        dbClient,
-        {},
-        {
-          onboarded: true,
-          approved: false,
-          completedUpchieveTraining: true,
-        }
-      )
+      volunteer = await createVolunteer(dbClient, {
+        onboarded: true,
+        approved: false,
+        completedUpchieveTraining: true,
+      })
     })
 
     test('Volunteer can complete safety screening steps (background info + proof of identity)', async ({

@@ -4,22 +4,20 @@ import {
   createStudent,
   createVolunteer,
   endSessionsFor,
+  loginAs,
   loginStudent,
   loginVolunteer,
   withCertifications,
 } from '../utils.ts'
 import { SessionView } from '../page-object-models/session-view.js'
-import { StudentDashboard } from '../page-object-models/student-dashboard.js'
-import { Login } from '../page-object-models/login.js'
 import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard.js'
 
-let dbClient
+const dbClient = getClient()
 test.describe('Session', async () => {
   let studentUser
   let volunteerUser
 
   test.beforeAll(async () => {
-    dbClient = await getClient().connect()
     studentUser = await createStudent(dbClient)
     volunteerUser = await createVolunteer(dbClient)
     await withCertifications(dbClient, {
@@ -30,32 +28,20 @@ test.describe('Session', async () => {
 
   test.afterAll(async () => {
     await endSessionsFor(dbClient, studentUser.id)
-    await dbClient.release()
   })
 
   test('can chat', async ({ browser }) => {
     /* Sign in student */
-    const studentContext = await browser.newContext()
-    const studentPage = await studentContext.newPage()
-    const studentDashboard = new StudentDashboard(studentPage)
+    const { studentPage, studentDashboard } = await loginStudent(
+      browser,
+      studentUser
+    )
     const studentSessionView = new SessionView(studentPage)
-    const studentLogin = new Login(studentPage)
-    await studentLogin.goto()
-    await studentLogin.loginWith(studentUser)
-    await studentPage.waitForURL('**/dashboard')
-    if (studentDashboard.isMobile) {
-      await studentPage.getByTestId('download-app-close-button').click()
-    }
 
     /* Sign in volunteer */
-    const volunteerContext = await browser.newContext()
-    const volunteerPage = await volunteerContext.newPage()
+    const { volunteerPage } = await loginVolunteer(browser, volunteerUser)
     const volunteerSessionView = new SessionView(volunteerPage)
     const volunteerDashboard = new VolunteerDashboard(volunteerPage)
-    const volunteerLogin = new Login(volunteerPage)
-    await volunteerLogin.goto()
-    await volunteerLogin.loginWith(volunteerUser)
-    await volunteerPage.waitForURL('**/dashboard')
 
     const { sessionId } = await studentDashboard.createSessionFor({
       subject: 'math',
@@ -166,10 +152,7 @@ test.describe('Session', async () => {
       volunteerSockets.push(ws, ws.connectToServer())
     })
     const volunteerPage = await volunteerContext.newPage()
-    const volunteerLogin = new Login(volunteerPage)
-    await volunteerLogin.goto()
-    await volunteerLogin.loginWith(volunteer)
-    await volunteerPage.waitForURL('**/dashboard')
+    await loginAs(volunteerPage, volunteer)
     const volunteerSessionView = new SessionView(volunteerPage)
     const isVolunteerSocketConnected = () =>
       volunteerPage.evaluate(

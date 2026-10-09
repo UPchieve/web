@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test'
+import { isMobileViewport } from '../utils/viewport'
 
 export class VolunteerDashboard {
   page
@@ -26,7 +27,7 @@ export class VolunteerDashboard {
   }
 
   get isMobile() {
-    return this.page.viewportSize().width < 767
+    return isMobileViewport(this.page)
   }
 
   async joinSessionFor(firstName) {

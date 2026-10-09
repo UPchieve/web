@@ -1,23 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { getClient } from '../db.ts'
+import { loginAs } from '../utils.ts'
 import { addNthsMember, createNthsPresident } from '../nths-utils.ts'
-import { Login } from '../page-object-models/login.js'
 import { NTHSChapterHQPage } from '../page-object-models/nths-chapter-hq.js'
 
 test.describe('A president can run their chapter from Chapter HQ', () => {
-  let dbClient
+  const dbClient = getClient()
   let president
   let chapter
   let members
   let hq
-
-  test.beforeAll(async () => {
-    dbClient = await getClient().connect()
-  })
-
-  test.afterAll(async () => {
-    await dbClient.release()
-  })
 
   test.beforeEach(async ({ page }) => {
     ;({ president, chapter } = await createNthsPresident(dbClient))
@@ -26,10 +18,7 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       members.push(await addNthsMember(dbClient, { groupId: chapter.groupId }))
     }
 
-    const login = new Login(page)
-    await login.goto()
-    await login.loginWith(president)
-    await page.waitForURL('**/dashboard')
+    await loginAs(page, president)
 
     hq = new NTHSChapterHQPage(page)
   })

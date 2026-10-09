@@ -2,20 +2,14 @@ import { test, expect } from '@playwright/test'
 import { getClient } from '../db'
 import { createStudent } from '../utils'
 import { Login } from '../page-object-models/login'
-import { POSTHOG_FEATURE_FLAGS } from '../../../src/consts'
+import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 
 const BAD_CREDENTIALS_ERROR =
   "Email and password don't match Check both, or use the button below if you signed up with Google, Clever, or ClassLink.  Reset password "
 
-let dbClient
 let testUser
 test.beforeAll(async () => {
-  dbClient = await getClient().connect()
-  testUser = await createStudent(dbClient)
-})
-
-test.afterAll(async () => {
-  await dbClient.release()
+  testUser = await createStudent(getClient())
 })
 
 const nameSuffix = (v) => {

@@ -1,35 +1,19 @@
 import { test } from '@playwright/test'
 import { getClient } from '../db.ts'
-import { createVolunteer } from '../utils.ts'
+import { createVolunteer, loginAs } from '../utils.ts'
 import { VolunteerTraining } from '../page-object-models/volunteer-training.js'
-import { Login } from '../page-object-models/login'
 
-let dbClient
+const dbClient = getClient()
 
 test.describe('Training', async () => {
   let volunteerUser
 
   test.beforeEach(async () => {
-    dbClient = await getClient().connect()
     volunteerUser = await createVolunteer(dbClient)
   })
 
-  test.afterAll(async () => {
-    await dbClient.release()
-  })
-
-  async function loginVolunteer(page) {
-    const volunteerLogin = new Login(page)
-    await volunteerLogin.goto()
-    await volunteerLogin.loginWith({
-      email: volunteerUser.email,
-      password: volunteerUser.password,
-    })
-    await page.waitForURL('**/dashboard')
-  }
-
   test('pass prealgebra quiz', async ({ page }) => {
-    await loginVolunteer(page)
+    await loginAs(page, volunteerUser)
 
     /* Volunteer pages */
     const volunteerTraining = new VolunteerTraining(page)
@@ -57,7 +41,7 @@ test.describe('Training', async () => {
   test('fail prealgebra quiz, review answers, retake quiz', async ({
     page,
   }) => {
-    await loginVolunteer(page)
+    await loginAs(page, volunteerUser)
 
     /* Volunteer pages */
     const volunteerTraining = new VolunteerTraining(page)
@@ -93,7 +77,7 @@ test.describe('Training', async () => {
   test('fail prealgebra quiz, review answers, review concepts, retake quiz', async ({
     page,
   }) => {
-    await loginVolunteer(page)
+    await loginAs(page, volunteerUser)
 
     /* Volunteer pages */
     const volunteerTraining = new VolunteerTraining(page)

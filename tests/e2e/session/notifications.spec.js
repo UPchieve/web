@@ -10,13 +10,12 @@ import {
   withCertifications,
 } from '../utils'
 
-let dbClient
+const dbClient = getClient()
 test.describe('Session notifications', async () => {
   let studentUser
   let volunteerUser
 
   test.beforeAll(async () => {
-    dbClient = await getClient().connect()
     studentUser = await createStudent(dbClient)
     volunteerUser = await createVolunteer(dbClient)
     await withCertifications(dbClient, {
@@ -26,8 +25,7 @@ test.describe('Session notifications', async () => {
   })
 
   test.afterAll(async () => {
-    endSessionsFor(dbClient, studentUser.id)
-    await dbClient.release()
+    await endSessionsFor(dbClient, studentUser.id)
   })
 
   test('Volunteer gets session notification', async ({ browser }) => {

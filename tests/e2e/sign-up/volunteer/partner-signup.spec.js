@@ -11,15 +11,7 @@ const PARTNER = {
 }
 
 test.describe('Volunteer partner sign-up', () => {
-  let dbClient
-
-  test.beforeAll(async () => {
-    dbClient = await getClient().connect()
-  })
-
-  test.afterAll(async () => {
-    await dbClient.release()
-  })
+  const dbClient = getClient()
 
   test('signs up from a partner link as a volunteer of that partner', async ({
     page,

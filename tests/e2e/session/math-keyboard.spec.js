@@ -53,18 +53,16 @@ async function expectLayoutTabIsClickable(page, tabLabel) {
   }).toPass({ timeout: 5000 })
 }
 
-let dbClient
+const dbClient = getClient()
 test.describe('Session math keyboard', async () => {
   let studentUser
 
   test.beforeAll(async () => {
-    dbClient = await getClient().connect()
     studentUser = await createStudent(dbClient)
   })
 
   test.afterAll(async () => {
     await endSessionsFor(dbClient, studentUser.id)
-    await dbClient.release()
   })
 
   test('can switch back from the abc layout', async ({ browser }) => {
@@ -76,11 +74,6 @@ test.describe('Session math keyboard', async () => {
       // permission keeps it from opening.
       { permissions: ['notifications'] }
     )
-    // The e2e bundle's Zwibbler demo build alert()s on every whiteboard mount.
-    // Without a listener, Playwright's server dismisses it without catching a
-    // failure (server/dialog.js), and CI failed with "No dialog is showing".
-    studentPage.on('dialog', (dialog) => dialog.dismiss().catch(() => {}))
-
     await requestSession(studentDashboard, {
       topic: 'prealgebra',
       subject: 'math',
