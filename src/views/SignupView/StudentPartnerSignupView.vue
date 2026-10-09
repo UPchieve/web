@@ -209,115 +209,30 @@
           :validation="v$.formData.college"
         />
 
-        <div class="uc-form-element">
-          <div class="uc-row justify-between">
-            <label
-              for="email"
-              v-bind:class="{
-                error: hasFormValidationError(v$.formData.email),
-              }"
-              >What is
-              {{ getFormLabelIdentifierPossessive }}
-              email?</label
-            >
-            <div
-              v-if="hasFormValidationError(v$.formData.email)"
-              class="error-caption"
-            >
-              {{ getFormValidationError(v$.formData.email) }}
-            </div>
-          </div>
-          <input
-            id="email"
-            autocomplete="off"
-            class="uc-form-text-input"
-            type="email"
-            :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
-            v-model="formData.email"
-            v-bind:class="{
-              'uc-form-text-input-invalid': hasFormValidationError(
-                v$.formData.email
-              ),
-            }"
-            @blur="v$.formData.email.$touch"
-            required
-          />
-        </div>
+        <FormEmail
+          v-model="formData.email"
+          :label="`What is ${getFormLabelIdentifierPossessive} email?`"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
+          @blur="v$.formData.email.$touch"
+        />
 
-        <div v-if="useParentGuardianSignUpFlow" class="uc-form-element">
-          <div class="uc-row justify-between">
-            <label
-              for="parent-email"
-              v-bind:class="{
-                error: hasFormValidationError(v$.formData.parentGuardianEmail),
-              }"
-              >What is your email?</label
-            >
-            <div
-              v-if="hasFormValidationError(v$.formData.parentGuardianEmail)"
-              class="error-caption"
-            >
-              {{ getFormValidationError(v$.formData.parentGuardianEmail) }}
-            </div>
-          </div>
-          <input
-            id="parent-email"
-            autocomplete="off"
-            class="uc-form-text-input"
-            type="email"
-            placeholder="Enter your email address"
-            v-model="formData.parentGuardianEmail"
-            v-bind:class="{
-              'uc-form-text-input-invalid': hasFormValidationError(
-                v$.formData.parentGuardianEmail
-              ),
-            }"
-            @blur="v$.formData.parentGuardianEmail.$touch"
-            required
-          />
-        </div>
+        <FormEmail
+          v-if="useParentGuardianSignUpFlow"
+          v-model="formData.parentGuardianEmail"
+          name="parent-email"
+          label="What is your email?"
+          placeholder="Enter your email address"
+          @blur="v$.formData.parentGuardianEmail.$touch"
+        />
 
-        <div v-if="!useParentGuardianSignUpFlow" class="uc-form-element">
-          <div class="uc-row justify-between">
-            <label
-              for="password"
-              v-bind:class="{
-                error: hasFormValidationError(v$.formData.password),
-              }"
-              >Create a password</label
-            >
-            <div
-              v-if="hasFormValidationError(v$.formData.password)"
-              class="error-caption"
-            >
-              {{ getFormValidationError(v$.formData.password) }}
-            </div>
-          </div>
-          <input
-            id="password"
-            autocomplete="new-password"
-            class="uc-form-text-input"
-            type="password"
-            placeholder="Create a password"
-            v-model="formData.password"
-            v-bind:class="{
-              'uc-form-text-input-invalid': hasFormValidationError(
-                v$.formData.password
-              ),
-            }"
-            @blur="v$.formData.password.$touch"
-            required
-          />
-          <div
-            class="metadata"
-            v-bind:class="{
-              'metadata error': hasFormValidationError(v$.formData.password),
-            }"
-          >
-            Must have at least one number, one uppercase letter, one lowercase
-            letter, and be at least 8 characters long.
-          </div>
-        </div>
+        <FormPassword
+          v-if="!useParentGuardianSignUpFlow"
+          v-model="formData.password"
+          label="Create a password"
+          placeholder="Create a password"
+          show-password-requirements
+          @blur="v$.formData.password.$touch"
+        />
 
         <div class="uc-form-element" v-if="requireSignupSource">
           <FormSelect
@@ -380,8 +295,10 @@ import LoggerService from '@/services/LoggerService'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import FormEmail from '@/components/FormEmail.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import FormInput from '@/components/FormInput.vue'
+import FormPassword from '@/components/FormPassword.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import SsoButton from '@/components/SsoButton.vue'
 import AuthService from '@/services/AuthService'
@@ -399,11 +316,13 @@ export default {
   name: 'student-partner-signup-view',
   components: {
     FormPageTemplate,
+    FormEmail,
     FormErrors,
     Autocomplete,
     VerificationBadge,
     SsoButton,
     FormInput,
+    FormPassword,
     FormSelect,
     LineDivider,
   },

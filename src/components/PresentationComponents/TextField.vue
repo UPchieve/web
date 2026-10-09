@@ -17,14 +17,14 @@
           'uc-form-text-input-invalid': errorMessage,
           'has-append': $slots.append,
         }"
-        v-bind="inputAttrs()"
         autocomplete="off"
+        v-bind="inputAttrs()"
       />
       <div v-if="$slots.append" class="text-field-append">
         <slot name="append" />
       </div>
     </div>
-    <div v-if="metadata" class="metadata" :class="{ error: errorMessage }">
+    <div v-if="metadata" class="metadata">
       {{ metadata }}
     </div>
   </div>
@@ -47,7 +47,7 @@ defineProps<{
 const attrs = useAttrs()
 
 function inputAttrs() {
-  return omit(attrs, ['class', 'type', 'autocomplete'])
+  return omit(attrs, ['class', 'type'])
 }
 
 function inputType() {

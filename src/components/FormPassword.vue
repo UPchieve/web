@@ -2,6 +2,7 @@
   <PasswordField
     :id="name"
     :name="name"
+    autocomplete="new-password"
     :placeholder="placeholder"
     :data-testid="testid"
     :model-value="modelValue"
@@ -10,6 +11,7 @@
     :required="isRequired"
     :label="label"
     :error-message="getErrorMessage()"
+    :metadata="showPasswordRequirements ? PASSWORD_HINT : undefined"
     :requirements="
       modelValue && showPasswordRequirements ? passwordRequirements : undefined
     "
@@ -29,6 +31,9 @@ const PASSWORD_REQUIREMENTS = {
   hasLowerCase: { label: 'One lowercase letter', rule: helpers.regex(/[a-z]/) },
   hasOneNumber: { label: 'One number', rule: helpers.regex(/[0-9]/) },
 }
+
+const PASSWORD_HINT =
+  'Must have at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long.'
 
 const props = defineProps({
   isRequired: { type: Boolean, default: true },

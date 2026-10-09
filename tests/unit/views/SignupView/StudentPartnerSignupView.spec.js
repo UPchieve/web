@@ -1,6 +1,7 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import router from '@/router'
 import store from '@/store'
+import vuetify from '@/plugins/vuetify'
 import StudentPartnerSignupView from '@/views/SignupView/StudentPartnerSignupView.vue'
 
 describe('StudentPartnerSignupView', () => {
@@ -8,7 +9,7 @@ describe('StudentPartnerSignupView', () => {
 
   const getWrapper = () => {
     return mount(StudentPartnerSignupView, {
-      global: { plugins: [router, store] },
+      global: { plugins: [router, store, vuetify] },
     })
   }
   beforeEach(() => {

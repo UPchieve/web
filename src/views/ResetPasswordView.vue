@@ -14,19 +14,13 @@
       <div v-if="msg" class="uc-form-text message">{{ msg }}</div>
 
       <form v-else autocomplete="off">
-        <div class="uc-form-element">
-          <label for="inputEmail" class="uc-form-label">Email</label>
-          <input
-            id="inputEmail"
-            class="uc-form-text-input"
-            type="email"
-            placeholder="Enter your email address"
-            v-model="email"
-            required
-            autofocus
-            autocomplete="off"
-          />
-        </div>
+        <FormEmail
+          v-model="email"
+          name="inputEmail"
+          label="Email"
+          placeholder="Enter your email address"
+          is-autofocused
+        />
 
         <button
           class="uc-form-button"
@@ -49,12 +43,14 @@
 
 <script>
 import AuthService from '@/services/AuthService'
+import FormEmail from '@/components/FormEmail.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import Loader from '@/components/Loader.vue'
 import LoggerService from '@/services/LoggerService'
 
 export default {
   components: {
+    FormEmail,
     FormPageTemplate,
     Loader,
   },

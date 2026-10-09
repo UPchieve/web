@@ -7,49 +7,25 @@
       </div>
 
       <form v-if="!showSuccess" autocomplete="off">
-        <div class="uc-form-element">
-          <label for="email">Email</label>
-          <input
-            id="email"
-            class="uc-form-text-input"
-            type="email"
-            placeholder="Enter your email address"
-            v-model="credentials.email"
-            required
-            autofocus
-            autocomplete="off"
-          />
-        </div>
+        <FormEmail
+          v-model="credentials.email"
+          placeholder="Enter your email address"
+          is-autofocused
+        />
 
-        <div class="uc-form-element">
-          <label for="password"> Password </label>
-          <input
-            id="password"
-            class="uc-form-text-input"
-            type="password"
-            placeholder="Create a new password"
-            v-model="credentials.password"
-            required
-            autocomplete="new-password"
-          />
-          <div class="metadata">
-            Must have at least one number, one uppercase letter, one lowercase
-            letter, and be at least 8 characters long.
-          </div>
-        </div>
+        <FormPassword
+          v-model="credentials.password"
+          placeholder="Create a new password"
+          show-password-requirements
+        />
 
-        <div class="uc-form-element">
-          <label for="re-enter-password"> Re-enter Password </label>
-          <input
-            id="re-enter-password"
-            class="uc-form-text-input"
-            type="password"
-            placeholder="Re-enter your new password"
-            v-model="credentials.newpassword"
-            required
-            autocomplete="new-password"
-          />
-        </div>
+        <FormPassword
+          v-model="credentials.newpassword"
+          name="re-enter-password"
+          label="Re-enter Password"
+          placeholder="Re-enter your new password"
+          :show-password-requirements="false"
+        />
 
         <button class="uc-form-button" type="submit" @click.prevent="submit()">
           Reset Password
@@ -71,7 +47,9 @@
 import { mapState } from 'vuex'
 
 import AuthService from '@/services/AuthService'
+import FormEmail from '@/components/FormEmail.vue'
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import FormPassword from '@/components/FormPassword.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
 import LoggerService from '@/services/LoggerService'
@@ -80,7 +58,9 @@ import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 export default {
   components: {
     RecaptchaCaption,
+    FormEmail,
     FormPageTemplate,
+    FormPassword,
     LargeButton,
     Loader,
   },

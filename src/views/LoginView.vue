@@ -158,6 +158,7 @@ function captureSsoClickEvent(provider: SsoProvider): void {
           :placeholder="useNewSignUpFlow ? 'Email' : 'Enter your email address'"
           :is-required="false"
           is-autofocused
+          autocomplete="username"
         />
         <FormPassword
           v-model="credentials.password"
@@ -165,6 +166,7 @@ function captureSsoClickEvent(provider: SsoProvider): void {
           :placeholder="useNewSignUpFlow ? 'Password' : 'Enter your password'"
           :is-required="false"
           :show-password-requirements="false"
+          autocomplete="current-password"
         />
         <router-link to="/resetpassword" class="uc-link subtext">
           Forgot your password?

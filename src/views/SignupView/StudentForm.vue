@@ -293,85 +293,27 @@
         :validation="v$.eligibility.zipCode"
       />
 
-      <div
-        v-if="!skipEligibilityEmail && !isEmailEligibilityHidden"
-        class="uc-form-element"
-      >
-        <div class="uc-row justify-between">
-          <label
-            for="student-email"
-            v-bind:class="{
-              error: hasFormValidationError(v$.eligibility.studentEmail),
-            }"
-            >Email</label
-          >
-          <div
-            v-if="hasFormValidationError(v$.eligibility.studentEmail)"
-            class="error-caption"
-          >
-            {{ getFormValidationError(v$.eligibility.studentEmail) }}
-          </div>
-        </div>
-        <input
-          id="student-email"
-          data-testid="student-email-input"
-          autocomplete="off"
-          class="uc-form-text-input"
-          type="email"
+      <div v-if="!skipEligibilityEmail && !isEmailEligibilityHidden">
+        <FormEmail
+          v-model="eligibility.studentEmail"
+          name="student-email"
+          testid="student-email-input"
           :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
           :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
-          v-model="eligibility.studentEmail"
-          v-bind:class="{
-            'uc-form-text-input-invalid': hasFormValidationError(
-              v$.eligibility.studentEmail
-            ),
-          }"
+          :metadata="`We will only use this email to notify ${getFormLabelIdentifier} if ${getFormLabelIdentifierPossessive} eligibility status changes in the future.`"
           @blur="v$.eligibility.studentEmail.$touch"
-          required
         />
-        <div class="metadata">
-          We will only use this email to notify
-          {{ getFormLabelIdentifier }} if
-          {{ getFormLabelIdentifierPossessive }}
-          eligibility status changes in the future.
-        </div>
 
-        <div v-if="useParentGuardianSignUpFlow" class="uc-form-element">
-          <div class="uc-row justify-between">
-            <label
-              for="parent-guardian-email"
-              v-bind:class="{
-                error: hasFormValidationError(
-                  v$.eligibility.parentGuardianEmail
-                ),
-              }"
-              >Your Email</label
-            >
-            <div
-              v-if="hasFormValidationError(v$.eligibility.parentGuardianEmail)"
-              class="error-caption"
-            >
-              {{ getFormValidationError(v$.eligibility.parentGuardianEmail) }}
-            </div>
-          </div>
-          <input
-            id="parent-guardian-email"
-            data-testid="parent-guardian-email-input"
-            autocomplete="off"
-            class="uc-form-text-input"
-            type="email"
-            placeholder="Enter your email address"
-            aria-label="Enter your email address"
-            v-model="eligibility.parentGuardianEmail"
-            v-bind:class="{
-              'uc-form-text-input-invalid': hasFormValidationError(
-                v$.eligibility.parentGuardianEmail
-              ),
-            }"
-            @blur="v$.eligibility.parentGuardianEmail.$touch"
-            required
-          />
-        </div>
+        <FormEmail
+          v-if="useParentGuardianSignUpFlow"
+          v-model="eligibility.parentGuardianEmail"
+          name="parent-guardian-email"
+          testid="parent-guardian-email-input"
+          label="Your Email"
+          placeholder="Enter your email address"
+          aria-label="Enter your email address"
+          @blur="v$.eligibility.parentGuardianEmail.$touch"
+        />
       </div>
 
       <button
@@ -550,83 +492,22 @@
         :validation="v$.profile.lastName"
       />
 
-      <div v-if="!eligibility.studentEmail" class="uc-form-element">
-        <div class="uc-row justify-between">
-          <label
-            for="email"
-            v-bind:class="{
-              error: hasFormValidationError(v$.credentials.email),
-            }"
-            >Email</label
-          >
-          <div
-            v-if="hasFormValidationError(v$.credentials.email)"
-            class="error-caption"
-          >
-            {{ getFormValidationError(v$.credentials.email) }}
-          </div>
-        </div>
-        <input
-          id="email"
-          autocomplete="off"
-          class="uc-form-text-input"
-          type="email"
-          :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
-          :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
-          v-model="credentials.email"
-          v-bind:class="{
-            'uc-form-text-input-invalid': hasFormValidationError(
-              v$.credentials.email
-            ),
-          }"
-          @blur="v$.credentials.email.$touch"
-          required
-        />
-      </div>
+      <FormEmail
+        v-if="!eligibility.studentEmail"
+        v-model="credentials.email"
+        :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
+        :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
+        @blur="v$.credentials.email.$touch"
+      />
 
-      <div class="uc-form-element">
-        <div class="uc-row justify-between">
-          <label
-            for="password"
-            v-bind:class="{
-              error: hasFormValidationError(v$.credentials.password),
-            }"
-            >Password</label
-          >
-          <div
-            v-if="hasFormValidationError(v$.credentials.password)"
-            class="error-caption"
-          >
-            {{ getFormValidationError(v$.credentials.password) }}
-          </div>
-        </div>
-        <input
-          id="password"
-          data-testid="student-password-input"
-          class="uc-form-text-input"
-          type="password"
-          autocomplete="new-password"
-          placeholder="Create a password"
-          aria-label="Create a password"
-          v-model="credentials.password"
-          v-bind:class="{
-            'uc-form-text-input-invalid': hasFormValidationError(
-              v$.credentials.password
-            ),
-          }"
-          @blur="v$.credentials.password.$touch"
-          required
-        />
-        <div
-          class="metadata"
-          v-bind:class="{
-            'metadata error': hasFormValidationError(v$.credentials.password),
-          }"
-        >
-          Must have at least one number, one uppercase letter, one lowercase
-          letter, and be at least 8 characters long.
-        </div>
-      </div>
+      <FormPassword
+        v-model="credentials.password"
+        testid="student-password-input"
+        placeholder="Create a password"
+        aria-label="Create a password"
+        show-password-requirements
+        @blur="v$.credentials.password.$touch"
+      />
 
       <button
         class="uc-form-button"
@@ -686,6 +567,7 @@ import FormErrors from '@/components/FormErrors.vue'
 import config from '@/config'
 import * as signupUtils from '@/utils/signup-utils'
 import FormEmail from '@/components/FormEmail.vue'
+import FormPassword from '@/components/FormPassword.vue'
 import FormInput from '@/components/FormInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import InternationalMessage from './InternationalMessage.vue'
@@ -698,6 +580,7 @@ export default {
     GoogleLogo,
     FormErrors,
     FormEmail,
+    FormPassword,
     FormInput,
     FormSelect,
     InternationalMessage,
