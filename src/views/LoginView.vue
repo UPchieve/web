@@ -13,7 +13,7 @@ import LineDivider from '@/components/LineDivider.vue'
 import SsoButton from '@/components/SsoButton.vue'
 import Spinner from '@/components/Spinner.vue'
 import { EVENTS } from '@/consts'
-import config from '../config'
+import config from '@/config'
 import { getQueryString } from '@/utils/router-utils'
 
 const route = useRoute()

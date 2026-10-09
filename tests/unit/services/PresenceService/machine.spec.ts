@@ -6,7 +6,6 @@ import { createActor } from 'xstate'
 import { activityMachine } from '@/services/PresenceService/machine'
 import * as PresenceService from '@/services/PresenceService'
 
-vi.mock('../../../services/NetworkService')
 vi.mock('@/services/PresenceService')
 
 const getStore = (args: { state?: any } = {}) => {

@@ -7,9 +7,9 @@ export enum MESSAGE_ALIGNMENT {
 </script>
 
 <script lang="ts" setup>
-import TypingIndicatorComponent from '../SessionView/TypingIndicatorComponent.vue'
-import MessageComponent from '../SessionView/MessageComponent.vue'
-import WidgetMessageComponent from '../SessionView/WidgetMessageComponent.vue'
+import TypingIndicatorComponent from '@/views/SessionView/TypingIndicatorComponent.vue'
+import MessageComponent from '@/views/SessionView/MessageComponent.vue'
+import WidgetMessageComponent from '@/views/SessionView/WidgetMessageComponent.vue'
 import { DISPLAY_CONTEXT } from '@/constants/bot-conversations'
 const props = defineProps<{
   messages: Partial<{

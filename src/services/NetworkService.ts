@@ -1,6 +1,6 @@
 import errcode from 'err-code'
 import promiseRetry from 'promise-retry'
-import config from '../config'
+import config from '@/config'
 import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'

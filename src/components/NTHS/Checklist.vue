@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import Spinner from '../Spinner.vue'
+import Spinner from '@/components/Spinner.vue'
 import {
   type ChecklistItem,
   toggleCheckbox,

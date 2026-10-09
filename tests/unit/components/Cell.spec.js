@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 
-import Cell from '../../../src/components/AvailabilityGrid/Cell.vue'
+import Cell from '@/components/AvailabilityGrid/Cell.vue'
 
 it('renders the cell in the unselectable state', () => {
   const wrapper = mount(Cell, {

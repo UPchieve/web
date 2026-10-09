@@ -5,7 +5,6 @@ import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import { storeOptions } from '@/store'
 import ModerationService from '@/services/ModerationService'
 
-vi.mock('../../../../../services/ModerationService')
 vi.mock('mathlive', () => ({}))
 window.mathVirtualKeyboard = { container: null, hide: vi.fn() }
 

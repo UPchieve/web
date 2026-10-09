@@ -1,4 +1,4 @@
-import config from '../config'
+import config from '@/config'
 import { EVENTS } from '@/consts'
 
 const GLEAP_TRACK_EVENTS = new Set([

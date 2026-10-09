@@ -23,7 +23,7 @@ import { mapState as mapPiniaState } from 'pinia'
 import { useAppHeaderStore } from '@/stores/app/header.js'
 import SidebarInfo from './SidebarInfo.vue'
 import SidebarLinks from './SidebarLinks.vue'
-import config from '../../../config'
+import config from '@/config'
 
 export default {
   components: { SidebarInfo, SidebarLinks },

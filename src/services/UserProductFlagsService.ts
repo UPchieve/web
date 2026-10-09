@@ -1,6 +1,6 @@
 import NetworkService from './NetworkService'
 import AnalyticsService from './AnalyticsService'
-import { EVENTS } from '../consts'
+import { EVENTS } from '@/consts'
 import type { Store } from 'vuex'
 import type { RootState } from '@/store'
 import type { ImpactStudyCampaign } from '@/types'

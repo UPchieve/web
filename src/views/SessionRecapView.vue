@@ -272,7 +272,7 @@ import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg?skipsvgo'
 import { dayjs } from '@/utils/time-utils'
 import Quill from 'quill'
 import { mapGetters, mapState } from 'vuex'
-import config from '../config'
+import config from '@/config'
 import { socket } from '@/socket'
 import { markRaw } from 'vue'
 

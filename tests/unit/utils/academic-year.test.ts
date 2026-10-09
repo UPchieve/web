@@ -1,6 +1,6 @@
 import { afterEach } from 'vitest'
-import { dayjs } from '../../../src/utils/time-utils'
-import { getAcademicYear } from '../../../src/utils/academic-year'
+import { dayjs } from '@/utils/time-utils'
+import { getAcademicYear } from '@/utils/academic-year'
 
 describe('getAcademicYear', () => {
   type TestCase = {

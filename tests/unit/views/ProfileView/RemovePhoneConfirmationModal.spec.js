@@ -5,7 +5,7 @@ import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirm
 import NetworkService from '@/services/NetworkService'
 import { storeOptions } from '@/store'
 
-vi.mock('../../../../src/services/NetworkService')
+vi.mock('@/services/NetworkService')
 describe('RemovePhoneConfirmationModal', () => {
   let defaultUserState
   const mockCancel = vi.fn()

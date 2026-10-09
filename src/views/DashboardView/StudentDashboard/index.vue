@@ -85,7 +85,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import DashboardBanner from '../DashboardBanner.vue'
+import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
 import UpdateSchoolModal from './UpdateSchoolModal.vue'

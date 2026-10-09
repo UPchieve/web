@@ -151,7 +151,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import DashboardBanner from '../DashboardBanner.vue'
+import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
 import NextTaskModal from './NextTaskModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
@@ -164,7 +164,7 @@ import OnboardingIcon from '@/assets/onboarding.svg'
 import TrainingIcon from '@/assets/training_icon.svg'
 import RingingNotificationBellIcon from '@/assets/icons/ringing-notification-bell.svg'
 import SimpleRingingBellIcon from '@/assets/icons/simple-ringing-notification-bell.svg'
-import config from '../../../config'
+import config from '@/config'
 import { vTooltip } from 'maz-ui'
 import ShareMilestoneModal from '@/views/DashboardView/VolunteerDashboard/ShareMilestoneModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'

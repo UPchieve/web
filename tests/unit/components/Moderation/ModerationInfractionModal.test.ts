@@ -1,6 +1,6 @@
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { mount } from '@vue/test-utils'
-import ModerationInfractionModal from '../../../../src/components/Moderation/ModerationInfractionModal.vue'
+import ModerationInfractionModal from '@/components/Moderation/ModerationInfractionModal.vue'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import { merge } from 'lodash-es'

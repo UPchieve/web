@@ -1,12 +1,10 @@
 import { vi, beforeEach, describe, it, expect, afterEach } from 'vitest'
-import * as VolunteerSignUpService from '../../../../src/services/SignUpService/VolunteerSignUpService'
-import NetworkService, {
-  NetworkError,
-} from '../../../../src/services/NetworkService'
+import * as VolunteerSignUpService from '@/services/SignUpService/VolunteerSignUpService'
+import NetworkService, { NetworkError } from '@/services/NetworkService'
 import { faker } from '@faker-js/faker'
-import LoggerService from '../../../../src/services/LoggerService'
+import LoggerService from '@/services/LoggerService'
 
-vi.mock('../../../../src/services/NetworkService')
+vi.mock('@/services/NetworkService')
 
 const mockedNetworkService = vi.mocked(NetworkService)
 

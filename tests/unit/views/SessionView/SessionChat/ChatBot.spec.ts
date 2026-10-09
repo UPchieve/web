@@ -8,10 +8,8 @@ import { nextTick } from 'vue'
 import {
   getSessionEndDMsMessage,
   getSessionEndedMessage,
-} from '../../../../../src/utils/chatbot-utils'
+} from '@/utils/chatbot-utils'
 import { dayjs } from '@/utils/time-utils'
-
-vi.mock('../../../../../services/NetworkService')
 
 describe('ChatBot', () => {
   beforeEach(() => {

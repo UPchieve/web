@@ -3,7 +3,7 @@ import {
   hoursToHoursAndMinutes,
   minutesToHoursAndMinutes,
   getCurrentSchoolYearStartDate,
-} from '../../../src/utils/time-utils'
+} from '@/utils/time-utils'
 import { dayjs } from '@/utils/time-utils'
 
 describe('hoursToHoursAndMinutes', () => {

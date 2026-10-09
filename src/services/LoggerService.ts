@@ -1,5 +1,5 @@
 import { isNavigationFailure, NavigationFailureType } from 'vue-router'
-import { isSocketDisconnectError } from '../utils/custom-error-handlers'
+import { isSocketDisconnectError } from '@/utils/custom-error-handlers'
 
 const newrelic = window.newrelic
 

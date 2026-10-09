@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
-import RecentSubjectCard from '../../../src/views/DashboardView/StudentDashboard/SubjectSelection/RecentSubjectCard.vue'
+import RecentSubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/RecentSubjectCard.vue'
 
 const subject = {
   id: 2,

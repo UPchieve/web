@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { interleave } from '../../../src/utils/array-utils'
+import { interleave } from '@/utils/array-utils'
 
 describe('Interleave', () => {
   it.each([

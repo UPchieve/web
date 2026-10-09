@@ -1,12 +1,12 @@
 import { shallowMount, flushPromises } from '@vue/test-utils'
 import SessionHistoryView from '@/views/SessionHistoryView.vue'
 import { describe, beforeEach, it, vi } from 'vitest'
-import NetworkService from '../../../src/services/NetworkService'
+import NetworkService from '@/services/NetworkService'
 import { createStore } from 'vuex'
 import { nextTick } from 'vue'
 import subjectsModule from '@/store/modules/subjects'
 
-vi.mock('../../../src/services/NetworkService')
+vi.mock('@/services/NetworkService')
 
 const mockedNetworkService = vi.mocked(NetworkService)
 

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import LargeButton from '../LargeButton.vue'
-import AnalyticsService from '../../services/AnalyticsService.js'
+import LargeButton from '@/components/LargeButton.vue'
+import AnalyticsService from '@/services/AnalyticsService.js'
 import { EVENTS } from '@/consts'
 import { useRouter } from 'vue-router'
 import UserService from '@/services/UserService'

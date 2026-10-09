@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue'
-import AnalyticsService from '../services/AnalyticsService.js'
+import AnalyticsService from '@/services/AnalyticsService.js'
 import { EVENTS } from '@/consts'
 import { useStore } from 'vuex'
 import BecomeVolunteerAd from './BecomeVolunteerAd.vue'

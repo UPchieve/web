@@ -305,7 +305,7 @@ import Callout from '@/components/Callout.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
-import { getAcademicYear } from '../utils/academic-year'
+import { getAcademicYear } from '@/utils/academic-year'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 

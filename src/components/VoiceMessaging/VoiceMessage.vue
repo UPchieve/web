@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import config from '../../config'
+import config from '@/config'
 import { ref } from 'vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import { EVENTS } from '../../consts'
+import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   message: { contents: string; transcript?: string }

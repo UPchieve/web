@@ -51,5 +51,38 @@ export default defineConfigWithVueTs([
       'no-undef': 'error',
     },
   },
+  {
+    files: ['src/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '(^|/)\\.\\.(/|$)',
+              message:
+                'Import from outside this folder with @/ instead of ../.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['tests/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^(\\.{1,2}/)+src(/|$)',
+              message: 'Import from src with @/ instead of ../.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   globalIgnores(['**/node_modules/', 'tests/setup.js']),
 ])

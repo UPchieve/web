@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, it, vi, describe } from 'vitest'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 
-vi.mock('../../../../src/services/NetworkService')
+vi.mock('@/services/NetworkService')
 
 describe('Session store', () => {
   const currentTime = new Date()

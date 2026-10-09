@@ -91,7 +91,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import NetworkService from '../services/NetworkService'
+import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import isEmail from 'validator/lib/isEmail'

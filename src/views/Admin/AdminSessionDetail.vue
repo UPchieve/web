@@ -179,7 +179,7 @@ import SurveyResponsePreview from '@/components/Admin/SurveyResponsePreview.vue'
 import Quill from 'quill'
 import SessionFlags from '@/components/Admin/SessionFlags.vue'
 import Separator from '@/components/Separator.vue'
-import config from '../../config'
+import config from '@/config'
 import { SESSION_TOOL_TYPES } from '@/consts'
 import { markRaw } from 'vue'
 

@@ -7,8 +7,8 @@ import {
 import type { AffiliationStatus } from '@/services/NTHSGroupService'
 import SchoolForm from './SchoolAffiliation/Form.vue'
 import { useMachine } from '@xstate/vue'
-import LargeButton from '../LargeButton.vue'
-import Spinner from '../Spinner.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import Spinner from '@/components/Spinner.vue'
 import HQSection from './HQ/HQSection.vue'
 import { computed, useId } from 'vue'
 

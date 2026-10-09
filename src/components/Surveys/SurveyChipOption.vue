@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import Chip from '../Chip.vue'
+import Chip from '@/components/Chip.vue'
 export default {
   name: 'SurveyChipOption',
   props: {

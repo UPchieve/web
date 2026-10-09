@@ -1,5 +1,5 @@
 import isEmail from 'validator/lib/isEmail'
-import errorFromHttpResponse from '../utils/error-from-http-response'
+import errorFromHttpResponse from '@/utils/error-from-http-response'
 import AnalyticsService from './AnalyticsService'
 import LoggerService from './LoggerService'
 import NetworkService from './NetworkService'

@@ -5,7 +5,7 @@ import {
   isTargetEmailDomain,
   setPermanentlyDismissSecondaryEmailModal,
   setTemporarilyDismissSecondaryEmailModal,
-} from '../../../src/utils/secondary-email-modal-utils'
+} from '@/utils/secondary-email-modal-utils'
 import { dayjs } from '@/utils/time-utils'
 
 const userId = 'user123'

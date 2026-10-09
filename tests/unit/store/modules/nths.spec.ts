@@ -13,7 +13,7 @@ import {
 } from '@/services/NTHSApplicationService'
 import { CheckboxStatus, type ChecklistItem } from '@/services/NTHSGroupService'
 
-vi.mock('../../../../src/services/NetworkService')
+vi.mock('@/services/NetworkService')
 vi.mock('@/services/LoggerService', () => ({
   default: { noticeError: vi.fn() },
 }))

@@ -827,7 +827,7 @@ import {
   INELIGIBLE_LOCAL_STORAGE_KEY,
 } from '@/consts'
 import FormErrors from '@/components/FormErrors.vue'
-import config from '../../config'
+import config from '@/config'
 import * as signupUtils from '@/utils/signup-utils'
 import FormEmail from '@/components/FormEmail.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'

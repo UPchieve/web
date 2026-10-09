@@ -6,7 +6,7 @@ import {
   visibilityWatcher,
   pagehideWatcher,
 } from './actors'
-import * as PresenceService from '../PresenceService'
+import * as PresenceService from '@/services/PresenceService'
 import type { RootState } from '@/store'
 import { Store } from 'vuex'
 

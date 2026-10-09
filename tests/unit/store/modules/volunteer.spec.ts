@@ -2,7 +2,7 @@ import { it, vi, describe, expect, beforeEach } from 'vitest'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 
-vi.mock('../../../../src/services/PresenceService')
+vi.mock('@/services/PresenceService')
 
 beforeEach(() => {
   vi.resetAllMocks()

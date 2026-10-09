@@ -4,7 +4,7 @@ import AboutThisSessionSurvey from '@/components/AboutThisSessionSurvey.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 
-vi.mock('../../../../services/AnalyticsService')
+vi.mock('@/services/AnalyticsService')
 
 describe('AboutThisSessionSurvey', () => {
   beforeEach(() => {
@@ -63,7 +63,10 @@ describe('AboutThisSessionSurvey', () => {
   it('Should emit events with the response data', async () => {
     const wrapper = getWrapper()
     const captureEventSpy = vi.spyOn(AnalyticsService, 'captureEvent')
-    expect(captureEventSpy).not.toHaveBeenCalled()
+    expect(captureEventSpy).not.toHaveBeenCalledWith(
+      EVENTS.SELECTED_ABOUT_THIS_SESSION_RATING,
+      expect.anything()
+    )
 
     await wrapper.find(lowRatingButtonSelector).trigger('click')
     expect(captureEventSpy).toHaveBeenCalledWith(
