@@ -5,7 +5,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useAppBannerStore } from '@/stores/app/banner'
 import BannerTemplate from './BannerTemplate.vue'
 import MobileAppNoticeBanner from './MobileAppNoticeBanner.vue'
 
@@ -15,13 +16,12 @@ export default {
     MobileAppNoticeBanner,
   },
   computed: {
-    ...mapState({
-      bannerComponent: (state) => state.app.banner.component,
-    }),
+    ...mapState(useAppBannerStore, { bannerComponent: 'component' }),
   },
   methods: {
+    ...mapActions(useAppBannerStore, { hideBanner: 'hide' }),
     onCancel() {
-      this.$store.dispatch('app/banner/hide')
+      this.hideBanner()
     },
   },
 }

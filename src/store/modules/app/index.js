@@ -1,7 +1,6 @@
 import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import sidebar from './sidebar'
 import modal from './modal'
-import banner from './banner'
 import { useAppHeaderStore } from '@/stores/app/header'
 
 export default {
@@ -9,7 +8,6 @@ export default {
   modules: {
     sidebar,
     modal,
-    banner,
   },
   state: {
     windowWidth: 0,

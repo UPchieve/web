@@ -20,7 +20,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { mapState as mapPiniaState } from 'pinia'
-import { useAppHeaderStore } from '@/stores/app/header.js'
+import { useAppHeaderStore } from '@/stores/app/header'
 import SidebarInfo from './SidebarInfo.vue'
 import SidebarLinks from './SidebarLinks.vue'
 import config from '@/config'

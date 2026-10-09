@@ -9,7 +9,7 @@
           <app-header v-show="showHeader" />
           <app-sidebar v-if="showSidebar" />
           <app-modal v-if="showModal" />
-          <app-banner v-if="showBanner" />
+          <app-banner v-if="bannerIsShown" />
           <div
             :class="{
               'App-router-view-wrapper': true,
@@ -35,8 +35,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { mapState as mapPiniaState } from 'pinia'
-import { useAppHeaderStore } from '@/stores/app/header.js'
+import { mapState as mapPiniaState, mapActions as mapPiniaActions } from 'pinia'
+import { useAppHeaderStore } from '@/stores/app/header'
+import { useAppBannerStore } from '@/stores/app/banner'
 import { IonApp, IonContent } from '@ionic/vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
@@ -142,6 +143,10 @@ export default {
       .removeEventListener('change', this.updateMotionPreference)
   },
   methods: {
+    ...mapPiniaActions(useAppBannerStore, {
+      showBanner: 'show',
+      hideBanner: 'hide',
+    }),
     endFade() {
       this.$store.commit('app/setFadeInContent', false)
     },
@@ -234,11 +239,13 @@ export default {
   },
   computed: {
     ...mapPiniaState(useAppHeaderStore, { showHeader: 'isShown' }),
+    ...mapPiniaState(useAppBannerStore, {
+      bannerIsShown: 'isShown',
+      bannerComponent: 'component',
+    }),
     ...mapState({
       showSidebar: (state) => state.app.sidebar.isShown,
       showModal: (state) => state.app.modal.isShown,
-      showBanner: (state) => state.app.banner.isShown,
-      bannerComponent: (state) => state.app.banner.component,
       isMobileApp: (state) => state.app.isMobileApp,
       isWebPageHidden: (state) => state.app.isWebPageHidden,
       user: (state) => state.user.user,
@@ -322,7 +329,7 @@ export default {
         FeatureFlagService.setPersonPropertiesForFlags(userProps)
 
         if (this.mobileMode && !this.isMobileApp && this.isStudent) {
-          this.$store.dispatch('app/banner/show', {
+          this.showBanner({
             component: 'MobileAppNoticeBanner',
           })
         }
@@ -371,7 +378,7 @@ export default {
      */
     mobileMode(isMobileMode) {
       if (!isMobileMode && this.bannerComponent === 'MobileAppNoticeBanner')
-        this.$store.dispatch('app/banner/hide')
+        this.hideBanner()
     },
 
     /**
