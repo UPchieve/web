@@ -1,2 +1,11 @@
 # Global owners
 *     @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
+
+# Presentation components and design tokens
+/src/components/PresentationComponents/   @iuliarontu @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
+/src/scss/setup/_colors.scss              @iuliarontu @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
+/src/scss/setup/_fonts.scss               @iuliarontu @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
+/src/scss/setup/_spacing-tokens.scss      @iuliarontu @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
+/src/scss/setup/_border-radius.scss       @iuliarontu @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
+/src/scss/setup/_breakpoints.scss         @iuliarontu @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
+/src/scss/setup/_transitions.scss         @iuliarontu @thedevelopnik @treystevens @alexlindsay @chrisshaw @jamiekasulis @sammynave @liseidybueno @kasozi.wilson1 @ben.wheeler2
