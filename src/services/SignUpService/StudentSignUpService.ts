@@ -5,7 +5,7 @@ import type {
   RouteLocationRaw,
 } from 'vue-router'
 import store from '@/store'
-import { GRADES, EVENTS } from '@/consts'
+import { GRADES, EVENTS, BIG_FUTURE_INTRO_COPY } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService from '@/services/AuthService'
 import * as SignUpService from '@/services/SignUpService'
@@ -33,7 +33,6 @@ import NetworkService, { type NetworkError } from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import { SsoProvider } from '@/services/SsoService'
 import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
-import featureFlags from '@/store/modules/feature-flags'
 
 const RoutePath = {
   account: `/sign-up/student/${SignUpPage.account}`,
@@ -140,9 +139,7 @@ export function getPageDetails(
 ): PageDetailsUnion<StudentSignUpFormData> {
   return getFilteredPageDetails(() => {
     if (isInternationalRoute(to)) {
-      return featureFlags.getters['showNewInternationalMessage']
-        ? getExperimentalIntlDetails()
-        : getInternationalPageDetails()
+      return getExperimentalIntlDetails()
     }
 
     if (isIneligibleRoute(to)) {
@@ -239,9 +236,8 @@ function getEligibilityPageDetails(
   }
 
   function getSubheaderText() {
-    const bfIntroCopy = store.getters['featureFlags/bfIntroCopy']
-    if (isBigFutureStudent() && bfIntroCopy) {
-      return bfIntroCopy
+    if (isBigFutureStudent()) {
+      return BIG_FUTURE_INTRO_COPY
     }
     if (isCollegeConfidentialStudent()) {
       return 'Students who use UPchieve get better grades in their classes and are more competitive during college admission season! Sign up for free access to the 24/7 academic support that can help you achieve your dream.'
@@ -395,46 +391,6 @@ function getExperimentalIntlDetails(): PageDetail<{}> {
       getRow('uc-row justify-center', {
         element: 'InternationalMessage',
       }),
-    ],
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-function getInternationalPageDetails(): PageDetail<{}> {
-  return {
-    backgroundLayout: 'full',
-    submitAction: () => {
-      return [{ path: '/contact' }, null]
-    },
-    classes: 'text-center screen-narrow',
-    rows: [
-      getRow('uc-row justify-center', {
-        element: 'error-badge',
-        classes: 'error-badge',
-      }),
-      getRow(
-        'justify-center center mt-4 pre-wrap',
-        getTextElement('h1', "Looks like you're not in\nthe US!")
-      ),
-      getRow(
-        'justify-center center mt-3 pre-wrap',
-        getTextElement(
-          'p',
-          "UPchieve is currently only available to students in the US.\nWe're sorry for the inconvenience! 😔"
-        )
-      ),
-      getRow(
-        'justify-center center mt-3 italic pre-wrap',
-        getTextElement(
-          'p',
-          "Live in the US and still seeing this message?\nMake sure you're not using a VPN."
-        )
-      ),
-      getRow(
-        'justify-center mt-3 el-gap-sm',
-        getRouterLinkElement('Contact us', '/contact'),
-        getTextElement('p', 'if you still need help!')
-      ),
     ],
   }
 }
@@ -772,8 +728,6 @@ function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
 
 function getSsoSectionElements(): FormRow[] {
   const isMobileMode = store.getters['app/mobileMode']
-  const isClassLinkSsoEnabled =
-    store.getters['featureFlags/isClassLinkSsoEnabled']
   const rows: FormRow[] = []
 
   if (!isMobileMode)
@@ -782,13 +736,11 @@ function getSsoSectionElements(): FormRow[] {
         'mt-4',
         getSsoButton(createAccountWithGoogle, 'Google', SsoProvider.GOOGLE),
         getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER),
-        isClassLinkSsoEnabled
-          ? getSsoButton(
-              createAccountWithClassLink,
-              'ClassLink',
-              SsoProvider.CLASSLINK
-            )
-          : undefined
+        getSsoButton(
+          createAccountWithClassLink,
+          'ClassLink',
+          SsoProvider.CLASSLINK
+        )
       )
     )
   else {
@@ -800,20 +752,16 @@ function getSsoSectionElements(): FormRow[] {
       getRow(
         'mt-3',
         getSsoButton(createAccountWithClever, 'Clever', SsoProvider.CLEVER)
-      )
-    )
-
-    if (isClassLinkSsoEnabled)
-      rows.push(
-        getRow(
-          'mt-3',
-          getSsoButton(
-            createAccountWithClassLink,
-            'ClassLink',
-            SsoProvider.CLASSLINK
-          )
+      ),
+      getRow(
+        'mt-3',
+        getSsoButton(
+          createAccountWithClassLink,
+          'ClassLink',
+          SsoProvider.CLASSLINK
         )
       )
+    )
   }
   rows.push(
     getRow(

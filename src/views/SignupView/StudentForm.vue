@@ -11,14 +11,12 @@
     </h1>
     <div
       v-if="
-        showBigFutureIntroCopy &&
+        partnerKey === 'bigfuture' &&
         !showBigFutureUpdatedEligibilityIntroCopy &&
         eligibilitySubStep !== 'secondary'
       "
     >
-      <p class="uc-form-text">
-        {{ bfIntroCopy }}
-      </p>
+      <p class="uc-form-text">{{ bigFutureIntroCopy }}</p>
     </div>
     <div v-if="eligibilitySubStep === 'secondary'">
       <p class="uc-form-text">
@@ -31,42 +29,13 @@
       <p class="uc-form-text">Just one more step to access free tutoring!</p>
     </div>
     <div v-if="isCollegeConfidential">
-      <div v-if="ccIntroCopy === 'get-that-a'">
-        <h1 class="uc-form-header">Get that A you deserve!</h1>
-        <p class="uc-form-text">
-          Students who use UPchieve get better grades in their classes and are
-          more competitive during college admission season! Sign up for free
-          access to the 24/7 academic support that can help you achieve your
-          dream.
-        </p>
-      </div>
-      <div v-else-if="ccIntroCopy === 'stuck-on-problem'">
-        <h1 class="uc-form-header">Stuck on a problem? Our tutors can help!</h1>
-        <p class="uc-form-text">
-          UPchieve connects students with tutors that will help them during any
-          part of a homework problem. Why struggle alone? Sign up for free
-          access to our thousands of 1:1 24/7 tutors that can help you whenever
-          you need it.
-        </p>
-      </div>
-      <div v-else-if="ccIntroCopy === 'grade-focused'">
-        <h1 class="uc-form-header">
-          6th to 12th grade, UPchieve has you covered!
-        </h1>
-        <p class="uc-form-text">
-          UPchieve provides students with trained 1:1 coaches who can follow you
-          in your academic journey and prepare you for future success. Why go
-          through school alone? Sign up for free 24/7 tutoring and college prep!
-        </p>
-      </div>
-      <div v-else>
-        <h1 class="uc-form-header">Welcome College Confidential Student!</h1>
-        <p class="uc-form-text">
-          UPchieve is partnering with College Confidential to offer 100% free,
-          online college counseling and tutoring available 24/7! Share some
-          quick info below to see if you're eligible.
-        </p>
-      </div>
+      <h1 class="uc-form-header">Get that A you deserve!</h1>
+      <p class="uc-form-text">
+        Students who use UPchieve get better grades in their classes and are
+        more competitive during college admission season! Sign up for free
+        access to the 24/7 academic support that can help you achieve your
+        dream.
+      </p>
     </div>
     <div v-if="isCodeDotOrgStudent" data-testid="code-dot-org-custom-copy">
       Create an account now to access FREE, 24/7 tutoring in all your classes,
@@ -827,31 +796,7 @@
   </div>
 
   <div v-else-if="step === 'international'">
-    <InternationalMessage v-if="showNewInternationalMessage" />
-    <div v-else class="uc-column justify-center items-center">
-      <error-badge />
-      <h1 class="uc-form-header center">
-        Looks like you're not in <br />the U.S.!
-      </h1>
-
-      <p class="international-availability-info">
-        UPchieve is currently only available to students in the U.S. We're sorry
-        for the inconvenience! 😔
-      </p>
-
-      <p>
-        Applying for college?
-        <a href="/sign-up/volunteer/account">Becoming a volunteer</a> is a great
-        way to improve your application!
-      </p>
-
-      <p class="international-contact-us">
-        Live in the U.S. and still seeing this message? Make sure you're not
-        using a VPN.
-        <router-link to="/contact" class="uc-link">Contact Us</router-link> if
-        you still need help!
-      </p>
-    </div>
+    <InternationalMessage />
   </div>
   <div v-else class="uc-form-body">Unexpected Error</div>
 </template>
@@ -875,7 +820,12 @@ import AnalyticsService from '@/services/AnalyticsService'
 import VerificationBadge from '@/assets/verification.svg'
 import ErrorBadge from '@/assets/error_badge.svg'
 import GoogleLogo from '@/assets/google_logo.svg'
-import { EVENTS, GRADES, INELIGIBLE_LOCAL_STORAGE_KEY } from '@/consts'
+import {
+  BIG_FUTURE_INTRO_COPY,
+  EVENTS,
+  GRADES,
+  INELIGIBLE_LOCAL_STORAGE_KEY,
+} from '@/consts'
 import FormErrors from '@/components/FormErrors.vue'
 import config from '../../config'
 import * as signupUtils from '@/utils/signup-utils'
@@ -993,7 +943,6 @@ export default {
       studentPartner: undefined,
       // Reach Studies:
       isCollegeConfidential: false,
-      showBigFutureIntroCopy: false,
       showCodeDotOrgIntroCopy: false,
       skipEligibilityEmail: false,
       useParentGuardianSignUpFlow: false,
@@ -1046,14 +995,6 @@ export default {
 
       if (
         this.partnerKey === 'bigfuture' &&
-        this.isBfIntroCopyEnabled &&
-        this.bfIntroCopy
-      ) {
-        this.showBigFutureIntroCopy = true
-      }
-
-      if (
-        this.partnerKey === 'bigfuture' &&
         this.isBigFutureEmailFirstFlowActive
       ) {
         this.showBigFutureEmailFirstFlow = true
@@ -1072,10 +1013,7 @@ export default {
         AnalyticsService.captureEvent(EVENTS.SKIPPING_ELIGIBILITY_EMAIL)
       }
 
-      if (
-        this.partnerKey === 'bigfuture' &&
-        this.isBigFutureTwoQuestionEligiblityFlowActive
-      ) {
+      if (this.partnerKey === 'bigfuture') {
         this.eligibilitySubStep = 'primary'
         this.skipEligibilityEmail = true
         AnalyticsService.captureEvent(
@@ -1101,16 +1039,13 @@ export default {
   },
   computed: {
     ...mapGetters({
-      ccIntroCopy: 'featureFlags/ccIntroCopy',
-      isBfIntroCopyEnabled: 'featureFlags/isBfIntroCopyEnabled',
-      bfIntroCopy: 'featureFlags/bfIntroCopy',
       eligibilityEmail: 'featureFlags/eligibilityEmail',
       isBigFutureEmailFirstFlowActive:
         'featureFlags/isBigFutureEmailFirstFlowActive',
-      isBigFutureTwoQuestionEligiblityFlowActive:
-        'featureFlags/isBigFutureTwoQuestionEligiblityFlowActive',
-      showNewInternationalMessage: 'featureFlags/showNewInternationalMessage',
     }),
+    bigFutureIntroCopy() {
+      return BIG_FUTURE_INTRO_COPY
+    },
     trimCurrentGrade() {
       // extracting the first word out of the gradeLevels
       // example: "8th grade" --> "8th"
@@ -1569,17 +1504,6 @@ p.small-paragraph {
   color: $c-soft-black;
   font-size: 14px;
   margin-top: 25px;
-}
-
-.international-availability-info,
-.international-contact-us {
-  font-weight: 500;
-  margin-top: 24px;
-}
-
-.international-contact-us {
-  font-style: italic;
-  margin-top: 0.5em;
 }
 
 .uc-form-text {

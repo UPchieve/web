@@ -102,7 +102,6 @@ type FormElementType =
   | 'header-logo-teal'
   | 'updog-crying'
   | 'updog-smiling'
-  | 'error-badge'
   | 'InternationalMessage'
 
 export function getFilteredPageDetails(

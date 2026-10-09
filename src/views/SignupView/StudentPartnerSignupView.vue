@@ -57,7 +57,7 @@
             :ssoMethod="SsoProvider.CLEVER"
           />
           <SsoButton
-            v-if="useClassLinkSSO && isClassLinkSsoEnabled"
+            v-if="useClassLinkSSO"
             @click="signUpWithSso('classlink')"
             class="sso-button"
             buttonText="ClassLink"
@@ -433,7 +433,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, required, requiredIf } from '@vuelidate/validators'
 import LoggerService from '@/services/LoggerService'
@@ -607,9 +606,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      isClassLinkSsoEnabled: 'featureFlags/isClassLinkSsoEnabled',
-    }),
     PASSWORD_PATTERN() {
       return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
     },

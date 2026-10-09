@@ -6,7 +6,7 @@
       </div>
 
       <VerificationMethodSelector
-        v-if="step === 1 && userMustEnterVerificationDetails"
+        v-if="step === 1"
         data-testid="verification-method-selector"
         :email="user.email"
         v-model="verificationInputs"
@@ -124,22 +124,10 @@ export default {
       isSubmitting: false,
     }
   },
-  beforeMount() {
-    if (this.isSmsVerificationEnabled || this.isForceSmsVerificationEnabled) {
-      this.step = 1
-    } else {
-      this.step = 2
-      this.verificationInputs.method = VERIFICATION_METHOD.EMAIL
-      this.sendCode()
-    }
-  },
   mounted() {
     this.$store.dispatch('app/hideNavigation')
   },
   computed: {
-    userMustEnterVerificationDetails() {
-      return this.isSmsVerificationEnabled || this.isForceSmsVerificationEnabled
-    },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
     },
@@ -148,11 +136,8 @@ export default {
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
-      isSmsVerificationEnabled: 'featureFlags/isSmsVerificationEnabled', // Whether SMS verification is enabled across the app
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
-      isForceSmsVerificationEnabled:
-        'featureFlags/isForceSmsVerificationEnabled',
       userType: 'user/userType',
       isVolunteer: 'user/isVolunteer',
       isStudentVolunteer: 'user/isStudentVolunteer',

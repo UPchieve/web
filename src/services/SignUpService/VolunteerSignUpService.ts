@@ -20,7 +20,6 @@ import type {
   SubmitActionResponse,
   FormRow,
 } from '@/services/SignUpService'
-import store from '@/store'
 import { SsoProvider } from '@/services/SsoService'
 import * as SignUpService from '@/services/SignUpService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -57,9 +56,6 @@ export type VolunteerAccountFormData = {
   [InputName.TERMS]?: boolean
   [InputName.INVITE_CODE]?: string
 }
-
-const isGoogleSignupForVolunteersEnabled = () =>
-  store.getters['featureFlags/isGoogleSignupForVolunteersEnabled']
 
 let partnerId: string = ''
 
@@ -135,7 +131,7 @@ async function getLogInDetails(
       ...(isPartnerSignup
         ? getPartnerRedirectElement(volunteerPartnerName)
         : []),
-      ...(isGoogleSignupForVolunteersEnabled() ? getSsoSectionElements() : []),
+      ...getSsoSectionElements(),
       getRow('mt-2 justify-center'),
       getRow('mt-2', {
         element: 'FormEmail',

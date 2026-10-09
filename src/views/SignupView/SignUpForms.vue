@@ -53,7 +53,6 @@
 <script>
 import { useVuelidate } from '@vuelidate/core'
 import CheckCircled from '@/assets/check-circled.svg'
-import ErrorBadge from '@/assets/error_badge.svg'
 import HeaderLogoTeal from '@/assets/logos/header-logo-teal.svg'
 import UpdogCrying from '@/assets/updog-crying.svg'
 import UpdogSmiling from '@/assets/updog-smiling.svg'
@@ -75,7 +74,6 @@ export default {
   name: 'sign-up-forms',
   components: {
     CheckCircled,
-    ErrorBadge,
     HeaderLogoTeal,
     UpdogCrying,
     UpdogSmiling,

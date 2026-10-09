@@ -34,9 +34,6 @@ const credentials = reactive({
 const useNewSignUpFlow = computed<boolean>(
   () => store.getters['featureFlags/useNewSignUpFlow']
 )
-const isClassLinkSsoEnabled = computed<boolean>(
-  () => store.getters['featureFlags/isClassLinkSsoEnabled']
-)
 const formPageTemplateLayout = computed(() =>
   useNewSignUpFlow.value ? 'panel-left-50p' : 'card'
 )
@@ -214,7 +211,6 @@ function captureSsoClickEvent(provider: SsoProvider): void {
             :ssoMethod="SsoProvider.CLEVER"
           />
           <SsoButton
-            v-if="isClassLinkSsoEnabled"
             @click="signInWithSso(SsoProvider.CLASSLINK)"
             class="sso-button"
             data-testid="classLinkSsoButton"

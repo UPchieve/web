@@ -4,7 +4,6 @@ import type {
   NavigationGuardNext,
   RouteLocationNormalized,
 } from 'vue-router'
-import store from '@/store'
 import router from '@/router'
 import {
   __test__,
@@ -311,11 +310,6 @@ describe('StudentSignUpService', () => {
         })
 
         test('BigFuture', () => {
-          const bfIntroCopy = 'Something for BF here.'
-          vi.spyOn(store, 'getters', 'get').mockReturnValue({
-            'featureFlags/bfIntroCopy': bfIntroCopy,
-          })
-
           const route = {
             path: '/sign-up/student/eligibility',
             params: {
@@ -335,7 +329,9 @@ describe('StudentSignUpService', () => {
             pageDetails.rows,
             (e) => e.element === 'p'
           )
-          expect(subheader?.formElement.content).toBe(bfIntroCopy)
+          expect(subheader?.formElement.content).toBe(
+            "UPchieve and BigFuture are working together to connect you to 100% FREE, online college counseling and tutoring available 24/7! Students who can't afford a tutor are eligible. Create your account now!"
+          )
         })
       })
     })
@@ -511,6 +507,7 @@ describe('StudentSignUpService', () => {
           'subheader',
           'cleverButton',
           'googleButton',
+          'classLinkButton',
           'orLineBreak',
           'firstName',
           'lastName',
@@ -685,6 +682,7 @@ describe('StudentSignUpService', () => {
           'subheader',
           'cleverButton',
           'googleButton',
+          'classLinkButton',
           'orLineBreak',
           'firstName',
           'lastName',

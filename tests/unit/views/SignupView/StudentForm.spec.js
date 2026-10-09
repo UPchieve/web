@@ -50,9 +50,6 @@ describe('StudentForm', () => {
           ...featureFlagsModule,
           getters: {
             ...featureFlagsModule.getters,
-            ccIntroCopy: () => true,
-            isBfIntroCopyEnabled: () => true,
-            bfIntroCopy: () => true,
             eligibilityEmail: () => true,
           },
         },

@@ -851,15 +851,8 @@ export default {
 
     showNationalPhoneNumbersOnly: (
       _state: UserStoreState,
-      getters: UserStoreGetterValues,
-      _rootState: RootState,
-      rootGetters: RootGetters
-    ) => {
-      return (
-        getters.isStudent &&
-        rootGetters['featureFlags/isNationalStudentPhoneEnabled']
-      )
-    },
+      getters: UserStoreGetterValues
+    ) => getters.isStudent,
 
     banType: (state: UserStoreState) => {
       return state.user?.banType ?? null

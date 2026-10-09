@@ -12,19 +12,15 @@ export default {
     toggleFlags: {
       [POSTHOG_FEATURE_FLAGS.FILTER_ACTIVE_SUBJECTS]: false,
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
-      [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
-      [POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
       [POSTHOG_FEATURE_FLAGS.PROGRESS_REPORT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.ABOUT_THIS_SESSION_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
-      [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: false,
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT]: false,
-      [POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE]: false,
       [POSTHOG_FEATURE_FLAGS.AI_OTHER_SUBJECT_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
@@ -32,10 +28,8 @@ export default {
       [POSTHOG_FEATURE_FLAGS.CONFETTI_CELEBRATION]: false,
       [POSTHOG_FEATURE_FLAGS.SHOW_AMBASSADOR_TITLE]: false,
       [POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA]: false,
-      [POSTHOG_FEATURE_FLAGS.SHOW_NEW_INTERNATIONAL_MESSAGE]: false,
       [POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS]: false,
       [POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES]: false,
-      [POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO]: false,
       [POSTHOG_FEATURE_FLAGS.STUDENT_REQUEST_SPECIFIC_VOLUNTEER_SESSIONS]: false,
       [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENT_CREATION]: false,
@@ -43,7 +37,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE]: false,
       [POSTHOG_FEATURE_FLAGS.PRESENTATION_SCHEDULE_SHIFTS]: false,
       [POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON]: false,
-      [POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY]: false,
       [POSTHOG_FEATURE_FLAGS.DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS]: false,
       [POSTHOG_FEATURE_FLAGS.USER_IS_APPROVED_NTHS_PRESIDENT]: false,
@@ -69,7 +62,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR]: false,
     },
     multivariantFlags: {
-      [POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY]: 'baseline',
       [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE]: '', // tutor-count-shown | tutor-count-hidden
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY]: '', // completed-first-hour-of-tutoring | tutored-first-three-students
@@ -79,7 +71,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
-      [POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY]: '',
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
       [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
@@ -126,16 +117,8 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT] ?? [],
     quizRollout: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
-    ccIntroCopy: (state: FeatureFlagState) =>
-      state.multivariantFlags[POSTHOG_FEATURE_FLAGS.CC_INTRO_COPY],
-    isBfIntroCopyEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
-    bfIntroCopy: (state: FeatureFlagState) =>
-      state.payloadFlags[POSTHOG_FEATURE_FLAGS.BF_INTRO_COPY],
     showDashboardRedesign: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN],
-    isSmsVerificationEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SMS_VERIFICATION],
     eligibilityEmail: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
     isProgressReportsSurveyActive: (state: FeatureFlagState) =>
@@ -147,10 +130,6 @@ export default {
     isBigFutureEmailFirstFlowActive: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW
-      ],
-    isBigFutureTwoQuestionEligiblityFlowActive: (state: FeatureFlagState) =>
-      state.toggleFlags[
-        POSTHOG_FEATURE_FLAGS.BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW
       ],
     isTutorBotChatEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
@@ -171,8 +150,6 @@ export default {
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT
       ],
-    isNationalStudentPhoneEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.NATIONAL_STUDENT_PHONE],
     aiTutor: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
     videoModerationSampleInterval: (state: FeatureFlagState) =>
@@ -197,14 +174,10 @@ export default {
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE],
     isBecomeAnAmbassadorCtaEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BECOME_AN_AMBASSADOR_CTA],
-    showNewInternationalMessage: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_NEW_INTERNATIONAL_MESSAGE],
     isTextReferralLinksEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.TEXT_REFERRAL_LINKS],
     isPendingMessagesEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES],
-    isClassLinkSsoEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.CLASSLINK_SSO],
     isStudentRequestSpecificVolunteerSessionsEnabled: (
       state: FeatureFlagState
     ) =>
@@ -229,8 +202,6 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.UPDATED_DOC_EDITOR_IMAGE_STORAGE],
     isVerifyHoursButtonEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.VERIFY_HOURS_BUTTON],
-    isGoogleSignupForVolunteersEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.GOOGLE_SIGNUP_FOR_VOLUNTEERS],
     isDisableStudentsJoinSlackCommunityEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[
         POSTHOG_FEATURE_FLAGS.DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY

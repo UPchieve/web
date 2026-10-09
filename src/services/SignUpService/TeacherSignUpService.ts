@@ -375,8 +375,6 @@ export async function beforeEnter(
 
 function getSsoSectionElements(): FormRow[] {
   const isMobileMode = store.getters['app/mobileMode']
-  const isClassLinkSsoEnabled =
-    store.getters['featureFlags/isClassLinkSsoEnabled']
   const cleverButton = getSsoButton(
     createAccountWithClever,
     'Clever',
@@ -387,18 +385,16 @@ function getSsoSectionElements(): FormRow[] {
     'Google',
     SsoProvider.GOOGLE
   )
-  const classLinkButton = isClassLinkSsoEnabled
-    ? getSsoButton(
-        createAccountWithClassLink,
-        'ClassLink',
-        SsoProvider.CLASSLINK
-      )
-    : undefined
+  const classLinkButton = getSsoButton(
+    createAccountWithClassLink,
+    'ClassLink',
+    SsoProvider.CLASSLINK
+  )
 
   if (isMobileMode) {
     return [
       getRow('mt-3', cleverButton),
-      ...(classLinkButton ? [getRow('mt-3', classLinkButton)] : []),
+      getRow('mt-3', classLinkButton),
       getRow('mt-3', googleButton),
     ]
   }

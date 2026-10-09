@@ -974,23 +974,18 @@ export enum POSTHOG_FEATURE_FLAGS {
   DOWNTIME_BANNER = 'downtime-banner',
   SUBJECT_REQUEST_ROLLOUT = 'subject-request-rollout',
   QUIZ_ROLLOUT = 'quiz-rollout',
-  CC_INTRO_COPY = 'cc-intro-copy',
-  BF_INTRO_COPY = 'bf-intro-copy',
   REFERRAL_COPY = 'referral-copy',
   DASHBOARD_REDESIGN = 'dashboard-redesign',
   FORCE_DASHBOARD_REDESIGN_ORG = 'force-dashboard-redesign-org',
-  SMS_VERIFICATION = 'sms-verification',
   ELIGIBILITY_EMAIL = 'eligibility-email',
   PROGRESS_REPORT_SURVEY = 'progress-report-survey',
   USE_NEW_SIGN_UP_FLOW = 'use-new-sign-up-flow',
   SHOW_IN_APP_SESSION_NOTIFICATIONS = 'show-in-app-session-notifications',
   ABOUT_THIS_SESSION_SURVEY = 'about-this-session-feedback',
   BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW = 'big-future-email-eligibility-flow',
-  BIG_FUTURE_TWO_QUESTION_ELIGIBILITY_FLOW = 'big-future-two-question-eligibility-flow',
   TUTOR_BOT_CHAT = 'tutor-bot-chat',
   FALL_INCENTIVE_PROGRAM = 'fall-incentive-program',
   FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT = 'fall-incentive-program-parental-consent',
-  NATIONAL_STUDENT_PHONE = 'national-student-phone',
   AI_TUTOR = 'stand-alone-ai-tutor',
   AI_OTHER_SUBJECT_SURVEY = 'ai-other-subject-survey',
   VIDEO_MODERATION_SAMPLE_INTERVAL = 'video-moderation-sample-interval',
@@ -1002,10 +997,8 @@ export enum POSTHOG_FEATURE_FLAGS {
   VOLUNTEER_SUBJECT_PRESENCE = 'volunteer-subject-presence',
   BECOME_AN_AMBASSADOR_CTA = 'become-an-ambassador-cta',
   UPDATE_SCHOOL_MODAL = 'update-school-modal',
-  SHOW_NEW_INTERNATIONAL_MESSAGE = 'show-new-international-message',
   TEXT_REFERRAL_LINKS = 'text-referral-links',
   PENDING_MESSAGES = 'pending-messages',
-  CLASSLINK_SSO = 'classlink-sso',
   STUDENT_REQUEST_SPECIFIC_VOLUNTEER_SESSIONS = 'student-request-specific-volunteer-sessions',
   VOLUNTEER_MILESTONE_SHARING_STUDY = 'volunteer-milestone-sharing-study',
   INCENTIVE_BANNER = 'incentive-banner',
@@ -1016,7 +1009,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   UPDATED_DOC_EDITOR_IMAGE_STORAGE = 'updated-doc-editor-image-storage',
   PRESENTATION_SCHEDULE_SHIFTS = 'presentation-schedule-shifts',
   VERIFY_HOURS_BUTTON = 'verify-hours-button',
-  GOOGLE_SIGNUP_FOR_VOLUNTEERS = 'google-signup-for-volunteers',
   DISABLE_STUDENTS_JOIN_SLACK_COMMUNITY = 'disable-students-join-slack-community',
   DISABLE_SLACK_BUTTON_FOR_UNAPPROVED_VOLUNTEERS = 'disable-slack-button-for-unapproved-volunteers',
   USER_IS_APPROVED_NTHS_PRESIDENT = 'user-is-approved-nths-president',
@@ -1146,3 +1138,6 @@ export const SHARE_INFO_FIELDS = [
 ] as const
 
 export type ShareInfoFieldKey = (typeof SHARE_INFO_FIELDS)[number]['key']
+
+export const BIG_FUTURE_INTRO_COPY =
+  "UPchieve and BigFuture are working together to connect you to 100% FREE, online college counseling and tutoring available 24/7! Students who can't afford a tutor are eligible. Create your account now!"
