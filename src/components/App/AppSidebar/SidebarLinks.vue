@@ -194,6 +194,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { mapState as mapPiniaState } from 'pinia'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { defineAsyncComponent } from 'vue'
 import SidebarLink from './SidebarLink.vue'
 import BookIcon from '@/assets/icons/open_book_icon.svg'
@@ -265,7 +267,9 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       productFlags: (state) => state.productFlags.flags,
-      isSidebarCollapsed: (state) => state.app.sidebar.isCollapsed,
+    }),
+    ...mapPiniaState(useAppSidebarStore, {
+      isSidebarCollapsed: 'isCollapsed',
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',

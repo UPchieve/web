@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -425,7 +426,6 @@ describe('SidebarLinks', () => {
 
         afterEach(() => {
           storeOptions.modules.app.state.windowWidth = 0
-          storeOptions.modules.app.modules.sidebar.state.isCollapsed = true
         })
 
         it.each([
@@ -454,11 +454,8 @@ describe('SidebarLinks', () => {
 
         it('fires when the phone sidebar opens', async () => {
           const captureEvent = vi.spyOn(AnalyticsService, 'captureEvent')
-          const wrapper = mountCoach(
-            { canApplyForNTHSPresident: true },
-            PHONE_WIDTH
-          )
-          await wrapper.vm.$store.dispatch('app/sidebar/expand')
+          mountCoach({ canApplyForNTHSPresident: true }, PHONE_WIDTH)
+          useAppSidebarStore().expand()
           await nextTick()
           expect(captureEvent).toHaveBeenCalledWith(
             EVENTS.NTHS_SIDEBAR_APPLY_LINK_SHOWN,

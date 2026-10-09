@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useStore } from 'vuex'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { computed, ref } from 'vue'
 import Menu from '@/components/Menu.vue'
 import { useRouter } from 'vue-router'
@@ -22,6 +23,7 @@ const props = withDefaults(
 )
 
 const store = useStore()
+const sidebarStore = useAppSidebarStore()
 const router = useRouter()
 
 const sessionStatus = computed(() => store.getters['session/sessionStatus'])
@@ -37,7 +39,7 @@ function closeMenu() {
   // The router collapses the mobile drawer only when the route name changes, so it misses
   // tapping Profile while already on Profile, and switching modes on the dashboard, which
   // does not navigate at all.
-  store.dispatch('app/sidebar/collapse')
+  sidebarStore.collapse()
 }
 
 function goTo(path: string) {

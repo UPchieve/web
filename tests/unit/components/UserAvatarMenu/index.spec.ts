@@ -1,12 +1,13 @@
 import UserAvatarMenu from '@/components/UserAvatarMenu/index.vue'
 import UserModeToggle from '@/components/UserAvatarMenu/UserModeToggle.vue'
 import { it, describe, expect, vi, afterEach } from 'vitest'
-import { createStore, type Store } from 'vuex'
+import { createStore } from 'vuex'
 import vuetify from '@/plugins/vuetify'
 import { storeOptions } from '@/store'
 import router from '@/router'
 import { mount, DOMWrapper, VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 
 describe('Navigation', () => {
   const SESSION_STATUS = {
@@ -91,17 +92,16 @@ describe('Navigation', () => {
     }
   }
 
-  const isDrawerCollapsed = (store: Store<any>) =>
-    store.state.app.sidebar.isCollapsed
+  const isDrawerCollapsed = () => useAppSidebarStore().isCollapsed
 
-  async function expandDrawer(store: Store<any>) {
-    store.dispatch('app/sidebar/expand')
+  async function expandDrawer() {
+    useAppSidebarStore().expand()
     await nextTick()
-    expect(isDrawerCollapsed(store)).toBe(false)
+    expect(isDrawerCollapsed()).toBe(false)
   }
 
   it('Navigates to the profile page and closes the menu', async () => {
-    const { wrapper, setProps, component, store } = getWrapper()
+    const { wrapper, setProps, component } = getWrapper()
 
     // Profile row should not be visible when the menu is closed
     expect(wrapper.find('[data-testid="menu-row-profile"]').exists()).toBe(
@@ -112,7 +112,7 @@ describe('Navigation', () => {
     await nextTick()
 
     expect(wrapper.find('[data-testid="menu-row-profile"]').exists()).toBe(true)
-    await expandDrawer(store)
+    await expandDrawer()
 
     const pushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
     await wrapper.find('[data-testid="menu-row-profile"]').trigger('click')
@@ -120,23 +120,23 @@ describe('Navigation', () => {
 
     expect(pushSpy).toHaveBeenCalledWith('/profile')
     expect(component.emitted('update:isMenuOpen')).toContainEqual([false])
-    expect(isDrawerCollapsed(store)).toBe(true)
+    expect(isDrawerCollapsed()).toBe(true)
   })
 
   it('Closes the menu and collapses the drawer after switching modes', async () => {
-    const { component, store } = getWrapper({
+    const { component } = getWrapper({
       isMenuOpen: true,
       app: { getters: { mobileMode: () => true } },
       user: { getters: { isStudentVolunteer: () => true } },
     })
     const modeToggle = () => component.findComponent(UserModeToggle)
     await vi.waitFor(() => expect(modeToggle().exists()).toBe(true))
-    await expandDrawer(store)
+    await expandDrawer()
 
     modeToggle().vm.$emit('switchedMode')
     await nextTick()
 
-    expect(isDrawerCollapsed(store)).toBe(true)
+    expect(isDrawerCollapsed()).toBe(true)
     expect(component.emitted('update:isMenuOpen')).toContainEqual([false])
   })
 

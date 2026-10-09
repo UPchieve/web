@@ -3,6 +3,7 @@ import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import { useAppHeaderStore } from '@/stores/app/header'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
 import SidebarInfo from '@/components/App/AppSidebar/SidebarInfo.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
@@ -17,14 +18,13 @@ const getWrapper = (options = {}) => {
   }
 
   useAppHeaderStore().setIsShown(options.showHeader)
+  if (options.isSidebarCollapsed) useAppSidebarStore().collapse()
+  else useAppSidebarStore().expand()
 
   const store = createStore(
     merge({}, storeOptions, {
       modules: {
         app: {
-          modules: {
-            sidebar: { state: { isCollapsed: options.isSidebarCollapsed } },
-          },
           getters: { mobileMode: () => options.mobileMode },
         },
         user: {

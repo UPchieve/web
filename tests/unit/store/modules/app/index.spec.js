@@ -1,8 +1,8 @@
 import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import appModule from '@/store/modules/app'
-import sidebarModule from '@/store/modules/app/sidebar'
 import modalModule from '@/store/modules/app/modal'
 import { useAppHeaderStore } from '@/stores/app/header'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { beforeEach, vi } from 'vitest'
 
 const { modules, state, mutations, actions, getters } = appModule
@@ -13,7 +13,6 @@ describe('`app` store module', () => {
   })
 
   it('modules', () => {
-    expect(modules.sidebar).toBe(sidebarModule)
     expect(modules.modal).toBe(modalModule)
   })
 
@@ -58,19 +57,18 @@ describe('`app` store module', () => {
   describe('actions', () => {
     it('showNavigation', () => {
       expect(typeof actions.showNavigation).toBe('function')
-      const dispatch = vi.fn()
-      actions.showNavigation({ dispatch })
+      actions.showNavigation()
       expect(useAppHeaderStore().isShown).toBe(true)
-      expect(dispatch).toHaveBeenCalledWith('sidebar/show')
+      expect(useAppSidebarStore().isShown).toBe(true)
     })
 
     it('hideNavigation', () => {
       expect(typeof actions.hideNavigation).toBe('function')
-      const dispatch = vi.fn()
       useAppHeaderStore().setIsShown(true)
-      actions.hideNavigation({ dispatch })
+      useAppSidebarStore().show()
+      actions.hideNavigation()
       expect(useAppHeaderStore().isShown).toBe(false)
-      expect(dispatch).toHaveBeenCalledWith('sidebar/hide')
+      expect(useAppSidebarStore().isShown).toBe(false)
     })
 
     it('windowResize', () => {

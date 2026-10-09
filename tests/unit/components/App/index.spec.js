@@ -4,6 +4,7 @@ import { createStore } from 'vuex'
 import router from '@/router'
 import { storeOptions } from '@/store'
 import { useAppHeaderStore } from '@/stores/app/header'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import App from '@/components/App/index.vue'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
@@ -24,13 +25,13 @@ const getWrapper = (options = {}) => {
   }
 
   useAppHeaderStore().setIsShown(options.showHeader)
+  if (options.showSidebar) useAppSidebarStore().show()
 
   const store = createStore(
     merge({}, storeOptions, {
       modules: {
         app: {
           modules: {
-            sidebar: { state: { isShown: options.showSidebar } },
             modal: { state: { isShown: options.showModal } },
           },
         },

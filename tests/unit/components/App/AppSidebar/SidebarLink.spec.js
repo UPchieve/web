@@ -1,17 +1,13 @@
 import { shallowMount } from '@vue/test-utils'
-import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import router from '@/router'
 import { storeOptions } from '@/store'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import { vi } from 'vitest'
 
-const getWrapper = (props = {}, collapse) => {
-  const store = createStore(
-    merge({}, storeOptions, {
-      modules: { app: { modules: { sidebar: { actions: { collapse } } } } },
-    })
-  )
+const getWrapper = (props = {}) => {
+  const store = createStore(storeOptions)
 
   return shallowMount(SidebarLink, {
     global: {
@@ -38,11 +34,8 @@ describe('SidebarLink', () => {
   })
 
   it('collapses sidebar when clicked', () => {
-    const collapse = vi.fn()
-    const wrapper = getWrapper(
-      { to: '/', text: 'Home', openNewTab: false },
-      collapse
-    )
+    const collapse = vi.spyOn(useAppSidebarStore(), 'collapse')
+    const wrapper = getWrapper({ to: '/', text: 'Home', openNewTab: false })
     wrapper.find('.SidebarLink').trigger('click')
     expect(collapse).toHaveBeenCalled()
   })

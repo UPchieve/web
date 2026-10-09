@@ -248,6 +248,8 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import { mapActions } from 'pinia'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import NetworkService from '@/services/NetworkService'
 import LargeButton from '@/components/LargeButton.vue'
 import { dayjs } from '@/utils/time-utils'
@@ -331,10 +333,7 @@ export default {
     },
   },
   async beforeMount() {
-    this.$store.dispatch('app/sidebar/hide')
-    this.$store.dispatch('app/header/show', {
-      component: 'SessionHeader',
-    })
+    this.hideSidebar()
     const sessionId = this.$route.params.sessionId
     const [sessionResponse, postsessionAlreadySavedResponse] =
       await Promise.all([
@@ -413,6 +412,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions(useAppSidebarStore, { hideSidebar: 'hide' }),
     scrollToTop() {
       this.$refs.feedbackMainContainer.scrollIntoView({ behavior: 'smooth' })
     },

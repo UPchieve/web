@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'pinia'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import HambugerIcon from '@/assets/hamburger.svg'
 import CrossIcon from '@/assets/cross.svg'
 
@@ -16,18 +18,16 @@ export default {
   name: 'HamburgerButton',
   props: { tabindex: Number },
   computed: {
+    ...mapState(useAppSidebarStore, ['isCollapsed']),
     icon() {
-      return this.$store.state.app.sidebar.isCollapsed
-        ? HambugerIcon
-        : CrossIcon
+      return this.isCollapsed ? HambugerIcon : CrossIcon
     },
   },
   methods: {
+    ...mapActions(useAppSidebarStore, ['expand', 'collapse']),
     handleAction() {
-      const action = this.$store.state.app.sidebar.isCollapsed
-        ? 'app/sidebar/expand'
-        : 'app/sidebar/collapse'
-      this.$store.dispatch(action)
+      if (this.isCollapsed) this.expand()
+      else this.collapse()
     },
   },
 }

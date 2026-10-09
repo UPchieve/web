@@ -1,12 +1,11 @@
 import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
-import sidebar from './sidebar'
 import modal from './modal'
 import { useAppHeaderStore } from '@/stores/app/header'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 
 export default {
   namespaced: true,
   modules: {
-    sidebar,
     modal,
   },
   state: {
@@ -34,13 +33,13 @@ export default {
     setFadeInContent: (state, val) => (state.fadeInContent = val),
   },
   actions: {
-    showNavigation: ({ dispatch }) => {
+    showNavigation: () => {
       useAppHeaderStore().setIsShown(true)
-      dispatch('sidebar/show')
+      useAppSidebarStore().show()
     },
-    hideNavigation: ({ dispatch }) => {
+    hideNavigation: () => {
       useAppHeaderStore().setIsShown(false)
-      dispatch('sidebar/hide')
+      useAppSidebarStore().hide()
     },
 
     windowResize: ({ commit }, { width, height }) => {

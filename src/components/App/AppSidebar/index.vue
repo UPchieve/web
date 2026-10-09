@@ -21,6 +21,7 @@
 import { mapState, mapGetters } from 'vuex'
 import { mapState as mapPiniaState } from 'pinia'
 import { useAppHeaderStore } from '@/stores/app/header'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import SidebarInfo from './SidebarInfo.vue'
 import SidebarLinks from './SidebarLinks.vue'
 import config from '@/config'
@@ -30,9 +31,11 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user.user,
-      isSidebarCollapsed: (state) => state.app.sidebar.isCollapsed,
     }),
     ...mapPiniaState(useAppHeaderStore, { showHeader: 'isShown' }),
+    ...mapPiniaState(useAppSidebarStore, {
+      isSidebarCollapsed: 'isCollapsed',
+    }),
     ...mapGetters({
       isAuthenticated: 'user/isAuthenticated',
       mobileMode: 'app/mobileMode',

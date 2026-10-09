@@ -62,6 +62,8 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import { mapActions } from 'pinia'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import ActivityDot from '@/components/ActivityDot.vue'
 import RightCaret from '@/assets/right-caret.svg'
 import Case from 'case'
@@ -109,11 +111,12 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppSidebarStore, ['collapse']),
     getSubject(subject) {
       return this.subjects[subject]
     },
     handleSubjectChange(subject) {
-      if (this.mobileMode) this.$store.dispatch('app/sidebar/collapse')
+      if (this.mobileMode) this.collapse()
       this.selectedSubject = subject.displayName
       this.$router.replace(`/sessions/progress/${Case.kebab(subject.name)}`)
     },

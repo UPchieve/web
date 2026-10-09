@@ -18,7 +18,7 @@
         :class="[parentClass, { 'SidebarLink--active': isActive }]"
         :to="to"
         tag="div"
-        @click="$store.dispatch('app/sidebar/collapse')"
+        @click="collapse"
         @keydown.enter="navigate()"
         :tabindex="isCollapsed && mobileMode ? -1 : 0"
       >
@@ -30,7 +30,9 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapState as mapPiniaState, mapActions } from 'pinia'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 
 export default {
   props: {
@@ -59,7 +61,7 @@ export default {
     },
   },
   computed: {
-    ...mapState({ isCollapsed: (state) => state.app.sidebar.isCollapsed }),
+    ...mapPiniaState(useAppSidebarStore, ['isCollapsed']),
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
     size() {
       return this.mobileMode ? '1em' : '1.5em'
@@ -78,8 +80,9 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppSidebarStore, ['collapse']),
     navigate() {
-      this.$store.dispatch('app/sidebar/collapse')
+      this.collapse()
 
       // necessary because router-link doesn't provide a way to set modifiers, like
       // keydown.enter, in the event prop

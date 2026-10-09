@@ -38,6 +38,7 @@ import { mapState, mapGetters } from 'vuex'
 import { mapState as mapPiniaState, mapActions as mapPiniaActions } from 'pinia'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppBannerStore } from '@/stores/app/banner'
+import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { IonApp, IonContent } from '@ionic/vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
@@ -239,12 +240,12 @@ export default {
   },
   computed: {
     ...mapPiniaState(useAppHeaderStore, { showHeader: 'isShown' }),
+    ...mapPiniaState(useAppSidebarStore, { showSidebar: 'isShown' }),
     ...mapPiniaState(useAppBannerStore, {
       bannerIsShown: 'isShown',
       bannerComponent: 'component',
     }),
     ...mapState({
-      showSidebar: (state) => state.app.sidebar.isShown,
       showModal: (state) => state.app.modal.isShown,
       isMobileApp: (state) => state.app.isMobileApp,
       isWebPageHidden: (state) => state.app.isWebPageHidden,
