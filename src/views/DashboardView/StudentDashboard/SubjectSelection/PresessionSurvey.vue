@@ -34,25 +34,20 @@
               :key="`${response.responseId}-checkbox-container`"
               class="fake-door-checkbox"
             >
-              <check-box
+              <FormCheckBox
                 class="question__response"
-                :id="`${currentQuestion.questionId}_${response.responseId}`"
-                :checked="
+                :name="`${currentQuestion.questionId}_${response.responseId}`"
+                :label="response.responseText"
+                :model-value="
                   userResponse[
                     fakeDoorQuestionId
                   ]?.selectedResponseIds?.includes(response.responseId)
                 "
-                :modelValue="
-                  userResponse[
-                    fakeDoorQuestionId
-                  ]?.selectedResponseIds?.includes(response.responseId)
-                "
-                @update:modelValue="
+                :is-required="false"
+                @update:model-value="
                   updateFakeDoorResponse(response.responseId, $event)
                 "
-              >
-                {{ response.responseText }}
-              </check-box>
+              />
             </div>
 
             <survey-image
@@ -140,7 +135,7 @@ import { QUESTION_TYPES, EVENTS } from '@/consts'
 import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
 import SurveyImage from '@/components/Surveys/SurveyImage.vue'
 import AnalyticsService from '@/services/AnalyticsService'
-import CheckBox from '@/components/CheckBox.vue'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 
 export default {
   components: {
@@ -149,7 +144,7 @@ export default {
     CrossIcon,
     SurveyRadio,
     SurveyImage,
-    CheckBox,
+    FormCheckBox,
   },
 
   props: {

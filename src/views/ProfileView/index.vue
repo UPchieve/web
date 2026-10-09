@@ -162,18 +162,13 @@
             />
 
             <div class="sms-consent" v-if="shouldSeeSmsConsentCheckbox">
-              <div class="checkbox-container">
-                <checkbox
-                  id="sms-consent-checkbox"
-                  v-model="smsConsent"
-                  @change="onChangeSmsConsent"
-                  :checked="smsConsent"
-                />
-                <label for="sms-consent-input"
-                  >By checking this box, I consent to receiving SMS messages
-                  from UPchieve at the phone number provided above.</label
-                >
-              </div>
+              <FormCheckBox
+                name="sms-consent-checkbox"
+                :model-value="smsConsent"
+                :is-required="false"
+                label="By checking this box, I consent to receiving SMS messages from UPchieve at the phone number provided above."
+                @update:model-value="onChangeSmsConsent"
+              />
               <div class="description" v-if="hasVolunteerRole">
                 <span v-if="smsConsent">
                   <strong class="sms-consent-true"
@@ -480,7 +475,7 @@ import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import { getAcademicYear } from '@/utils/academic-year'
 import Loader from '@/components/Loader.vue'
 import VerificationModal from '@/views/VerificationModal.vue'
-import Checkbox from '@/components/CheckBox.vue'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import RemovePhoneConfirmationModal from '@/views/ProfileView/RemovePhoneConfirmationModal.vue'
 import TutoringLanguagesChecklist from '@/views/TutoringLanguagesChecklist.vue'
 import CleverLogo from '@/components/CleverLogo.vue'
@@ -553,7 +548,7 @@ export default {
     SecondaryEmailModal,
     RemovePhoneConfirmationModal,
     TutoringLanguagesChecklist,
-    Checkbox,
+    FormCheckBox,
     DeactivateAccountModal,
     MazPhoneNumberInput,
     Loader,
@@ -747,8 +742,8 @@ export default {
       this.smsConsent = false
     },
 
-    async onChangeSmsConsent() {
-      const smsConsent = !this.smsConsent
+    async onChangeSmsConsent(smsConsent) {
+      this.smsConsent = smsConsent
       const reqBody = this.createUpdateProfileRequestBody({
         smsConsent,
       })
@@ -1215,11 +1210,6 @@ button:hover {
   display: flex;
   flex-direction: column;
   align-items: baseline;
-
-  .checkbox-container {
-    display: flex;
-    flex-direction: row;
-  }
 
   .sms-consent-false {
     color: $c-error-red;

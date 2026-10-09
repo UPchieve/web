@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { VolunteerOccupations } from '@/services/VolunteerService'
-import CheckBox from '@/components/CheckBox.vue'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import FormInput from '@/components/FormInput.vue'
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 import { getAcademicYear } from '@/utils/academic-year'
@@ -170,21 +170,16 @@ function updateHighSchool(name: string) {
         Please select at least one occupation.
       </p>
 
-      <div
+      <FormCheckBox
         v-for="occupation in VolunteerOccupations"
         :key="occupation"
-        class="uc-form-checkbox"
-      >
-        <CheckBox
-          :id="occupation"
-          :checked="isOccupationSelected(occupation)"
-          :model-value="isOccupationSelected(occupation)"
-          :data-testid="occupation"
-          @update:model-value="updateOccupation(occupation, $event)"
-        >
-          {{ occupation }}
-        </CheckBox>
-      </div>
+        :name="occupation"
+        :label="occupation"
+        :model-value="isOccupationSelected(occupation)"
+        :is-required="false"
+        :data-testid="occupation"
+        @update:model-value="updateOccupation(occupation, $event)"
+      />
       <div v-if="shouldShowSchoolField" class="occupation-field__school">
         <p
           v-if="props.showInputErrors && !highSchoolId && !cannotFindHighSchool"

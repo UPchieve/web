@@ -6,7 +6,6 @@ import Modal from '@/components/Modal.vue'
 import Loader from '@/components/Loader.vue'
 import UpdogHooray from '@/assets/updog-hooray.svg'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
-import Checkbox from '@/components/CheckBox.vue'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import type {
   CountryCode,
@@ -19,6 +18,7 @@ import NetworkService from '@/services/NetworkService'
 import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
 import { enrollStudentToIncentiveProgram } from '@/services/UserProductFlagsService'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import FormEmail from '@/components/FormEmail.vue'
 import FormInput from '@/components/FormInput.vue'
 import useVuelidate from '@vuelidate/core'
@@ -39,7 +39,7 @@ const hasResentCode = ref(false)
 const isSubmitting = ref(false)
 const loadingMessage = ref('')
 const error = ref('')
-const parentalConsent = defineModel()
+const parentalConsent = defineModel<boolean>({ default: false })
 const proxyEmail = ref('')
 
 const v$ = useVuelidate()
@@ -400,9 +400,11 @@ onMounted(() => {
             "
             class="parental-consent-container"
           >
-            <checkbox id="parental-consent" v-model="parentalConsent">
-              I have consent from my parent/guardian to receive gift cards.
-            </checkbox>
+            <FormCheckBox
+              name="parental-consent"
+              v-model="parentalConsent"
+              label="I have consent from my parent/guardian to receive gift cards."
+            />
           </div>
         </section>
         <footer class="incentive-enrollment-modal__footer">

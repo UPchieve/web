@@ -1,5 +1,5 @@
 <template>
-  <label class="uc-form-checkbox" :for="inputId()" v-bind="wrapperAttrs()">
+  <label class="uc-form-checkbox" v-bind="wrapperAttrs()">
     <input v-model="model" type="checkbox" v-bind="inputAttrs()" />
     <span class="checkbox-label">
       {{ label }}
@@ -18,7 +18,7 @@ defineProps<{
   label?: string
 }>()
 
-const { wrapperAttrs, inputAttrs, inputId } = useInputAttrs(['type'])
+const { wrapperAttrs, inputAttrs } = useInputAttrs(['type'])
 </script>
 
 <style lang="scss" scoped>

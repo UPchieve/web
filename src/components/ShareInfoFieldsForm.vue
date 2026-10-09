@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import CheckBox from '@/components/CheckBox.vue'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import {
   getShareInfoFields,
   setShareInfoFields,
@@ -99,23 +99,18 @@ defineExpose({
         Nothing will be shared with your student.
       </p>
     </div>
-    <div
+    <FormCheckBox
       v-for="field in SHARE_INFO_FIELDS"
       :key="field.key"
-      class="uc-form-checkbox"
-    >
-      <CheckBox
-        :id="field.key"
-        :checked="isSelected(field.key)"
-        :model-value="isSelected(field.key)"
-        :data-testid="field.key"
-        @update:model-value="
-          (checked: boolean) => toggleField(field.key, checked)
-        "
-      >
-        {{ field.label }}
-      </CheckBox>
-    </div>
+      :name="field.key"
+      :label="field.label"
+      :model-value="isSelected(field.key)"
+      :is-required="false"
+      :data-testid="field.key"
+      @update:model-value="
+        (checked: boolean) => toggleField(field.key, checked)
+      "
+    />
     <div v-if="showButtons" class="share-info-form-buttons">
       <button
         class="uc-form-button-secondary secondary-button"
