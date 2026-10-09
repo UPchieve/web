@@ -119,17 +119,13 @@
           :validation="v$.formData.lastName"
         />
 
-        <div v-if="showHighSchoolCheckbox" class="uc-form-checkbox">
-          <input
-            id="highSchoolCheckbox"
-            v-model="isHighSchoolStudent"
-            type="checkbox"
-          />
-          <label for="highSchoolCheckbox">
-            {{ getFormQuestionIdentifier }}
-            currently a middle or high school student?
-          </label>
-        </div>
+        <FormCheckBox
+          v-if="showHighSchoolCheckbox"
+          name="highSchoolCheckbox"
+          v-model="isHighSchoolStudent"
+          :label="`${getFormQuestionIdentifier} currently a middle or high school student?`"
+          :is-required="false"
+        />
 
         <div class="uc-form-element">
           <FormSelect
@@ -188,17 +184,13 @@
           </autocomplete>
         </div>
 
-        <div v-if="showCollegeCheckbox" class="uc-form-checkbox">
-          <input
-            id="collegeCheckbox"
-            v-model="isCollegeStudent"
-            type="checkbox"
-          />
-          <label for="collegeCheckbox">
-            {{ getFormQuestionIdentifier }}
-            currently a college student?
-          </label>
-        </div>
+        <FormCheckBox
+          v-if="showCollegeCheckbox"
+          name="collegeCheckbox"
+          v-model="isCollegeStudent"
+          :label="`${getFormQuestionIdentifier} currently a college student?`"
+          :is-required="false"
+        />
 
         <FormInput
           v-if="showCollegeInput"
@@ -295,6 +287,7 @@ import LoggerService from '@/services/LoggerService'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import FormEmail from '@/components/FormEmail.vue'
 import FormErrors from '@/components/FormErrors.vue'
 import FormInput from '@/components/FormInput.vue'
@@ -316,6 +309,7 @@ export default {
   name: 'student-partner-signup-view',
   components: {
     FormPageTemplate,
+    FormCheckBox,
     FormEmail,
     FormErrors,
     Autocomplete,

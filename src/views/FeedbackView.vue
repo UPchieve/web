@@ -176,8 +176,9 @@
                     :checkboxValue="response.responseId"
                     :name="questionInfo.questionId"
                     :checked="
-                      userResponse[questionInfo.questionId].responseId ===
-                      response.responseId
+                      !!userResponse[
+                        questionInfo.questionId
+                      ].responseId?.includes?.(response.responseId)
                     "
                     :questionId="questionInfo.questionId"
                     :responseId="response.responseId"

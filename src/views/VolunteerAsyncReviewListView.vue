@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { EVENTS } from '@/consts'
 import type { EssayReviewSubmissionForVolunteer } from '@/types/essay-review'
@@ -67,7 +68,8 @@ async function load() {
   }
 }
 
-async function updateEmailPreference() {
+async function updateEmailPreference(isOptedIn: boolean) {
+  optedIn.value = isOptedIn
   try {
     await NetworkService.updateEssayReviewEmailPreference(optedIn.value)
     AnalyticsService.captureEvent(
@@ -112,18 +114,15 @@ onMounted(load)
     <div v-if="isLoading" class="empty-state">Loading submissions...</div>
 
     <template v-else>
-      <label
+      <FormCheckBox
         v-if="isEmailNotificationsEnabled"
-        class="email-preference detail-card uc-form-checkbox"
-      >
-        <input
-          v-model="optedIn"
-          type="checkbox"
-          class="checkbox-input"
-          @change="updateEmailPreference"
-        />
-        Email me when new submissions need reviews
-      </label>
+        class="email-preference detail-card"
+        name="essay-review-email-preference"
+        label="Email me when new submissions need reviews"
+        :model-value="optedIn"
+        :is-required="false"
+        @update:model-value="updateEmailPreference"
+      />
 
       <div v-if="submissions.length" class="review-table-wrapper">
         <table class="review-table">
@@ -245,7 +244,6 @@ onMounted(load)
 
 .email-preference {
   display: flex;
-  gap: 10px;
   align-items: center;
   cursor: pointer;
 }

@@ -134,22 +134,16 @@
             <p v-if="showInputErrors && occupations.length === 0" class="error">
               Please fill out this field.
             </p>
-            <div
-              class="uc-form-checkbox"
+            <FormCheckBox
               v-for="option in options.occupations"
               :key="option"
-            >
-              <input
-                type="checkbox"
-                :value="option"
-                v-model="occupations"
-                :id="option"
-                :data-testid="option"
-              />
-              <label class="uc-form-label" :for="option">
-                {{ option }}
-              </label>
-            </div>
+              :name="option"
+              :label="option"
+              :model-value="isOccupationSelected(option)"
+              :is-required="false"
+              :data-testid="option"
+              @update:model-value="updateOccupation(option, $event)"
+            />
             <template v-if="isInHighSchool">
               <p
                 data-testid="grade-level-question"
@@ -204,7 +198,7 @@
               </FormInput>
             </template>
 
-            <template v-if="isWorkingFullTime">
+            <template v-if="isWorking">
               <FormInput
                 name="company"
                 v-model="company"
@@ -295,6 +289,7 @@ import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 import { getAcademicYear } from '@/utils/academic-year'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import FormInput from '@/components/FormInput.vue'
 
 export default {
@@ -307,6 +302,7 @@ export default {
     LargeButton,
     MazPhoneNumberInput,
     FormSelect,
+    FormCheckBox,
     FormInput,
   },
   data() {
@@ -390,9 +386,10 @@ export default {
         this.occupations.includes('A graduate student')
       )
     },
-    isWorkingFullTime() {
+    isWorking() {
       return (
-        this.occupations.includes('Working full-time') &&
+        (this.occupations.includes(VolunteerOccupations.WORKING_FULL_TIME) ||
+          this.occupations.includes(VolunteerOccupations.WORKING_PART_TIME)) &&
         !this.user.volunteerPartnerOrg
       )
     },
@@ -421,6 +418,16 @@ export default {
   },
   methods: {
     getAcademicYear,
+    isOccupationSelected(occupation) {
+      return this.occupations.includes(occupation)
+    },
+    updateOccupation(occupation, selected) {
+      this.occupations = selected
+        ? [...this.occupations, occupation]
+        : this.occupations.filter(
+            (selectedOccupation) => selectedOccupation !== occupation
+          )
+    },
     goToDashboard() {
       this.$router.push('/dashboard')
     },
@@ -531,7 +538,7 @@ export default {
         (this.isUnitedStatesSelected && !this.state) ||
         !this.isValidLinkedInUrl ||
         (this.isCollegeEducated && !this.college) ||
-        (this.isWorkingFullTime && !this.company) ||
+        (this.isWorking && !this.company) ||
         (this.isInHighSchool && !this.gradeLevel) ||
         (this.shouldShowOtherSignupInput && !this.otherSignupSource) ||
         (this.shouldShowSchoolField &&
@@ -554,7 +561,7 @@ ol {
 .uc-form-checkbox {
   margin-bottom: 0.6em;
 
-  & label {
+  :deep(.checkbox-label) {
     @include font-category('body');
   }
 }

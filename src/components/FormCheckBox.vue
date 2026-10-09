@@ -3,6 +3,7 @@
     :id="name"
     :name="name"
     :label="label"
+    :variant="variant"
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
     :required="isRequired"
@@ -32,6 +33,11 @@ export default {
     modelValue: {
       type: Boolean,
       default: false,
+    },
+    variant: {
+      type: String,
+      default: 'primary',
+      validator: (value) => ['primary', 'secondary'].includes(value),
     },
   },
   emits: ['update:modelValue'],

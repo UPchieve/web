@@ -1,23 +1,21 @@
 <template>
-  <div class="uc-form-checkbox">
-    <input
-      @input="handleCheckboxSelection"
-      type="checkbox"
-      tabindex="-1"
-      :id="id"
-      :value="checkboxValue"
-      :name="name"
-      :checked="checked"
-    />
-
-    <label :for="id" tabindex="0">
-      <span>{{ label }}</span>
-    </label>
-  </div>
+  <FormCheckBox
+    :id="id"
+    :name="String(name)"
+    :value="checkboxValue"
+    :label="label"
+    :model-value="!!checked"
+    :is-required="false"
+    variant="secondary"
+    @update:model-value="handleCheckboxSelection"
+  />
 </template>
 
 <script>
+import FormCheckBox from '@/components/FormCheckBox.vue'
+
 export default {
+  components: { FormCheckBox },
   props: {
     id: {
       type: String,
@@ -59,18 +57,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-label {
+:deep(.checkbox-label) {
   font-weight: 400;
   font-size: 16px;
-  margin-top: 5px;
 }
 
-input[type='checkbox'] {
+:deep(input[type='checkbox']) {
   background-color: $upchieve-white;
-  &:checked {
-    background-color: $c-accent;
-    color: white;
-    border-color: $c-accent;
-  }
 }
 </style>

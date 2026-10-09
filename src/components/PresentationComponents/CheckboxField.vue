@@ -1,5 +1,5 @@
 <template>
-  <label class="uc-form-checkbox" v-bind="wrapperAttrs()">
+  <label class="uc-form-checkbox" :class="variant" v-bind="wrapperAttrs()">
     <input v-model="model" type="checkbox" v-bind="inputAttrs()" />
     <span class="checkbox-label">
       {{ label }}
@@ -14,9 +14,13 @@ defineOptions({ inheritAttrs: false })
 
 const model = defineModel<boolean>({ default: false })
 
-defineProps<{
-  label?: string
-}>()
+withDefaults(
+  defineProps<{
+    label?: string
+    variant?: 'primary' | 'secondary'
+  }>(),
+  { variant: 'primary' }
+)
 
 const { wrapperAttrs, inputAttrs } = useInputAttrs(['type'])
 </script>

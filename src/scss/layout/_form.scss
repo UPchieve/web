@@ -513,6 +513,10 @@
 .uc-form-checkbox {
   @include flex-container(row, flex-start, baseline);
 
+  &.secondary {
+    --checkbox-color: #{$c-success-green};
+  }
+
   label {
     @include font-category('body');
     color: $c-soft-black;
@@ -534,8 +538,8 @@
       opacity: 0;
     }
     &:checked {
-      background-color: $uc-primary-blue;
-      border-color: $uc-primary-blue;
+      background-color: var(--checkbox-color, #{$uc-primary-blue});
+      border-color: var(--checkbox-color, #{$uc-primary-blue});
       color: white;
 
       &:after {

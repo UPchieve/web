@@ -44,6 +44,7 @@
                   ]?.selectedResponseIds?.includes(response.responseId)
                 "
                 :is-required="false"
+                variant="secondary"
                 @update:model-value="
                   updateFakeDoorResponse(response.responseId, $event)
                 "

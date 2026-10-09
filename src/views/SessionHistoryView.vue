@@ -43,16 +43,14 @@
           group="subjects"
           @update:modelValue="filter"
         />
-        <div class="unread-dms-checkbox">
-          <label>
-            <input
-              type="checkbox"
-              v-model="filters.hasUnreadDMs"
-              @change="filter"
-            />
-            Sessions with unread messages
-          </label>
-        </div>
+        <FormCheckBox
+          class="unread-dms-checkbox"
+          name="unread-dms-checkbox"
+          label="Sessions with unread messages"
+          :model-value="filters.hasUnreadDMs"
+          :is-required="false"
+          @update:model-value="onChangeUnreadDMs"
+        />
         <button type="button" class="clear-filters" @click="clearFilters">
           Clear all
         </button>
@@ -293,6 +291,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
+import FormCheckBox from '@/components/FormCheckBox.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import LargeButton from '@/components/LargeButton.vue'
@@ -304,6 +303,7 @@ export default {
   components: {
     CaretIcon,
     FavoritingToggle,
+    FormCheckBox,
     FormSelect,
     LargeButton,
     Loader,
@@ -457,6 +457,10 @@ export default {
     },
     filter() {
       this.navigateTo({ page: 1 })
+    },
+    onChangeUnreadDMs(hasUnreadDMs) {
+      this.filters.hasUnreadDMs = hasUnreadDMs
+      this.filter()
     },
     clearFilters() {
       this.filters.firstName = ''
