@@ -23,13 +23,9 @@
           <label for="affiliation" class="uc-form-label"
             >In what capacity do you know the applicant?</label
           >
-          <input
-            type="text"
-            id="affiliation"
-            autocomplete="off"
-            class="uc-form-input"
+          <FormInput
+            name="affiliation"
             v-model="affiliation"
-            required
             placeholder="Your answer"
           />
         </div>
@@ -38,13 +34,9 @@
           <label for="relationship-length" class="uc-form-label"
             >How long have you known the applicant?</label
           >
-          <input
-            type="text"
-            id="relationship-length"
-            autocomplete="off"
-            class="uc-form-input"
+          <FormInput
+            name="relationship-length"
             v-model="relationshipLength"
-            required
             placeholder="Your answer"
           />
         </div>
@@ -241,13 +233,14 @@
 <script>
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
+import FormInput from './FormInput.vue'
 import FormSelect from './FormInputs/FormSelect.vue'
 import { EVENTS } from '@/consts'
 import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'ReferenceForm',
-  components: { FormSelect },
+  components: { FormInput, FormSelect },
   props: {
     isAdminReview: { type: Boolean, default: false },
     reference: { type: Object },

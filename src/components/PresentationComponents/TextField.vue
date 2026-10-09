@@ -2,7 +2,7 @@
   <div class="uc-form-element w-full" :class="$attrs.class">
     <div class="uc-row justify-between">
       <label :for="inputId()" :class="{ error: errorMessage }">
-        {{ label }}
+        <slot name="label">{{ label }}</slot>
       </label>
       <div v-if="errorMessage" class="error-caption">
         {{ errorMessage }}

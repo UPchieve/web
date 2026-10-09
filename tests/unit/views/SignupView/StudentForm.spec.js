@@ -211,12 +211,12 @@ describe('StudentForm', () => {
         },
         testStudentPartnerOrg
       )
-      expect(
-        wrapper.find('[data-testid="student-first-name-label"]').text()
-      ).toEqual("What is the student's first name?")
-      expect(
-        wrapper.find('[data-testid="student-last-name-label"]').text()
-      ).toEqual("What is the student's last name?")
+      expect(wrapper.find('label[for="studentFirstName"]').text()).toEqual(
+        "What is the student's first name?"
+      )
+      expect(wrapper.find('label[for="studentLastName"]').text()).toEqual(
+        "What is the student's last name?"
+      )
       expect(
         wrapper.findComponent('[data-testid="student-grade-select"]').props()
           .placeholder
@@ -245,13 +245,18 @@ describe('StudentForm', () => {
 
     it("Should only render the student's first and last name fields on the eligibility form for parent/guardian signup", async () => {
       const wrapper = await getWrapper()
-      expect(
-        wrapper.find('[data-testid="student-first-name-label"]').exists()
-      ).toBeFalsy()
-      expect(
-        wrapper.find('[data-testid="student-last-name-label"]').exists()
-      ).toBeFalsy()
+      expect(wrapper.find('label[for="studentFirstName"]').exists()).toBeFalsy()
+      expect(wrapper.find('label[for="studentLastName"]').exists()).toBeFalsy()
     })
+  })
+
+  it('shows the zip code error once the field is blurred', async () => {
+    const wrapper = await getWrapper()
+    const zip = wrapper.find('[data-testid="student-zipcode-input"]')
+    await zip.setValue('12')
+    await zip.trigger('blur')
+    expect(wrapper.find('label[for="zipCode"]').classes()).toContain('error')
+    expect(wrapper.text()).toContain('Must be 5 characters long')
   })
 
   describe('Code.org students', () => {

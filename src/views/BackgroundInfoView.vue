@@ -55,22 +55,15 @@
               :is-required="true"
               :reduce="(option) => option.id"
             />
-            <div class="uc-column" v-if="shouldShowOtherSignupInput">
-              <input
-                id="otherSignupSource"
-                data-testid="otherSignupSource"
-                type="text"
-                class="uc-form-input"
-                v-model="otherSignupSource"
-                v-bind:class="{
-                  'uc-form-input--invalid':
-                    invalidInputs.indexOf('otherSignupSource') > -1,
-                }"
-                placeholder="Tell us where you heard about us!"
-                autofocus
-                autocomplete="off"
-              />
-            </div>
+            <FormInput
+              v-if="shouldShowOtherSignupInput"
+              class="uc-column"
+              name="otherSignupSource"
+              testid="otherSignupSource"
+              v-model="otherSignupSource"
+              placeholder="Tell us where you heard about us!"
+              autofocus
+            />
           </li>
 
           <li class="uc-form-col">
@@ -112,20 +105,17 @@
               />
             </template>
             <template v-if="country">
-              <label class="uc-form-label location-label" for="city"
-                >City<span class="background-info__question-required"
-                  >*</span
-                ></label
-              >
-              <input
-                type="text"
+              <FormInput
+                name="city"
+                testid="city-input"
                 v-model="city"
                 placeholder="Enter a city..."
-                class="uc-form-input location-input"
-                id="city"
-                data-testid="city-input"
-                autocomplete="off"
-              />
+                class="location-input slotted-label-input"
+              >
+                <template #label>
+                  City<span class="background-info__question-required">*</span>
+                </template>
+              </FormInput>
             </template>
             <p v-if="showInputErrors" class="error">
               Please fill out these fields.
@@ -199,37 +189,35 @@
             </p>
 
             <template v-if="isCollegeEducated">
-              <label class="uc-form-label occupations-label" for="college"
-                >What college/university do you currently attend?<span
-                  class="background-info__question-required"
-                  >*</span
-                ></label
-              >
-              <input
-                type="text"
+              <FormInput
+                name="college"
                 v-model="college"
                 placeholder="Enter a college..."
-                class="uc-form-input occupations-input"
-                id="college"
-                autocomplete="off"
-              />
+                class="occupations-input slotted-label-input"
+              >
+                <template #label>
+                  What college/university do you currently attend?<span
+                    class="background-info__question-required"
+                    >*</span
+                  >
+                </template>
+              </FormInput>
             </template>
 
             <template v-if="isWorkingFullTime">
-              <label class="uc-form-label occupations-label" for="company"
-                >What company do you currently work at?<span
-                  class="background-info__question-required"
-                  >*</span
-                ></label
-              >
-              <input
-                type="text"
+              <FormInput
+                name="company"
                 v-model="company"
                 placeholder="Enter your company..."
-                class="uc-form-input occupations-input"
-                id="company"
-                autocomplete="off"
-              />
+                class="occupations-input slotted-label-input"
+              >
+                <template #label>
+                  What company do you currently work at?<span
+                    class="background-info__question-required"
+                    >*</span
+                  >
+                </template>
+              </FormInput>
             </template>
           </li>
 
@@ -240,15 +228,14 @@
             </p>
             <p class="background-info__question-description">(optional)</p>
 
-            <input
-              type="text"
-              :pattern="linkedInUrlPattern.source"
+            <FormInput
+              name="linkedin"
+              testid="linked-in-input"
               v-model="linkedInUrl"
               placeholder="https://www.linkedin.com/in/yourname"
-              class="linkedin-input uc-form-input"
-              id="linkedin"
-              data-testid="linked-in-input"
-              autocomplete="off"
+              :is-required="false"
+              :pattern="linkedInUrlPattern.source"
+              class="linkedin-input"
             />
             <p v-if="!isValidLinkedInUrl" class="error">
               Your url should be in this format:
@@ -308,6 +295,7 @@ import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 import { getAcademicYear } from '@/utils/academic-year'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
+import FormInput from '@/components/FormInput.vue'
 
 export default {
   name: 'background-info-view',
@@ -319,6 +307,7 @@ export default {
     LargeButton,
     MazPhoneNumberInput,
     FormSelect,
+    FormInput,
   },
   data() {
     return {
@@ -555,10 +544,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-input:invalid {
-  border-bottom: $c-error-red solid 3px;
-}
-
 ol {
   padding-inline-start: 30px;
   @include breakpoint-above('medium') {
@@ -649,6 +634,24 @@ textarea {
   display: block;
   margin-top: 1.4em;
   margin-bottom: 0.5em;
+}
+
+.slotted-label-input {
+  margin-top: 1.4em;
+
+  :deep(label) {
+    @include font-category('body');
+    margin: 0 0 0.5em;
+  }
+
+  :deep(label:not(.error)) {
+    color: inherit;
+  }
+
+  // line up text for the label and 'Required'
+  :deep(.uc-row) {
+    align-items: baseline;
+  }
 }
 
 .linkedin-input,

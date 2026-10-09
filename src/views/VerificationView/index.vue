@@ -20,20 +20,14 @@
             sendTo
           }}</span>
         </p>
-        <div class="uc-form-element">
-          <label for="verification-code">
-            Enter your 6-digit verification code
-          </label>
-          <input
-            id="verification-code"
-            class="uc-form-text-input"
-            v-model="verificationCode"
-            type="text"
-            placeholder="XXXXXX"
-            required
-            autocomplete="off"
-          />
-        </div>
+        <FormInput
+          name="verification-code"
+          label="Enter your 6-digit verification code"
+          placeholder="XXXXXX"
+          v-model="verificationCode"
+          maxlength="6"
+          :is-required="false"
+        />
 
         <div class="uc-form-subtext verification__sub-text">
           Did not receive
@@ -102,6 +96,7 @@ import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import FormInput from '@/components/FormInput.vue'
 
 export default {
   name: 'VerificationView',
@@ -110,6 +105,7 @@ export default {
     Loader,
     VerificationMethodSelector,
     LargeButton,
+    FormInput,
   },
   data() {
     return {

@@ -7,6 +7,7 @@ import { secondsInMs } from '@/utils/time-utils'
 import LoggerService from '@/services/LoggerService'
 import { useStore } from 'vuex'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import FormInput from '@/components/FormInput.vue'
 
 const store = useStore()
 const userTutoringLanguages = computed(
@@ -34,10 +35,10 @@ const selectedLanguages = computed(() => {
 const showAddOtherLanguage = computed(() =>
   selectedOptions.value.includes(OTHER)
 )
-const otherLanguage = ref<string | null>(null)
+const otherLanguage = ref<string>('')
 
 // If the update fails, reset to the last state.
-const lastConfirmedOtherLanguage = ref<string | null>(null)
+const lastConfirmedOtherLanguage = ref<string>('')
 const lastConfirmedSelections = ref<string[]>(userTutoringLanguages.value)
 
 const debouncedUpdate = debounce(updateTutoringLanguages, secondsInMs(1.5))
@@ -54,7 +55,7 @@ async function updateTutoringLanguages() {
     return
   }
   if (!selectedOptions.value.includes(OTHER) && otherLanguage.value) {
-    otherLanguage.value = null
+    otherLanguage.value = ''
   }
   try {
     await NetworkService.addBackgroundInfo({
@@ -90,13 +91,13 @@ const emit = defineEmits<{
       label="Select all that apply"
       class="dropdown"
     />
-    <input
-      type="text"
-      v-model="otherLanguage"
-      class="uc-form-input other-input"
+    <FormInput
       v-if="showAddOtherLanguage"
+      name="other-language"
+      v-model="otherLanguage"
+      class="other-input"
       placeholder="Enter the other language"
-      autocomplete="off"
+      :is-required="false"
     />
   </div>
 </template>

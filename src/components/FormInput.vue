@@ -13,10 +13,10 @@
     :min="minValue"
     :disabled="readOnly"
     :label="label"
-    :error-message="
-      hasValidationError(customError) ? getValidationErrors(customError) : ''
-    "
-  />
+    :error-message="errorMessage"
+  >
+    <template v-if="$slots.label" #label><slot name="label" /></template>
+  </TextField>
 </template>
 
 <script>
@@ -87,6 +87,12 @@ export default {
       type: String,
       default: '',
     },
+    // A page-level Vuelidate field (e.g. `v$.formData.firstName`). When given,
+    // it replaces FormInput's own rules: its errors are shown and it is touched
+    // on blur, so the field is only validated once.
+    validation: {
+      type: Object,
+    },
   },
   emits: ['update:modelValue'],
 
@@ -102,6 +108,8 @@ export default {
   },
 
   validations() {
+    if (this.validation) return {}
+
     const textValidations = {
       required: helpers.withMessage('Required', requiredIf(this.isRequired)),
     }
@@ -137,6 +145,13 @@ export default {
   },
 
   computed: {
+    errorMessage() {
+      if (this.customError) return this.customError
+      if (this.validation) {
+        return this.validation.$errors.map((e) => e.$message).join(', ')
+      }
+      return this.hasValidationError() ? this.getValidationErrors() : ''
+    },
     // v-model casts number inputs to number, but we want to emit strings here
     // if the value is a number, then we want to stringify it
     textFieldValue() {
@@ -148,7 +163,8 @@ export default {
 
   methods: {
     onBlur() {
-      this.v$.modelValue.$touch()
+      const field = this.validation ?? this.v$.modelValue
+      field.$touch()
       if (this.modelValue && !this.hasEnteredText && this.blurEvent) {
         AnalyticsService.captureEvent(this.blurEvent, this.blurEventProperties)
         this.hasEnteredText = true

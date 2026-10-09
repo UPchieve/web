@@ -20,6 +20,7 @@ import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
 import { enrollStudentToIncentiveProgram } from '@/services/UserProductFlagsService'
 import FormEmail from '@/components/FormEmail.vue'
+import FormInput from '@/components/FormInput.vue'
 import useVuelidate from '@vuelidate/core'
 import type { AxiosError } from 'axios'
 
@@ -439,20 +440,14 @@ onMounted(() => {
         </header>
 
         <section class="incentive-enrollment-modal__section">
-          <div class="uc-form-element">
-            <label for="verification-code"
-              >Enter your 6-digit verification code</label
-            >
-            <input
-              id="verification-code"
-              class="uc-form-text-input"
-              v-model="verificationCode"
-              type="text"
-              placeholder="XXXXXX"
-              autocomplete="off"
-              required
-            />
-          </div>
+          <FormInput
+            name="verification-code"
+            label="Enter your 6-digit verification code"
+            placeholder="XXXXXX"
+            v-model="verificationCode"
+            maxlength="6"
+            :is-required="false"
+          />
           <div
             class="uc-form-subtext verification__sub-text"
             v-if="!hasResentCode"

@@ -22,20 +22,14 @@
           }}</span
           >.
         </p>
-        <div class="uc-form-element">
-          <label for="verification-code-field">
-            Enter your 6-digit verification code
-          </label>
-          <input
-            class="uc-form-text-input"
-            id="verification-code-field"
-            v-model="verificationCode"
-            type="text"
-            placeholder="XXXXXX"
-            maxlength="6"
-            autocomplete="off"
-          />
-        </div>
+        <FormInput
+          name="verification-code-field"
+          label="Enter your 6-digit verification code"
+          placeholder="XXXXXX"
+          v-model="verificationCode"
+          maxlength="6"
+          :is-required="false"
+        />
         <p class="uc-form-subtext">
           Did not receive a code?
           <span
@@ -100,6 +94,7 @@ import { mapState, mapGetters } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
+import FormInput from '@/components/FormInput.vue'
 import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 
 export default {
@@ -108,6 +103,7 @@ export default {
     RecaptchaCaption,
     Modal,
     Loader,
+    FormInput,
   },
   props: {
     phoneOrEmailToVerify: {

@@ -9,6 +9,7 @@ import UpdogStarIcon from '@/assets/updog-star.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import Modal from '@/components/Modal.vue'
 import FormEmail from '@/components/FormEmail.vue'
+import FormInput from '@/components/FormInput.vue'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 import Loader from '@/components/Loader.vue'
 import { useVerification } from '@/composables/useVerification'
@@ -337,20 +338,14 @@ watch(modalView, () => {
         </header>
 
         <section class="impact-study-modal__section">
-          <div class="uc-form-element">
-            <label for="verification-code"
-              >You can find your 6-digit code in your email
-            </label>
-            <input
-              id="verification-code"
-              class="uc-form-text-input"
-              v-model="verificationCode"
-              type="text"
-              placeholder="XXXXXX"
-              autocomplete="off"
-              required
-            />
-          </div>
+          <FormInput
+            name="verification-code"
+            label="You can find your 6-digit code in your email"
+            placeholder="XXXXXX"
+            v-model="verificationCode"
+            maxlength="6"
+            :is-required="false"
+          />
           <div
             class="uc-form-subtext impact-study-verification__sub-text"
             v-if="!hasResentCode"

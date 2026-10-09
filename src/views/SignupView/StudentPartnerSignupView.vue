@@ -103,59 +103,21 @@
           ></v-select-legacy>
         </div>
 
-        <div class="uc-form-element">
-          <label
-            for="firstName"
-            v-bind:class="{
-              error: hasFormValidationError(v$.formData.firstName),
-            }"
-            >What is
-            {{ getFormLabelIdentifierPossessive }}
-            first name?
-          </label>
-          <input
-            id="firstName"
-            class="uc-form-text-input"
-            type="text"
-            :placeholder="`Enter ${getFormLabelIdentifierPossessive} first name`"
-            v-bind:class="{
-              'uc-form-text-input-invalid': hasFormValidationError(
-                v$.formData.firstName
-              ),
-            }"
-            v-model="formData.firstName"
-            @blur="v$.formData.firstName.$touch"
-            autocomplete="off"
-            required
-          />
-        </div>
+        <FormInput
+          name="firstName"
+          :label="`What is ${getFormLabelIdentifierPossessive} first name?`"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} first name`"
+          v-model="formData.firstName"
+          :validation="v$.formData.firstName"
+        />
 
-        <div class="uc-form-element">
-          <label
-            for="lastName"
-            v-bind:class="{
-              error: hasFormValidationError(v$.formData.lastName),
-            }"
-            >What is
-            {{ getFormLabelIdentifierPossessive }}
-            last name?
-          </label>
-          <input
-            id="lastName"
-            class="uc-form-text-input"
-            type="text"
-            :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
-            v-bind:class="{
-              'uc-form-text-input-invalid': hasFormValidationError(
-                v$.formData.lastName
-              ),
-            }"
-            v-model="formData.lastName"
-            @blur="v$.formData.lastName.$touch"
-            autocomplete="off"
-            required
-          />
-        </div>
+        <FormInput
+          name="lastName"
+          :label="`What is ${getFormLabelIdentifierPossessive} last name?`"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} last name`"
+          v-model="formData.lastName"
+          :validation="v$.formData.lastName"
+        />
 
         <div v-if="showHighSchoolCheckbox" class="uc-form-checkbox">
           <input
@@ -238,31 +200,14 @@
           </label>
         </div>
 
-        <div v-if="showCollegeInput" class="uc-form-element">
-          <label
-            for="college"
-            v-bind:class="{
-              error: hasFormValidationError(v$.formData.college),
-            }"
-            >What is
-            {{ getFormLabelIdentifierPossessive }}
-            college?</label
-          >
-          <input
-            id="college"
-            autocomplete="off"
-            class="uc-form-text-input"
-            :placeholder="`Enter ${getFormLabelIdentifierPossessive} college`"
-            type="text"
-            v-model="formData.college"
-            v-bind:class="{
-              'uc-form-text-input-invalid': hasFormValidationError(
-                v$.formData.college
-              ),
-            }"
-            @blur="v$.formData.college.$touch"
-          />
-        </div>
+        <FormInput
+          v-if="showCollegeInput"
+          name="college"
+          :label="`What is ${getFormLabelIdentifierPossessive} college?`"
+          :placeholder="`Enter ${getFormLabelIdentifierPossessive} college`"
+          v-model="formData.college"
+          :validation="v$.formData.college"
+        />
 
         <div class="uc-form-element">
           <div class="uc-row justify-between">
@@ -386,17 +331,13 @@
             :reduce="(option) => option.id"
           />
         </div>
-        <div class="uc-form-element" v-if="shouldShowOtherSignupInput()">
-          <label for="other-signup-source">How did you hear about us?</label>
-          <input
-            id="other-signup-source"
-            type="text"
-            autocomplete="off"
-            class="uc-form-text-input"
-            v-model="formData.otherSignupSource"
-            autofocus
-          />
-        </div>
+        <FormInput
+          v-if="shouldShowOtherSignupInput()"
+          name="other-signup-source"
+          label="How did you hear about us?"
+          v-model="formData.otherSignupSource"
+          autofocus
+        />
 
         <button
           class="uc-form-button"
@@ -440,6 +381,7 @@ import Autocomplete from '@trevoreyre/autocomplete-vue'
 
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
 import FormErrors from '@/components/FormErrors.vue'
+import FormInput from '@/components/FormInput.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import SsoButton from '@/components/SsoButton.vue'
 import AuthService from '@/services/AuthService'
@@ -461,6 +403,7 @@ export default {
     Autocomplete,
     VerificationBadge,
     SsoButton,
+    FormInput,
     FormSelect,
     LineDivider,
   },
@@ -512,6 +455,12 @@ export default {
           required: helpers.withMessage(
             'Required',
             requiredIf(() => this.requireSignupSource)
+          ),
+        },
+        otherSignupSource: {
+          required: helpers.withMessage(
+            'Required',
+            requiredIf(() => this.shouldShowOtherSignupInput())
           ),
         },
         gradeLevel: {

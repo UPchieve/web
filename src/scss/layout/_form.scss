@@ -172,7 +172,8 @@
     outline: 1px solid $c-information-blue;
   }
 
-  &-invalid {
+  &-invalid,
+  &:user-invalid {
     outline: 1px solid $c-error-red;
   }
 
