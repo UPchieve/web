@@ -54,14 +54,12 @@
         :placeholder="`Enter ${getFormLabelIdentifierPossessive} email address`"
         :aria-label="`Enter ${getFormLabelIdentifierPossessive} email address`"
         label="Email"
-        :is-required="false"
         v-bind:class="{
           'uc-form-text-input-invalid': hasFormValidationError(
             v$.eligibility.studentEmail
           ),
         }"
         @blur="v$.eligibility.studentEmail.$touch"
-        required
         is-autofocused
       />
 

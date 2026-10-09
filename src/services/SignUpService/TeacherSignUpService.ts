@@ -296,7 +296,6 @@ function getAccountPageDetails(): PageDetail<TeacherAccountFormData> {
         element: 'FormPassword',
         props: {
           name: InputName.PASSWORD,
-          showPasswordRequirements: true,
           blurEvent: EVENTS.TEACHER_ENTERED_PASSWORD,
         },
       }),

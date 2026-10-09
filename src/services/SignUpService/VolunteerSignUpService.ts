@@ -145,7 +145,6 @@ async function getLogInDetails(
         element: 'FormPassword',
         props: {
           name: InputName.PASSWORD,
-          showPasswordRequirements: true,
         },
       }),
       getRow(

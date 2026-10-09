@@ -8,14 +8,25 @@
         {{ errorMessage }}
       </div>
     </div>
-    <input
-      v-model="model"
-      :type="inputType()"
-      class="uc-form-text-input"
-      :class="{ 'uc-form-text-input-invalid': errorMessage }"
-      v-bind="inputAttrs()"
-      autocomplete="off"
-    />
+    <div class="text-field-input">
+      <input
+        v-model="model"
+        :type="inputType()"
+        class="uc-form-text-input"
+        :class="{
+          'uc-form-text-input-invalid': errorMessage,
+          'has-append': $slots.append,
+        }"
+        v-bind="inputAttrs()"
+        autocomplete="off"
+      />
+      <div v-if="$slots.append" class="text-field-append">
+        <slot name="append" />
+      </div>
+    </div>
+    <div v-if="metadata" class="metadata" :class="{ error: errorMessage }">
+      {{ metadata }}
+    </div>
   </div>
 </template>
 
@@ -30,6 +41,7 @@ const model = defineModel<string | number>({ default: '' })
 defineProps<{
   label?: string
   errorMessage?: string
+  metadata?: string
 }>()
 
 const attrs = useAttrs()
@@ -46,3 +58,23 @@ function inputId() {
   return attrs.id as string
 }
 </script>
+
+<style lang="scss" scoped>
+.text-field-input {
+  @include flex-container(column);
+  position: relative;
+}
+
+.has-append {
+  padding-right: 36px;
+}
+
+.text-field-append {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 8px;
+  display: flex;
+  align-items: center;
+}
+</style>

@@ -164,6 +164,7 @@ function captureSsoClickEvent(provider: SsoProvider): void {
           testid="inputPassword"
           :placeholder="useNewSignUpFlow ? 'Password' : 'Enter your password'"
           :is-required="false"
+          :show-password-requirements="false"
         />
         <router-link to="/resetpassword" class="uc-link subtext">
           Forgot your password?

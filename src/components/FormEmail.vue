@@ -1,124 +1,65 @@
 <template>
-  <div class="uc-form-element w-full">
-    <div class="uc-row justify-between">
-      <label
-        :for="name"
-        :class="{
-          error: hasValidationError(),
-        }"
-        >{{ label }}</label
-      >
-      <div v-if="hasValidationError()" class="error-caption">
-        {{ getValidationErrors() }}
-      </div>
-    </div>
-    <input
-      :id="name"
-      :data-testid="testid"
-      :name="name"
-      autocomplete="off"
-      class="uc-form-text-input"
-      :class="{
-        'uc-form-text-input-invalid': hasValidationError(),
-      }"
-      type="email"
-      :placeholder="placeholder"
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-      @blur="onBlur"
-      :required="isRequired"
-      :autofocus="isAutofocused"
-    />
-    <div
-      v-if="metadata"
-      class="metadata"
-      :class="{
-        'metadata error': hasValidationError(),
-      }"
-    >
-      {{ metadata }}
-    </div>
-  </div>
+  <TextField
+    :id="name"
+    :name="name"
+    type="email"
+    :placeholder="placeholder"
+    :data-testid="testid"
+    :model-value="modelValue"
+    @update:model-value="emit('update:modelValue', String($event))"
+    @blur="onBlur"
+    :required="isRequired"
+    :autofocus="isAutofocused"
+    :label="label"
+    :metadata="metadata"
+    :error-message="hasValidationError() ? getValidationErrors() : ''"
+  />
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { helpers, requiredIf, email } from '@vuelidate/validators'
 import AnalyticsService from '@/services/AnalyticsService'
+import TextField from '@/components/PresentationComponents/TextField.vue'
 
-export default {
-  props: {
-    isRequired: {
-      type: Boolean,
-      default: true,
-    },
-    isAutofocused: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: 'Email',
-    },
-    name: {
-      type: String,
-      default: 'email',
-    },
-    placeholder: {
-      type: String,
-      default: 'What is your email?',
-    },
-    blurEvent: {
-      type: String,
-    },
-    testid: {
-      type: String,
-      default: '',
-    },
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    metadata: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
+const props = defineProps({
+  isRequired: { type: Boolean, default: true },
+  isAutofocused: { type: Boolean, default: false },
+  label: { type: String, default: 'Email' },
+  name: { type: String, default: 'email' },
+  placeholder: { type: String, default: 'What is your email?' },
+  blurEvent: { type: String },
+  testid: { type: String, default: '' },
+  modelValue: { type: String, default: '' },
+  metadata: { type: String, default: '' },
+})
 
-  setup() {
-    return { v$: useVuelidate() }
-  },
+const emit = defineEmits(['update:modelValue'])
 
-  data() {
-    return {
-      hasEnteredEmail: false,
-    }
-  },
+const hasEnteredEmail = ref(false)
 
-  validations() {
-    return {
-      modelValue: {
-        required: helpers.withMessage('Required', requiredIf(this.isRequired)),
-        email: helpers.withMessage('Not a valid email address', email),
-      },
-    }
+const rules = computed(() => ({
+  modelValue: {
+    required: helpers.withMessage('Required', requiredIf(props.isRequired)),
+    email: helpers.withMessage('Not a valid email address', email),
   },
+}))
 
-  methods: {
-    onBlur() {
-      this.v$.modelValue.$touch()
-      if (this.modelValue && !this.hasEnteredEmail && this.blurEvent) {
-        AnalyticsService.captureEvent(this.blurEvent)
-        this.hasEnteredEmail = true
-      }
-    },
-    hasValidationError() {
-      return this.v$.$error
-    },
-    getValidationErrors() {
-      return this.v$.$errors.map((e) => e.$message).join(', ')
-    },
-  },
+const v$ = useVuelidate(rules, props)
+
+function hasValidationError() {
+  return v$.value.$error
+}
+function getValidationErrors() {
+  return v$.value.$errors.map((e) => e.$message).join(', ')
+}
+
+function onBlur() {
+  v$.value.modelValue.$touch()
+  if (props.modelValue && !hasEnteredEmail.value && props.blurEvent) {
+    AnalyticsService.captureEvent(props.blurEvent)
+    hasEnteredEmail.value = true
+  }
 }
 </script>

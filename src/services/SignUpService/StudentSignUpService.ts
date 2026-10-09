@@ -535,7 +535,6 @@ function getAccountPageDetails(
             props: {
               label: 'Password',
               name: InputName.PASSWORD,
-              showPasswordRequirements: true,
               blurEvent: EVENTS.STUDENT_ENTERED_PASSWORD,
             },
           })
