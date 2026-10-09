@@ -3,10 +3,10 @@ import { onMounted, ref, watch } from 'vue'
 import { secondsInMs } from '@/utils/time-utils'
 import NetworkService from '@/services/NetworkService'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
+import { useCelebrationsStore } from '@/stores/celebrations'
 
 const router = useRouter()
-const store = useStore()
+const celebrationsStore = useCelebrationsStore()
 
 const targetMode = 'volunteer'
 const isSwitchModePromiseResolved = ref<boolean>(false)
@@ -38,7 +38,7 @@ onMounted(() => {
       isSwitchModePromiseRejected.value = true
     })
   // trigger confetti
-  store.dispatch('celebrations/celebrate')
+  celebrationsStore.celebrate()
 })
 
 watch(

@@ -215,6 +215,7 @@
 <script>
 import { startCase } from 'lodash-es'
 import { mapState, mapGetters } from 'vuex'
+import { mapActions } from 'pinia'
 import { dayjs } from '@/utils/time-utils'
 import { socket } from '@/socket'
 
@@ -238,7 +239,10 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import ModerationService from '@/services/ModerationService'
 
-import { DEFAULT_CELEBRATION_DURATION } from '@/store/modules/celebrations'
+import {
+  DEFAULT_CELEBRATION_DURATION,
+  useCelebrationsStore,
+} from '@/stores/celebrations'
 import getChatAvatar from '@/utils/get-chat-avatar'
 import sendWebNotification from '@/utils/send-web-notification'
 
@@ -467,6 +471,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(useCelebrationsStore, { showConfetti: 'celebrate' }),
     renderLatex,
     getModerationFailureReason(reasonKey) {
       switch (reasonKey.toLowerCase()) {
@@ -809,7 +814,7 @@ export default {
       return currentFormatted !== nextFormatted
     },
     celebrate() {
-      this.$store.dispatch('celebrations/celebrate')
+      this.showConfetti()
       socket.emit('celebrate', {
         sessionId: this.currentSession.id,
         userId: this.user.id,

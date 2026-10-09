@@ -2,18 +2,16 @@
 import { vConfetti } from '@neoconfetti/vue'
 import { useStore } from 'vuex'
 import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useCelebrationsStore } from '@/stores/celebrations'
 
 const store = useStore()
+const { confettiCelebrations } = storeToRefs(useCelebrationsStore())
 // Add 100 to fall off the edge of the screen
 const stageWidth = computed(() => store.state.app.windowWidth + 100)
 const stageHeight = computed(() => store.state.app.windowHeight + 100)
 
-const showConfetti = computed(
-  () => store.state.celebrations.confettiCelebrations.length > 0
-)
-const confettiCelebrations = computed(
-  () => store.state.celebrations.confettiCelebrations
-)
+const showConfetti = computed(() => confettiCelebrations.value.length > 0)
 
 const prefersReducedMotion = computed(() => {
   return store.state.app.prefersReducedMotion

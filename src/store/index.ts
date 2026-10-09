@@ -12,7 +12,6 @@ import botConversationsModule, {
   type TutorBotStoreState,
 } from './modules/bot-conversations'
 import liveMediaModule from './modules/liveMedia'
-import celebrationsModule from './modules/celebrations'
 import americaCountsVolunteerModule from './modules/america-counts-volunteer'
 import nthsModule from './modules/nths'
 
@@ -39,7 +38,6 @@ export const storeOptions = {
     session: sessionModule,
     liveMedia: liveMediaModule,
     botConversations: botConversationsModule,
-    celebrations: celebrationsModule,
     americaCountsVolunteer: americaCountsVolunteerModule,
     nths: nthsModule,
   },

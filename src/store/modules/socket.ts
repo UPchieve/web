@@ -8,6 +8,7 @@ import {
   PARTNER_IMAGE_UPLOAD_STATUS,
 } from '@/composables/imageUploadState'
 import AnalyticsService from '@/services/AnalyticsService'
+import { useCelebrationsStore } from '@/stores/celebrations'
 import { EVENTS } from '@/consts'
 import { getShareInfoFields } from '@/services/BrowserStorageService'
 import {
@@ -216,7 +217,7 @@ export default {
       })
 
       socket.on('celebrate', (data: { duration: number }) => {
-        dispatch('celebrations/celebrate', data.duration, { root: true })
+        useCelebrationsStore().celebrate(data.duration)
         if (rootGetters['user/isStudent']) {
           AnalyticsService.captureEvent(EVENTS.USER_RECEIVED_CELEBRATION)
         }
