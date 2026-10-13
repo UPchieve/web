@@ -5,6 +5,7 @@ import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVoluntee
 import * as PresenceService from '@/services/PresenceService'
 import { maybeGetActiveSessionHoldForUser } from '@/utils/session'
 import { union } from 'lodash-es'
+import { useNotificationsStore } from '@/stores/notifications'
 
 export default {
   namespaced: true,
@@ -109,7 +110,8 @@ export default {
       if (isDashboard && isMobile) {
         return
       }
-      const notifications = this.state.notifications.notifications
+      const notificationsStore = useNotificationsStore()
+      const notifications = notificationsStore.notifications
       const rollupShowing =
         notifications.findIndex(({ id }) => id === 'rollup-alert') > -1
       if (
@@ -117,13 +119,13 @@ export default {
         (isMobile && availableSessions.length > 3)
       ) {
         if (rollupShowing) {
-          this.dispatch('notifications/updateTitle', {
+          notificationsStore.updateTitle({
             notificationId: 'rollup-alert',
             title: `There are ${availableSessions.length} students that need help`,
           })
         } else {
-          this.dispatch('notifications/clear')
-          this.dispatch('notifications/add', {
+          notificationsStore.clear()
+          notificationsStore.add({
             id: 'rollup-alert',
             icon: StudentIcon,
             title: `There are ${availableSessions.length} students that need help`,
@@ -136,7 +138,7 @@ export default {
           })
         }
       } else {
-        this.dispatch('notifications/add', {
+        notificationsStore.add({
           id: session.id,
           icon: StudentIcon,
           title: `${session.student?.firstname ?? 'A student'} needs help with ${session.subjectDisplayName}`,
@@ -147,7 +149,7 @@ export default {
           type: 'secondary',
           duration: 1000 * 60 * 2,
         })
-        this.dispatch('notifications/remove', 'rollup-alert')
+        notificationsStore.remove('rollup-alert')
       }
     },
 
@@ -256,7 +258,7 @@ export default {
       for (const removedSession of removedSessions) {
         // If a locked session was cancelled or picked up, let it remain in the list for
         // a short time to give the coach a chance to still click on it to take the cert quiz.
-        this.dispatch('notifications/remove', removedSession.id)
+        useNotificationsStore().remove(removedSession.id)
         const isLockedSession = !user.subjects.includes(removedSession.subTopic)
         if (isLockedSession) {
           dispatch('setSessionToExpire', removedSession.id)

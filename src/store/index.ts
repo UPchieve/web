@@ -5,7 +5,6 @@ import productFlagsModule from './modules/product-flags'
 import userModule, { type UserStoreState } from './modules/user'
 import subjectsModule from './modules/subjects'
 import volunteerModule from './modules/volunteer'
-import notificationsModule from './modules/notifications'
 import socketModule from './modules/socket'
 import sessionModule, { type SessionState } from './modules/session'
 import botConversationsModule, {
@@ -33,7 +32,6 @@ export const storeOptions = {
     featureFlags: featureFlagsModule,
     subjects: subjectsModule,
     volunteer: volunteerModule,
-    notifications: notificationsModule,
     socket: socketModule,
     session: sessionModule,
     liveMedia: liveMediaModule,

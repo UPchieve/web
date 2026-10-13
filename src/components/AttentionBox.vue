@@ -38,6 +38,8 @@
 <script>
 import { EVENTS } from '@/consts'
 import { mapGetters } from 'vuex'
+import { mapActions } from 'pinia'
+import { useNotificationsStore } from '@/stores/notifications'
 import CrossIcon from '@/assets/cross.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -60,6 +62,7 @@ export default {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
   },
   methods: {
+    ...mapActions(useNotificationsStore, ['remove']),
     clickCta() {
       AnalyticsService.captureEvent(
         EVENTS.VOLUNTEER_JOINED_SESSION_FROM_NOTIFICATION
@@ -73,7 +76,7 @@ export default {
     },
     close() {
       clearTimeout(this.timeoutId)
-      this.$store.dispatch('notifications/remove', this.notification.id)
+      this.remove(this.notification.id)
     },
   },
   mounted() {
@@ -81,7 +84,7 @@ export default {
       AnalyticsService.captureEvent(
         EVENTS.NOTIFICATION_AUTO_CLOSED_AFTER_DURATION_REACHED
       )
-      this.$store.dispatch('notifications/remove', this.notification.id)
+      this.remove(this.notification.id)
     }, this.notification.duration || 3000)
   },
   beforeUnmount() {

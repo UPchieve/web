@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState } from 'pinia'
+import { useNotificationsStore } from '@/stores/notifications'
 import AttentionBox from './AttentionBox.vue'
 export default {
   name: 'AttentionBoxes',
@@ -20,9 +21,7 @@ export default {
     AttentionBox,
   },
   computed: {
-    ...mapState({
-      notifications: (state) => state.notifications.notifications,
-    }),
+    ...mapState(useNotificationsStore, ['notifications']),
   },
 }
 </script>
