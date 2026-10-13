@@ -3,6 +3,8 @@ import config from '@/config'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
 import axios from 'axios'
+import { pinia } from '@/stores'
+import { useProductFlagsStore } from '@/stores/product-flags'
 
 const FIVE_MINUTES_IN_MS = 1000 * 60 * 5
 
@@ -118,8 +120,8 @@ class FeatureFlagService {
   }
 
   static async preloadPersonPropertiesToStore(props: any) {
-    const { default: store } = await import('@/store')
-    await store.dispatch('productFlags/addToProductFlags', {
+    // this runs in main.ts before `app.use(pinia)`. we must pass the instance explicitly.
+    useProductFlagsStore(pinia).addToProductFlags({
       fallIncentiveEnrollmentAt: props?.fallIncentiveEnrollmentAt,
     })
   }

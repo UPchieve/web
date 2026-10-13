@@ -85,6 +85,8 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import { mapState as mapPiniaState, mapActions } from 'pinia'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
@@ -258,13 +260,13 @@ export default {
     }
   },
   computed: {
+    ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapState({
       user: (state) => state.user.user,
       hadASession: (state) => state.user.hadASession,
       prevSessionSubject: (state) => state.user.prevSessionSubject,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
       latestSession: (state) => state.session.latestSession,
-      productFlags: (state) => state.productFlags.flags,
       currentSession: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
     }),
@@ -345,6 +347,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useProductFlagsStore, ['setImpactStudyCampaigns']),
     setGradeLevelTaskDismissed() {
       this.dismissedGradeLevelTask = true
       BrowserStorageService.setGradeLevelTaskInStorage()
@@ -472,7 +475,7 @@ export default {
 
           await NetworkService.upsertImpactStudyCampaign(campaign)
           campaigns[campaignId] = campaign
-          this.$store.commit('productFlags/setImpactStudyCampaigns', campaigns)
+          this.setImpactStudyCampaigns(campaigns)
         }
 
         if (campaign.submittedAt || campaign.viewCount >= maxViewCount) return

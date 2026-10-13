@@ -1,7 +1,6 @@
 import { createStore } from 'vuex'
 import appModule from './modules/app'
 import featureFlagsModule from './modules/feature-flags'
-import productFlagsModule from './modules/product-flags'
 import userModule, { type UserStoreState } from './modules/user'
 import subjectsModule from './modules/subjects'
 import volunteerModule from './modules/volunteer'
@@ -28,7 +27,6 @@ export const storeOptions = {
   modules: {
     app: appModule,
     user: userModule,
-    productFlags: productFlagsModule,
     featureFlags: featureFlagsModule,
     subjects: subjectsModule,
     volunteer: volunteerModule,

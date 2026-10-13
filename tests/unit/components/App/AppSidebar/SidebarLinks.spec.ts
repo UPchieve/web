@@ -155,9 +155,6 @@ const getWrapper = (options = {}) => {
           ...(options.featureFlags?.getters ?? {}),
         },
       },
-      productFlags: {
-        ...storeOptions.modules.productFlags,
-      },
       nths: {
         ...storeOptions.modules.nths,
         state: {

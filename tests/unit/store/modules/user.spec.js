@@ -29,12 +29,6 @@ describe('User store module', () => {
     return createStore({
       modules: {
         ...storeOptions.modules,
-        productFlags: {
-          ...storeOptions.modules.productFlags,
-          flags: {
-            fallIncentiveEnrollmentAt: new Date(),
-          },
-        },
         featureFlags: {
           ...storeOptions.modules.featureFlags,
           getters: {

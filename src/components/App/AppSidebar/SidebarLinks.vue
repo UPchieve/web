@@ -196,6 +196,7 @@
 import { mapState, mapGetters } from 'vuex'
 import { mapState as mapPiniaState } from 'pinia'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import { defineAsyncComponent } from 'vue'
 import SidebarLink from './SidebarLink.vue'
 import BookIcon from '@/assets/icons/open_book_icon.svg'
@@ -266,8 +267,8 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user.user,
-      productFlags: (state) => state.productFlags.flags,
     }),
+    ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapPiniaState(useAppSidebarStore, {
       isSidebarCollapsed: 'isCollapsed',
     }),

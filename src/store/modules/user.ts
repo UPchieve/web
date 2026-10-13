@@ -27,6 +27,7 @@ import type {
 import type { RootGetters, RootState } from '@/store/index'
 import type { Uuid } from '@/types/shared'
 import { VolunteerOccupations } from '@/services/VolunteerService'
+import { useProductFlagsStore } from '@/stores/product-flags'
 
 export type SessionState = Omit<CurrentSessionPublic, 'messages'> & {
   messages: SessionMessage[]
@@ -826,7 +827,7 @@ export default {
         // we apply it to all users to override any existing values in the merged PostHog
         // Person profiles. This allows for consistent rollout for the Fall Incentive program
         userProps.fallIncentiveEnrollmentAt =
-          rootState.productFlags.flags.fallIncentiveEnrollmentAt ?? null
+          useProductFlagsStore().flags.fallIncentiveEnrollmentAt ?? null
 
         if (rootState.nths.NTHSGroups.length) {
           userProps.NTHSGroupId = rootState.nths.NTHSGroups[0].groupInfo.id

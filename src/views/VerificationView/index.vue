@@ -216,9 +216,7 @@ export default {
               this.isFallIncentiveProgramEnabled
             ) {
               try {
-                await UserProductFlagsService.enrollStudentToIncentiveProgram(
-                  this.$store
-                )
+                await UserProductFlagsService.enrollStudentToIncentiveProgram()
               } catch (error) {
                 LoggerService.noticeError(error.response?.data)
               }

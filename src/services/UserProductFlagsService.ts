@@ -1,14 +1,10 @@
 import NetworkService from './NetworkService'
 import AnalyticsService from './AnalyticsService'
 import { EVENTS } from '@/consts'
-import type { Store } from 'vuex'
-import type { RootState } from '@/store'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import type { ImpactStudyCampaign } from '@/types'
 
-export async function enrollStudentToIncentiveProgram(
-  store: Store<RootState>,
-  proxyEmail?: string
-) {
+export async function enrollStudentToIncentiveProgram(proxyEmail?: string) {
   const {
     data: { fallIncentiveEnrollmentAt },
   } = await NetworkService.enrollStudentInIncentiveProgram(proxyEmail)
@@ -19,13 +15,10 @@ export async function enrollStudentToIncentiveProgram(
       $set: { fallIncentiveEnrollmentAt },
     }
   )
-  store.dispatch('productFlags/addToProductFlags', {
-    fallIncentiveEnrollmentAt,
-  })
+  useProductFlagsStore().addToProductFlags({ fallIncentiveEnrollmentAt })
 }
 
 export async function processImpactStudySurveySubmission(
-  store: Store<RootState>,
   campaign: ImpactStudyCampaign
 ) {
   const {
@@ -36,8 +29,6 @@ export async function processImpactStudySurveySubmission(
     AnalyticsService.captureEvent(EVENTS.STUDENT_IMPACT_STUDY_ENROLLED, {
       $set: { impactStudyEnrollmentAt },
     })
-    store.dispatch('productFlags/addToProductFlags', {
-      impactStudyEnrollmentAt,
-    })
+    useProductFlagsStore().addToProductFlags({ impactStudyEnrollmentAt })
   }
 }

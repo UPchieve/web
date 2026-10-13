@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useStore } from 'vuex'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import ArrowIcon from '@/assets/arrow.svg'
 import { ref, computed, defineAsyncComponent } from 'vue'
 
@@ -10,7 +11,8 @@ const FallIncentiveEnrollmentModal = defineAsyncComponent(
 const store = useStore()
 const showFallIncentiveEnrollmentModal = ref(false)
 const user = computed(() => store.state.user.user)
-const productFlags = computed(() => store.state.productFlags.flags)
+const productFlagsStore = useProductFlagsStore()
+const productFlags = computed(() => productFlagsStore.flags)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 const fallIncentiveProgramPayload = computed(
   () => store.getters['featureFlags/getFallIncentiveProgramPayload']

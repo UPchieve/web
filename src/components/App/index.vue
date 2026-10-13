@@ -39,6 +39,7 @@ import { mapState as mapPiniaState, mapActions as mapPiniaActions } from 'pinia'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppBannerStore } from '@/stores/app/banner'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import { IonApp, IonContent } from '@ionic/vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
@@ -144,6 +145,7 @@ export default {
       .removeEventListener('change', this.updateMotionPreference)
   },
   methods: {
+    ...mapPiniaActions(useProductFlagsStore, ['getUserProductFlags']),
     ...mapPiniaActions(useAppBannerStore, {
       showBanner: 'show',
       hideBanner: 'hide',
@@ -241,6 +243,7 @@ export default {
   computed: {
     ...mapPiniaState(useAppHeaderStore, { showHeader: 'isShown' }),
     ...mapPiniaState(useAppSidebarStore, { showSidebar: 'isShown' }),
+    ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapPiniaState(useAppBannerStore, {
       bannerIsShown: 'isShown',
       bannerComponent: 'component',
@@ -253,7 +256,6 @@ export default {
       session: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
       topics: (state) => state.subjects.topics,
-      productFlags: (state) => state.productFlags.flags,
       isConnected: (state) => state.socket.isConnected,
       messageData: (state) => state.socket.messageData,
       fadeInContent: (state) => state.app.fadeInContent,
@@ -323,7 +325,7 @@ export default {
           this.$store.dispatch('socket/connect')
         }
 
-        await this.$store.dispatch('productFlags/getUserProductFlags')
+        await this.getUserProductFlags()
         const userProps = this.getUserPropsForAnalytics()
         AnalyticsService.identify(currentUserValue.id, userProps)
         LoggerService.identify(currentUserValue.id)

@@ -91,6 +91,8 @@ import Modal from '@/components/Modal.vue'
 import { VERIFICATION_METHOD } from '@/consts'
 import AuthService from '@/services/AuthService'
 import { mapState, mapGetters } from 'vuex'
+import { mapState as mapPiniaState } from 'pinia'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
@@ -154,9 +156,9 @@ export default {
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
     },
+    ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapState({
       user: (state) => state.user.user,
-      productFlags: (state) => state.productFlags.flags,
     }),
     ...mapGetters({
       isFallIncentiveProgramEnabled:
@@ -218,9 +220,7 @@ export default {
               !this.productFlags.fallIncentiveEnrollmentAt &&
               this.isFallIncentiveProgramEnabled
             )
-              await UserProductFlagsService.enrollStudentToIncentiveProgram(
-                this.$store
-              )
+              await UserProductFlagsService.enrollStudentToIncentiveProgram()
 
             if (this.user.phone !== this.phoneOrEmailToVerify) {
               AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED)

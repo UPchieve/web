@@ -19,6 +19,7 @@ import type {
   SurveyUserResponsesMap,
 } from '@/services/SurveyService'
 import { processImpactStudySurveySubmission } from '@/services/UserProductFlagsService'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import { getImpactStudyCacheKey } from '@/utils/cache-keys'
 import FeatureFlagService from '@/services/FeatureFlagService'
 
@@ -42,7 +43,8 @@ export function useSurvey(data: UseSurveyPayload) {
   const initialUserResponses = ref<SurveyUserResponsesMap>({})
   const store = useStore()
   const user = computed(() => store.state.user.user)
-  const productFlags = computed(() => store.state.productFlags.flags)
+  const productFlagsStore = useProductFlagsStore()
+  const productFlags = computed(() => productFlagsStore.flags)
   const getImpactStudySurveyPayload = computed(
     () => store.getters['featureFlags/getImpactStudySurveyPayload']
   )
@@ -274,13 +276,13 @@ export function useSurvey(data: UseSurveyPayload) {
           ...campaign,
           submittedAt: new Date(),
         }
-        await processImpactStudySurveySubmission(store, updatedCampaign)
+        await processImpactStudySurveySubmission(updatedCampaign)
 
         const updatedCampaigns = {
           ...campaigns,
           [campaignId]: updatedCampaign,
         }
-        store.commit('productFlags/setImpactStudyCampaigns', updatedCampaigns)
+        productFlagsStore.setImpactStudyCampaigns(updatedCampaigns)
 
         FeatureFlagService.setPersonPropertiesForFlags({
           [`impactStudySurveySubmitted--${campaignId}`]: true,

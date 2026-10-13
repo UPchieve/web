@@ -310,6 +310,8 @@
 <script>
 import { ref, markRaw, onBeforeUnmount } from 'vue'
 import { mapState, mapGetters } from 'vuex'
+import { mapState as mapPiniaState } from 'pinia'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import AnalyticsService from '@/services/AnalyticsService'
 import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
@@ -590,6 +592,7 @@ export default {
     }
   },
   computed: {
+    ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapState({
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
       potentialPartnerInfraction: (state) =>
@@ -599,7 +602,6 @@ export default {
       docEditorVersion: (state) => state.user.session.docEditorVersion,
       auxiliaryType: (state) => state.user.session.toolType,
       isSocketConnected: (state) => state.socket.isConnected,
-      productFlags: (state) => state.productFlags.flags,
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
       isPartnerOnline: (state) => state.session.isPartnerOnline,

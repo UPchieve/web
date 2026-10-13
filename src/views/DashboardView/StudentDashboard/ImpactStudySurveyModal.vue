@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import { useProductFlagsStore } from '@/stores/product-flags'
 import useVuelidate from '@vuelidate/core'
 import { useRouter } from 'vue-router'
 import { EVENTS, VERIFICATION_TYPE } from '@/consts'
@@ -59,7 +60,8 @@ const isSubmitting = ref(false)
 const loadingMessage = ref('')
 
 const user = computed(() => store.state.user.user)
-const productFlags = computed(() => store.state.productFlags.flags)
+const productFlagsStore = useProductFlagsStore()
+const productFlags = computed(() => productFlagsStore.flags)
 const mobileMode = computed(() => store.getters['app/mobileMode'])
 const impactStudyCampaign = computed(
   () =>
@@ -165,7 +167,7 @@ async function handleModalViewCount() {
       ...campaigns,
       [campaignId]: updatedCampaign,
     }
-    store.commit('productFlags/setImpactStudyCampaigns', updatedCampaigns)
+    productFlagsStore.setImpactStudyCampaigns(updatedCampaigns)
     FeatureFlagService.setPersonPropertiesForFlags({
       [`impactStudySurveyModalViewCount--${campaignId}`]:
         updatedCampaign.viewCount,

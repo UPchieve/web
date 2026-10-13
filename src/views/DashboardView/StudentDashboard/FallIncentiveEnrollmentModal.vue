@@ -201,7 +201,7 @@ async function handleCodeConfirmation() {
       }
     )
     if (success) {
-      await enrollStudentToIncentiveProgram(store)
+      await enrollStudentToIncentiveProgram()
       const addToUserPayload =
         verificationMethod.value === VERIFICATION_METHOD.SMS
           ? {
@@ -255,7 +255,7 @@ async function handleStudentPartnerEnrollment() {
   }
 
   try {
-    await enrollStudentToIncentiveProgram(store, proxyEmail.value)
+    await enrollStudentToIncentiveProgram(proxyEmail.value)
   } catch (err) {
     error.value =
       ((err as AxiosError).response?.data as { err?: string })?.err ??
