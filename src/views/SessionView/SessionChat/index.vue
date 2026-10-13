@@ -361,8 +361,6 @@ export default {
       user: (state) => state.user.user,
       isWebPageHidden: (state) => state.app.isWebPageHidden,
       unreadChatMessageIndices: (state) => state.user.unreadChatMessageIndices,
-      chatScrolledToMessageIndex: (state) =>
-        state.user.chatScrolledToMessageIndex,
       isTyping: (state) => state.socket.isTyping,
       messageData: (state) => state.socket.messageData,
       myInProgressCaptionMessage: (state) =>
@@ -460,14 +458,6 @@ export default {
 
       return messages.some((message) => message.createdAt > endedAt)
     },
-  },
-
-  async created() {
-    if (this.chatScrolledToMessageIndex) {
-      const messageElements = this.getUserMessageElements()
-      this.$refs.messages.scrollTop =
-        messageElements[this.chatScrolledToMessageIndex]?.offsetTop
-    }
   },
 
   methods: {
@@ -680,14 +670,6 @@ export default {
         )
         this.$store.dispatch('user/markChatMessagesAsRead', readMessageIndices)
       }
-
-      const topVisibleMessageElementIndex = messageElements.findIndex(
-        this.isMessageElementInView
-      )
-      this.$store.dispatch(
-        'user/scrollChatToMessage',
-        topVisibleMessageElementIndex
-      )
 
       this.updateAutoscrolling()
     },

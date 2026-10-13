@@ -43,7 +43,6 @@ export type UserStoreState = {
   isFirstDashboardVisit: boolean
   presessionSurvey: Record<string, any>
   unreadChatMessageIndices: number[]
-  chatScrolledToMessageIndex: number | null
   chatSessionId: string | null
   hadASession: boolean
   prevSessionSubject: string
@@ -96,7 +95,6 @@ export default {
     isFirstDashboardVisit: false,
     presessionSurvey: {},
     unreadChatMessageIndices: [],
-    chatScrolledToMessageIndex: null,
     chatSessionId: null,
     hadASession: false,
     prevSessionSubject: '',
@@ -201,16 +199,9 @@ export default {
       }
     },
 
-    scrollChatToMessage: (state: UserStoreState, index: number) => {
-      if (typeof index === 'number') {
-        state.chatScrolledToMessageIndex = index
-      }
-    },
-
     setChatSessionId: (state: UserStoreState, sessionId: string) => {
       if (sessionId !== state.chatSessionId) {
         state.unreadChatMessageIndices = []
-        state.chatScrolledToMessageIndex = null
         state.chatSessionId = sessionId
       }
     },
@@ -407,10 +398,6 @@ export default {
       indices: number[]
     ) => {
       commit('markChatMessagesRead', indices)
-    },
-
-    scrollChatToMessage: ({ commit }: UserActionContext, index: number) => {
-      commit('scrollChatToMessage', index)
     },
 
     setChatSessionId: ({ commit }: UserActionContext, sessionId: string) => {

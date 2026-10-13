@@ -22,7 +22,6 @@ export function createVoiceChatMockStore(
     user: {
       user: { id: 'user-1', firstName: 'Test' },
       unreadChatMessageIndices: [],
-      chatScrolledToMessageIndex: null,
     },
     app: {
       isWebPageHidden: false,

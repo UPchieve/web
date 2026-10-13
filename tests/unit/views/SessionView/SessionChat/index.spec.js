@@ -24,7 +24,6 @@ describe('SessionChat', () => {
               ...(overrides?.user?.state ?? {}),
             },
             unreadChatMessageIndices: [],
-            chatScrolledToMessageIndex: null,
           },
           getters: {
             ...storeOptions.modules.user.getters,

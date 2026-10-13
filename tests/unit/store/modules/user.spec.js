@@ -454,23 +454,20 @@ describe('User store module', () => {
     const seedChat = async (store, sessionId) => {
       await store.dispatch('user/setChatSessionId', sessionId)
       store.commit('user/markChatMessageUnread', 3)
-      store.commit('user/scrollChatToMessage', 5)
     }
 
-    it('Clears unread indices and the scroll index when the session id changes', async () => {
+    it('Clears unread indices when the session id changes', async () => {
       const store = getStore()
       await seedChat(store, 'session-1')
       await store.dispatch('user/setChatSessionId', 'session-2')
       expect(store.state.user.unreadChatMessageIndices).toEqual([])
-      expect(store.state.user.chatScrolledToMessageIndex).toBeNull()
     })
 
-    it('Keeps unread indices and the scroll index when the session id is unchanged', async () => {
+    it('Keeps unread indices when the session id is unchanged', async () => {
       const store = getStore()
       await seedChat(store, 'session-1')
       await store.dispatch('user/setChatSessionId', 'session-1')
       expect(store.state.user.unreadChatMessageIndices).toEqual([3])
-      expect(store.state.user.chatScrolledToMessageIndex).toBe(5)
     })
   })
 })
