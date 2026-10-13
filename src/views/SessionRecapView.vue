@@ -253,6 +253,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import ChatLog from '@/components/ChatLog.vue'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import Loader from '@/components/Loader.vue'
@@ -471,6 +473,7 @@ export default {
     this.zwibblerCtx?.destroy()
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     joinExclusiveRequest() {
       if (!this.exclusiveRequest) return
       const { id, type, subTopic } = this.exclusiveRequest
@@ -501,7 +504,7 @@ export default {
       this.reportSubmitted = true
     },
     reportSession() {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'ReportSessionModal',
         data: {
           showTemplateButtons: false,
@@ -558,7 +561,7 @@ export default {
         [matchedSubject.name]: matchedSubject.displayName,
       }
 
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'SubjectSelectionModal',
         data: {
           backText: 'Session Recap',

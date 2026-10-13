@@ -7,6 +7,7 @@ import {
   type RouteRecordRaw,
 } from 'vue-router'
 import store from './store'
+import { useAppModalStore } from '@/stores/app/modal'
 const AdminView = () => import('./views/Admin/index.vue')
 const AdminCleverRoster = () => import('./views/Admin/AdminCleverRoster.vue')
 const AdminNTHS = () => import('./views/Admin/AdminNTHS.vue')
@@ -1204,7 +1205,7 @@ router.afterEach((to, from) => {
       store.dispatch('app/showNavigation')
     }
   }
-  store.dispatch('app/modal/hide')
+  useAppModalStore().hide()
 
   // check after a route change if there are any waiting, eligible sessions to auto-join
   store.dispatch('americaCountsVolunteer/maybeJoin')

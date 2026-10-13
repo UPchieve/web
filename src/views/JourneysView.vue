@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAppModalStore } from '@/stores/app/modal'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -28,6 +29,7 @@ type Journey = {
 
 const $router = useRouter()
 const store = useStore()
+const modalStore = useAppModalStore()
 const selectedJourney = ref<Journey | undefined>(undefined)
 const isAsyncEssayReviewEnabled = computed(
   () => store.getters['featureFlags/isAsyncEssayReviewEnabled']
@@ -109,7 +111,7 @@ async function startSession(journeyStep: JourneyStep, stepNumber: number) {
     isAsyncEssayReviewEnabled.value &&
     ['applicationEssays', 'collegeList'].includes(sessionSubject)
   ) {
-    store.dispatch('app/modal/show', {
+    modalStore.show({
       component: 'EssayHelpModal',
       data: {
         backText: 'Dashboard',

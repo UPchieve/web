@@ -26,7 +26,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import ModalTemplate from './ModalTemplate.vue'
 import RejoinSessionModal from './RejoinSessionModal.vue'
 import ConfirmModal from './ConfirmModal.vue'
@@ -79,10 +80,10 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      modalComponent: (state) => state.app.modal.component,
-      modalData: (state) => state.app.modal.modalTemplateProps,
-      modalComponentProps: (state) => state.app.modal.componentProps,
+    ...mapState(useAppModalStore, {
+      modalComponent: 'component',
+      modalData: 'modalTemplateProps',
+      modalComponentProps: 'componentProps',
     }),
   },
   mounted() {

@@ -1,11 +1,11 @@
 <script lang="ts">
+import { useAppModalStore } from '@/stores/app/modal'
 export default {
   name: 'ConfirmModal',
 }
 </script>
 
 <script lang="ts" setup>
-import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 
 type ConfirmModalData = {
@@ -24,15 +24,15 @@ type Props = {
 }
 
 const props = defineProps<Props>()
-const $store = useStore()
+const modalStore = useAppModalStore()
 
 function onConfirm() {
-  $store.dispatch('app/modal/hide')
+  modalStore.hide()
   props.modalData.onConfirm?.()
 }
 
 function onCancel() {
-  $store.dispatch('app/modal/hide')
+  modalStore.hide()
   props.modalData.onCancel?.()
 }
 

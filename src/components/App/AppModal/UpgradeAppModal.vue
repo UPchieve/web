@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import getOperatingSystem from '@/utils/get-operating-system'
@@ -68,9 +70,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     onClose() {
       this.$emit('cancel')
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
   },
 }

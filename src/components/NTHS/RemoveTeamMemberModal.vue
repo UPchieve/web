@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useStore } from 'vuex'
+import { useAppModalStore } from '@/stores/app/modal'
 import type { GroupMember } from '@/services/NTHSGroupService'
 import Loader from '@/components/Loader.vue'
 import RemoveMemberConfirmation from '@/views/NTHS/RemoveMemberConfirmation.vue'
@@ -13,7 +13,7 @@ export type RemoveTeamMemberModalProps = {
 }
 
 const props = defineProps<RemoveTeamMemberModalProps>()
-const store = useStore()
+const modalStore = useAppModalStore()
 
 function onCancelRemoveMember() {
   props.onCancel()
@@ -25,7 +25,7 @@ async function onRemovedMember() {
 }
 
 function closeModal() {
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
 }
 </script>
 

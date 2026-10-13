@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useAppModalStore } from '@/stores/app/modal'
 import TransferToSessionButton from '@/views/BotConversationsView/TransferToSessionView/TransferToSessionButton.vue'
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
 import { useStore } from 'vuex'
@@ -6,6 +7,8 @@ import { computed } from 'vue'
 import TutorIcon from '@/assets/icons/graduation_cap_icon.svg'
 
 const store = useStore()
+
+const modalStore = useAppModalStore()
 
 const props = defineProps<{
   topic: string
@@ -38,7 +41,7 @@ const showPresessionSurvey = () => {
     props.topic === 'college' &&
     props.subject === 'essays'
   ) {
-    store.dispatch('app/modal/show', {
+    modalStore.show({
       component: 'EssayHelpModal',
       data: {
         backText: 'Dashboard',
@@ -54,7 +57,7 @@ const showPresessionSurvey = () => {
     return
   }
 
-  store.dispatch('app/modal/show', {
+  modalStore.show({
     // Hack for now: Render the SubjectSelectionModal in the state _after_ the topic is selected
     // (The presession survey step)
     component: SubjectSelectionModal,

@@ -157,6 +157,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -308,6 +310,10 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, {
+      hideAppModal: 'hide',
+      showAppModal: 'show',
+    }),
     async showToast(message, isError) {
       const toast = await toastController.create({
         message,
@@ -352,7 +358,7 @@ export default {
     },
 
     openCreateTeacherClassModal() {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'CreateTeacherClassModal',
         data: {
           createTeacherClass: this.createTeacherClass,
@@ -362,7 +368,7 @@ export default {
     },
 
     openTeacherCodeModal(code) {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'TeacherClassCodeModal',
         data: {
           code,
@@ -372,7 +378,7 @@ export default {
 
     openCreateAssignmentModal(teacherClass) {
       AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_OPEN_CREATE_MODAL)
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'CreateAndEditAssignmentModal',
         data: {
           onAssignmentCreated: this.handleCreateAssignment,
@@ -410,7 +416,7 @@ export default {
 
         const classId = currentClass.id
         this.$router.push(`/dashboard/teacher/class/${classId}/assignments`)
-        this.$store.dispatch('app/modal/hide')
+        this.hideAppModal()
       } catch (err) {
         const error = err?.response?.data?.err ?? 'Unable to create assignment.'
         this.showToast(error, true)

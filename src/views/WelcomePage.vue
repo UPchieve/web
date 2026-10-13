@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapState, mapGetters } from 'vuex'
 import TopicChip from '@/components/TopicChip.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -74,13 +76,14 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     handleTopicClick(topicName) {
       if (this.isStudentVolunteer)
         AnalyticsService.captureEvent(
           EVENTS.ROLE_SWITCHING_USER_SELECTED_SUBJECT
         )
       const topicCard = this.topicCards.find((card) => card.topic === topicName)
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'SubjectSelectionModal',
         data: {
           backText: 'Back',

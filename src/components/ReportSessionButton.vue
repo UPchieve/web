@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useAppModalStore } from '@/stores/app/modal'
 import LargeButton from '@/components/LargeButton.vue'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
@@ -15,10 +16,12 @@ const props = defineProps({
 })
 
 const store = useStore()
+
+const modalStore = useAppModalStore()
 const session = computed(() => store.state.user.session)
 
 const reportSession = () => {
-  store.dispatch('app/modal/show', {
+  modalStore.show({
     component: 'ReportSessionModal',
     data: {
       showTemplateButtons: false,

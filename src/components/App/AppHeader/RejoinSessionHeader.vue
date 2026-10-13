@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters } from 'vuex'
 import * as sessionUtils from '@/utils/session'
 import SessionService from '@/services/SessionService'
@@ -54,8 +56,9 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     showModal() {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'RejoinSessionModal',
         data: { backText: 'Dashboard', important: true },
       })

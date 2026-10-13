@@ -1,19 +1,19 @@
 <script lang="ts" setup>
+import { useAppModalStore } from '@/stores/app/modal'
 import { VERIFICATION_METHOD } from '@/consts'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import VerificationModal from '@/views/VerificationModal.vue'
 
 const store = useStore()
+
+const modalStore = useAppModalStore()
 const email = computed(() => store.state.user.user.email)
 const showVerificationModal = computed(() => {
-  return (
-    store.state.app.modal.isShown &&
-    store.state.app.modal.component === 'VerificationAppModal'
-  )
+  return modalStore.isShown && modalStore.component === 'VerificationAppModal'
 })
 function closeModal() {
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
 }
 </script>
 

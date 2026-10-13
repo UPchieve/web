@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import Modal from '@/components/Modal.vue'
 import { useClipboard } from '@vueuse/core'
 import LinkUnion from '@/assets/LinkUnion.svg'
@@ -57,8 +59,9 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     close() {
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
 
     copyURL() {

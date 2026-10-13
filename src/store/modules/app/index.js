@@ -1,13 +1,9 @@
 import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
-import modal from './modal'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 
 export default {
   namespaced: true,
-  modules: {
-    modal,
-  },
   state: {
     windowWidth: 0,
     windowHeight: 0,

@@ -159,6 +159,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { dayjs } from '@/utils/time-utils'
 import { mapGetters, mapState } from 'vuex'
 import FormInput from '@/components/FormInput.vue'
@@ -291,8 +293,9 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     close() {
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
 
     openFileDialog(event) {

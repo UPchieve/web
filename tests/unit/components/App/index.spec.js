@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
-import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import router from '@/router'
 import { storeOptions } from '@/store'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
+import { useAppModalStore } from '@/stores/app/modal'
 import App from '@/components/App/index.vue'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
@@ -26,18 +26,9 @@ const getWrapper = (options = {}) => {
 
   useAppHeaderStore().setIsShown(options.showHeader)
   if (options.showSidebar) useAppSidebarStore().show()
+  if (options.showModal) useAppModalStore().show()
 
-  const store = createStore(
-    merge({}, storeOptions, {
-      modules: {
-        app: {
-          modules: {
-            modal: { state: { isShown: options.showModal } },
-          },
-        },
-      },
-    })
-  )
+  const store = createStore(storeOptions)
 
   return mount(App, {
     attachTo: window.document.body,

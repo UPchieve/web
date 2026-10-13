@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useAppModalStore } from '@/stores/app/modal'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -15,6 +16,7 @@ const isDeleteConfirmed = ref(false)
 
 const $router = useRouter()
 const $store = useStore()
+const modalStore = useAppModalStore()
 const mobileMode = computed(() => $store.getters['app/mobileMode'])
 
 const emit = defineEmits(['enable-accept'])
@@ -30,7 +32,7 @@ async function onAccept() {
   try {
     await NetworkService.deleteAccount()
   } catch {
-    $store.dispatch('app/modal/update', {
+    modalStore.update({
       modalTemplateProps: { showTemplateButtons: false },
     })
     error.value =

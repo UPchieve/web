@@ -6,6 +6,7 @@ import AnalyticsService from './AnalyticsService'
 import NetworkService, { isNetworkError } from './NetworkService'
 import errorFromHttpResponse from '@/utils/error-from-http-response.js'
 import ModalService from './ModalService'
+import { useAppModalStore } from '@/stores/app/modal'
 import LoggerService from './LoggerService'
 import Case from 'case'
 
@@ -174,7 +175,7 @@ export default {
       ModalService.showAlert('Error', 'Could not end session')
     } finally {
       store.commit('user/setSessionIsEnding', false)
-      store.dispatch('app/modal/hide')
+      useAppModalStore().hide()
     }
   },
 

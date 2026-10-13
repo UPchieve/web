@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapState } from 'vuex'
 import RecentSubjectCard from './RecentSubjectCard.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -52,8 +54,9 @@ export default {
     }),
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     togglePresessionSurvey(subject) {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'SubjectSelectionModal',
         data: {
           topic: subject.topicName,

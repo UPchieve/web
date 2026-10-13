@@ -43,6 +43,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 // TODO: Merge this component with 'CreateTeacherClassModal'.
 import { mapState } from 'vuex'
 import FormInput from '@/components/FormInput.vue'
@@ -85,8 +87,9 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     close() {
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
 
     accept() {
@@ -99,13 +102,13 @@ export default {
       this.modalData.updateTeacherClass({
         classData: newClassInfo,
       })
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
 
     deactivateClass() {
       const classId = this.modalData.classInfo.id
       this.modalData.deactivateTeacherClass({ id: classId })
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
   },
 }

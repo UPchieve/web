@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { merge } from 'lodash-es'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
+import { useAppModalStore } from '@/stores/app/modal'
 import AppModal from '@/components/App/AppModal/index.vue'
 import ModalTemplate from '@/components/App/AppModal/ModalTemplate.vue'
 import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectSelectionModal.vue'
@@ -10,15 +11,15 @@ import { afterEach } from 'vitest'
 const getWrapper = async (state = {}) => {
   state = { component: null, modalTemplateProps: {}, ...state }
 
+  const modalStore = useAppModalStore()
+  modalStore.show({
+    component: state.component,
+    data: state.modalTemplateProps,
+  })
+
   const store = createStore(
     merge({}, storeOptions, {
-      attachTo: window.document.body,
-      modules: {
-        app: {
-          modules: { modal: { state } },
-          getters: { mobileMode: () => false },
-        },
-      },
+      modules: { app: { getters: { mobileMode: () => false } } },
     })
   )
 

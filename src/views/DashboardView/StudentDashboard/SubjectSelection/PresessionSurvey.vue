@@ -127,6 +127,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import Stepper from '@/components/Stepper.vue'
@@ -177,7 +179,7 @@ export default {
      * which is uses the ModalTemplate. Hide the default template buttons when we
      * transition into this modal.
      */
-    this.$store.dispatch('app/modal/update', {
+    this.updateAppModal({
       modalTemplateProps: { showTemplateButtons: false },
     })
 
@@ -279,6 +281,10 @@ export default {
   },
   emits: ['survey-completed'],
   methods: {
+    ...mapActions(useAppModalStore, {
+      hideAppModal: 'hide',
+      updateAppModal: 'update',
+    }),
     submitSurvey() {
       if (!this.isSurveyComplete) return
 
@@ -304,7 +310,7 @@ export default {
       this.$emit('survey-completed')
     },
     cancel() {
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
     nextStep() {
       if (

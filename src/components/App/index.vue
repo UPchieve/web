@@ -39,6 +39,7 @@ import { mapState as mapPiniaState, mapActions as mapPiniaActions } from 'pinia'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppBannerStore } from '@/stores/app/banner'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
+import { useAppModalStore } from '@/stores/app/modal'
 import { useProductFlagsStore } from '@/stores/product-flags'
 import { IonApp, IonContent } from '@ionic/vue'
 import Gleap from 'gleap'
@@ -101,7 +102,7 @@ export default {
       if (isOutdatedMobileAppVersion()) {
         // show modal after children components have mounted
         setTimeout(() => {
-          this.$store.dispatch('app/modal/show', {
+          this.showAppModal({
             component: 'UpgradeAppModal',
             data: {
               showTemplateButtons: false,
@@ -146,6 +147,7 @@ export default {
   },
   methods: {
     ...mapPiniaActions(useProductFlagsStore, ['getUserProductFlags']),
+    ...mapPiniaActions(useAppModalStore, { showAppModal: 'show' }),
     ...mapPiniaActions(useAppBannerStore, {
       showBanner: 'show',
       hideBanner: 'hide',
@@ -244,12 +246,12 @@ export default {
     ...mapPiniaState(useAppHeaderStore, { showHeader: 'isShown' }),
     ...mapPiniaState(useAppSidebarStore, { showSidebar: 'isShown' }),
     ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
+    ...mapPiniaState(useAppModalStore, { showModal: 'isShown' }),
     ...mapPiniaState(useAppBannerStore, {
       bannerIsShown: 'isShown',
       bannerComponent: 'component',
     }),
     ...mapState({
-      showModal: (state) => state.app.modal.isShown,
       isMobileApp: (state) => state.app.isMobileApp,
       isWebPageHidden: (state) => state.app.isWebPageHidden,
       user: (state) => state.user.user,

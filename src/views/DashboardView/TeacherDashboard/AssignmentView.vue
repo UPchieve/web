@@ -143,6 +143,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { EVENTS } from '@/consts'
 import NetworkService from '@/services/NetworkService'
 import AssignmentIcon from '@/assets/AssignmentIcon.svg'
@@ -205,6 +207,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     async copyURL() {
       const { copy } = useClipboard()
       copy(`https://app.upchieve.org/join-class/${this.classData?.code}`)
@@ -253,7 +256,7 @@ export default {
     },
 
     openStudentCompletionModal() {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'StudentCompletionModal',
         data: {
           studentCompletion: this.studentAssignments,

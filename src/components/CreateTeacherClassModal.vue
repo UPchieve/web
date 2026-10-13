@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 // TODO: Merge this component with 'EditTeacherClassModal'.
 import { mapState } from 'vuex'
 import { EVENTS } from '@/consts'
@@ -86,8 +88,9 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     close() {
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
 
     accept() {
@@ -100,7 +103,7 @@ export default {
         className: this.className,
         topicId: this.selectedTopic.id,
       })
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
   },
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAppModalStore } from '@/stores/app/modal'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -21,6 +22,8 @@ const props = defineProps<{
 }>()
 
 const store = useStore()
+
+const modalStore = useAppModalStore()
 const router = useRouter()
 
 const journeySessionData = computed(
@@ -41,7 +44,7 @@ function closeModal() {
     subject: props.modalData.subject,
   })
 
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
 }
 
 function onCancel() {

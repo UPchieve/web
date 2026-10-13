@@ -150,6 +150,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapState, mapGetters } from 'vuex'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
@@ -671,6 +673,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     async loadPendingAsyncReviewCount() {
       try {
         const response = await NetworkService.getPendingAsyncReviewCount()
@@ -777,7 +780,7 @@ export default {
       this.notificationsCardWasDismissed = !this.notificationsCardWasDismissed
     },
     showOnboardingModal() {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'VolunteerOnboardingModal',
         data: { alertModal: true, acceptText: 'Get started' },
       })

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useStore } from 'vuex'
+import { useAppModalStore } from '@/stores/app/modal'
 
-const store = useStore()
+const modalStore = useAppModalStore()
 
 const props = defineProps({
   modalData: {
@@ -11,12 +11,12 @@ const props = defineProps({
 })
 
 function close() {
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
 }
 
 function accept() {
   props.modalData.deleteAssignment(props.modalData.assignmentId)
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
 }
 </script>
 

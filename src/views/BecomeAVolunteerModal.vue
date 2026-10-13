@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useStore } from 'vuex'
+import { useAppModalStore } from '@/stores/app/modal'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import UserService from '@/services/UserService'
@@ -7,10 +7,10 @@ import { useRouter } from 'vue-router'
 import { EVENTS } from '@/consts'
 const router = useRouter()
 
-const store = useStore()
+const modalStore = useAppModalStore()
 
 function close() {
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
 }
 
 const becomeAVolunteer = async () => {

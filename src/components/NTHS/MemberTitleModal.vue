@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { useAppModalStore } from '@/stores/app/modal'
 import { ref } from 'vue'
-import { useStore } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import type { NTHSTitle } from '@/services/NTHSGroupService'
 import type { TitleChoice } from '@/services/NTHSRosterService'
@@ -15,7 +15,7 @@ export type MemberTitleModalProps = {
 }
 
 const props = defineProps<MemberTitleModalProps>()
-const store = useStore()
+const modalStore = useAppModalStore()
 
 const selected = ref<NTHSTitle>(
   props.choices.some((choice) => choice.title === props.current)
@@ -24,12 +24,12 @@ const selected = ref<NTHSTitle>(
 )
 
 function choose() {
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
   props.resolveTitle(selected.value)
 }
 
 function onCancel() {
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
   props.resolveTitle(undefined)
 }
 

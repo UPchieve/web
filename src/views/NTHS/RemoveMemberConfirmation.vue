@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useAppModalStore } from '@/stores/app/modal'
 import type { GroupMember } from '@/services/NTHSGroupService'
 import LargeButton from '@/components/LargeButton.vue'
 import NetworkService, { isNetworkError } from '@/services/NetworkService'
@@ -13,6 +14,8 @@ export type RemoveMemberConfirmationProps = {
 }
 
 const store = useStore()
+
+const modalStore = useAppModalStore()
 const router = useRouter()
 const props = defineProps<RemoveMemberConfirmationProps>()
 const emit = defineEmits<{
@@ -106,7 +109,7 @@ async function removeTeamMember() {
 function onCancel() {
   emit('cancel')
   if (props.isRemovingSelf) {
-    store.dispatch('app/modal/hide')
+    modalStore.hide()
   }
 }
 </script>

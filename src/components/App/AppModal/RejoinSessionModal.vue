@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters } from 'vuex'
 import * as sessionUtils from '@/utils/session'
 import SessionService from '@/services/SessionService'
@@ -32,10 +34,11 @@ export default {
   watch: {
     // Hide modal if mobileMode becomes false
     mobileMode(value) {
-      if (!value) this.$store.dispatch('app/modal/hide')
+      if (!value) this.hideAppModal()
     },
   },
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     rejoin() {
       sessionUtils.rejoinSession(
         this,

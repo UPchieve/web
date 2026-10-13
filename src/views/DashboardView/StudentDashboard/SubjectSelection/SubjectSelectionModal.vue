@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapState, mapGetters } from 'vuex'
 import { startSession } from '@/utils/session'
 import LargeButton from '@/components/LargeButton.vue'
@@ -108,6 +110,7 @@ export default {
     this.onAccept()
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     setSelectedSubtopic(subject) {
       this.selectedSubtopic = subject
       this.$emit('enable-accept', subject !== '')
@@ -127,7 +130,7 @@ export default {
         this.isMobileApp &&
         !hasSentPushTokenRegister
       ) {
-        this.$store.dispatch('app/modal/show', {
+        this.showAppModal({
           component: 'NotificationsModal',
           data: {
             backText: 'Dashboard',
@@ -144,7 +147,7 @@ export default {
       if (this.selectedSubtopic === '') return
       else if (this.modalData.trainingSelect) this.handleTrainingRedirect()
       else if (this.shouldShowEssayHelpModal) {
-        this.$store.dispatch('app/modal/show', {
+        this.showAppModal({
           component: 'EssayHelpModal',
           data: {
             backText: 'Dashboard',

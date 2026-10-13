@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import LargeButton from '@/components/LargeButton.vue'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import { mapState } from 'vuex'
@@ -34,8 +36,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     openVerificationModal() {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'VerificationAppModal',
       })
       AnalyticsService.captureEvent(EVENTS.VERIFICATION_HEADER_CLICKED, {

@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters, mapState } from 'vuex'
 import { startSession } from '@/utils/session'
 import LargeButton from '@/components/LargeButton.vue'
@@ -55,6 +57,7 @@ export default {
   },
   emits: ['cancel'],
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     async handlePushNotification() {
       const { topic, selectedSubtopic } = this.modalData
       setCookie('hasSentPushTokenRegister', true)
@@ -73,7 +76,7 @@ export default {
     },
     async onClose() {
       this.$emit('cancel')
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
       setCookie('hasSentPushTokenRegister', true)
 
       const { topic, selectedSubtopic } = this.modalData

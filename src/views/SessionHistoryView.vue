@@ -283,6 +283,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { dayjs } from '@/utils/time-utils'
 import { mapGetters, mapState } from 'vuex'
 import { EVENTS } from '@/consts'
@@ -391,6 +393,7 @@ export default {
     await this.fetchSessionHistory()
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     setStateFromQuery(query) {
       this.page = parseInt(query.page) || 1
       this.filters.firstName = query.firstName || ''
@@ -566,7 +569,7 @@ export default {
         [matchedSubject.name]: matchedSubject.displayName,
       }
 
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'SubjectSelectionModal',
         data: {
           backText: 'Session History',

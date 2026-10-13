@@ -194,7 +194,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { mapState as mapPiniaState } from 'pinia'
+import { mapState as mapPiniaState, mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { useProductFlagsStore } from '@/stores/product-flags'
 import { defineAsyncComponent } from 'vue'
@@ -351,6 +352,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     // Fires before the route switches a student-mode user to coach mode, so
     // userType is the role they clicked from.
     nthsSidebarLinkClicked() {

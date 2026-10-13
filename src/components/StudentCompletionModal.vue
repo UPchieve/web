@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import Modal from '@/components/Modal.vue'
 import Check from '@/assets/check.svg'
 import { dayjs } from '@/utils/time-utils'
@@ -55,13 +57,14 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     formatTimestamp(timestamp) {
       const date = dayjs(timestamp)
       return date.format('MM/DD/YYYY')
     },
 
     close() {
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
   },
 }

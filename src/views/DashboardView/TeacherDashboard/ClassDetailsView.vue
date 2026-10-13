@@ -312,6 +312,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { computed } from 'vue'
 import { mapState, mapGetters } from 'vuex'
 import Loader from '@/components/Loader.vue'
@@ -515,6 +517,10 @@ export default {
   },
 
   methods: {
+    ...mapActions(useAppModalStore, {
+      hideAppModal: 'hide',
+      showAppModal: 'show',
+    }),
     async showToast(message, isError) {
       const toast = await toastController.create({
         message,
@@ -585,7 +591,7 @@ export default {
 
     openTeacherCodeModal() {
       const code = this.classData.code
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'TeacherClassCodeModal',
         data: {
           code,
@@ -594,7 +600,7 @@ export default {
     },
 
     openEditClassModal() {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'EditTeacherClassModal',
         data: {
           classInfo: this.classData,
@@ -607,7 +613,7 @@ export default {
 
     openCreateAssignmentModal() {
       AnalyticsService.captureEvent(EVENTS.ASSIGNMENT_OPEN_CREATE_MODAL)
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'CreateAndEditAssignmentModal',
         data: {
           onAssignmentCreated: this.handleCreateAssignment,
@@ -623,7 +629,7 @@ export default {
       AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_EDIT_ASSIGNMENT, {
         isGettingStartedAssignment: assignment.isGettingStartedAssignment,
       })
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'CreateAndEditAssignmentModal',
         data: {
           onAssignmentEdited: this.handleEditAssignment,
@@ -637,7 +643,7 @@ export default {
     },
 
     openRemoveAssignmentConfirmationModal(assignmentId) {
-      this.$store.dispatch('app/modal/show', {
+      this.showAppModal({
         component: 'RemoveAssignmentConfirmationModal',
         data: {
           showTemplateButtons: false,
@@ -681,7 +687,7 @@ export default {
         }
 
         await this.getStudentAssignmentCompletions()
-        this.$store.dispatch('app/modal/hide')
+        this.hideAppModal()
 
         if (!this.$route.path.includes('assignments')) {
           this.$router.push(
@@ -732,7 +738,7 @@ export default {
         }
 
         await this.getStudentAssignmentCompletions()
-        this.$store.dispatch('app/modal/hide')
+        this.hideAppModal()
       } catch (err) {
         const error = err?.response?.data?.err ?? 'Unable to edit assignment'
         this.showToast(error, true)

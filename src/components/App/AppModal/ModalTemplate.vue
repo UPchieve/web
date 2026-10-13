@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters } from 'vuex'
 import LargeButton from '@/components/LargeButton.vue'
 import ArrowIcon from '@/assets/arrow.svg'
@@ -95,9 +97,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     handleCancel() {
       this.$emit('cancel')
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
     closeModal(event) {
       // users must interact with the modal button to close session related modals

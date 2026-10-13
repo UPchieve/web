@@ -62,7 +62,6 @@ function getWrapper(
     mutations: { 'nths/setNTHSGroupMembers': setNTHSGroupMembers },
     actions: {
       'nths/fetchNthsData': vi.fn(),
-      'app/modal/hide': vi.fn(),
       'nths/fetchNTHSGroupMembers': fetchNTHSGroupMembers,
     },
   })

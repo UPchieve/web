@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
@@ -130,6 +132,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
     async submit() {
       this.error = ''
       try {
@@ -154,10 +157,10 @@ export default {
           }
         )
 
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
     cancel() {
-      this.$store.dispatch('app/modal/hide')
+      this.hideAppModal()
     },
   },
 }

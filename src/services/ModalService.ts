@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import store from '@/store'
+import { useAppModalStore } from '@/stores/app/modal'
 import SessionErrorModal from '@/views/SessionView/SessionErrorModal.vue'
 import type { RemoveTeamMemberModalProps } from '@/components/NTHS/RemoveTeamMemberModal.vue'
 import MemberTitleModal, {
@@ -47,7 +47,7 @@ function show(
 ): void {
   const modalComponentName =
     typeof component === 'string' ? component : (component as Component).name
-  store.dispatch('app/modal/show', {
+  useAppModalStore().show({
     component,
     data: {
       ...data,
@@ -59,7 +59,7 @@ function show(
 
 export default {
   async hide() {
-    await store.dispatch('app/modal/hide')
+    useAppModalStore().hide()
   },
   showSessionError(
     {

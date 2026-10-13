@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useAppModalStore } from '@/stores/app/modal'
 import Modal from '@/components/Modal.vue'
 import SessionService from '@/services/SessionService'
 import { socket } from '@/socket'
@@ -10,6 +11,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import * as PresenceService from '@/services/PresenceService'
 const store = useStore()
+const modalStore = useAppModalStore()
 
 const sessionHold = computed(
   () => store.getters['volunteer/currentSessionHold']
@@ -41,7 +43,7 @@ function onPassSession() {
   })
   socket.emit('dismissSessionHold', { sessionId: sessionId.value })
   store.commit('volunteer/addDismissedSessionHold', sessionId.value)
-  store.dispatch('app/modal/hide')
+  modalStore.hide()
 }
 
 function onTimeout() {

@@ -1,19 +1,14 @@
 import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import appModule from '@/store/modules/app'
-import modalModule from '@/store/modules/app/modal'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { beforeEach, vi } from 'vitest'
 
-const { modules, state, mutations, actions, getters } = appModule
+const { state, mutations, actions, getters } = appModule
 
 describe('`app` store module', () => {
   beforeEach(() => {
     useAppHeaderStore().setIsShown(false)
-  })
-
-  it('modules', () => {
-    expect(modules.modal).toBe(modalModule)
   })
 
   it('state', () => {

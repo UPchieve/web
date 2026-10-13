@@ -86,6 +86,8 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters } from 'vuex'
 import DropdownList from '@/components/DropdownList.vue'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
@@ -145,12 +147,13 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     handleClick() {
       if (this.title === 'Invite Your Friends') {
         AnalyticsService.captureEvent(
           EVENTS.STUDENT_CLICKED_TO_GET_REFERRAL_LINK_CARD
         )
-        this.$store.dispatch('app/modal/show', {
+        this.showAppModal({
           component: 'ReferralModal',
           data: {
             svg: this.svg,
@@ -158,7 +161,7 @@ export default {
           },
         })
       } else {
-        this.$store.dispatch('app/modal/show', {
+        this.showAppModal({
           component: 'SubjectSelectionModal',
           data: {
             backText: 'Dashboard',
