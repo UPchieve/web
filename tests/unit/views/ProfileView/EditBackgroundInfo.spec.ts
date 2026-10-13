@@ -306,12 +306,14 @@ describe('EditBackgroundInfo', () => {
     // can retry without re-entering everything
     expect(editButton(wrapper).text()).toBe('Save')
     expect(
-      wrapper.find(`[data-testid="${VolunteerOccupations.RETIRED}"]`).element
-        .checked
+      wrapper.find<HTMLInputElement>(
+        `[data-testid="${VolunteerOccupations.RETIRED}"]`
+      ).element.checked
     ).toBe(true)
     expect(
-      wrapper.find(`[data-testid="${VolunteerOccupations.CAREGIVER}"]`).element
-        .checked
+      wrapper.find<HTMLInputElement>(
+        `[data-testid="${VolunteerOccupations.CAREGIVER}"]`
+      ).element.checked
     ).toBe(true)
   })
 })

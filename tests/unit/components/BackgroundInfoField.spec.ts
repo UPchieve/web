@@ -40,7 +40,7 @@ function getWrapper(props = {}, { hasExistingStudentSchool = false } = {}) {
 }
 
 function checkboxFor(wrapper: VueWrapper, occupation: string) {
-  return wrapper.find(`[data-testid="${occupation}"]`)
+  return wrapper.find<HTMLInputElement>(`[data-testid="${occupation}"]`)
 }
 
 describe('BackgroundInfoField', () => {

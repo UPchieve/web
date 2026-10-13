@@ -317,7 +317,9 @@ describe('Checklist', () => {
       { ...AFFILIATION_ITEM, status: CheckboxStatus.Done },
     ])
 
-    expect(wrapper.find(checkbox(AFFILIATION)).element.checked).toBe(true)
+    expect(
+      wrapper.find<HTMLInputElement>(checkbox(AFFILIATION)).element.checked
+    ).toBe(true)
 
     wrapper.unmount()
   })

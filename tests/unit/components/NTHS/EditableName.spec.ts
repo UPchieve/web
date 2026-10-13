@@ -48,13 +48,13 @@ describe('EditableName', () => {
   it.each([
     {
       via: 'blur',
-      interact: (input: DOMWrapper<Element>) => input.trigger('blur'),
+      interact: (input: DOMWrapper<HTMLInputElement>) => input.trigger('blur'),
     },
     {
       // The Enter handler calls blur(), which fires a blur event only on a
       // focused element.
       via: 'Enter',
-      interact: (input: DOMWrapper<Element>) => {
+      interact: (input: DOMWrapper<HTMLInputElement>) => {
         input.element.focus()
         return input.trigger('keydown', { key: 'Enter' })
       },
