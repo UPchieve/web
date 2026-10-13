@@ -44,6 +44,7 @@ export type UserStoreState = {
   presessionSurvey: Record<string, any>
   unreadChatMessageIndices: number[]
   chatScrolledToMessageIndex: number | null
+  chatSessionId: string | null
   hadASession: boolean
   prevSessionSubject: string
   progressReportOverviewSubjectStats: Array<any>
@@ -96,6 +97,7 @@ export default {
     presessionSurvey: {},
     unreadChatMessageIndices: [],
     chatScrolledToMessageIndex: null,
+    chatSessionId: null,
     hadASession: false,
     prevSessionSubject: '',
     progressReportOverviewSubjectStats: [],
@@ -199,18 +201,18 @@ export default {
       }
     },
 
-    clearUnreadChatMessages: (state: UserStoreState) => {
-      state.unreadChatMessageIndices = []
-    },
-
     scrollChatToMessage: (state: UserStoreState, index: number) => {
       if (typeof index === 'number') {
         state.chatScrolledToMessageIndex = index
       }
     },
 
-    clearChatScrolledToMessageIndex: (state: UserStoreState) => {
-      state.chatScrolledToMessageIndex = null
+    setChatSessionId: (state: UserStoreState, sessionId: string) => {
+      if (sessionId !== state.chatSessionId) {
+        state.unreadChatMessageIndices = []
+        state.chatScrolledToMessageIndex = null
+        state.chatSessionId = sessionId
+      }
     },
 
     setHadASession: (state: UserStoreState, flag: boolean) => {
@@ -325,8 +327,6 @@ export default {
 
     clearSession: ({ commit }: UserActionContext) => {
       commit('setSession', {})
-      commit('clearUnreadChatMessages')
-      commit('clearChatScrolledToMessageIndex')
     },
 
     updateSession: (
@@ -413,8 +413,8 @@ export default {
       commit('scrollChatToMessage', index)
     },
 
-    clearChatScrolledToMessageIndex: ({ commit }: UserActionContext) => {
-      commit('clearChatScrolledToMessageIndex')
+    setChatSessionId: ({ commit }: UserActionContext, sessionId: string) => {
+      commit('setChatSessionId', sessionId)
     },
 
     updateHadASession: ({ commit }: UserActionContext, flag: boolean) => {

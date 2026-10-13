@@ -1015,6 +1015,7 @@ export default {
     'currentSession.id': {
       handler(newId) {
         if (!newId) return
+        this.$store.dispatch('user/setChatSessionId', newId)
         this.$nextTick(() => {
           this.scrollToBottom()
           this.updateAutoscrolling()
