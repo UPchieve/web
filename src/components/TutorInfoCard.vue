@@ -5,6 +5,7 @@ import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
 
 const props = defineProps<{
   info: VolunteerPublicProfileInfoShared
+  viewerRole: 'student' | 'volunteer'
 }>()
 
 const VOLUNTEER_SHAREABLE_STATS = [
@@ -21,8 +22,12 @@ const VOLUNTEER_SHAREABLE_STATS = [
   },
 ] as const
 
-const isCollapsed = ref(false)
+// Only collapse the student's view, not the volunteer's
+const isCollapsible = computed(() => props.viewerRole === 'student')
+const isCollapsed = ref(props.viewerRole === 'student')
+
 function toggleCollapsed() {
+  if (!isCollapsible.value) return
   isCollapsed.value = !isCollapsed.value
 }
 
@@ -50,7 +55,12 @@ const hasAnyInfo = computed(() => hasOccupations.value || hasAnyStat.value)
   <div v-if="hasAnyInfo" class="tutor-info-card" data-testid="tutor-info-card">
     <div class="tutor-info-header">
       <span class="tutor-info-label">Meet your coach</span>
-      <button type="button" class="tutor-info-toggle" @click="toggleCollapsed">
+      <button
+        v-if="isCollapsible"
+        type="button"
+        class="tutor-info-toggle"
+        @click="toggleCollapsed"
+      >
         {{ isCollapsed ? 'Show' : 'Hide' }}
       </button>
     </div>

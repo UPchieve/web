@@ -169,6 +169,9 @@
           'chat-container--hidden': shouldHideChatSection,
         }"
       >
+        <div v-if="hasPartnerSharedInfo" class="tutor-info">
+          <TutorInfoCard :info="partnerSharedInfo" viewerRole="student" />
+        </div>
         <div
           v-if="showSessionMetadataContainer"
           class="about-session-container"
@@ -361,6 +364,7 @@ import {
   hasSeenScreenShareDisclaimerThisSession,
   setHasSeenScreenShareDisclaimerThisSession,
 } from '@/utils/session'
+import TutorInfoCard from '@/components/TutorInfoCard.vue'
 //import { createBrowserInspector } from '@statelyai/inspect'
 
 const meetingActor = ref(null)
@@ -389,6 +393,7 @@ export default {
     LiveMediaChatHeader,
     PartnerAckScreenShareInfractionModal,
     AckPartnerIntiatedPotentialBan,
+    TutorInfoCard,
   },
 
   setup() {
@@ -627,6 +632,13 @@ export default {
     }),
     attempts() {
       return `${this.attemptNumber}/${this.maxAttempts}`
+    },
+    // Only contains the fields the volunteer chose to share
+    partnerSharedInfo() {
+      return this.sessionPartner?.publicProfileStats ?? {}
+    },
+    hasPartnerSharedInfo() {
+      return Object.keys(this.partnerSharedInfo).length > 0
     },
     micState() {
       if (
@@ -1492,5 +1504,10 @@ export default {
 
 .no-pointer-events {
   pointer-events: none;
+}
+
+.tutor-info {
+  background-color: #fff;
+  padding: 16px;
 }
 </style>

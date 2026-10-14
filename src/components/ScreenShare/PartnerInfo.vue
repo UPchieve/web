@@ -1,11 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import StarIcon from '@/assets/icons/star_icon.svg'
-import { EVENTS, type ShareInfoFieldKey } from '@/consts'
-import AnalyticsService from '@/services/AnalyticsService'
-import { buildShareInfoMessage } from '@/utils/build-share-info-message'
-import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
 
 const store = useStore()
 const props = defineProps<{
@@ -14,34 +10,6 @@ const props = defineProps<{
 }>()
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
-
-const sharedInfoMessage = computed(() => {
-  const shared: VolunteerPublicProfileInfoShared =
-    sessionPartner.value?.publicProfileStats ?? {}
-  const sharedFields = Object.keys(shared) as ShareInfoFieldKey[]
-  return buildShareInfoMessage(sharedFields, {
-    occupations: shared.occupation,
-    numSessionsTutored: shared.numSessionsTutored ?? 0,
-    numStudentsTutored: shared.numStudentsHelped ?? 0,
-    totalHoursTutored: shared.totalVolunteerHours ?? 0,
-  })
-})
-
-const showSharedInfo = ref(false)
-function toggleSharedInfo() {
-  AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_LEARN_MORE_ABOUT_COACH)
-  showSharedInfo.value = !showSharedInfo.value
-}
-
-watch(
-  sharedInfoMessage,
-  (message, previousMessage) => {
-    if (message && !previousMessage) {
-      AnalyticsService.captureEvent(EVENTS.STUDENT_SAW_LEARN_MORE_ABOUT_COACH)
-    }
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
@@ -53,17 +21,6 @@ watch(
       </div>
       <div class="status">
         {{ props.partnerPresence }}
-      </div>
-      <button
-        v-if="sharedInfoMessage"
-        type="button"
-        class="shared-info-toggle"
-        @click="toggleSharedInfo"
-      >
-        {{ showSharedInfo ? 'Hide' : 'Learn more about your coach' }}
-      </button>
-      <div v-if="showSharedInfo && sharedInfoMessage" class="shared-info">
-        {{ sharedInfoMessage }}
       </div>
     </div>
   </div>
@@ -107,24 +64,6 @@ watch(
 .status {
   font-size: 12px;
   font-weight: 400;
-}
-
-.shared-info-toggle {
-  background: none;
-  border: none;
-  padding: 0;
-  color: white;
-  font-size: 12px;
-  font-weight: 400;
-  text-decoration: underline;
-  cursor: pointer;
-  display: block;
-}
-
-.shared-info {
-  font-size: 12px;
-  font-weight: 400;
-  margin-top: 4px;
 }
 
 .star-icon {
