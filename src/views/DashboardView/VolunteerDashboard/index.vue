@@ -136,10 +136,7 @@
     <volunteer-share-info-modal
       v-if="showShareInfoModal"
       :closeModal="toggleShareInfoModal"
-      :volunteerOccupations="volunteerInfo.occupations"
-      :numSessionsTutored="volunteerInfo.numSessionsTutored"
-      :numStudentsTutored="volunteerInfo.numStudentsTutored"
-      :totalHoursTutored="volunteerInfo.totalHoursTutored"
+      :info="volunteerInfo"
     />
 
     <show-online-status-modal
@@ -180,6 +177,7 @@ import JoinedTeamModal from './JoinedTeamModal.vue'
 import { quizRoute } from '@/utils/quiz-route'
 import ImpactSummaryCard from '@/components/ImpactSummaryCard.vue'
 import VolunteerShareInfoModal from './VolunteerShareInfoModal.vue'
+import { volunteerDataFromUser } from '@/utils/build-share-info-message'
 import ShowOnlineStatusModal from './ShowOnlineStatusModal.vue'
 import {
   hasSeenShowOnlineStatusModal,
@@ -637,7 +635,6 @@ export default {
       )
     },
     showShareInfoModal() {
-      AnalyticsService.captureEvent(EVENTS.VOLUNTEER_SAW_SHARE_INFO_MODAL)
       return (
         !this.hasSeenShareInfoModal &&
         !this.dismissedShareInfoModal &&
@@ -651,13 +648,7 @@ export default {
       )
     },
     volunteerInfo() {
-      return {
-        // Volunteers can select multiple occupations
-        occupations: this.user.occupation ?? [],
-        numSessionsTutored: this.user.pastSessions?.length ?? 0,
-        numStudentsTutored: this.user.uniqueStudentsHelpedCount ?? 0,
-        totalHoursTutored: this.user.hoursTutored ?? 0,
-      }
+      return volunteerDataFromUser(this.user)
     },
   },
   watch: {
@@ -673,6 +664,14 @@ export default {
           AnalyticsService.captureEvent(
             EVENTS.VOLUNTEER_ASYNC_ESSAY_REVIEW_DASHBOARD_CARD_VIEWED
           )
+        }
+      },
+    },
+    showShareInfoModal: {
+      immediate: true,
+      handler(isVisible) {
+        if (isVisible) {
+          AnalyticsService.captureEvent(EVENTS.VOLUNTEER_SAW_SHARE_INFO_MODAL)
         }
       },
     },

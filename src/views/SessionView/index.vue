@@ -169,7 +169,7 @@
           'chat-container--hidden': shouldHideChatSection,
         }"
       >
-        <div v-if="hasPartnerSharedInfo" class="tutor-info">
+        <div v-if="isStudent && hasPartnerSharedInfo" class="tutor-info">
           <TutorInfoCard :info="partnerSharedInfo" viewerRole="student" />
         </div>
         <div

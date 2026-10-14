@@ -3,13 +3,11 @@ import { ref } from 'vue'
 import Modal from '@/components/Modal.vue'
 import ShareInfoFieldsForm from '@/components/ShareInfoFieldsForm.vue'
 import LoggerService from '@/services/LoggerService'
+import type { ShareableVolunteerData } from '@/utils/build-share-info-message'
 
 const props = defineProps<{
   closeModal: () => void
-  volunteerOccupations?: string[]
-  numSessionsTutored: number
-  numStudentsTutored: number
-  totalHoursTutored: number
+  info: ShareableVolunteerData
 }>()
 
 const shareInfoFormRef = ref<InstanceType<typeof ShareInfoFieldsForm>>()
@@ -30,15 +28,13 @@ async function handleDismiss() {
       <h1>Help your students get to know you better!</h1>
       <p>
         Here's what your students will see. Uncheck anything you'd rather keep
-        private. You can change this anytime from your profile.
+        private. You can change this anytime from
+        <router-link :to="`/profile`">your profile</router-link>.
       </p>
     </div>
     <ShareInfoFieldsForm
       ref="shareInfoFormRef"
-      :volunteerOccupations="volunteerOccupations"
-      :numSessionsTutored="numSessionsTutored"
-      :numStudentsTutored="numStudentsTutored"
-      :totalHoursTutored="totalHoursTutored"
+      :info="info"
       @saved="props.closeModal"
     />
   </modal>
@@ -48,5 +44,9 @@ async function handleDismiss() {
 h1 {
   font-size: 1.5rem;
   margin-top: 0;
+}
+
+:deep(.upc-modal-form) {
+  max-width: 800px;
 }
 </style>

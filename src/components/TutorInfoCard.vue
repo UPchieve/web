@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue'
 import Chip from '@/components/Chip.vue'
 import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
+import { EVENTS } from '@/consts'
+import AnalyticsService from '@/services/AnalyticsService'
 
 const props = defineProps<{
   info: VolunteerPublicProfileInfoShared
@@ -25,10 +27,20 @@ const VOLUNTEER_SHAREABLE_STATS = [
 // Only collapse the student's view, not the volunteer's
 const isCollapsible = computed(() => props.viewerRole === 'student')
 const isCollapsed = ref(props.viewerRole === 'student')
+const studentOpenedShowTutorInfo = ref(false)
 
 function toggleCollapsed() {
   if (!isCollapsible.value) return
   isCollapsed.value = !isCollapsed.value
+
+  if (
+    !isCollapsed.value &&
+    props.viewerRole === 'student' &&
+    !studentOpenedShowTutorInfo.value
+  ) {
+    studentOpenedShowTutorInfo.value = true
+    AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_LEARN_MORE_ABOUT_COACH)
+  }
 }
 
 const statsToShow = computed(() =>

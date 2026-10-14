@@ -1,21 +1,21 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import FormCheckBox from '@/components/FormCheckBox.vue'
-import { buildShareInfoMessage } from '@/utils/build-share-info-message'
+import ToggleButton from './ToggleButton.vue'
+import TutorInfoCard from '@/components/TutorInfoCard.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import UserService from '@/services/UserService'
 import { EVENTS, SHARE_INFO_FIELDS, type ShareInfoFieldKey } from '@/consts'
+import type { ShareableVolunteerData } from '@/utils/build-share-info-message'
+import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
 
 const props = withDefaults(
   defineProps<{
-    volunteerOccupations?: string[]
-    numSessionsTutored: number
-    numStudentsTutored: number
-    totalHoursTutored: number
+    info: ShareableVolunteerData
     showButtons?: boolean
+    stackedLayout?: boolean
   }>(),
-  { showButtons: true }
+  { showButtons: true, stackedLayout: false }
 )
 
 const emit = defineEmits<{
@@ -42,16 +42,20 @@ function toggleField(key: ShareInfoFieldKey, checked: boolean) {
     : selectedFields.value.filter((field) => field !== key)
 }
 
-const previewMessage = computed(() =>
-  buildShareInfoMessage(selectedFields.value, {
-    occupations: props.volunteerOccupations,
-    numSessionsTutored: props.numSessionsTutored,
-    numStudentsTutored: props.numStudentsTutored,
-    totalHoursTutored: props.totalHoursTutored,
-  })
-)
+const hasSelection = computed(() => selectedFields.value.length > 0)
 
-const hasSelection = computed(() => previewMessage.value.length > 0)
+// Preview the card as students will see it, with only the selected fields
+const previewInfo = computed<VolunteerPublicProfileInfoShared>(() => {
+  const allInfo: VolunteerPublicProfileInfoShared = {
+    occupation: props.info.occupations,
+    numSessionsTutored: props.info.numSessionsTutored,
+    numStudentsHelped: props.info.numStudentsTutored,
+    totalVolunteerHours: props.info.totalHoursTutored,
+  }
+  return Object.fromEntries(
+    selectedFields.value.map((key) => [key, allInfo[key]])
+  )
+})
 
 async function save(fields: ShareInfoFieldKey[]) {
   await UserService.setProfile({ publicProfileKeys: fields }, store)
@@ -76,22 +80,23 @@ async function handleOptOut() {
 
 defineExpose({
   save: () => save(selectedFields.value),
-  // Persists "share nothing" without touching the checkboxes - used when the
-  // modal is dismissed (e.g. clicking outside) instead of explicitly saved.
+  // Stores as "share nothing" when the modal is dismissed
   optOut: () => save([]),
 })
 </script>
 
 <template>
-  <div class="share-info-form">
+  <div
+    class="share-info-form"
+    :class="{ 'share-info-form--stacked': stackedLayout }"
+  >
     <div class="preview">
-      <p
+      <TutorInfoCard
         v-if="hasSelection"
-        class="preview-text"
+        :info="previewInfo"
+        viewer-role="volunteer"
         data-testid="share-info-preview"
-      >
-        {{ previewMessage }}
-      </p>
+      />
       <p
         v-else
         class="preview-text preview-text--empty"
@@ -100,39 +105,78 @@ defineExpose({
         Nothing will be shared with your student.
       </p>
     </div>
-    <FormCheckBox
-      v-for="field in SHARE_INFO_FIELDS"
-      :key="field.key"
-      :name="field.key"
-      :label="field.label"
-      :model-value="isSelected(field.key)"
-      :is-required="false"
-      :data-testid="field.key"
-      @update:model-value="
-        (checked: boolean) => toggleField(field.key, checked)
-      "
-    />
-    <div v-if="showButtons" class="share-info-form-buttons">
-      <button
-        class="uc-form-button-secondary secondary-button"
-        type="button"
-        @click="handleOptOut"
+    <div
+      class="share-info-toggle-buttons"
+      :class="{ 'share-info-toggle-buttons--stacked': stackedLayout }"
+    >
+      <div
+        v-for="field in SHARE_INFO_FIELDS"
+        :key="field.key"
+        class="toggle-buttons"
       >
-        Don't share anything
-      </button>
-      <button class="uc-form-button" type="button" @click="handleSave">
-        Save
-      </button>
+        <ToggleButton
+          :id="field.key"
+          :value="isSelected(field.key)"
+          sync
+          :data-testid="field.key"
+          @input="(checked: boolean) => toggleField(field.key, checked)"
+          :color="{
+            unchecked: '#abb2bd',
+          }"
+          class="toggle-button"
+        />
+        <span class="toggle-field-label">{{ field.label }}</span>
+      </div>
     </div>
+  </div>
+  <div v-if="showButtons" class="share-info-form-buttons">
+    <button
+      class="uc-form-button-secondary secondary-button"
+      type="button"
+      @click="handleOptOut"
+    >
+      Don't share anything
+    </button>
+    <button class="uc-form-button" type="button" @click="handleSave">
+      Save
+    </button>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.share-info-form {
+  @include flex-container(row);
+  @include breakpoint-between(0, 800px) {
+    flex-direction: column;
+  }
+}
+
+.share-info-form.share-info-form--stacked {
+  flex-direction: column;
+}
+
+.share-info-toggle-buttons {
+  @include flex-container(column, center, flex-start);
+  padding: 16px;
+  @include child-spacing(top, 12px);
+}
+
+.share-info-toggle-buttons--stacked {
+  padding: 0px 16px;
+}
+
+.toggle-buttons {
+  @include flex-container(row, center, flex-start);
+  gap: 8px;
+}
+
 .preview {
-  background: $c-background-grey;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
+  box-sizing: border-box;
+  min-height: 210px;
+  min-width: 342px;
 }
 
 .preview-text {

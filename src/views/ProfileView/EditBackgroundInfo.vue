@@ -229,16 +229,14 @@ async function onEditButtonClick() {
       <div class="prompt">Share With Your Students</div>
       <div class="description">
         Choose which information, if any, your students see about you during
-        sessions. This is experimental and separate from the background
-        information above. Changes save with the button above.
+        sessions. This is separate from the background information above.
+        Changes save with the button above.
       </div>
       <ShareInfoFieldsForm
         ref="shareInfoFormRef"
         :showButtons="false"
-        :volunteerOccupations="shareInfoVolunteerData.occupations"
-        :numSessionsTutored="shareInfoVolunteerData.numSessionsTutored"
-        :numStudentsTutored="shareInfoVolunteerData.numStudentsTutored"
-        :totalHoursTutored="shareInfoVolunteerData.totalHoursTutored"
+        :info="shareInfoVolunteerData"
+        stacked-layout
       />
     </div>
   </div>
