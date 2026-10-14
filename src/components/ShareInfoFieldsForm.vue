@@ -6,8 +6,10 @@ import TutorInfoCard from '@/components/TutorInfoCard.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import UserService from '@/services/UserService'
 import { EVENTS, SHARE_INFO_FIELDS, type ShareInfoFieldKey } from '@/consts'
-import type { ShareableVolunteerData } from '@/utils/build-share-info-message'
-import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
+import {
+  toPublicProfileInfoShared,
+  type ShareableVolunteerData,
+} from '@/utils/build-share-info-message'
 
 const props = withDefaults(
   defineProps<{
@@ -45,17 +47,9 @@ function toggleField(key: ShareInfoFieldKey, checked: boolean) {
 const hasSelection = computed(() => selectedFields.value.length > 0)
 
 // Preview the card as students will see it, with only the selected fields
-const previewInfo = computed<VolunteerPublicProfileInfoShared>(() => {
-  const allInfo: VolunteerPublicProfileInfoShared = {
-    occupation: props.info.occupations,
-    numSessionsTutored: props.info.numSessionsTutored,
-    numStudentsHelped: props.info.numStudentsTutored,
-    totalVolunteerHours: props.info.totalHoursTutored,
-  }
-  return Object.fromEntries(
-    selectedFields.value.map((key) => [key, allInfo[key]])
-  )
-})
+const previewInfo = computed(() =>
+  toPublicProfileInfoShared(props.info, selectedFields.value)
+)
 
 async function save(fields: ShareInfoFieldKey[]) {
   await UserService.setProfile({ publicProfileKeys: fields }, store)
@@ -80,7 +74,7 @@ async function handleOptOut() {
 
 defineExpose({
   save: () => save(selectedFields.value),
-  // Stores as "share nothing" when the modal is dismissed
+  // Stores as sharing nothing when the modal is dismissed
   optOut: () => save([]),
 })
 </script>
@@ -173,7 +167,6 @@ defineExpose({
 .preview {
   border-radius: 8px;
   padding: 16px;
-  margin-bottom: 16px;
   box-sizing: border-box;
   min-height: 210px;
   min-width: 342px;

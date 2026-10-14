@@ -169,7 +169,10 @@
           'chat-container--hidden': shouldHideChatSection,
         }"
       >
-        <div v-if="isStudent && hasPartnerSharedInfo" class="tutor-info">
+        <div
+          v-if="isStudent && isShowInfoOptInEnabled && hasPartnerSharedInfo"
+          class="tutor-info"
+        >
           <TutorInfoCard :info="partnerSharedInfo" viewerRole="student" />
         </div>
         <div
@@ -624,6 +627,7 @@ export default {
       isTutorBotChatEnabled: 'featureFlags/isTutorBotChatEnabled',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
+      isShowInfoOptInEnabled: 'featureFlags/isShowInfoOptInEnabled',
       currentTutorBotConversation: 'botConversations/currentConversation',
       isSessionInProgress: 'user/isSessionInProgress',
       sessionPartner: 'user/sessionPartner',

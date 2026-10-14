@@ -1,14 +1,18 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { EVENTS } from '@/consts'
+import { EVENTS, type ShareInfoFieldKey } from '@/consts'
 import UserService from '@/services/UserService'
 import BackGroundInfoField from '@/components/BackgroundInfoField.vue'
 import ShareInfoFieldsForm from '@/components/ShareInfoFieldsForm.vue'
 import PencilIcon from '@/assets/pencil.svg'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import AnalyticsService from '@/services/AnalyticsService'
-import { volunteerDataFromUser } from '@/utils/build-share-info-message'
+import {
+  toPublicProfileInfoShared,
+  volunteerDataFromUser,
+} from '@/utils/build-share-info-message'
+import TutorInfoCard from '@/components/TutorInfoCard.vue'
 
 const emit = defineEmits<{
   (e: 'error', err: any): void
@@ -30,6 +34,9 @@ const cannotFindHighSchool = ref(false)
 const city = ref(user.value.city ?? '')
 const state = ref(user.value.state ?? '')
 const country = ref(user.value.country ?? '')
+const publicProfileKeys = computed<ShareInfoFieldKey[]>(
+  () => user.value.publicProfileKeys ?? []
+)
 
 if (occupations.value.length === 0) {
   AnalyticsService.captureEvent(EVENTS.COACH_HAS_NO_OCCUPATION)
@@ -81,6 +88,12 @@ const isShowInfoOptInEnabled = computed(
   () => store.getters['featureFlags/isShowInfoOptInEnabled']
 )
 const shareInfoVolunteerData = computed(() => volunteerDataFromUser(user.value))
+const sharedInfoPreview = computed(() =>
+  toPublicProfileInfoShared(
+    shareInfoVolunteerData.value,
+    publicProfileKeys.value
+  )
+)
 const shareInfoFormRef = ref<InstanceType<typeof ShareInfoFieldsForm>>()
 
 async function onEditButtonClick() {
@@ -206,6 +219,23 @@ async function onEditButtonClick() {
       <template v-else>No background information provided</template>
     </div>
 
+    <div
+      v-if="isShowInfoOptInEnabled"
+      v-show="!isEditing"
+      class="share-info-preview-section"
+    >
+      <div class="prompt">Information shared with students</div>
+      <TutorInfoCard
+        v-if="publicProfileKeys.length"
+        :info="sharedInfoPreview"
+        viewer-role="volunteer"
+        class="tutor-info-card"
+      />
+      <div v-else class="description">
+        Nothing will be shared with your students.
+      </div>
+    </div>
+
     <BackGroundInfoField
       v-show="isEditing"
       v-model="occupations"
@@ -220,7 +250,6 @@ async function onEditButtonClick() {
       v-model:state="state"
       :show-input-errors="showInputErrors"
     />
-
     <div
       v-if="isShowInfoOptInEnabled"
       v-show="isEditing"
@@ -284,6 +313,10 @@ ul {
   border-top: 1px solid $c-border-grey;
 }
 
+.share-info-preview-section {
+  margin-top: 16px;
+}
+
 .field-button {
   color: $c-soft-black;
   border-radius: 0px;
@@ -303,5 +336,9 @@ ul {
 .edit-occupation-icon {
   height: 14px;
   width: 14px;
+}
+
+.tutor-info-card {
+  margin-top: 16px;
 }
 </style>

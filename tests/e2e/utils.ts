@@ -59,6 +59,7 @@ export type VolunteerOptions = {
   approved?: boolean
   onboarded?: boolean
   completedUpchieveTraining?: boolean
+  publicProfileKeys?: string[]
 }
 
 export const createVolunteer = async (
@@ -78,6 +79,7 @@ export const createVolunteer = async (
     approved: true,
     onboarded: true,
     completedUpchieveTraining: true,
+    publicProfileKeys: [],
     ...options,
   }
 
@@ -87,8 +89,8 @@ export const createVolunteer = async (
     `UPDATE users SET verified = true WHERE id = '${user.id}'`
   )
   await dbClient.query(
-    `UPDATE volunteer_profiles SET approved = $1, onboarded = $2 WHERE user_id = '${user.id}'`,
-    [opts.approved, opts.onboarded]
+    `UPDATE volunteer_profiles SET approved = $1, onboarded = $2, info_shared_with_students = $3::upchieve.volunteer_info_type[] WHERE user_id = '${user.id}'`,
+    [opts.approved, opts.onboarded, opts.publicProfileKeys]
   )
   if (opts.completedUpchieveTraining)
     await completeUpchieveTraining(dbClient, user.id)

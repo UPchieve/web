@@ -1,5 +1,6 @@
 import EditBackgroundInfo from '@/views/ProfileView/EditBackgroundInfo.vue'
 import BackgroundInfoField from '@/components/BackgroundInfoField.vue'
+import TutorInfoCard from '@/components/TutorInfoCard.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import NetworkService from '@/services/NetworkService'
 import UserService from '@/services/UserService'
@@ -8,9 +9,18 @@ import { it, describe, expect, vi, beforeEach } from 'vitest'
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 
-function getWrapper(user = {}, { hasExistingStudentSchool = false } = {}) {
+function getWrapper(
+  user = {},
+  { hasExistingStudentSchool = false, isShowInfoOptInEnabled = true } = {}
+) {
   const store = createStore({
     modules: {
+      featureFlags: {
+        namespaced: true,
+        getters: {
+          isShowInfoOptInEnabled: () => isShowInfoOptInEnabled,
+        },
+      },
       user: {
         namespaced: true,
         state: { user },
@@ -82,6 +92,7 @@ describe('EditBackgroundInfo', () => {
 
     expect(editButton(wrapper).text()).toBe('Save')
     expect(wrapper.findComponent(BackgroundInfoField).isVisible()).toBe(true)
+    expect(wrapper.findComponent(TutorInfoCard).isVisible()).toBe(true)
   })
 
   it('blocks saving and shows a validation error when no occupation is selected', async () => {
@@ -313,5 +324,93 @@ describe('EditBackgroundInfo', () => {
         `[data-testid="${VolunteerOccupations.CAREGIVER}"]`
       ).element.checked
     ).toBe(true)
+  })
+
+  it('saves the edited share-info selection together with background info', async () => {
+    const wrapper = getWrapper({
+      occupation: [VolunteerOccupations.WORKING_PART_TIME],
+      country: 'Canada',
+      city: 'Toronto',
+      publicProfileKeys: [
+        'occupation',
+        'numSessionsTutored',
+        'numStudentsHelped',
+        'totalVolunteerHours',
+      ],
+    })
+
+    await editButton(wrapper).trigger('click')
+    await wrapper
+      .find('[data-testid="occupation"] input[type="checkbox"]')
+      .setValue(false)
+
+    await editButton(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(NetworkService.setProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        publicProfileKeys: [
+          'numSessionsTutored',
+          'numStudentsHelped',
+          'totalVolunteerHours',
+        ],
+      })
+    )
+    expect(editButton(wrapper).text()).toBe('Edit')
+    expect(
+      Object.keys(wrapper.findComponent(TutorInfoCard).props('info'))
+    ).toEqual([
+      'numSessionsTutored',
+      'numStudentsHelped',
+      'totalVolunteerHours',
+    ])
+  })
+
+  it('shows a fallback message in place of the Tutor Info Card if opted out of sharing info', async () => {
+    const wrapper = getWrapper({
+      occupation: [VolunteerOccupations.WORKING_PART_TIME],
+      country: 'Canada',
+      city: 'Toronto',
+      publicProfileKeys: ['occupation'],
+    })
+
+    expect(wrapper.findComponent(TutorInfoCard).exists()).toBe(true)
+
+    await editButton(wrapper).trigger('click')
+    await wrapper
+      .find('[data-testid="occupation"] input[type="checkbox"]')
+      .setValue(false)
+
+    await editButton(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(NetworkService.setProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ publicProfileKeys: [] })
+    )
+
+    expect(wrapper.text()).toContain('Information shared with students')
+    expect(wrapper.findComponent(TutorInfoCard).exists()).toBe(false)
+    expect(wrapper.text()).toContain(
+      'Nothing will be shared with your students.'
+    )
+  })
+
+  it('hides the share-info sections when the feature flag is off', async () => {
+    const wrapper = getWrapper(
+      {
+        occupation: [VolunteerOccupations.WORKING_PART_TIME],
+        country: 'Canada',
+        city: 'Toronto',
+        publicProfileKeys: ['occupation'],
+      },
+      { isShowInfoOptInEnabled: false }
+    )
+
+    expect(wrapper.text()).not.toContain('Information shared with students')
+    expect(wrapper.findComponent(TutorInfoCard).exists()).toBe(false)
+
+    await editButton(wrapper).trigger('click')
+
+    expect(wrapper.text()).not.toContain('Share With Your Students')
   })
 })
