@@ -5,6 +5,7 @@ import SubjectSelectionModal from '@/views/DashboardView/StudentDashboard/Subjec
 import { useStore } from 'vuex'
 import { computed } from 'vue'
 import TutorIcon from '@/assets/icons/graduation_cap_icon.svg'
+import { useSessionStore } from '@/stores/session'
 
 const store = useStore()
 
@@ -20,9 +21,7 @@ const currentConversationId = computed(
   () => store.state.botConversations.currentConversation?.conversationId
 )
 
-const cooldownMinutes = computed(
-  () => store.getters['session/sessionRequestCooldownMinutes']
-)
+const cooldownMinutes = computed(() => useSessionStore().cooldownMinutes)
 
 const isAsyncEssayReviewEnabled = computed(
   () => store.getters['featureFlags/isAsyncEssayReviewEnabled']
@@ -73,7 +72,7 @@ const showPresessionSurvey = () => {
   <div class="transfer-to-session">
     <TransferToSessionButton
       :onClick="showPresessionSurvey"
-      :disable-button="cooldownMinutes"
+      :disable-button="cooldownMinutes > 0"
     />
   </div>
 </template>

@@ -5,7 +5,6 @@ import userModule, { type UserStoreState } from './modules/user'
 import subjectsModule from './modules/subjects'
 import volunteerModule from './modules/volunteer'
 import socketModule from './modules/socket'
-import sessionModule, { type SessionState } from './modules/session'
 import botConversationsModule, {
   type TutorBotStoreState,
 } from './modules/bot-conversations'
@@ -18,7 +17,6 @@ import nthsModule from './modules/nths'
 // from the store modules importing this file
 export type RootState = {
   user: UserStoreState
-  session: SessionState
   botConversations: TutorBotStoreState
 }
 export type RootGetters = any
@@ -31,7 +29,6 @@ export const storeOptions = {
     subjects: subjectsModule,
     volunteer: volunteerModule,
     socket: socketModule,
-    session: sessionModule,
     liveMedia: liveMediaModule,
     botConversations: botConversationsModule,
     americaCountsVolunteer: americaCountsVolunteerModule,

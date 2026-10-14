@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import { useSessionStore } from '@/stores/session'
+import { mapState as mapPiniaState } from 'pinia'
 import { mapGetters, mapState } from 'vuex'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import LoggerService from '@/services/LoggerService'
@@ -78,8 +80,8 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user.user,
-      latestSession: (state) => state.session.latestSession,
     }),
+    ...mapPiniaState(useSessionStore, ['latestSession']),
     ...mapGetters({
       firstName: 'user/firstName',
       isStudent: 'user/isStudent',

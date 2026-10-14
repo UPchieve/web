@@ -470,4 +470,125 @@ describe('User store module', () => {
       expect(store.state.user.unreadChatMessageIndices).toEqual([3])
     })
   })
+
+  describe('sessionStatus', () => {
+    const student = { userType: 'student' }
+    const volunteer = (extra = {}) => ({
+      userType: 'volunteer',
+      isOnboarded: true,
+      isApproved: true,
+      ...extra,
+    })
+    const liveSession = { id: 'session-1', createdAt: new Date() }
+
+    // `setUser` replaces the whole user, so `baseUser` does not leak in.
+    const getStatusStore = (user = {}, session) => {
+      const store = getStore()
+      store.commit('user/setUser', user)
+      if (session) store.commit('user/setSession', session)
+      return store
+    }
+
+    it.each([
+      [
+        'a student who is not in a session',
+        student,
+        { text: 'Ready to chat', class: '' },
+      ],
+      [
+        'an onboarded, approved volunteer',
+        volunteer(),
+        { text: 'Ready to help', class: '' },
+      ],
+      [
+        'a completely banned user',
+        { ...student, banType: 'complete' },
+        { text: 'Paused', class: 'indicator--banned' },
+      ],
+      [
+        'a shadow-banned user (not treated as banned)',
+        { ...student, banType: 'shadow' },
+        { text: 'Ready to chat', class: '' },
+      ],
+      [
+        'a volunteer who has not finished onboarding',
+        volunteer({ isOnboarded: false }),
+        { text: 'Onboarding', class: 'indicator--onboarding' },
+      ],
+      [
+        'an onboarded volunteer who is not yet approved',
+        volunteer({ isApproved: false }),
+        { text: 'Pending approval', class: 'indicator--onboarding' },
+      ],
+    ])('Reports %s', (_label, user, expected) => {
+      const store = getStatusStore(user)
+      expect(store.getters['user/sessionStatus']).toEqual(expected)
+    })
+
+    it('Reports "Chat in session" while a session is alive', () => {
+      const store = getStatusStore(student, liveSession)
+      expect(store.getters['user/sessionStatus']).toEqual({
+        text: 'Chat in session',
+        class: 'indicator--session',
+      })
+    })
+
+    it('Does not report a session once it has ended', () => {
+      const store = getStatusStore(student, {
+        ...liveSession,
+        endedAt: new Date(),
+      })
+      expect(store.getters['user/sessionStatus']).toEqual({
+        text: 'Ready to chat',
+        class: '',
+      })
+    })
+
+    it('Lets "Chat in session" win the text over "Paused"', () => {
+      const store = getStatusStore(
+        { ...student, banType: 'complete' },
+        liveSession
+      )
+      expect(store.getters['user/sessionStatus'].text).toBe('Chat in session')
+    })
+
+    it('Lets "Onboarding" win the text over "Chat in session"', () => {
+      const store = getStatusStore(
+        volunteer({ isOnboarded: false }),
+        liveSession
+      )
+      expect(store.getters['user/sessionStatus'].text).toBe('Onboarding')
+    })
+
+    it('Appends overlapping classes without a separator (current behaviour)', () => {
+      const store = getStatusStore(
+        { ...student, banType: 'complete' },
+        liveSession
+      )
+      expect(store.getters['user/sessionStatus'].class).toBe(
+        'indicator--bannedindicator--session'
+      )
+    })
+
+    it('Tolerates a user with no fields', () => {
+      const store = getStatusStore({})
+      expect(store.getters['user/sessionStatus']).toEqual({
+        text: 'Ready to chat',
+        class: '',
+      })
+    })
+
+    it('Recomputes when the user or session changes', () => {
+      const store = getStatusStore(student)
+      expect(store.getters['user/sessionStatus'].text).toBe('Ready to chat')
+
+      store.commit('user/setSession', liveSession)
+      expect(store.getters['user/sessionStatus'].text).toBe('Chat in session')
+
+      store.commit('user/setUser', { ...student, banType: 'complete' })
+      expect(store.getters['user/sessionStatus'].class).toBe(
+        'indicator--bannedindicator--session'
+      )
+    })
+  })
 })

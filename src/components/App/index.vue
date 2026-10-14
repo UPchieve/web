@@ -41,6 +41,7 @@ import { useAppBannerStore } from '@/stores/app/banner'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { useAppModalStore } from '@/stores/app/modal'
 import { useProductFlagsStore } from '@/stores/product-flags'
+import { useSessionStore } from '@/stores/session'
 import { IonApp, IonContent } from '@ionic/vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
@@ -147,6 +148,7 @@ export default {
   },
   methods: {
     ...mapPiniaActions(useProductFlagsStore, ['getUserProductFlags']),
+    ...mapPiniaActions(useSessionStore, ['fetchLatestSession']),
     ...mapPiniaActions(useAppModalStore, { showAppModal: 'show' }),
     ...mapPiniaActions(useAppBannerStore, {
       showBanner: 'show',
@@ -340,7 +342,7 @@ export default {
         }
 
         if (this.isStudent) {
-          this.$store.dispatch('session/fetchLatestSession')
+          this.fetchLatestSession()
         }
 
         if (Object.entries(this.subjects).length === 0)

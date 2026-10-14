@@ -26,7 +26,7 @@ const store = useStore()
 const sidebarStore = useAppSidebarStore()
 const router = useRouter()
 
-const sessionStatus = computed(() => store.getters['session/sessionStatus'])
+const sessionStatus = computed(() => store.getters['user/sessionStatus'])
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
 const isStudentVolunteer = computed(
   () => store.getters['user/isStudentVolunteer']

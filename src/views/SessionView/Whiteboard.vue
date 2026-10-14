@@ -390,6 +390,7 @@
 </template>
 
 <script>
+import { useSessionStore } from '@/stores/session'
 import { socket } from '@/socket'
 import { mapGetters } from 'vuex'
 import { markRaw } from 'vue'
@@ -1297,7 +1298,7 @@ export default {
       })
 
       this.zwibblerCtx = markRaw(zwibblerCtx)
-      await this.$store.dispatch('session/setZwibbler', this.zwibblerCtx)
+      useSessionStore().setZwibbler(this.zwibblerCtx)
       this.zwibblerCtx.setPaperSize(this.canvasWidth, this.canvasHeight)
       this.resizeViewRectangle()
       this.addListeners()
@@ -1589,7 +1590,7 @@ export default {
     }
     this.zwibblerCtx.destroy()
     this.zwibblerCtx = null
-    await this.$store.dispatch('session/setZwibbler', null)
+    useSessionStore().setZwibbler(null)
   },
   watch: {
     partnerImageUploadStatus(newValue, oldValue) {

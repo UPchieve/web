@@ -17,8 +17,9 @@
 </template>
 
 <script>
+import { useSessionStore } from '@/stores/session'
 import { mapGetters, mapState } from 'vuex'
-import { mapActions } from 'pinia'
+import { mapActions, mapState as mapPiniaState } from 'pinia'
 import { useAppHeaderStore } from '@/stores/app/header'
 import ActivityDot from '@/components/ActivityDot.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
@@ -50,11 +51,11 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
     }),
+    ...mapPiniaState(useSessionStore, ['hasCooldown']),
     ...mapGetters({
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
       isStudent: 'user/isStudent',
-      hasCooldown: 'session/hasCooldown',
       isFallIncentiveProgramEnabled:
         'featureFlags/isFallIncentiveProgramEnabled',
       isIncentiveBannerEnabled: 'featureFlags/isIncentiveBannerEnabled',

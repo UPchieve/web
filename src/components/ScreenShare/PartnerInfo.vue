@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useSessionStore } from '@/stores/session'
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import StarIcon from '@/assets/icons/star_icon.svg'
@@ -13,9 +14,8 @@ const props = defineProps<{
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
 
-const sharedInfoMessage = computed(
-  () => store.state.session.partnerSharedInfoMessage
-)
+const sessionStore = useSessionStore()
+const sharedInfoMessage = computed(() => sessionStore.partnerSharedInfoMessage)
 
 const showSharedInfo = ref(false)
 function toggleSharedInfo() {

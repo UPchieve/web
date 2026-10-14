@@ -9,6 +9,7 @@ import {
 import JourneysView from '@/views/JourneysView.vue'
 import router from '@/router'
 import store from '@/store'
+import { useSessionStore } from '@/stores/session'
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils'
 
 function getWrapper() {
@@ -29,11 +30,9 @@ function getElements(wrapper: VueWrapper) {
 }
 
 describe('JourneysView', () => {
-  let commitSpy: MockInstance
   let routerPushSpy: MockInstance
 
   beforeEach(() => {
-    commitSpy = vi.spyOn(store, 'commit')
     routerPushSpy = vi.spyOn(router, 'push')
   })
   test('renders the journey page with correct title and subtitle', () => {
@@ -57,7 +56,7 @@ describe('JourneysView', () => {
     await stepButtons[0].trigger('click')
     await flushPromises()
 
-    expect(commitSpy).toHaveBeenCalledWith('session/setJourneySessionData', {
+    expect(useSessionStore().journeySessionData).toEqual({
       dropdownLabel: 'Getting into College',
       key: 'college',
       stepNumber: 1,
@@ -79,7 +78,7 @@ describe('JourneysView', () => {
     await stepButtons[1].trigger('click')
     await flushPromises()
 
-    expect(commitSpy).toHaveBeenCalledWith('session/setJourneySessionData', {
+    expect(useSessionStore().journeySessionData).toEqual({
       dropdownLabel: 'Getting into College',
       key: 'college',
       stepNumber: 2,
@@ -101,7 +100,7 @@ describe('JourneysView', () => {
     await stepButtons[2].trigger('click')
     await flushPromises()
 
-    expect(commitSpy).toHaveBeenCalledWith('session/setJourneySessionData', {
+    expect(useSessionStore().journeySessionData).toEqual({
       dropdownLabel: 'Getting into College',
       key: 'college',
       stepNumber: 3,
@@ -123,7 +122,7 @@ describe('JourneysView', () => {
     await stepButtons[3].trigger('click')
     await flushPromises()
 
-    expect(commitSpy).toHaveBeenCalledWith('session/setJourneySessionData', {
+    expect(useSessionStore().journeySessionData).toEqual({
       dropdownLabel: 'Getting into College',
       key: 'college',
       stepNumber: 4,
@@ -147,7 +146,7 @@ describe('JourneysView', () => {
     await stepButtons[4].trigger('click')
     await flushPromises()
 
-    expect(commitSpy).toHaveBeenCalledWith('session/setJourneySessionData', {
+    expect(useSessionStore().journeySessionData).toEqual({
       dropdownLabel: 'Getting into College',
       key: 'college',
       stepNumber: 5,

@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import { useAppHeaderStore } from '@/stores/app/header'
+import { useSessionStore } from '@/stores/session'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
@@ -22,6 +23,8 @@ const getWrapper = (params) => {
     routeName: 'LoginView',
     ...params,
   }
+
+  useSessionStore().cooldownMinutes = options.hasCooldown ? 1 : 0
 
   const store = createStore({
     modules: {
@@ -45,12 +48,6 @@ const getWrapper = (params) => {
         getters: {
           isSessionAlive: () => options.isSessionAlive,
           isStudent: () => true,
-        },
-      },
-      session: {
-        ...storeOptions.modules.session,
-        getters: {
-          hasCooldown: () => options.hasCooldown,
         },
       },
       featureFlags: {

@@ -56,7 +56,14 @@ export type UserStoreState = {
   fetchingSessionPromise: null | Promise<Record<string, never>>
 }
 
+export type SessionStatus = {
+  text: string
+  class: string
+}
+
 type UserStoreGetterValues = {
+  isSessionAlive: boolean
+  sessionStatus: SessionStatus
   firstName: string
   lastName: string
   userType: string
@@ -640,6 +647,45 @@ export default {
 
       // True if the session hasn't ended
       return !state.session.endedAt
+    },
+
+    sessionStatus: (
+      state: UserStoreState,
+      getters: UserStoreGetterValues
+    ): SessionStatus => {
+      const inSession = getters.isSessionAlive
+      const isVolunteer = getters.isVolunteer
+      const user = state.user
+      const status = {
+        text: 'Ready to chat',
+        class: '',
+      }
+
+      if (isVolunteer) {
+        status.text = 'Ready to help'
+      }
+
+      if (user?.banType === 'complete') {
+        status.class += 'indicator--banned'
+        status.text = 'Paused'
+      }
+
+      if (inSession) {
+        status.class += 'indicator--session'
+        status.text = 'Chat in session'
+      }
+
+      if (isVolunteer && !user?.isOnboarded) {
+        status.class += 'indicator--onboarding'
+        status.text = 'Onboarding'
+      }
+
+      if (isVolunteer && user?.isOnboarded && !user?.isApproved) {
+        status.class += 'indicator--onboarding'
+        status.text = 'Pending approval'
+      }
+
+      return status
     },
 
     isSessionWaitingForVolunteer: (state: UserStoreState) => {

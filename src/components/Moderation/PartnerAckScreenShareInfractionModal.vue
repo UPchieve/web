@@ -42,6 +42,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSessionStore } from '@/stores/session'
 import { computed } from 'vue'
 import { toastController } from '@ionic/vue'
 import { closeCircleOutline } from 'ionicons/icons'
@@ -56,6 +57,7 @@ import SessionService from '@/services/SessionService'
 import Warning from '@/assets/warning.svg'
 
 const store = useStore()
+const sessionStore = useSessionStore()
 
 const partner = store.getters['user/isStudent'] ? 'coach' : 'student'
 
@@ -85,8 +87,8 @@ const handlePotentialViolation = async (
   }
 ) => {
   try {
-    const lastSession = store.state.session?.latestSession
-      ? store.state.session.latestSession
+    const lastSession = sessionStore.latestSession
+      ? sessionStore.latestSession
       : (await SessionService.getLatestSession()).sessionData
 
     socket.emit(socketEvent, { ...data, sessionId: lastSession.id })

@@ -1,4 +1,5 @@
 import NetworkService from '@/services/NetworkService'
+import { useSessionStore } from '@/stores/session'
 import LoggerService from '@/services/LoggerService'
 import ModerationService from '@/services/ModerationService'
 import { EVENTS } from '@/consts'
@@ -227,7 +228,7 @@ export default {
           isUpbotSessionEditorContextEnabled &&
           toolType === 'whiteboard'
         ) {
-          const zwibbler = rootState.session.zwibbler
+          const zwibbler = useSessionStore().zwibbler
           if (zwibbler?.save) {
             const snapshotDataUrl = zwibbler.save({
               format: 'image/jpeg',

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { useSessionStore } from '@/stores/session'
 import { useAppModalStore } from '@/stores/app/modal'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
 import CrossIcon from '@/assets/cross.svg'
 import PresessionSurvey from './SubjectSelection/PresessionSurvey.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -21,14 +21,11 @@ const props = defineProps<{
   modalData: EssayHelpModalData
 }>()
 
-const store = useStore()
-
 const modalStore = useAppModalStore()
 const router = useRouter()
 
-const journeySessionData = computed(
-  () => store.state.session.journeySessionData
-)
+const sessionStore = useSessionStore()
+const journeySessionData = computed(() => sessionStore.journeySessionData)
 
 const showSurvey = ref(false)
 const isCollegeList = computed(() => props.modalData.subject === 'collegeList')
@@ -73,10 +70,10 @@ function startEssayReview() {
 
   if (journeySessionData.value) {
     AnalyticsService.captureEvent(EVENTS.GUIDED_JOURNEY_SESSION_REQUESTED, {
-      ...journeySessionData,
+      ...journeySessionData.value,
       isAsyncEssay: true,
     })
-    store.commit('session/setJourneySessionData', undefined)
+    sessionStore.clearJourneySessionData()
   }
 
   router.push(isCollegeList.value ? '/college-list-review' : '/essay-review')

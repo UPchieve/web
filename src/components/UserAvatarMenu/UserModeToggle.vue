@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import type { SessionStatus } from '@/store/modules/user'
 import UserService from '@/services/UserService'
 import LoggerService from '@/services/LoggerService'
 import { useRouter } from 'vue-router'
@@ -37,9 +38,7 @@ async function switchMode() {
 }
 
 const sessionStatus = computed(
-  (): {
-    class: string
-  } => store.getters['session/sessionStatus']
+  (): SessionStatus => store.getters['user/sessionStatus']
 )
 </script>
 

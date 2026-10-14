@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSessionStore } from '@/stores/session'
 import { useAppModalStore } from '@/stores/app/modal'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -29,6 +30,7 @@ type Journey = {
 
 const $router = useRouter()
 const store = useStore()
+const sessionStore = useSessionStore()
 const modalStore = useAppModalStore()
 const selectedJourney = ref<Journey | undefined>(undefined)
 const isAsyncEssayReviewEnabled = computed(
@@ -99,7 +101,7 @@ async function startSession(journeyStep: JourneyStep, stepNumber: number) {
   const { title, sessionTopic, sessionSubject } = journeyStep
   const { dropdownLabel, key } = selectedJourney.value
 
-  await store.commit('session/setJourneySessionData', {
+  sessionStore.setJourneySessionData({
     dropdownLabel,
     key,
     stepNumber,

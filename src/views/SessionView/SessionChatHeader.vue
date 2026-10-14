@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import { useSessionStore } from '@/stores/session'
+import { mapState as mapPiniaState } from 'pinia'
 // TODO: This file needs to be refactored to remove session logic from this component
 import { mapState, mapGetters } from 'vuex'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
@@ -117,8 +119,8 @@ export default {
     ...mapState({
       user: (state) => state.user.user,
       session: (state) => state.user.session,
-      isPartnerOnline: (state) => state.session.isPartnerOnline,
     }),
+    ...mapPiniaState(useSessionStore, ['isPartnerOnline']),
     ...mapGetters({
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',

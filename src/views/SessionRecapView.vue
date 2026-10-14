@@ -253,7 +253,8 @@
 </template>
 
 <script>
-import { mapActions } from 'pinia'
+import { useSessionStore } from '@/stores/session'
+import { mapActions, mapState as mapPiniaState } from 'pinia'
 import { useAppModalStore } from '@/stores/app/modal'
 import ChatLog from '@/components/ChatLog.vue'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
@@ -316,8 +317,8 @@ export default {
       isSessionSummaryEnabled: 'featureFlags/isSessionSummaryEnabled',
       isStudentRequestSpecificVolunteerSessionsEnabled:
         'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
-      hasCooldown: 'session/hasCooldown',
     }),
+    ...mapPiniaState(useSessionStore, ['hasCooldown']),
     canRequestSessionWithSameTutor() {
       return (
         this.isStudent &&

@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import { useSessionStore } from '@/stores/session'
+import { mapState as mapPiniaState } from 'pinia'
 import { mapState, mapGetters } from 'vuex'
 import SubjectCard from './SubjectCard.vue'
 import ReferralSVG from '@/assets/dashboard_icons/student/referral.svg'
@@ -49,8 +51,8 @@ export default {
     }
   },
   computed: {
+    ...mapPiniaState(useSessionStore, ['latestSession', 'hasCooldown']),
     ...mapState({
-      latestSession: (state) => state.session.latestSession,
       subjects: (state) => state.subjects.subjects,
       isFetchingSubjects: (state) => state.subjects.isFetchingSubjects,
       fetchingSubjectsError: (state) => state.subjects.fetchingSubjectsError,
@@ -61,7 +63,6 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       topicCards: 'subjects/sessionRequestTopicCards',
       showDashboardRedesign: 'user/showDashboardRedesign',
-      hasCooldown: 'session/hasCooldown',
     }),
     cards() {
       const cards = [...this.topicCards]

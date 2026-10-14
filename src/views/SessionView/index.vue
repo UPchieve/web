@@ -308,6 +308,7 @@
 </template>
 
 <script>
+import { useSessionStore } from '@/stores/session'
 import { ref, markRaw, onBeforeUnmount } from 'vue'
 import { mapState, mapGetters } from 'vuex'
 import { mapState as mapPiniaState } from 'pinia'
@@ -450,7 +451,7 @@ export default {
           ...this.journeySessionData,
           sessionId: this.sessionId,
         })
-        await this.$store.commit('session/setJourneySessionData', undefined)
+        useSessionStore().clearJourneySessionData()
       }
 
       if (this.isStudentVolunteer) {
@@ -592,6 +593,10 @@ export default {
     }
   },
   computed: {
+    ...mapPiniaState(useSessionStore, [
+      'isPartnerOnline',
+      'journeySessionData',
+    ]),
     ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapState({
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
@@ -604,10 +609,8 @@ export default {
       isSocketConnected: (state) => state.socket.isConnected,
       isFetchingConversation: (state) =>
         state.botConversations.isFetchingConversation,
-      isPartnerOnline: (state) => state.session.isPartnerOnline,
       everShownDisplayCallStatus: (state) =>
         state.liveMedia.audio.everShownDisplayCallStatus,
-      journeySessionData: (state) => state.session.journeySessionData,
     }),
     ...mapGetters({
       mobileMode: 'app/mobileMode',

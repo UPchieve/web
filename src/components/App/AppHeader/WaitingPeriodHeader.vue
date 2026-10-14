@@ -7,7 +7,9 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useSessionStore } from '@/stores/session'
 
 export default {
   name: 'waiting-period-header',
@@ -15,9 +17,7 @@ export default {
     ...mapGetters({
       mobileMode: 'app/mobileMode',
     }),
-    ...mapState({
-      cooldownMinutes: (state) => state.session.cooldownMinutes,
-    }),
+    ...mapState(useSessionStore, ['cooldownMinutes']),
     message() {
       const minuteTextFormat = this.cooldownMinutes === 1 ? 'minute' : 'minutes'
       return `You must wait at least ${this.cooldownMinutes} ${minuteTextFormat} before requesting a new session.`

@@ -10,10 +10,6 @@ import { nextTick } from 'vue'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 
 describe('Navigation', () => {
-  const SESSION_STATUS = {
-    text: 'Ready to chat',
-    class: '',
-  }
   const DEFAULT_USER_STATE = {
     userType: 'student',
     firstName: 'J',
@@ -21,6 +17,9 @@ describe('Navigation', () => {
   const DEFAULT_USER_GETTERS = {
     userType: () => 'student',
     isVolunteer: () => false,
+    isSessionAlive: () => false,
+    // Real getter, so the test covers how the status is derived from the other getters.
+    sessionStatus: storeOptions.modules.user.getters.sessionStatus,
   }
 
   // Tests query the whole document, so a component left mounted by an earlier test would
@@ -48,12 +47,6 @@ describe('Navigation', () => {
               ...DEFAULT_USER_STATE,
               ...(options?.user?.state ?? {}),
             },
-          },
-        },
-        session: {
-          namespaced: true,
-          getters: {
-            sessionStatus: () => SESSION_STATUS,
           },
         },
         app: {
@@ -175,6 +168,21 @@ describe('Navigation', () => {
     ).toBe(true)
     expect(
       wrapper.find('[data-testid="session-status-container"]').text()
-    ).toContain(SESSION_STATUS.text)
+    ).toContain('Ready to chat')
+  })
+
+  it('Shows the session status from the user store', async () => {
+    const { wrapper } = getWrapper({
+      isMenuOpen: true,
+      user: {
+        state: { firstName: 'Alice', userType: 'student' },
+        getters: { ...DEFAULT_USER_GETTERS, isSessionAlive: () => true },
+      },
+    })
+    await nextTick()
+
+    expect(
+      wrapper.find('[data-testid="session-status-container"]').text()
+    ).toContain('Chat in session')
   })
 })

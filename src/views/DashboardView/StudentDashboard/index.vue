@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import { useSessionStore } from '@/stores/session'
 import { mapGetters, mapState } from 'vuex'
 import { mapState as mapPiniaState, mapActions } from 'pinia'
 import { useProductFlagsStore } from '@/stores/product-flags'
@@ -261,12 +262,12 @@ export default {
   },
   computed: {
     ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
+    ...mapPiniaState(useSessionStore, ['latestSession']),
     ...mapState({
       user: (state) => state.user.user,
       hadASession: (state) => state.user.hadASession,
       prevSessionSubject: (state) => state.user.prevSessionSubject,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
-      latestSession: (state) => state.session.latestSession,
       currentSession: (state) => state.user.session,
       subjects: (state) => state.subjects.subjects,
     }),

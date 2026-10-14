@@ -7,6 +7,7 @@ import NetworkService, { isNetworkError } from './NetworkService'
 import errorFromHttpResponse from '@/utils/error-from-http-response.js'
 import ModalService from './ModalService'
 import { useAppModalStore } from '@/stores/app/modal'
+import { useSessionStore } from '@/stores/session'
 import LoggerService from './LoggerService'
 import Case from 'case'
 
@@ -136,12 +137,12 @@ export default {
         ...currentSession,
         ...endSessionResponse.data.session,
       }
-      store.commit('session/setLatestSession', updatedSession) // @TODO - Eventually remove duplicate state in latestSession
+      useSessionStore().setLatestSession(updatedSession) // @TODO - Eventually remove duplicate state in latestSession
       store.commit('user/setSession', updatedSession)
       const isSessionStudent =
         store.state.user.user.id === currentSession.student.id
       if (isSessionStudent) {
-        store.dispatch('session/startCooldownInterval')
+        useSessionStore().startCooldownInterval()
       }
       store.dispatch('americaCountsVolunteer/startCooldown')
       AnalyticsService.captureEvent(EVENTS.SESSION_ENDED, {

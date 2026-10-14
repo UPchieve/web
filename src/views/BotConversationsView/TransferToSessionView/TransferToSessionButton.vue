@@ -7,7 +7,7 @@ import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   onClick: () => void
-  disableButton: false
+  disableButton: boolean
 }>()
 
 onMounted(async () => {

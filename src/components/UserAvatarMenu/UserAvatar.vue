@@ -33,7 +33,7 @@ const avatar = computed(
 )
 const isMobileMode = computed(() => store.getters['app/mobileMode'])
 const user = computed(() => store.state.user.user)
-const sessionStatus = computed(() => store.getters['session/sessionStatus'])
+const sessionStatus = computed(() => store.getters['user/sessionStatus'])
 
 // Student-volunteer accounts
 const isStudentVolunteer = computed(

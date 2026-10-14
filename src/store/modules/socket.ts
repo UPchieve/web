@@ -9,6 +9,7 @@ import {
 } from '@/composables/imageUploadState'
 import AnalyticsService from '@/services/AnalyticsService'
 import { useCelebrationsStore } from '@/stores/celebrations'
+import { useSessionStore } from '@/stores/session'
 import { EVENTS } from '@/consts'
 import { getShareInfoFields } from '@/services/BrowserStorageService'
 import {
@@ -265,7 +266,7 @@ export default {
       })
 
       socket.on('sessions/partner:in-session', (isOnline: boolean) => {
-        dispatch('session/onlineStatusForPartner', isOnline, { root: true })
+        useSessionStore().onlineStatusForPartner(isOnline)
         if (!isOnline) commit('setIsTyping', false)
 
         if (isOnline && rootGetters['user/isVolunteer']) {
@@ -281,9 +282,7 @@ export default {
       })
 
       socket.on('sessions/partner:share-info-opt-in', (message: string) => {
-        dispatch('session/shareInfoOptInForPartner', message, {
-          root: true,
-        })
+        useSessionStore().shareInfoOptInForPartner(message)
       })
 
       socket.on('sessions:partner-banned-from-live-media', () => {

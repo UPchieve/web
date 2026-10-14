@@ -8,17 +8,10 @@ import * as PresenceService from '@/services/PresenceService'
 
 vi.mock('@/services/PresenceService')
 
-const getStore = (args: { state?: any } = {}) => {
+const getStore = () => {
   return createStore({
     modules: {
       ...storeOptions.modules,
-      session: {
-        ...storeOptions.modules.session,
-        state: {
-          ...storeOptions.modules.session.state,
-          ...(args?.state || {}),
-        },
-      },
     },
   })
 }

@@ -1,10 +1,12 @@
 import appModule from '@/store/modules/app'
+import { useSessionStore } from '@/stores/session'
 import SubjectSelection from '@/views/DashboardView/StudentDashboard/SubjectSelection/index.vue'
 import SubjectCard from '@/views/DashboardView/StudentDashboard/SubjectSelection/SubjectCard.vue'
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 
 const getWrapper = (mobileMode = false) => {
+  useSessionStore().latestSession = {}
   const store = createStore({
     modules: {
       app: {
@@ -13,7 +15,6 @@ const getWrapper = (mobileMode = false) => {
           mobileMode: () => mobileMode,
         },
       },
-      session: { state: { latestSession: {} } },
     },
   })
 

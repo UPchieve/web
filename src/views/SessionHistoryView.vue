@@ -283,7 +283,8 @@
 </template>
 
 <script>
-import { mapActions } from 'pinia'
+import { useSessionStore } from '@/stores/session'
+import { mapActions, mapState as mapPiniaState } from 'pinia'
 import { useAppModalStore } from '@/stores/app/modal'
 import { dayjs } from '@/utils/time-utils'
 import { mapGetters, mapState } from 'vuex'
@@ -341,8 +342,8 @@ export default {
       sessionsWithUnreadDMs: 'user/sessionsWithUnreadDMs',
       isStudentRequestSpecificVolunteerSessionsEnabled:
         'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
-      hasCooldown: 'session/hasCooldown',
     }),
+    ...mapPiniaState(useSessionStore, ['hasCooldown']),
     ...mapState({
       subjectsMap: (state) => state.subjects.subjects,
       currentSession: (state) => state.user.session,
