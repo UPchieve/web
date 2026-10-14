@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { useSessionStore } from '@/stores/session'
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import StarIcon from '@/assets/icons/star_icon.svg'
-import { EVENTS } from '@/consts'
+import { EVENTS, type ShareInfoFieldKey } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import { buildShareInfoMessage } from '@/utils/build-share-info-message'
+import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
 
 const store = useStore()
 const props = defineProps<{
@@ -14,8 +15,17 @@ const props = defineProps<{
 
 const sessionPartner = computed(() => store.getters['user/sessionPartner'])
 
-const sessionStore = useSessionStore()
-const sharedInfoMessage = computed(() => sessionStore.partnerSharedInfoMessage)
+const sharedInfoMessage = computed(() => {
+  const shared: VolunteerPublicProfileInfoShared =
+    sessionPartner.value?.publicProfileStats ?? {}
+  const sharedFields = Object.keys(shared) as ShareInfoFieldKey[]
+  return buildShareInfoMessage(sharedFields, {
+    occupations: shared.occupation,
+    numSessionsTutored: shared.numSessionsTutored ?? 0,
+    numStudentsTutored: shared.numStudentsHelped ?? 0,
+    totalHoursTutored: shared.totalVolunteerHours ?? 0,
+  })
+})
 
 const showSharedInfo = ref(false)
 function toggleSharedInfo() {

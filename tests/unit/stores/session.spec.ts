@@ -30,7 +30,6 @@ describe('`session` store', () => {
   describe('initial state', () => {
     it('starts with every field at its default', () => {
       expect(store.isPartnerOnline).toBe(false)
-      expect(store.partnerSharedInfoMessage).toBe('')
       expect(store.latestSession).toBeUndefined()
       expect(store.cooldownMinutes).toBe(0)
       expect(store.journeySessionData).toBeUndefined()
@@ -64,13 +63,6 @@ describe('`session` store', () => {
       expect(store.isPartnerOnline).toBe(true)
       store.onlineStatusForPartner(false)
       expect(store.isPartnerOnline).toBe(false)
-    })
-  })
-
-  describe('shareInfoOptInForPartner', () => {
-    it('stores the partner share-info message', () => {
-      store.shareInfoOptInForPartner('Hi, I am a coach')
-      expect(store.partnerSharedInfoMessage).toBe('Hi, I am a coach')
     })
   })
 

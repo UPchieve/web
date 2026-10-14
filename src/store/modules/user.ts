@@ -22,6 +22,7 @@ import type {
   SessionMessage,
   PendingMessage,
   UserMessage,
+  VolunteerPublicProfileInfoShared,
 } from '@/types/sessions'
 
 import type { RootGetters, RootState } from '@/store/index'
@@ -126,6 +127,17 @@ export default {
       state: UserStoreState,
       session: UserStoreState['session'] = {} as Record<string, never>
     ) => (state.session = session),
+    // Updates the volunteer's shared info when they edit it mid-session
+    setSessionVolunteerSharedInfo: (
+      state: UserStoreState,
+      publicProfileStats: VolunteerPublicProfileInfoShared
+    ) => {
+      if (!('volunteer' in state.session) || !state.session.volunteer) return
+      state.session.volunteer = {
+        ...state.session.volunteer,
+        publicProfileStats,
+      }
+    },
     setRecapSession: (state: UserStoreState, session = {}) =>
       (state.recapSession = session),
     // For live voice chat message.

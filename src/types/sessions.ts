@@ -2,6 +2,13 @@ import type { DateString, Uuid } from './shared'
 
 export type SessionMessageType = 'audio-transcription'
 
+export type VolunteerPublicProfileInfoShared = {
+  occupation?: string[]
+  numSessionsTutored?: number
+  numStudentsHelped?: number
+  totalVolunteerHours?: number
+}
+
 export type SessionUserInfoPublic = {
   // TODO: migrate all uses of `_id` to `id`
   _id: Uuid
@@ -10,6 +17,9 @@ export type SessionUserInfoPublic = {
   firstname: string
   firstName: string
   gradeLevel?: number
+  // Only populated for the volunteer side of a session - backs the "share
+  // info with students" feature.
+  publicProfileStats?: VolunteerPublicProfileInfoShared
 }
 
 export type SessionMessagePublic = {

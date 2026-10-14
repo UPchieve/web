@@ -1,10 +1,8 @@
 import store from '@/store'
-import type { ShareInfoFieldKey } from '@/consts'
 import { getUserCacheKey } from '@/utils/cache-keys'
 import type { NTHSApplicationDraft } from '@/services/NTHSApplicationService'
 
 const HAS_SEEN_VOLUNTEER_HOURS = 'has-seen-volunteer-calculator'
-const SHARE_INFO_OPT_IN = 'volunteer-share-info-opt-in'
 const HAS_SEEN_SHOW_ONLINE_STATUS_MODAL = 'has-seen-show-online-status-modal'
 const NTHS_APPLICATION_DRAFT = 'nths-application-draft'
 
@@ -36,27 +34,6 @@ export function setHasSeenVolunteerHours(userId: string) {
 
 export function hasSeenVolunteerHours(userId: string) {
   return (get(HAS_SEEN_VOLUNTEER_HOURS) ?? '[]').includes(userId)
-}
-
-export function setShareInfoFields(
-  userId: string,
-  fields: ShareInfoFieldKey[]
-): void {
-  const answers = get(SHARE_INFO_OPT_IN) ?? {}
-  set(SHARE_INFO_OPT_IN, { ...answers, [userId]: fields })
-}
-
-// Returns undefined if the volunteer hasn't answered yet.
-export function getShareInfoFields(
-  userId: string
-): ShareInfoFieldKey[] | undefined {
-  const answers = get(SHARE_INFO_OPT_IN) ?? {}
-  return answers[userId]
-}
-
-export function hasAnsweredShareInfoOptIn(userId: string): boolean {
-  const answers = get(SHARE_INFO_OPT_IN) ?? {}
-  return Object.hasOwn(answers, userId)
 }
 
 export function setHasSeenShowOnlineStatusModal(userId: string) {

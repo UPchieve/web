@@ -1113,12 +1113,11 @@ export const LANGUAGES: Language[] = [
   { code: 'other', name: 'Other' },
 ]
 
-// For volunteer sharing info experiment - can be moved/changed later.
 export const SHARE_INFO_FIELDS = [
   { key: 'occupation', label: 'Occupation' },
-  { key: 'sessionsTutored', label: 'Number of sessions tutored' },
-  { key: 'studentsTutored', label: 'Number of students tutored' },
-  { key: 'hoursTutored', label: 'Total hours of tutoring' },
+  { key: 'numSessionsTutored', label: 'Number of sessions tutored' },
+  { key: 'numStudentsHelped', label: 'Number of students tutored' },
+  { key: 'totalVolunteerHours', label: 'Total hours of tutoring' },
 ] as const
 
 export type ShareInfoFieldKey = (typeof SHARE_INFO_FIELDS)[number]['key']

@@ -5,7 +5,7 @@ import NetworkService from '@/services/NetworkService'
 import UserService from '@/services/UserService'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { it, describe, expect, vi, beforeEach } from 'vitest'
-import { mount, VueWrapper } from '@vue/test-utils'
+import { mount, VueWrapper, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
 
 function getWrapper(user = {}, { hasExistingStudentSchool = false } = {}) {
@@ -108,8 +108,7 @@ describe('EditBackgroundInfo', () => {
     await wrapper.find('input[name="company"]').setValue('Acme')
 
     await editButton(wrapper).trigger('click')
-    await wrapper.vm.$nextTick()
-    await wrapper.vm.$nextTick()
+    await flushPromises()
 
     expect(NetworkService.setProfile).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -220,8 +219,7 @@ describe('EditBackgroundInfo', () => {
     await schoolSearch.vm.$emit('update:cannotFindSchool', true)
     await schoolSearch.vm.$emit('selected-school-name', '')
     await editButton(wrapper).trigger('click')
-    await wrapper.vm.$nextTick()
-    await wrapper.vm.$nextTick()
+    await flushPromises()
 
     expect(NetworkService.setProfile).toHaveBeenCalledWith(
       expect.objectContaining({ schoolId: null })

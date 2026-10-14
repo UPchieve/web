@@ -140,7 +140,7 @@ async function onEditButtonClick() {
       highSchoolName.value = ''
     }
 
-    shareInfoFormRef.value?.save()
+    await shareInfoFormRef.value?.save()
 
     AnalyticsService.captureEvent(EVENTS.COACH_SAVED_BACKGROUND_INFO)
     showInputErrors.value = false

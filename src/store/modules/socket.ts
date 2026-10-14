@@ -2,6 +2,7 @@ import type { ActionContext } from 'vuex'
 import router from '@/router'
 import { socket } from '@/socket'
 import type { RootState } from '@/store/index'
+import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
 import LoggerService from '@/services/LoggerService'
 import {
   IMAGE_UPLOAD_EVENTS,
@@ -11,11 +12,6 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { useCelebrationsStore } from '@/stores/celebrations'
 import { useSessionStore } from '@/stores/session'
 import { EVENTS } from '@/consts'
-import { getShareInfoFields } from '@/services/BrowserStorageService'
-import {
-  buildShareInfoMessage,
-  volunteerDataFromUser,
-} from '@/utils/build-share-info-message'
 
 /**
  * These errors handled internally and shouldn't be forwarded to our logger.
@@ -268,22 +264,16 @@ export default {
       socket.on('sessions/partner:in-session', (isOnline: boolean) => {
         useSessionStore().onlineStatusForPartner(isOnline)
         if (!isOnline) commit('setIsTyping', false)
+      })
 
-        if (isOnline && rootGetters['user/isVolunteer']) {
-          const fields = getShareInfoFields(rootState.user.user.id) ?? []
-          socket.emit(
-            'sessions/share-info:opt-in',
-            buildShareInfoMessage(
-              fields,
-              volunteerDataFromUser(rootState.user.user)
-            )
-          )
+      socket.on(
+        'sessions/partner:public-profile-stats-updated',
+        (publicProfileStats: VolunteerPublicProfileInfoShared) => {
+          commit('user/setSessionVolunteerSharedInfo', publicProfileStats, {
+            root: true,
+          })
         }
-      })
-
-      socket.on('sessions/partner:share-info-opt-in', (message: string) => {
-        useSessionStore().shareInfoOptInForPartner(message)
-      })
+      )
 
       socket.on('sessions:partner-banned-from-live-media', () => {
         dispatch('liveMedia/partnerBannedFromLiveMedia', null, { root: true })

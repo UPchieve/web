@@ -2,15 +2,15 @@ import type { ShareInfoFieldKey } from '@/consts'
 
 export interface ShareableVolunteerData {
   occupations?: string[]
-  numSessionsTutored?: number
-  numStudentsTutored?: number
-  totalHoursTutored?: number
+  numSessionsTutored: number
+  numStudentsTutored: number
+  totalHoursTutored: number
 }
 
 export function volunteerDataFromUser(user: any): ShareableVolunteerData {
   return {
     occupations: user?.occupation ?? [],
-    numSessionsTutored: user?.pastSessions?.length ?? 0,
+    numSessionsTutored: user?.numSessionsTutored ?? 0,
     numStudentsTutored: user?.uniqueStudentsHelpedCount ?? 0,
     totalHoursTutored: user?.hoursTutored ?? 0,
   }
@@ -33,19 +33,19 @@ const TUTORING_STAT_SLOTS: {
   text: (data: ShareableVolunteerData) => string
 }[] = [
   {
-    key: 'studentsTutored',
+    key: 'numStudentsHelped',
     connector: '',
     verb: 'has tutored',
     text: (data) => pluralize(data.numStudentsTutored ?? 0, 'student'),
   },
   {
-    key: 'sessionsTutored',
+    key: 'numSessionsTutored',
     connector: 'in',
     verb: 'has completed',
     text: (data) => pluralize(data.numSessionsTutored ?? 0, 'session'),
   },
   {
-    key: 'hoursTutored',
+    key: 'totalVolunteerHours',
     connector: 'over',
     verb: 'has volunteered',
     text: (data) => pluralize(data.totalHoursTutored ?? 0, 'hour'),

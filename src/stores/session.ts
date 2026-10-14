@@ -29,7 +29,6 @@ type JourneySessionData = {
 
 export const useSessionStore = defineStore('session', () => {
   const isPartnerOnline = ref(false)
-  const partnerSharedInfoMessage = ref('')
   const latestSession = ref<LatestSession>()
   const cooldownMinutes = ref(0)
   const journeySessionData = ref<JourneySessionData>()
@@ -40,10 +39,6 @@ export const useSessionStore = defineStore('session', () => {
 
   function onlineStatusForPartner(flag: boolean) {
     isPartnerOnline.value = flag
-  }
-
-  function shareInfoOptInForPartner(message: string) {
-    partnerSharedInfoMessage.value = message
   }
 
   function calculateCooldown(): number {
@@ -122,14 +117,12 @@ export const useSessionStore = defineStore('session', () => {
 
   return {
     isPartnerOnline,
-    partnerSharedInfoMessage,
     latestSession,
     cooldownMinutes,
     journeySessionData,
     zwibbler,
     hasCooldown,
     onlineStatusForPartner,
-    shareInfoOptInForPartner,
     startCooldownInterval,
     stopCooldownInterval,
     fetchLatestSession,

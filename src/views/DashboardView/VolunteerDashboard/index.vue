@@ -182,7 +182,6 @@ import ImpactSummaryCard from '@/components/ImpactSummaryCard.vue'
 import VolunteerShareInfoModal from './VolunteerShareInfoModal.vue'
 import ShowOnlineStatusModal from './ShowOnlineStatusModal.vue'
 import {
-  hasAnsweredShareInfoOptIn,
   hasSeenShowOnlineStatusModal,
   setHasSeenShowOnlineStatusModal,
 } from '@/services/BrowserStorageService'
@@ -234,7 +233,6 @@ export default {
     this.notificationsCardWasDismissed =
       localStorage.getItem('DISMISSED_NOTIFICATIONS_CARD') === this.user.id
 
-    this.hasSeenShareInfoModal = hasAnsweredShareInfoOptIn(this.user.id)
     this.hasSeenOnlineStatusModal = hasSeenShowOnlineStatusModal(this.user.id)
 
     if (localStorage.getItem('isSSOSignUpRedirect')) {
@@ -262,10 +260,10 @@ export default {
       notificationsCardWasDismissed: false,
       joinedTeamCode: '',
       nextTask: {},
-      hasSeenShareInfoModal: false,
       hasSeenOnlineStatusModal: false,
       essayReviewCardImpressionTracked: false,
       pendingSubmissionCount: null,
+      dismissedShareInfoModal: false,
     }
   },
   computed: {
@@ -276,6 +274,9 @@ export default {
       availabilityLastModifiedAt: (state) =>
         state.user.user?.availabilityLastModifiedAt,
       group: (state) => state.nths.NTHSGroups?.[0],
+      hasSeenShareInfoModal() {
+        return this.user.publicProfileKeys != null
+      },
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',

@@ -2,12 +2,9 @@
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import FormCheckBox from '@/components/FormCheckBox.vue'
-import {
-  getShareInfoFields,
-  setShareInfoFields,
-} from '@/services/BrowserStorageService'
 import { buildShareInfoMessage } from '@/utils/build-share-info-message'
 import AnalyticsService from '@/services/AnalyticsService'
+import UserService from '@/services/UserService'
 import { EVENTS, SHARE_INFO_FIELDS, type ShareInfoFieldKey } from '@/consts'
 
 const props = withDefaults(
@@ -26,12 +23,13 @@ const emit = defineEmits<{
 }>()
 
 const store = useStore()
-const userId = computed(() => store.state.user.user.id)
 
 //Defaults to all selected
 const selectedFields = ref<ShareInfoFieldKey[]>(
-  getShareInfoFields(userId.value) ??
-    SHARE_INFO_FIELDS.map((field) => field.key)
+  (store.state.user.user.publicProfileKeys as
+    | ShareInfoFieldKey[]
+    | undefined
+    | null) ?? SHARE_INFO_FIELDS.map((field) => field.key)
 )
 
 function isSelected(key: ShareInfoFieldKey) {
@@ -55,8 +53,8 @@ const previewMessage = computed(() =>
 
 const hasSelection = computed(() => previewMessage.value.length > 0)
 
-function save(fields: ShareInfoFieldKey[]) {
-  setShareInfoFields(userId.value, fields)
+async function save(fields: ShareInfoFieldKey[]) {
+  await UserService.setProfile({ publicProfileKeys: fields }, store)
   AnalyticsService.captureEvent(
     fields.length > 0
       ? EVENTS.VOLUNTEER_SELECTED_TO_SHARE_INFO
@@ -66,18 +64,21 @@ function save(fields: ShareInfoFieldKey[]) {
   emit('saved')
 }
 
-function handleSave() {
-  save(selectedFields.value)
+async function handleSave() {
+  await save(selectedFields.value)
 }
 
-function handleOptOut() {
+async function handleOptOut() {
   AnalyticsService.captureEvent(EVENTS.VOLUNTEER_OPTED_OUT_OF_SHARE_INFO)
   selectedFields.value = []
-  save([])
+  await save([])
 }
 
 defineExpose({
   save: () => save(selectedFields.value),
+  // Persists "share nothing" without touching the checkboxes - used when the
+  // modal is dismissed (e.g. clicking outside) instead of explicitly saved.
+  optOut: () => save([]),
 })
 </script>
 
