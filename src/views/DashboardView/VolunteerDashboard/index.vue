@@ -638,7 +638,11 @@ export default {
     },
     showShareInfoModal() {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_SAW_SHARE_INFO_MODAL)
-      return !this.hasSeenShareInfoModal && this.isShowInfoOptInEnabled
+      return (
+        !this.hasSeenShareInfoModal &&
+        !this.dismissedShareInfoModal &&
+        this.isShowInfoOptInEnabled
+      )
     },
     showOnlineStatusModal() {
       return (
@@ -802,7 +806,7 @@ export default {
       this.showNextTaskModal = !this.showNextTaskModal
     },
     toggleShareInfoModal() {
-      this.hasSeenShareInfoModal = true
+      this.dismissedShareInfoModal = true
     },
     closeOnlineStatusModal() {
       setHasSeenShowOnlineStatusModal(this.user.id)
