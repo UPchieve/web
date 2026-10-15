@@ -442,7 +442,7 @@ watch(isSocketReadyToRequestForDoc, ([connected, sessionId]) => {
 </template>
 
 <style lang="scss">
-.ql-editor {
+.document-editor .ql-editor {
   overflow: visible;
 }
 
