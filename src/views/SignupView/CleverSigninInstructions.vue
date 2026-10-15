@@ -1,5 +1,15 @@
 <script lang="ts" setup>
 import FormPageTemplate from '@/components/FormPageTemplate.vue'
+import SsoButton from '@/components/SsoButton.vue'
+import { SsoProvider, signInWithSso } from '@/services/SsoService'
+
+function signInWithClever() {
+  signInWithSso({
+    provider: SsoProvider.CLEVER,
+    isLogin: 'true',
+    errorRedirect: '/clever-signin-instructions',
+  })
+}
 </script>
 
 <template>
@@ -15,7 +25,14 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
         </h1>
       </div>
       <div class="instructions-text">
-        <h2 class="second-heading">Go back to the Clever Portal</h2>
+        <SsoButton
+          @click="signInWithClever"
+          class="sso-button"
+          data-testid="cleverSsoButton"
+          buttonText="Sign in with Clever"
+          :ssoMethod="SsoProvider.CLEVER"
+        />
+        <h2 class="second-heading">Or go back to the Clever Portal</h2>
         <p>
           Go to <a href="https://clever.com/" class="links">clever.com</a> and
           login with your school account (unless you're already logged in).
@@ -59,5 +76,10 @@ import FormPageTemplate from '@/components/FormPageTemplate.vue'
 
 .links {
   color: $c-information-blue;
+}
+
+.sso-button {
+  margin: 8px auto 16px;
+  max-width: 300px;
 }
 </style>
