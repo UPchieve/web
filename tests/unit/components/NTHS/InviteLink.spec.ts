@@ -10,7 +10,7 @@ describe('InviteLink', () => {
     // document.execCommand('copy'), in every browser.
     const execCommand = vi.spyOn(document, 'execCommand')
     const wrapper = mount(InviteLink, {
-      props: { code: 'HQDEMO' },
+      props: { code: 'HQDEMO', referralCode: 'PERSON123' },
       attachTo: document.body,
     })
 
@@ -19,7 +19,7 @@ describe('InviteLink', () => {
     expect(execCommand).toHaveBeenCalledWith('copy')
     expect(wrapper.text()).toContain('Copied')
     expect(window.getSelection()?.toString()).toBe(
-      `${config.appRoot}/join-team/HQDEMO`
+      `${config.appRoot}/join-team/HQDEMO?referral=PERSON123`
     )
     wrapper.unmount()
   })

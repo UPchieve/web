@@ -55,6 +55,7 @@ export type VolunteerAccountFormData = {
   [InputName.SIGNUP_SOURCE_ID]?: string
   [InputName.TERMS]?: boolean
   [InputName.INVITE_CODE]?: string
+  [InputName.REFERRED_BY_CODE]?: string | null
 }
 
 let partnerId: string = ''
@@ -302,11 +303,11 @@ function createAccountWithProvider(
   provider: SsoProvider,
   data: VolunteerAccountFormData
 ) {
-  return SignUpService.createAccountWithProvider(
-    provider,
-    UserType.volunteer,
-    data
-  )
+  return SignUpService.createAccountWithProvider(provider, UserType.volunteer, {
+    ...data,
+    [InputName.REFERRED_BY_CODE]:
+      window.localStorage.getItem('upcReferredByCode'),
+  })
 }
 
 function createAccountWithGoogle(data: VolunteerAccountFormData) {

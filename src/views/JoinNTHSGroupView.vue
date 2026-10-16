@@ -23,6 +23,7 @@ const verifyUser = ref<boolean>(!!authenticatedUserEmail.value)
 
 const errorMessage = ref<string>('')
 const email = ref<string | undefined>($route.query.email as string)
+const referralCode = ref<string | undefined>($route.query.referral as string)
 const inviteCode = ref<string | undefined>(
   ($route.params.inviteCode as string)?.toUpperCase()
 )
@@ -119,6 +120,7 @@ async function addVolunteerToTeam() {
     const data = {
       email: email.value as string,
       inviteCode: inviteCode.value as string,
+      ...(referralCode.value ? { referral: referralCode.value } : {}),
     }
     if (response.data.isExistingVolunteer) {
       const redirectUriParams = new URLSearchParams({

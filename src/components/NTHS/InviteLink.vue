@@ -6,10 +6,13 @@ import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
 
-const props = defineProps<{ code: string }>()
+const props = defineProps<{ code: string; referralCode: string }>()
 const copyMessage = ref('Copy link')
 const linkElement = ref<HTMLElement>()
-const link = computed(() => `${config.appRoot}/join-team/${props.code}`)
+const link = computed(() => {
+  const query = new URLSearchParams({ referral: props.referralCode })
+  return `${config.appRoot}/join-team/${props.code}?${query.toString()}`
+})
 
 function copyURL() {
   copyMessage.value = 'Copied'

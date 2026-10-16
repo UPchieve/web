@@ -52,7 +52,9 @@ function storeFor(
   schoolAffiliationStatus: AffiliationStatus | null
 ) {
   return createStore({
-    state: { user: { user: { id: userId } } },
+    state: {
+      user: { user: { id: userId, referralCode: 'PERSON123' } },
+    },
     modules: {
       nths: {
         ...nths,
@@ -136,7 +138,12 @@ describe('NTHSHomeView', () => {
   it('gives a member the invite link and scripts', async () => {
     const wrapper = await getWrapper('member')
 
-    expect(wrapper.findComponent({ name: 'InviteLink' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'InviteLink' }).props()).toMatchObject(
+      {
+        code: 'ABC123',
+        referralCode: 'PERSON123',
+      }
+    )
     const link = wrapper.find('[data-testid="invite-scripts"]')
     expect(link.attributes('href')).toBe(NTHS_RECRUITMENT_TEMPLATES_URL)
   })

@@ -3,8 +3,13 @@ import * as VolunteerSignUpService from '@/services/SignUpService/VolunteerSignU
 import NetworkService, { NetworkError } from '@/services/NetworkService'
 import { faker } from '@faker-js/faker'
 import LoggerService from '@/services/LoggerService'
+import { signInWithSso } from '@/services/SsoService'
 
 vi.mock('@/services/NetworkService')
+vi.mock('@/services/SsoService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/SsoService')>()),
+  signInWithSso: vi.fn(),
+}))
 
 const mockedNetworkService = vi.mocked(NetworkService)
 
@@ -48,6 +53,35 @@ describe('createAccount', () => {
         })
       )
     })
+  })
+})
+
+describe('Google sign-up referrals', () => {
+  const LOCAL_STORAGE_KEY = 'upcReferredByCode'
+
+  afterEach(() => {
+    window.localStorage.removeItem(LOCAL_STORAGE_KEY)
+  })
+
+  it('passes the stored referral code into the SSO registration', async () => {
+    window.localStorage.setItem(LOCAL_STORAGE_KEY, 'PERSON123')
+    const pageDetails = await VolunteerSignUpService.getPageDetails({
+      path: '/sign-up/volunteer/account',
+      fullPath: '/sign-up/volunteer/account',
+      query: {},
+    } as any)
+    const googleButton = pageDetails.rows
+      .flatMap((row) => row?.elements ?? [])
+      .find((element) => element.element === 'SsoButton')
+
+    if (!googleButton || !('submitAction' in googleButton)) {
+      throw new Error('Google SSO button not found')
+    }
+    await googleButton.submitAction({})
+
+    expect(signInWithSso).toHaveBeenCalledWith(
+      expect.objectContaining({ referredByCode: 'PERSON123' })
+    )
   })
 })
 

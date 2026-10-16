@@ -18,6 +18,9 @@ const router = useRouter()
 const group = computed(() => store.state.nths.NTHSGroups?.[0])
 const groupId = computed(() => group.value?.groupInfo?.id)
 const currentUserId = computed(() => store.state.user.user.id)
+const currentUserReferralCode = computed(
+  () => store.state.user.user.referralCode
+)
 const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
 
 const { impact, isLoading, loadFailed, load } = useChapterImpact()
@@ -51,7 +54,10 @@ onBeforeMount(async () => {
     >
       <span id="invite-eyebrow" class="invite-eyebrow">Invite members</span>
       <p class="invite-line">Anyone with this link joins your chapter</p>
-      <InviteLink :code="group.groupInfo.inviteCode">
+      <InviteLink
+        :code="group.groupInfo.inviteCode"
+        :referralCode="currentUserReferralCode"
+      >
         <a
           class="invite-scripts"
           :href="NTHS_RECRUITMENT_TEMPLATES_URL"
