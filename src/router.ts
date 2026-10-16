@@ -1262,7 +1262,13 @@ axiosInstance.interceptors.response.use(
       isAuthenticatedRoute
     ) {
       router
-        .push(`login/?401=true&redirect=${router.currentRoute.value.path}`)
+        .push({
+          path: '/login',
+          query: {
+            redirect: router.currentRoute.value.path,
+            401: 'true',
+          },
+        })
         .catch((err) => {
           LoggerService.noticeError(
             err,
