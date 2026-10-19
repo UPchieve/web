@@ -5,6 +5,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "if [ -z \"$CI\" ]; then ./bin/install_git_hooks.sh; fi",
+    "api-contracts:prod": "pnpm update @upchieve/api-contracts@latest --save-exact",
+    "api-contracts:preview": "if [ -z \"$API_CONTRACTS_PREVIEW_MR_ID\" ]; then echo \"API_CONTRACTS_PREVIEW_MR_ID is required\"; exit 1; fi; pnpm update @upchieve/api-contracts@mr-$API_CONTRACTS_PREVIEW_MR_ID --save-exact",
     "serve": "op run --no-masking --env-file=./.env.op -- doppler run -- env VITE_CJS_TRACE=true vite",
     "serve:local-whiteboard": "op run --env-file=./.env.op -- doppler run -- env VUE_APP_MAIN_WEBSOCKET_ROOT=ws://localhost:4545 VITE_CJS_TRACE=true vite",
     "build": "vite build",
@@ -44,6 +46,7 @@
     "@tiptap/starter-kit": "^3.22.5",
     "@tiptap/vue-3": "^3.22.5",
     "@trevoreyre/autocomplete-vue": "^3.0.2",
+    "@upchieve/api-contracts": "0.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vuelidate/core": "^2.0.2",
     "@vuelidate/validators": "^2.0.2",

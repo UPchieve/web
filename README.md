@@ -46,6 +46,26 @@ You'll need read access to the `engineering` vault in 1Password, and to login to
 ### Package Manager
 This project uses [pnpm](https://pnpm.io/) instead of npm. Once [installed](https://pnpm.io/installation), use `pnpm install <dependency>` to install dependencies, and `pnpm run <script>` to run scripts.
 
+#### API Contracts
+
+Install and pin the latest production release:
+
+```shell
+pnpm api-contracts:prod
+```
+
+Install and pin the latest preview from a Subway merge request:
+
+```shell
+API_CONTRACTS_PREVIEW_MR_ID=<MR IID> pnpm api-contracts:preview
+```
+
+Import contracts from their exported API group, for example:
+
+```ts
+import type { NTHSChecklistResponse } from '@upchieve/api-contracts/nths-checklist'
+```
+
 ### Git Hooks
 We have both pre-commit and pre-push Git hooks. When you first run `pn install`, Git will point to `.githooks` (which we do commit), via the `core.hooksPath` setting, when running hooks, instead of `.git/hooks` (which is not committed).
 

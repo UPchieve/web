@@ -19,8 +19,12 @@ allowBuilds:
 
 blockExoticSubdeps: true
 minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - '@upchieve/api-contracts'
 trustPolicy: no-downgrade
 trustPolicyExclude:
+  # GitLab's package metadata omits the fields required by pnpm's trust policy.
+  - '@upchieve/api-contracts'
   # Released July 2023, required transitively by a number of vite related dependencies.
   - 'semver@6.3.1'
   # Released Aug 2025, required by amazon-chime-sdk-js.

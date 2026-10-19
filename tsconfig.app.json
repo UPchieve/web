@@ -8,7 +8,10 @@
     "lib": ["DOM", "ES2022"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@upchieve/api-contracts/*": [
+        "./node_modules/@upchieve/api-contracts/dist/*"
+      ]
     },
     "moduleResolution": "Node",
     "resolveJsonModule": true,
