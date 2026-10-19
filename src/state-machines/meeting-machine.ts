@@ -184,7 +184,7 @@ export function create() {
         return !context?.isMeetingJoined
       },
       allowScreenshare: () => {
-        return !store.getters['featureFlags/blockScreenshare']
+        return store.getters['liveMedia/screenshareAllowed']
       },
       allowAudioCall: () => {
         return !store.getters['featureFlags/blockAudioCall']

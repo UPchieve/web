@@ -71,6 +71,10 @@ export default {
       }
       return source
     },
+    // Chime shares a screen through getDisplayMedia, which Android browsers and iOS Safari before 27 lack.
+    screenshareAllowed: (state, getters, rootState, rootGetters) =>
+      !rootGetters['featureFlags/blockScreenshare'] &&
+      typeof navigator.mediaDevices?.getDisplayMedia === 'function',
     screenShareActor: (state) => {
       return state.screenShareActor
     },

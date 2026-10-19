@@ -575,11 +575,6 @@ export default {
       didAutoOpen: false,
       draggingScreenShare: false,
       resizingScreenShare: false,
-      // chime uses getDisplayMedia for screen sharing and iOS safari does not support it
-      // so we hide the screen share button on iOS.
-      // NOTE: users can still view a shared screen in iOS safari, they just can't share their own screen
-      getDisplayMediaSupported:
-        typeof navigator.mediaDevices.getDisplayMedia !== 'undefined',
       previousSessionCountWithStudent: 0,
       meetingActor,
       showModerationInfractionModal: false,

@@ -117,7 +117,7 @@ const blockSessionImageUpload = computed<boolean>(
 )
 const allowSessionImageUpload = computed(() => !blockSessionImageUpload.value)
 const allowScreenshare = computed<boolean>(
-  () => !store.getters['featureFlags/blockScreenshare']
+  () => store.getters['liveMedia/screenshareAllowed']
 )
 
 const partnerImageUploadError = computed(

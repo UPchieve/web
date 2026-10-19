@@ -598,13 +598,10 @@ export default {
       partnerImageUploadStatus: 'socket/partnerImageUploadStatus',
       roleInCurrentSession: 'user/roleInCurrentSession',
       blockSessionImageUpload: 'featureFlags/blockSessionImageUpload',
-      blockScreenshare: 'featureFlags/blockScreenshare',
+      allowScreenshare: 'liveMedia/screenshareAllowed',
     }),
     allowSessionImageUpload() {
       return !this.blockSessionImageUpload
-    },
-    allowScreenshare() {
-      return !this.blockScreenshare
     },
     isAiWidgetHidden() {
       return this.aiWidgetHidden
