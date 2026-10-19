@@ -38,6 +38,11 @@ import type {
   CheckCredentialResponse,
   AuthPayload,
 } from '@/contracts/auth'
+import type {
+  NTHSChecklistResponse,
+  UpdateNTHSChecklistItemProgressRequest,
+  UpdateNTHSChecklistItemProgressResponse,
+} from '@upchieve/api-contracts/nths-checklist'
 
 const AUTH_ROOT = `${config.serverRoot}/auth`
 const API_ROOT = `${config.serverRoot}/api`
@@ -271,6 +276,26 @@ export function checkRegister(data: AuthPayload) {
   )
 }
 
+export function getNTHSChecklist(groupId: string) {
+  return httpGet<NTHSChecklistResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/checklist`
+  )
+}
+
+export function updateNTHSChecklistItemProgress(
+  groupId: string,
+  itemKey: string,
+  data: UpdateNTHSChecklistItemProgressRequest
+) {
+  return httpPut<
+    UpdateNTHSChecklistItemProgressResponse,
+    UpdateNTHSChecklistItemProgressRequest
+  >(
+    `${API_ROOT}/nths-groups/${groupId}/checklist/${encodeURIComponent(itemKey)}`,
+    data
+  )
+}
+
 export default {
   _successHandler(res) {
     return Promise.resolve(res)
@@ -354,6 +379,8 @@ export default {
   login,
   logout,
   checkRegister,
+  getNTHSChecklist,
+  updateNTHSChecklistItemProgress,
   getVolunteerPartner(partnerId) {
     return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(
