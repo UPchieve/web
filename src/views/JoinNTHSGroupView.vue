@@ -3,8 +3,9 @@ import { computed, onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
-import AuthService from '@/services/AuthService'
+import AuthService, { getStatus } from '@/services/AuthService'
 import FeatureFlagService from '@/services/FeatureFlagService'
+import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import FormEmail from '@/components/FormEmail.vue'
 import FormErrors from '@/components/FormErrors.vue'
@@ -29,7 +30,8 @@ const inviteCode = ref<string | undefined>(
 )
 const askForInviteCode = ref<boolean>(!inviteCode.value)
 const isLoading = ref(true)
-const team = ref({ name: '' })
+const team = ref<{ name: string; closedAt?: string | null }>({ name: '' })
+const isSignedIn = computed(() => !!$store.state.user.user?.id)
 
 const v$ = useVuelidate()
 const isDisabled = computed(() => {
@@ -40,6 +42,21 @@ onBeforeMount(async () => {
   FeatureFlagService.setPersonPropertiesForFlags({
     cohort: 'joining-nths-group',
   })
+
+  // The router checks auth only on protected routes, so opening an invite link
+  // directly arrives without the signed-in user.
+  if (!$store.state.user.user?.id) {
+    try {
+      const { authenticated } = await getStatus()
+      if (authenticated) {
+        await $store.dispatch('user/fetchUser')
+        authenticatedUserEmail.value = $store.state.user.user?.email
+        verifyUser.value = !!authenticatedUserEmail.value
+      }
+    } catch (err) {
+      LoggerService.noticeError(err)
+    }
+  }
 
   // ensure we have a user before making this call,
   // otherwise we get `Not Authorized` and are redirected to /login
@@ -68,7 +85,7 @@ onBeforeMount(async () => {
       isLoading.value = false
     }
   }
-  if (email.value && inviteCode.value) {
+  if (email.value && inviteCode.value && !team.value.closedAt) {
     await addVolunteerToTeam()
   }
 })
@@ -76,6 +93,7 @@ onBeforeMount(async () => {
 function removeTeam() {
   askForInviteCode.value = true
   inviteCode.value = ''
+  team.value = { name: '' }
   $router.replace('/join-team')
 }
 
@@ -171,64 +189,107 @@ async function addVolunteerToTeam() {
 
     <form-errors v-if="errorMessage" :errors="[errorMessage]" />
 
-    <h1>Join {{ team.name }}</h1>
-
-    <div v-if="verifyUser && !isLoading" class="center">
-      <p class="mt-4">This device is currently logged in as:</p>
-      <p class="bold">{{ authenticatedUserEmail }}</p>
-      <p class="mt-3">If this is you, press continue.</p>
-      <p class="mt-3">
-        <a class="mt-3 uc-link" @click="removeUser"
-          >I don't recognize this account.</a
+    <div v-if="team.closedAt && !isLoading" data-testid="chapter-closed">
+      <h1>This chapter has closed</h1>
+      <p class="mt-4">
+        {{ team.name }} has closed and isn't accepting new members.
+      </p>
+      <button
+        v-if="isSignedIn"
+        type="button"
+        class="uc-form-button"
+        data-testid="button-go-to-dashboard"
+        v-ph:nths="'join_closed.dashboard'"
+        @click="$router.push('/dashboard')"
+      >
+        Go to dashboard
+      </button>
+      <button
+        v-else
+        type="button"
+        class="uc-form-button"
+        data-testid="button-sign-up"
+        v-ph:nths="'join_closed.sign_up'"
+        @click="
+          $router.push({
+            path: '/sign-up/volunteer',
+            query: referralCode ? { referral: referralCode } : {},
+          })
+        "
+      >
+        Sign up as a coach
+      </button>
+      <p class="sub mt-3">
+        <a
+          class="uc-link"
+          data-testid="link-not-your-team"
+          v-ph:nths="'join_closed.different_code'"
+          @click="removeTeam"
+          >Not your team? Enter a different code</a
         >
       </p>
-      <button type="button" class="uc-form-button" @click="confirmUser">
-        Continue
-      </button>
     </div>
 
-    <div v-else-if="!isLoading">
-      <FormInput
-        v-if="askForInviteCode"
-        class="mt-3"
-        v-model="inviteCode"
-        name="inviteCode"
-        label="Team Code"
-        placeholder="Team Code"
-        :blur-event="EVENTS.VOLUNTEER_ENTERED_TEAM_CODE"
-        :is-required="askForInviteCode"
-        testid="input-class-code"
-      />
-      <div v-else class="uc-row mt-2">
-        <p class="sub" data-testid="text-team-code">
-          Team code: <span class="bold">{{ inviteCode }}</span>
+    <template v-else>
+      <h1>Join {{ team.name }}</h1>
+
+      <div v-if="verifyUser && !isLoading" class="center">
+        <p class="mt-4">This device is currently logged in as:</p>
+        <p class="bold">{{ authenticatedUserEmail }}</p>
+        <p class="mt-3">If this is you, press continue.</p>
+        <p class="mt-3">
+          <a class="mt-3 uc-link" @click="removeUser"
+            >I don't recognize this account.</a
+          >
         </p>
-        <a
-          class="uc-link ml-4"
-          data-testid="link-not-your-team"
-          @click="removeTeam"
-          >Not your team?</a
-        >
+        <button type="button" class="uc-form-button" @click="confirmUser">
+          Continue
+        </button>
       </div>
 
-      <FormEmail
-        v-if="!authenticatedUserEmail"
-        class="mt-3"
-        v-model="email"
-        :blur-event="EVENTS.VOLUNTEER_ENTERED_EMAIL_ON_JOIN_TEAM"
-        testid="input-email"
-      />
+      <div v-else-if="!isLoading">
+        <FormInput
+          v-if="askForInviteCode"
+          class="mt-3"
+          v-model="inviteCode"
+          name="inviteCode"
+          label="Team Code"
+          placeholder="Team Code"
+          :blur-event="EVENTS.VOLUNTEER_ENTERED_TEAM_CODE"
+          :is-required="askForInviteCode"
+          testid="input-class-code"
+        />
+        <div v-else class="uc-row mt-2">
+          <p class="sub" data-testid="text-team-code">
+            Team code: <span class="bold">{{ inviteCode }}</span>
+          </p>
+          <a
+            class="uc-link ml-4"
+            data-testid="link-not-your-team"
+            @click="removeTeam"
+            >Not your team?</a
+          >
+        </div>
 
-      <button
-        class="uc-form-button"
-        type="submit"
-        @click="addVolunteerToTeam"
-        :disabled="isDisabled"
-        data-testid="button-submit"
-      >
-        Continue
-      </button>
-    </div>
+        <FormEmail
+          v-if="!authenticatedUserEmail"
+          class="mt-3"
+          v-model="email"
+          :blur-event="EVENTS.VOLUNTEER_ENTERED_EMAIL_ON_JOIN_TEAM"
+          testid="input-email"
+        />
+
+        <button
+          class="uc-form-button"
+          type="submit"
+          @click="addVolunteerToTeam"
+          :disabled="isDisabled"
+          data-testid="button-submit"
+        >
+          Continue
+        </button>
+      </div>
+    </template>
   </form-page-template>
 </template>
 
@@ -238,7 +299,7 @@ form-page-template {
 }
 h1 {
   font-size: 2rem;
-  width: 750px;
+  max-width: 750px;
 }
 
 p {
