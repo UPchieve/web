@@ -37,8 +37,9 @@ const SUBJECTS: { [subjectName: string]: any } = {
   },
 }
 
-function getWrapper() {
+function getWrapper(classId?: string) {
   return mount(StudentClassesView, {
+    props: { classId },
     global: {
       plugins: [
         router,
@@ -164,7 +165,7 @@ describe('StudentClassesView', () => {
     await flushPromises()
 
     const { studentClasses } = getElements(wrapper)
-    expect(studentClasses.length).toBe(fakeClasses.length)
+    expect(studentClasses.length).toBe(fakeClasses.length + 1)
 
     const firstClass = studentClasses.find(
       (c) => c.text() === fakeClasses[0].name
@@ -196,32 +197,27 @@ describe('StudentClassesView', () => {
 
     const wrapper = getWrapper()
     await flushPromises()
-    expect(routerReplaceSpy).toHaveBeenCalledWith(
-      `/classes/${fakeClasses[0].id}`
-    )
+    expect(routerReplaceSpy).not.toHaveBeenCalled()
 
     const { studentClasses } = getElements(wrapper)
 
-    await studentClasses[1].setValue()
+    await studentClasses[2].setValue()
     expect(routerReplaceSpy).toHaveBeenLastCalledWith(
       `/classes/${fakeClasses[1].id}`
     )
 
-    await studentClasses[2].setValue()
+    await studentClasses[3].setValue()
     expect(routerReplaceSpy).toHaveBeenLastCalledWith(
       `/classes/${fakeClasses[2].id}`
     )
 
     await studentClasses[0].setValue()
-    expect(routerReplaceSpy).toHaveBeenLastCalledWith(
-      `/classes/${fakeClasses[0].id}`
-    )
+    expect(routerReplaceSpy).toHaveBeenLastCalledWith('/classes')
 
     routerReplaceSpy.mockReset()
   })
 
-  test('lists classes newest first, then by name, and opens on the newest', async () => {
-    const routerReplaceSpy = vi.spyOn(router, 'replace')
+  test('lists all classes, then each class newest first and by name', async () => {
     const older = buildStudentClass({ createdAt: new Date('2025-09-01') })
     const period10 = buildStudentClass({ name: 'Period 10' })
     const period2 = buildStudentClass({ name: 'Period 2' })
@@ -239,12 +235,22 @@ describe('StudentClassesView', () => {
     await flushPromises()
 
     expect(getElements(wrapper).studentClasses.map((c) => c.text())).toEqual([
+      'All classes',
       'Period 2',
       'Period 10',
       `${older.name} (open to-dos)`,
     ])
-    expect(routerReplaceSpy).toHaveBeenCalledWith(`/classes/${period2.id}`)
-    routerReplaceSpy.mockReset()
+
+    const links = wrapper.findAll('aside a')
+    expect(links.map((link) => link.attributes('href'))).toEqual([
+      '/classes',
+      `/classes/${period2.id}`,
+      `/classes/${period10.id}`,
+      `/classes/${older.id}`,
+    ])
+    expect(links[3].find('[role="img"]').attributes('aria-label')).toBe(
+      '(open to-dos)'
+    )
   })
 
   test('shows no classes yet if student has no classes', async () => {
@@ -321,7 +327,7 @@ describe('StudentClassesView', () => {
     expect(currentAssignments.length + pastAssignments.length).toBe(0)
   })
 
-  test('shows the assignments with their due dates for each class', async () => {
+  test("shows each class's to-dos under its name, or only the picked class's", async () => {
     const class0 = buildStudentClass({ name: 'Class A' })
     const class1 = buildStudentClass({ name: 'Class B' })
     const class2 = buildStudentClass({ name: 'Class C' })
@@ -357,23 +363,21 @@ describe('StudentClassesView', () => {
       data: { assignmentDocuments: [] },
     })
 
-    const wrapper = getWrapper()
+    const allClasses = getWrapper()
     await flushPromises()
+    expect(
+      allClasses.findAll('[data-testid="class-name"]').map((h) => h.text())
+    ).toEqual(['Class A', 'Class B', 'Class C'])
+    expect(getElements(allClasses).currentAssignments.length).toBe(9)
 
-    const { studentClasses } = getElements(wrapper)
-    let { currentAssignments, pastAssignments } = getElements(wrapper)
-    let combinedAssignments = currentAssignments.concat(pastAssignments)
-    expect(combinedAssignments.length).toBe(class0Assignments.length)
-
-    await studentClasses[1].setValue()
-    ;({ currentAssignments, pastAssignments } = getElements(wrapper))
-    combinedAssignments = currentAssignments.concat(pastAssignments)
-    expect(combinedAssignments.length).toBe(class1Assignments.length)
-
-    await studentClasses[2].setValue()
-    ;({ currentAssignments, pastAssignments } = getElements(wrapper))
-    combinedAssignments = currentAssignments.concat(pastAssignments)
-    expect(combinedAssignments.length).toBe(class2Assignments.length)
+    const classB = getWrapper(class1.id)
+    await flushPromises()
+    expect(
+      classB.findAll('[data-testid="class-name"]').map((h) => h.text())
+    ).toEqual(['Class B'])
+    expect(getElements(classB).currentAssignments.length).toBe(
+      class1Assignments.length
+    )
   })
 
   test('shows the current assignments and the past assignments in different sections', async () => {

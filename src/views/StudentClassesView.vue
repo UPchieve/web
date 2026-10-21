@@ -11,6 +11,7 @@ import CheckIcon from '@/assets/check.svg'
 import CrossIcon from '@/assets/cross.svg'
 import TaskBadge from '@/assets/task-badge.svg'
 import UpdogCrying from '@/assets/updog-crying.svg'
+import ActivityDot from '@/components/ActivityDot.vue'
 import Loader from '@/components/Loader.vue'
 import NetworkService from '@/services/NetworkService'
 import JoinClassModal from '@/views/JoinClassModal.vue'
@@ -55,7 +56,14 @@ const isLoading = ref<boolean>(true)
 const errorMessage = ref<string | undefined>()
 
 const allStudentClasses = ref<TeacherClass[]>([])
-const currentClass = ref<TeacherClass | undefined>()
+const currentClass = computed(() =>
+  allStudentClasses.value.find((c) => c.id === props.classId)
+)
+const shownClasses = computed(() =>
+  currentClass.value
+    ? [currentClass.value]
+    : allStudentClasses.value.filter(hasAnyAssignments)
+)
 const selectedAssignment = ref<Assignment | undefined>()
 
 const showJoinClassModal = ref<boolean>(false)
@@ -79,7 +87,6 @@ onMounted(async () => {
     ])
 
     allStudentClasses.value = getClassesWithAssignments(classes, assignments)
-    updateCurrentClassSelected()
 
     await Promise.all(
       assignments.map(async (assignment: Assignment) => {
@@ -159,23 +166,6 @@ function sortByDueDate(
   return 0
 }
 
-function updateCurrentClassSelected() {
-  if (!allStudentClasses.value.length) return
-
-  if (props.classId) {
-    const c = allStudentClasses.value.find((c) => {
-      return c.id === props.classId
-    })
-    if (c) {
-      currentClass.value = c
-      return
-    }
-  }
-
-  currentClass.value = allStudentClasses.value[0]
-  $router.replace(`/classes/${currentClass.value.id}`)
-}
-
 function optionLabel(teacherClass: TeacherClass) {
   return teacherClass.assignments.length
     ? `${teacherClass.name} (open to-dos)`
@@ -185,8 +175,7 @@ function optionLabel(teacherClass: TeacherClass) {
 const selectedClassId = computed({
   get: () => currentClass.value?.id,
   set: (classId?: string) => {
-    currentClass.value = allStudentClasses.value.find((c) => c.id === classId)
-    $router.replace(`/classes/${classId}`)
+    $router.replace(classId ? `/classes/${classId}` : '/classes')
   },
 })
 
@@ -289,7 +278,7 @@ function joinClass() {
           Join a class
         </button>
       </div>
-      <div v-else class="uc-column h-full">
+      <div v-else class="uc-column h-full classes-layout">
         <select
           v-model="selectedClassId"
           class="class-select"
@@ -297,6 +286,7 @@ function joinClass() {
           aria-label="Class"
           data-testid="class-select"
         >
+          <option :value="undefined">All classes</option>
           <option
             v-for="teacherClass in allStudentClasses"
             :key="teacherClass.id"
@@ -306,14 +296,14 @@ function joinClass() {
           </option>
         </select>
         <section>
-          <div v-if="hasAnyAssignments(currentClass)">
-            <div class="uc-row items-center">
-              <binder-icon />
-              <h3 class="ml-2">To-dos</h3>
-            </div>
-            <h4 class="mt-2 mb-4">Upcoming</h4>
+          <div class="uc-row items-center">
+            <binder-icon />
+            <h3 class="ml-2">To-dos</h3>
+          </div>
+          <div v-for="teacherClass in shownClasses" :key="teacherClass.id">
+            <h4 data-testid="class-name">{{ teacherClass.name }}</h4>
             <div
-              v-for="assignment in currentClass?.assignments"
+              v-for="assignment in teacherClass.assignments"
               :key="assignment.id"
               class="assignment-card"
               data-testid="current-assignments"
@@ -352,9 +342,11 @@ function joinClass() {
               </button>
             </div>
 
-            <h4 class="mt-4 mb-2">Past</h4>
+            <h5 v-if="teacherClass.pastAssignments.length" class="mt-4 mb-2">
+              Past
+            </h5>
             <div
-              v-for="assignment in currentClass?.pastAssignments"
+              v-for="assignment in teacherClass.pastAssignments"
               :key="assignment.id"
               class="assignment-card past"
               data-testid="past-assignments"
@@ -393,13 +385,30 @@ function joinClass() {
             </div>
           </div>
           <div
-            v-else
+            v-if="!shownClasses.some(hasAnyAssignments)"
             class="uc-row justify-center"
             data-testid="no-assignments-container"
           >
             You don't have any tasks yet!
           </div>
         </section>
+        <aside class="class-list" aria-labelledby="class-list-header">
+          <h3 id="class-list-header">Classes</h3>
+          <router-link to="/classes" replace>All classes</router-link>
+          <router-link
+            v-for="teacherClass in allStudentClasses"
+            :key="teacherClass.id"
+            :to="`/classes/${teacherClass.id}`"
+            replace
+          >
+            {{ teacherClass.name }}
+            <activity-dot
+              v-if="teacherClass.assignments.length"
+              class="dot"
+              label="(open to-dos)"
+            />
+          </router-link>
+        </aside>
       </div>
     </div>
   </div>
@@ -452,12 +461,30 @@ h1 {
   border: 1px solid $border-grey;
   border-radius: $radius-md;
   color: $c-soft-black;
+
+  @include breakpoint-above('huge') {
+    display: none;
+  }
+}
+
+.classes-layout {
+  @include breakpoint-above('huge') {
+    display: grid;
+    grid-template-columns: 1fr 28%;
+    align-items: start;
+    gap: $spacing-lg;
+    padding: 0 $padding-horizontal $spacing-lg;
+  }
 }
 
 section {
   background-color: white;
   height: 100%;
   padding: 30px $padding-horizontal;
+
+  @include breakpoint-above('huge') {
+    border-radius: $radius-md;
+  }
 }
 
 h3 {
@@ -467,10 +494,53 @@ h3 {
 }
 
 h4 {
+  @include font-category('subheading');
+  margin: $spacing-lg 0 $spacing-sm;
+}
+
+h5 {
   color: #565961;
   font-size: 16px;
   font-weight: 400;
   margin-bottom: 0;
+}
+
+.class-list {
+  display: none;
+
+  @include breakpoint-above('huge') {
+    @include flex-container(column, $align-items: stretch);
+    padding: $spacing-sm;
+    background-color: white;
+    border-radius: $radius-md;
+  }
+
+  h3 {
+    @include font-category('body');
+    margin: $spacing-xs $spacing-sm $spacing-sm;
+  }
+
+  a {
+    @include flex-container(row, space-between, center);
+    gap: $spacing-xs;
+    padding: $spacing-sm;
+    border-radius: $radius-md;
+    color: $c-soft-black;
+    text-decoration: none;
+
+    &:hover,
+    &.router-link-exact-active {
+      background-color: $c-background-blue;
+    }
+
+    &.router-link-exact-active {
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  .dot {
+    flex: none;
+  }
 }
 
 .assignment-card {

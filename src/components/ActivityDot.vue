@@ -1,5 +1,9 @@
 <template>
-  <div class="activity-dot">
+  <div
+    class="activity-dot"
+    :role="label ? 'img' : undefined"
+    :aria-label="label"
+  >
     <span v-if="total" class="activity-dot--total">{{ total }}</span>
   </div>
 </template>
@@ -10,6 +14,10 @@ export default {
   props: {
     total: {
       type: Number,
+      required: false,
+    },
+    label: {
+      type: String,
       required: false,
     },
   },
