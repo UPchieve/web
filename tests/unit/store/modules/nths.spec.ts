@@ -12,6 +12,7 @@ import {
   type NTHSFormVersion,
 } from '@/services/NTHSApplicationService'
 import { CheckboxStatus, type ChecklistItem } from '@/services/NTHSGroupService'
+import type { NTHSChecklistPublic } from '@upchieve/api-contracts/nths-checklist'
 
 vi.mock('@/services/NetworkService')
 vi.mock('@/services/LoggerService', () => ({
@@ -111,6 +112,7 @@ const getStore = (
     checksInFlight?: number[]
     schoolAffiliationStatus?: string | null
     NTHSGroups?: object[]
+    NTHSChecklistData?: NTHSChecklistPublic | null
   } = {}
 ) => {
   const {
@@ -119,6 +121,7 @@ const getStore = (
     checksInFlight = [],
     schoolAffiliationStatus = null,
     NTHSGroups = [{ groupInfo: { id: 'group-1' }, schoolAffiliationStatus }],
+    NTHSChecklistData = null,
   } = state
 
   return createStore({
@@ -132,11 +135,81 @@ const getStore = (
           NTHSActions,
           NTHSGroupActions,
           checksInFlight,
+          NTHSChecklistData,
         },
       },
     },
   })
 }
+
+const DYNAMIC_CHECKLIST: NTHSChecklistPublic = {
+  sections: [
+    {
+      id: 1,
+      title: 'Get started',
+      order: 1,
+      items: [
+        {
+          key: 'invite-members',
+          order: 1,
+          title: 'Invite members',
+          resources: [],
+          checkable: true,
+          skippable: false,
+          status: 'incomplete',
+        },
+      ],
+    },
+  ],
+}
+
+describe('nths dynamic checklist state', () => {
+  it('loads the checklist from the backend', async () => {
+    vi.mocked(NetworkService.getNTHSChecklist).mockResolvedValue({
+      checklist: DYNAMIC_CHECKLIST,
+    })
+    const store = getStore()
+
+    await expect(
+      store.dispatch('nths/fetchNTHSChecklist', 'group-1')
+    ).resolves.toEqual(DYNAMIC_CHECKLIST)
+
+    expect(NetworkService.getNTHSChecklist).toHaveBeenCalledWith('group-1')
+    expect(store.state.nths.NTHSChecklistData).toEqual(DYNAMIC_CHECKLIST)
+  })
+
+  it.each(['complete', 'incomplete'] as const)(
+    'uses the backend response when updating an item to %s',
+    async (status) => {
+      const checklist = structuredClone(DYNAMIC_CHECKLIST)
+      checklist.sections[0].items[0].status =
+        status === 'complete' ? 'incomplete' : 'complete'
+
+      vi.mocked(
+        NetworkService.updateNTHSChecklistItemProgress
+      ).mockResolvedValue({
+        itemKey: 'invite-members',
+        status,
+      })
+      const store = getStore({
+        NTHSChecklistData: checklist,
+      })
+
+      await store.dispatch('nths/updateNTHSChecklistItemProgress', {
+        groupId: 'group-1',
+        itemKey: 'invite-members',
+        status,
+      })
+
+      expect(
+        NetworkService.updateNTHSChecklistItemProgress
+      ).toHaveBeenLastCalledWith('group-1', 'invite-members', { status })
+      expect(
+        store.state.nths.NTHSChecklistData.sections[0].items[0].status
+      ).toBe(status)
+    }
+  )
+})
 
 const checklistOf = (...args: Parameters<typeof getStore>): ChecklistItem[] =>
   getStore(...args).getters['nths/NTHSChecklist']

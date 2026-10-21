@@ -15,6 +15,11 @@ import {
   type ChecklistItem,
   type NTHSAction,
 } from '@/services/NTHSGroupService'
+import type {
+  NTHSChecklistItemStatus,
+  NTHSChecklistPublic,
+  UpdateNTHSChecklistItemProgressResponse,
+} from '@upchieve/api-contracts/nths-checklist'
 
 // Views like NTHSCreateGroupView commit NTHS state without going through
 // fetchNthsData, so the attribute can lag by a page load. Gleap sends each
@@ -44,6 +49,7 @@ export default {
     NTHSGroupMembers: {},
     NTHSGroupActions: [],
     NTHSActions: [],
+    NTHSChecklistData: null as NTHSChecklistPublic | null,
     checksInFlight: [],
     NTHSCandidateApplicationStatus: undefined,
     canApplyForNTHSPresident: false,
@@ -59,6 +65,18 @@ export default {
     setNTHSGroupActions: (state, data) => {
       state.NTHSGroupActions = data.groupActions
       state.NTHSActions = data.actions
+    },
+    setNTHSChecklist: (state, checklist: NTHSChecklistPublic) => {
+      state.NTHSChecklistData = checklist
+    },
+    setNTHSChecklistItemProgress: (
+      state,
+      { itemKey, status }: UpdateNTHSChecklistItemProgressResponse
+    ) => {
+      const item = state.NTHSChecklistData?.sections
+        .flatMap((section) => section.items)
+        .find((item) => item.key === itemKey)
+      if (item) item.status = status
     },
     setNTHSGroupName: (state, { groupId, groupName }) => {
       const group = state.NTHSGroups.find((g) => g.groupInfo.id === groupId)
@@ -160,6 +178,31 @@ export default {
         groupActions,
         actions: response.data.actions,
       })
+    },
+    async fetchNTHSChecklist({ commit }, groupId: string) {
+      const { checklist } = await NetworkService.getNTHSChecklist(groupId)
+      commit('setNTHSChecklist', checklist)
+      return checklist
+    },
+    async updateNTHSChecklistItemProgress(
+      { commit },
+      {
+        groupId,
+        itemKey,
+        status,
+      }: {
+        groupId: string
+        itemKey: string
+        status: NTHSChecklistItemStatus
+      }
+    ) {
+      const progress = await NetworkService.updateNTHSChecklistItemProgress(
+        groupId,
+        itemKey,
+        { status }
+      )
+      commit('setNTHSChecklistItemProgress', progress)
+      return progress
     },
     addNTHSGroupAction({ commit }, action) {
       commit('appendNTHSGroupAction', action)
