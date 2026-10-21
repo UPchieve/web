@@ -3,26 +3,25 @@ import { computed, nextTick, onBeforeMount, ref } from 'vue'
 import { useStore } from 'vuex'
 import { RouterLink } from 'vue-router'
 import LoggerService from '@/services/LoggerService'
-import {
-  CheckboxStatus,
-  toggleCheckbox,
-  type ChecklistItem,
-} from '@/services/NTHSGroupService'
+import type {
+  NTHSChecklistItemPublic,
+  NTHSChecklistPublic,
+} from '@upchieve/api-contracts/nths-checklist'
 
 const props = defineProps<{ groupId: string }>()
 const emit = defineEmits<{ (e: 'finished'): void }>()
-
 const store = useStore()
-const checklist = computed<ChecklistItem[]>(
-  () => store.getters['nths/NTHSChecklist']
+const checklist = computed<NTHSChecklistPublic | null>(
+  () => store.state.nths.NTHSChecklistData
 )
-
 const isLoading = ref(true)
 const loadFailed = ref(false)
 
 onBeforeMount(async () => {
   try {
-    await store.dispatch('nths/fetchNTHSGroupActions', props.groupId)
+    if (!checklist.value) {
+      await store.dispatch('nths/fetchNTHSChecklist', props.groupId)
+    }
   } catch (err) {
     loadFailed.value = true
     LoggerService.noticeError(err, 'Could not load the NTHS chapter checklist')
@@ -31,42 +30,50 @@ onBeforeMount(async () => {
   }
 })
 
-const item = computed(() =>
-  isLoading.value || loadFailed.value
-    ? undefined
-    : checklist.value.find(({ status }) => status !== CheckboxStatus.Done)
-)
+const item = computed(() => {
+  if (isLoading.value || loadFailed.value) return undefined
+  return checklist.value?.sections
+    .flatMap(({ items }) => items)
+    .find(
+      ({ status, checkable, skippable }) =>
+        status === 'incomplete' && (checkable || skippable)
+    )
+})
 
 const heading = ref<HTMLElement>()
 const isSaving = ref(false)
 const errorMessage = ref('')
 const announcement = ref('')
 
-async function markDone() {
-  const current = item.value
-  if (!current || current.locked || isSaving.value) return
-
+async function updateItem(
+  current: NTHSChecklistItemPublic,
+  status: 'complete' | 'skipped'
+) {
+  if (isSaving.value) return
   isSaving.value = true
   errorMessage.value = ''
   announcement.value = ''
-  const recorded = await toggleCheckbox({
-    item: current,
-    groupId: props.groupId,
-  })
-  isSaving.value = false
-  if (!recorded) {
+  try {
+    await store.dispatch('nths/updateNTHSChecklistItemProgress', {
+      groupId: props.groupId,
+      itemKey: current.key,
+      status,
+    })
+  } catch (err) {
+    LoggerService.noticeError(err)
     errorMessage.value = 'Something went wrong while saving. Please try again.'
     return
+  } finally {
+    isSaving.value = false
   }
 
-  // The pressed button leaves with its item, so focus moves to the next
-  // item's heading, or out to Home.
+  const verb = status === 'skipped' ? 'Skipped' : 'Marked'
   if (item.value) {
-    announcement.value = `Marked "${current.text}" as done.`
+    announcement.value = `${verb} "${current.title}".`
     await nextTick()
     heading.value?.focus()
   } else {
-    announcement.value = `Marked "${current.text}" as done. Your checklist is finished.`
+    announcement.value = `${verb} "${current.title}". Your checklist is finished.`
     emit('finished')
   }
 }
@@ -80,69 +87,69 @@ async function markDone() {
       aria-labelledby="do-next-eyebrow"
       data-testid="do-this-next"
     >
-      <p id="do-next-eyebrow" class="eyebrow">Do this next</p>
+      <p id="do-next-eyebrow" class="eyebrow">Up next</p>
       <h2
         ref="heading"
         class="title"
         tabindex="-1"
         data-testid="do-this-next-title"
       >
-        {{ item.text }}
+        {{ item.title }}
       </h2>
-      <p v-if="item.help" class="help" data-testid="do-this-next-help">
-        {{ item.help }}
+      <p v-if="item.description" class="help" data-testid="do-this-next-help">
+        {{ item.description }}
       </p>
 
+      <div v-if="item.resources.length" class="resources">
+        <span class="resources-label">Resources:</span>
+        <ul>
+          <li v-for="resource in item.resources" :key="resource.label">
+            <a
+              v-if="resource.url"
+              class="resource"
+              :href="resource.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="do-this-next-resource"
+            >
+              {{ resource.label }} <span aria-hidden="true">↗</span>
+            </a>
+            <span v-else>{{ resource.label }}</span>
+          </li>
+        </ul>
+      </div>
+
       <div class="actions">
-        <a
-          v-if="item.url"
-          class="action resource"
-          :href="item.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="do-this-next-resource"
-          v-ph:nthshq="`home.do_next.link.${item.actionName}`"
-        >
-          {{ item.controlText }}
-        </a>
-        <RouterLink
-          v-else-if="item.routeTo"
-          class="action resource"
-          :to="item.routeTo"
-          data-testid="do-this-next-resource"
-          v-ph:nthshq="`home.do_next.link.${item.actionName}`"
-        >
-          {{ item.controlText }}
-        </RouterLink>
         <button
-          v-if="!item.locked"
+          v-if="item.checkable"
           type="button"
           class="action mark-done"
-          :aria-disabled="isSaving || undefined"
+          :disabled="isSaving"
           data-testid="do-this-next-mark-done"
-          v-ph:nthshq="'home.do_next.mark_done'"
-          @click="markDone"
+          @click="updateItem(item, 'complete')"
         >
           {{ isSaving ? 'Saving…' : 'Mark as done' }}
+        </button>
+        <button
+          v-if="item.skippable"
+          type="button"
+          class="skip"
+          :disabled="isSaving"
+          data-testid="do-this-next-skip"
+          @click="updateItem(item, 'skipped')"
+        >
+          Skip this step
         </button>
         <RouterLink
           class="to-do"
           to="/groups/to-do"
           data-testid="do-this-next-to-do"
-          v-ph:nthshq="'home.do_next.see_checklist'"
         >
           See the full checklist
         </RouterLink>
       </div>
 
-      <p
-        v-if="errorMessage"
-        class="error"
-        role="alert"
-        data-testid="do-this-next-error"
-      >
-        {{ errorMessage }}
-      </p>
+      <p v-if="errorMessage" class="error" role="alert">{{ errorMessage }}</p>
     </section>
   </Transition>
   <p class="visually-hidden" role="status" data-testid="do-this-next-status">
@@ -168,11 +175,10 @@ async function markDone() {
   line-height: 1.3;
   max-width: 560px;
   margin: 14px 0 0;
-
-  &:focus-visible {
-    outline: 2px solid $c-college;
-    outline-offset: 4px;
-  }
+}
+.title:focus-visible {
+  outline: 2px solid $c-college;
+  outline-offset: 4px;
 }
 .help {
   font-size: 15px;
@@ -186,91 +192,71 @@ async function markDone() {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 16px;
-  margin-top: 22px;
+  margin-top: 18px;
+}
+.resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: rgba($upchieve-white, 0.85);
+}
+.resources-label {
+  font-weight: 600;
+}
+.resources ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.resources li:not(:last-child)::after {
+  content: '·';
+  margin-left: 8px;
+}
+.resource {
+  color: $upchieve-white;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  // Transparent on the resource link so both pills are the same height.
   border: 1px solid transparent;
   border-radius: 20px;
   padding: 10px 22px;
   font-size: 15px;
   line-height: 1.2;
-  text-align: center;
   text-decoration: none;
-  cursor: pointer;
-
-  &:focus-visible {
-    outline: 2px solid $c-college;
-    outline-offset: 2px;
-  }
-
-  @include breakpoint-below('small') {
-    flex: 1 1 100%;
-  }
-}
-.resource {
-  background: $c-college;
-  color: $c-nths-navy;
-  font-weight: 600;
-
-  &:hover {
-    background: darken($c-college, 9%);
-    color: $c-nths-navy;
-    text-decoration: none;
-  }
 }
 .mark-done {
   background: transparent;
   border-color: rgba($upchieve-white, 0.5);
   color: $upchieve-white;
-  font-weight: 500;
-
-  &:hover {
-    border-color: $upchieve-white;
-  }
-
-  &[aria-disabled='true'] {
-    border-color: rgba($upchieve-white, 0.5);
-    color: rgba($upchieve-white, 0.7);
-    cursor: default;
-  }
 }
-.to-do {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.2;
-  padding: 2px 0;
+.skip {
+  border: 0;
+  background: transparent;
   color: $upchieve-white;
   text-decoration: underline;
-
-  &:hover {
-    color: $c-college;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $c-college;
-    outline-offset: 2px;
-  }
-
-  @include breakpoint-below('small') {
-    flex: 1 1 100%;
-    text-align: center;
-  }
+}
+.to-do {
+  color: $upchieve-white;
+  font-size: 14px;
+  text-decoration: underline;
 }
 .error {
   @include nths-error-box;
   color: $c-soft-black;
-  font-size: 14px;
-  line-height: 1.4;
   margin: 16px 0 0;
 }
 .visually-hidden {
   @include visually-hidden;
 }
-
 .card-enter-active,
 .card-leave-active {
   transition: opacity 200ms ease;
@@ -278,11 +264,5 @@ async function markDone() {
 .card-enter-from,
 .card-leave-to {
   opacity: 0;
-}
-@media (prefers-reduced-motion: reduce) {
-  .card-enter-active,
-  .card-leave-active {
-    transition: none;
-  }
 }
 </style>

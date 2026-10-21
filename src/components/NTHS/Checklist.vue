@@ -1,208 +1,264 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { ref } from 'vue'
+import { useStore } from 'vuex'
 import Spinner from '@/components/Spinner.vue'
-import {
-  type ChecklistItem,
-  toggleCheckbox,
-  CheckboxStatus,
-} from '@/services/NTHSGroupService'
-import { RouterLink } from 'vue-router'
 import ExternalPage from '@/assets/ExternalPage.svg'
 import HQSection from './HQ/HQSection.vue'
+import LoggerService from '@/services/LoggerService'
+import type {
+  NTHSChecklistItemPublic,
+  NTHSChecklistItemStatus,
+  NTHSChecklistPublic,
+} from '@upchieve/api-contracts/nths-checklist'
 
 const props = defineProps<{
   groupId: string
-  checklist: ChecklistItem[]
+  checklist: NTHSChecklistPublic
 }>()
+const store = useStore()
+const savingItems = ref(new Set<string>())
+const itemErrors = ref<Record<string, string>>({})
 
-const checkboxDimensions = 20
-const checkboxSize = `${checkboxDimensions}px`
-
-const doneCount = computed(
-  () =>
-    props.checklist.filter(({ status }) => status === CheckboxStatus.Done)
-      .length
+const processed = ({ status }: NTHSChecklistItemPublic) =>
+  status === 'complete' || status === 'skipped'
+const doneCount = (items: NTHSChecklistItemPublic[]) =>
+  items.filter((item) => item.checkable && processed(item)).length
+const checkableCount = (items: NTHSChecklistItemPublic[]) =>
+  items.filter((item) => item.checkable).length
+const sectionComplete = (items: NTHSChecklistItemPublic[]) =>
+  checkableCount(items) > 0 && doneCount(items) === checkableCount(items)
+const collapsedSections = ref(
+  new Set(
+    props.checklist.sections
+      .filter((section) => sectionComplete(section.items))
+      .map((section) => section.id)
+  )
 )
-const allDone = computed(
-  () => props.checklist.length > 0 && doneCount.value === props.checklist.length
-)
 
-const tooltipId = ({ actionName }: ChecklistItem) =>
-  `checklist-tooltip-${actionName.replaceAll(' ', '-')}`
-
-const hoveredRow = ref<string>()
-const focusedRow = ref<string>()
-const dismissed = ref(false)
-
-const tooltipOpen = (item: ChecklistItem) =>
-  !dismissed.value &&
-  (hoveredRow.value === item.actionName || focusedRow.value === item.actionName)
-
-const onEscape = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') dismissed.value = true
-}
-onMounted(() => document.addEventListener('keydown', onEscape))
-onUnmounted(() => document.removeEventListener('keydown', onEscape))
-
-function onRowEnter(item: ChecklistItem) {
-  hoveredRow.value = item.actionName
-  dismissed.value = false
+function toggleSection(sectionId: number) {
+  const collapsed = new Set(collapsedSections.value)
+  if (collapsed.has(sectionId)) collapsed.delete(sectionId)
+  else collapsed.add(sectionId)
+  collapsedSections.value = collapsed
 }
 
-function onCheckboxFocus(item: ChecklistItem) {
-  focusedRow.value = item.actionName
-  dismissed.value = false
+async function updateStatus(
+  item: NTHSChecklistItemPublic,
+  status: NTHSChecklistItemStatus
+) {
+  if (savingItems.value.has(item.key)) return
+  savingItems.value = new Set(savingItems.value).add(item.key)
+  itemErrors.value = { ...itemErrors.value, [item.key]: '' }
+  try {
+    await store.dispatch('nths/updateNTHSChecklistItemProgress', {
+      groupId: props.groupId,
+      itemKey: item.key,
+      status,
+    })
+  } catch (err) {
+    LoggerService.noticeError(err, 'Could not update the NTHS checklist item')
+    itemErrors.value = {
+      ...itemErrors.value,
+      [item.key]: 'Something went wrong while saving. Please try again.',
+    }
+  } finally {
+    const saving = new Set(savingItems.value)
+    saving.delete(item.key)
+    savingItems.value = saving
+  }
 }
 
-// A locked row is aria-disabled rather than disabled so it stays in the tab order
-// but it is still interactive so we need to manually cancel click events
-function onCheckboxClick(item: ChecklistItem, event: MouseEvent) {
-  if (item.locked) event.preventDefault()
-}
-
-function onToggle(item: ChecklistItem) {
-  toggleCheckbox({ item, groupId: props.groupId })
-}
+const toggleComplete = (item: NTHSChecklistItemPublic) =>
+  updateStatus(item, item.status === 'complete' ? 'incomplete' : 'complete')
+const toggleSkipped = (item: NTHSChecklistItemPublic) =>
+  updateStatus(item, item.status === 'skipped' ? 'incomplete' : 'skipped')
+const dueDate = (value: string) =>
+  new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(
+    new Date(value)
+  )
 </script>
 
 <template>
-  <HQSection eyebrow="Set up">
-    <template v-slot:header-end>
-      <span class="count" :class="{ complete: allDone }">
-        {{ allDone ? 'Done ✓' : `${doneCount} of ${checklist.length} done` }}
-      </span>
-    </template>
+  <div class="sections">
+    <HQSection
+      v-for="section in checklist.sections"
+      :key="section.id"
+      :eyebrow="section.title"
+    >
+      <template #header-end>
+        <button
+          type="button"
+          class="section-toggle"
+          :aria-expanded="!collapsedSections.has(section.id)"
+          :aria-controls="`checklist-section-${section.id}`"
+          :aria-label="`${
+            collapsedSections.has(section.id) ? 'Expand' : 'Collapse'
+          } ${section.title}`"
+          :data-testid="`checklist-section-toggle-${section.id}`"
+          @click="toggleSection(section.id)"
+        >
+          <span v-if="checkableCount(section.items)" class="count">
+            {{ doneCount(section.items) }} of
+            {{ checkableCount(section.items) }} done
+          </span>
+          <span
+            class="chevron"
+            :class="{ collapsed: collapsedSections.has(section.id) }"
+            aria-hidden="true"
+          />
+        </button>
+      </template>
 
-    <h2 class="card-title" data-testid="card-title">Set up your chapter</h2>
-
-    <div class="list">
       <div
-        v-for="item in checklist"
-        :key="item.actionName"
-        class="row"
-        :data-testid="`checklist-item-${item.actionName}`"
+        v-if="!collapsedSections.has(section.id)"
+        :id="`checklist-section-${section.id}`"
+        class="list"
       >
         <div
-          class="anchor"
-          @mouseenter="onRowEnter(item)"
-          @mouseleave="hoveredRow = undefined"
+          v-for="item in section.items"
+          :key="item.key"
+          class="row"
+          :data-testid="`checklist-item-${item.key}`"
         >
           <label class="item">
             <Spinner
-              :container-width="checkboxDimensions"
-              :container-height="checkboxDimensions"
-              :width="checkboxDimensions"
-              :height="checkboxDimensions"
+              v-if="savingItems.has(item.key)"
+              :container-width="20"
+              :container-height="20"
+              :width="20"
+              :height="20"
               :thickness="4"
               class="checkbox"
-              v-if="item.status === CheckboxStatus.Saving"
             />
             <input
-              v-else
+              v-else-if="item.checkable"
               class="checkbox"
-              :class="{ locked: item.locked }"
               type="checkbox"
-              :data-testid="`checklist-checkbox-${item.actionName}`"
-              v-ph:nthshq="`todo.checkbox.${item.actionName}`"
-              :checked="item.status === CheckboxStatus.Done"
-              :aria-disabled="item.locked ? 'true' : undefined"
-              :aria-describedby="item.locked ? tooltipId(item) : undefined"
-              @click="onCheckboxClick(item, $event)"
-              @focus="onCheckboxFocus(item)"
-              @blur="focusedRow = undefined"
-              @input="onToggle(item)"
+              :checked="processed(item)"
+              :disabled="item.status === 'skipped'"
+              :data-testid="`checklist-checkbox-${item.key}`"
+              @change="toggleComplete(item)"
             />
-            <span
-              class="title"
-              :class="{ done: item.status === CheckboxStatus.Done }"
-              >{{ item.text }}</span
-            >
+            <span v-else class="checkbox-placeholder" aria-hidden="true" />
+            <span class="title" :class="{ done: processed(item) }">
+              {{ item.title }}
+            </span>
           </label>
 
-          <p v-if="item.help" class="help">{{ item.help }}</p>
-
-          <span
-            v-if="item.locked"
-            class="tooltip"
-            :class="{ open: tooltipOpen(item) }"
-            role="tooltip"
-            :id="tooltipId(item)"
-            :data-testid="`checklist-tooltip-${item.actionName}`"
-            >{{ item.lockedTooltip }}</span
-          >
+          <div class="details">
+            <p v-if="item.description" class="description">
+              {{ item.description }}
+            </p>
+            <p v-if="item.dueDate" class="due-date">
+              Due {{ dueDate(item.dueDate) }}
+            </p>
+            <div v-if="item.resources.length" class="resources">
+              <span class="resources-label">Resources:</span>
+              <template
+                v-for="resource in item.resources"
+                :key="`${item.key}-${resource.label}`"
+              >
+                <a
+                  v-if="resource.url"
+                  :href="resource.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :data-testid="`checklist-resource-${item.key}`"
+                >
+                  {{ resource.label }}
+                  <ExternalPage class="icon" aria-hidden="true" />
+                </a>
+                <span v-else>{{ resource.label }}</span>
+              </template>
+            </div>
+            <button
+              v-if="item.skippable"
+              type="button"
+              class="skip"
+              :disabled="savingItems.has(item.key)"
+              :data-testid="`checklist-skip-${item.key}`"
+              @click="toggleSkipped(item)"
+            >
+              {{
+                item.status === 'skipped' ? 'Skipped · Undo' : 'Skip this step'
+              }}
+            </button>
+            <p v-if="itemErrors[item.key]" class="error" role="alert">
+              {{ itemErrors[item.key] }}
+            </p>
+          </div>
         </div>
-
-        <RouterLink
-          v-if="item.routeTo"
-          class="control"
-          :to="item.routeTo"
-          :data-testid="`checklist-control-${item.actionName}`"
-          v-ph:nthshq="`todo.link.${item.actionName}`"
-        >
-          {{ item.controlText }}
-          <ExternalPage class="icon" aria-hidden="true" />
-        </RouterLink>
-
-        <a
-          v-else-if="item.url"
-          class="control"
-          :href="item.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          :data-testid="`checklist-control-${item.actionName}`"
-          v-ph:nthshq="`todo.link.${item.actionName}`"
-        >
-          {{ item.controlText }}
-          <ExternalPage class="icon" aria-hidden="true" />
-        </a>
       </div>
-    </div>
-  </HQSection>
+    </HQSection>
+  </div>
 </template>
 
 <style scoped lang="scss">
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 .count {
+  color: $c-secondary-grey;
   font-size: 13px;
   font-weight: 500;
-  line-height: 1.2;
-  color: $c-secondary-grey;
   white-space: nowrap;
 }
-.count.complete {
-  color: $c-nths-deep-teal;
+.section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
 }
-.card-title {
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1.3;
-  margin-top: 8px;
+.chevron {
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid $c-nths-navy;
+  border-bottom: 2px solid $c-nths-navy;
+  transform: rotate(225deg);
+  transition: transform 150ms ease;
+}
+.chevron.collapsed {
+  transform: rotate(45deg);
 }
 .list {
   display: flex;
   flex-direction: column;
-  margin-top: 14px;
+  margin-top: 8px;
 }
 .row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  column-gap: 14px;
-  row-gap: 8px;
-  padding: 13px 0;
+  padding: 16px 0;
   border-top: 1px solid $c-nths-track;
-}
-.anchor {
-  position: relative;
-  flex: 1 1 14em;
 }
 .item {
   display: flex;
-  justify-content: start;
   align-items: flex-start;
   gap: 14px;
   margin: 0;
-  text-align: left;
+}
+.checkbox,
+.checkbox-placeholder {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.checkbox {
+  appearance: none;
+  background: $upchieve-white;
+  border: 2px solid $border-grey;
+  border-radius: 4px;
+}
+.checkbox:checked {
+  background-color: $c-nths-navy;
+  border-color: $c-nths-navy;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M1.5 6.3 4.4 9.2 10.5 3' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 12px;
 }
 .title {
   font-size: 15px;
@@ -213,96 +269,52 @@ function onToggle(item: ChecklistItem) {
   color: $c-secondary-grey;
   text-decoration: line-through;
 }
-.help {
-  margin: 3px 0 0 calc(v-bind(checkboxSize) + 14px);
+.details {
+  margin-left: 34px;
+}
+.description,
+.due-date {
+  color: $c-secondary-grey;
   font-size: 13px;
   line-height: 1.5;
+  margin: 4px 0 0;
+}
+.due-date {
+  font-weight: 500;
+}
+.resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+.resources-label {
   color: $c-secondary-grey;
-  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
 }
-.checkbox {
-  width: v-bind(checkboxSize);
-  height: v-bind(checkboxSize);
-  flex-shrink: 0;
-  margin: 1px 0 0;
-  appearance: none;
-  background: $upchieve-white;
-  border: 2px solid $border-grey;
-  border-radius: 4px;
-}
-.checkbox:checked {
-  background-color: $c-nths-navy;
-  border-color: $c-nths-navy;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M1.5 6.3 4.4 9.2 10.5 3' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 12px 12px;
-}
-// aria-disabled has no disabled styling, so add back the :disabled gray. A
-// checked locked box keeps the navy fill, or it reads as not done.
-.checkbox.locked:not(:checked) {
-  filter: grayscale(1) opacity(0.3);
-}
-.checkbox.loader :deep(div) {
-  border-color: $c-information-blue transparent transparent transparent;
-}
-.control {
+.resources a {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  background: $c-nths-sky;
-  border-radius: 4px;
-  padding: 5px 10px;
-  color: $c-information-blue;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.2;
-  white-space: nowrap;
-  text-decoration: none;
-}
-.control:hover {
-  color: $button-primary-bg-hover;
+  gap: 4px;
 }
 .icon {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
 }
-.tooltip {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 1;
-  max-width: 22em;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: $c-soft-black;
-  color: white;
+.skip {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: $c-information-blue;
   font-size: 12px;
-  text-align: left;
-  visibility: hidden;
-  opacity: 0;
-  transition:
-    opacity 0.15s ease-in-out,
-    visibility 0.15s;
+  text-decoration: underline;
 }
-// Bridges the 4px gap between the label and the tooltip so the pointer
-// can reach the tooltip without closing it.
-.tooltip::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  height: 4px;
-}
-.tooltip.open {
-  visibility: visible;
-  opacity: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-  .tooltip {
-    transition: none;
-  }
+.error {
+  @include nths-error-box;
+  margin-top: 10px;
+  font-size: 13px;
 }
 </style>

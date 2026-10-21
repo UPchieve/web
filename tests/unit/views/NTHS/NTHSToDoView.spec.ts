@@ -41,7 +41,7 @@ describe('NTHSToDoView', () => {
       'is still loading',
       () =>
         vi
-          .spyOn(NetworkService, 'getActionsForNTHSGroup')
+          .spyOn(NetworkService, 'getNTHSChecklist')
           .mockReturnValue(new Promise(() => {})),
       'checklist-loading',
     ],
@@ -49,7 +49,7 @@ describe('NTHSToDoView', () => {
       'fails to load',
       () => {
         vi.spyOn(LoggerService, 'noticeError').mockImplementation(() => {})
-        vi.spyOn(NetworkService, 'getActionsForNTHSGroup').mockRejectedValue(
+        vi.spyOn(NetworkService, 'getNTHSChecklist').mockRejectedValue(
           new Error('boom')
         )
       },
@@ -58,9 +58,9 @@ describe('NTHSToDoView', () => {
     [
       'has nothing on it',
       () =>
-        vi.spyOn(NetworkService, 'getActionsForNTHSGroup').mockResolvedValue({
-          data: { groupId: GROUP_ID, actions: [], groupActions: [] },
-        } as never),
+        vi.spyOn(NetworkService, 'getNTHSChecklist').mockResolvedValue({
+          checklist: { sections: [] },
+        }),
       'checklist-empty',
     ],
   ])(

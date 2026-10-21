@@ -1,25 +1,10 @@
 import { expect } from '@playwright/test'
 
-const SCHOOL_APPROVAL_ACTION = 'MARKED SCHOOL AFFILIATION IN PROGRESS'
-
-const itemTestId = (actionName) => `checklist-item-${actionName}`
-export const checkboxTestId = (actionName) => `checklist-checkbox-${actionName}`
-const controlTestId = (actionName) => `checklist-control-${actionName}`
-
 export class NTHSChapterPage {
   page
 
   constructor(page) {
     this.page = page
-    this.schoolApprovalItem = page.getByTestId(
-      itemTestId(SCHOOL_APPROVAL_ACTION)
-    )
-    this.schoolApprovalCheckbox = page.getByTestId(
-      checkboxTestId(SCHOOL_APPROVAL_ACTION)
-    )
-    this.schoolApprovalControl = page.getByTestId(
-      controlTestId(SCHOOL_APPROVAL_ACTION)
-    )
     this.schoolApprovedPath = page.getByTestId('school-approved-path')
     this.communityPath = page.getByTestId('community-path')
     this.communityCurrentBadge = page.getByTestId('community-current-badge')
@@ -45,23 +30,13 @@ export class NTHSChapterPage {
     await this.page.waitForURL('**/groups/to-do')
   }
 
-  async schoolApprovalIsOutstanding() {
-    await expect(this.schoolApprovalItem).toBeVisible()
-    await expect(this.schoolApprovalCheckbox).not.toBeChecked()
-  }
-
-  // The checklist lives on To do and the chooser on Chapter setup, so this hops
-  // tabs and comes back: callers assert on setup elements straight afterwards.
   async schoolApprovalIsSettled() {
-    await this.page.goto('/groups/to-do')
-    await this.page.waitForURL('**/groups/to-do')
-    await expect(this.schoolApprovalCheckbox).toBeChecked()
     await this.page.goto('/groups/setup')
     await this.page.waitForURL('**/groups/setup')
   }
 
   async openPathChooser() {
-    await this.schoolApprovalControl.click()
+    await this.page.goto('/groups/setup')
     await this.page.waitForURL('**/groups/setup')
     await expect(this.schoolApprovedPath).toBeVisible()
     await expect(this.communityPath).toBeVisible()
@@ -70,7 +45,7 @@ export class NTHSChapterPage {
   }
 
   async openPathChooserAfterDenial() {
-    await this.schoolApprovalControl.click()
+    await this.page.goto('/groups/setup')
     await this.page.waitForURL('**/groups/setup')
     await expect(this.denialNotice).toBeVisible()
     await expect(this.tryAgainButton).toBeVisible()

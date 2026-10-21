@@ -1,284 +1,181 @@
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
-import LoggerService from '@/services/LoggerService'
-import {
-  checklistControls,
-  NTHS_ORIENTATION_URL,
-  NTHS_SETUP_ROUTE,
-  type AffiliationStatus,
-  type NTHSActionName,
-} from '@/services/NTHSGroupService'
 import nths from '@/store/modules/nths'
-import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
-import { userEvent } from '@vitest/browser/context'
+import NetworkService from '@/services/NetworkService'
+import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { createStore } from 'vuex'
+import type { NTHSChecklistPublic } from '@upchieve/api-contracts/nths-checklist'
 
-// toggleCheckbox dispatches to the app's store module, so route it to the
-// store under test.
-vi.mock('@/store', () => ({
-  default: {
-    dispatch: (type: string, payload: unknown) => store.dispatch(type, payload),
-  },
-}))
-
-const getActionsForNTHSGroup = vi.fn()
-const createActionForNTHSGroup = vi.fn()
-vi.mock('@/services/NetworkService', () => ({
-  default: {
-    getActionsForNTHSGroup: (groupId: string) =>
-      getActionsForNTHSGroup(groupId),
-    createActionForNTHSGroup: (groupId: string, action: NTHSActionName) =>
-      createActionForNTHSGroup(groupId, action),
-  },
-}))
+vi.mock('@/store', () => ({ default: { dispatch: vi.fn() } }))
+vi.mock('@/services/NetworkService')
 
 const GROUP_ID = 'group-123'
-
-const ACTIONS: { id: number; name: NTHSActionName }[] = [
-  { id: 1, name: 'NAMED YOUR TEAM' },
-  { id: 2, name: 'REVIEWED RESOURCES' },
-  { id: 3, name: 'ATTENDED ORIENTATION' },
-  { id: 4, name: 'MARKED SCHOOL AFFILIATION IN PROGRESS' },
-  { id: 5, name: 'RECRUITMENT SPRINT' },
-]
-
-const ORIENTATION = 'ATTENDED ORIENTATION'
-const NAME = 'NAMED YOUR TEAM'
-const RESOURCES = 'REVIEWED RESOURCES'
-const CHAPTER_TYPE = 'MARKED SCHOOL AFFILIATION IN PROGRESS'
-const SPRINT = 'RECRUITMENT SPRINT'
-
-const groupAction = (actionName: NTHSActionName) => ({
-  id: 100 + ACTIONS.findIndex(({ name }) => name === actionName),
-  groupId: GROUP_ID,
-  actionId: ACTIONS.find(({ name }) => name === actionName)!.id,
-  actionName,
-  createdAt: '2026-09-01T00:00:00.000Z',
-})
-
-const controlFor = (actionName: NTHSActionName) =>
-  checklistControls.find(({ action }) => action === actionName)!
-
-function respondWithDone(...done: NTHSActionName[]) {
-  getActionsForNTHSGroup.mockResolvedValue({
-    data: {
-      groupId: GROUP_ID,
-      actions: ACTIONS,
-      groupActions: done.map(groupAction),
+const CHECKLIST: NTHSChecklistPublic = {
+  sections: [
+    {
+      id: 1,
+      title: 'Get started',
+      order: 1,
+      items: [
+        {
+          key: 'already-skipped',
+          order: 1,
+          title: 'Already skipped',
+          resources: [],
+          checkable: true,
+          skippable: true,
+          status: 'skipped',
+        },
+        {
+          key: 'invite-members',
+          order: 2,
+          title: 'Invite members',
+          description: 'Invite at least three members.',
+          resources: [],
+          checkable: true,
+          skippable: true,
+          status: 'incomplete',
+        },
+      ],
     },
-  })
+  ],
 }
-
-function makeStore(schoolAffiliationStatus: AffiliationStatus | null) {
-  return createStore({
-    modules: {
-      nths: {
-        ...nths,
-        state: () => ({
-          ...nths.state,
-          NTHSGroups: [
-            {
-              groupInfo: { id: GROUP_ID },
-              memberInfo: { roleName: 'admin' },
-              schoolAffiliationStatus,
-            },
-          ],
-        }),
-      },
-    },
-  })
-}
-let store: ReturnType<typeof makeStore>
 
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     { path: '/', component: { template: '<div />' } },
-    { path: NTHS_SETUP_ROUTE, component: { template: '<div />' } },
     { path: '/groups/to-do', component: { template: '<div />' } },
   ],
 })
 
-const CARD = '[data-testid="do-this-next"]'
-const TITLE = '[data-testid="do-this-next-title"]'
-const HELP = '[data-testid="do-this-next-help"]'
-const RESOURCE = '[data-testid="do-this-next-resource"]'
-const MARK_DONE = '[data-testid="do-this-next-mark-done"]'
-const TO_DO = '[data-testid="do-this-next-to-do"]'
-const STATUS = '[data-testid="do-this-next-status"]'
-
-enableAutoUnmount(afterEach)
-
-async function getWrapper({
-  schoolAffiliationStatus = null,
-}: { schoolAffiliationStatus?: AffiliationStatus | null } = {}) {
-  store = makeStore(schoolAffiliationStatus)
+async function getWrapper(
+  existingChecklist: NTHSChecklistPublic | null = null
+) {
+  const store = createStore({
+    modules: {
+      nths: {
+        ...nths,
+        state: {
+          ...nths.state,
+          NTHSChecklistData: existingChecklist,
+        },
+      },
+    },
+  })
   await router.push('/')
   await router.isReady()
-  // Focus only moves between elements in the document.
   const wrapper = mount(DoThisNextCard, {
     props: { groupId: GROUP_ID },
     global: { plugins: [store, router] },
-    attachTo: 'body',
   })
   await flushPromises()
   return wrapper
 }
 
-function deferred<T>() {
-  let resolve!: (value: T) => void
-  const promise = new Promise<T>((r) => {
-    resolve = r
-  })
-  return { promise, resolve }
-}
-
 beforeEach(() => {
-  getActionsForNTHSGroup.mockReset()
-  createActionForNTHSGroup.mockReset()
-  respondWithDone()
-  createActionForNTHSGroup.mockImplementation(
-    async (groupId: string, action: NTHSActionName) => ({
-      data: { groupId, action: groupAction(action) },
-    })
+  vi.mocked(NetworkService.getNTHSChecklist).mockResolvedValue({
+    checklist: structuredClone(CHECKLIST),
+  })
+  vi.mocked(NetworkService.updateNTHSChecklistItemProgress).mockImplementation(
+    async (_groupId, itemKey, { status }) => ({ itemKey, status })
   )
-  vi.spyOn(LoggerService, 'noticeError').mockImplementation(() => {})
 })
 
+afterEach(() => vi.clearAllMocks())
+
 describe('DoThisNextCard', () => {
-  it('shows the first item that is not done, in checklist order', async () => {
-    respondWithDone(ORIENTATION, RESOURCES)
+  it('shows the first incomplete item and ignores skipped items', async () => {
     const wrapper = await getWrapper()
 
-    expect(getActionsForNTHSGroup).toHaveBeenCalledWith(GROUP_ID)
-    expect(wrapper.find(TITLE).text()).toBe(controlFor(NAME).text)
-    expect(wrapper.find(HELP).text()).toBe(controlFor(NAME).help)
-    expect(wrapper.find(TO_DO).attributes('href')).toBe('/groups/to-do')
+    expect(NetworkService.getNTHSChecklist).toHaveBeenCalledWith(GROUP_ID)
+    expect(wrapper.get('[data-testid="do-this-next-title"]').text()).toBe(
+      'Invite members'
+    )
   })
 
-  it('shows the chapter type item, with no Mark as done, until the chapter has chosen a path', async () => {
-    respondWithDone(ORIENTATION, NAME, RESOURCES)
+  it('reuses a checklist that is already in Vuex', async () => {
+    const wrapper = await getWrapper(structuredClone(CHECKLIST))
 
-    const wrapper = await getWrapper()
-    expect(wrapper.find(TITLE).text()).toBe(controlFor(CHAPTER_TYPE).text)
-    expect(wrapper.find(MARK_DONE).exists()).toBe(false)
+    expect(NetworkService.getNTHSChecklist).not.toHaveBeenCalled()
+    expect(wrapper.get('[data-testid="do-this-next-title"]').text()).toBe(
+      'Invite members'
+    )
+  })
+
+  it('renders multiple resources as secondary links', async () => {
+    const checklist = structuredClone(CHECKLIST)
+    checklist.sections[0].items[1].resources = [
+      { label: 'Chapter Setup', url: 'https://example.com/setup' },
+      { label: 'Orientation guide', url: 'https://example.com/orientation' },
+    ]
+
+    const wrapper = await getWrapper(checklist)
+    const resources = wrapper.findAll('[data-testid="do-this-next-resource"]')
+
+    expect(resources).toHaveLength(2)
+    expect(resources.map((resource) => resource.text())).toEqual([
+      'Chapter Setup ↗',
+      'Orientation guide ↗',
+    ])
+    expect(resources.map((resource) => resource.attributes('href'))).toEqual([
+      'https://example.com/setup',
+      'https://example.com/orientation',
+    ])
+  })
+
+  it('ignores informational items that cannot be completed or skipped', async () => {
+    const checklist = structuredClone(CHECKLIST)
+    checklist.sections[0].items = [
+      {
+        key: 'informational-item',
+        order: 1,
+        title: 'Keep tutoring',
+        resources: [],
+        checkable: false,
+        skippable: false,
+        status: 'incomplete',
+      },
+    ]
+
+    const wrapper = await getWrapper(checklist)
+
+    expect(wrapper.find('[data-testid="do-this-next"]').exists()).toBe(false)
+  })
+
+  it('keeps the current item visible and reports an update failure', async () => {
+    vi.mocked(
+      NetworkService.updateNTHSChecklistItemProgress
+    ).mockRejectedValueOnce(new Error('save failed'))
+    const wrapper = await getWrapper(structuredClone(CHECKLIST))
+
+    await wrapper.get('[data-testid="do-this-next-mark-done"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="do-this-next-title"]').text()).toBe(
+      'Invite members'
+    )
+    expect(wrapper.get('[role="alert"]').text()).toContain(
+      'Something went wrong while saving'
+    )
   })
 
   it.each([
-    {
-      kind: 'a nationaltutor.org resource, in a new tab',
-      done: [],
-      affiliation: null,
-      href: NTHS_ORIENTATION_URL,
-      target: '_blank',
-    },
-    {
-      kind: 'an in-app page',
-      done: [ORIENTATION],
-      affiliation: null,
-      href: NTHS_SETUP_ROUTE,
-      target: undefined,
-    },
-  ] as const)('links $kind', async ({ done, affiliation, href, target }) => {
-    respondWithDone(...done)
-    const wrapper = await getWrapper({ schoolAffiliationStatus: affiliation })
-    const link = wrapper.find(RESOURCE)
+    { control: 'do-this-next-mark-done', status: 'complete' },
+    { control: 'do-this-next-skip', status: 'skipped' },
+  ] as const)(
+    'saves $status and finishes the checklist',
+    async ({ control, status }) => {
+      const wrapper = await getWrapper()
 
-    expect(link.attributes('href')).toBe(href)
-    expect(link.attributes('target')).toBe(target)
-    if (target) expect(link.attributes('rel')).toBe('noopener noreferrer')
-  })
+      await wrapper.get(`[data-testid="${control}"]`).trigger('click')
+      await flushPromises()
 
-  it('records the item, announces it and moves focus to the next item', async () => {
-    const wrapper = await getWrapper()
-
-    ;(wrapper.find(MARK_DONE).element as HTMLButtonElement).focus()
-    await userEvent.keyboard('{Enter}')
-
-    expect(createActionForNTHSGroup).toHaveBeenCalledWith(GROUP_ID, ORIENTATION)
-    await vi.waitFor(() =>
-      expect(document.activeElement).toBe(wrapper.find(TITLE).element)
-    )
-    expect(wrapper.find(TITLE).text()).toBe(controlFor(NAME).text)
-    expect(wrapper.find(RESOURCE).attributes('href')).toBe(NTHS_SETUP_ROUTE)
-    expect(wrapper.find(STATUS).text()).toContain(controlFor(ORIENTATION).text)
-  })
-
-  it('ignores further presses while saving', async () => {
-    const save = deferred<unknown>()
-    createActionForNTHSGroup.mockReturnValue(save.promise)
-    const wrapper = await getWrapper()
-    const button = wrapper.find(MARK_DONE).element as HTMLButtonElement
-
-    await userEvent.click(button)
-    await flushPromises()
-    expect(button.getAttribute('aria-disabled')).toBe('true')
-    // Playwright treats aria-disabled as disabled and would wait out its
-    // actionability check.
-    await userEvent.click(button, { force: true })
-    await flushPromises()
-
-    save.resolve({ data: { action: groupAction(ORIENTATION) } })
-    await vi.waitFor(() =>
-      expect(wrapper.find(TITLE).text()).toBe(controlFor(NAME).text)
-    )
-    expect(createActionForNTHSGroup).toHaveBeenCalledTimes(1)
-  })
-
-  it('keeps the item and explains when saving fails, then lets the president try again', async () => {
-    const boom = new Error('save failed')
-    createActionForNTHSGroup.mockRejectedValueOnce(boom)
-    const wrapper = await getWrapper()
-    const button = wrapper.find(MARK_DONE).element as HTMLButtonElement
-
-    await userEvent.click(button)
-    await flushPromises()
-
-    expect(wrapper.find(TITLE).text()).toBe(controlFor(ORIENTATION).text)
-    expect(wrapper.find('[role="alert"]').exists()).toBe(true)
-    expect(LoggerService.noticeError).toHaveBeenCalledWith(boom)
-    expect(button.getAttribute('aria-disabled')).toBeNull()
-    expect(document.activeElement).toBe(button)
-
-    await userEvent.click(button)
-    await vi.waitFor(() =>
-      expect(wrapper.find(TITLE).text()).toBe(controlFor(NAME).text)
-    )
-    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
-  })
-
-  it('leaves and emits finished once the last item is done', async () => {
-    respondWithDone(ORIENTATION, NAME, RESOURCES)
-    const wrapper = await getWrapper({ schoolAffiliationStatus: 'AFFILIATED' })
-
-    await userEvent.click(wrapper.find(MARK_DONE).element)
-
-    await vi.waitFor(() => expect(wrapper.emitted('finished')).toHaveLength(1))
-    expect(wrapper.find(CARD).exists()).toBe(false)
-    expect(wrapper.find(STATUS).text()).toContain(controlFor(SPRINT).text)
-  })
-
-  it.each([
-    {
-      state: 'every item is already done',
-      respond: () => respondWithDone(ORIENTATION, NAME, RESOURCES, SPRINT),
-    },
-    {
-      state: 'the checklist fails to load',
-      respond: () =>
-        getActionsForNTHSGroup.mockRejectedValue(new Error('load failed')),
-    },
-    {
-      state: 'the checklist is loading',
-      respond: () =>
-        getActionsForNTHSGroup.mockReturnValue(new Promise(() => {})),
-    },
-  ])('stays hidden when $state', async ({ respond }) => {
-    respond()
-    const wrapper = await getWrapper({ schoolAffiliationStatus: 'AFFILIATED' })
-
-    expect(wrapper.find(CARD).exists()).toBe(false)
-    expect(wrapper.emitted('finished')).toBeUndefined()
-  })
+      expect(
+        NetworkService.updateNTHSChecklistItemProgress
+      ).toHaveBeenCalledWith(GROUP_ID, 'invite-members', { status })
+      expect(wrapper.emitted('finished')).toHaveLength(1)
+    }
+  )
 })

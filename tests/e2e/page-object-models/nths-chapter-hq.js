@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test'
-import { checkboxTestId, NTHSChapterPage } from './nths-chapter.js'
+import { NTHSChapterPage } from './nths-chapter.js'
 
 export class NTHSChapterHQPage extends NTHSChapterPage {
   constructor(page) {
@@ -30,8 +30,8 @@ export class NTHSChapterHQPage extends NTHSChapterPage {
     await this.page.waitForURL('**/groups/setup')
   }
 
-  checklistCheckbox(actionName) {
-    return this.page.getByTestId(checkboxTestId(actionName))
+  checklistCheckbox(itemName) {
+    return this.page.getByRole('checkbox', { name: itemName })
   }
 
   memberRow(userId) {

@@ -1623,20 +1623,10 @@ export default {
         : undefined
     ).catch(this._axiosErrorHandler)
   },
-  getActionsForNTHSGroup(groupId: string) {
-    return httpGetDeprecated(
-      `${API_ROOT}/nths-groups/${groupId}/actions`
-    ).catch(this._axiosErrorHandler)
-  },
   createActionForNTHSGroup(groupId: string, action: NTHSActionName) {
     return httpPostDeprecated(`${API_ROOT}/nths-groups/${groupId}/actions`, {
       action,
     }).then(this._successHandler, this._errorHandler)
-  },
-  deleteActionForNTHSGroup(groupId: string, action: NTHSActionName) {
-    return httpDeleteDeprecated(
-      `${API_ROOT}/nths-groups/${groupId}/actions/${encodeURIComponent(action)}`
-    ).then(this._successHandler, this._errorHandler)
   },
   submitSchoolAffiliation(groupId: string, advisorInfo: AdvisorInfo) {
     return httpPostDeprecated(

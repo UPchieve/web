@@ -24,13 +24,12 @@ vi.mock('vue-router', async (importOriginal) => ({
 }))
 
 const getNTHSChapterImpact = vi.fn()
-const getActionsForNTHSGroup = vi.fn()
+const getNTHSChecklist = vi.fn()
 vi.mock('@/services/NetworkService', () => ({
   default: {
     getNTHSChapterImpact: (groupId: string, monthStartsAt: Date) =>
       getNTHSChapterImpact(groupId, monthStartsAt),
-    getActionsForNTHSGroup: (groupId: string) =>
-      getActionsForNTHSGroup(groupId),
+    getNTHSChecklist: (groupId: string) => getNTHSChecklist(groupId),
   },
 }))
 
@@ -103,12 +102,27 @@ beforeEach(() => {
   vi.setSystemTime(NOW)
   getNTHSChapterImpact.mockReset()
   getNTHSChapterImpact.mockResolvedValue({ data: { impact: IMPACT } })
-  getActionsForNTHSGroup.mockReset()
-  getActionsForNTHSGroup.mockResolvedValue({
-    data: {
-      groupId: 'group-123',
-      actions: [{ id: 1, name: 'NAMED YOUR TEAM' }],
-      groupActions: [],
+  getNTHSChecklist.mockReset()
+  getNTHSChecklist.mockResolvedValue({
+    checklist: {
+      sections: [
+        {
+          id: 1,
+          title: 'Get started',
+          order: 1,
+          items: [
+            {
+              key: 'invite-members',
+              order: 1,
+              title: 'Invite members',
+              resources: [],
+              checkable: true,
+              skippable: true,
+              status: 'incomplete',
+            },
+          ],
+        },
+      ],
     },
   })
 })
@@ -170,7 +184,7 @@ describe('NTHSHomeView', () => {
   )
 
   it('loads the rest of Home without waiting for the checklist', async () => {
-    getActionsForNTHSGroup.mockReturnValue(new Promise(() => {}))
+    getNTHSChecklist.mockReturnValue(new Promise(() => {}))
     const wrapper = await getWrapper('admin')
 
     expect(wrapper.find(DO_THIS_NEXT).exists()).toBe(false)

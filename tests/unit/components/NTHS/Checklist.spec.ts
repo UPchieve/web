@@ -1,416 +1,190 @@
 import Checklist from '@/components/NTHS/Checklist.vue'
-import LoggerService from '@/services/LoggerService'
-import store from '@/store'
-import Spinner from '@/components/Spinner.vue'
-import NetworkService from '@/services/NetworkService'
-import {
-  CheckboxStatus,
-  NTHS_ORIENTATION_URL,
-  NTHS_RECRUITMENT_SPRINT_URL,
-  NTHS_RESOURCES_URL,
-  type ChecklistItem,
-} from '@/services/NTHSGroupService'
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { userEvent } from '@vitest/browser/context'
-import { createMemoryHistory, createRouter } from 'vue-router'
+import { flushPromises, mount } from '@vue/test-utils'
+import { describe, expect, it, vi } from 'vitest'
+import { createStore } from 'vuex'
+import type {
+  NTHSChecklistItemPublic,
+  NTHSChecklistPublic,
+} from '@upchieve/api-contracts/nths-checklist'
 
 const GROUP_ID = 'group-123'
-
-const NAME_ITEM: ChecklistItem = {
-  text: 'Name your chapter',
-  controlText: 'Edit in Chapter setup',
-  routeTo: '/groups/setup',
-  status: CheckboxStatus.NotDone,
-  actionId: 1,
-  actionName: 'NAMED YOUR TEAM',
+const ITEM: NTHSChecklistItemPublic = {
+  key: 'invite-members',
+  order: 1,
+  title: 'Invite members',
+  description: 'Invite at least three members.',
+  dueDate: '2026-10-30T00:00:00.000Z',
+  resources: [{ label: 'Recruitment guide', url: 'https://example.com' }],
+  checkable: true,
+  skippable: true,
+  status: 'incomplete',
 }
 
-const RESOURCES_ITEM: ChecklistItem = {
-  text: 'Review NTHS resources',
-  controlText: 'View resources',
-  url: NTHS_RESOURCES_URL,
-  status: CheckboxStatus.NotDone,
-  actionId: 2,
-  actionName: 'REVIEWED RESOURCES',
-}
-
-const ORIENTATION_ITEM: ChecklistItem = {
-  text: 'Complete orientation',
-  controlText: 'Orientation',
-  url: NTHS_ORIENTATION_URL,
-  status: CheckboxStatus.NotDone,
-  actionId: 3,
-  actionName: 'ATTENDED ORIENTATION',
-}
-
-const AFFILIATION_ITEM: ChecklistItem = {
-  text: 'Choose your chapter type',
-  controlText: 'Choose in Chapter setup',
-  routeTo: '/groups/setup',
-  locked: true,
-  lockedTooltip:
-    'Choose your chapter type in Chapter setup and this ticks itself.',
-  status: CheckboxStatus.NotDone,
-  actionName: 'MARKED SCHOOL AFFILIATION IN PROGRESS',
-}
-
-const SPRINT_ITEM: ChecklistItem = {
-  text: 'Complete the recruitment sprint',
-  controlText: 'Recruitment Sprint',
-  url: NTHS_RECRUITMENT_SPRINT_URL,
-  status: CheckboxStatus.NotDone,
-  actionId: 5,
-  actionName: 'RECRUITMENT SPRINT',
-}
-
-const ALL_ITEMS = [
-  NAME_ITEM,
-  RESOURCES_ITEM,
-  ORIENTATION_ITEM,
-  AFFILIATION_ITEM,
-  SPRINT_ITEM,
-]
-
-const row = (actionName: string) =>
-  `[data-testid="checklist-item-${actionName}"]`
-const checkbox = (actionName: string) =>
-  `[data-testid="checklist-checkbox-${actionName}"]`
-const control = (actionName: string) =>
-  `[data-testid="checklist-control-${actionName}"]`
-const tooltip = (actionName: string) =>
-  `[data-testid="checklist-tooltip-${actionName}"]`
-const CARD_TITLE = '[data-testid="card-title"]'
-
-const AFFILIATION = AFFILIATION_ITEM.actionName
-const ORIENTATION = ORIENTATION_ITEM.actionName
-
-const router = createRouter({
-  history: createMemoryHistory(),
-  routes: [
-    { path: '/', component: { template: '<div />' } },
-    { path: '/groups/setup', component: { template: '<div />' } },
-  ],
+const checklistWith = (item: NTHSChecklistItemPublic): NTHSChecklistPublic => ({
+  sections: [{ id: 1, title: 'Recruit', order: 1, items: [item] }],
 })
 
-async function getWrapper(checklist: ChecklistItem[]) {
-  await router.push('/')
-  await router.isReady()
-  // Real focus, hover and computed styles need the row in the document.
-  return mount(Checklist, {
-    props: { groupId: GROUP_ID, checklist },
-    global: { plugins: [router] },
-    attachTo: 'body',
-  })
+const secondItem: NTHSChecklistItemPublic = {
+  ...ITEM,
+  key: 'plan-kickoff',
+  title: 'Plan kickoff',
 }
 
-// The card heading sits above every row, clear of the anchors and the tooltip.
-const parkPointer = (wrapper: VueWrapper) =>
-  userEvent.hover(wrapper.find(CARD_TITLE).element, { force: true })
-
-async function getLockedRow() {
-  const wrapper = await getWrapper([AFFILIATION_ITEM])
-  const input = wrapper.find(checkbox(AFFILIATION)).element as HTMLInputElement
-  const tip = wrapper.find(tooltip(AFFILIATION)).element as HTMLElement
-  // A row mounted under a resting pointer picks up a hover of its own.
-  await parkPointer(wrapper)
+function getWrapper(item = ITEM) {
+  const update = vi.fn().mockResolvedValue(undefined)
+  const store = createStore({
+    modules: {
+      nths: {
+        namespaced: true,
+        actions: {
+          updateNTHSChecklistItemProgress: (_context, payload) =>
+            update(payload),
+        },
+      },
+    },
+  })
   return {
-    wrapper,
-    input,
-    tip,
-    label: input.closest('label') as HTMLLabelElement,
-    anchor: tip.parentElement as HTMLElement,
+    update,
+    wrapper: mount(Checklist, {
+      props: { groupId: GROUP_ID, checklist: checklistWith(item) },
+      global: { plugins: [store] },
+    }),
   }
 }
 
-// visibility is transitioned, so it reports the outgoing value for a frame either way.
-const settle = (el: Element, state: 'visible' | 'hidden') =>
-  vi.waitFor(() => expect(getComputedStyle(el).visibility).toBe(state))
-
 describe('Checklist', () => {
-  beforeEach(() => {
-    NetworkService.createActionForNTHSGroup = vi
-      .fn()
-      .mockResolvedValue({ data: { action: {} } })
-    NetworkService.deleteActionForNTHSGroup = vi.fn().mockResolvedValue({})
-  })
+  it('renders backend sections, descriptions, due dates and resources', () => {
+    const { wrapper } = getWrapper()
 
-  it('leaves every item label as plain text', async () => {
-    const wrapper = await getWrapper(ALL_ITEMS)
-
-    for (const item of ALL_ITEMS) {
-      const label = wrapper.find(`${row(item.actionName)} label`)
-      expect(label.text()).toBe(item.text)
-      expect(label.find('a').exists()).toBe(false)
-    }
-
-    wrapper.unmount()
-  })
-
-  it.each([{ item: NAME_ITEM }, { item: AFFILIATION_ITEM }])(
-    'sends $item.actionName to the settings tab in-app',
-    async ({ item }) => {
-      const wrapper = await getWrapper(ALL_ITEMS)
-
-      const link = wrapper.find(control(item.actionName))
-      expect(link.attributes('href')).toBe('/groups/setup')
-      expect(link.attributes('target')).toBeUndefined()
-      expect(link.attributes('rel')).toBeUndefined()
-
-      wrapper.unmount()
-    }
-  )
-
-  it.each([
-    { item: RESOURCES_ITEM, url: NTHS_RESOURCES_URL },
-    { item: ORIENTATION_ITEM, url: NTHS_ORIENTATION_URL },
-    { item: SPRINT_ITEM, url: NTHS_RECRUITMENT_SPRINT_URL },
-  ])('opens $item.actionName in a new tab', async ({ item, url }) => {
-    const wrapper = await getWrapper(ALL_ITEMS)
-
-    const link = wrapper.find(control(item.actionName))
-    expect(link.attributes('href')).toBe(url)
-    expect(link.attributes('target')).toBe('_blank')
-    expect(link.attributes('rel')).toBe('noopener noreferrer')
-
-    wrapper.unmount()
-  })
-
-  it('names the locked checkbox after its item and describes it with the tooltip', async () => {
-    const { wrapper, input } = await getLockedRow()
-
-    await expect.element(input).toHaveAccessibleName('Choose your chapter type')
-    await expect
-      .element(input)
-      .toHaveAccessibleDescription(
-        'Choose your chapter type in Chapter setup and this ticks itself.'
-      )
-
-    wrapper.unmount()
-  })
-
-  it('describes the locked checkbox with a tooltip', async () => {
-    const { wrapper, input, tip } = await getLockedRow()
-
-    expect(input.getAttribute('aria-describedby')).toBe(tip.id)
-    expect(tip.getAttribute('role')).toBe('tooltip')
-    // A native title attribute would double up with the tooltip on hover.
-    expect(input.getAttribute('title')).toBeNull()
-
-    wrapper.unmount()
-  })
-
-  it('keeps the tooltip out of the locked checkbox accessible name', async () => {
-    const wrapper = await getWrapper([AFFILIATION_ITEM])
-
+    expect(wrapper.text()).toContain('Recruit')
+    expect(wrapper.text()).toContain(ITEM.description)
+    expect(wrapper.text()).toContain('Due')
     expect(
-      wrapper.find(`${row(AFFILIATION)} label [role="tooltip"]`).exists()
-    ).toBe(false)
-
-    wrapper.unmount()
+      wrapper
+        .get('[data-testid="checklist-resource-invite-members"]')
+        .attributes('href')
+    ).toBe('https://example.com')
   })
 
-  it('keeps the locked checkbox in the tab order', async () => {
-    const { wrapper, input } = await getLockedRow()
-
-    expect(input.getAttribute('aria-disabled')).toBe('true')
-    expect(input.disabled).toBe(false)
-    ;(document.activeElement as HTMLElement | null)?.blur()
-    await userEvent.tab()
-
-    expect(document.activeElement).toBe(input)
-
-    wrapper.unmount()
-  })
-
-  it.each([
-    { status: CheckboxStatus.NotDone, checked: false },
-    { status: CheckboxStatus.Done, checked: true },
-  ])(
-    'refuses a click on a locked checkbox ($status)',
-    async ({ status, checked }) => {
-      const wrapper = await getWrapper([{ ...AFFILIATION_ITEM, status }])
-      const input = wrapper.find(checkbox(AFFILIATION))
-        .element as HTMLInputElement
-
-      // Playwright treats aria-disabled as disabled and would wait out its
-      // actionability check.
-      await userEvent.click(input, { force: true })
-      await flushPromises()
-
-      expect(input.checked).toBe(checked)
-      expect(NetworkService.createActionForNTHSGroup).not.toHaveBeenCalled()
-      expect(NetworkService.deleteActionForNTHSGroup).not.toHaveBeenCalled()
-
-      wrapper.unmount()
-    }
-  )
-
-  it('shows the tooltip on hover and on focus', async () => {
-    const { wrapper, input, label, tip } = await getLockedRow()
-
-    await settle(tip, 'hidden')
-
-    input.focus()
-    await settle(tip, 'visible')
-
-    input.blur()
-    await settle(tip, 'hidden')
-
-    await userEvent.hover(label)
-    await settle(tip, 'visible')
-
-    await parkPointer(wrapper)
-    await settle(tip, 'hidden')
-
-    wrapper.unmount()
-  })
-
-  it('dismisses the tooltip on escape without moving focus', async () => {
-    const { wrapper, input, tip } = await getLockedRow()
-
-    input.focus()
-    await settle(tip, 'visible')
-
-    await userEvent.keyboard('{Escape}')
-    await settle(tip, 'hidden')
-
-    expect(document.activeElement).toBe(input)
-
-    input.blur()
-    input.focus()
-    await settle(tip, 'visible')
-
-    wrapper.unmount()
-  })
-
-  it('dismisses a hover-opened tooltip on escape while focus is elsewhere', async () => {
-    const { wrapper, label, tip } = await getLockedRow()
-
-    await userEvent.hover(label)
-    await settle(tip, 'visible')
-    expect(document.activeElement).toBe(document.body)
-
-    await userEvent.keyboard('{Escape}')
-    await settle(tip, 'hidden')
-
-    wrapper.unmount()
-  })
-
-  it('leaves no dead zone between the locked row and its tooltip', async () => {
-    const { wrapper, label, tip, anchor } = await getLockedRow()
-
-    await userEvent.hover(label)
-    await settle(tip, 'visible')
-
-    const anchorBox = anchor.getBoundingClientRect()
-    const gap = { x: 4, y: anchorBox.height + 2 }
-    expect(
-      document.elementFromPoint(anchorBox.left + gap.x, anchorBox.top + gap.y)
-    ).toBe(tip)
-
-    wrapper.unmount()
-  })
-
-  it('ticks the locked checkbox when the item is done', async () => {
-    const wrapper = await getWrapper([
-      { ...AFFILIATION_ITEM, status: CheckboxStatus.Done },
-    ])
-
-    expect(
-      wrapper.find<HTMLInputElement>(checkbox(AFFILIATION)).element.checked
-    ).toBe(true)
-
-    wrapper.unmount()
-  })
-
-  it.each([
-    {
-      status: CheckboxStatus.NotDone,
-      assert: () =>
-        expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
-          GROUP_ID,
-          ORIENTATION
-        ),
-    },
-    {
-      status: CheckboxStatus.Done,
-      assert: (dispatch: ReturnType<typeof vi.spyOn>) => {
-        expect(NetworkService.deleteActionForNTHSGroup).toHaveBeenCalledWith(
-          GROUP_ID,
-          ORIENTATION
-        )
-        expect(NetworkService.createActionForNTHSGroup).not.toHaveBeenCalled()
-        expect(dispatch).toHaveBeenCalledWith(
-          'nths/removeNTHSGroupAction',
-          ORIENTATION_ITEM.actionId
-        )
+  it('toggles sections independently', async () => {
+    const { wrapper } = getWrapper()
+    await wrapper.setProps({
+      checklist: {
+        sections: [
+          ...checklistWith(ITEM).sections,
+          { id: 2, title: 'Launch', order: 2, items: [secondItem] },
+        ],
       },
-    },
-  ])('toggles an unlocked item from $status', async ({ status, assert }) => {
-    const dispatch = vi.spyOn(store, 'dispatch')
-    const wrapper = await getWrapper([{ ...ORIENTATION_ITEM, status }])
+    })
 
-    await wrapper.find(checkbox(ORIENTATION)).trigger('input')
-    await flushPromises()
+    await wrapper
+      .get('[data-testid="checklist-section-toggle-1"]')
+      .trigger('click')
 
-    assert(dispatch)
+    expect(wrapper.find('#checklist-section-1').exists()).toBe(false)
+    expect(wrapper.get('#checklist-section-2').exists()).toBe(true)
+  })
 
-    wrapper.unmount()
+  it('starts completed sections collapsed but allows them to be reopened', async () => {
+    const { wrapper } = getWrapper({ ...ITEM, status: 'complete' })
+    const toggle = wrapper.get('[data-testid="checklist-section-toggle-1"]')
+
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(wrapper.find('#checklist-section-1').exists()).toBe(false)
+
+    await toggle.trigger('click')
+
+    expect(toggle.attributes('aria-expanded')).toBe('true')
+    expect(wrapper.get('#checklist-section-1').exists()).toBe(true)
+  })
+
+  it('does not collapse an open section when its final item is completed', async () => {
+    const { wrapper } = getWrapper()
+
+    await wrapper.setProps({
+      checklist: checklistWith({ ...ITEM, status: 'complete' }),
+    })
+
+    expect(wrapper.get('#checklist-section-1').exists()).toBe(true)
+  })
+
+  it('excludes uncheckable items from progress and keeps informational sections open', async () => {
+    const informationalItem = {
+      ...ITEM,
+      checkable: false,
+      status: 'incomplete' as const,
+    }
+    const { wrapper } = getWrapper(informationalItem)
+
+    expect(wrapper.text()).not.toContain('0 of 1 done')
+    expect(wrapper.get('#checklist-section-1').exists()).toBe(true)
+  })
+
+  it('counts only checkable items in mixed sections', async () => {
+    const { wrapper } = getWrapper()
+    await wrapper.setProps({
+      checklist: {
+        sections: [
+          {
+            id: 1,
+            title: 'Recruit',
+            order: 1,
+            items: [ITEM, { ...secondItem, checkable: false }],
+          },
+        ],
+      },
+    })
+
+    expect(wrapper.text()).toContain('0 of 1 done')
   })
 
   it.each([
-    {
-      status: CheckboxStatus.NotDone,
-      fail: () =>
-        vi
-          .mocked(NetworkService.createActionForNTHSGroup)
-          .mockRejectedValue(new Error('save failed')),
-      committedAction: 'nths/addNTHSGroupAction',
-    },
-    {
-      status: CheckboxStatus.Done,
-      fail: () =>
-        vi
-          .mocked(NetworkService.deleteActionForNTHSGroup)
-          .mockRejectedValue(new Error('delete failed')),
-      committedAction: 'nths/removeNTHSGroupAction',
-    },
-  ])(
-    'logs a failed toggle from $status and clears the saving state',
-    async ({ status, fail, committedAction }) => {
-      fail()
-      const noticeError = vi
-        .spyOn(LoggerService, 'noticeError')
-        .mockImplementation(() => {})
-      const dispatch = vi.spyOn(store, 'dispatch')
-      const wrapper = await getWrapper([{ ...ORIENTATION_ITEM, status }])
+    { current: 'incomplete', expected: 'complete' },
+    { current: 'complete', expected: 'incomplete' },
+  ] as const)(
+    'changes $current items to $expected',
+    async ({ current, expected }) => {
+      const { wrapper, update } = getWrapper({ ...ITEM, status: current })
+      if (current === 'complete')
+        await wrapper
+          .get('[data-testid="checklist-section-toggle-1"]')
+          .trigger('click')
 
-      await wrapper.find(checkbox(ORIENTATION)).trigger('input')
+      await wrapper
+        .get('[data-testid="checklist-checkbox-invite-members"]')
+        .trigger('change')
       await flushPromises()
 
-      expect(noticeError).toHaveBeenCalled()
-      expect(dispatch).not.toHaveBeenCalledWith(
-        committedAction,
-        ORIENTATION_ITEM.actionId
-      )
-      expect(dispatch).toHaveBeenCalledWith(
-        'nths/removeFromChecksInFlight',
-        ORIENTATION_ITEM.actionId
-      )
-
-      wrapper.unmount()
+      expect(update).toHaveBeenCalledWith({
+        groupId: GROUP_ID,
+        itemKey: ITEM.key,
+        status: expected,
+      })
     }
   )
 
-  it('swaps the checkbox for a spinner while saving', async () => {
-    const wrapper = await getWrapper([
-      { ...ORIENTATION_ITEM, status: CheckboxStatus.Saving },
-    ])
+  it.each([
+    { current: 'incomplete', expected: 'skipped' },
+    { current: 'skipped', expected: 'incomplete' },
+  ] as const)(
+    'changes $current items to $expected from the skip control',
+    async ({ current, expected }) => {
+      const { wrapper, update } = getWrapper({ ...ITEM, status: current })
+      if (current === 'skipped')
+        await wrapper
+          .get('[data-testid="checklist-section-toggle-1"]')
+          .trigger('click')
 
-    expect(wrapper.find(checkbox(ORIENTATION)).exists()).toBe(false)
-    expect(wrapper.findComponent(Spinner).exists()).toBe(true)
+      await wrapper
+        .get('[data-testid="checklist-skip-invite-members"]')
+        .trigger('click')
+      await flushPromises()
 
-    wrapper.unmount()
-  })
+      expect(update).toHaveBeenCalledWith({
+        groupId: GROUP_ID,
+        itemKey: ITEM.key,
+        status: expected,
+      })
+    }
+  )
 })

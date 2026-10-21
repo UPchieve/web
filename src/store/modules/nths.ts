@@ -6,15 +6,7 @@ import {
   nthsDestination,
   type NTHSDestinationSource,
 } from '@/views/NTHS/nths-route-helpers'
-import {
-  checklistControls,
-  CheckboxStatus,
-  hasChosenAffiliationPath,
-  SCHOOL_AFFILIATION_ACTION,
-  type AffiliationStatus,
-  type ChecklistItem,
-  type NTHSAction,
-} from '@/services/NTHSGroupService'
+import type { AffiliationStatus } from '@/services/NTHSGroupService'
 import type {
   NTHSChecklistItemStatus,
   NTHSChecklistPublic,
@@ -47,10 +39,7 @@ export default {
   state: {
     NTHSGroups: [],
     NTHSGroupMembers: {},
-    NTHSGroupActions: [],
-    NTHSActions: [],
     NTHSChecklistData: null as NTHSChecklistPublic | null,
-    checksInFlight: [],
     NTHSCandidateApplicationStatus: undefined,
     canApplyForNTHSPresident: false,
     NTHSApplicationIneligibilityReasons: [],
@@ -61,10 +50,6 @@ export default {
     },
     setNTHSGroupMembers: (state, data) => {
       state.NTHSGroupMembers[data.groupId] = data.groupMembers
-    },
-    setNTHSGroupActions: (state, data) => {
-      state.NTHSGroupActions = data.groupActions
-      state.NTHSActions = data.actions
     },
     setNTHSChecklist: (state, checklist: NTHSChecklistPublic) => {
       state.NTHSChecklistData = checklist
@@ -99,17 +84,6 @@ export default {
       const group = state.NTHSGroups.find((g) => g.groupInfo.id === groupId)
       if (group) group.schoolAffiliationStatus = schoolAffiliationStatus
     },
-    appendNTHSGroupAction: (state, action) => {
-      state.NTHSGroupActions = [...state.NTHSGroupActions, action]
-    },
-    removeNTHSGroupAction: (state, actionId) => {
-      state.NTHSGroupActions = state.NTHSGroupActions.filter(
-        (action) => action.actionId !== actionId
-      )
-    },
-    setChecksInFlight(state, checksInFlight) {
-      state.checksInFlight = checksInFlight
-    },
     setNTHSCandidateApplicationStatus: (state, status) => {
       state.NTHSCandidateApplicationStatus = status
     },
@@ -121,15 +95,6 @@ export default {
     },
   },
   actions: {
-    appendToChecksInFlight({ commit, state }, id) {
-      commit('setChecksInFlight', state.checksInFlight.concat([id]))
-    },
-    removeFromChecksInFlight({ commit, state }, id) {
-      commit(
-        'setChecksInFlight',
-        state.checksInFlight.filter((c) => c !== id)
-      )
-    },
     setNTHSCandidateApplicationStatus: (state, status) => {
       state.NTHSCandidateApplicationStatus = status
     },
@@ -170,15 +135,6 @@ export default {
       const groupMembers = response.data?.members ?? []
       commit('setNTHSGroupMembers', { groupId, groupMembers })
     },
-    async fetchNTHSGroupActions({ commit }, groupId) {
-      const response = await NetworkService.getActionsForNTHSGroup(groupId)
-      const groupActions = response.data?.groupActions ?? []
-      commit('setNTHSGroupActions', {
-        groupId,
-        groupActions,
-        actions: response.data.actions,
-      })
-    },
     async fetchNTHSChecklist({ commit }, groupId: string) {
       const { checklist } = await NetworkService.getNTHSChecklist(groupId)
       commit('setNTHSChecklist', checklist)
@@ -204,12 +160,6 @@ export default {
       commit('setNTHSChecklistItemProgress', progress)
       return progress
     },
-    addNTHSGroupAction({ commit }, action) {
-      commit('appendNTHSGroupAction', action)
-    },
-    removeNTHSGroupAction({ commit }, actionId) {
-      commit('removeNTHSGroupAction', actionId)
-    },
   },
 
   getters: {
@@ -218,53 +168,5 @@ export default {
     hasAdminRole: (state, getters) => getters.memberRole === 'admin',
     isGroupMemberOnly: (state, getters) =>
       !getters.hasAdminRole && state.NTHSGroups.length > 0,
-    NTHSChecklist: (state) => {
-      if (state.NTHSActions.length === 0) return []
-
-      const affiliationStatus =
-        state.NTHSGroups?.[0]?.schoolAffiliationStatus ?? null
-
-      const checklist: ChecklistItem[] = []
-      for (const { action: name, ...control } of checklistControls) {
-        if (name === SCHOOL_AFFILIATION_ACTION) {
-          checklist.push({
-            ...control,
-            locked: true,
-            status: hasChosenAffiliationPath(affiliationStatus)
-              ? CheckboxStatus.Done
-              : CheckboxStatus.NotDone,
-            actionName: name,
-          })
-          continue
-        }
-
-        const action = state.NTHSActions.find(
-          (a: NTHSAction) => a.name === name
-        )
-        if (!action) continue
-
-        let status: CheckboxStatus
-        if (state.checksInFlight.includes(action.id)) {
-          status = CheckboxStatus.Saving
-        } else if (
-          state.NTHSGroupActions.some(
-            ({ actionId }: { actionId: number }) => actionId === action.id
-          )
-        ) {
-          status = CheckboxStatus.Done
-        } else {
-          status = CheckboxStatus.NotDone
-        }
-
-        checklist.push({
-          ...control,
-          status,
-          actionId: action.id,
-          actionName: name,
-        })
-      }
-
-      return checklist
-    },
   },
 }

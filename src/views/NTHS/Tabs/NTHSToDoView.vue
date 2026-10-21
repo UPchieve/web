@@ -7,17 +7,18 @@ import LoggerService from '@/services/LoggerService'
 
 const store = useStore()
 const group = computed(() => store.state.nths.NTHSGroups?.[0])
-const checklist = computed(() => store.getters['nths/NTHSChecklist'])
+const checklist = computed(() => store.state.nths.NTHSChecklistData)
+const hasItems = computed(() =>
+  checklist.value?.sections.some(({ items }) => items.length > 0)
+)
 
 const isLoading = ref(true)
 const loadFailed = ref(false)
 
 onBeforeMount(async () => {
   try {
-    await store.dispatch(
-      'nths/fetchNTHSGroupActions',
-      group.value?.groupInfo?.id
-    )
+    const groupId = group.value?.groupInfo?.id
+    if (groupId) await store.dispatch('nths/fetchNTHSChecklist', groupId)
   } catch (err) {
     loadFailed.value = true
     LoggerService.noticeError(err, 'Could not load the NTHS chapter checklist')
@@ -39,7 +40,7 @@ onBeforeMount(async () => {
       We couldn't load your checklist. Refresh the page to try again.
     </p>
     <Checklist
-      v-else-if="checklist.length"
+      v-else-if="checklist && hasItems"
       :groupId="group.groupInfo.id"
       :checklist="checklist"
     />

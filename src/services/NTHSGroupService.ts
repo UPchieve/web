@@ -1,6 +1,3 @@
-import store from '@/store'
-import NetworkService from './NetworkService'
-import LoggerService from './LoggerService'
 import type { DateString, Uuid } from '@/types/shared'
 
 export type Role = 'admin' | 'member'
@@ -106,8 +103,6 @@ export const NTHS_ORIENTATION_URL = 'https://nationaltutor.org/orientation'
 export const NTHS_RESOURCES_URL = 'https://nationaltutor.org/resources'
 export const NTHS_RECRUITMENT_TEMPLATES_URL =
   'https://nationaltutor.org/resources/recruitment-templates'
-export const NTHS_RECRUITMENT_SPRINT_URL =
-  'https://nationaltutor.org/orientation/6'
 export const SCHOOL_AFFILIATION_ACTION =
   'MARKED SCHOOL AFFILIATION IN PROGRESS' satisfies NTHSActionName
 export const OPTED_OUT_ACTION = 'OPTED OUT' satisfies NTHSActionName
@@ -133,129 +128,3 @@ export type AffiliationStatus =
   | 'DENIED'
   | 'OPTED_OUT'
   | 'UNAFFILIATED'
-
-const affiliationPathChosen: Record<AffiliationStatus, boolean> = {
-  PENDING_SCHOOL_AFFILIATION: true,
-  PENDING_UPCHIEVE_VERIFICATION: true,
-  AFFILIATED: true,
-  // A denied chapter has to pick a path again, so the checklist reopens to send
-  // the president back to Settings.
-  DENIED: false,
-  OPTED_OUT: true,
-  // UNAFFILIATED means we already have school information for the chapter
-  // from the application process, before the president opted in or out.
-  UNAFFILIATED: false,
-}
-
-export function hasChosenAffiliationPath(
-  status: AffiliationStatus | null
-): boolean {
-  if (status === null) return false
-  return affiliationPathChosen[status] ?? false
-}
-
-export const NTHS_SETUP_ROUTE = '/groups/setup'
-
-export type ChecklistControl = {
-  text: string
-  help?: string
-  controlText?: string
-  url?: string
-  routeTo?: string
-  lockedTooltip?: string
-}
-
-// Renders in this order; upchieve.nths_actions comes back unordered. Only the
-// actions listed here render as checkboxes. The other school affiliation rows
-// arrive from the same endpoint and are driven by the chapter setup card.
-export const checklistControls: (ChecklistControl & {
-  action: NTHSActionName
-})[] = [
-  {
-    action: 'ATTENDED ORIENTATION',
-    text: 'Complete orientation',
-    help: 'Start with the president orientation on nationaltutor.org.',
-    controlText: 'Orientation',
-    url: NTHS_ORIENTATION_URL,
-  },
-  {
-    action: 'NAMED YOUR TEAM',
-    text: 'Name your chapter',
-    help: 'Pick the name your members and students will see.',
-    controlText: 'Edit in Chapter setup',
-    routeTo: NTHS_SETUP_ROUTE,
-  },
-  {
-    action: 'REVIEWED RESOURCES',
-    text: 'Review NTHS resources',
-    help: 'Guides and templates for running your chapter.',
-    controlText: 'View resources',
-    url: NTHS_RESOURCES_URL,
-  },
-  {
-    action: SCHOOL_AFFILIATION_ACTION,
-    text: 'Choose your chapter type',
-    help: 'School-approved or community. Chapter setup records the choice.',
-    controlText: 'Choose in Chapter setup',
-    routeTo: NTHS_SETUP_ROUTE,
-    lockedTooltip:
-      'Choose your chapter type in Chapter setup and this ticks itself.',
-  },
-  {
-    action: 'RECRUITMENT SPRINT',
-    text: 'Complete the recruitment sprint',
-    help: 'Invite your first members and get them tutoring.',
-    controlText: 'Recruitment Sprint',
-    url: NTHS_RECRUITMENT_SPRINT_URL,
-  },
-]
-
-export enum CheckboxStatus {
-  Done = 'done',
-  NotDone = 'not-done',
-  Saving = 'saving',
-}
-
-export type NTHSAction = {
-  id: number
-  name: NTHSActionName
-}
-
-// A locked item can't be ticked by the president and may have no nths_actions row
-// to toggle.
-export type ChecklistItem = ChecklistControl & {
-  status: CheckboxStatus
-  actionName: NTHSActionName
-} & ({ locked: true; actionId?: never } | { locked?: false; actionId: number })
-
-// Resolves false rather than rejecting on failure, which is already logged here.
-export async function toggleCheckbox({
-  item,
-  groupId,
-}: {
-  item: ChecklistItem
-  groupId: string
-}): Promise<boolean> {
-  if (item.locked) return false
-
-  try {
-    store.dispatch('nths/appendToChecksInFlight', item.actionId)
-    if (item.status === CheckboxStatus.Done) {
-      await NetworkService.deleteActionForNTHSGroup(groupId, item.actionName)
-      store.dispatch('nths/removeNTHSGroupAction', item.actionId)
-    } else {
-      const result = await NetworkService.createActionForNTHSGroup(
-        groupId,
-        item.actionName
-      )
-      store.dispatch('nths/addNTHSGroupAction', result.data.action)
-    }
-    return true
-  } catch (err) {
-    // The checkbox reverts to its prior state when the spinner clears.
-    LoggerService.noticeError(err)
-    return false
-  } finally {
-    store.dispatch('nths/removeFromChecksInFlight', item.actionId)
-  }
-}

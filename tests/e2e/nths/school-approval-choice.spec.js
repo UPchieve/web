@@ -20,12 +20,9 @@ test.describe('NTHS school approval choice', () => {
     await loginAs(page, president)
 
     chapterPage = new NTHSChapterPage(page)
-    await chapterPage.goto()
   })
 
   test('president stays a community chapter', async ({ page }) => {
-    await chapterPage.schoolApprovalIsOutstanding()
-
     await chapterPage.openPathChooser()
     await chapterPage.stayCommunity()
 
@@ -41,8 +38,6 @@ test.describe('NTHS school approval choice', () => {
   })
 
   test('president seeks school approval', async () => {
-    await chapterPage.schoolApprovalIsOutstanding()
-
     await chapterPage.openPathChooser()
     await chapterPage.chooseSchoolApproved()
 
@@ -54,9 +49,6 @@ test.describe('NTHS school approval choice', () => {
 
   test('denied president switches to a community chapter', async () => {
     await denySchoolAffiliation(dbClient, chapter.groupId)
-    await chapterPage.goto()
-
-    await chapterPage.schoolApprovalIsOutstanding()
 
     await chapterPage.openPathChooserAfterDenial()
     await chapterPage.stayCommunity()
@@ -70,8 +62,6 @@ test.describe('NTHS school approval choice', () => {
   test('president backs out of the advisor form and stays pending', async ({
     page,
   }) => {
-    await chapterPage.schoolApprovalIsOutstanding()
-
     await chapterPage.openPathChooser()
     await chapterPage.chooseSchoolApproved()
     await chapterPage.cancelAdvisorForm()

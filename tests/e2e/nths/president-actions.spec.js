@@ -4,6 +4,48 @@ import { loginAs } from '../utils.ts'
 import { addNthsMember, createNthsPresident } from '../nths-utils.ts'
 import { NTHSChapterHQPage } from '../page-object-models/nths-chapter-hq.js'
 
+async function mockChecklist(page) {
+  const item = {
+    key: 'president-orientation',
+    order: 1,
+    title: 'Complete President Orientation',
+    description: 'Review requirements and plan your recruitment.',
+    resources: [],
+    checkable: true,
+    skippable: false,
+    status: 'incomplete',
+  }
+  const checklist = {
+    sections: [
+      {
+        id: 1,
+        title: 'Set Up Your Chapter',
+        order: 1,
+        items: [item],
+      },
+    ],
+  }
+
+  await page.route(
+    /\/api\/nths-groups\/[^/]+\/checklist(?:\/[^/?]+)?(?:\?.*)?$/,
+    async (route) => {
+      const request = route.request()
+      if (request.method() === 'GET') {
+        await route.fulfill({ json: { checklist } })
+        return
+      }
+      if (request.method() === 'PUT') {
+        item.status = request.postDataJSON().status
+        await route.fulfill({
+          json: { itemKey: item.key, status: item.status },
+        })
+        return
+      }
+      await route.fallback()
+    }
+  )
+}
+
 test.describe('A president can run their chapter from Chapter HQ', () => {
   const dbClient = getClient()
   let president
@@ -18,6 +60,7 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       members.push(await addNthsMember(dbClient, { groupId: chapter.groupId }))
     }
 
+    await mockChecklist(page)
     await loginAs(page, president)
 
     hq = new NTHSChapterHQPage(page)
@@ -35,12 +78,17 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
 
     await test.step('Tick a checklist item, from To do', async () => {
       await hq.goto()
-      const orientation = hq.checklistCheckbox('ATTENDED ORIENTATION')
+      const orientation = hq.checklistCheckbox('Complete President Orientation')
       await expect(orientation).not.toBeChecked()
       await orientation.check()
       await expect(orientation).toBeChecked()
       await page.reload()
-      await expect(hq.checklistCheckbox('ATTENDED ORIENTATION')).toBeChecked()
+      await page
+        .getByRole('button', { name: 'Expand Set Up Your Chapter' })
+        .click()
+      await expect(
+        hq.checklistCheckbox('Complete President Orientation')
+      ).toBeChecked()
     })
 
     await test.step('Edit the chapter name, from Chapter setup', async () => {
