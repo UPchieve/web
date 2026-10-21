@@ -3,6 +3,8 @@ import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 import {
   getNTHSApplicationDraft,
   setNTHSApplicationDraft,
@@ -118,6 +120,8 @@ function getStore(checklist: NTHSChecklistPublic | null = null) {
 }
 
 describe('nths dynamic checklist state', () => {
+  beforeEach(() => vi.mocked(AnalyticsService.captureEvent).mockClear())
+
   it('loads the checklist from the backend', async () => {
     vi.mocked(NetworkService.getNTHSChecklist).mockResolvedValue({
       checklist: DYNAMIC_CHECKLIST,
@@ -127,6 +131,25 @@ describe('nths dynamic checklist state', () => {
     await store.dispatch('nths/fetchNTHSChecklist', 'group-1')
 
     expect(store.state.nths.NTHSChecklistData).toEqual(DYNAMIC_CHECKLIST)
+  })
+
+  it('tracks a failed checklist load with its HTTP status', async () => {
+    const failure = {
+      isAxiosError: true,
+      response: { status: 503 },
+    }
+    vi.mocked(NetworkService.getNTHSChecklist).mockRejectedValueOnce(failure)
+    const store = getStore()
+
+    await expect(
+      store.dispatch('nths/fetchNTHSChecklist', 'group-1')
+    ).rejects.toBe(failure)
+
+    expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
+      EVENTS.NTHS_CHECKLIST_LOAD_FAILED,
+      { groupId: 'group-1', httpStatus: 503 }
+    )
+    expect(store.state.nths.NTHSChecklistData).toBeNull()
   })
 
   it.each(['complete', 'incomplete', 'skipped'] as const)(
@@ -149,6 +172,54 @@ describe('nths dynamic checklist state', () => {
       expect(
         store.state.nths.NTHSChecklistData.sections[0].items[0].status
       ).toBe(status)
+      expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
+        EVENTS.NTHS_CHECKLIST_ITEM_UPDATED,
+        {
+          groupId: 'group-1',
+          sectionId: 1,
+          sectionTitle: 'Get started',
+          sectionOrder: 1,
+          itemKey: 'invite-members',
+          itemTitle: 'Invite members',
+          itemOrder: 1,
+          previousStatus: 'incomplete',
+          status,
+        }
+      )
     }
   )
+
+  it('tracks a failed checklist update without recording progress', async () => {
+    vi.mocked(
+      NetworkService.updateNTHSChecklistItemProgress
+    ).mockRejectedValueOnce(new Error('save failed'))
+    const store = getStore(structuredClone(DYNAMIC_CHECKLIST))
+
+    await expect(
+      store.dispatch('nths/updateNTHSChecklistItemProgress', {
+        groupId: 'group-1',
+        itemKey: 'invite-members',
+        status: 'complete',
+      })
+    ).rejects.toThrow('save failed')
+
+    expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
+      EVENTS.NTHS_CHECKLIST_ITEM_UPDATE_FAILED,
+      {
+        groupId: 'group-1',
+        sectionId: 1,
+        sectionTitle: 'Get started',
+        sectionOrder: 1,
+        itemKey: 'invite-members',
+        itemTitle: 'Invite members',
+        itemOrder: 1,
+        previousStatus: 'incomplete',
+        attemptedStatus: 'complete',
+      }
+    )
+    expect(AnalyticsService.captureEvent).not.toHaveBeenCalledWith(
+      EVENTS.NTHS_CHECKLIST_ITEM_UPDATED,
+      expect.anything()
+    )
+  })
 })

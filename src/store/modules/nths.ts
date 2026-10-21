@@ -1,6 +1,8 @@
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
+import axios from 'axios'
 import { clearNTHSApplicationDraft } from '@/services/BrowserStorageService'
 import {
   nthsDestination,
@@ -136,12 +138,24 @@ export default {
       commit('setNTHSGroupMembers', { groupId, groupMembers })
     },
     async fetchNTHSChecklist({ commit }, groupId: string) {
-      const { checklist } = await NetworkService.getNTHSChecklist(groupId)
+      let checklist: NTHSChecklistPublic
+      try {
+        const response = await NetworkService.getNTHSChecklist(groupId)
+        checklist = response.checklist
+      } catch (error) {
+        AnalyticsService.captureEvent(EVENTS.NTHS_CHECKLIST_LOAD_FAILED, {
+          groupId,
+          httpStatus: axios.isAxiosError(error)
+            ? error.response?.status
+            : undefined,
+        })
+        throw error
+      }
       commit('setNTHSChecklist', checklist)
       return checklist
     },
     async updateNTHSChecklistItemProgress(
-      { commit },
+      { commit, state },
       {
         groupId,
         itemKey,
@@ -152,12 +166,41 @@ export default {
         status: NTHSChecklistItemStatus
       }
     ) {
-      const progress = await NetworkService.updateNTHSChecklistItemProgress(
-        groupId,
-        itemKey,
-        { status }
+      const checklist = state.NTHSChecklistData as NTHSChecklistPublic | null
+      const section = checklist?.sections.find(({ items }) =>
+        items.some(({ key }) => key === itemKey)
       )
+      const item = section?.items.find(({ key }) => key === itemKey)
+      const previousStatus = item?.status
+      const eventProperties = {
+        groupId,
+        sectionId: section?.id,
+        sectionTitle: section?.title,
+        sectionOrder: section?.order,
+        itemKey,
+        itemTitle: item?.title,
+        itemOrder: item?.order,
+        previousStatus,
+      }
+      let progress: UpdateNTHSChecklistItemProgressResponse
+      try {
+        progress = await NetworkService.updateNTHSChecklistItemProgress(
+          groupId,
+          itemKey,
+          { status }
+        )
+      } catch (error) {
+        AnalyticsService.captureEvent(
+          EVENTS.NTHS_CHECKLIST_ITEM_UPDATE_FAILED,
+          { ...eventProperties, attemptedStatus: status }
+        )
+        throw error
+      }
       commit('setNTHSChecklistItemProgress', progress)
+      AnalyticsService.captureEvent(EVENTS.NTHS_CHECKLIST_ITEM_UPDATED, {
+        ...eventProperties,
+        status: progress.status,
+      })
       return progress
     },
   },
