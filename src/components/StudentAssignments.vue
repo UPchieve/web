@@ -24,19 +24,13 @@
             </div>
           </div>
           <p class="assignments-progress-text">
-            {{ assignment.completedSessions.length }} /
+            {{ completedSessionsCount(assignment) }} /
             {{ assignment.numberOfSessions }} sessions completed
           </p>
           <div class="progress-bar-container">
             <div
               class="progress-bar"
-              :style="{
-                width:
-                  (assignment.completedSessions.length /
-                    assignment.numberOfSessions) *
-                    100 +
-                  '%',
-              }"
+              :style="{ width: progressPercent(assignment) + '%' }"
             ></div>
           </div>
         </button>
@@ -80,6 +74,19 @@ export default {
         return dayjs(date).format('MM/DD/YYYY')
       }
       return 'None'
+    },
+
+    completedSessionsCount(assignment) {
+      return assignment.completedSessions?.length ?? 0
+    },
+
+    progressPercent(assignment) {
+      if (!assignment.numberOfSessions) return 0
+      return (
+        (this.completedSessionsCount(assignment) /
+          assignment.numberOfSessions) *
+        100
+      )
     },
 
     goToClasses() {

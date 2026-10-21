@@ -15,4 +15,9 @@ export type StudentAssignmentPublic = {
   subjectId?: number
   subjectName?: string
   submittedAt?: ISODateString
+  completedSessions?: StudentAssignmentSessionPublic[]
+}
+
+export type StudentAssignmentSessionPublic = {
+  endedAt?: ISODateString
 }
