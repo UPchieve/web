@@ -332,11 +332,10 @@ function createAccountWithProvider(
   AnalyticsService.captureEvent(EVENTS.TEACHER_CLICKED_CREATE_ACCOUNT, {
     provider,
   })
-  return SignUpService.createAccountWithProvider(
-    provider,
-    UserType.teacher,
-    data
-  )
+  return SignUpService.createAccountWithProvider(provider, UserType.teacher, {
+    [InputName.SCHOOL_ID]: data.schoolId,
+    [InputName.SIGNUP_SOURCE]: data.signupSource,
+  })
 }
 
 export function createAccountWithClever(data: TeacherAccountFormData) {

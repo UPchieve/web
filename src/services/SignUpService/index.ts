@@ -6,26 +6,21 @@ import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import { SsoProvider, signInWithSso } from '@/services/SsoService'
 import type {
-  StudentAccountFormData,
   StudentEligibilityFormData,
   StudentSignUpFormData,
 } from './StudentSignUpService'
 import type {
-  TeacherAccountFormData,
   TeacherEligibilityFormData,
   TeacherSignUpFormData,
 } from './TeacherSignUpService'
-import type { VolunteerAccountFormData } from './VolunteerSignUpService'
 
 // TODO: Move more common types into types.ts
 export type SignUpFormData = StudentSignUpFormData | TeacherSignUpFormData
 export type EligibilityFormData =
   | StudentEligibilityFormData
   | TeacherEligibilityFormData
-type AccountFormData =
-  | StudentAccountFormData
-  | TeacherAccountFormData
-  | VolunteerAccountFormData
+// Every key lands in the /auth/sso URL and subway's session userData.
+type SsoSignUpPayload = Record<string, string | number | undefined>
 
 /**
 Create a union of all the PageDetail. So, for example,
@@ -161,7 +156,7 @@ export function getSubmitResponse(
 
 const signUpMethodByProvider: Record<
   SsoProvider,
-  (userType: UserType, data: AccountFormData) => SubmitActionResponse
+  (userType: UserType, payload: SsoSignUpPayload) => SubmitActionResponse
 > = {
   [SsoProvider.GOOGLE]: createAccountWithGoogle,
   [SsoProvider.CLEVER]: createAccountWithClever,
@@ -171,47 +166,48 @@ const signUpMethodByProvider: Record<
 export function createAccountWithProvider(
   provider: SsoProvider,
   userType: UserType,
-  data: AccountFormData
+  payload: SsoSignUpPayload
 ) {
   const method = signUpMethodByProvider[provider]
   if (!method) {
     throw new Error(`No sign-up method found for provider: ${provider}`)
   }
-  return method(userType, data)
+  return method(userType, payload)
 }
 
 export function createAccountWithGoogle(
   userType: UserType,
-  data: AccountFormData
+  payload: SsoSignUpPayload
 ) {
   AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_GOOGLE)
-  return createAccountWithSso(SsoProvider.GOOGLE, userType, data)
+  return createAccountWithSso(SsoProvider.GOOGLE, userType, payload)
 }
 
 export function createAccountWithClever(
   userType: UserType,
-  data: AccountFormData
+  payload: SsoSignUpPayload
 ) {
   AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLEVER)
-  return createAccountWithSso(SsoProvider.CLEVER, userType, data)
+  return createAccountWithSso(SsoProvider.CLEVER, userType, payload)
 }
 
 export function createAccountWithClassLink(
   userType: UserType,
-  data: AccountFormData
+  payload: SsoSignUpPayload
 ) {
   AnalyticsService.captureEvent(EVENTS.USER_CLICKED_SIGN_UP_WITH_CLASSLINK)
-  return createAccountWithSso(SsoProvider.CLASSLINK, userType, data)
+  return createAccountWithSso(SsoProvider.CLASSLINK, userType, payload)
 }
 
 function createAccountWithSso(
   provider: SsoProvider,
   userType: UserType,
-  data: AccountFormData
+  payload: SsoSignUpPayload
 ): SubmitActionResponse {
   try {
     localStorage.setItem('isSSOSignUpRedirect', 'true')
     signInWithSso({
+      ...payload,
       provider,
       errorRedirect:
         provider === SsoProvider.GOOGLE || provider === SsoProvider.CLASSLINK
@@ -219,7 +215,6 @@ function createAccountWithSso(
           : '/clever-signin-instructions',
       accountType: userType,
       isLogin: 'false',
-      ...data,
     })
     return [null, null]
   } catch (err) {

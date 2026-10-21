@@ -304,9 +304,12 @@ function createAccountWithProvider(
   data: VolunteerAccountFormData
 ) {
   return SignUpService.createAccountWithProvider(provider, UserType.volunteer, {
-    ...data,
+    // subway's SSO failure redirect echoes email back to the invite code page,
+    // which reads it from the query.
+    [InputName.EMAIL]: data.inviteCode ? data.email : undefined,
+    [InputName.INVITE_CODE]: data.inviteCode,
     [InputName.REFERRED_BY_CODE]:
-      window.localStorage.getItem('upcReferredByCode'),
+      window.localStorage.getItem('upcReferredByCode') ?? undefined,
   })
 }
 

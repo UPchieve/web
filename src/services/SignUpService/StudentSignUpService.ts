@@ -591,11 +591,18 @@ function createAccountWithProvider(
   AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_CREATE_ACCOUNT, {
     provider,
   })
-  return SignUpService.createAccountWithProvider(
-    provider,
-    UserType.student,
-    data
-  )
+  return SignUpService.createAccountWithProvider(provider, UserType.student, {
+    // subway's SSO failure redirect echoes email back to the class code page,
+    // which reads it from the query.
+    [InputName.EMAIL]: data.classCode ? data.email : undefined,
+    [InputName.CLASS_CODE]: data.classCode,
+    [InputName.GRADE_LEVEL]: data.gradeLevel,
+    [InputName.SCHOOL_ID]: data.schoolId,
+    [InputName.SIGNUP_SOURCE_ID]: data.signupSourceId,
+    [InputName.STUDENT_PARTNER_ORG_KEY]: data.studentPartnerOrgKey,
+    [InputName.STUDENT_PARTNER_ORG_SITE_NAME]: data.studentPartnerOrgSiteName,
+    [InputName.ZIP_CODE]: data.zipCode,
+  })
 }
 
 function createAccountWithGoogle(data: StudentAccountFormData) {
