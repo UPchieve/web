@@ -110,7 +110,7 @@
       v-if="joinedTeamCode && group?.groupInfo?.name"
       @close-modal="() => (joinedTeamCode = '')"
       :teamCode="joinedTeamCode"
-      :teamName="group.groupInfo?.groupName"
+      :teamName="group.groupInfo.name"
     />
 
     <photo-upload-modal
