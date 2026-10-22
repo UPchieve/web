@@ -20,9 +20,7 @@ describe('ProfileView', () => {
     UserService.setProfile = vi.fn().mockResolvedValue()
     AuthService.initiateVerification = vi.fn().mockResolvedValue()
     AnalyticsService.captureEvent = vi.fn().mockReturnValue()
-    NetworkService.addBackgroundInfo = vi
-      .fn()
-      .mockResolvedValue({ removedFromNTHS: false })
+    NetworkService.addBackgroundInfo = vi.fn().mockResolvedValue()
     storeOptions.modules.user.actions.addToUser = vi.fn().mockResolvedValue()
 
     DEFAULT_USER = {

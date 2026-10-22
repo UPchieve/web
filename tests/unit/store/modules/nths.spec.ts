@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
-import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
@@ -16,36 +15,9 @@ import {
 import type { NTHSChecklistPublic } from '@upchieve/api-contracts/nths-checklist'
 
 vi.mock('@/services/NetworkService')
-vi.mock('@/services/LoggerService', () => ({
-  default: { noticeError: vi.fn() },
-}))
 vi.mock('@/services/AnalyticsService')
 
 const nthsModule = (storeOptions.modules as any).nths
-const refreshAfterProfileChange = nthsModule.actions.refreshAfterProfileChange
-
-describe('nths/refreshAfterProfileChange', () => {
-  beforeEach(() => vi.mocked(LoggerService.noticeError).mockClear())
-
-  it('refetches so the sidebar and route guards see the new eligibility', async () => {
-    const dispatch = vi.fn().mockResolvedValue([])
-    await refreshAfterProfileChange({ dispatch })
-    expect(dispatch).toHaveBeenCalledWith('fetchNthsData')
-  })
-
-  it('reports a failed refetch rather than rejecting', async () => {
-    const boom = new Error('network down')
-    const dispatch = vi.fn().mockRejectedValue(boom)
-
-    await expect(
-      refreshAfterProfileChange({ dispatch })
-    ).resolves.toBeUndefined()
-    expect(LoggerService.noticeError).toHaveBeenCalledWith(
-      boom,
-      'Could not refresh NTHS data after a profile change'
-    )
-  })
-})
 
 describe('nths/fetchNthsData', () => {
   const USER_ID = 'coach-1'

@@ -115,7 +115,7 @@ function onCancel() {
 </script>
 
 <template>
-  <div class="main-container" :class="{ 'self-removal': isRemovingSelf }">
+  <div class="main-container">
     <div
       v-if="errorMessage"
       class="error-container"
@@ -126,34 +126,32 @@ function onCancel() {
     </div>
 
     <template v-if="isRemovingSelf">
-      <div class="text-content">
-        Are you sure you want to remove yourself from your team?<br />
-        <strong
-          ><span class="warning-text"
-            >This action cannot be undone!</span
-          ></strong
+      <h2 class="title">Leave your NTHS chapter?</h2>
+      <p class="body">
+        You'll keep your UPchieve account and can keep coaching students. Hours
+        you already logged stay on the chapter's total.
+      </p>
+      <p class="body warning-text">
+        This can't be undone. You won't be able to rejoin this chapter.
+      </p>
+      <div class="actions">
+        <LargeButton
+          :showArrow="false"
+          variant="secondary"
+          v-ph:nthshq="'setup.leave_team.cancel'"
+          @click="onCancel"
+          >Cancel</LargeButton
+        >
+        <LargeButton
+          :showArrow="false"
+          variant="danger"
+          data-testid="confirm-remove-self"
+          v-ph:nthshq="'setup.leave_team.confirm'"
+          :disabled="isRemoving"
+          @click="removeTeamMember"
+          >Leave chapter</LargeButton
         >
       </div>
-
-      <LargeButton
-        :showArrow="false"
-        variant="danger"
-        data-testid="confirm-remove-self"
-        v-ph:nthshq="'setup.leave_team.confirm'"
-        :disabled="isRemoving"
-        @click="removeTeamMember"
-        class="main-button"
-      >
-        Remove yourself from team</LargeButton
-      >
-      <LargeButton
-        :showArrow="false"
-        variant="secondary"
-        v-ph:nthshq="'setup.leave_team.cancel'"
-        @click="onCancel"
-        class="main-button"
-        >Cancel</LargeButton
-      >
     </template>
 
     <template v-else>
@@ -194,28 +192,12 @@ function onCancel() {
 .main-container {
   text-align: left;
 }
-.main-container.self-removal {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-  text-align: center;
-}
 
 .error-container {
   @include nths-error-box;
   margin-bottom: 32px;
 }
 
-.text-content {
-  padding-bottom: 16px;
-}
-.warning-text {
-  color: $c-error-red;
-}
-.main-button {
-  width: 80%;
-}
 .title {
   font-size: 20px;
   font-weight: 500;
@@ -224,6 +206,10 @@ function onCancel() {
 .body {
   @include nths-page-subtitle;
   margin-top: 10px;
+}
+// After .body, whose subtitle mixin sets a grey color at the same specificity.
+.warning-text {
+  color: $c-error-red;
 }
 .actions {
   display: flex;

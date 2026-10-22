@@ -11,14 +11,6 @@
         <p data-testid="bg-info-complete">
           Thank you for submitting your background information!<br />
         </p>
-        <Callout v-if="showRemovedFromNTHSMessage" variant="information">
-          <template v-slot:content>
-            Your responses in this form indicate that you are not currently a
-            high school student. Don't worry— you can still volunteer! However,
-            we have removed you from your National Tutoring Honor Society
-            chapter since that program is for current high school students only.
-          </template>
-        </Callout>
         <LargeButton
           variant="primary"
           data-testid="bg-info-complete-button"
@@ -283,7 +275,6 @@ import LargeButton from '@/components/LargeButton.vue'
 import { backOff } from 'exponential-backoff'
 import MazPhoneNumberInput from 'maz-ui/components/MazPhoneNumberInput'
 import { isEmpty } from 'lodash-es'
-import Callout from '@/components/Callout.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.vue'
 import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
@@ -299,7 +290,6 @@ export default {
     FormSchoolSearch,
     GradeLevelSelect,
     FormSearchableSelect,
-    Callout,
     LargeButton,
     MazPhoneNumberInput,
     FormSelect,
@@ -331,7 +321,6 @@ export default {
       invalidInputs: [],
       phoneInputData: {},
       phoneNumber: '',
-      showRemovedFromNTHSMessage: false,
       gradeLevel: gradeLevel ?? '',
     }
   },
@@ -497,11 +486,7 @@ export default {
       }
 
       try {
-        const response = await NetworkService.addBackgroundInfo(data)
-        if (response.data?.wasRemovedFromNTHS) {
-          this.showRemovedFromNTHSMessage = true
-          await this.$store.commit('nths/setNTHSGroups', [])
-        }
+        await NetworkService.addBackgroundInfo(data)
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_COMPLETED, {
           event: EVENTS.BACKGROUND_INFORMATION_COMPLETED,
         })
@@ -523,7 +508,6 @@ export default {
           gradeLevel: data.gradeLevel ?? this.user.gradeLevel ?? '',
         }
         await this.$store.dispatch('user/addToUser', update)
-        await this.$store.dispatch('nths/refreshAfterProfileChange')
       } catch (error) {
         LoggerService.noticeError(error)
         AnalyticsService.captureEvent(EVENTS.BACKGROUND_INFORMATION_ERROR, {

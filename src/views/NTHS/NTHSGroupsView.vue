@@ -3,7 +3,8 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import LargeButton from '@/components/LargeButton.vue'
-import { VolunteerOccupations } from '@/services/VolunteerService'
+import ModalService from '@/services/ModalService'
+import type { GroupMember } from '@/services/NTHSGroupService'
 import Callout from '@/components/Callout.vue'
 
 const store = useStore()
@@ -23,33 +24,64 @@ const tabs = computed(() =>
 
 const hidePageContentReason = computed(function ():
   | 'not ready to tutor'
+  | 'no occupation'
   | 'not in high school'
   | undefined {
   // Hide page content that could contain member information, such as first names,
-  // until the user is onboarded, approved, and has confirmed they are a high school student.
-  // Admins are an exception.
+  // until the user has confirmed they are a high school student, and (for
+  // non-admins) is onboarded and approved.
+  if (!store.getters['user/isVolunteerInHighSchool']) {
+    return store.state.user.user.occupation?.length
+      ? 'not in high school'
+      : 'no occupation'
+  }
   if (isGroupAdmin.value) return
-  const occupations = store.state.user.user.occupation
-  const isHighSchoolStudent =
-    occupations &&
-    occupations.includes(VolunteerOccupations.HIGH_SCHOOL_STUDENT)
-  if (!isHighSchoolStudent) return 'not in high school'
 
   const isReadyToTutor = store.getters['volunteer/isReadyToTutor']
   if (isReadyToTutor) return
   return 'not ready to tutor'
 })
 
+const chapterName = computed(
+  () => group.value?.groupInfo?.name ?? 'your chapter'
+)
+
 const hidePageContentMessage = computed(() => {
-  if (hidePageContentReason.value === 'not ready to tutor') {
-    return `Finish the volunteer Onboarding and Safety Screening tasks on the dashboard to view your NTHS Chapter details`
-  } else {
-    return `Uh oh! It looks like you have indicated that you are not a high school student in your Background Information form. Unfortunately, National Tutoring Honor Society is only available to current high school students. You can keep volunteering with UPchieve, but you will be removed from ${group.value?.groupInfo?.name ?? 'this NTHS chapter'} automatically.`
+  switch (hidePageContentReason.value) {
+    case 'not ready to tutor':
+      return `Finish the volunteer Onboarding and Safety Screening tasks on the dashboard to view your NTHS Chapter details`
+    case 'no occupation':
+      return `We don't have your occupation on file yet. National Tutoring Honor Society is for high school students, so add your background info to see ${chapterName.value}. Not in high school? You can leave the chapter and keep coaching with UPchieve.`
+    default:
+      return `Your profile says you're not in high school. National Tutoring Honor Society is for current high school students, so ${chapterName.value} is unavailable for now. In high school? Update your profile. If not, you can leave the chapter and keep coaching with UPchieve.`
   }
 })
 
+const profileAction = computed(() =>
+  hidePageContentReason.value === 'no occupation'
+    ? {
+        label: 'Add background info',
+        path: '/background-information',
+        phLabel: 'add_background_info',
+      }
+    : { label: 'Update profile', path: '/profile', phLabel: 'update_profile' }
+)
+
 function goToDashboard() {
   router.push('/dashboard')
+}
+
+// The members list is refused to gated members, so the self member comes from the store.
+function onLeaveChapter() {
+  const nthsGroupId = group.value?.groupInfo?.id
+  if (!nthsGroupId) return
+  ModalService.showLeaveTeamModal({
+    isRemovingSelf: true,
+    memberToRemove: {
+      userId: store.state.user.user.id,
+      nthsGroupId,
+    } as GroupMember,
+  })
 }
 
 // The tab strip scrolls horizontally below ~1100px. Landing directly on a tab
@@ -123,6 +155,24 @@ watch(
               >
                 Continue Onboarding
               </LargeButton>
+              <template v-else>
+                <LargeButton
+                  variant="primary-blue"
+                  :showArrow="false"
+                  v-ph:nthshq="profileAction.phLabel"
+                  @click="router.push(profileAction.path)"
+                >
+                  {{ profileAction.label }}
+                </LargeButton>
+                <LargeButton
+                  variant="secondary"
+                  :showArrow="false"
+                  v-ph:nthshq="'leave_chapter'"
+                  @click="onLeaveChapter"
+                >
+                  Leave chapter
+                </LargeButton>
+              </template>
             </div>
           </template>
         </Callout>
@@ -211,6 +261,10 @@ watch(
 }
 .hide-content-container {
   width: 80%;
+
+  @include breakpoint-below('medium') {
+    width: 100%;
+  }
 }
 .callout-content {
   display: flex;

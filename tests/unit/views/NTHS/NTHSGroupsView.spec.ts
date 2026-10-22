@@ -2,12 +2,15 @@ import NTHSGroupsView from '@/views/NTHS/NTHSGroupsView.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { describe, expect, it } from 'vitest'
-import { createStore } from 'vuex'
+import { describe, expect, it, vi } from 'vitest'
+import ModalService from '@/services/ModalService'
+import NetworkService from '@/services/NetworkService'
+import userModule, { type UserStoreState } from '@/store/modules/user'
+import { createStore, type Store } from 'vuex'
 import { h } from 'vue'
 
 type UserOverrides = {
-  occupation?: string[]
+  occupation?: string[] | null
   isReadyToTutor?: boolean
 }
 
@@ -27,15 +30,26 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
       // from admin/member tab visibility - keep it out of the way here.
       user: {
         user: {
-          occupation: userOverrides.occupation ?? [
-            VolunteerOccupations.HIGH_SCHOOL_STUDENT,
-          ],
+          id: 'user-1',
+          occupation:
+            userOverrides.occupation === undefined
+              ? [VolunteerOccupations.HIGH_SCHOOL_STUDENT]
+              : userOverrides.occupation,
         },
       },
     },
     getters: {
+      'user/isVolunteerInHighSchool': (state) =>
+        userModule.getters.isVolunteerInHighSchool(
+          state.user as unknown as UserStoreState
+        ),
       'volunteer/isReadyToTutor': () => userOverrides.isReadyToTutor ?? true,
       'nths/hasAdminRole': () => roleName === 'admin',
+    },
+    mutations: {
+      setOccupation(state, occupation) {
+        state.user.user.occupation = occupation
+      },
     },
   })
 }
@@ -106,9 +120,15 @@ describe('NTHSGroupsView', () => {
         hidden: true,
       },
       {
-        name: 'an admin in the same uncleared state',
+        name: 'an admin with no high-school occupation',
         role: 'admin',
-        overrides: { occupation: [], isReadyToTutor: false },
+        overrides: { occupation: [] },
+        hidden: true,
+      },
+      {
+        name: 'an admin with high school who is not ready to tutor',
+        role: 'admin',
+        overrides: { isReadyToTutor: false },
         hidden: false,
       },
     ])(
@@ -125,5 +145,89 @@ describe('NTHSGroupsView', () => {
         )
       }
     )
+  })
+
+  describe('the high school notice', () => {
+    // A plain member is also not ready to tutor here: the high school notice
+    // must win over the onboarding one.
+    const roles = [
+      { role: 'admin', ready: {} },
+      { role: 'member', ready: { isReadyToTutor: false } },
+    ]
+    it.each(
+      [
+        {
+          name: 'no occupation',
+          overrides: { occupation: [] },
+          text: "We don't have your occupation on file yet",
+          button: 'Add background info',
+          path: '/background-information',
+        },
+        {
+          name: 'a missing occupation',
+          overrides: { occupation: null },
+          text: "We don't have your occupation on file yet",
+          button: 'Add background info',
+          path: '/background-information',
+        },
+        {
+          name: 'occupations without high school',
+          overrides: { occupation: [VolunteerOccupations.UNDERGRAD_STUDENT] },
+          text: "Your profile says you're not in high school",
+          button: 'Update profile',
+          path: '/profile',
+        },
+      ].flatMap((c) => roles.map((r) => ({ ...c, ...r })))
+    )(
+      'offers the right link and leaving to a $role with $name',
+      async ({ role, ready, overrides, text, button, path }) => {
+        const wrapper = await getWrapper('/groups/home', role, {
+          ...overrides,
+          ...ready,
+        })
+        const notice = wrapper.get('[data-testid="hide-page-content"]')
+        expect(notice.text()).toContain(text)
+        expect(notice.text()).not.toMatch(/removed/i)
+
+        const buttons = notice.findAll('button')
+        expect(buttons.map((b) => b.text())).toEqual([button, 'Leave chapter'])
+        await buttons[0].trigger('click')
+        await flushPromises()
+        expect(wrapper.vm.$router.currentRoute.value.path).toBe(path)
+      }
+    )
+
+    it('opens the self-leave confirmation without fetching members', async () => {
+      const spy = vi
+        .spyOn(ModalService, 'showLeaveTeamModal')
+        .mockImplementation(() => undefined as never)
+      const fetchMembers = vi.spyOn(NetworkService, 'getNTHSGroupMembers')
+      const wrapper = await getWrapper('/groups/home', 'admin', {
+        occupation: [],
+      })
+      await wrapper.findAll('button')[1].trigger('click')
+      expect(spy).toHaveBeenCalledWith({
+        isRemovingSelf: true,
+        memberToRemove: { userId: 'user-1', nthsGroupId: 'group-123' },
+      })
+      expect(fetchMembers).not.toHaveBeenCalled()
+    })
+
+    it('clears the notice once a high school occupation is saved', async () => {
+      const wrapper = await getWrapper('/groups/members', 'member', {
+        occupation: [],
+      })
+      expect(wrapper.find('[data-testid="hide-page-content"]').exists()).toBe(
+        true
+      )
+      const { $store } = wrapper.vm as unknown as { $store: Store<unknown> }
+      $store.commit('setOccupation', [VolunteerOccupations.HIGH_SCHOOL_STUDENT])
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="hide-page-content"]').exists()).toBe(
+        false
+      )
+      expect(wrapper.find('[data-testid="routed-members"]').exists()).toBe(true)
+    })
   })
 })

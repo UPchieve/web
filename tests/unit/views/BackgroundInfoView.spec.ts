@@ -15,8 +15,6 @@ const HIGH_SCHOOLER_IN_US = {
   city: 'Denver',
 }
 
-const refreshAfterProfileChange = vi.fn()
-
 function getStore({
   hasExistingStudentSchool = false,
   user = {},
@@ -31,12 +29,6 @@ function getStore({
           hasExistingStudentSchool: () => hasExistingStudentSchool,
         },
         actions: { addToUser: vi.fn() },
-      },
-      nths: {
-        namespaced: true,
-        state: { groups: [] },
-        mutations: { setNTHSGroups: vi.fn() },
-        actions: { refreshAfterProfileChange },
       },
     },
   })
@@ -63,22 +55,6 @@ describe('BackgroundInfoView', () => {
       .fn()
       .mockResolvedValue({ data: { results: [] } })
     NetworkService.addBackgroundInfo = vi.fn().mockResolvedValue({ data: {} })
-    refreshAfterProfileChange.mockClear()
-  })
-
-  // Occupation decides NTHS eligibility, so the sidebar entry and the route
-  // guards stay wrong until the store reloads.
-  it('refreshes NTHS data after saving background info', async () => {
-    const wrapper = await getWrapper()
-    await wrapper.setData(HIGH_SCHOOLER_IN_US)
-
-    await wrapper
-      .findComponent(FormSchoolSearch)
-      .vm.$emit('update:modelValue', 'school-123')
-    await wrapper.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(refreshAfterProfileChange).toHaveBeenCalled()
   })
 
   it('blocks submitting while a US high schooler has no school', async () => {

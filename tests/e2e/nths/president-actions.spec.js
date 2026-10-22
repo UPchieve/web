@@ -134,7 +134,7 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       await hq.goSetup()
       await hq.leaveTeamButton.click()
       await expect(
-        page.getByRole('button', { name: /Remove yourself/ })
+        page.getByRole('button', { name: 'Leave chapter' })
       ).toBeVisible()
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(hq.leaveTeamButton).toBeVisible()

@@ -1,5 +1,4 @@
 import NetworkService from '@/services/NetworkService'
-import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import axios from 'axios'
@@ -121,18 +120,6 @@ export default {
 
       syncNTHSStatusToGleap(rootState, rootGetters)
       return results.data.groups
-    },
-    // A profile save can remove the coach from their chapters, so the sidebar and
-    // route guards go stale. Failure is swallowed because the profile itself saved.
-    async refreshAfterProfileChange({ dispatch }) {
-      try {
-        await dispatch('fetchNthsData')
-      } catch (err) {
-        LoggerService.noticeError(
-          err,
-          'Could not refresh NTHS data after a profile change'
-        )
-      }
     },
     async fetchNTHSGroupMembers({ commit }, groupId) {
       const response = await NetworkService.getNTHSGroupMembers(groupId)
