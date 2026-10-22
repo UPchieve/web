@@ -14,6 +14,7 @@ type AnalyticPersonPropertiesFields = {
   hasTeacherRole: boolean
   onboarded?: boolean
   approved?: boolean
+  sessionsAsTutor?: number
   partner?: string | null
   schoolPartner?: string | null
   partnerSchoolId?: Uuid | null

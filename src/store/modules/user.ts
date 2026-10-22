@@ -841,6 +841,7 @@ export default {
         if (getters.hasVolunteerRole) {
           userProps.onboarded = state.user.isOnboarded
           userProps.approved = state.user.isApproved
+          userProps.sessionsAsTutor = state.user.sessionsAsTutor
 
           const certificationInfo = Object.entries(
             state.user.certifications ?? {}

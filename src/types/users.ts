@@ -156,6 +156,7 @@ export type LegacyUserPublic = {
   timezone?: string
   totalVolunteerHours?: number
   hoursTutored?: number
+  sessionsAsTutor?: number
   hoursTutoredThisWeek?: number
   elapsedAvailability?: number
   references?: ReferencePublic[]

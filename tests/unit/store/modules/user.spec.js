@@ -242,6 +242,17 @@ describe('User store module', () => {
       )
     })
 
+    it('Sets sessionsAsTutor for coaches only', () => {
+      const propsFor = (roles, sessionsAsTutor) =>
+        getStore({
+          user: {
+            state: { user: { roleContext: { roles }, sessionsAsTutor } },
+          },
+        }).getters['user/getUserPropsForAnalytics']()
+      expect(propsFor(['volunteer'], 4).sessionsAsTutor).toBe(4)
+      expect(propsFor(['student'], 4)).not.toHaveProperty('sessionsAsTutor')
+    })
+
     it('Sets certification properties', () => {
       const store = getStore({
         user: {
