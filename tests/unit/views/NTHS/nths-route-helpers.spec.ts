@@ -8,6 +8,7 @@ import {
   redirectBlockedApplicant,
 } from '@/views/NTHS/nths-route-helpers'
 import LoggerService from '@/services/LoggerService'
+import { hoursInMs } from '@/utils/time-utils'
 
 vi.mock('@/services/LoggerService', () => ({
   default: { noticeError: vi.fn() },
@@ -21,6 +22,7 @@ type StoreShape = {
   applicationPageOn?: boolean
   canApply?: boolean
   reasons?: string[]
+  expiresAt?: string | null
 }
 
 // Only the fields nthsDestination reads, so a change to any of them is visible
@@ -31,6 +33,7 @@ function fakeStore({
   applicationPageOn = true,
   canApply = true,
   reasons = [],
+  expiresAt = null,
 }: StoreShape) {
   return {
     state: {
@@ -38,6 +41,7 @@ function fakeStore({
         NTHSGroups: groups,
         NTHSCandidateApplicationStatus: status,
         canApplyForNTHSPresident: canApply,
+        approvalExpiresAt: expiresAt,
         NTHSApplicationIneligibilityReasons: reasons,
       },
     },
@@ -77,6 +81,19 @@ describe('nthsDestination', () => {
       )
     ).toBe('create')
   })
+
+  const HOUR = hoursInMs(1)
+  it.each([
+    ['approved', HOUR, 'create'],
+    ['approved', -HOUR, 'expired'],
+    ['applied', -HOUR, 'pending'],
+  ])(
+    'routes %s with an expiry %ims from now to %s',
+    (status, offset, expected) => {
+      const expiresAt = new Date(Date.now() + offset).toISOString()
+      expect(nthsDestination(fakeStore({ status, expiresAt }))).toBe(expected)
+    }
+  )
 
   it('sends someone under review to the pending page', () => {
     expect(nthsDestination(fakeStore({ status: 'applied' }))).toBe('pending')
@@ -193,6 +210,7 @@ describe('resolveNthsRoute', () => {
     ['/groups/apply', 'apply'],
     ['/groups/apply/form', 'apply'],
     ['/groups/application-pending', 'pending'],
+    ['/groups/application-expired', 'expired'],
     ['/groups/create', 'create'],
     ['/groups', 'group'],
   ] as const
@@ -201,6 +219,10 @@ describe('resolveNthsRoute', () => {
     apply: { status: undefined },
     pending: { status: 'applied' },
     create: { status: 'approved' },
+    expired: {
+      status: 'approved',
+      expiresAt: new Date(Date.now() - 1000).toISOString(),
+    },
     group: { groups: [{ groupId: 123 }] },
   } as const
 

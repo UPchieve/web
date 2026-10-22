@@ -15,7 +15,7 @@
           <template v-slot:content>
             Your responses in this form indicate that you are not currently a
             high school student. Don't worry— you can still volunteer! However,
-            we have removed you from your National Tutoring Honors Society
+            we have removed you from your National Tutoring Honor Society
             chapter since that program is for current high school students only.
           </template>
         </Callout>

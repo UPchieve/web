@@ -84,6 +84,25 @@ describe('nths/fetchNthsData', () => {
       expect(getNTHSApplicationDraft(USER_ID) !== undefined).toBe(keepsDraft)
     }
   )
+
+  it('stores the approval deadline from the chapter list', async () => {
+    const approvalExpiresAt = '2026-11-20T15:00:00.000Z'
+    vi.mocked(NetworkService.getNTHSGroupsForUser).mockResolvedValue({
+      data: {
+        groups: [],
+        candidateApplicationStatus: 'approved',
+        approvalExpiresAt,
+      },
+    } as never)
+    vi.mocked(NetworkService.getNTHSApplicationEligibility).mockResolvedValue({
+      data: { eligible: false },
+    } as never)
+    const store = getStore()
+
+    await store.dispatch('nths/fetchNthsData')
+
+    expect(store.state.nths.approvalExpiresAt).toBe(approvalExpiresAt)
+  })
 })
 
 const DYNAMIC_CHECKLIST: NTHSChecklistPublic = {

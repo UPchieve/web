@@ -44,7 +44,7 @@ const hidePageContentMessage = computed(() => {
   if (hidePageContentReason.value === 'not ready to tutor') {
     return `Finish the volunteer Onboarding and Safety Screening tasks on the dashboard to view your NTHS Chapter details`
   } else {
-    return `Uh oh! It looks like you have indicated that you are not a high school student in your Background Information form. Unfortunately, National Tutoring Honors Society is only available to current high school students. You can keep volunteering with UPchieve, but you will be removed from ${group.value?.groupInfo?.name ?? 'this NTHS chapter'} automatically.`
+    return `Uh oh! It looks like you have indicated that you are not a high school student in your Background Information form. Unfortunately, National Tutoring Honor Society is only available to current high school students. You can keep volunteering with UPchieve, but you will be removed from ${group.value?.groupInfo?.name ?? 'this NTHS chapter'} automatically.`
   }
 })
 

@@ -43,6 +43,7 @@ export default {
     NTHSGroupMembers: {},
     NTHSChecklistData: null as NTHSChecklistPublic | null,
     NTHSCandidateApplicationStatus: undefined,
+    approvalExpiresAt: null as string | null,
     canApplyForNTHSPresident: false,
     NTHSApplicationIneligibilityReasons: [],
   },
@@ -89,6 +90,9 @@ export default {
     setNTHSCandidateApplicationStatus: (state, status) => {
       state.NTHSCandidateApplicationStatus = status
     },
+    setApprovalExpiresAt(state, expiresAt: string | null) {
+      state.approvalExpiresAt = expiresAt
+    },
     setCanApplyForNTHSPresident(state, isEligible) {
       state.canApplyForNTHSPresident = isEligible
     },
@@ -97,9 +101,6 @@ export default {
     },
   },
   actions: {
-    setNTHSCandidateApplicationStatus: (state, status) => {
-      state.NTHSCandidateApplicationStatus = status
-    },
     async fetchNthsData({ commit, rootState, rootGetters }) {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
@@ -107,6 +108,7 @@ export default {
         'setNTHSCandidateApplicationStatus',
         results.data.candidateApplicationStatus
       )
+      commit('setApprovalExpiresAt', results.data.approvalExpiresAt ?? null)
       if (results.data.candidateApplicationStatus)
         clearNTHSApplicationDraft(rootState.user?.user?.id)
 

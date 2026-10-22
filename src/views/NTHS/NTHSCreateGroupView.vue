@@ -6,11 +6,17 @@ import { useRouter } from 'vue-router'
 import { computed, ref, watch } from 'vue'
 import LoggerService from '@/services/LoggerService'
 import { isErrorWithResponse } from '@/utils/error-utils'
+import { dayjs } from '@/utils/time-utils'
+import NTHSPageLayout from '@/components/NTHS/NTHSPageLayout.vue'
 
 const store = useStore()
 const router = useRouter()
 const hasGroup = computed(() => store.state.nths.NTHSGroups.length)
 const errorMessage = ref('')
+const approvalDeadline = computed(() => {
+  const expiresAt = store.state.nths.approvalExpiresAt
+  return expiresAt ? dayjs(expiresAt).format('MMMM D [at] h A') : null
+})
 
 watch(
   () => hasGroup.value,
@@ -50,87 +56,35 @@ async function createTeam() {
 </script>
 
 <template>
-  <div class="page">
-    <div class="container">
-      <form autocomplete="off" class="content" @submit.prevent="createTeam">
-        <h1 class="title">National Tutoring Honors Society</h1>
-        <span>
-          Create an NTHS Chapter to help more under-resourced students get free,
-          on-demand academic and college support
-        </span>
-        <span class="error" v-if="errorMessage.length">{{ errorMessage }}</span>
-        <div class="actions">
-          <LargeButton variant="primary-blue" :show-arrow="false" type="submit"
-            >Create NTHS Chapter</LargeButton
-          >
-        </div>
-      </form>
-      <div class="footer">
-        <img class="image" src="@/assets/nths/create-team.png" aria-hidden />
+  <NTHSPageLayout>
+    <form autocomplete="off" class="form" @submit.prevent="createTeam">
+      <span>
+        Create an NTHS Chapter to help more under-resourced students get free,
+        on-demand academic and college support
+      </span>
+      <span v-if="approvalDeadline"
+        >You have until {{ approvalDeadline }} to start your chapter.</span
+      >
+      <span class="error" v-if="errorMessage.length">{{ errorMessage }}</span>
+      <div class="actions">
+        <LargeButton variant="primary-blue" :show-arrow="false" type="submit"
+          >Create NTHS Chapter</LargeButton
+        >
       </div>
-    </div>
-  </div>
+    </form>
+  </NTHSPageLayout>
 </template>
 
 <style lang="scss" scoped>
-.title {
-  font-weight: 500;
-  @include breakpoint-below('medium') {
-    font-size: 24px;
-  }
-}
-
-.page {
+.form {
   display: flex;
-  width: 100%;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 32px;
-}
-.container {
-  border-radius: 8px;
-  width: 100%;
-  background-color: #fff;
-  overflow: hidden;
-  box-shadow:
-    3px 3px 3px $c-shadow-header,
-    -3px 3px 3px $c-shadow-header;
-
-  @include breakpoint-above('medium') {
-    max-width: 600px;
-  }
-}
-.content {
-  padding: 32px;
   gap: 12px;
-  display: flex;
-  flex-direction: column;
-}
-.footer {
-  display: flex;
-  justify-content: center;
-  background-color: $upchieve-green;
-  background-color: color-mix(in oklab, $upchieve-green, white 70%);
-  padding: 24px;
 }
 .actions {
   display: flex;
   justify-content: center;
 }
-.image {
-  max-height: 233px;
-}
-.header {
-  padding: 1em 1em 0 1em;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  @include breakpoint-below('large') {
-    flex-direction: column;
-  }
-}
-
 .error {
   color: $c-error-red;
 }

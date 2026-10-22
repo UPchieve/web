@@ -2,14 +2,21 @@ import type { Store } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
+import { dayjs } from '@/utils/time-utils'
 
-export type NTHSDestination = 'group' | 'create' | 'pending' | 'apply'
+export type NTHSDestination =
+  | 'group'
+  | 'create'
+  | 'pending'
+  | 'apply'
+  | 'expired'
 
 export const NTHS_DESTINATION_PATHS: Record<NTHSDestination, string> = {
   group: '/groups',
   create: '/groups/create',
   pending: '/groups/application-pending',
   apply: '/groups/apply',
+  expired: '/groups/application-expired',
 }
 
 // Lives here rather than in SidebarLinks so the Record keeps a new destination
@@ -20,6 +27,7 @@ export const NTHS_DESTINATION_LABELS: Record<NTHSDestination, string> = {
   create: 'NTHS',
   pending: 'NTHS application',
   apply: 'Apply to NTHS',
+  expired: 'NTHS',
 }
 
 // A rejection here would abort the navigation and leave every NTHS route
@@ -48,10 +56,15 @@ export function nthsDestination(
     NTHSGroups,
     NTHSCandidateApplicationStatus,
     canApplyForNTHSPresident,
+    approvalExpiresAt,
   } = store.state.nths
 
   if (NTHSGroups.length > 0) return 'group'
-  if (NTHSCandidateApplicationStatus === 'approved') return 'create'
+  if (NTHSCandidateApplicationStatus === 'approved') {
+    if (approvalExpiresAt && !dayjs(approvalExpiresAt).isAfter(dayjs()))
+      return 'expired'
+    return 'create'
+  }
   if (NTHSCandidateApplicationStatus === 'applied') return 'pending'
 
   if (!store.getters['featureFlags/isNTHSApplicationPageEnabled']) return

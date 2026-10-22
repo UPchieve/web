@@ -97,6 +97,8 @@ const NTHSApplicationFormView = () =>
   import('@/views/NTHS/NTHSApplicationFormView.vue')
 const NTHSApplicationPending = () =>
   import('./views/NTHS/NTHSApplicationPending.vue')
+const NTHSApplicationExpired = () =>
+  import('./views/NTHS/NTHSApplicationExpired.vue')
 const StandaloneBotChatView = () =>
   import('./views/BotConversationsView/StandaloneBotChatView.vue')
 const Totp = () => import('./views/Totp/index.vue')
@@ -985,6 +987,13 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('pending')],
   },
   {
+    path: '/groups/application-expired',
+    name: 'NTHSApplicationExpired',
+    component: NTHSApplicationExpired,
+    meta: { protected: true },
+    beforeEnter: [switchToVolunteerOrCancel, nthsRouteGuard('expired')],
+  },
+  {
     path: '/groups/create',
     name: 'NTHSCreateGroupView',
     component: NTHSCreateGroupView,
@@ -1008,6 +1017,7 @@ const routes: RouteRecordRaw[] = [
           NTHSApplicationView,
           NTHSCreateGroupView,
           NTHSApplicationPending,
+          NTHSApplicationExpired,
           ...VOLUNTEER_SIDEBAR_LINKED_VIEWS,
         ],
       },
