@@ -199,6 +199,7 @@ onUnmounted(() => {
     :style="{
       left: `${position.left}px`,
       top: `${position.top}px`,
+      '--widget-top': `${position.top}px`,
       width: `${position.width}px`,
       height: `${position.height}px`,
     }"

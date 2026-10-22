@@ -1270,6 +1270,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// iOS Safari with a hardware keyboard scrolls the page, and the fixed app header
+// with it, up 66px when the focused caret is near the bottom. On an iPad the chat
+// textarea held at 100px, but a caret on a line flush with the bottom of the doc
+// editor's scroller needed 130.
+$ios-keyboard-bar-clearance: 130px;
+
 /*
   * @notes
   * [1] Refactoring candidate: these styles should be placed in the container
@@ -1338,6 +1344,25 @@ export default {
     padding: 20px;
     grid-template-columns: repeat(3, 1fr) minmax(300px, 1fr);
     grid-template-rows: minmax(min-content, max-content) 1fr;
+
+    // Phones need no clearance: below 768px mobileMode hides the session header,
+    // and on iOS device-width is the portrait screen width in either orientation
+    // (440px at most on an iPhone, 744px at least on an iPad).
+    @media (min-device-width: 700px) {
+      // -webkit-touch-callout parses only on iOS-family WebKit, including
+      // iPadOS Safari with a Mac user agent.
+      @supports (-webkit-touch-callout: none) {
+        padding-bottom: $ios-keyboard-bar-clearance;
+
+        // The AI widget is absolutely positioned, so padding does not constrain it.
+        :deep(.widget-container) {
+          max-height: min(
+            80vh,
+            calc(100% - var(--widget-top) - #{$ios-keyboard-bar-clearance})
+          );
+        }
+      }
+    }
   }
 
   @include breakpoint-above('large') {
