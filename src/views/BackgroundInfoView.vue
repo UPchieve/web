@@ -170,6 +170,7 @@
                 startSearchEvent=""
                 cannotFindSchoolEvent=""
                 selectedEvent=""
+                :defaultValue="profileSchoolName"
                 v-model="highSchoolId"
                 v-model:cannotFindSchool="cannotFindHighSchool"
               />
@@ -306,13 +307,14 @@ export default {
     FormInput,
   },
   data() {
+    const { occupation, gradeLevel, schoolId } = this.$store.state.user.user
     return {
       options: {
         occupations: VolunteerOccupations,
       },
       showInputErrors: false,
       formError: '',
-      occupations: [],
+      occupations: [...(occupation ?? [])],
       linkedInUrl: '',
       wasSubmitted: false,
       country: '',
@@ -320,7 +322,7 @@ export default {
       city: '',
       college: '',
       company: '',
-      highSchoolId: null,
+      highSchoolId: schoolId ?? null,
       cannotFindHighSchool: false,
       signupSourceId: '',
       signupSourcesOptions: [],
@@ -330,7 +332,7 @@ export default {
       phoneInputData: {},
       phoneNumber: '',
       showRemovedFromNTHSMessage: false,
-      gradeLevel: '',
+      gradeLevel: gradeLevel ?? '',
     }
   },
   async beforeMount() {
@@ -402,16 +404,19 @@ export default {
       )
       return otherOption && otherOption.id === this.signupSourceId
     },
+    profileSchoolName() {
+      return this.user.schoolName ?? ''
+    },
     signedUpWithGoogle() {
       return !isEmpty(this.user.issuers)
     },
   },
   watch: {
     // v-if unmounts the school field, so the values it drives are reset here to
-    // keep them from going stale behind a blank field
+    // match what the search box shows when it mounts again
     shouldShowSchoolField(shows) {
       if (!shows) {
-        this.highSchoolId = null
+        this.highSchoolId = this.user.schoolId ?? null
         this.cannotFindHighSchool = false
       }
     },

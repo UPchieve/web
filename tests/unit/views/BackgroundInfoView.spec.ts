@@ -1,5 +1,6 @@
 import BackgroundInfoView from '@/views/BackgroundInfoView.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
+import GradeLevelSelect from '@/components/GradeLevelSelect.vue'
 import NetworkService from '@/services/NetworkService'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils'
@@ -16,12 +17,15 @@ const HIGH_SCHOOLER_IN_US = {
 
 const refreshAfterProfileChange = vi.fn()
 
-function getStore({ hasExistingStudentSchool = false } = {}) {
+function getStore({
+  hasExistingStudentSchool = false,
+  user = {},
+}: { hasExistingStudentSchool?: boolean; user?: object } = {}) {
   return createStore({
     modules: {
       user: {
         namespaced: true,
-        state: { user: {} },
+        state: { user },
         getters: {
           isStudentVolunteer: () => false,
           hasExistingStudentSchool: () => hasExistingStudentSchool,
@@ -38,7 +42,7 @@ function getStore({ hasExistingStudentSchool = false } = {}) {
   })
 }
 
-async function getWrapper(storeOverrides = {}) {
+async function getWrapper(storeOverrides: Parameters<typeof getStore>[0] = {}) {
   const wrapper = mount(BackgroundInfoView, {
     global: { plugins: [getStore(storeOverrides)] },
   })
@@ -170,5 +174,88 @@ describe('BackgroundInfoView', () => {
       -1
     )[0]
     expect(payload.highSchoolId).toBeUndefined()
+  })
+
+  describe('with a profile already on file', () => {
+    const user = {
+      occupation: [
+        VolunteerOccupations.HIGH_SCHOOL_STUDENT,
+        VolunteerOccupations.WORKING_PART_TIME,
+      ],
+      gradeLevel: '11th',
+      schoolId: 'school-on-file',
+      schoolName: 'Lincoln High School',
+    }
+
+    it('starts from the stored occupations, grade and school', async () => {
+      const wrapper = await getWrapper({ user })
+      await wrapper.setData({ country: 'United States of America' })
+
+      for (const occupation of user.occupation)
+        expect(wrapper.find(`[id="${occupation}"]`).element).toHaveProperty(
+          'checked',
+          true
+        )
+      expect(wrapper.findComponent(GradeLevelSelect).props('modelValue')).toBe(
+        '11th'
+      )
+      expect(
+        wrapper.findComponent(FormSchoolSearch).props('defaultValue')
+      ).toBe('Lincoln High School')
+    })
+
+    it('saves every prefilled occupation and the stored school', async () => {
+      const wrapper = await getWrapper({ user })
+      await wrapper.setData({
+        country: 'United States of America',
+        state: 'CO',
+        city: 'Denver',
+        company: 'Acme',
+      })
+
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      expect(NetworkService.addBackgroundInfo).toHaveBeenCalledWith(
+        expect.objectContaining({
+          occupation: user.occupation,
+          gradeLevel: '11th',
+          highSchoolId: 'school-on-file',
+        })
+      )
+    })
+
+    it('puts the stored school back when the school field is hidden and reshown', async () => {
+      const wrapper = await getWrapper({ user })
+      await wrapper.setData({
+        country: 'United States of America',
+        state: 'CO',
+        city: 'Denver',
+        company: 'Acme',
+      })
+      await wrapper
+        .findComponent(FormSchoolSearch)
+        .vm.$emit('update:modelValue', null)
+      expect(submitButton(wrapper).attributes('disabled')).toBeDefined()
+
+      // the search box remounts showing the stored school
+      await wrapper.setData({ occupations: [] })
+      await wrapper.setData({ occupations: user.occupation })
+
+      expect(submitButton(wrapper).attributes('disabled')).toBeUndefined()
+    })
+  })
+
+  it('starts blank for a coach with nothing on file', async () => {
+    const wrapper = await getWrapper()
+    await wrapper.setData({
+      country: 'United States of America',
+      occupations: [VolunteerOccupations.HIGH_SCHOOL_STUDENT],
+    })
+
+    expect(wrapper.findComponent(GradeLevelSelect).props('modelValue')).toBe('')
+    expect(wrapper.findComponent(FormSchoolSearch).props('defaultValue')).toBe(
+      ''
+    )
   })
 })

@@ -145,7 +145,8 @@ export default {
 
   data() {
     return {
-      school: {},
+      // a preselected school satisfies the required check until the user searches again
+      school: this.defaultValue ? { name: this.defaultValue } : {},
       hasStartedSearchingForSchool: false,
     }
   },

@@ -116,6 +116,20 @@ describe('FormSchoolSearch', () => {
     wrapper.unmount()
   })
 
+  it('does not flag a preselected school as missing', async () => {
+    const wrapper = getWrapper({
+      isRequired: true,
+      defaultValue: SCHOOL.name,
+    })
+
+    await wrapper.find('input').trigger('blur')
+    await flushPromises()
+
+    expect(wrapper.find('.error-caption').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('unsets cannotFindSchool as soon as the user searches again', async () => {
     const wrapper = getWrapper({ allowCannotFindSchool: true })
     await search(wrapper, 'Central')
