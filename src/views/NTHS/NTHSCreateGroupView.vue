@@ -7,6 +7,7 @@ import { computed, ref, watch } from 'vue'
 import LoggerService from '@/services/LoggerService'
 import { isErrorWithResponse } from '@/utils/error-utils'
 import { dayjs } from '@/utils/time-utils'
+import { nthsDestination } from '@/views/NTHS/nths-route-helpers'
 import NTHSPageLayout from '@/components/NTHS/NTHSPageLayout.vue'
 
 const store = useStore()
@@ -15,7 +16,7 @@ const hasGroup = computed(() => store.state.nths.NTHSGroups.length)
 const errorMessage = ref('')
 const approvalDeadline = computed(() => {
   const expiresAt = store.state.nths.approvalExpiresAt
-  return expiresAt ? dayjs(expiresAt).format('MMMM D [at] h A') : null
+  return expiresAt ? dayjs(expiresAt).format('MMMM Do [at] h:mmA z') : null
 })
 
 watch(
@@ -38,11 +39,13 @@ async function createTeam() {
       if (e.response.data.err === 'User already in a group') {
         router.replace('/groups')
       } else if (e.response.status === 422) {
-        // A 422 here is a rule the applicant has run into rather than a fault:
-        // most often another chapter already covers their school, which staff
-        // resolve by handing over that chapter's invite code. The server's
-        // message is already the one to show them.
-        errorMessage.value = e.response.data.err
+        // Besides an expired approval, 422 covers rule hits such as a school
+        // already claimed, whose message is shown as is.
+        if (nthsDestination(store) === 'expired') {
+          router.replace('/groups/application-expired')
+        } else {
+          errorMessage.value = e.response.data.err
+        }
       } else {
         errorMessage.value = `Unknown error, please try again: ${e.response.data.err}`
         LoggerService.noticeError(e.response.data.err)
@@ -59,11 +62,11 @@ async function createTeam() {
   <NTHSPageLayout>
     <form autocomplete="off" class="form" @submit.prevent="createTeam">
       <span>
-        Create an NTHS Chapter to help more under-resourced students get free,
-        on-demand academic and college support
+        Create an NTHS chapter to help students across the U.S. get free,
+        on-demand academic support!
       </span>
       <span v-if="approvalDeadline"
-        >You have until {{ approvalDeadline }} to start your chapter.</span
+        >Deadline to create chapter: {{ approvalDeadline }}</span
       >
       <span class="error" v-if="errorMessage.length">{{ errorMessage }}</span>
       <div class="actions">

@@ -54,6 +54,12 @@ const mountView = (
             return h('div', this.$slots.default?.())
           },
         },
+        RouterLink: {
+          props: ['to'],
+          render() {
+            return h('a', { href: this.to }, this.$slots.default?.())
+          },
+        },
         Loader: true,
         FormErrors: true,
         FormInput: true,
@@ -115,9 +121,8 @@ describe('JoinNTHSGroupView', () => {
       const wrapper = mountView()
       await flushPromises()
 
-      expect(wrapper.text()).toContain('This chapter has closed')
       expect(wrapper.text()).toContain(
-        "Test Chapter has closed and isn't accepting new members."
+        "Test Chapter isn't accepting new members"
       )
       expect(wrapper.find('[data-testid="button-submit"]').exists()).toBe(false)
       expect(
@@ -145,6 +150,21 @@ describe('JoinNTHSGroupView', () => {
       await wrapper.find(`[data-testid="${testid}"]`).trigger('click')
 
       expect(push).toHaveBeenCalledWith(path)
+    })
+
+    it('gives a signed-out visitor a log in link back to the invite', async () => {
+      const wrapper = mountView()
+      await flushPromises()
+
+      const link = wrapper.find('[data-testid="link-log-in"]')
+      expect(link.text()).toBe('Log in')
+      const redirect = new URL(
+        link.attributes('href') as string,
+        'http://localhost'
+      ).searchParams.get('redirect')
+      expect(redirect).toBe(
+        '/join-team/TEAM123?inviteCode=TEAM123&referral=PERSON123'
+      )
     })
 
     it('offers the dashboard to a signed-in coach who opened the link directly', async () => {

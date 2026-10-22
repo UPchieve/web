@@ -114,6 +114,24 @@ function confirmUser() {
   verifyUser.value = false
 }
 
+function loginPath(
+  data: Record<string, string>,
+  extra: Record<string, string> = {}
+) {
+  const redirectUriParams = new URLSearchParams({
+    redirect: `/join-team/${inviteCode.value}?${new URLSearchParams(data).toString()}`,
+    ...extra,
+  })
+  return '/login?' + redirectUriParams.toString()
+}
+
+const closedLoginPath = computed(() =>
+  loginPath({
+    inviteCode: inviteCode.value as string,
+    ...(referralCode.value ? { referral: referralCode.value } : {}),
+  })
+)
+
 async function addVolunteerToTeam() {
   isLoading.value = true
 
@@ -141,18 +159,18 @@ async function addVolunteerToTeam() {
       ...(referralCode.value ? { referral: referralCode.value } : {}),
     }
     if (response.data.isExistingVolunteer) {
-      const redirectUriParams = new URLSearchParams({
-        redirect: `/join-team/${inviteCode.value}?${new URLSearchParams(data).toString()}`,
-        email: email.value as string,
-        message: 'Sign in to finish joining your team!',
-      })
       AnalyticsService.captureEvent(
         EVENTS.VOLUNTEER_JOIN_TEAM_REDIRECT_TO_LOGIN,
         {
           inviteCode: inviteCode.value,
         }
       )
-      $router.push('/login?' + redirectUriParams.toString())
+      $router.push(
+        loginPath(data, {
+          email: email.value as string,
+          message: 'Sign in to finish joining your team!',
+        })
+      )
     } else {
       AnalyticsService.captureEvent(
         EVENTS.VOLUNTEER_JOIN_TEAM_REDIRECT_TO_SIGN_UP,
@@ -190,35 +208,61 @@ async function addVolunteerToTeam() {
     <form-errors v-if="errorMessage" :errors="[errorMessage]" />
 
     <div v-if="team.closedAt && !isLoading" data-testid="chapter-closed">
-      <h1>This chapter has closed</h1>
+      <h1>{{ team.name }} isn't accepting new members</h1>
       <p class="mt-4">
-        {{ team.name }} has closed and isn't accepting new members.
+        Thanks so much for your interest in {{ team.name }}. Unfortunately, this
+        chapter isn't accepting new members right now.
       </p>
-      <button
-        v-if="isSignedIn"
-        type="button"
-        class="uc-form-button"
-        data-testid="button-go-to-dashboard"
-        v-ph:nths="'join_closed.dashboard'"
-        @click="$router.push('/dashboard')"
-      >
-        Go to dashboard
-      </button>
-      <button
-        v-else
-        type="button"
-        class="uc-form-button"
-        data-testid="button-sign-up"
-        v-ph:nths="'join_closed.sign_up'"
-        @click="
-          $router.push({
-            path: '/sign-up/volunteer',
-            query: referralCode ? { referral: referralCode } : {},
-          })
-        "
-      >
-        Sign up as a coach
-      </button>
+      <template v-if="isSignedIn">
+        <p class="mt-4">
+          Still interested in tutoring and earning volunteer hours?
+        </p>
+        <button
+          type="button"
+          class="uc-form-button"
+          data-testid="button-go-to-dashboard"
+          v-ph:nths="'join_closed.dashboard'"
+          @click="$router.push('/dashboard')"
+        >
+          Tutoring dashboard
+        </button>
+      </template>
+      <template v-else>
+        <p class="mt-4">
+          You can still earn volunteer hours by tutoring on UPchieve!
+        </p>
+        <p class="mt-2">✅ 100% flexible schedule</p>
+        <p>✅ No experience required</p>
+        <p class="mt-2">
+          Choose from 30+ subjects to tutor, including 6th Grade Math, Reading,
+          Middle School Science, and more. Earn verified volunteer hours and
+          make a real impact in your downtime.
+        </p>
+        <button
+          type="button"
+          class="uc-form-button"
+          data-testid="button-sign-up"
+          v-ph:nths="'join_closed.sign_up'"
+          @click="
+            $router.push({
+              path: '/sign-up/volunteer',
+              query: referralCode ? { referral: referralCode } : {},
+            })
+          "
+        >
+          Sign up as a coach
+        </button>
+        <p class="sub mt-3">
+          Already have an account?
+          <router-link
+            class="uc-link"
+            data-testid="link-log-in"
+            v-ph:nths="'join_closed.log_in'"
+            :to="closedLoginPath"
+            >Log in</router-link
+          >
+        </p>
+      </template>
       <p class="sub mt-3">
         <a
           class="uc-link"
