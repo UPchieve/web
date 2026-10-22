@@ -144,6 +144,7 @@ export default defineConfig({
       'vuetify/components/VDatePicker',
       'vuetify/components/VIcon',
       'vuetify/components/VMenu',
+      'vuetify/components/VProgressCircular',
       'vuetify/components/VProgressLinear',
       'vuetify/components/VSelect',
       'vuetify/components/VTextField',
