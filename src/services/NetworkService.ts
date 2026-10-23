@@ -93,6 +93,17 @@ export function isNetworkError(err: unknown): err is NetworkError {
   return err instanceof NetworkError
 }
 
+export type NTHSCloseStatus = 'closed' | 'alreadyClosed' | 'notFound' | 'failed'
+export type NTHSCloseChapter = {
+  id: string
+  name: string
+  createdAt: string
+  closedAt: string | null
+  schoolName: string | null
+  currentMemberCount: number
+  presidents: { firstName: string; lastName: string }[]
+}
+
 export const axiosInstance = axios.create({
   withCredentials: true,
   baseURL: config.serverRoot,
@@ -294,6 +305,18 @@ export function updateNTHSChecklistItemProgress(
     `${API_ROOT}/nths-groups/${groupId}/checklist/${encodeURIComponent(itemKey)}`,
     data
   )
+}
+
+export function adminNTHSGetChapters(ids: string[]) {
+  return httpGet<{ chapters: NTHSCloseChapter[] }>(
+    `${ADMIN_ROOT}/nths/chapters?ids=${ids.map(encodeURIComponent).join(',')}`
+  )
+}
+
+export function adminNTHSCloseChapters(chapterIds: string[]) {
+  return httpPost<{
+    results: { chapterId: string; status: NTHSCloseStatus }[]
+  }>(`${ADMIN_ROOT}/nths/chapters/close`, { chapterIds })
 }
 
 export default {

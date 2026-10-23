@@ -11,6 +11,7 @@ import { useAppModalStore } from '@/stores/app/modal'
 const AdminView = () => import('./views/Admin/index.vue')
 const AdminCleverRoster = () => import('./views/Admin/AdminCleverRoster.vue')
 const AdminNTHS = () => import('./views/Admin/AdminNTHS.vue')
+const AdminNTHSClose = () => import('./views/Admin/AdminNTHSClose.vue')
 const AdminEditSchool = () => import('./views/Admin/AdminEditSchool.vue')
 const AdminIneligibleStudents = () =>
   import('./views/Admin/AdminIneligibleStudents.vue')
@@ -802,6 +803,12 @@ const routes: RouteRecordRaw[] = [
     path: '/admin/nths',
     name: 'AdminNTHS',
     component: AdminNTHS,
+    meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/nths/close',
+    name: 'AdminNTHSClose',
+    component: AdminNTHSClose,
     meta: { protected: true, requiresAdmin: true },
   },
   {
