@@ -560,6 +560,12 @@ export default {
 
     getTipTapMessageText() {
       if (!this.editor) return { text: '', isLatex: false }
+      let isLatex = false
+      this.editor.state.doc.descendants((node) => {
+        if (node.type.name === 'inlineMath') {
+          isLatex = true
+        }
+      })
       const text = this.editor
         .getText({
           textSerializers: {
@@ -567,7 +573,7 @@ export default {
           },
         })
         .trim()
-      return { text, isLatex: /\$[^$]+\$/.test(text) }
+      return { text, isLatex }
     },
 
     resetComposer() {

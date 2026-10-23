@@ -371,6 +371,41 @@ describe('SessionChat', () => {
     })
   })
 
+  describe('getTipTapMessageText', () => {
+    it('does not treat two currency amounts as math', () => {
+      const wrapper = getWrapper()
+      const message = 'It costs $5 to rent and $20 to buy'
+
+      wrapper.vm.editor.commands.setContent(message)
+
+      expect(wrapper.vm.getTipTapMessageText()).toEqual({
+        text: message,
+        isLatex: false,
+      })
+    })
+
+    it('treats an inline math node as math', () => {
+      const wrapper = getWrapper()
+      wrapper.vm.editor.commands.setContent({
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'The answer is ' },
+              { type: 'inlineMath', attrs: { latex: 'x^2 + 3' } },
+            ],
+          },
+        ],
+      })
+
+      expect(wrapper.vm.getTipTapMessageText()).toEqual({
+        text: 'The answer is $x^2 + 3$',
+        isLatex: true,
+      })
+    })
+  })
+
   it('Sends a message when Enter comes right after typing', async () => {
     const wrapper = getWrapper()
     // Render first, so isComposerEmpty has cached the empty composer.
