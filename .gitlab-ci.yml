@@ -15,7 +15,7 @@ cache:
     - .pnpm-store
 
 .node_setup:
-  image: node:24.15.0-trixie
+  image: node:24.22.1-trixie
   before_script:
     - corepack enable pnpm
     - pnpm config set store-dir .pnpm-store
