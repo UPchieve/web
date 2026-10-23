@@ -27,12 +27,20 @@ function syncNTHSStatusToGleap(
     state: rootState,
     getters: rootGetters,
   })
-  // every signed-in user runs this, not just coaches
-  if (!destination) return
-
   const userId = rootState.user?.user?.id
   if (!userId) return
-  AnalyticsService.setContactCustomData(userId, { nthsStatus: destination })
+
+  const groups = rootState.nths.NTHSGroups ?? []
+  const customData = {
+    ...(destination ? { nthsStatus: destination } : {}),
+    isNthsMember: groups.length > 0,
+    isNthsAdmin: groups.some((group) => group.memberInfo.roleName === 'admin'),
+    isNthsPresident: groups.some(
+      (group) => group.memberInfo.title === 'President'
+    ),
+  }
+  // every signed-in user runs this, not just coaches
+  AnalyticsService.setContactCustomData(userId, customData)
 }
 
 export default {
