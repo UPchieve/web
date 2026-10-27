@@ -937,6 +937,7 @@ export default {
       try {
         const sessionId = this.currentSession.id
         const userId = this.user.id
+        if (!sessionId || !userId) return
         await NetworkService.updateSessionLastSeen(sessionId, userId)
         this.$store.dispatch('user/fetchUnreadDMs')
       } catch (error) {

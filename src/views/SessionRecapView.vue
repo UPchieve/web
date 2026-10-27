@@ -148,6 +148,7 @@
               </button>
             </div>
             <session-chat
+              v-if="isRecapSessionLoaded"
               class="chat__dms-session-chat"
               :currentSession="recapSession"
               :shouldHideChatSection="false"
@@ -238,6 +239,7 @@
             </span>
           </div>
           <session-chat
+            v-if="isRecapSessionLoaded"
             class="chat__dms-session-chat"
             :currentSession="recapSession"
             :shouldHideChatSection="false"
@@ -339,6 +341,9 @@ export default {
     },
     volunteerAvatar() {
       return VolunteerIcon
+    },
+    isRecapSessionLoaded() {
+      return !!this.session?.id && this.recapSession?.id === this.session.id
     },
     isJoinedSessionSocketReadyToEmit() {
       return [this.isConnected, this.session?.id]
@@ -468,6 +473,7 @@ export default {
   },
   async beforeUnmount() {
     socket.emit('sessions/recap:leave', { sessionId: this.session.id })
+    this.$store.commit('user/setRecapSession', {})
     if (this.zwibblerCtx?.leaveSharedSession) {
       await this.zwibblerCtx.leaveSharedSession()
     }

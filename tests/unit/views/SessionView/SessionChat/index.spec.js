@@ -4,6 +4,7 @@ import { createStore } from 'vuex'
 import SessionChat from '@/views/SessionView/SessionChat/index.vue'
 import { storeOptions } from '@/store'
 import ModerationService from '@/services/ModerationService'
+import NetworkService from '@/services/NetworkService'
 
 vi.mock('mathlive', () => ({}))
 window.mathVirtualKeyboard = { container: null, hide: vi.fn() }
@@ -426,5 +427,32 @@ describe('SessionChat', () => {
 
     expect(ModerationService.checkIfMessageIsClean).not.toHaveBeenCalled()
     expect(wrapper.vm.editor.getText()).toBe(message)
+  })
+
+  describe('updateSessionLastSeen', () => {
+    test('updates last seen for the current session and user on mount', async () => {
+      NetworkService.updateSessionLastSeen = vi.fn().mockResolvedValue()
+      getWrapper({
+        user: { state: { id: 'user-1' } },
+        currentSession: { id: 'abc', messages: [] },
+      })
+      await flushPromises()
+
+      expect(NetworkService.updateSessionLastSeen).toHaveBeenCalledWith(
+        'abc',
+        'user-1'
+      )
+    })
+
+    test('does not update last seen before the session has loaded', async () => {
+      NetworkService.updateSessionLastSeen = vi.fn().mockResolvedValue()
+      getWrapper({
+        user: { state: { id: 'user-1' } },
+        currentSession: { messages: [] },
+      })
+      await flushPromises()
+
+      expect(NetworkService.updateSessionLastSeen).not.toHaveBeenCalled()
+    })
   })
 })
