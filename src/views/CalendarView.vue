@@ -117,7 +117,7 @@ export default {
     hasChangedSchedule() {
       const estUtcOffset = dayjs.tz(Date.now(), 'America/New_York').utcOffset()
       const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
-      const offset = (estUtcOffset - userUtcOffset) / 60
+      const offset = (userUtcOffset - estUtcOffset) / 60
 
       return (
         !isEqual(
@@ -144,7 +144,7 @@ export default {
     async updateLocalWaitTimes() {
       const originalWaitTimes = await CalendarService.getWaitTimes()
       const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
-      const offset = (-1 * userUtcOffset) / 60
+      const offset = userUtcOffset / 60
       this.waitTimes = this.convertAvailability(originalWaitTimes, offset)
     },
     someThingChanged() {
@@ -159,7 +159,7 @@ export default {
 
       const estUtcOffset = dayjs.tz(Date.now(), 'America/New_York').utcOffset()
       const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
-      const offset = (estUtcOffset - userUtcOffset) / 60
+      const offset = (userUtcOffset - estUtcOffset) / 60
       this.availability = this.convertAvailability(originalAvailability, offset)
     },
     async initWaitTimeData() {
@@ -285,8 +285,8 @@ export default {
       }
       const estUtcOffset = dayjs.tz(Date.now(), 'America/New_York').utcOffset()
       const userUtcOffset = dayjs.tz(Date.now(), this.selectedTz).utcOffset()
-      // offsets returned by zone.utcOffset() are returned in minutes and inverted for POSIX compatibility
-      const offset = (userUtcOffset - estUtcOffset) / 60
+      // Calculate the hour difference from the user's timezone to Eastern time
+      const offset = (estUtcOffset - userUtcOffset) / 60
       CalendarService.updateSchedule(
         this,
         this.convertAvailability(this.availability, offset),
