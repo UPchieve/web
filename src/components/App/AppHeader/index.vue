@@ -24,7 +24,7 @@ import { useAppHeaderStore } from '@/stores/app/header'
 import ActivityDot from '@/components/ActivityDot.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
-import FallIncentiveHeader from '@/components/App/AppHeader/FallIncentiveHeader.vue'
+import IncentiveBannerHeader from '@/components/App/AppHeader/IncentiveBannerHeader.vue'
 import HamburgerButton from '@/components/App/AppHeader/HamburgerButton.vue'
 import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.vue'
 import SessionHeader from '@/components/App/AppHeader/SessionHeader.vue'
@@ -37,7 +37,7 @@ export default {
     ActivityDot,
     BannedHeader,
     DefaultHeader,
-    FallIncentiveHeader,
+    IncentiveBannerHeader,
     HamburgerButton,
     RejoinSessionHeader,
     SessionHeader,
@@ -56,8 +56,6 @@ export default {
       mobileMode: 'app/mobileMode',
       isSessionAlive: 'user/isSessionAlive',
       isStudent: 'user/isStudent',
-      isFallIncentiveProgramEnabled:
-        'featureFlags/isFallIncentiveProgramEnabled',
       isIncentiveBannerEnabled: 'featureFlags/isIncentiveBannerEnabled',
       hasVolunteerRole: 'user/hasVolunteerRole',
       hasUnreadProgressOverviewReports: 'user/hasUnreadProgressOverviewReports',
@@ -81,8 +79,8 @@ export default {
         return 'waiting-period-header'
       }
 
-      if (this.showFallIncentiveHeader) {
-        return 'fall-incentive-header'
+      if (this.showIncentiveBannerHeader) {
+        return 'incentive-banner-header'
       }
 
       if (this.showVerificationHeader) {
@@ -116,11 +114,8 @@ export default {
       return this.hasCooldown
     },
 
-    showFallIncentiveHeader() {
-      return (
-        this.isStudent &&
-        (this.isFallIncentiveProgramEnabled || this.isIncentiveBannerEnabled)
-      )
+    showIncentiveBannerHeader() {
+      return this.isStudent && this.isIncentiveBannerEnabled
     },
 
     showVerificationHeader() {

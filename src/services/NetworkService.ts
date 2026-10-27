@@ -1368,19 +1368,6 @@ export default {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
-  enrollStudentInIncentiveProgram(proxyEmail) {
-    return httpPostDeprecated(
-      `${API_ROOT}/product-flags/fall-incentive-enrollment/enroll`,
-      {
-        proxyEmail,
-      }
-    ).then(this._successHandler, this._errorHandler)
-  },
-  deniedIncentiveProgramEnrollment() {
-    return httpPostDeprecated(
-      `${API_ROOT}/product-flags/fall-incentive-enrollment/denied`
-    ).then(this._successHandler, this._errorHandler)
-  },
   getStudentClasses() {
     return httpGetDeprecated(`${API_ROOT}/students/classes`).then(
       this._successHandler,

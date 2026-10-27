@@ -46,11 +46,6 @@
       @close-modal="() => (joinedClassCode = '')"
       :classCode="joinedClassCode"
     />
-    <fall-incentive-enrollment-modal
-      v-if="showFallIncentiveEnrollmentModal"
-      :closeModal="toggleFallIncentiveEnrollmentModal"
-      :isFirstModalView="fallIncentiveProgramModalViewCount === 0"
-    />
     <impact-study-survey-modal
       v-if="showImpactStudySurveyModal"
       :closeModal="toggleImpactStudySurveyModal"
@@ -97,7 +92,6 @@ import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import * as BrowserStorageService from '@/services/BrowserStorageService'
 import { EVENTS, POSTHOG_FEATURE_FLAGS } from '@/consts'
-import Gleap from 'gleap'
 import ArrowIcon from '@/assets/arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import StudentAssignments from '@/components/StudentAssignments.vue'
@@ -129,9 +123,6 @@ import VolunteerRelevantExperienceWidget from './VolunteerRelevantExperienceWidg
 const ImpactStudySurveyModal = defineAsyncComponent(
   () => import('./ImpactStudySurveyModal.vue')
 )
-const FallIncentiveEnrollmentModal = defineAsyncComponent(
-  () => import('./FallIncentiveEnrollmentModal.vue')
-)
 
 export default {
   name: 'student-dashboard',
@@ -142,7 +133,6 @@ export default {
     DashboardBanner,
     SubjectSelection,
     JoinedClassModal,
-    FallIncentiveEnrollmentModal,
     ImpactStudySurveyModal,
     UpdateSchoolModal,
     ArrowIcon,
@@ -157,12 +147,6 @@ export default {
     }
   },
   async created() {
-    if (
-      this.shouldSeeIncentiveModalForFirstTime ||
-      this.shouldSeeIncentiveModalForSecondTime
-    )
-      this.triggerIncentiveEnrollmentModal()
-
     this.hasGradeLevel = !!this.user.gradeLevel
 
     // TODO: Do this better.
@@ -250,7 +234,6 @@ export default {
   data() {
     return {
       joinedClassCode: '',
-      showFallIncentiveEnrollmentModal: false,
       assignments: [],
       onboardingFrames: [],
       showImpactStudySurveyModal: false,
@@ -275,8 +258,6 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       showDashboardRedesign: 'user/showDashboardRedesign',
-      isFallIncentiveProgramEnabled:
-        'featureFlags/isFallIncentiveProgramEnabled',
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
       getImpactStudySurveyPayload: 'featureFlags/getImpactStudySurveyPayload',
       isMobileMode: 'app/mobileMode',
@@ -314,30 +295,6 @@ export default {
         this.isTargetEmailDomainForSecondaryEmailModal
       )
     },
-    shouldSeeIncentiveModalForFirstTime() {
-      return (
-        this.isFallIncentiveProgramEnabled &&
-        Object.entries(this.productFlags).length &&
-        !this.productFlags.fallIncentiveEnrollmentAt &&
-        this.fallIncentiveProgramModalViewCount === 0
-      )
-    },
-    shouldSeeIncentiveModalForSecondTime() {
-      return (
-        this.isFallIncentiveProgramEnabled &&
-        Object.entries(this.productFlags).length &&
-        !this.productFlags.fallIncentiveEnrollmentAt &&
-        this.fallIncentiveProgramModalViewCount === 1 &&
-        this.hadASession
-      )
-    },
-    fallIncentiveProgramModalViewCount() {
-      const viewCount = parseInt(
-        localStorage.getItem('fallIncentiveEnrollmentViewCount') ?? ''
-      )
-      if (!isNaN(viewCount)) return viewCount
-      else return 0
-    },
     impactStudySurveyCache() {
       const cacheHit = localStorage.getItem(
         getImpactStudyCacheKey(this.user.id)
@@ -368,20 +325,8 @@ export default {
     toggleSecondaryEmailModal() {
       this.dismissedSecondaryEmailModal = true
     },
-    toggleFallIncentiveEnrollmentModal() {
-      this.showFallIncentiveEnrollmentModal =
-        !this.showFallIncentiveEnrollmentModal
-    },
     toggleImpactStudySurveyModal() {
       this.showImpactStudySurveyModal = !this.showImpactStudySurveyModal
-    },
-    triggerIncentiveEnrollmentModal() {
-      if (this.showFallIncentiveEnrollmentModal) return
-      localStorage.setItem(
-        'fallIncentiveEnrollmentViewCount',
-        this.fallIncentiveProgramModalViewCount + 1
-      )
-      this.showFallIncentiveEnrollmentModal = true
     },
     async maybeTriggerVolunteerPresenceNotification() {
       const now = Date.now()
@@ -495,24 +440,6 @@ export default {
           this.$store.dispatch('user/updateHadASession', false)
         }
       },
-    },
-    isFallIncentiveProgramEnabled(currentValue, prevValue) {
-      if (!currentValue && prevValue) {
-        this.showFallIncentiveEnrollmentModal = false
-        AnalyticsService.captureEvent(
-          EVENTS.STUDENT_FALL_INCENTIVE_PROGRAM_ACCESS_REVOKED
-        )
-      }
-
-      if (currentValue && !prevValue) {
-        Gleap.trackEvent('fall-incentive-program')
-      }
-    },
-    shouldSeeIncentiveModalForFirstTime(currentValue, prevValue) {
-      if (currentValue && !prevValue) this.triggerIncentiveEnrollmentModal()
-    },
-    shouldSeeIncentiveModalForSecondTime(currentValue, prevValue) {
-      if (currentValue && !prevValue) this.triggerIncentiveEnrollmentModal()
     },
     volunteerSubjectPresenceVariant(currentValue, prevValue) {
       if (currentValue && !prevValue)

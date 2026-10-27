@@ -16,8 +16,6 @@ export default {
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: false,
-      [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: false,
-      [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT]: false,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: false,
       [POSTHOG_FEATURE_FLAGS.TEACHER_GUIDANCE_EXPERIMENT]: false,
       [POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE]: false,
@@ -62,11 +60,10 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
-      [POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]: {},
       [POSTHOG_FEATURE_FLAGS.VIDEO_MODERATION_SAMPLE_INTERVAL]: 2000,
       [POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL]: null,
       [POSTHOG_FEATURE_FLAGS.IMPACT_STUDY_SURVEY]: {},
-      [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: '',
+      [POSTHOG_FEATURE_FLAGS.INCENTIVE_BANNER]: null,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_FEEDBACK_FOR_STUDENT]: null,
       [POSTHOG_FEATURE_FLAGS.STUDENT_POST_SESSION_SURVEY_VARIANT]: null,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR]: {},
@@ -122,19 +119,6 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT],
     getUpdateSchoolConfig: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.UPDATE_SCHOOL_MODAL],
-    isFallIncentiveProgramEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM],
-    getFallIncentiveProgramPayload: (state: FeatureFlagState) => {
-      const payload =
-        state.payloadFlags[POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM]
-      if (!payload?.maxQualifiedSessionsPerWeek)
-        payload.maxQualifiedSessionsPerWeek = 1
-      return payload
-    },
-    isFallIncentiveParentalConsentEnabled: (state: FeatureFlagState) =>
-      state.toggleFlags[
-        POSTHOG_FEATURE_FLAGS.FALL_INCENTIVE_PROGRAM_PARENTAL_CONSENT
-      ],
     aiTutor: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.AI_TUTOR],
     videoModerationSampleInterval: (state: FeatureFlagState) =>

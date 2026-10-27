@@ -6,7 +6,7 @@ import { useSessionStore } from '@/stores/session'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import BannedHeader from '@/components/App/AppHeader/BannedHeader.vue'
 import DefaultHeader from '@/components/App/AppHeader/DefaultHeader.vue'
-import FallIncentiveHeader from '@/components/App/AppHeader/FallIncentiveHeader.vue'
+import IncentiveBannerHeader from '@/components/App/AppHeader/IncentiveBannerHeader.vue'
 import RejoinSessionHeader from '@/components/App/AppHeader/RejoinSessionHeader.vue'
 import SessionHeader from '@/components/App/AppHeader/SessionHeader.vue'
 import VerificationHeader from '@/components/App/AppHeader/VerificationHeader.vue'
@@ -17,7 +17,7 @@ const getWrapper = (params) => {
     banType: 'none',
     emailVerified: true,
     hasCooldown: false,
-    isFallIncentiveProgramEnabled: false,
+    isIncentiveBannerEnabled: false,
     isSessionAlive: false,
     mobileMode: false,
     routeName: 'LoginView',
@@ -53,8 +53,7 @@ const getWrapper = (params) => {
       featureFlags: {
         ...storeOptions.modules.featureFlags,
         getters: {
-          isFallIncentiveProgramEnabled: () =>
-            options.isFallIncentiveProgramEnabled,
+          isIncentiveBannerEnabled: () => options.isIncentiveBannerEnabled,
         },
       },
     },
@@ -78,7 +77,7 @@ test('renders BannedHeader if the user is banned before anything else', async ()
     banType: 'complete',
     emailVerified: false,
     hasCooldown: true,
-    isFallIncentiveProgramEnabled: true,
+    isIncentiveBannerEnabled: true,
     isSessionAlive: true,
     routeName: 'SessionView',
   })
@@ -96,7 +95,7 @@ test.each([
     const wrapper = getWrapper({
       emailVerified: false,
       hasCooldown: true,
-      isFallIncentiveProgramEnabled: true,
+      isIncentiveBannerEnabled: true,
       isSessionAlive: true,
       mobileMode,
       routeName: 'SessionView',
@@ -114,7 +113,7 @@ test.each([true, false])(
     const wrapper = getWrapper({
       emailVerified: false,
       hasCooldown: true,
-      isFallIncentiveProgramEnabled: true,
+      isIncentiveBannerEnabled: true,
       isSessionAlive: true,
       mobileMode,
       routeName: 'FeedbackView',
@@ -130,7 +129,7 @@ test('renders RejoinSessionHeader when user is not in session and session is act
   const wrapper = getWrapper({
     emailVerified: false,
     hasCooldown: true,
-    isFallIncentiveProgramEnabled: true,
+    isIncentiveBannerEnabled: true,
     isSessionAlive: true,
   })
 
@@ -142,20 +141,20 @@ test('renders WaitingPeriodHeader when user has a cooldown', () => {
   const wrapper = getWrapper({
     emailVerified: false,
     hasCooldown: true,
-    isFallIncentiveProgramEnabled: true,
+    isIncentiveBannerEnabled: true,
   })
 
   const c = wrapper.findComponent(WaitingPeriodHeader)
   expect(c.exists()).toBe(true)
 })
 
-test('renders FallIncentiveHeader when incentive program enabled', () => {
+test('renders IncentiveBannerHeader when incentive banner enabled', () => {
   const wrapper = getWrapper({
     emailVerified: false,
-    isFallIncentiveProgramEnabled: true,
+    isIncentiveBannerEnabled: true,
   })
 
-  const c = wrapper.findComponent(FallIncentiveHeader)
+  const c = wrapper.findComponent(IncentiveBannerHeader)
   expect(c.exists()).toBe(true)
 })
 

@@ -8,10 +8,10 @@ describe('`productFlags` store', () => {
     const getFlags = vi.spyOn(NetworkService, 'getUserProductFlags')
 
     getFlags.mockResolvedValueOnce({
-      data: { flags: { fallIncentiveEnrollmentAt: '2026-01-01' } },
+      data: { flags: { impactStudyEnrollmentAt: '2026-01-01' } },
     })
     await store.getUserProductFlags()
-    expect(store.flags).toEqual({ fallIncentiveEnrollmentAt: '2026-01-01' })
+    expect(store.flags).toEqual({ impactStudyEnrollmentAt: '2026-01-01' })
 
     getFlags.mockResolvedValueOnce({ data: {} })
     await store.getUserProductFlags()
@@ -20,11 +20,11 @@ describe('`productFlags` store', () => {
 
   it('merges new flags into the existing ones', () => {
     const store = useProductFlagsStore()
-    store.addToProductFlags({ fallIncentiveEnrollmentAt: '2026-01-01' })
+    store.addToProductFlags({ impactStudyCampaigns: {} })
     store.addToProductFlags({ impactStudyEnrollmentAt: '2026-02-01' })
 
     expect(store.flags).toEqual({
-      fallIncentiveEnrollmentAt: '2026-01-01',
+      impactStudyCampaigns: {},
       impactStudyEnrollmentAt: '2026-02-01',
     })
   })

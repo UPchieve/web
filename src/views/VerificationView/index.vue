@@ -92,7 +92,6 @@ import Loader from '@/components/Loader.vue'
 import AuthService from '@/services/AuthService'
 import LoggerService from '@/services/LoggerService'
 import AnalyticsService from '@/services/AnalyticsService'
-import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 import { EVENTS, VERIFICATION_METHOD } from '@/consts'
 import VerificationMethodSelector from '@/views/VerificationView/VerificationMethodSelector.vue'
 import LargeButton from '@/components/LargeButton.vue'
@@ -132,8 +131,6 @@ export default {
     }),
     ...mapGetters({
       isAutoFlowUser: 'user/isAutoFlowUser',
-      isFallIncentiveProgramEnabled:
-        'featureFlags/isFallIncentiveProgramEnabled',
       userType: 'user/userType',
       isVolunteer: 'user/isVolunteer',
       isStudentVolunteer: 'user/isStudentVolunteer',
@@ -211,16 +208,6 @@ export default {
             userUpdates.phoneVerified = true
             userUpdates.phone = this.sendTo
             AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
-            if (
-              this.user.userType === 'student' &&
-              this.isFallIncentiveProgramEnabled
-            ) {
-              try {
-                await UserProductFlagsService.enrollStudentToIncentiveProgram()
-              } catch (error) {
-                LoggerService.noticeError(error.response?.data)
-              }
-            }
           } else {
             userUpdates.emailVerified = true
             AnalyticsService.captureEvent(EVENTS.EMAIL_VERIFIED)

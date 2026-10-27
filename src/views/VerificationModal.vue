@@ -90,14 +90,11 @@ import Loader from '@/components/Loader.vue'
 import Modal from '@/components/Modal.vue'
 import { VERIFICATION_METHOD } from '@/consts'
 import AuthService from '@/services/AuthService'
-import { mapState, mapGetters } from 'vuex'
-import { mapState as mapPiniaState } from 'pinia'
-import { useProductFlagsStore } from '@/stores/product-flags'
+import { mapState } from 'vuex'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import RecaptchaCaption from '@/components/recaptcha/RecaptchaCaption.vue'
 import FormInput from '@/components/FormInput.vue'
-import * as UserProductFlagsService from '@/services/UserProductFlagsService'
 
 export default {
   name: 'verification-modal',
@@ -156,13 +153,8 @@ export default {
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
     },
-    ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapState({
       user: (state) => state.user.user,
-    }),
-    ...mapGetters({
-      isFallIncentiveProgramEnabled:
-        'featureFlags/isFallIncentiveProgramEnabled',
     }),
     isValidVerificationCode() {
       return !(
@@ -216,12 +208,6 @@ export default {
           this.verificationComplete = true
           if (this.verificationMethod === VERIFICATION_METHOD.SMS) {
             AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_VERIFIED)
-            if (
-              !this.productFlags.fallIncentiveEnrollmentAt &&
-              this.isFallIncentiveProgramEnabled
-            )
-              await UserProductFlagsService.enrollStudentToIncentiveProgram()
-
             if (this.user.phone !== this.phoneOrEmailToVerify) {
               AnalyticsService.captureEvent(EVENTS.PHONE_NUMBER_UPDATED)
             }

@@ -5,7 +5,6 @@ import type { ImpactStudyCampaign } from '@/types'
 import type { ISODateString } from '@/types/shared'
 
 export type ProductFlags = {
-  fallIncentiveEnrollmentAt?: ISODateString | null
   impactStudyEnrollmentAt?: ISODateString | null
   impactStudyCampaigns?: Record<string, ImpactStudyCampaign>
 }

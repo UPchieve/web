@@ -3,8 +3,6 @@ import config from '@/config'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
 import axios from 'axios'
-import { pinia } from '@/stores'
-import { useProductFlagsStore } from '@/stores/product-flags'
 
 const FIVE_MINUTES_IN_MS = 1000 * 60 * 5
 
@@ -16,9 +14,6 @@ class FeatureFlagService {
         ui_host: 'https://app.posthog.com',
         persistence: 'localStorage+cookie',
         async loaded() {
-          await FeatureFlagService.preloadPersonPropertiesToStore(
-            personProperties
-          )
           FeatureFlagService.setPersonProperties(personProperties)
 
           FeatureFlagService.listenForFlagReload()
@@ -118,13 +113,6 @@ class FeatureFlagService {
   static getFeatureFlagPayload(featureFlagKey: string) {
     return posthog.getFeatureFlagPayload(featureFlagKey)
   }
-
-  static async preloadPersonPropertiesToStore(props: any) {
-    // this runs in main.ts before `app.use(pinia)`. we must pass the instance explicitly.
-    useProductFlagsStore(pinia).addToProductFlags({
-      fallIncentiveEnrollmentAt: props?.fallIncentiveEnrollmentAt,
-    })
-  }
 }
 
 class DevFeatureFlagService {
@@ -191,11 +179,6 @@ class DevFeatureFlagService {
   static getFeatureFlagPayload(featureFlagKey: string) {
     // eslint-disable-next-line no-console
     console.info('FeatureFlagService.getFeatureFlagPayload', featureFlagKey)
-  }
-
-  static async preloadPersonPropertiesToStore(props: any) {
-    // eslint-disable-next-line no-console
-    console.info('FeatureFlagService.preloadPersonPropertiesToStore', props)
   }
 }
 

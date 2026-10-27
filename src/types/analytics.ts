@@ -20,7 +20,6 @@ type AnalyticPersonPropertiesFields = {
   partnerSchoolId?: Uuid | null
   partnerSchoolName?: string | null
   gradeLevel?: GRADES | null
-  fallIncentiveEnrollmentAt?: ISODateString | null
   usesClever?: boolean
   usesGoogle?: boolean
   hasSubjectCertification?: boolean

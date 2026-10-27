@@ -186,15 +186,6 @@
           />
           <div v-else>
             <div
-              v-if="isStudent && showReviewWarning"
-              class="about-session-button"
-              @click="handleReviewWarningClick"
-              role="button"
-            >
-              Session will be reviewed
-              <caret-icon class="caret" />
-            </div>
-            <div
               v-if="studentAssignment"
               class="about-session-button"
               @click="showAssignmentDetail"
@@ -308,10 +299,6 @@
       :assignment="studentAssignment"
       :isStudent="isStudent"
     />
-    <fall-incentive-review-warning-modal
-      v-if="showFallIncentiveReviewWarningModal"
-      :closeModal="toggleFallIncentiveReviewWarningModal"
-    />
   </div>
 </template>
 
@@ -320,7 +307,6 @@ import { useSessionStore } from '@/stores/session'
 import { ref, markRaw, onBeforeUnmount } from 'vue'
 import { mapState, mapGetters } from 'vuex'
 import { mapState as mapPiniaState } from 'pinia'
-import { useProductFlagsStore } from '@/stores/product-flags'
 import AnalyticsService from '@/services/AnalyticsService'
 import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
@@ -345,7 +331,6 @@ import AboutSessionModal from './AboutSessionModal.vue'
 import OpenToAllPromptModal from './OpenToAllPromptModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import AssignmentDetailModal from './AssignmentDetailModal.vue'
-import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS, SESSION_TOOL_TYPES } from '@/consts'
 import Gleap from 'gleap'
@@ -391,7 +376,6 @@ export default {
     AboutSessionModal,
     LoadingMessage,
     QuestionMarkIcon,
-    FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
     OpenToAllPromptModal,
     LargeButton,
@@ -566,7 +550,6 @@ export default {
       isLoadingSessionMetadata: false,
       isFetchingIsSessionRecapEligible: false,
       sessionHasEnded: false,
-      showFallIncentiveReviewWarningModal: false,
       aiWidgetHidden: true,
       aiWidgetEnabled: false,
       hasUnreadAiTutorMessage: false,
@@ -603,7 +586,6 @@ export default {
       'isPartnerOnline',
       'journeySessionData',
     ]),
-    ...mapPiniaState(useProductFlagsStore, { productFlags: 'flags' }),
     ...mapState({
       moderationInfraction: (state) => state.liveMedia.moderationInfraction,
       potentialPartnerInfraction: (state) =>
@@ -628,8 +610,6 @@ export default {
       isSessionOver: 'user/isSessionOver',
       isSessionAlive: 'user/isSessionAlive',
       isTutorBotChatEnabled: 'featureFlags/isTutorBotChatEnabled',
-      isFallIncentiveProgramEnabled:
-        'featureFlags/isFallIncentiveProgramEnabled',
       isShowInfoOptInEnabled: 'featureFlags/isShowInfoOptInEnabled',
       currentTutorBotConversation: 'botConversations/currentConversation',
       isSessionInProgress: 'user/isSessionInProgress',
@@ -781,16 +761,9 @@ export default {
         !this.aiWidgetHidden
       )
     },
-    showReviewWarning() {
-      return (
-        this.isFallIncentiveProgramEnabled &&
-        this.productFlags.fallIncentiveEnrollmentAt
-      )
-    },
     showSessionMetadataContainer() {
       return (
         this.isLoadingSessionMetadata ||
-        (this.isStudent && this.showReviewWarning) ||
         this.studentAssignment ||
         this.isVolunteer ||
         this.mobileMode
@@ -1206,21 +1179,11 @@ export default {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_ABOUT_SESSION)
       this.toggleAboutSessionModal()
     },
-    handleReviewWarningClick() {
-      AnalyticsService.captureEvent(
-        EVENTS.STUDENT_FALL_INCENTIVE_REVIEW_SESSION_INFORMATION_CLICKED
-      )
-      this.toggleFallIncentiveReviewWarningModal()
-    },
     toggleAssignmentDetailModal() {
       this.showAssignmentDetailModal = !this.showAssignmentDetailModal
     },
     toggleAboutSessionModal() {
       this.showAboutSessionModal = !this.showAboutSessionModal
-    },
-    toggleFallIncentiveReviewWarningModal() {
-      this.showFallIncentiveReviewWarningModal =
-        !this.showFallIncentiveReviewWarningModal
     },
     async getSessionContext() {
       try {
