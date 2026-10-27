@@ -19,6 +19,7 @@ import type {
   SubmitFormRow,
 } from '@/services/SignUpService'
 import { UserType } from '@/services/SignUpService/types'
+import { getAcademicYear } from '@/utils/academic-year'
 
 vi.mock('@/services/AnalyticsService')
 vi.mock('@/services/AuthService')
@@ -89,7 +90,9 @@ describe('StudentSignUpService', () => {
           (e) => e.props?.name === 'gradeLevel'
         )
         expect(grade).toBeDefined()
-        expect(grade?.formElement.props.label).toContain('Grade in')
+        const gradeLabel = `Grade in ${getAcademicYear().asString}`
+        expect(grade?.formElement.props.label).toBe(gradeLabel)
+        expect(grade?.formElement.props.placeholder).toBe(gradeLabel)
 
         const zipCode = findElementAndRow(
           pageDetails.rows,
@@ -158,7 +161,9 @@ describe('StudentSignUpService', () => {
           (e) => e.props?.name === 'gradeLevel'
         )
         expect(grade).toBeDefined()
-        expect(grade?.formElement.props.label).toContain("Child's Grade in")
+        const gradeLabel = `Child's Grade in ${getAcademicYear().asString}`
+        expect(grade?.formElement.props.label).toBe(gradeLabel)
+        expect(grade?.formElement.props.placeholder).toBe(gradeLabel)
 
         const school = findElementAndRow(
           pageDetails.rows,

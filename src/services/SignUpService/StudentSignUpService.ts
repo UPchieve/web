@@ -32,6 +32,7 @@ import type {
 import NetworkService, { type NetworkError } from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import { SsoProvider } from '@/services/SsoService'
+import { getAcademicYear } from '@/utils/academic-year'
 import { getFormAddressee, getLabelPrefix } from '@/utils/signup-utils'
 
 const RoutePath = {
@@ -718,14 +719,17 @@ function getZipCodeElement(): FormElement {
 }
 
 function getGradeSelectionElement(isParentGuardian: boolean): FormElement {
+  const gradeLabel =
+    getLabelPrefix(isParentGuardian) + `Grade in ${getAcademicYear().asString}`
+
   return {
     element: 'FormSelect',
     props: {
       blurEvent: EVENTS.STUDENT_SELECTED_GRADE,
       options: GRADES,
       name: InputName.GRADE_LEVEL,
-      label: getLabelPrefix(isParentGuardian) + 'Grade in 2025-2026',
-      placeholder: getLabelPrefix(isParentGuardian) + 'Grade in 2025-2026',
+      label: gradeLabel,
+      placeholder: gradeLabel,
       isRequired: true,
       reduce: (option: string) => option.split(' ')[0],
     },
