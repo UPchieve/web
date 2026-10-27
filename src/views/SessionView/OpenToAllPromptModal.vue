@@ -1,20 +1,20 @@
 <template>
   <modal :closeModal="closeModal" :backText="''">
-    <div class="breakout-prompt-modal">
+    <div class="open-to-all-prompt-modal">
       <header>
-        <h1 class="breakout-prompt-modal__title">Want help sooner?</h1>
+        <h1 class="open-to-all-prompt-modal__title">Want help sooner?</h1>
       </header>
 
-      <h2 class="breakout-prompt-modal__subtitle">
+      <h2 class="open-to-all-prompt-modal__subtitle">
         It looks your tutor is busy! If you'd like, we can open this session up
         to other available tutors so you can get help faster.
       </h2>
       <separator />
-      <div class="breakout-prompt-modal__footer">
-        <div class="breakout-prompt-modal__buttons">
+      <div class="open-to-all-prompt-modal__footer">
+        <div class="open-to-all-prompt-modal__buttons">
           <large-button
             @click="closeModal"
-            class="breakout-prompt-modal__buttons--cancel"
+            class="open-to-all-prompt-modal__buttons--cancel"
             >Keep Waiting</large-button
           >
           <large-button primary @click="$emit('confirm')"
@@ -32,7 +32,7 @@ import Separator from '@/components/Separator.vue'
 import LargeButton from '@/components/LargeButton.vue'
 
 export default {
-  name: 'BreakoutPromptModal',
+  name: 'OpenToAllPromptModal',
   components: { LargeButton, Modal, Separator },
   emits: ['confirm'],
   props: {
@@ -42,7 +42,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.breakout-prompt-modal {
+.open-to-all-prompt-modal {
   @include flex-container(column);
 
   &__title {

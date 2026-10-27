@@ -73,7 +73,7 @@ export default {
 
     if (sessionId) {
       const {
-        data: { session, isZwibserveSession, exclusiveVolunteerId },
+        data: { session, isZwibserveSession },
       } = await NetworkService.joinSession({ sessionId, joinedFrom })
       await store.dispatch('user/updateSession', {
         ...session,
@@ -81,7 +81,7 @@ export default {
         subTopic,
         _id: session.id,
       })
-      return { session, isZwibserveSession, exclusiveVolunteerId }
+      return { session, isZwibserveSession }
     }
 
     const presessionSurvey = Object.keys(store.state.user.presessionSurvey)
@@ -125,7 +125,6 @@ export default {
     return {
       session,
       isZwibserveSession,
-      exclusiveVolunteerId: requestedVolunteerId,
     }
   },
 

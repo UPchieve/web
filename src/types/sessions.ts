@@ -47,6 +47,8 @@ export type CurrentSessionPublic = {
   // TODO: Rename this property, this refers to a topic's name
   type: string
   subTopic: string
+  requestedVolunteerId?: Uuid
+  openedToAllAt?: string
   createdAt: Date
   endedAt?: Date
   endedBy?: Uuid

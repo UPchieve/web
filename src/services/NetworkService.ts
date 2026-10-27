@@ -566,22 +566,16 @@ export default {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
-  async breakoutSession(sessionId: string) {
-    try {
-      return await httpPostDeprecated<{
-        sessionId: Uuid
-        session: CurrentSessionPublic
-      }>(`${API_ROOT}/session/${sessionId}/breakout`, {})
-    } catch (err) {
-      return this._axiosErrorHandler(err as AxiosError)
-    }
+  async openSessionToAll(sessionId: string) {
+    return httpPost<{
+      session: CurrentSessionPublic
+    }>(`${API_ROOT}/session/${sessionId}/open-to-all`, {})
   },
   async joinSession(data: { sessionId: string; joinedFrom?: string }) {
     try {
       return await httpPostDeprecated<{
         session: CurrentSessionPublic
         isZwibserveSession: boolean
-        exclusiveVolunteerId?: string
       }>(`${API_ROOT}/session/join`, data)
     } catch (err) {
       return this._axiosErrorHandler(err as AxiosError)

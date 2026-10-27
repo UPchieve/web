@@ -4,7 +4,7 @@
     :class="{ 'session--whiteboard': auxiliaryType === 'WHITEBOARD' }"
   >
     <div
-      v-if="exclusiveVolunteerId && !session?.volunteerId"
+      v-if="isWaitingForRequestedVolunteer && !session?.volunteerId"
       class="exclusive-session-banner"
     >
       <span class="exclusive-session-banner__text">
@@ -14,15 +14,15 @@
       <large-button
         variant="primary-blue"
         :showArrow="false"
-        @click="confirmBreakout('banner')"
+        @click="confirmOpenToAll('banner')"
       >
         Open to all tutors
       </large-button>
     </div>
-    <breakout-prompt-modal
-      v-if="showBreakoutPrompt"
-      :closeModal="dismissBreakoutPrompt"
-      @confirm="confirmBreakout('prompt-modal')"
+    <open-to-all-prompt-modal
+      v-if="showOpenToAllPrompt"
+      :closeModal="dismissOpenToAllPrompt"
+      @confirm="confirmOpenToAll('prompt-modal')"
     />
     <div
       v-if="sessionId"
@@ -248,7 +248,9 @@
           :connectingMessage="`${connectingMessage} ${attempts}`"
           :isSessionAlive="isSessionAlive"
           :sessionHasEnded="sessionHasEnded"
-          :isExclusiveSession="!!exclusiveVolunteerId && !session?.volunteerId"
+          :isExclusiveSession="
+            !!isWaitingForRequestedVolunteer && !session?.volunteerId
+          "
           :isListeningToPartnerAudio="!isSpeakerMuted"
         />
       </div>
@@ -340,7 +342,7 @@ import CaretIcon from '@/assets/caret.svg'
 import QuestionMarkIcon from '@/assets/question-mark-icon.svg'
 import WebNotificationsModal from '@/components/WebNotificationsModal.vue'
 import AboutSessionModal from './AboutSessionModal.vue'
-import BreakoutPromptModal from './BreakoutPromptModal.vue'
+import OpenToAllPromptModal from './OpenToAllPromptModal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import AssignmentDetailModal from './AssignmentDetailModal.vue'
 import FallIncentiveReviewWarningModal from './FallIncentiveReviewWarningModal.vue'
@@ -391,7 +393,7 @@ export default {
     QuestionMarkIcon,
     FallIncentiveReviewWarningModal,
     AssignmentDetailModal,
-    BreakoutPromptModal,
+    OpenToAllPromptModal,
     LargeButton,
     LiveMediaChatHeader,
     PartnerAckScreenShareInfractionModal,
@@ -432,7 +434,7 @@ export default {
   async created() {
     try {
       const requestedVolunteerId = this.$route.query?.requestedVolunteerId
-      const { session, isZwibserveSession, exclusiveVolunteerId } =
+      const { session, isZwibserveSession } =
         await SessionService.createOrJoinSession(
           this.$route.params.topic,
           this.$route.params.subTopic,
@@ -445,8 +447,7 @@ export default {
       this.sessionId = session.id
       this.isZwibserveSession = isZwibserveSession
       // Prefer the backend-derived value (survives page refresh)
-      this.exclusiveVolunteerId = exclusiveVolunteerId || requestedVolunteerId
-      if (this.exclusiveVolunteerId) this.handleBreakoutPrompt()
+      if (this.isWaitingForRequestedVolunteer) this.handleOpenToAllPrompt()
       await this.linkTransferredTutorBotConversation(session.id)
 
       if (this.journeySessionData) {
@@ -540,7 +541,7 @@ export default {
     this.isUnmounted = true
     this.isJoiningSocket = false
     clearTimeout(this.connectingMessageSlowTimeout)
-    clearTimeout(this.breakoutPromptTimeout)
+    clearTimeout(this.openToAllPromptTimeout)
     socket.off('sessions/recap:joined', this.onEndedSessionRoomJoined)
     socket.emit('sessions:leave', {
       sessionId: this.sessionId,
@@ -554,8 +555,7 @@ export default {
     return {
       auxiliaryOpen: false,
       sessionId: null,
-      exclusiveVolunteerId: null,
-      showBreakoutPrompt: false,
+      showOpenToAllPrompt: false,
       hasSeenNewMessage: true,
       showNotificationModal: false,
       showAboutSessionModal: false,
@@ -582,7 +582,7 @@ export default {
       showScreenShareDisclaimer: false,
       isSocketSessionRoomConnected: false,
       isZwibserveSession: false,
-      breakoutPromptTimeout: null,
+      openToAllPromptTimeout: null,
       isUnmounted: false,
       connectingMessage: 'Attempting to connect the chat',
       maxAttempts: 4,
@@ -591,6 +591,14 @@ export default {
     }
   },
   computed: {
+    isWaitingForRequestedVolunteer() {
+      return (
+        !!this.session?.requestedVolunteerId &&
+        !this.session.openedToAllAt &&
+        !this.session.volunteerId &&
+        !this.session.endedAt
+      )
+    },
     ...mapPiniaState(useSessionStore, [
       'isPartnerOnline',
       'journeySessionData',
@@ -799,6 +807,12 @@ export default {
     },
   },
   watch: {
+    isWaitingForRequestedVolunteer(waiting) {
+      if (!waiting) {
+        clearTimeout(this.openToAllPromptTimeout)
+        this.showOpenToAllPrompt = false
+      }
+    },
     moderationInfraction(newVal) {
       if (newVal?.stopStreamImmediatelyReasons?.length) {
         this.showModerationInfractionModal = true
@@ -943,54 +957,62 @@ export default {
     },
   },
   methods: {
-    handleBreakoutPrompt() {
+    handleOpenToAllPrompt() {
       const key = `breakoutPromptSeen:${this.sessionId}`
       if (sessionStorage.getItem(key)) return
 
       const createdAt = new Date(this.session.createdAt).getTime()
-      const fiveMinutes = 5 * 60 * 1000
+      const threeMinutes = 3 * 60 * 1000
       const elapsed = Date.now() - createdAt
-      const delay = Math.max(fiveMinutes - elapsed, 0)
+      const delay = Math.max(threeMinutes - elapsed, 0)
 
-      this.breakoutPromptTimeout = setTimeout(() => {
-        if (sessionStorage.getItem(key)) return
+      this.openToAllPromptTimeout = setTimeout(() => {
+        if (
+          sessionStorage.getItem(key) ||
+          !this.isWaitingForRequestedVolunteer ||
+          this.session?.volunteerId ||
+          this.session?.endedAt
+        )
+          return
 
-        this.showBreakoutPrompt = true
+        this.showOpenToAllPrompt = true
         sessionStorage.setItem(key, 'true')
 
         AnalyticsService.captureEvent(
           EVENTS.STUDENT_SAW_BREAKOUT_PROMPT_MODAL,
           {
             sessionId: this.sessionId,
-            requestedVolunteerId: this.exclusiveVolunteerId,
+            requestedVolunteerId: this.session.requestedVolunteerId,
           }
         )
       }, delay)
     },
-    async confirmBreakout(source = 'banner') {
+    async confirmOpenToAll(source = 'banner') {
       try {
-        await NetworkService.breakoutSession(this.sessionId)
+        const { session } = await NetworkService.openSessionToAll(
+          this.sessionId
+        )
+        await this.$store.dispatch('user/updateSession', session)
         AnalyticsService.captureEvent(
           EVENTS.STUDENT_BROKE_OUT_EXCLUSIVE_SESSION,
           {
             sessionId: this.sessionId,
             source,
-            requestedVolunteerId: this.exclusiveVolunteerId,
+            requestedVolunteerId: this.session.requestedVolunteerId,
           }
         )
-        this.exclusiveVolunteerId = null
       } catch (err) {
         LoggerService.noticeError(err)
       } finally {
-        this.showBreakoutPrompt = false
+        this.showOpenToAllPrompt = false
       }
     },
-    dismissBreakoutPrompt() {
+    dismissOpenToAllPrompt() {
       AnalyticsService.captureEvent(
         EVENTS.STUDENT_DISMISSED_BREAKOUT_PROMPT_MODAL,
         { sessionId: this.sessionId }
       )
-      this.showBreakoutPrompt = false
+      this.showOpenToAllPrompt = false
     },
     startScreenShare() {
       this.meetingActor.send({ type: 'share_screen' })
