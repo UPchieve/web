@@ -574,6 +574,7 @@ describe('SidebarLinks', () => {
         )
         expect(pendingLinkPresent).toEqual(true)
         expect(applyLinkPresent).toEqual(false)
+        expect(wrapper.vm.shouldShowNthsChapterCreationDot).toEqual(false)
       })
 
       it('Renders the "NTHS application" link while the application page is flagged off', async () => {
@@ -682,6 +683,31 @@ describe('SidebarLinks', () => {
           )
         })
         expect(isTargetLinkPresent).toEqual(true)
+        expect(wrapper.vm.shouldShowNthsChapterCreationDot).toEqual(true)
+      })
+
+      it('does not show the chapter creation dot when the approval has expired', () => {
+        const wrapper = getWrapper({
+          props: { authenticated: true },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              hasVolunteerRole: () => true,
+              isTeacher: () => false,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [],
+              NTHSCandidateApplicationStatus: 'approved',
+              approvalExpiresAt: new Date(Date.now() - 60_000).toISOString(),
+            },
+          },
+        })
+
+        expect(wrapper.vm.nthsSidebarDestination).toEqual('expired')
+        expect(wrapper.vm.shouldShowNthsChapterCreationDot).toEqual(false)
       })
 
       it('Hides the "Create Team" link when only the approved-president flag is set', async () => {
@@ -752,6 +778,7 @@ describe('SidebarLinks', () => {
             )
           })
           expect(isTargetLinkPresent).toEqual(true)
+          expect(wrapper.vm.shouldShowNthsChapterCreationDot).toEqual(false)
         }
       )
     })

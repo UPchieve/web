@@ -131,6 +131,11 @@
           @click.capture="nthsSidebarLinkClicked"
         >
           <groups-icon class="icon" />
+          <activity-dot
+            v-if="shouldShowNthsChapterCreationDot"
+            class="SidebarLinks__notification"
+            label="Create your NTHS chapter"
+          />
         </sidebar-link>
 
         <sidebar-link
@@ -320,6 +325,9 @@ export default {
         to: NTHS_DESTINATION_PATHS[destination],
         text: NTHS_DESTINATION_LABELS[destination],
       }
+    },
+    shouldShowNthsChapterCreationDot() {
+      return this.nthsSidebarDestination === 'create'
     },
     isStandaloneAiEnabled() {
       return this.aiTutor && this.aiTutor.includes('stand-alone')
