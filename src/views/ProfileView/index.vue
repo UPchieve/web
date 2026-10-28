@@ -16,7 +16,6 @@
       :phoneOrEmailToVerify="phoneInputInfo.e164"
       :verificationMethod="VERIFICATION_METHOD.SMS"
       :closeModal="toggleShowSmsVerificationModal"
-      :onCloseSuccess="updateVerifiedPhoneInfo"
     />
     <SecondaryEmailModal
       v-if="showSecondaryEmailModal"
@@ -566,7 +565,6 @@ export default {
       ProfileSections,
       ModalService,
       activeEdit: false,
-      editPhoneInformationButtonLabel: 'Edit',
       errors: [],
       invalidInputs: [],
       saveFailed: false,
@@ -575,7 +573,6 @@ export default {
       isAccountActive: true,
       isAllowingNotifications: true,
       showDeactivateAccountModal: false,
-      shouldSeeSmsConsentCheckbox: false,
       showDeletePhoneConfirmationModal: false,
       showSmsVerificationModal: false,
       smsConsent: false,
@@ -596,7 +593,6 @@ export default {
       this.newMutedSubjectAlerts = [...this.user.mutedSubjectAlerts]
     }
     this.selectedGradeLevel = this.user.gradeLevel ?? ''
-    this.updateVerifiedPhoneInfo()
 
     if (this.$route?.query?.error) {
       const toast = await toastController.create({
@@ -637,6 +633,12 @@ export default {
     },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
+    },
+    shouldSeeSmsConsentCheckbox() {
+      return !!this.user.phone
+    },
+    editPhoneInformationButtonLabel() {
+      return this.activeEdit ? 'Save' : 'Edit'
     },
     userSubjects() {
       const userSubjects = this.user.activeSubjects
@@ -738,7 +740,6 @@ export default {
     },
     handleDeleteNumber() {
       this.showDeletePhoneConfirmationModal = false
-      this.shouldSeeSmsConsentCheckbox = false
       this.smsConsent = false
     },
 
@@ -803,7 +804,9 @@ export default {
     },
 
     toggleShowSmsVerificationModal(isSuccess) {
-      if (!isSuccess) {
+      if (isSuccess) {
+        this.smsConsent = !!this.user.smsConsent
+      } else {
         this.phone = this.user.phone
       }
       this.showSmsVerificationModal = !this.showSmsVerificationModal
@@ -811,10 +814,6 @@ export default {
 
     setIsAccountActive(value) {
       this.isAccountActive = value
-    },
-
-    async updateVerifiedPhoneInfo() {
-      this.shouldSeeSmsConsentCheckbox = this.user.phone
     },
 
     syncClever() {
@@ -829,7 +828,6 @@ export default {
     editPhoneInformation() {
       // {Case A} Enter the editing state, then early exit
       if (!this.activeEdit) {
-        this.editPhoneInformationButtonLabel = 'Save'
         this.activeEdit = true
         return
       }

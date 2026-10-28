@@ -1,5 +1,5 @@
 <template>
-  <Modal :closeModal="() => closeModal(verificationComplete)">
+  <Modal :closeModal="completeModal">
     <Loader v-if="isSubmitting" :message="loadingMessage" overlay />
     <!-- Step 1 content: Need to complete verification -->
     <div v-if="!verificationComplete">
@@ -233,6 +233,8 @@ export default {
     },
     async completeModal() {
       this.closeModal(this.verificationComplete)
+      if (!this.verificationComplete) return
+
       const updates = {}
       if (this.verificationMethod === VERIFICATION_METHOD.EMAIL) {
         updates.emailVerified = true

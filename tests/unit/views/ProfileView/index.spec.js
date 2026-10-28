@@ -246,6 +246,28 @@ describe('ProfileView', () => {
       ).toBeFalsy()
     })
 
+    it('should switch the phone button label back to "Edit" after saving', async () => {
+      const wrapper = getWrapper({
+        user: {
+          state: {
+            phone: '+18602124444',
+            phoneVerified: true,
+          },
+        },
+      })
+      const button = () => wrapper.find('[data-testid="edit-profile-btn"]')
+      expect(button().text()).toContain('Edit')
+
+      await clickEditSaveButton(wrapper)
+      expect(button().text()).toContain('Save')
+
+      const { countryCodeInput, phoneNumberInput } = getPhoneInputs(wrapper)
+      await countryCodeInput.setValue('+1')
+      await phoneNumberInput.setValue('(212) 998-1123')
+      await clickEditSaveButton(wrapper)
+      expect(button().text()).toContain('Edit')
+    })
+
     it('Should open the verification modal if the user changes their phone number', async () => {
       const wrapper = getWrapper({
         user: {
