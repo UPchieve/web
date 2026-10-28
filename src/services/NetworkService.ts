@@ -9,6 +9,8 @@ import type {
   NTHSChapterImpactResponse,
   NTHSChapterRosterResponse,
   NTHSMemberUpdate,
+  NTHSTitle,
+  Role,
 } from './NTHSGroupService'
 import type {
   NTHSFormVersion,
@@ -102,6 +104,29 @@ export type NTHSCloseChapter = {
   schoolName: string | null
   currentMemberCount: number
   presidents: { firstName: string; lastName: string }[]
+}
+
+export type NTHSMemberForStaff = {
+  member: {
+    userId: Uuid
+    firstName: string
+    lastName: string
+    email: string
+    title: NTHSTitle
+    roleName: Role
+    joinedAt: DateString
+    deactivatedAt: DateString | null
+    deleted: boolean
+    isLastAdmin: boolean
+  }
+  chapter: { id: Uuid; name: string; closedAt: DateString | null }
+  otherAdmins: {
+    userId: Uuid
+    firstName: string
+    lastInitial: string
+    title: NTHSTitle
+    deleted: boolean
+  }[]
 }
 
 export const axiosInstance = axios.create({
@@ -317,6 +342,23 @@ export function adminNTHSCloseChapters(chapterIds: string[]) {
   return httpPost<{
     results: { chapterId: string; status: NTHSCloseStatus }[]
   }>(`${ADMIN_ROOT}/nths/chapters/close`, { chapterIds })
+}
+
+export function adminNTHSGetMember(chapterId: string, userId: string) {
+  return httpGet<NTHSMemberForStaff>(
+    `${ADMIN_ROOT}/nths/chapters/${encodeURIComponent(chapterId)}/members/${encodeURIComponent(userId)}`
+  )
+}
+
+export function adminNTHSUpdateMember(
+  chapterId: string,
+  userId: string,
+  update: NTHSMemberUpdate
+) {
+  return httpPut<void, NTHSMemberUpdate>(
+    `${ADMIN_ROOT}/nths/chapters/${encodeURIComponent(chapterId)}/members/${encodeURIComponent(userId)}`,
+    update
+  )
 }
 
 export default {

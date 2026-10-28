@@ -12,6 +12,7 @@ const AdminView = () => import('./views/Admin/index.vue')
 const AdminCleverRoster = () => import('./views/Admin/AdminCleverRoster.vue')
 const AdminNTHS = () => import('./views/Admin/AdminNTHS.vue')
 const AdminNTHSClose = () => import('./views/Admin/AdminNTHSClose.vue')
+const AdminNTHSMember = () => import('./views/Admin/AdminNTHSMember.vue')
 const AdminEditSchool = () => import('./views/Admin/AdminEditSchool.vue')
 const AdminIneligibleStudents = () =>
   import('./views/Admin/AdminIneligibleStudents.vue')
@@ -809,6 +810,12 @@ const routes: RouteRecordRaw[] = [
     path: '/admin/nths/close',
     name: 'AdminNTHSClose',
     component: AdminNTHSClose,
+    meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/nths/member',
+    name: 'AdminNTHSMember',
+    component: AdminNTHSMember,
     meta: { protected: true, requiresAdmin: true },
   },
   {

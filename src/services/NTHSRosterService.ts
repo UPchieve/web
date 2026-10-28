@@ -388,7 +388,9 @@ type NTHSDisplayTitle =
 
 type PresidencyLabel = Extract<NTHSDisplayTitle, 'President' | 'Co-President'>
 
-function isCurrentPresident(member: NTHSRosterMemberPublic): boolean {
+function isCurrentPresident(
+  member: Pick<NTHSRosterMemberPublic, 'title' | 'accountClosed'>
+): boolean {
   return member.title === 'President' && !member.accountClosed
 }
 
@@ -397,8 +399,8 @@ function presidencyLabel(presidentCount: number): PresidencyLabel {
 }
 
 export function displayTitle(
-  member: NTHSRosterMemberPublic,
-  roster: NTHSRosterMemberPublic[]
+  member: Pick<NTHSRosterMemberPublic, 'title' | 'accountClosed'>,
+  roster: Pick<NTHSRosterMemberPublic, 'title' | 'accountClosed'>[]
 ): NTHSDisplayTitle | undefined {
   if (member.accountClosed) return undefined
   if (member.title === 'President')
@@ -409,7 +411,7 @@ export function displayTitle(
 // Leaves out the member being edited, so a sole president editing their own
 // title is offered "President".
 export function presidencyChoiceLabel(
-  roster: NTHSRosterMemberPublic[],
+  roster: Pick<NTHSRosterMemberPublic, 'userId' | 'title' | 'accountClosed'>[],
   editingUserId: string
 ): PresidencyLabel {
   const others = roster.filter(
@@ -443,8 +445,8 @@ export function roleLabel(
 export type TitleChoice = { title: NTHSTitle; label: string }
 
 export function titleChoices(
-  member: NTHSRosterMemberPublic,
-  roster: NTHSRosterMemberPublic[],
+  member: Pick<NTHSRosterMemberPublic, 'userId'>,
+  roster: Pick<NTHSRosterMemberPublic, 'userId' | 'title' | 'accountClosed'>[],
   asAdmin: boolean
 ): TitleChoice[] {
   const leadership: TitleChoice[] = asAdmin
