@@ -330,7 +330,22 @@ export default {
     })
     this.editor = new Editor({
       extensions: [
-        StarterKit,
+        StarterKit.configure({
+          bold: false,
+          italic: false,
+          strike: false,
+          underline: false,
+          code: false,
+          codeBlock: false,
+          heading: false,
+          blockquote: false,
+          bulletList: false,
+          orderedList: false,
+          listItem: false,
+          listKeymap: false,
+          horizontalRule: false,
+          link: false,
+        }),
         Mathematics,
         Placeholder.configure({ placeholder: 'Type a message...' }),
       ],
