@@ -17,6 +17,8 @@ cache:
 .node_setup:
   image: node:24.22.1-trixie
   before_script:
+    # keytar falls back to a native build when its prebuilt binary is unavailable.
+    - apt-get update && apt-get install -y libsecret-1-dev
     - corepack enable pnpm
     - pnpm config set store-dir .pnpm-store
     - pnpm install --frozen-lockfile

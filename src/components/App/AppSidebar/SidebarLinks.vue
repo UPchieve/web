@@ -329,6 +329,10 @@ export default {
     shouldShowNthsChapterCreationDot() {
       return this.nthsSidebarDestination === 'create'
     },
+    isNthsChapterCreationDotShown() {
+      if (this.mobileMode && this.isSidebarCollapsed) return false
+      return this.shouldShowNthsChapterCreationDot
+    },
     isStandaloneAiEnabled() {
       return this.aiTutor && this.aiTutor.includes('stand-alone')
     },
@@ -400,6 +404,17 @@ export default {
             destination: 'apply',
             userType: this.userType,
           })
+        }
+      },
+      immediate: true,
+    },
+    isNthsChapterCreationDotShown: {
+      handler(isShown) {
+        if (isShown) {
+          AnalyticsService.captureEvent(
+            EVENTS.NTHS_CHAPTER_CREATION_DOT_SHOWN,
+            { destination: 'create', userType: this.userType }
+          )
         }
       },
       immediate: true,

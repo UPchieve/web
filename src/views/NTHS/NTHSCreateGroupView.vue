@@ -9,6 +9,8 @@ import { isErrorWithResponse } from '@/utils/error-utils'
 import { dayjs } from '@/utils/time-utils'
 import { nthsDestination } from '@/views/NTHS/nths-route-helpers'
 import NTHSPageLayout from '@/components/NTHS/NTHSPageLayout.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const store = useStore()
 const router = useRouter()
@@ -31,6 +33,7 @@ async function createTeam() {
     errorMessage.value = ''
     const results = await NetworkService.createNTHSGroup()
     store.commit('nths/setNTHSGroups', [results.data.group])
+    AnalyticsService.captureEvent(EVENTS.NTHS_CHAPTER_CREATED)
   } catch (e) {
     if (isErrorWithResponse(e)) {
       // The use shouldn't really be able to get to this
