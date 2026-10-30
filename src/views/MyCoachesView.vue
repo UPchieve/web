@@ -9,13 +9,23 @@ import CaretIcon from '@/assets/caret.svg'
 import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import StarIcon from '@/assets/icons/star_icon.svg'
 import Loader from '@/components/Loader.vue'
-import MyCoachCard from '@/components/MyCoachCard.vue'
+import FavoritingToggle from '@/components/FavoritingToggle.vue'
+import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
+import { minutesInMs } from '@/utils/time-utils'
+import type { PastVolunteer } from '@/types/students'
 
-interface Coach {
-  volunteerId: string
-  firstName: string
-  numSessions: number
-  isFavorite: boolean
+interface Coach extends Omit<PastVolunteer, 'lastSession'> {
+  lastSession: LastSession | null
+}
+
+function toLastSession(volunteer: PastVolunteer): LastSession | null {
+  const session = volunteer.lastSession
+  if (!session) return null
+  return {
+    subject: session.subjectDisplayName,
+    date: session.createdAt,
+    durationMinutes: session.timeTutored / minutesInMs(1),
+  }
 }
 
 const $route = useRoute()
@@ -49,7 +59,11 @@ async function fetchCoaches() {
   isFetchingCoaches.value = true
   try {
     const response = await NetworkService.getPastVolunteers()
-    allCoaches.value = response.data.pastVolunteers || []
+    const pastVolunteers: PastVolunteer[] = response.data.pastVolunteers || []
+    allCoaches.value = pastVolunteers.map((volunteer) => ({
+      ...volunteer,
+      lastSession: toLastSession(volunteer),
+    }))
 
     applyFilter()
     paginate()
@@ -179,13 +193,23 @@ onMounted(async () => {
         class="coaches-loader"
       />
       <template v-else-if="total > 0">
-        <MyCoachCard
+        <PersonCard
           v-for="coach in coaches"
           :key="coach.volunteerId"
           class="coach-card"
-          :coach="coach"
-          :handleFavoriteChange="handleFavoriteChange"
-        />
+          type="coach"
+          :name="coach.firstName"
+          :last-session="coach.lastSession"
+        >
+          <template #actions>
+            <FavoritingToggle
+              :initialIsFavorite="coach.isFavorite"
+              :volunteerName="coach.firstName"
+              :volunteerId="coach.volunteerId"
+              @change-favorited="handleFavoriteChange"
+            />
+          </template>
+        </PersonCard>
       </template>
       <div v-else class="coach-list">
         <div v-if="filters.favoritesOnly" class="favorite-coaches__no-coaches">
@@ -258,8 +282,7 @@ onMounted(async () => {
 }
 
 .container {
-  padding: 1.5em;
-  margin: 0;
+  padding: 1em;
 
   @include breakpoint-above('large') {
     padding: 2.5em;
@@ -410,6 +433,6 @@ onMounted(async () => {
 }
 
 .coach-card {
-  margin: 24px 0;
+  margin: 4px 0;
 }
 </style>
