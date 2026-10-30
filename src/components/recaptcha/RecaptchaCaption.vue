@@ -1,16 +1,6 @@
-<!-- We are required to show this on whichever user flows are protected by reCAPTCHA -->
+<!-- We are required to show this on whichever user flows are protected by reCAPTCHA, since we hide the badge. -->
 <template>
-  <p class="caption">
-    This site is protected by reCAPTCHA and the Google
-    <a target="_blank" href="https://policies.google.com/privacy"
-      >Privacy Policy</a
-    >
-    and
-    <a target="_blank" href="https://policies.google.com/terms"
-      >Terms of Service</a
-    >
-    apply.
-  </p>
+  <p class="caption">This site is protected by reCAPTCHA.</p>
 </template>
 
 <script>
