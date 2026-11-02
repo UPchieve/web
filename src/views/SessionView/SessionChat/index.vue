@@ -208,7 +208,11 @@
       >
         <SendMessage />
       </button>
+      <slot name="session-tool-toggle" />
     </div>
+    <p class="safety-notice" data-testid="chat-safety-notice">
+      We review every session. Please be respectful.
+    </p>
     <div class="math-keyboard-container" ref="mathKeyboardContainer"></div>
   </div>
 </template>
@@ -1099,6 +1103,20 @@ export default {
   flex-direction: column;
   flex-grow: 1;
 }
+.safety-notice {
+  flex-shrink: 0;
+  color: #4f4f55;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0.375rem 1rem;
+  text-align: center;
+
+  @include breakpoint-below('medium') {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
 .moderation-body {
   /*
    * min-width for flex content is `auto` by default.
@@ -1279,16 +1297,23 @@ export default {
 .message-input {
   display: flex;
   align-items: center;
-  border-top: 1px solid $c-border-grey;
   min-width: 0;
   width: 100%;
-  border-top: none;
-  column-gap: 0.75em;
+  column-gap: 0.5rem;
+  padding: 0.75rem 0.75rem 0;
 }
 .send-button {
-  padding-right: 18px;
-  @include breakpoint-below('medium') {
-    padding-right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  :deep(svg) {
+    width: 40px;
+    height: 40px;
   }
 }
 .send-button:hover:not(:disabled) {
@@ -1304,7 +1329,9 @@ export default {
   flex: 1;
   max-height: 250px;
   overflow: auto;
-  padding: 1.5em 1em;
+  border: 1px solid $c-border-grey;
+  border-radius: 20px;
+  padding: 0.6em 1em;
   line-height: 1.5;
   outline: none;
   word-break: break-word;
@@ -1340,12 +1367,6 @@ export default {
       border-color: $c-information-blue;
       box-shadow: 0 0 0 2px rgba($c-information-blue, 0.15);
     }
-  }
-
-  @include breakpoint-below('medium') {
-    border: 1px solid $c-border-grey;
-    border-radius: 20px;
-    padding: 0.6em 1em;
   }
 }
 

@@ -1,7 +1,9 @@
 <template>
   <div
     class="session"
-    :class="{ 'session--whiteboard': auxiliaryType === 'WHITEBOARD' }"
+    :class="{
+      'session--whiteboard': auxiliaryType === sessionToolTypes.WHITEBOARD,
+    }"
   >
     <div
       v-if="isWaitingForRequestedVolunteer && !session?.volunteerId"
@@ -243,13 +245,47 @@
             !!isWaitingForRequestedVolunteer && !session?.volunteerId
           "
           :isListeningToPartnerAudio="!isSpeakerMuted"
-        />
+        >
+          <template #session-tool-toggle>
+            <div
+              v-if="mobileMode"
+              class="toggleButton"
+              id="toggleButton"
+              @click="toggleAuxiliary"
+            >
+              <div class="toggleButton__wrapper">
+                <span
+                  class="toggleButton__message-indicator"
+                  v-if="!hasSeenNewMessage"
+                ></span>
+                <img
+                  v-if="auxiliaryOpen"
+                  id="toggleIcon"
+                  src="@/assets/Chat.png"
+                  alt="toggle icon"
+                />
+                <img
+                  v-else-if="auxiliaryType === sessionToolTypes.WHITEBOARD"
+                  id="toggleIcon"
+                  src="@/assets/Pencil.png"
+                  alt="toggle icon"
+                />
+                <img
+                  v-else
+                  id="toggleIcon"
+                  src="@/assets/doc_editor_icon.png"
+                  alt="toggle icon"
+                />
+              </div>
+            </div>
+          </template>
+        </session-chat>
       </div>
     </div>
     <div
-      v-if="mobileMode"
-      class="toggleButton"
-      id="toggleButton"
+      v-if="mobileMode && auxiliaryOpen"
+      class="toggleButton toggleButton--back back"
+      id="toggleButtonBack"
       @click="toggleAuxiliary"
     >
       <div class="toggleButton__wrapper">
@@ -257,24 +293,7 @@
           class="toggleButton__message-indicator"
           v-if="!hasSeenNewMessage"
         ></span>
-        <img
-          v-if="auxiliaryOpen"
-          id="toggleIcon"
-          src="@/assets/Chat.png"
-          alt="toggle icon"
-        />
-        <img
-          v-else-if="auxiliaryType === sessionToolTypes.WHITEBOARD"
-          id="toggleIcon"
-          src="@/assets/Pencil.png"
-          alt="toggle icon"
-        />
-        <img
-          v-else
-          id="toggleIcon"
-          src="@/assets/doc_editor_icon.png"
-          alt="toggle icon"
-        />
+        <img src="@/assets/Chat.png" alt="Return to chat" />
       </div>
     </div>
     <ModerationDisclaimerModal
@@ -1441,31 +1460,34 @@ $ios-keyboard-bar-clearance: 130px;
 }
 
 .toggleButton {
-  position: fixed;
-  z-index: 3;
-  bottom: 10px;
-  right: 20px;
-  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 22px;
   background-color: #16d2aa;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   transition: 0.4s;
   text-align: center;
 
-  @include breakpoint-below('medium') {
-    bottom: 40px;
-  }
-
   img,
   svg {
-    margin-top: 7px;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
+  }
+
+  &--back {
+    position: fixed;
+    z-index: 3;
+    right: 20px;
+    bottom: 40px;
   }
 }
 
 .toggleButton__wrapper {
   position: relative;
+  line-height: 0;
 }
 
 .toggleButton__message-indicator {
