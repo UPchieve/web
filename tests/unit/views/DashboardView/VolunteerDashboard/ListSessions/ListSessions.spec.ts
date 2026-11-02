@@ -298,7 +298,7 @@ describe('Locked sessions', () => {
     const session1Subject = tableRows[1].find(
       '[data-testid="subject-session-1"]'
     )
-    expect(session1WaitTime.text()).toEqual('5 mins')
+    expect(session1WaitTime.text()).toEqual('5:00')
     expect(session1Subject.text()).toEqual('Prealgebra')
 
     // Second session should be algebra one, with a wait time of 3 minutes
@@ -308,7 +308,7 @@ describe('Locked sessions', () => {
     const session2Subject = tableRows[2].find(
       '[data-testid="subject-session-2"]'
     )
-    expect(session2WaitTime.text()).toEqual('3 mins')
+    expect(session2WaitTime.text()).toEqual('3:00')
     expect(session2Subject.text()).toEqual('Algebra 1')
 
     // Third session is session-4, Biology, locked, with a wait time of 10 minutes
@@ -318,7 +318,7 @@ describe('Locked sessions', () => {
     const session3Subject = tableRows[3].find(
       '[data-testid="subject-session-4"]'
     )
-    expect(session3WaitTime.text()).toEqual('10 mins')
+    expect(session3WaitTime.text()).toEqual('10:00')
     expect(session3Subject.text()).toEqual('🔒Biology')
 
     // Fourth session is session-3, Calculus BC, locked, with a wait time of 9 minutes
@@ -328,7 +328,7 @@ describe('Locked sessions', () => {
     const session4Subject = tableRows[4].find(
       '[data-testid="subject-session-3"]'
     )
-    expect(session4WaitTime.text()).toEqual('9 mins')
+    expect(session4WaitTime.text()).toEqual('9:00')
     expect(session4Subject.text()).toEqual('🔒Calculus BC')
   })
 

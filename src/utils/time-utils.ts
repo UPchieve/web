@@ -5,6 +5,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
+import duration from 'dayjs/plugin/duration'
 
 D.extend(localizedFormat)
 D.extend(relativeTime)
@@ -12,6 +13,7 @@ D.extend(customParseFormat)
 D.extend(utc)
 D.extend(timezone)
 D.extend(advancedFormat)
+D.extend(duration)
 
 export const dayjs = D
 

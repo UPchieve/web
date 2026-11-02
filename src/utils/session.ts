@@ -1,5 +1,6 @@
 import Case from 'case'
 import UserService from '@/services/UserService'
+import { dayjs } from '@/utils/time-utils'
 
 /**
  * Starts a new session for the specified topic and subtopic.
@@ -55,12 +56,23 @@ function getActiveHolds(session) {
   )
 }
 
-export function sessionHasActiveHold(session) {
-  const activeHolds = getActiveHolds(session)
-  return activeHolds.length > 0
-}
-
 export function maybeGetActiveSessionHoldForUser(session, forUserId) {
   const activeHolds = getActiveHolds(session)
   return activeHolds.find((hold) => hold.coachId === forUserId)
+}
+
+export function getWaitTimeDisplay(session: { createdAt: Date }): string {
+  const createdAt = dayjs(new Date(session.createdAt))
+  const now = dayjs(new Date())
+  const waitDuration = dayjs.duration(now.diff(createdAt))
+
+  const hours = waitDuration.hours()
+  const minutes = waitDuration.minutes()
+  const seconds = waitDuration.seconds()
+
+  if (hours > 0) {
+    return `${hours}hr+`
+  }
+  const secondsDisplay = seconds > 9 ? seconds : `0${seconds}`
+  return `${minutes}:${secondsDisplay}`
 }

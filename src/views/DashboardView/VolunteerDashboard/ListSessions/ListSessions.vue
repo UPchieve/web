@@ -101,6 +101,7 @@ import SessionService from '@/services/SessionService'
 import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
+import { getWaitTimeDisplay } from '@/utils/session'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
@@ -234,33 +235,11 @@ function goToSubjectCert(session: any) {
   }
 }
 
-const mobileMode = computed(() => store.getters['app/mobileMode'])
 const ticks = computed(() => store.state.volunteer.ticks)
 function waitTime(args: { createdAt: any }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   ticks.value //This line makes waitTime recalculate as `ticks` changes in the store.
-  const newTime = new Date().getTime() - new Date(args.createdAt).getTime()
-  const seconds = Number((newTime / 1000).toFixed(0))
-  const minutes = Number((newTime / (1000 * 60)).toFixed(0))
-  const hours = Number((newTime / (1000 * 60 * 60)).toFixed(0))
-
-  // Use shorter labels on mobile
-  const minuteLabel = mobileMode.value ? 'm' : ' min'
-  const minutesLabel = mobileMode.value ? 'm' : ' mins'
-  const hourLabel = mobileMode.value ? 'h' : ' hr'
-  const hoursLabel = mobileMode.value ? 'h' : ' hrs'
-
-  if (seconds < 60) {
-    return `< 1${minuteLabel}`
-  }
-  if (minutes < 60) {
-    if (minutes === 1) return `${minutes}${minutesLabel}`
-    return `${minutes}${minutesLabel}`
-  }
-  if (hours < 24) {
-    if (hours === 1) return `${hours}${hourLabel}`
-    return `${hours}${hoursLabel}`
-  }
+  return getWaitTimeDisplay(args)
 }
 </script>
 
