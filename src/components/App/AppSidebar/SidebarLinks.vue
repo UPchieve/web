@@ -232,7 +232,11 @@ import {
   NTHS_DESTINATION_LABELS,
   NTHS_DESTINATION_PATHS,
 } from '@/views/NTHS/nths-route-helpers'
-import { NEXT_PRESIDENT_UNNAMED_TITLE } from '@/services/NTHSRenewalService'
+import {
+  CHAPTER_NEEDS_PRESIDENT_DOT_TITLE,
+  NAMED_PRESIDENT_DOT_TITLE,
+  NEXT_PRESIDENT_UNNAMED_TITLE,
+} from '@/services/NTHSRenewalService'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
@@ -301,6 +305,7 @@ export default {
       isNthsGroupMemberOnly: 'nths/isGroupMemberOnly',
       hasNthsAdminRole: 'nths/hasAdminRole',
       nthsRenewalNeedsAttention: 'nths/renewalNeedsAttention',
+      nthsRenewalPrompt: 'nths/renewalPrompt',
     }),
     hasSeenCalculator() {
       if (this.shouldShowStudentToVolunteerHoursPage) {
@@ -334,6 +339,12 @@ export default {
     nthsDotLabel() {
       if (this.shouldShowNthsChapterCreationDot) {
         return 'Create your NTHS chapter'
+      }
+      if (this.nthsRenewalPrompt === 'successor-must-answer') {
+        return NAMED_PRESIDENT_DOT_TITLE
+      }
+      if (this.nthsRenewalPrompt === 'member-must-answer') {
+        return CHAPTER_NEEDS_PRESIDENT_DOT_TITLE
       }
       if (this.nthsRenewalNeedsAttention) {
         return NEXT_PRESIDENT_UNNAMED_TITLE

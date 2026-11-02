@@ -52,6 +52,8 @@ function syncNTHSStatusToGleap(
 
 const RENEWAL_ATTENTION_PROMPTS: NTHSRenewalPrompt[] = [
   'name-successor-reminder',
+  'successor-must-answer',
+  'member-must-answer',
 ]
 
 export default {
@@ -202,6 +204,25 @@ export default {
       )
       commit('setNTHSGroupRenewal', { groupId, renewal })
     },
+    async acceptNTHSRenewalPresidency(
+      { commit },
+      {
+        groupId,
+        commitments,
+      }: { groupId: string; commitments?: NTHSRenewalCommitments }
+    ) {
+      const { renewal, outcome } =
+        await NetworkService.acceptNTHSRenewalPresidency(groupId, {
+          commitments,
+        })
+      commit('setNTHSGroupRenewal', { groupId, renewal })
+      return outcome
+    },
+    async declineNTHSRenewalPresidency({ commit }, groupId: string) {
+      const { renewal } =
+        await NetworkService.declineNTHSRenewalPresidency(groupId)
+      commit('setNTHSGroupRenewal', { groupId, renewal })
+    },
     async fetchNTHSChecklist({ commit }, groupId: string) {
       let checklist: NTHSChecklistPublic
       try {
@@ -276,6 +297,7 @@ export default {
     hasAdminRole: (state, getters) => getters.memberRole === 'admin',
     isGroupMemberOnly: (state, getters) =>
       !getters.hasAdminRole && state.NTHSGroups.length > 0,
+    renewalPrompt: (state) => state.NTHSGroups[0]?.renewal?.prompt,
     renewalNeedsAttention: (state) => {
       const prompt = state.NTHSGroups[0]?.renewal?.prompt
       return !!prompt && RENEWAL_ATTENTION_PROMPTS.includes(prompt)

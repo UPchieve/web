@@ -1,8 +1,8 @@
 import NTHSGroupsView from '@/views/NTHS/NTHSGroupsView.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
-import { flushPromises, mount } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ModalService from '@/services/ModalService'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
@@ -118,6 +118,8 @@ async function getWrapper(
   await flushPromises()
   return wrapper
 }
+
+enableAutoUnmount(afterEach)
 
 describe('NTHSGroupsView', () => {
   beforeEach(() => {
@@ -281,6 +283,19 @@ describe('NTHSGroupsView', () => {
 
       expect(refreshNTHSGroups).toHaveBeenCalledTimes(3)
       expect(fetchNthsData).not.toHaveBeenCalled()
+    })
+
+    it('refreshes the chapter list when the coach comes back to the browser tab', async () => {
+      await getWrapper('/groups/home')
+      const visibilityState = vi.spyOn(document, 'visibilityState', 'get')
+
+      for (const state of ['hidden', 'visible'] as const) {
+        visibilityState.mockReturnValue(state)
+        document.dispatchEvent(new Event('visibilitychange'))
+        await flushPromises()
+      }
+
+      expect(refreshNTHSGroups).toHaveBeenCalledTimes(2)
     })
 
     it('moves a coach removed from the chapter off Chapter HQ on the next tab change', async () => {

@@ -36,6 +36,9 @@ const BASE_RENEWAL: NTHSRenewalPublic = {
   commitmentsRequired: true,
   canNameSelf: true,
   namingSelfAccepts: false,
+  namedSelf: false,
+  memberStageOpen: false,
+  acceptedPresidents: [],
 }
 
 function successor(

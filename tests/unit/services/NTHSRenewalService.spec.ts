@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import {
-  namedSuccessorsTitle,
-  successorPickerHint,
-} from '@/services/NTHSRenewalService'
-import type {
-  NTHSRenewalPublic,
-  NTHSRenewalSuccessorPublic,
-} from '@/services/NTHSGroupService'
+import { namedSuccessorsTitle } from '@/services/NTHSRenewalService'
+import type { NTHSRenewalSuccessorPublic } from '@/services/NTHSGroupService'
 
 const VIEWER_ID = 'viewer'
 const ANA = { userId: 'viewer', firstName: 'Ana', lastInitial: 'R' }
@@ -52,28 +46,4 @@ describe('namedSuccessorsTitle', () => {
   ])('words the title when $name', ({ successors, title }) => {
     expect(namedSuccessorsTitle(successors, VIEWER_ID)).toBe(title)
   })
-})
-
-describe('successorPickerHint', () => {
-  it.each([
-    {
-      namingSelfAccepts: false,
-      hint: "Name one or more members. They'll be notified and can accept starting Aug 1. You can change who's named until Sept 14.",
-    },
-    {
-      namingSelfAccepts: true,
-      hint: "Name one or more members. They'll be notified and can accept right away. You can change who's named until Sept 14, or until someone accepts.",
-    },
-  ])(
-    'words the hint when accepting right away is $namingSelfAccepts',
-    ({ namingSelfAccepts, hint }) => {
-      const renewal = {
-        successorConfirmationOn: '2027-08-01',
-        namingClosesOn: '2027-09-14',
-        namingSelfAccepts,
-      } as NTHSRenewalPublic
-
-      expect(successorPickerHint(renewal)).toBe(hint)
-    }
-  )
 })

@@ -36,6 +36,9 @@ const RENEWAL: NTHSRenewalPublic = {
   commitmentsRequired: true,
   canNameSelf: true,
   namingSelfAccepts: false,
+  namedSelf: false,
+  memberStageOpen: false,
+  acceptedPresidents: [],
 }
 const ALL_COMMITMENTS = Object.fromEntries(
   NTHS_COMMITMENTS.map(({ key }) => [key, true])

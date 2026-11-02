@@ -9,6 +9,7 @@ import type {
   NTHSChapterImpactResponse,
   NTHSChapterRosterResponse,
   NTHSMemberUpdate,
+  NTHSRenewalAcceptResponse,
   NTHSRenewalCommitments,
   NTHSRenewalResponse,
   NTHSRenewalSuccessorsResponse,
@@ -362,6 +363,23 @@ export function nameSelfAsNTHSRenewalSuccessor(
   )
 }
 
+export function acceptNTHSRenewalPresidency(
+  groupId: string,
+  data: { commitments?: NTHSRenewalCommitments }
+) {
+  return httpPost<NTHSRenewalAcceptResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/renewal/accept`,
+    data
+  )
+}
+
+export function declineNTHSRenewalPresidency(groupId: string) {
+  return httpPost<NTHSRenewalResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/renewal/decline`,
+    {}
+  )
+}
+
 export function adminNTHSGetChapters(ids: string[]) {
   return httpGet<{ chapters: NTHSCloseChapter[] }>(
     `${ADMIN_ROOT}/nths/chapters?ids=${ids.map(encodeURIComponent).join(',')}`
@@ -479,6 +497,8 @@ export default {
   getNTHSRenewalSuccessors,
   setNTHSRenewalSuccessors,
   nameSelfAsNTHSRenewalSuccessor,
+  acceptNTHSRenewalPresidency,
+  declineNTHSRenewalPresidency,
   getVolunteerPartner(partnerId) {
     return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(

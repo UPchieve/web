@@ -8,9 +8,12 @@ import LoggerService from '@/services/LoggerService'
 import { useRenewalNaming } from '@/composables/useRenewalNaming'
 import {
   NEXT_PRESIDENT_UNNAMED_TITLE,
+  acceptedPresidentsTitle,
   namedSuccessors,
   namedSuccessorsTitle,
+  renewalCountdownTitle,
   renewalDate,
+  renewalDaysLeft,
   renewalSchoolYear,
   successorPickerHint,
   whoWillLeadTitle,
@@ -23,22 +26,36 @@ import type {
 
 const props = defineProps<{ groupId: string }>()
 const store = useStore()
-const { renewal, chapterName, isSubmitting, errorMessage, nameSelf } =
-  useRenewalNaming(
-    () => props.groupId,
-    () =>
-      ModalService.showNthsAcceptPresidency({
-        chapterName: chapterName.value,
-        schoolYear: renewalSchoolYear(renewal.value?.closesOn ?? null),
-      })
-  )
+const {
+  renewal,
+  chapterName,
+  isSubmitting,
+  errorMessage,
+  nameSelf,
+  accept,
+  decline,
+} = useRenewalNaming(
+  () => props.groupId,
+  () =>
+    ModalService.showNthsAcceptPresidency({
+      chapterName: chapterName.value,
+      schoolYear: renewalSchoolYear(renewal.value?.closesOn ?? null),
+    })
+)
 const successorsFailed = ref(false)
 
 const successors = computed<NTHSRenewalSuccessorPublic[]>(
   () => store.state.nths.NTHSRenewalSuccessors[props.groupId] ?? []
 )
 
-type Banner = { title: string; body: string; primaryLabel: string }
+type Banner = {
+  title: string
+  body: string
+  primaryLabel: string
+  variant: 'information' | 'warning'
+  onPrimary: () => unknown
+  secondary?: { label: string; onClick: () => unknown }
+}
 
 const BANNERS: Partial<
   Record<NTHSRenewalPrompt, (renewal: NTHSRenewalPublic) => Banner>
@@ -47,11 +64,15 @@ const BANNERS: Partial<
     title: whoWillLeadTitle(chapterName.value),
     body: `Name one or more members as next year's president. They'll be notified and can accept starting ${renewalDate(r.successorConfirmationOn)}.`,
     primaryLabel: 'Name president',
+    variant: 'information',
+    onPrimary: openPicker,
   }),
   'name-successor-reminder': (r) => ({
     title: NEXT_PRESIDENT_UNNAMED_TITLE,
     body: `Name one or more members by ${renewalDate(r.namingClosesOn)}. If nobody accepts by ${renewalDate(r.closesOn)}, the chapter closes.`,
     primaryLabel: 'Name president',
+    variant: 'information',
+    onPrimary: openPicker,
   }),
   'successors-named': (r) => ({
     title: successorsFailed.value
@@ -59,6 +80,29 @@ const BANNERS: Partial<
       : namedSuccessorsTitle(successors.value, store.state.user.user.id),
     body: successorPickerHint(r),
     primaryLabel: 'Change',
+    variant: 'information',
+    onPrimary: openPicker,
+  }),
+  'co-president-offer': (r) => ({
+    title: acceptedPresidentsTitle(
+      r.acceptedPresidents,
+      renewalSchoolYear(r.closesOn)
+    ),
+    body: `You were named too, so you can still join as co-president until ${renewalDate(r.closesOn)}.`,
+    primaryLabel: 'Accept as co-president',
+    variant: 'information',
+    onPrimary: accept,
+    secondary: { label: 'Step down', onClick: decline },
+  }),
+  'decliner-countdown': (r) => ({
+    title: renewalCountdownTitle(
+      chapterName.value,
+      renewalDaysLeft(r.closesOn)
+    ),
+    body: `Nobody has accepted the presidency for ${renewalSchoolYear(r.closesOn)} yet. If nobody does by ${renewalDate(r.closesOn)}, the chapter closes. You can still step up.`,
+    primaryLabel: 'Lead the chapter',
+    variant: 'warning',
+    onPrimary: accept,
   }),
 }
 
@@ -116,7 +160,7 @@ function openPicker() {
     class="renewal-banner"
     data-testid="renewal-banner"
   >
-    <Callout v-if="banner && isReady" variant="information">
+    <Callout v-if="banner && isReady" :variant="banner.variant">
       <template v-slot:content>
         <div class="banner-content">
           <div class="banner-text">
@@ -129,8 +173,17 @@ function openPicker() {
               :showArrow="false"
               data-testid="renewal-banner-primary"
               :disabled="isSubmitting"
-              @click="openPicker"
+              @click="banner.onPrimary()"
               >{{ banner.primaryLabel }}</LargeButton
+            >
+            <LargeButton
+              v-if="banner.secondary"
+              variant="secondary"
+              :showArrow="false"
+              data-testid="renewal-banner-secondary"
+              :disabled="isSubmitting"
+              @click="banner.secondary.onClick()"
+              >{{ banner.secondary.label }}</LargeButton
             >
             <LargeButton
               v-if="renewal?.canNameSelf"

@@ -8,6 +8,7 @@ import type { NTHSRenewalCommitments } from '@/services/NTHSGroupService'
 export type AcceptPresidencyProps = {
   chapterName: string
   schoolYear: string
+  submitting?: boolean
 }
 
 defineProps<AcceptPresidencyProps>()
@@ -62,6 +63,7 @@ defineExpose({ onCancel })
         :showArrow="false"
         variant="secondary"
         data-testid="accept-presidency-cancel"
+        :disabled="submitting"
         @click="onCancel"
         >Cancel</LargeButton
       >
@@ -69,7 +71,7 @@ defineExpose({ onCancel })
         :showArrow="false"
         variant="primary-blue"
         data-testid="accept-presidency-accept"
-        :disabled="!canAccept"
+        :disabled="!canAccept || submitting"
         @click="onAccept"
         >Accept the presidency</LargeButton
       >
@@ -80,32 +82,11 @@ defineExpose({ onCancel })
 <style lang="scss" scoped>
 .accept-presidency {
   text-align: left;
-}
-.eyebrow {
-  @include nths-section-eyebrow;
-  color: $c-secondary-grey;
-  margin: 0;
-}
-.title {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.3;
-  margin: 6px 0 0;
-}
-.body {
-  @include nths-page-subtitle;
-  margin-top: 10px;
+  @include nths-answer-copy;
 }
 .commitments {
   display: flex;
   flex-direction: column;
   margin-top: 12px;
-}
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 24px;
 }
 </style>

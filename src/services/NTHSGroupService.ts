@@ -151,6 +151,9 @@ export type NTHSRenewalPublic = {
   commitmentsRequired: boolean
   canNameSelf: boolean
   namingSelfAccepts: boolean
+  namedSelf: boolean
+  memberStageOpen: boolean
+  acceptedPresidents: { firstName: string; lastInitial: string }[]
 }
 
 export type NTHSRenewalSuccessorPublic = {
@@ -169,6 +172,12 @@ export type NTHSRenewalSuccessorsResponse = {
 }
 
 export type NTHSRenewalResponse = { renewal: NTHSRenewalPublic }
+
+export type NTHSAcceptanceOutcome = 'accepted' | 'has_president'
+
+export type NTHSRenewalAcceptResponse = NTHSRenewalResponse & {
+  outcome: NTHSAcceptanceOutcome
+}
 
 export type NTHSRenewalCommitmentKey =
   | 'commitWeeklyHours'

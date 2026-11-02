@@ -239,6 +239,9 @@ describe('nths renewal state', () => {
     commitmentsRequired: true,
     canNameSelf: true,
     namingSelfAccepts: false,
+    namedSelf: false,
+    memberStageOpen: false,
+    acceptedPresidents: [],
   } satisfies NTHSRenewalPublic
 
   const groupsOf = (store: ReturnType<typeof getStore>) =>

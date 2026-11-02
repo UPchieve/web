@@ -7,6 +7,11 @@ import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import {
+  CHAPTER_NEEDS_PRESIDENT_DOT_TITLE,
+  NAMED_PRESIDENT_DOT_TITLE,
+  NEXT_PRESIDENT_UNNAMED_TITLE,
+} from '@/services/NTHSRenewalService'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -699,7 +704,11 @@ describe('SidebarLinks', () => {
         expect(wrapper.vm.shouldShowNthsChapterCreationDot).toEqual(true)
       })
 
-      it('labels the chapter dot when the renewal asks for a president', () => {
+      it.each([
+        ['name-successor-reminder', NEXT_PRESIDENT_UNNAMED_TITLE],
+        ['successor-must-answer', NAMED_PRESIDENT_DOT_TITLE],
+        ['member-must-answer', CHAPTER_NEEDS_PRESIDENT_DOT_TITLE],
+      ])('labels the chapter dot for renewal prompt %s', (prompt, label) => {
         const wrapper = getWrapper({
           props: { authenticated: true },
           stubs: {
@@ -726,16 +735,14 @@ describe('SidebarLinks', () => {
                 {
                   groupInfo: { id: 'group-1' },
                   memberInfo: { roleName: 'admin' },
-                  renewal: { prompt: 'name-successor-reminder' },
+                  renewal: { prompt },
                 },
               ],
             },
           },
         })
         const dot = wrapper.find('.SidebarLinks__notification')
-        expect(dot.attributes('label')).toBe(
-          "Next year's president hasn't been named yet"
-        )
+        expect(dot.attributes('label')).toBe(label)
       })
 
       it('does not show the chapter creation dot when the approval has expired', () => {

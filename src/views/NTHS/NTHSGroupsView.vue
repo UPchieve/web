@@ -2,12 +2,18 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { useDocumentVisibility } from '@vueuse/core'
 import LargeButton from '@/components/LargeButton.vue'
 import ModalService from '@/services/ModalService'
 import type { GroupMember } from '@/services/NTHSGroupService'
 import Callout from '@/components/Callout.vue'
+import RenewalAnswerPanel from '@/components/NTHS/Renewal/RenewalAnswerPanel.vue'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
 import LoggerService from '@/services/LoggerService'
+import {
+  isRenewalMustAnswer,
+  renewalWarningLine,
+} from '@/services/NTHSRenewalService'
 import { useAppModalStore } from '@/stores/app/modal'
 import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
 
@@ -46,8 +52,18 @@ const hidePageContentReason = computed(function ():
   return 'not ready to tutor'
 })
 
+const showRenewalAnswer = computed(() =>
+  isRenewalMustAnswer(group.value?.renewal?.prompt)
+)
+
 const chapterName = computed(
   () => group.value?.groupInfo?.name ?? 'your chapter'
+)
+
+const renewalLine = computed(() =>
+  group.value?.renewal
+    ? renewalWarningLine(group.value.renewal, chapterName.value)
+    : undefined
 )
 
 const hidePageContentMessage = computed(() => {
@@ -136,6 +152,14 @@ watch(
   () => void refreshNTHSData()
 )
 
+// The renewal countdown reads today's date, which nothing reactive changes in
+// a tab left open overnight.
+watch(useDocumentVisibility(), (visibility) => {
+  if (visibility === 'visible') {
+    void refreshNTHSData()
+  }
+})
+
 // The tab strip scrolls horizontally below ~1100px. Landing directly on a tab
 // route (e.g. from the checklist's "Edit in Chapter setup") mounts the active
 // tab already off the visible strip, with no scroll event to reveal it.
@@ -172,7 +196,7 @@ watch(
       <nav
         class="tabs"
         ref="tabsNav"
-        v-if="!hidePageContentReason"
+        v-if="!hidePageContentReason && !showRenewalAnswer"
         aria-label="Chapter sections"
       >
         <RouterLink
@@ -197,6 +221,13 @@ watch(
         <Callout variant="warning">
           <template v-slot:content>
             <div class="callout-content">
+              <p
+                v-if="renewalLine"
+                class="warning-line"
+                data-testid="renewal-warning-line"
+              >
+                {{ renewalLine }}
+              </p>
               {{ hidePageContentMessage }}
               <LargeButton
                 v-if="hidePageContentReason === 'not ready to tutor'"
@@ -229,6 +260,10 @@ watch(
           </template>
         </Callout>
       </div>
+      <RenewalAnswerPanel
+        v-else-if="showRenewalAnswer"
+        :groupId="group.groupInfo.id"
+      />
       <template v-else>
         <RenewalBanner
           v-if="group?.groupInfo?.id"
@@ -323,6 +358,10 @@ watch(
   @include breakpoint-below('medium') {
     width: 100%;
   }
+}
+.warning-line {
+  font-weight: 700;
+  margin: 0 0 12px;
 }
 .callout-content {
   display: flex;

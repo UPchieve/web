@@ -6,19 +6,23 @@ import { secondsInMs } from '@/utils/time-utils'
 import { isNetworkError } from '@/services/NetworkService'
 import {
   isRenewalErrorCode,
+  renewalAcceptedToast,
+  renewalDeclinedToast,
   renewalErrorMessage,
-  renewalSchoolYear,
 } from '@/services/NTHSRenewalService'
 import type {
+  NTHSAcceptanceOutcome,
   NTHSRenewalCommitments,
   NTHSRenewalPublic,
 } from '@/services/NTHSGroupService'
 
 export type RenewalNamingResult = 'saved' | 'cancelled' | 'failed'
 
+type Send = (commitments?: NTHSRenewalCommitments) => Promise<unknown>
+
 type NamingRequest = {
   namesCaller: boolean
-  send: (commitments?: NTHSRenewalCommitments) => Promise<unknown>
+  send: Send
 }
 
 export function useRenewalNaming(
@@ -41,9 +45,9 @@ export function useRenewalNaming(
   const isSubmitting = ref(false)
   const errorMessage = ref('')
 
-  async function showAcceptedToast(schoolYear: string) {
+  async function showToast(message: string) {
     const toast = await toastController.create({
-      message: `You're ${chapterName.value}'s president for ${schoolYear}.`,
+      message,
       color: 'dark',
       duration: secondsInMs(5),
       position: 'bottom',
@@ -63,17 +67,21 @@ export function useRenewalNaming(
     }
   }
 
+  function reloadNthsData() {
+    void store.dispatch('nths/fetchNthsData').catch((err) => {
+      LoggerService.noticeError(err, 'Could not refresh NTHS data')
+    })
+  }
+
   // A commitments_required refusal asks for the commitments and retries.
-  async function submit({
-    namesCaller,
-    send,
-  }: NamingRequest): Promise<RenewalNamingResult> {
-    const before = renewal.value
-    if (!before) return 'cancelled'
+  async function save(
+    commitmentsNeeded: boolean,
+    send: Send
+  ): Promise<RenewalNamingResult> {
     errorMessage.value = ''
     let commitments: NTHSRenewalCommitments | undefined
     let asked = false
-    if (namesCaller && before.namingSelfAccepts && before.commitmentsRequired) {
+    if (commitmentsNeeded) {
       commitments = await askCommitments()
       if (!commitments) return 'cancelled'
       asked = true
@@ -101,13 +109,30 @@ export function useRenewalNaming(
     } finally {
       isSubmitting.value = false
     }
+    return 'saved'
+  }
+
+  async function submit({
+    namesCaller,
+    send,
+  }: NamingRequest): Promise<RenewalNamingResult> {
+    const before = renewal.value
+    if (!before) return 'cancelled'
+    const result = await save(
+      namesCaller && before.namingSelfAccepts && before.commitmentsRequired,
+      send
+    )
+    if (result !== 'saved') return result
 
     const accepted = namesCaller && !!renewal.value?.namingSelfAccepts
     if (accepted) {
-      void showAcceptedToast(renewalSchoolYear(before.closesOn))
-      void store.dispatch('nths/fetchNthsData').catch((err) => {
-        LoggerService.noticeError(err, 'Could not refresh NTHS data')
-      })
+      void showToast(
+        renewalAcceptedToast({
+          chapterName: chapterName.value,
+          closesOn: before.closesOn,
+        })
+      )
+      reloadNthsData()
     }
     return 'saved'
   }
@@ -123,6 +148,53 @@ export function useRenewalNaming(
     })
   }
 
+  async function accept(): Promise<RenewalNamingResult> {
+    const before = renewal.value
+    if (!before) return 'cancelled'
+    const wasAdmin: boolean = store.getters['nths/hasAdminRole']
+    let outcome = undefined as NTHSAcceptanceOutcome | undefined
+    const result = await save(
+      before.commitmentsRequired,
+      async (commitments) => {
+        outcome = await store.dispatch('nths/acceptNTHSRenewalPresidency', {
+          groupId: groupId(),
+          commitments,
+        })
+      }
+    )
+    if (result !== 'saved') return result
+
+    if (outcome === 'accepted') {
+      void showToast(
+        renewalAcceptedToast({
+          chapterName: chapterName.value,
+          closesOn: before.closesOn,
+          asCoPresident: before.prompt === 'co-president-offer',
+          gainedAdmin: !wasAdmin,
+        })
+      )
+    }
+    reloadNthsData()
+    return 'saved'
+  }
+
+  async function decline(): Promise<RenewalNamingResult> {
+    const before = renewal.value
+    if (!before) return 'cancelled'
+    const wasAdmin: boolean = store.getters['nths/hasAdminRole']
+    const result = await save(false, () =>
+      store.dispatch('nths/declineNTHSRenewalPresidency', groupId())
+    )
+    if (result !== 'saved') return result
+
+    const toast = renewalDeclinedToast({ before, isAdmin: wasAdmin })
+    if (toast) {
+      void showToast(toast)
+    }
+    reloadNthsData()
+    return 'saved'
+  }
+
   return {
     renewal,
     chapterName,
@@ -130,5 +202,7 @@ export function useRenewalNaming(
     errorMessage,
     submit,
     nameSelf,
+    accept,
+    decline,
   }
 }
