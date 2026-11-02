@@ -5,6 +5,7 @@ import axios from 'axios'
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ImpactStudyCampaign } from '@/types'
 import type {
+  NTHSAcceptanceReason,
   NTHSActionName,
   NTHSChapterImpactResponse,
   NTHSChapterRosterResponse,
@@ -365,7 +366,10 @@ export function nameSelfAsNTHSRenewalSuccessor(
 
 export function acceptNTHSRenewalPresidency(
   groupId: string,
-  data: { commitments?: NTHSRenewalCommitments }
+  data: {
+    commitments?: NTHSRenewalCommitments
+    reason?: NTHSAcceptanceReason
+  }
 ) {
   return httpPost<NTHSRenewalAcceptResponse>(
     `${API_ROOT}/nths-groups/${groupId}/renewal/accept`,

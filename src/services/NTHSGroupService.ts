@@ -141,6 +141,7 @@ export type NTHSRenewalPrompt =
   | 'successors-named'
   | 'name-successor-reminder'
   | 'name-successor-banner'
+  | 'step-up'
 
 // Dates are YYYY-MM-DD, null when the chapter isn't renewing.
 export type NTHSRenewalPublic = {
@@ -187,6 +188,8 @@ export type NTHSRenewalCommitmentKey =
   | 'commitRecruitKnownHighSchoolers'
 
 export type NTHSRenewalCommitments = Record<NTHSRenewalCommitmentKey, true>
+
+export type NTHSAcceptanceReason = 'renewal' | 'step-up'
 
 export type NTHSRenewalSuccessorsUpdate = {
   userIds: Uuid[]

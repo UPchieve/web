@@ -7,7 +7,7 @@ import type { NTHSRenewalCommitments } from '@/services/NTHSGroupService'
 
 export type AcceptPresidencyProps = {
   chapterName: string
-  schoolYear: string
+  schoolYear?: string
   submitting?: boolean
 }
 
@@ -44,10 +44,14 @@ defineExpose({ onCancel })
 <template>
   <div class="accept-presidency">
     <p class="eyebrow">Accept the presidency</p>
-    <h2 class="title">Lead {{ chapterName }} in {{ schoolYear }}</h2>
+    <h2 class="title">
+      Lead {{ chapterName
+      }}<template v-if="schoolYear"> in {{ schoolYear }}</template>
+    </h2>
     <p class="body">
-      Confirm each of the president's commitments for next school year. Nothing
-      is saved until you accept.
+      Confirm each of the president's commitments<template v-if="schoolYear">
+        for next school year</template
+      >. Nothing is saved until you accept.
     </p>
     <div class="commitments">
       <FormCheckBox

@@ -18,6 +18,7 @@ vi.mock('@/services/NetworkService', async (importOriginal) => ({
   default: {
     getNTHSRenewalSuccessors: vi.fn(),
     nameSelfAsNTHSRenewalSuccessor: vi.fn(),
+    acceptNTHSRenewalPresidency: vi.fn(),
   },
 }))
 const present = vi.fn()
@@ -319,6 +320,34 @@ describe('RenewalBanner', () => {
       expect.objectContaining({
         message: "You're Lincoln High NTHS's president for 2027–28.",
       })
+    )
+  })
+
+  it('steps up through the commitments modal with reason step-up', async () => {
+    const commitments = Object.fromEntries(
+      NTHS_COMMITMENTS.map(({ key }) => [key, true])
+    ) as NTHSRenewalCommitments
+    const askCommitments = vi
+      .spyOn(ModalService, 'showNthsAcceptPresidency')
+      .mockResolvedValue(commitments)
+    vi.mocked(NetworkService.acceptNTHSRenewalPresidency).mockResolvedValue({
+      renewal: { ...BASE_RENEWAL, prompt: 'none' },
+      outcome: 'accepted',
+    })
+    const wrapper = await mountBanner({
+      prompt: 'step-up',
+      commitmentsRequired: false,
+    })
+
+    await wrapper.get('[data-testid="renewal-banner-primary"]').trigger('click')
+    await flushPromises()
+
+    expect(askCommitments).toHaveBeenCalledWith(
+      expect.objectContaining({ schoolYear: undefined })
+    )
+    expect(NetworkService.acceptNTHSRenewalPresidency).toHaveBeenCalledWith(
+      'group-1',
+      { commitments, reason: 'step-up' }
     )
   })
 

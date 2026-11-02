@@ -152,13 +152,15 @@ export function useRenewalNaming(
     const before = renewal.value
     if (!before) return 'cancelled'
     const wasAdmin: boolean = store.getters['nths/hasAdminRole']
+    const stepUp = before.prompt === 'step-up'
     let outcome = undefined as NTHSAcceptanceOutcome | undefined
     const result = await save(
-      before.commitmentsRequired,
+      stepUp || before.commitmentsRequired,
       async (commitments) => {
         outcome = await store.dispatch('nths/acceptNTHSRenewalPresidency', {
           groupId: groupId(),
           commitments,
+          reason: stepUp ? 'step-up' : undefined,
         })
       }
     )
@@ -171,6 +173,7 @@ export function useRenewalNaming(
           closesOn: before.closesOn,
           asCoPresident: before.prompt === 'co-president-offer',
           gainedAdmin: !wasAdmin,
+          stepUp,
         })
       )
     }

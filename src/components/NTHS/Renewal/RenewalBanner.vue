@@ -39,7 +39,10 @@ const {
   () =>
     ModalService.showNthsAcceptPresidency({
       chapterName: chapterName.value,
-      schoolYear: renewalSchoolYear(renewal.value?.closesOn ?? null),
+      schoolYear:
+        renewal.value?.prompt === 'step-up'
+          ? undefined
+          : renewalSchoolYear(renewal.value?.closesOn ?? null),
     })
 )
 const successorsFailed = ref(false)
@@ -101,6 +104,13 @@ const BANNERS: Partial<
     ),
     body: `Nobody has accepted the presidency for ${renewalSchoolYear(r.closesOn)} yet. If nobody does by ${renewalDate(r.closesOn)}, the chapter closes. You can still step up.`,
     primaryLabel: 'Lead the chapter',
+    variant: 'warning',
+    onPrimary: accept,
+  }),
+  'step-up': () => ({
+    title: `${chapterName.value} needs a president`,
+    body: 'Nobody can manage your chapter right now. Step up as president to keep it going.',
+    primaryLabel: 'Step up as president',
     variant: 'warning',
     onPrimary: accept,
   }),

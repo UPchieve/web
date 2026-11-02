@@ -53,12 +53,17 @@ export function renewalAcceptedToast({
   closesOn,
   asCoPresident = false,
   gainedAdmin = false,
+  stepUp = false,
 }: {
   chapterName: string
   closesOn: string | null
   asCoPresident?: boolean
   gainedAdmin?: boolean
+  stepUp?: boolean
 }): string {
+  if (stepUp) {
+    return `You're now the president of ${chapterName}, with admin access.`
+  }
   const year = renewalSchoolYear(closesOn)
   const title = asCoPresident
     ? `You're a co-president of ${chapterName} for ${year}.`

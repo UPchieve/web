@@ -9,6 +9,7 @@ import {
 } from '@/views/NTHS/nths-route-helpers'
 import type {
   AffiliationStatus,
+  NTHSAcceptanceReason,
   NTHSRenewalCommitments,
   NTHSRenewalPrompt,
   NTHSRenewalPublic,
@@ -209,11 +210,17 @@ export default {
       {
         groupId,
         commitments,
-      }: { groupId: string; commitments?: NTHSRenewalCommitments }
+        reason,
+      }: {
+        groupId: string
+        commitments?: NTHSRenewalCommitments
+        reason?: NTHSAcceptanceReason
+      }
     ) {
       const { renewal, outcome } =
         await NetworkService.acceptNTHSRenewalPresidency(groupId, {
           commitments,
+          reason,
         })
       commit('setNTHSGroupRenewal', { groupId, renewal })
       return outcome
