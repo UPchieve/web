@@ -999,7 +999,6 @@ export enum POSTHOG_FEATURE_FLAGS {
   BLOCK_AUDIO_CALL = 'block-audio-call',
   VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR = 'volunteer-relevant-experience-fake-door',
   VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR = 'volunteer-show-online-status-fake-door',
-  NTHS_SHORT_APPLICATION = 'nths-short-application',
   AMERICA_COUNTS_AUTO_JOIN_DELAY = 'america-counts-auto-join-delay',
 }
 

@@ -1,21 +1,12 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import {
-  NTHS_APPLICATION_FORMS,
-  type NTHSApplicationDraft,
-  type NTHSFormVersion,
-} from '@/services/NTHSApplicationService'
+import type { NTHSApplicationDraft } from '@/services/NTHSApplicationService'
 import {
   clearNTHSApplicationDraft,
   getNTHSApplicationDraft,
   setNTHSApplicationDraft,
 } from '@/services/BrowserStorageService'
 
-const [FORM_VERSION] = Object.keys(NTHS_APPLICATION_FORMS).map(
-  Number
-) as NTHSFormVersion[]
-
 const DRAFT: NTHSApplicationDraft = {
-  formVersion: FORM_VERSION,
   schoolId: 'school-1',
   schoolName: 'Riverside High',
   cannotFindSchool: false,

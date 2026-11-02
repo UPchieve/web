@@ -5,12 +5,8 @@ import store from '@/store'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import NTHSApplicationFormView from '@/views/NTHS/NTHSApplicationFormView.vue'
-import { POSTHOG_FEATURE_FLAGS, US_COUNTRY } from '@/consts'
-import {
-  NTHS_APPLICATION_FORMS,
-  NTHS_LONG_FORM_VERSION,
-  type NTHSFormVersion,
-} from '@/services/NTHSApplicationService'
+import { US_COUNTRY } from '@/consts'
+import { NTHS_APPLICATION_QUESTIONS } from '@/services/NTHSApplicationService'
 import {
   getNTHSApplicationDraft,
   setNTHSApplicationDraft,
@@ -28,9 +24,7 @@ async function mountAtQuestions() {
   })
   await wrapper.vm.$nextTick()
   const vm = wrapper.vm as any
-  for (const question of NTHS_APPLICATION_FORMS[
-    vm.formVersion as NTHSFormVersion
-  ]) {
+  for (const question of NTHS_APPLICATION_QUESTIONS) {
     vm.responses[question.key] =
       question.type === 'longText' || question.type === 'shortText'
         ? 'An answer'
@@ -44,58 +38,46 @@ async function mountAtQuestions() {
 
 const USER_ID = 'coach-1'
 
-function setVariant(variant: string) {
-  store.state.featureFlags.multivariantFlags[
-    POSTHOG_FEATURE_FLAGS.NTHS_SHORT_APPLICATION
-  ] = variant
-}
-
 describe('NTHSApplicationFormView submit', () => {
   beforeEach(() => {
     vi.mocked(LoggerService.noticeError).mockClear()
     store.commit('nths/setNTHSCandidateApplicationStatus', undefined)
     store.commit('user/setUser', { id: USER_ID })
-    setVariant('')
     localStorage.clear()
   })
 
-  it.each(Object.keys(NTHS_APPLICATION_FORMS).map(Number) as NTHSFormVersion[])(
-    'restores a draft saved on form version %i onto step one, whatever the flag says',
-    async (formVersion) => {
-      const question = NTHS_APPLICATION_FORMS[formVersion].find(
-        (q) => q.type !== 'attestation'
-      )!
-      setNTHSApplicationDraft(USER_ID, {
-        formVersion,
-        schoolId: null,
-        schoolName: '',
-        cannotFindSchool: true,
-        unlistedSchool: {
-          name: 'Riverside High',
-          city: 'Riverside',
-          country: 'United States of America',
-          state: 'CA',
-          region: '',
-          website: '',
-        },
-        gradeLevel: '11th grade',
-        responses: { [question.key]: 'To help my peers' },
-      })
+  it('restores a saved draft onto step one', async () => {
+    const question = NTHS_APPLICATION_QUESTIONS.find(
+      (q) => q.type !== 'attestation'
+    )!
+    setNTHSApplicationDraft(USER_ID, {
+      schoolId: null,
+      schoolName: '',
+      cannotFindSchool: true,
+      unlistedSchool: {
+        name: 'Riverside High',
+        city: 'Riverside',
+        country: 'United States of America',
+        state: 'CA',
+        region: '',
+        website: '',
+      },
+      gradeLevel: '11th grade',
+      responses: { [question.key]: 'To help my peers' },
+    })
 
-      const wrapper = mount(NTHSApplicationFormView, {
-        global: { plugins: [store, router] },
-      })
-      await flushPromises()
-      const vm = wrapper.vm as any
+    const wrapper = mount(NTHSApplicationFormView, {
+      global: { plugins: [store, router] },
+    })
+    await flushPromises()
+    const vm = wrapper.vm as any
 
-      expect(vm.formVersion).toBe(formVersion)
-      expect(vm.step).toBe('school')
-      expect(vm.school.cannotFindSchool).toBe(true)
-      expect(vm.school.city).toBe('Riverside')
-      expect(vm.gradeLevel).toBe('11th grade')
-      expect(vm.responses[question.key]).toBe('To help my peers')
-    }
-  )
+    expect(vm.step).toBe('school')
+    expect(vm.school.cannotFindSchool).toBe(true)
+    expect(vm.school.city).toBe('Riverside')
+    expect(vm.gradeLevel).toBe('11th grade')
+    expect(vm.responses[question.key]).toBe('To help my peers')
+  })
 
   it('does not re-save a draft once another tab reports the coach applied', async () => {
     const vm = await mountAtQuestions()
@@ -152,7 +134,7 @@ describe('NTHSApplicationFormView submit', () => {
   // would have the pending page's guard send them straight back to /groups/apply.
   it('still moves to the pending page when the refresh after submitting fails', async () => {
     vi.spyOn(NetworkService, 'submitNTHSApplication').mockResolvedValue({
-      data: { application: { formVersion: 1 } },
+      data: { application: {} },
     } as never)
     const boom = new Error('network down')
     vi.spyOn(store, 'dispatch').mockRejectedValue(boom)
@@ -176,7 +158,7 @@ describe('NTHSApplicationFormView submit', () => {
 
   it('moves to the pending page on a clean submit', async () => {
     vi.spyOn(NetworkService, 'submitNTHSApplication').mockResolvedValue({
-      data: { application: { formVersion: 1 } },
+      data: { application: {} },
     } as never)
     vi.spyOn(store, 'dispatch').mockResolvedValue([] as never)
     vi.spyOn(NetworkService, 'user').mockResolvedValue({
@@ -222,7 +204,6 @@ describe('NTHSApplicationFormView submit', () => {
 describe('NTHSApplicationFormView unlisted school', () => {
   beforeEach(() => {
     store.commit('nths/setNTHSCandidateApplicationStatus', undefined)
-    setVariant('')
     localStorage.clear()
   })
 
@@ -257,7 +238,6 @@ describe('NTHSApplicationFormView unlisted school', () => {
     async (draftCountry, profileCountry, expected) => {
       store.commit('user/setUser', { id: USER_ID, country: profileCountry })
       setNTHSApplicationDraft(USER_ID, {
-        formVersion: NTHS_LONG_FORM_VERSION,
         schoolId: null,
         schoolName: '',
         cannotFindSchool: true,

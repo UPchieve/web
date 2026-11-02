@@ -18,10 +18,7 @@ import type {
   NTHSTitle,
   Role,
 } from './NTHSGroupService'
-import type {
-  NTHSFormVersion,
-  NTHSUnlistedSchool,
-} from './NTHSApplicationService'
+import type { NTHSUnlistedSchool } from './NTHSApplicationService'
 import type { CalendarRosterPeriod } from './NTHSRosterService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
@@ -1749,7 +1746,6 @@ export default {
     unlistedSchool?: NTHSUnlistedSchool
     gradeLevel: string
     responses: Record<string, string | boolean>
-    formVersion: NTHSFormVersion
   }) {
     return httpPostDeprecated(`${API_ROOT}/nths-application`, data).then(
       this._successHandler,

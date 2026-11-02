@@ -3,17 +3,16 @@ import {
   buildEmptyResponses,
   collectResponses,
   HIGH_SCHOOL_GRADES,
-  NTHS_APPLICATION_FORMS,
+  NTHS_APPLICATION_QUESTIONS,
   sanitizeNTHSApplicationDraft,
   type NTHSApplicationDraft,
   type NTHSApplicationResponses,
-  type NTHSFormVersion,
   type NTHSQuestion,
   upcomingApplicationDeadline,
 } from '@/services/NTHSApplicationService'
 import { US_COUNTRY } from '@/consts'
 
-// A form-version-agnostic stand-in for a real NTHS_APPLICATION_FORMS entry:
+// A stand-in for NTHS_APPLICATION_QUESTIONS:
 // one required longText, one optional shortText, one attestation.
 const TEST_QUESTIONS: NTHSQuestion[] = [
   {
@@ -116,16 +115,6 @@ describe('collectResponses', () => {
 })
 
 describe('sanitizeNTHSApplicationDraft', () => {
-  // Derived from whichever form(s) NTHS_APPLICATION_FORMS currently defines, so
-  // these tests don't care which form versions exist or which get deleted.
-  const FORM_VERSIONS = Object.keys(NTHS_APPLICATION_FORMS).map(
-    Number
-  ) as NTHSFormVersion[]
-  const FORM_VERSION = FORM_VERSIONS[0]
-  const FORM_QUESTIONS = NTHS_APPLICATION_FORMS[FORM_VERSION]
-  const UNKNOWN_FORM_VERSION = (Math.max(...FORM_VERSIONS) +
-    1000) as NTHSFormVersion
-
   function answersFor(questions: NTHSQuestion[]): NTHSApplicationResponses {
     return questions.reduce((responses, question) => {
       responses[question.key] =
@@ -138,7 +127,6 @@ describe('sanitizeNTHSApplicationDraft', () => {
     overrides: Partial<NTHSApplicationDraft> = {}
   ): NTHSApplicationDraft {
     return {
-      formVersion: FORM_VERSION,
       schoolId: 'school-1',
       schoolName: 'Riverside High',
       cannotFindSchool: false,
@@ -151,37 +139,31 @@ describe('sanitizeNTHSApplicationDraft', () => {
         website: '',
       },
       gradeLevel: '10th grade',
-      responses: answersFor(FORM_QUESTIONS),
+      responses: answersFor(NTHS_APPLICATION_QUESTIONS),
       ...overrides,
     }
   }
 
-  it('keeps a well-formed draft on the form version it was saved on', () => {
-    // The fallback is an unknown version, so this only passes if the saved
-    // (valid) version wins over it.
-    expect(
-      sanitizeNTHSApplicationDraft(buildDraft(), UNKNOWN_FORM_VERSION)
-    ).toEqual(buildDraft())
+  it('keeps a well-formed draft', () => {
+    expect(sanitizeNTHSApplicationDraft(buildDraft())).toEqual(buildDraft())
   })
 
-  it.each([undefined, UNKNOWN_FORM_VERSION])(
-    'moves a draft saved on form version %s to the fallback form, dropping answers it does not ask',
-    (formVersion) => {
-      const draft = sanitizeNTHSApplicationDraft(
-        buildDraft({
-          formVersion: formVersion as never,
-          responses: { ...answersFor(FORM_QUESTIONS), notAQuestion: 'nope' },
-        }),
-        FORM_VERSION
-      )
+  it('drops answers the current form does not ask', () => {
+    const draft = sanitizeNTHSApplicationDraft({
+      ...buildDraft(),
+      formVersion: 3,
+      responses: {
+        ...answersFor(NTHS_APPLICATION_QUESTIONS),
+        notAQuestion: 'nope',
+      },
+    })
 
-      expect(draft?.formVersion).toBe(FORM_VERSION)
-      expect(draft?.responses).toEqual(answersFor(FORM_QUESTIONS))
-    }
-  )
+    expect(draft).not.toHaveProperty('formVersion')
+    expect(draft?.responses).toEqual(answersFor(NTHS_APPLICATION_QUESTIONS))
+  })
 
   it('drops fields with the wrong shape', () => {
-    const answers = answersFor(FORM_QUESTIONS)
+    const answers = answersFor(NTHS_APPLICATION_QUESTIONS)
     const wrongTypes = Object.fromEntries(
       Object.entries(answers).map(([key, answer]) => [
         key,
@@ -195,8 +177,7 @@ describe('sanitizeNTHSApplicationDraft', () => {
         cannotFindSchool: true,
         gradeLevel: 'College',
         responses: wrongTypes,
-      }),
-      FORM_VERSION
+      })
     )
 
     expect(draft).toMatchObject({
@@ -206,10 +187,8 @@ describe('sanitizeNTHSApplicationDraft', () => {
       responses: {},
     })
     expect(
-      sanitizeNTHSApplicationDraft(
-        buildDraft({ cannotFindSchool: true }),
-        FORM_VERSION
-      )?.cannotFindSchool
+      sanitizeNTHSApplicationDraft(buildDraft({ cannotFindSchool: true }))
+        ?.cannotFindSchool
     ).toBe(false)
   })
 
@@ -236,8 +215,7 @@ describe('sanitizeNTHSApplicationDraft', () => {
             website: '',
             ...fields,
           } as never,
-        }),
-        FORM_VERSION
+        })
       )
 
       expect(draft?.unlistedSchool.country).toBe(country)
@@ -247,7 +225,7 @@ describe('sanitizeNTHSApplicationDraft', () => {
   it.each([undefined, null, 'a string', 42])(
     'reads %s as no draft',
     (saved) => {
-      expect(sanitizeNTHSApplicationDraft(saved, FORM_VERSION)).toBeNull()
+      expect(sanitizeNTHSApplicationDraft(saved)).toBeNull()
     }
   )
 })

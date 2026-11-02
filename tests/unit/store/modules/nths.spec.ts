@@ -8,10 +8,6 @@ import {
   getNTHSApplicationDraft,
   setNTHSApplicationDraft,
 } from '@/services/BrowserStorageService'
-import {
-  NTHS_APPLICATION_FORMS,
-  type NTHSFormVersion,
-} from '@/services/NTHSApplicationService'
 import type { NTHSChecklistPublic } from '@upchieve/api-contracts/nths-checklist'
 import type {
   NTHSRenewalPrompt,
@@ -25,9 +21,6 @@ const nthsModule = (storeOptions.modules as any).nths
 
 describe('nths/fetchNthsData', () => {
   const USER_ID = 'coach-1'
-  const [FORM_VERSION] = Object.keys(NTHS_APPLICATION_FORMS).map(
-    Number
-  ) as NTHSFormVersion[]
 
   beforeEach(() => localStorage.clear())
 
@@ -46,7 +39,6 @@ describe('nths/fetchNthsData', () => {
       const store = getStore()
       store.commit('user/setUser', { id: USER_ID })
       setNTHSApplicationDraft(USER_ID, {
-        formVersion: FORM_VERSION,
         schoolId: 'school-1',
         schoolName: 'Riverside High',
         cannotFindSchool: false,

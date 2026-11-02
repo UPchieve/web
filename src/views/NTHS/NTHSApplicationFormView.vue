@@ -26,8 +26,7 @@ import {
   buildEmptyResponses,
   collectResponses,
   HIGH_SCHOOL_GRADES,
-  NTHS_APPLICATION_FORMS,
-  nthsFormVersionForVariant,
+  NTHS_APPLICATION_QUESTIONS,
   sanitizeNTHSApplicationDraft,
   type NTHSApplicationDraft,
   type NTHSApplicationResponses,
@@ -64,19 +63,8 @@ const gradeLevel = ref<string>(store.getters['user/gradeLevel'])
 
 const userId: string | undefined = store.state.user.user?.id
 
-// Read once: a later flag reload must not swap the form under a coach who is
-// partway through it. A draft keeps the form it was started on, since right
-// after an in-app sign-in the flag can still hold the anonymous visitor's
-// variant until PostHog reloads flags.
-const flaggedFormVersion = nthsFormVersionForVariant(
-  store.getters['featureFlags/nthsShortApplicationVariant']
-)
-const draft = sanitizeNTHSApplicationDraft(
-  getNTHSApplicationDraft(userId),
-  flaggedFormVersion
-)
-const formVersion = draft?.formVersion ?? flaggedFormVersion
-const questions = NTHS_APPLICATION_FORMS[formVersion]
+const draft = sanitizeNTHSApplicationDraft(getNTHSApplicationDraft(userId))
+const questions = NTHS_APPLICATION_QUESTIONS
 
 const responses = reactive(buildEmptyResponses(questions))
 
@@ -118,7 +106,6 @@ const isQuestionsStepIncomplete = computed(
 
 onMounted(async () => {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_FORM_VIEWED, {
-    formVersion,
     hadPrefilledSchool: !!profileSchoolName,
     hadGradeOnFile: !!gradeLevel.value,
   })
@@ -158,7 +145,6 @@ function saveDraft() {
   // this form is open and clears the draft; saving would bring it back.
   if (store.state.nths.NTHSCandidateApplicationStatus) return
   setNTHSApplicationDraft(userId, {
-    formVersion,
     schoolId: school.schoolId,
     schoolName: school.schoolId ? selectedSchoolName.value : '',
     cannotFindSchool: school.cannotFindSchool,
@@ -179,7 +165,6 @@ function goToQuestions() {
   if (!canLeaveSchoolStep.value) return
   error.value = ''
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_STEP_COMPLETED, {
-    formVersion,
     step: 'school',
     usedUnlistedSchool: !school.schoolId,
     gradeLevel: submittedGradeLevel.value,
@@ -204,8 +189,8 @@ async function submit() {
   error.value = ''
 
   const collected = collectResponses(questions, responses)
-  const application = await postApplication(collected)
-  if (!application) {
+  const submitted = await postApplication(collected)
+  if (!submitted) {
     isSubmitting.value = false
     return
   }
@@ -214,7 +199,6 @@ async function submit() {
   clearNTHSApplicationDraft(userId)
 
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_SUBMITTED, {
-    formVersion: application.formVersion,
     usedUnlistedSchool: !school.schoolId,
     gradeLevel: submittedGradeLevel.value,
     optionalQuestionsAnswered: answeredOptionalQuestions(collected),
@@ -245,7 +229,7 @@ async function submit() {
 // later failure is not a failed submission.
 async function postApplication(
   collected: NTHSApplicationResponses
-): Promise<{ formVersion: number } | undefined> {
+): Promise<boolean> {
   try {
     const response = await NetworkService.submitNTHSApplication({
       schoolId: school.schoolId ?? undefined,
@@ -263,9 +247,8 @@ async function postApplication(
           },
       gradeLevel: submittedGradeLevel.value,
       responses: collected,
-      formVersion,
     })
-    return response.data.application
+    return !!response.data.application
   } catch (err: any) {
     const httpStatus = err?.response?.status
     AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_SUBMIT_FAILED, {
@@ -275,6 +258,7 @@ async function postApplication(
     error.value =
       err?.response?.data?.err ??
       'We could not submit your application. Please try again.'
+    return false
   }
 }
 
@@ -288,7 +272,6 @@ function secondsSince(startedAt: number) {
 
 function questionAnsweredProperties(question: NTHSQuestion) {
   return {
-    formVersion,
     questionKey: question.key,
     questionType: question.type,
     answerLength: String(responses[question.key]).length,
