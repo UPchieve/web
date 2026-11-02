@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import { useStore } from 'vuex'
 import Loader from '@/components/Loader.vue'
@@ -50,6 +50,7 @@ const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
 
 const {
   members,
+  currentMembers,
   schoolYear,
   topTutorThisMonth,
   isLoading,
@@ -95,6 +96,15 @@ onBeforeMount(async () => {
   }
 })
 
+watch(
+  () => group.value?.renewal?.prompt,
+  () => {
+    if (groupId.value) {
+      void refreshRoster(groupId.value, now)
+    }
+  }
+)
+
 const rosterLoaded = computed(() => !isLoading.value && !loadFailed.value)
 const impactLoaded = computed(
   () => !isImpactLoading.value && !impactLoadFailed.value
@@ -109,11 +119,6 @@ const visibleMembers = computed(() =>
     activeSort.value,
     activePeriod.value
   )
-)
-// A closed account is not a current member of the chapter, so it is excluded
-// from the roster count even though its row still appears under "All".
-const currentMembers = computed(() =>
-  members.value.filter((m) => !m.accountClosed)
 )
 // The viewer is always a current member, so a count of 1 means nobody else
 // has joined yet.

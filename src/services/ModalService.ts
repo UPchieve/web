@@ -5,7 +5,16 @@ import type { RemoveTeamMemberModalProps } from '@/components/NTHS/RemoveTeamMem
 import MemberTitleModal, {
   type MemberTitleModalProps,
 } from '@/components/NTHS/MemberTitleModal.vue'
-import type { NTHSTitle } from '@/services/NTHSGroupService'
+import AcceptPresidency, {
+  type AcceptPresidencyProps,
+} from '@/components/NTHS/Renewal/AcceptPresidency.vue'
+import SuccessorPickerModal, {
+  type SuccessorPickerModalProps,
+} from '@/components/NTHS/Renewal/SuccessorPickerModal.vue'
+import type {
+  NTHSRenewalCommitments,
+  NTHSTitle,
+} from '@/services/NTHSGroupService'
 import type { RemoveMemberConfirmationProps } from '@/views/NTHS/RemoveMemberConfirmation.vue'
 import SessionHoldAlert from '@/views/SessionHolds/SessionHoldAlert.vue'
 
@@ -108,6 +117,43 @@ export default {
           showTemplateButtons: false,
         },
         { ...props, resolveTitle: resolve }
+      )
+    })
+  },
+
+  showNthsSuccessorPicker(props: SuccessorPickerModalProps) {
+    show(
+      SuccessorPickerModal,
+      {
+        showAccept: false,
+        showSeparator: false,
+        showTemplateButtons: false,
+      },
+      props
+    )
+  },
+
+  // Bound through props; settle hides here because AcceptPresidency also renders inside the picker.
+  showNthsAcceptPresidency(
+    props: AcceptPresidencyProps
+  ): Promise<NTHSRenewalCommitments | undefined> {
+    return new Promise((resolve) => {
+      const settle = (answer?: NTHSRenewalCommitments) => {
+        useAppModalStore().hide()
+        resolve(answer)
+      }
+      show(
+        AcceptPresidency,
+        {
+          showAccept: false,
+          showSeparator: false,
+          showTemplateButtons: false,
+        },
+        {
+          ...props,
+          onAccept: (answer: NTHSRenewalCommitments) => settle(answer),
+          onCancel: () => settle(undefined),
+        }
       )
     })
   },

@@ -7,7 +7,14 @@ import {
   nthsDestination,
   type NTHSDestinationSource,
 } from '@/views/NTHS/nths-route-helpers'
-import type { AffiliationStatus } from '@/services/NTHSGroupService'
+import type {
+  AffiliationStatus,
+  NTHSRenewalCommitments,
+  NTHSRenewalPrompt,
+  NTHSRenewalPublic,
+  NTHSRenewalSuccessorPublic,
+  NTHSRenewalSuccessorsUpdate,
+} from '@/services/NTHSGroupService'
 import type {
   NTHSChecklistItemStatus,
   NTHSChecklistPublic,
@@ -43,6 +50,10 @@ function syncNTHSStatusToGleap(
   AnalyticsService.setContactCustomData(userId, customData)
 }
 
+const RENEWAL_ATTENTION_PROMPTS: NTHSRenewalPrompt[] = [
+  'name-successor-reminder',
+]
+
 export default {
   namespaced: true,
   state: {
@@ -53,6 +64,7 @@ export default {
     approvalExpiresAt: null as string | null,
     canApplyForNTHSPresident: false,
     NTHSApplicationIneligibilityReasons: [],
+    NTHSRenewalSuccessors: {} as Record<string, NTHSRenewalSuccessorPublic[]>,
   },
   mutations: {
     setNTHSGroups: (state, groups) => {
@@ -94,6 +106,24 @@ export default {
       const group = state.NTHSGroups.find((g) => g.groupInfo.id === groupId)
       if (group) group.schoolAffiliationStatus = schoolAffiliationStatus
     },
+    setNTHSGroupRenewal: (
+      state,
+      { groupId, renewal }: { groupId: string; renewal: NTHSRenewalPublic }
+    ) => {
+      const group = state.NTHSGroups.find((g) => g.groupInfo.id === groupId)
+      if (group) {
+        group.renewal = renewal
+      }
+    },
+    setNTHSRenewalSuccessors: (
+      state,
+      {
+        groupId,
+        successors,
+      }: { groupId: string; successors: NTHSRenewalSuccessorPublic[] }
+    ) => {
+      state.NTHSRenewalSuccessors[groupId] = successors
+    },
     setNTHSCandidateApplicationStatus: (state, status) => {
       state.NTHSCandidateApplicationStatus = status
     },
@@ -108,7 +138,7 @@ export default {
     },
   },
   actions: {
-    async fetchNthsData({ commit, rootState, rootGetters }) {
+    async refreshNTHSGroups({ commit, rootState }) {
       const results = await NetworkService.getNTHSGroupsForUser()
       commit('setNTHSGroups', results.data.groups)
       commit(
@@ -118,6 +148,10 @@ export default {
       commit('setApprovalExpiresAt', results.data.approvalExpiresAt ?? null)
       if (results.data.candidateApplicationStatus)
         clearNTHSApplicationDraft(rootState.user?.user?.id)
+      return results.data.groups
+    },
+    async fetchNthsData({ commit, dispatch, rootState, rootGetters }) {
+      const groups = await dispatch('refreshNTHSGroups')
 
       const eligibility = await NetworkService.getNTHSApplicationEligibility()
       commit('setCanApplyForNTHSPresident', eligibility.data.eligible)
@@ -127,12 +161,46 @@ export default {
       )
 
       syncNTHSStatusToGleap(rootState, rootGetters)
-      return results.data.groups
+      return groups
     },
     async fetchNTHSGroupMembers({ commit }, groupId) {
       const response = await NetworkService.getNTHSGroupMembers(groupId)
       const groupMembers = response.data?.members ?? []
       commit('setNTHSGroupMembers', { groupId, groupMembers })
+    },
+    async fetchNTHSRenewalSuccessors({ commit }, groupId: string) {
+      const response = await NetworkService.getNTHSRenewalSuccessors(groupId)
+      commit('setNTHSRenewalSuccessors', {
+        groupId,
+        successors: response.successors,
+      })
+      return response
+    },
+    async saveNTHSRenewalSuccessors(
+      { commit },
+      {
+        groupId,
+        update,
+      }: { groupId: string; update: NTHSRenewalSuccessorsUpdate }
+    ) {
+      const { renewal } = await NetworkService.setNTHSRenewalSuccessors(
+        groupId,
+        update
+      )
+      commit('setNTHSGroupRenewal', { groupId, renewal })
+    },
+    async nameSelfAsNTHSRenewalSuccessor(
+      { commit },
+      {
+        groupId,
+        commitments,
+      }: { groupId: string; commitments?: NTHSRenewalCommitments }
+    ) {
+      const { renewal } = await NetworkService.nameSelfAsNTHSRenewalSuccessor(
+        groupId,
+        { commitments }
+      )
+      commit('setNTHSGroupRenewal', { groupId, renewal })
     },
     async fetchNTHSChecklist({ commit }, groupId: string) {
       let checklist: NTHSChecklistPublic
@@ -208,5 +276,9 @@ export default {
     hasAdminRole: (state, getters) => getters.memberRole === 'admin',
     isGroupMemberOnly: (state, getters) =>
       !getters.hasAdminRole && state.NTHSGroups.length > 0,
+    renewalNeedsAttention: (state) => {
+      const prompt = state.NTHSGroups[0]?.renewal?.prompt
+      return !!prompt && RENEWAL_ATTENTION_PROMPTS.includes(prompt)
+    },
   },
 }

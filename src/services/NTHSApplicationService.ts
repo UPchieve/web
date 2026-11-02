@@ -1,5 +1,6 @@
 import { COUNTRIES, US_COUNTRY } from '@/consts'
 import { dayjs } from '@/utils/time-utils'
+import type { NTHSRenewalCommitmentKey } from '@/services/NTHSGroupService'
 
 export const HIGH_SCHOOL_GRADES = [
   '9th grade',
@@ -29,7 +30,9 @@ export type NTHSQuestion = {
   isRequired?: boolean
 }
 
-const NTHS_COMMITMENTS: NTHSQuestion[] = [
+export const NTHS_COMMITMENTS: (NTHSQuestion & {
+  key: NTHSRenewalCommitmentKey
+})[] = [
   {
     key: 'commitWeeklyHours',
     type: 'attestation',
@@ -48,7 +51,8 @@ const NTHS_COMMITMENTS: NTHSQuestion[] = [
   {
     key: 'commitFortyTutoringHours',
     type: 'attestation',
-    label: 'My chapter will provide 40 hours of free tutoring by June 2027.',
+    label:
+      'My chapter will provide 40 hours of free tutoring by the end of the school year.',
   },
   {
     key: 'commitRecruitKnownHighSchoolers',

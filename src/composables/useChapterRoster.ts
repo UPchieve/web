@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
 import type {
   NTHSChapterRosterPublic,
@@ -14,6 +14,10 @@ import {
 
 export function useChapterRoster() {
   const members = ref<NTHSRosterMemberPublic[]>([])
+  // A closed account is not a current member, though its row stays in the roster.
+  const currentMembers = computed(() =>
+    members.value.filter((member) => !member.accountClosed)
+  )
   const schoolYear = ref<NTHSSchoolYearPublic>()
   const topTutorThisMonth = ref<NTHSTopTutorPublic>()
   const isLoading = ref(true)
@@ -82,6 +86,7 @@ export function useChapterRoster() {
 
   return {
     members,
+    currentMembers,
     schoolYear,
     topTutorThisMonth,
     isLoading,

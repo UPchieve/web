@@ -12,6 +12,7 @@ import { computed } from 'vue'
 const props = defineProps<{
   member: NTHSRosterMemberPublic
   roster: NTHSRosterMemberPublic[]
+  detail?: string
 }>()
 
 const tag = computed(() => roleTagLabel(props.member, props.roster))
@@ -34,7 +35,7 @@ const tag = computed(() => roleTagLabel(props.member, props.roster))
         >{{ tag }}</span
       >
     </div>
-    <span class="member-role">{{ roleLabel(member, roster) }}</span>
+    <span class="member-role">{{ detail ?? roleLabel(member, roster) }}</span>
   </div>
 </template>
 

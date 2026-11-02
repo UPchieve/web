@@ -9,6 +9,10 @@ import type {
   NTHSChapterImpactResponse,
   NTHSChapterRosterResponse,
   NTHSMemberUpdate,
+  NTHSRenewalCommitments,
+  NTHSRenewalResponse,
+  NTHSRenewalSuccessorsResponse,
+  NTHSRenewalSuccessorsUpdate,
   NTHSTitle,
   Role,
 } from './NTHSGroupService'
@@ -332,6 +336,32 @@ export function updateNTHSChecklistItemProgress(
   )
 }
 
+export function getNTHSRenewalSuccessors(groupId: string) {
+  return httpGet<NTHSRenewalSuccessorsResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/renewal`
+  )
+}
+
+export function setNTHSRenewalSuccessors(
+  groupId: string,
+  data: NTHSRenewalSuccessorsUpdate
+) {
+  return httpPut<NTHSRenewalResponse, NTHSRenewalSuccessorsUpdate>(
+    `${API_ROOT}/nths-groups/${groupId}/renewal/successors`,
+    data
+  )
+}
+
+export function nameSelfAsNTHSRenewalSuccessor(
+  groupId: string,
+  data: { commitments?: NTHSRenewalCommitments }
+) {
+  return httpPost<NTHSRenewalResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/renewal/successors/self`,
+    data
+  )
+}
+
 export function adminNTHSGetChapters(ids: string[]) {
   return httpGet<{ chapters: NTHSCloseChapter[] }>(
     `${ADMIN_ROOT}/nths/chapters?ids=${ids.map(encodeURIComponent).join(',')}`
@@ -446,6 +476,9 @@ export default {
   checkRegister,
   getNTHSChecklist,
   updateNTHSChecklistItemProgress,
+  getNTHSRenewalSuccessors,
+  setNTHSRenewalSuccessors,
+  nameSelfAsNTHSRenewalSuccessor,
   getVolunteerPartner(partnerId) {
     return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(

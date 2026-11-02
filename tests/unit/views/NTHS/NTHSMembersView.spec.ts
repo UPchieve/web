@@ -295,6 +295,22 @@ describe('NTHSMembersView', () => {
       }
     )
 
+    it('reloads the roster when the renewal prompt changes', async () => {
+      const wrapper = await getWrapper()
+      const { $store } = wrapper.vm as unknown as {
+        $store: ReturnType<typeof storeFor>
+      }
+      expect(getNTHSChapterRoster).toHaveBeenCalledTimes(1)
+
+      const [group] = $store.state.nths.NTHSGroups as unknown as {
+        renewal?: { prompt: string }
+      }[]
+      group.renewal = { prompt: 'successors-named' }
+      await flushPromises()
+
+      expect(getNTHSChapterRoster).toHaveBeenCalledTimes(2)
+    })
+
     it('reads the roster endpoint and shows every current member, the president included', async () => {
       const wrapper = await getWrapper()
 

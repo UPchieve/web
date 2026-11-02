@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { h, nextTick, type Component } from 'vue'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
@@ -104,7 +104,19 @@ const links = {
   },
 }
 
-const getWrapper = (options = {}) => {
+type WrapperOptions = {
+  path?: string
+  props?: Record<string, unknown>
+  stubs?: Record<string, Component>
+  user?: {
+    getters?: Record<string, () => unknown>
+    state?: Record<string, unknown>
+  }
+  featureFlags?: { getters?: Record<string, () => unknown> }
+  nths?: { state?: Record<string, unknown> }
+}
+
+const getWrapper = (options: WrapperOptions = {}) => {
   const DEFAULTS = {
     path: '/',
     props: {
@@ -168,6 +180,7 @@ const getWrapper = (options = {}) => {
   return shallowMount(SidebarLinks, {
     global: {
       plugins: [store],
+      stubs: options.stubs,
       mocks: { $route: { path: options.path ?? DEFAULTS.path, query: {} } },
     },
     props: {
@@ -684,6 +697,45 @@ describe('SidebarLinks', () => {
         })
         expect(isTargetLinkPresent).toEqual(true)
         expect(wrapper.vm.shouldShowNthsChapterCreationDot).toEqual(true)
+      })
+
+      it('labels the chapter dot when the renewal asks for a president', () => {
+        const wrapper = getWrapper({
+          props: { authenticated: true },
+          stubs: {
+            SidebarLink: {
+              render() {
+                return h('div', (this as any).$slots.default?.())
+              },
+            },
+          },
+          featureFlags: {
+            getters: { isNTHSApplicationPageEnabled: () => true },
+          },
+          user: {
+            getters: {
+              isStudent: () => false,
+              isVolunteer: () => true,
+              hasVolunteerRole: () => true,
+              isTeacher: () => false,
+            },
+          },
+          nths: {
+            state: {
+              NTHSGroups: [
+                {
+                  groupInfo: { id: 'group-1' },
+                  memberInfo: { roleName: 'admin' },
+                  renewal: { prompt: 'name-successor-reminder' },
+                },
+              ],
+            },
+          },
+        })
+        const dot = wrapper.find('.SidebarLinks__notification')
+        expect(dot.attributes('label')).toBe(
+          "Next year's president hasn't been named yet"
+        )
       })
 
       it('does not show the chapter creation dot when the approval has expired', () => {

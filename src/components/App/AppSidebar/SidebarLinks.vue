@@ -132,9 +132,9 @@
         >
           <groups-icon class="icon" />
           <activity-dot
-            v-if="shouldShowNthsChapterCreationDot"
+            v-if="nthsDotLabel"
             class="SidebarLinks__notification"
-            label="Create your NTHS chapter"
+            :label="nthsDotLabel"
           />
         </sidebar-link>
 
@@ -232,6 +232,7 @@ import {
   NTHS_DESTINATION_LABELS,
   NTHS_DESTINATION_PATHS,
 } from '@/views/NTHS/nths-route-helpers'
+import { NEXT_PRESIDENT_UNNAMED_TITLE } from '@/services/NTHSRenewalService'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
@@ -299,6 +300,7 @@ export default {
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
       isNthsGroupMemberOnly: 'nths/isGroupMemberOnly',
       hasNthsAdminRole: 'nths/hasAdminRole',
+      nthsRenewalNeedsAttention: 'nths/renewalNeedsAttention',
     }),
     hasSeenCalculator() {
       if (this.shouldShowStudentToVolunteerHoursPage) {
@@ -328,6 +330,15 @@ export default {
     },
     shouldShowNthsChapterCreationDot() {
       return this.nthsSidebarDestination === 'create'
+    },
+    nthsDotLabel() {
+      if (this.shouldShowNthsChapterCreationDot) {
+        return 'Create your NTHS chapter'
+      }
+      if (this.nthsRenewalNeedsAttention) {
+        return NEXT_PRESIDENT_UNNAMED_TITLE
+      }
+      return undefined
     },
     isNthsChapterCreationDotShown() {
       if (this.mobileMode && this.isSidebarCollapsed) return false

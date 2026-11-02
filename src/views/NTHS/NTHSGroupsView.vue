@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import LargeButton from '@/components/LargeButton.vue'
 import ModalService from '@/services/ModalService'
 import type { GroupMember } from '@/services/NTHSGroupService'
 import Callout from '@/components/Callout.vue'
+import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
+import LoggerService from '@/services/LoggerService'
+import { useAppModalStore } from '@/stores/app/modal'
+import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
 
 const store = useStore()
 const router = useRouter()
@@ -83,6 +87,54 @@ function onLeaveChapter() {
     } as GroupMember,
   })
 }
+
+let isUnmounted = false
+onBeforeUnmount(() => {
+  isUnmounted = true
+})
+
+// loadNTHSData skips the fetch once groups are loaded, so renewal prompts
+// would otherwise stay as they were when the coach first opened Chapter HQ.
+async function refreshNTHSData(): Promise<boolean> {
+  try {
+    const groups = await store.dispatch('nths/refreshNTHSGroups')
+    // The /groups route guard runs only on entry, so a coach removed mid-visit is moved here.
+    if (!groups.length) {
+      const redirect = await resolveNthsRoute(
+        store,
+        'group',
+        router.currentRoute.value.path
+      )
+      if (redirect && !isUnmounted) {
+        await router.replace(redirect)
+      }
+    }
+    return true
+  } catch (err) {
+    LoggerService.noticeError(err, 'Could not refresh NTHS data')
+    return false
+  }
+}
+
+const modalStore = useAppModalStore()
+
+onMounted(async () => {
+  const refreshed = await refreshNTHSData()
+  if (isUnmounted || !refreshed || modalStore.isShown) return
+  const groupId = group.value?.groupInfo?.id
+  if (
+    groupId &&
+    !hidePageContentReason.value &&
+    group.value?.renewal?.prompt === 'name-successor-reminder'
+  ) {
+    ModalService.showNthsSuccessorPicker({ groupId, asReminder: true })
+  }
+})
+
+watch(
+  () => router.currentRoute.value.path,
+  () => void refreshNTHSData()
+)
 
 // The tab strip scrolls horizontally below ~1100px. Landing directly on a tab
 // route (e.g. from the checklist's "Edit in Chapter setup") mounts the active
@@ -177,7 +229,13 @@ watch(
           </template>
         </Callout>
       </div>
-      <RouterView v-else />
+      <template v-else>
+        <RenewalBanner
+          v-if="group?.groupInfo?.id"
+          :groupId="group.groupInfo.id"
+        />
+        <RouterView />
+      </template>
     </div>
   </div>
 </template>

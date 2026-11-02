@@ -13,6 +13,10 @@ import {
   type NTHSFormVersion,
 } from '@/services/NTHSApplicationService'
 import type { NTHSChecklistPublic } from '@upchieve/api-contracts/nths-checklist'
+import type {
+  NTHSRenewalPrompt,
+  NTHSRenewalPublic,
+} from '@/services/NTHSGroupService'
 
 vi.mock('@/services/NetworkService')
 vi.mock('@/services/AnalyticsService')
@@ -56,6 +60,17 @@ describe('nths/fetchNthsData', () => {
       expect(getNTHSApplicationDraft(USER_ID) !== undefined).toBe(keepsDraft)
     }
   )
+
+  it('refreshNTHSGroups skips the eligibility fetch', async () => {
+    vi.mocked(NetworkService.getNTHSGroupsForUser).mockResolvedValue({
+      data: { groups: [] },
+    } as never)
+    vi.mocked(NetworkService.getNTHSApplicationEligibility).mockClear()
+
+    await getStore().dispatch('nths/refreshNTHSGroups')
+
+    expect(NetworkService.getNTHSApplicationEligibility).not.toHaveBeenCalled()
+  })
 
   it('stores the approval deadline from the chapter list', async () => {
     const approvalExpiresAt = '2026-11-20T15:00:00.000Z'
@@ -212,5 +227,72 @@ describe('nths dynamic checklist state', () => {
       EVENTS.NTHS_CHECKLIST_ITEM_UPDATED,
       expect.anything()
     )
+  })
+})
+
+describe('nths renewal state', () => {
+  const RENEWAL = {
+    prompt: 'name-successor-banner',
+    closesOn: '2027-09-30',
+    successorConfirmationOn: '2027-08-01',
+    namingClosesOn: '2027-09-14',
+    commitmentsRequired: true,
+    canNameSelf: true,
+    namingSelfAccepts: false,
+  } satisfies NTHSRenewalPublic
+
+  const groupsOf = (store: ReturnType<typeof getStore>) =>
+    (store.state as { nths: { NTHSGroups: { renewal: NTHSRenewalPublic }[] } })
+      .nths.NTHSGroups
+
+  function storeWithGroups(prompts: NTHSRenewalPrompt[]) {
+    const store = getStore()
+    store.commit(
+      'nths/setNTHSGroups',
+      prompts.map((prompt, i) => ({
+        groupInfo: { id: `group-${i}` },
+        renewal: { ...RENEWAL, prompt },
+      }))
+    )
+    return store
+  }
+
+  it.each<{ prompts: NTHSRenewalPrompt[]; needsAttention: boolean }>([
+    { prompts: ['name-successor-reminder'], needsAttention: true },
+    { prompts: ['name-successor-reminder', 'none'], needsAttention: true },
+    { prompts: ['none', 'name-successor-reminder'], needsAttention: false },
+    { prompts: ['name-successor-banner'], needsAttention: false },
+    { prompts: ['successors-named'], needsAttention: false },
+    { prompts: [], needsAttention: false },
+  ])(
+    'needs attention for prompts $prompts: $needsAttention',
+    ({ prompts, needsAttention }) => {
+      expect(
+        storeWithGroups(prompts).getters['nths/renewalNeedsAttention']
+      ).toBe(needsAttention)
+    }
+  )
+
+  it("patches only the written group's renewal from a successors save", async () => {
+    const store = storeWithGroups(['name-successor-reminder', 'none'])
+    const saved: NTHSRenewalPublic = { ...RENEWAL, prompt: 'successors-named' }
+    vi.mocked(NetworkService.setNTHSRenewalSuccessors).mockResolvedValue({
+      renewal: saved,
+    })
+    const update = { userIds: ['u-1'], expectedUserIds: [] }
+
+    await store.dispatch('nths/saveNTHSRenewalSuccessors', {
+      groupId: 'group-0',
+      update,
+    })
+
+    expect(NetworkService.setNTHSRenewalSuccessors).toHaveBeenCalledWith(
+      'group-0',
+      update
+    )
+    expect(groupsOf(store).map((g) => g.renewal.prompt)).toEqual([
+      'successors-named',
+      'none',
+    ])
   })
 })

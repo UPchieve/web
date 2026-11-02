@@ -128,3 +128,59 @@ export type AffiliationStatus =
   | 'DENIED'
   | 'OPTED_OUT'
   | 'UNAFFILIATED'
+
+// Chapter renewal payloads, mirroring server/contracts/nths-group.ts in subway.
+export type NTHSRenewalPrompt =
+  | 'none'
+  | 'co-president-offer'
+  | 'successor-must-answer'
+  | 'successor-not-cleared'
+  | 'decliner-countdown'
+  | 'member-must-answer'
+  | 'member-not-cleared'
+  | 'successors-named'
+  | 'name-successor-reminder'
+  | 'name-successor-banner'
+
+// Dates are YYYY-MM-DD, null when the chapter isn't renewing.
+export type NTHSRenewalPublic = {
+  prompt: NTHSRenewalPrompt
+  closesOn: string | null
+  successorConfirmationOn: string | null
+  namingClosesOn: string | null
+  commitmentsRequired: boolean
+  canNameSelf: boolean
+  namingSelfAccepts: boolean
+}
+
+export type NTHSRenewalSuccessorPublic = {
+  userId: Uuid
+  firstName: string
+  lastInitial: string
+  // false: stepped down this cycle; null: named, not answered yet.
+  accepted: boolean | null
+  // null on member-stage rows, or when the namer's account is gone.
+  namedBy: { userId: Uuid; firstName: string; lastInitial: string } | null
+}
+
+export type NTHSRenewalSuccessorsResponse = {
+  successors: NTHSRenewalSuccessorPublic[]
+  canEditSuccessors: boolean
+}
+
+export type NTHSRenewalResponse = { renewal: NTHSRenewalPublic }
+
+export type NTHSRenewalCommitmentKey =
+  | 'commitWeeklyHours'
+  | 'commitRecruitThreeTutors'
+  | 'commitHostFourMeetings'
+  | 'commitFortyTutoringHours'
+  | 'commitRecruitKnownHighSchoolers'
+
+export type NTHSRenewalCommitments = Record<NTHSRenewalCommitmentKey, true>
+
+export type NTHSRenewalSuccessorsUpdate = {
+  userIds: Uuid[]
+  expectedUserIds: Uuid[]
+  commitments?: NTHSRenewalCommitments
+}

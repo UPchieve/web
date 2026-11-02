@@ -2,17 +2,23 @@ import NTHSGroupsView from '@/views/NTHS/NTHSGroupsView.vue'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ModalService from '@/services/ModalService'
+import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import userModule, { type UserStoreState } from '@/store/modules/user'
 import { createStore, type Store } from 'vuex'
 import { h } from 'vue'
+import { useAppModalStore } from '@/stores/app/modal'
 
 type UserOverrides = {
   occupation?: string[] | null
   isReadyToTutor?: boolean
+  renewalPrompt?: string
 }
+
+const fetchNthsData = vi.fn()
+const refreshNTHSGroups = vi.fn()
 
 function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
   return createStore({
@@ -22,8 +28,20 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
           {
             groupInfo: { id: 'group-123', name: 'Test Chapter' },
             memberInfo: { roleName },
+            renewal: userOverrides.renewalPrompt
+              ? {
+                  prompt: userOverrides.renewalPrompt,
+                  closesOn: '2027-09-30',
+                  successorConfirmationOn: '2027-08-01',
+                  namingClosesOn: '2027-09-14',
+                  commitmentsRequired: true,
+                  canNameSelf: true,
+                  namingSelfAccepts: false,
+                }
+              : undefined,
           },
         ],
+        NTHSRenewalSuccessors: {},
       },
       // A member who isn't a high-school student or isn't ready to tutor has
       // the whole tab strip hidden behind a callout, which is a separate gate
@@ -51,7 +69,20 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
         state.user.user.occupation = occupation
       },
     },
+    actions: {
+      'nths/fetchNthsData': fetchNthsData,
+      'nths/refreshNTHSGroups': refreshNTHSGroups,
+    },
   })
+}
+
+function removeCoachFromChapter({
+  state,
+}: {
+  state: { nths: { NTHSGroups: unknown[] } }
+}) {
+  state.nths.NTHSGroups = []
+  return []
 }
 
 async function getWrapper(
@@ -89,6 +120,13 @@ async function getWrapper(
 }
 
 describe('NTHSGroupsView', () => {
+  beforeEach(() => {
+    fetchNthsData.mockReset()
+    refreshNTHSGroups.mockReset().mockResolvedValue([{}])
+    useAppModalStore().hide()
+    vi.restoreAllMocks()
+  })
+
   it.each([
     { role: 'member', shows: ['/groups/members'], hides: ['/groups/to-do'] },
     { role: 'admin', shows: ['/groups/members', '/groups/to-do'], hides: [] },
@@ -228,6 +266,154 @@ describe('NTHSGroupsView', () => {
         false
       )
       expect(wrapper.find('[data-testid="routed-members"]').exists()).toBe(true)
+    })
+  })
+
+  describe('renewal', () => {
+    it('refreshes the chapter list on mount and on each tab change', async () => {
+      const wrapper = await getWrapper('/groups/home')
+      expect(refreshNTHSGroups).toHaveBeenCalledTimes(1)
+
+      await wrapper.vm.$router.push('/groups/members')
+      await flushPromises()
+      await wrapper.vm.$router.push('/groups/home')
+      await flushPromises()
+
+      expect(refreshNTHSGroups).toHaveBeenCalledTimes(3)
+      expect(fetchNthsData).not.toHaveBeenCalled()
+    })
+
+    it('moves a coach removed from the chapter off Chapter HQ on the next tab change', async () => {
+      const wrapper = await getWrapper('/groups/home')
+      refreshNTHSGroups.mockImplementation(removeCoachFromChapter)
+
+      await wrapper.vm.$router.push('/groups/members')
+      await flushPromises()
+
+      expect(fetchNthsData).toHaveBeenCalled()
+      expect(wrapper.vm.$router.currentRoute.value.path).toBe('/dashboard')
+    })
+
+    it('leaves the route alone when the view unmounts before the refresh lands', async () => {
+      let finishRefresh: () => void = () => undefined
+      refreshNTHSGroups.mockImplementation(
+        (context) =>
+          new Promise((resolve) => {
+            finishRefresh = () => resolve(removeCoachFromChapter(context))
+          })
+      )
+      const wrapper = await getWrapper('/groups/home')
+      const replace = vi.spyOn(wrapper.vm.$router, 'replace')
+
+      wrapper.unmount()
+      finishRefresh()
+      await flushPromises()
+
+      expect(replace).not.toHaveBeenCalled()
+    })
+
+    it('logs a failed refresh and stays on the page', async () => {
+      const noticeError = vi
+        .spyOn(LoggerService, 'noticeError')
+        .mockImplementation(() => undefined)
+      refreshNTHSGroups.mockRejectedValue(new Error('network'))
+
+      const wrapper = await getWrapper('/groups/home')
+
+      expect(noticeError).toHaveBeenCalled()
+      expect(wrapper.vm.$router.currentRoute.value.path).toBe('/groups/home')
+    })
+
+    it('skips the reminder when another modal is already open', async () => {
+      const showReminder = vi
+        .spyOn(ModalService, 'showNthsSuccessorPicker')
+        .mockImplementation(() => undefined)
+      useAppModalStore().show()
+
+      await getWrapper('/groups/home', 'admin', {
+        renewalPrompt: 'name-successor-reminder',
+      })
+
+      expect(showReminder).not.toHaveBeenCalled()
+    })
+
+    it('skips the reminder when the view unmounts before the refresh lands', async () => {
+      const showReminder = vi
+        .spyOn(ModalService, 'showNthsSuccessorPicker')
+        .mockImplementation(() => undefined)
+      let finishRefresh: (groups: unknown[]) => void = () => undefined
+      refreshNTHSGroups.mockReturnValue(
+        new Promise<unknown[]>((resolve) => {
+          finishRefresh = resolve
+        })
+      )
+      const wrapper = await getWrapper('/groups/home', 'admin', {
+        renewalPrompt: 'name-successor-reminder',
+      })
+
+      wrapper.unmount()
+      finishRefresh([{}])
+      await flushPromises()
+
+      expect(showReminder).not.toHaveBeenCalled()
+    })
+
+    it.each([
+      {
+        name: 'the reminder prompt',
+        prompt: 'name-successor-reminder',
+        overrides: {},
+        opens: true,
+      },
+      {
+        name: 'the May banner prompt',
+        prompt: 'name-successor-banner',
+        overrides: {},
+        opens: false,
+      },
+      {
+        name: 'the reminder prompt behind the high school notice',
+        prompt: 'name-successor-reminder',
+        overrides: { occupation: [] },
+        opens: false,
+      },
+    ])(
+      'opens the reminder once per mount for $name: $opens',
+      async ({ prompt, overrides, opens }) => {
+        const showReminder = vi
+          .spyOn(ModalService, 'showNthsSuccessorPicker')
+          .mockImplementation(() => undefined)
+        const wrapper = await getWrapper('/groups/home', 'admin', {
+          ...overrides,
+          renewalPrompt: prompt,
+        })
+        await wrapper.vm.$router.push('/groups/members')
+        await flushPromises()
+
+        expect(showReminder).toHaveBeenCalledTimes(opens ? 1 : 0)
+        if (opens) {
+          expect(showReminder).toHaveBeenCalledWith({
+            groupId: 'group-123',
+            asReminder: true,
+          })
+        }
+      }
+    )
+
+    it('shows the renewal banner only with the page content', async () => {
+      vi.spyOn(ModalService, 'showNthsSuccessorPicker').mockImplementation(
+        () => undefined
+      )
+      const shown = await getWrapper('/groups/home', 'admin', {
+        renewalPrompt: 'name-successor-reminder',
+      })
+      const gated = await getWrapper('/groups/home', 'admin', {
+        renewalPrompt: 'name-successor-reminder',
+        occupation: [],
+      })
+
+      expect(shown.find('[data-testid="renewal-banner"]').exists()).toBe(true)
+      expect(gated.find('[data-testid="renewal-banner"]').exists()).toBe(false)
     })
   })
 })
