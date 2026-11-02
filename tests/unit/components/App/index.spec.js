@@ -9,6 +9,7 @@ import App from '@/components/App/index.vue'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
 import AppModal from '@/components/App/AppModal/index.vue'
+import ModalService from '@/services/ModalService'
 
 const getWrapper = (options = {}) => {
   options = {
@@ -96,5 +97,44 @@ describe('App', () => {
     const wrapper = getWrapper({ mockRoute: mockSessionRoute })
     const refreshAppAlert = wrapper.find('[data-testid="refresh-app-alert"]')
     expect(refreshAppAlert.exists()).toBeFalsy()
+  })
+
+  describe('sessionHoldData watcher', () => {
+    const hold = { endsAt: new Date() }
+    const state = (extra = {}) => ({
+      hold,
+      hideAlert: false,
+      isVolunteer: true,
+      isInSession: false,
+      ...extra,
+    })
+
+    it.each([
+      [
+        'a volunteer whose session goes live hides the modal',
+        state({ isInSession: true }),
+        state(),
+        1,
+      ],
+      [
+        'a volunteer already in session does not hide again',
+        state({ isInSession: true }),
+        state({ isInSession: true }),
+        0,
+      ],
+      [
+        'a non-volunteer whose session goes live does not hide',
+        state({ isInSession: true, isVolunteer: false }),
+        state({ isVolunteer: false }),
+        0,
+      ],
+    ])('%s', (_label, current, previous, hideCalls) => {
+      const hide = vi.spyOn(ModalService, 'hide').mockImplementation(() => {})
+      const fakeThis = { $store: { commit: vi.fn() } }
+
+      App.watch.sessionHoldData.handler.call(fakeThis, current, previous)
+
+      expect(hide).toHaveBeenCalledTimes(hideCalls)
+    })
   })
 })

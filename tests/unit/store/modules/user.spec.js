@@ -1,6 +1,8 @@
 import { it, vi } from 'vitest'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
+import { useNotificationsStore } from '@/stores/notifications'
+import SessionService from '@/services/SessionService'
 
 describe('User store module', () => {
   const baseUser = {
@@ -479,6 +481,51 @@ describe('User store module', () => {
       await seedChat(store, 'session-1')
       await store.dispatch('user/setChatSessionId', 'session-1')
       expect(store.state.user.unreadChatMessageIndices).toEqual([3])
+    })
+  })
+
+  describe('updateSession', () => {
+    it.each([
+      ['a live session clears notifications', {}, 0],
+      [
+        'an ended session leaves notifications alone',
+        { endedAt: new Date() },
+        1,
+      ],
+    ])('%s', async (_label, extra, expectedCount) => {
+      const store = getStore()
+      const notificationsStore = useNotificationsStore()
+      notificationsStore.add({ id: 'session-request-1', title: 'Request' })
+
+      await store.dispatch('user/updateSession', {
+        id: 'session-1',
+        createdAt: new Date(),
+        ...extra,
+      })
+
+      expect(notificationsStore.notifications).toHaveLength(expectedCount)
+    })
+  })
+
+  describe('fetchSession', () => {
+    it.each([
+      [
+        'a live fetched session clears notifications',
+        { id: 'session-1', createdAt: new Date() },
+        0,
+      ],
+      ['no live session leaves notifications alone', {}, 1],
+    ])('%s', async (_label, sessionData, expectedCount) => {
+      vi.spyOn(SessionService, 'getCurrentSession').mockResolvedValue({
+        sessionData,
+      })
+      const store = getStore()
+      const notificationsStore = useNotificationsStore()
+      notificationsStore.add({ id: 'session-request-1', title: 'Request' })
+
+      await store.dispatch('user/fetchSession')
+
+      expect(notificationsStore.notifications).toHaveLength(expectedCount)
     })
   })
 

@@ -311,7 +311,11 @@ export default {
           this.$store.commit('volunteer/setHideSessionHoldAlert', false)
         }
         if (current.hold && !current.hideAlert) {
-          if (!current.isVolunteer || current.isInSession) {
+          if (!current.isVolunteer) return
+          if (current.isInSession) {
+            if (previous.hold && !previous.isInSession) {
+              ModalService.hide()
+            }
             return
           }
           ModalService.showSessionHoldAlert({

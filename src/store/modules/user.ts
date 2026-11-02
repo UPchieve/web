@@ -16,6 +16,7 @@ import {
   isVolunteerUserType,
 } from '@/utils/user-type'
 import AnalyticsService from '@/services/AnalyticsService'
+import { useNotificationsStore } from '@/stores/notifications'
 import { minutesInMs } from '@/utils/time-utils'
 import type {
   CurrentSessionPublic,
@@ -290,12 +291,15 @@ export default {
       commit('setUser', {})
     },
 
-    fetchSession: ({ state, commit }: UserActionContext) => {
+    fetchSession: ({ state, commit, getters }: UserActionContext) => {
       if (state.user.fetchingSessionPromise)
         return state.user.fetchingSessionPromise
       const p = SessionService.getCurrentSession()
         .then(({ sessionData }) => {
           commit('setSession', sessionData)
+          if (getters.isSessionAlive) {
+            useNotificationsStore().clear()
+          }
         })
         .catch((err) => {
           commit('setSession', {})
@@ -343,6 +347,9 @@ export default {
       sessionData
     ) => {
       commit('setSession', sessionData)
+      if (getters.isSessionAlive) {
+        useNotificationsStore().clear()
+      }
       if (sessionData.endedAt && getters.isVolunteer) {
         dispatch('americaCountsVolunteer/startCooldown', null, {
           root: true,
