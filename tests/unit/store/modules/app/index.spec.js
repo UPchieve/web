@@ -1,10 +1,9 @@
-import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import appModule from '@/store/modules/app'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { beforeEach, vi } from 'vitest'
 
-const { state, mutations, actions, getters } = appModule
+const { state, mutations, actions } = appModule
 
 describe('`app` store module', () => {
   beforeEach(() => {
@@ -17,6 +16,7 @@ describe('`app` store module', () => {
       isLoading: true,
       windowWidth: 0,
       windowHeight: 0,
+      isMobileMode: false,
       isMobileApp: false,
       isWebPageHidden: false,
       version: '',
@@ -36,7 +36,6 @@ describe('`app` store module', () => {
       mutations.setWindowWidth(state, -100)
       expect(state.windowWidth).toBe(0)
     })
-
     it('setWindowHeight', () => {
       expect(typeof mutations.setWindowHeight).toBe('function')
       const state = { windowHeight: 0 }
@@ -74,18 +73,6 @@ describe('`app` store module', () => {
       actions.windowResize({ commit }, { width, height })
       expect(commit).toHaveBeenNthCalledWith(1, 'setWindowWidth', width)
       expect(commit).toHaveBeenNthCalledWith(2, 'setWindowHeight', height)
-    })
-  })
-
-  describe('getters', () => {
-    it('mobileMode', () => {
-      expect(getters.mobileMode({ windowWidth: 0 })).toBe(true)
-      expect(getters.mobileMode({ windowWidth: MAX_MOBILE_MODE_WIDTH })).toBe(
-        true
-      )
-      expect(
-        getters.mobileMode({ windowWidth: MAX_MOBILE_MODE_WIDTH + 1 })
-      ).toBe(false)
     })
   })
 })

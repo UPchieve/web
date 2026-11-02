@@ -421,6 +421,8 @@ describe('SidebarLinks', () => {
 
         const mountCoach = (nthsState, windowWidth) => {
           storeOptions.modules.app.state.windowWidth = windowWidth
+          storeOptions.modules.app.state.isMobileMode =
+            windowWidth === PHONE_WIDTH
           return getWrapper({
             props: { authenticated: true },
             user: {
@@ -441,6 +443,7 @@ describe('SidebarLinks', () => {
 
         afterEach(() => {
           storeOptions.modules.app.state.windowWidth = 0
+          storeOptions.modules.app.state.isMobileMode = false
         })
 
         it.each([

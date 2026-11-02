@@ -43,6 +43,40 @@ const getWrapper = (options = {}) => {
 }
 
 describe('App', () => {
+  it('syncs viewport state when the mobile breakpoint changes', () => {
+    const originalMatchMedia = window.matchMedia.bind(window)
+    const mobileModeMediaQuery = originalMatchMedia('(max-width: 767px)')
+    const addEventListener = vi.spyOn(mobileModeMediaQuery, 'addEventListener')
+    const removeEventListener = vi.spyOn(
+      mobileModeMediaQuery,
+      'removeEventListener'
+    )
+    const matchMedia = vi
+      .spyOn(window, 'matchMedia')
+      .mockImplementation((query) =>
+        query === '(max-width: 767px)'
+          ? mobileModeMediaQuery
+          : originalMatchMedia(query)
+      )
+
+    const wrapper = getWrapper()
+    const breakpointChangeHandler = addEventListener.mock.calls.find(
+      ([event]) => event === 'change'
+    )[1]
+    const dispatch = vi.spyOn(wrapper.vm.$store, 'dispatch')
+
+    breakpointChangeHandler({ matches: true })
+
+    expect(dispatch).toHaveBeenCalledWith('app/mobileModeChange', true)
+
+    wrapper.unmount()
+    expect(removeEventListener).toHaveBeenCalledWith(
+      'change',
+      breakpointChangeHandler
+    )
+    matchMedia.mockRestore()
+  })
+
   it('renders expected elements', () => {
     const wrapper = getWrapper().find('#app')
     expect(wrapper.classes('App')).toBe(true)

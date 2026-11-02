@@ -1,4 +1,3 @@
-import { MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import { useAppHeaderStore } from '@/stores/app/header'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 
@@ -7,6 +6,7 @@ export default {
   state: {
     windowWidth: 0,
     windowHeight: 0,
+    isMobileMode: false,
     isMobileApp: false,
     isWebPageHidden: false,
     version: '',
@@ -20,6 +20,8 @@ export default {
       (state.windowWidth = Math.max(0, width)),
     setWindowHeight: (state, height = 0) =>
       (state.windowHeight = Math.max(0, height)),
+    setIsMobileMode: (state, isMobileMode) =>
+      (state.isMobileMode = isMobileMode),
     setIsMobileApp: (state, isMobileApp) => (state.isMobileApp = isMobileApp),
     setVersion: (state, version) => (state.version = version),
     isWebPageHidden: (state, isVisible) => (state.isWebPageHidden = isVisible),
@@ -42,6 +44,9 @@ export default {
       commit('setWindowWidth', width)
       commit('setWindowHeight', height)
     },
+    mobileModeChange: ({ commit }, isMobileMode) => {
+      commit('setIsMobileMode', isMobileMode)
+    },
 
     checkEnvironment: ({ commit }) => {
       const mobileAppDetectionString = 'upchieve/'
@@ -59,7 +64,7 @@ export default {
     },
   },
   getters: {
-    mobileMode: (state) => state.windowWidth <= MAX_MOBILE_MODE_WIDTH,
+    mobileMode: (state) => state.isMobileMode,
     widthLessThanPx: (state) => (px) => {
       return state.windowWidth < px
     },

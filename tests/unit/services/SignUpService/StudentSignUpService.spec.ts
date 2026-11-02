@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import type {
   RouteLocation,
   NavigationGuardNext,
@@ -20,6 +20,7 @@ import type {
 } from '@/services/SignUpService'
 import { UserType } from '@/services/SignUpService/types'
 import { getAcademicYear } from '@/utils/academic-year'
+import store from '@/store'
 
 vi.mock('@/services/AnalyticsService')
 vi.mock('@/services/AuthService')
@@ -45,6 +46,14 @@ function findElementAndRow(
 }
 
 describe('StudentSignUpService', () => {
+  beforeEach(() => {
+    store.commit('app/setIsMobileMode', true)
+  })
+
+  afterEach(() => {
+    store.commit('app/setIsMobileMode', false)
+  })
+
   describe('Check eligibility step', () => {
     describe('getEligibilityPageDetails', () => {
       test('returns correct page details for organic student', () => {

@@ -61,12 +61,13 @@ import sound from '@/assets/audio/alert.mp3'
 import RefreshAppAlert from '@/views/RefreshAppAlert.vue'
 import Celebration from '@/components/Celebration.vue'
 import getNotificationPermission from '@/utils/get-notification-permission'
-import { EVENTS } from '@/consts'
+import { EVENTS, MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import RouteLoadingIndicator from '@/components/RouteLoadingIndicator.vue'
 import AppTheme from './AppTheme.vue'
 import ModalService from '@/services/ModalService'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+const MOBILE_MODE_QUERY = `(max-width: ${MAX_MOBILE_MODE_WIDTH}px)`
 
 export default {
   name: 'App',
@@ -89,11 +90,18 @@ export default {
       isIOS: false,
       docHiddenProperty: '',
       checkForUpdateIntervalId: null,
+      mobileModeMediaQuery: null,
     }
   },
   async created() {
     // Listen for resize event
     window.addEventListener('resize', this.handleResize)
+    this.mobileModeMediaQuery = window.matchMedia(MOBILE_MODE_QUERY)
+    this.mobileModeMediaQuery.addEventListener(
+      'change',
+      this.handleMobileModeChange
+    )
+    this.handleMobileModeChange(this.mobileModeMediaQuery)
     this.handleResize()
     await this.$store.dispatch('app/checkEnvironment', this)
 
@@ -135,6 +143,10 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize)
+    this.mobileModeMediaQuery?.removeEventListener(
+      'change',
+      this.handleMobileModeChange
+    )
     clearInterval(this.checkForUpdateIntervalId)
 
     if (this.isMobileApp) {
@@ -178,6 +190,9 @@ export default {
         width: window.innerWidth,
         height: window.innerHeight,
       })
+    },
+    handleMobileModeChange({ matches }) {
+      this.$store.dispatch('app/mobileModeChange', matches)
     },
     setVisibilityListener() {
       let visibilityChange
