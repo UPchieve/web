@@ -116,13 +116,19 @@
                 </span>
               </div>
               <div class="session-list__session-recap">
-                <large-button
-                  v-if="canRequestSessionWith(session)"
-                  variant="primary-blue"
-                  :showArrow="false"
+                <request-coach-button
+                  :volunteerId="session.volunteerId"
+                  :volunteerName="session.volunteerFirstName"
+                  :subject="{
+                    topicName: session.topic,
+                    displayName: session.subject,
+                  }"
+                  :pastSessionId="session.id"
+                  sourceView="session-history"
+                  backText="Session History"
                   class="request-tutor-button"
-                  @click="openRequestSessionModal(session)"
-                  >Request {{ session.volunteerFirstName }} again</large-button
+                  >Request
+                  {{ session.volunteerFirstName }} again</request-coach-button
                 >
                 <large-button
                   variant="outlined"
@@ -235,13 +241,19 @@
                   <span class="mobile-session-list__created-at">
                     {{ getSessionTimeForMobile(session.createdAt) }}</span
                   >
-                  <large-button
-                    v-if="canRequestSessionWith(session)"
+                  <request-coach-button
+                    :volunteerId="session.volunteerId"
+                    :volunteerName="session.volunteerFirstName"
+                    :subject="{
+                      topicName: session.topic,
+                      displayName: session.subject,
+                    }"
+                    :pastSessionId="session.id"
+                    sourceView="session-history"
+                    backText="Session History"
                     class="request-tutor-button request-tutor-button--mobile"
-                    primary
-                    @click.stop="openRequestSessionModal(session)"
                     >Request session with
-                    {{ session.volunteerFirstName }}</large-button
+                    {{ session.volunteerFirstName }}</request-coach-button
                   >
                 </div>
                 <caret-icon class="caret caret--next mobile-caret" />
@@ -283,9 +295,6 @@
 </template>
 
 <script>
-import { useSessionStore } from '@/stores/session'
-import { mapActions, mapState as mapPiniaState } from 'pinia'
-import { useAppModalStore } from '@/stores/app/modal'
 import { dayjs } from '@/utils/time-utils'
 import { mapGetters, mapState } from 'vuex'
 import { EVENTS } from '@/consts'
@@ -300,6 +309,7 @@ import FormSearchableSelect from '@/components/FormInputs/FormSearchableSelect.v
 import LargeButton from '@/components/LargeButton.vue'
 import Loader from '@/components/Loader.vue'
 import BellIcon from '@/assets/BellIcon.svg'
+import RequestCoachButton from '@/components/RequestCoachButton.vue'
 
 export default {
   name: 'session-history-view',
@@ -312,6 +322,7 @@ export default {
     Loader,
     FormSearchableSelect,
     BellIcon,
+    RequestCoachButton,
   },
   data() {
     return {
@@ -340,13 +351,8 @@ export default {
       sessionPartner: 'user/sessionPartner',
       subjectsByTopics: 'subjects/subjectsByTopics',
       sessionsWithUnreadDMs: 'user/sessionsWithUnreadDMs',
-      isStudentRequestSpecificVolunteerSessionsEnabled:
-        'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
     }),
-    ...mapPiniaState(useSessionStore, ['hasCooldown']),
     ...mapState({
-      subjectsMap: (state) => state.subjects.subjects,
-      currentSession: (state) => state.user.session,
       userId: (state) => state.user.user.id,
     }),
     filterBySubjectOptions() {
@@ -394,7 +400,6 @@ export default {
     await this.fetchSessionHistory()
   },
   methods: {
-    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     setStateFromQuery(query) {
       this.page = parseInt(query.page) || 1
       this.filters.firstName = query.firstName || ''
@@ -533,57 +538,6 @@ export default {
         AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_NEW_MESSAGE)
       }
       this.$router.push(`/sessions/${sessionId}/recap`)
-    },
-    canRequestSessionWith(session) {
-      return (
-        this.isStudent &&
-        this.isStudentRequestSpecificVolunteerSessionsEnabled &&
-        !!session.volunteerId &&
-        !!session.volunteerFirstName &&
-        !this.currentSession?.id &&
-        !this.hasCooldown
-      )
-    },
-    openRequestSessionModal(session) {
-      const matchedSubject = Object.values(this.subjectsMap).find(
-        (s) =>
-          s.topicName === session.topic && s.displayName === session.subject
-      )
-      if (!matchedSubject) return
-
-      AnalyticsService.captureEvent(
-        EVENTS.STUDENT_CLICKED_REQUEST_TUTOR_AGAIN,
-        {
-          sourceView: 'session-history',
-          requestedVolunteerId: session.volunteerId,
-          subject: matchedSubject.name,
-          topic: session.topic,
-          pastSessionId: session.id,
-        }
-      )
-
-      // Lock the request to the past session's subject — no picker for this
-      // flow. Backend trusts the locked subject (no certification re-check),
-      // so the modal must not offer alternatives.
-      const subtopics = [matchedSubject.name]
-      const subtopicDisplayNames = {
-        [matchedSubject.name]: matchedSubject.displayName,
-      }
-
-      this.showAppModal({
-        component: 'SubjectSelectionModal',
-        data: {
-          backText: 'Session History',
-          acceptText: 'Continue',
-          topic: session.topic,
-          title: matchedSubject.topicDisplayName || '',
-          subtopics,
-          subtopicDisplayNames,
-          preSelectedSubtopic: matchedSubject.name,
-          subtitle: `Start a ${matchedSubject.displayName} session with ${session.volunteerFirstName}.`,
-          sessionArgs: { requestedVolunteerId: session.volunteerId },
-        },
-      })
     },
   },
   watch: {

@@ -4,8 +4,20 @@
       <presession-survey
         v-on:survey-completed="onSurveyCompleted"
         :subject="selectedSubtopic"
+        :surveyDefinition="volunteerSurveys[selectedSubtopic]"
+        :hasSubjectSelection="!!modalData.volunteerSubjects"
+        @back-to-subject="showSurvey = false"
       />
     </div>
+    <request-coach-subject-modal
+      v-else-if="modalData.volunteerSubjects"
+      :subjects="modalData.volunteerSubjects"
+      :volunteerName="modalData.volunteerName"
+      :selectedSubject="selectedSubtopic"
+      :totalSteps="requestTotalSteps"
+      :isLoading="isLoadingSurvey"
+      :onSelect="selectCoachSubject"
+    />
     <div v-else>
       <component
         v-if="!mobileMode && typeof modalData.svg === 'object'"
@@ -48,6 +60,7 @@
         </div>
       </div>
     </div>
+    <p v-if="surveyError" role="alert">{{ surveyError }}</p>
   </div>
 </template>
 
@@ -60,6 +73,9 @@ import LargeButton from '@/components/LargeButton.vue'
 import PresessionSurvey from './PresessionSurvey.vue'
 import getCookie from '@/utils/get-cookie'
 import { quizRoute } from '@/utils/quiz-route'
+import RequestCoachSubjectModal from '@/components/RequestCoachSubjectModal.vue'
+import NetworkService from '@/services/NetworkService'
+import LoggerService from '@/services/LoggerService'
 
 /**
  *
@@ -70,7 +86,7 @@ import { quizRoute } from '@/utils/quiz-route'
  *
  */
 export default {
-  components: { LargeButton, PresessionSurvey },
+  components: { LargeButton, PresessionSurvey, RequestCoachSubjectModal },
   props: {
     modalData: { type: Object, required: true },
   },
@@ -78,6 +94,9 @@ export default {
     return {
       selectedSubtopic: this.modalData.preSelectedSubtopic || '',
       showSurvey: this.modalData.preSelectedSubtopic ? true : false,
+      volunteerSurveys: {},
+      isLoadingSurvey: false,
+      surveyError: '',
     }
   },
   computed: {
@@ -89,6 +108,21 @@ export default {
       mobileMode: 'app/mobileMode',
       isAsyncEssayReviewEnabled: 'featureFlags/isAsyncEssayReviewEnabled',
     }),
+    requestTotalSteps() {
+      const subjectName =
+        this.selectedSubtopic || this.modalData.volunteerSubjects?.[0]?.name
+      const survey = this.volunteerSurveys[subjectName]
+      if (!survey) return 0
+      return survey.survey.length + 1
+    },
+    selectedTopic() {
+      if (this.modalData.volunteerSubjects) {
+        return this.modalData.volunteerSubjects.find(
+          (subject) => subject.name === this.selectedSubtopic
+        )?.topicName
+      }
+      return this.modalData.topic
+    },
     title() {
       if (this.modalData.title)
         return `Choose a${
@@ -108,6 +142,9 @@ export default {
     // when mounted, skip the presession survey for certain topics
     // or show the presession survey for the rest of them
     this.onAccept()
+    if (this.modalData.volunteerSubjects?.length) {
+      this.loadVolunteerSurvey(this.modalData.volunteerSubjects[0].name)
+    }
   },
   methods: {
     ...mapActions(useAppModalStore, { showAppModal: 'show' }),
@@ -136,7 +173,7 @@ export default {
             backText: 'Dashboard',
             acceptText: 'Yes, please notify me!',
             selectedSubtopic: this.selectedSubtopic,
-            topic: this.modalData.topic,
+            topic: this.selectedTopic,
           },
         })
       } else {
@@ -152,7 +189,7 @@ export default {
           data: {
             backText: 'Dashboard',
             showTemplateButtons: false,
-            topic: this.modalData.topic,
+            topic: this.selectedTopic,
             subject: this.selectedSubtopic,
             sessionArgs: this.modalData.sessionArgs,
             svg: this.modalData.svg,
@@ -169,13 +206,40 @@ export default {
         : undefined
       startSession(
         this.$router,
-        this.modalData.topic,
+        this.selectedTopic,
         this.selectedSubtopic,
         queryParams
       )
     },
     startsWithVowel(word) {
       return /[AEIOUaeiou]/i.test(word[0])
+    },
+    async selectCoachSubject(subjectName) {
+      const survey = await this.loadVolunteerSurvey(subjectName)
+      if (!survey) return
+      this.setSelectedSubtopic(subjectName)
+      if (this.modalData.onSubjectSelected) {
+        this.modalData.onSubjectSelected(subjectName)
+      }
+      this.onAccept()
+    },
+    async loadVolunteerSurvey(subjectName) {
+      if (this.volunteerSurveys[subjectName]) {
+        return this.volunteerSurveys[subjectName]
+      }
+
+      this.isLoadingSurvey = true
+      this.surveyError = ''
+      try {
+        const response = await NetworkService.getPresessionSurvey(subjectName)
+        this.volunteerSurveys[subjectName] = response.data
+        return response.data
+      } catch (err) {
+        LoggerService.noticeError(err)
+        this.surveyError = `Couldn't load the form. Please try again.`
+      } finally {
+        this.isLoadingSurvey = false
+      }
     },
     handleTrainingRedirect() {
       this.$router.push(quizRoute(this.selectedSubtopic))

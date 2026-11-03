@@ -65,14 +65,20 @@
             <template v-if="canRequestSessionWithSameTutor">
               <span class="card-detail__title"></span>
               <div class="card-detail recap-card__exclusive-cta-cell">
-                <large-button
-                  variant="primary-blue"
-                  @click="openRequestSessionWithTutorModal"
-                  :showArrow="false"
+                <request-coach-button
+                  :volunteerId="session.volunteerId"
+                  :volunteerName="session.volunteerFirstName"
+                  :subject="{
+                    topicName: session.topic,
+                    displayName: session.subject,
+                  }"
+                  :pastSessionId="session.id"
+                  sourceView="session-recap"
+                  backText="Session Recap"
                 >
                   Start another {{ session.subject }} session with
                   {{ session.volunteerFirstName }}
-                </large-button>
+                </request-coach-button>
               </div>
             </template>
             <template
@@ -266,6 +272,7 @@ import ProgressReportSession from '@/components/ProgressReportSession.vue'
 import Dropdown from '@/components/Dropdown.vue'
 import Separator from '@/components/Separator.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import RequestCoachButton from '@/components/RequestCoachButton.vue'
 import Case from 'case'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -299,6 +306,7 @@ export default {
     Dropdown,
     Separator,
     LargeButton,
+    RequestCoachButton,
     StudentIcon,
     VolunteerIcon,
   },
@@ -308,7 +316,6 @@ export default {
       recapSession: (state) => state.user.recapSession,
       socketJoinedRoom: (state) => state.socket.socketJoinedRoom,
       isConnected: (state) => state.socket.isConnected,
-      subjectsMap: (state) => state.subjects.subjects,
       currentSession: (state) => state.user.session,
     }),
     ...mapGetters({
@@ -326,7 +333,7 @@ export default {
         this.isStudent &&
         this.isStudentRequestSpecificVolunteerSessionsEnabled &&
         !!this.session?.volunteerId &&
-        !this.currentSession.id &&
+        !this.currentSession?.id &&
         !this.hasCooldown
       )
     },
@@ -539,51 +546,6 @@ export default {
         EVENTS.PROGRESS_REPORT_SESSION_RECAP_STUDENT_REQUESTED_HELP
       )
       this.$router.push('/session/readingWriting/reading/')
-    },
-    openRequestSessionWithTutorModal() {
-      // Mirror SessionHistoryView.openRequestSessionModal: lock the new
-      // session to the same subject as the recap'd session and ride the
-      // tutor's id through as requestedVolunteerId so the backend gates the
-      // session as exclusive to them.
-      const matchedSubject = Object.values(this.subjectsMap).find(
-        (s) =>
-          s.topicName === this.session.topic &&
-          s.displayName === this.session.subject
-      )
-      if (!matchedSubject) return
-
-      AnalyticsService.captureEvent(
-        EVENTS.STUDENT_CLICKED_REQUEST_TUTOR_AGAIN,
-        {
-          sourceView: 'session-recap',
-          requestedVolunteerId: this.session.volunteerId,
-          subject: matchedSubject.name,
-          topic: this.session.topic,
-          pastSessionId: this.session.id,
-        }
-      )
-
-      const subtopics = [matchedSubject.name]
-      const subtopicDisplayNames = {
-        [matchedSubject.name]: matchedSubject.displayName,
-      }
-
-      this.showAppModal({
-        component: 'SubjectSelectionModal',
-        data: {
-          backText: 'Session Recap',
-          acceptText: 'Continue',
-          topic: this.session.topic,
-          title: matchedSubject.topicDisplayName || '',
-          subtopics,
-          subtopicDisplayNames,
-          preSelectedSubtopic: matchedSubject.name,
-          subtitle: `Start a ${matchedSubject.displayName} session with ${this.session.volunteerFirstName}.`,
-          sessionArgs: {
-            requestedVolunteerId: this.session.volunteerId,
-          },
-        },
-      })
     },
     handleProgressReportToggle(isOpen) {
       if (isOpen)
