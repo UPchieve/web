@@ -12,33 +12,6 @@ import {
 } from '@/services/NTHSApplicationService'
 import { US_COUNTRY } from '@/consts'
 
-// A stand-in for NTHS_APPLICATION_QUESTIONS:
-// one required longText, one optional shortText, one attestation.
-const TEST_QUESTIONS: NTHSQuestion[] = [
-  {
-    key: 'projectPlan',
-    type: 'longText',
-    label: 'What is your plan?',
-    isRequired: true,
-  },
-  {
-    key: 'mentorEmail',
-    type: 'shortText',
-    label: 'Mentor email (optional)',
-    isRequired: false,
-  },
-  {
-    key: 'willAttendOrientation',
-    type: 'attestation',
-    label: 'I will attend orientation',
-  },
-  {
-    key: 'willSubmitReports',
-    type: 'attestation',
-    label: 'I will submit reports',
-  },
-]
-
 describe('HIGH_SCHOOL_GRADES', () => {
   // The form submits grade.split(' ')[0], which has to land on the GRADES enum
   // subway validates with asEnum.
@@ -54,59 +27,61 @@ describe('HIGH_SCHOOL_GRADES', () => {
 
 describe('buildEmptyResponses', () => {
   it('starts attestations false and text empty', () => {
-    const responses = buildEmptyResponses(TEST_QUESTIONS)
+    const responses = buildEmptyResponses()
 
-    expect(responses.willAttendOrientation).toBe(false)
-    expect(responses.projectPlan).toBe('')
-    expect(Object.keys(responses)).toHaveLength(TEST_QUESTIONS.length)
+    expect(responses.commitWeeklyHours).toBe(false)
+    expect(responses.whyStartChapter).toBe('')
+    expect(Object.keys(responses)).toHaveLength(
+      NTHS_APPLICATION_QUESTIONS.length
+    )
   })
 })
 
 describe('collectResponses', () => {
   it('drops blank answers rather than sending them empty', () => {
-    const collected = collectResponses(TEST_QUESTIONS, {
-      ...buildEmptyResponses(TEST_QUESTIONS),
-      projectPlan: 'Recruit five tutors',
+    const collected = collectResponses({
+      ...buildEmptyResponses(),
+      whyStartChapter: 'Recruit five tutors',
     })
 
-    expect(collected).toEqual({ projectPlan: 'Recruit five tutors' })
-    expect('mentorEmail' in collected).toBe(false)
+    expect(collected).toEqual({ whyStartChapter: 'Recruit five tutors' })
+    expect('coPresidentEmail' in collected).toBe(false)
   })
 
   it('drops whitespace-only answers', () => {
-    const collected = collectResponses(TEST_QUESTIONS, {
-      ...buildEmptyResponses(TEST_QUESTIONS),
-      projectPlan: '   ',
+    const collected = collectResponses({
+      ...buildEmptyResponses(),
+      whyStartChapter: '   ',
     })
 
-    expect('projectPlan' in collected).toBe(false)
+    expect('whyStartChapter' in collected).toBe(false)
   })
 
   it('trims the answers it keeps', () => {
-    const collected = collectResponses(TEST_QUESTIONS, {
-      ...buildEmptyResponses(TEST_QUESTIONS),
-      projectPlan: '  Recruit five tutors  ',
+    const collected = collectResponses({
+      ...buildEmptyResponses(),
+      whyStartChapter: '  Recruit five tutors  ',
     })
 
-    expect(collected.projectPlan).toBe('Recruit five tutors')
+    expect(collected.whyStartChapter).toBe('Recruit five tutors')
   })
 
   it('keeps checked attestations and drops unchecked ones', () => {
-    const collected = collectResponses(TEST_QUESTIONS, {
-      ...buildEmptyResponses(TEST_QUESTIONS),
-      willAttendOrientation: true,
+    const collected = collectResponses({
+      ...buildEmptyResponses(),
+      commitWeeklyHours: true,
     })
 
-    expect(collected.willAttendOrientation).toBe(true)
+    expect(collected.commitWeeklyHours).toBe(true)
     // subway reads an absent attestation as unanswered rather than as a no, so
     // dropping the false ones cannot smuggle an application past its checks.
-    expect('willSubmitReports' in collected).toBe(false)
+    expect('commitRecruitThreeTutors' in collected).toBe(false)
   })
 
   it('ignores keys that are not part of the form', () => {
-    const collected = collectResponses(TEST_QUESTIONS, {
-      ...buildEmptyResponses(TEST_QUESTIONS),
-      projectPlan: 'Recruit five tutors',
+    const collected = collectResponses({
+      ...buildEmptyResponses(),
+      whyStartChapter: 'Recruit five tutors',
       somethingElse: 'should not be sent',
     } as never)
 

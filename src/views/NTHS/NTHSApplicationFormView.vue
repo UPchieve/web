@@ -64,9 +64,8 @@ const gradeLevel = ref<string>(store.getters['user/gradeLevel'])
 const userId: string | undefined = store.state.user.user?.id
 
 const draft = sanitizeNTHSApplicationDraft(getNTHSApplicationDraft(userId))
-const questions = NTHS_APPLICATION_QUESTIONS
 
-const responses = reactive(buildEmptyResponses(questions))
+const responses = reactive(buildEmptyResponses())
 
 const academicYear = getAcademicYear().asString
 
@@ -188,7 +187,7 @@ async function submit() {
   isSubmitting.value = true
   error.value = ''
 
-  const collected = collectResponses(questions, responses)
+  const collected = collectResponses(responses)
   const submitted = await postApplication(collected)
   if (!submitted) {
     isSubmitting.value = false
@@ -279,11 +278,9 @@ function questionAnsweredProperties(question: NTHSQuestion) {
 }
 
 function answeredOptionalQuestions(collected: NTHSApplicationResponses) {
-  return questions
-    .filter(
-      (question) => question.isRequired === false && question.key in collected
-    )
-    .map((question) => question.key)
+  return NTHS_APPLICATION_QUESTIONS.filter(
+    (question) => question.isRequired === false && question.key in collected
+  ).map((question) => question.key)
 }
 
 function submitErrorClass(httpStatus?: number) {
@@ -408,7 +405,10 @@ function submitErrorClass(httpStatus?: number) {
         <form v-else @submit.prevent="submit" autocomplete="off">
           <p class="step-label">Step 2 of 2</p>
 
-          <template v-for="question in questions" :key="question.key">
+          <template
+            v-for="question in NTHS_APPLICATION_QUESTIONS"
+            :key="question.key"
+          >
             <FormTextArea
               v-if="question.type === 'longText'"
               v-model="responses[question.key] as string"

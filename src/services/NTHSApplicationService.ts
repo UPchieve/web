@@ -62,13 +62,6 @@ export const NTHS_COMMITMENTS: (NTHSQuestion & {
   },
 ]
 
-const HOW_DID_YOU_HEAR: NTHSQuestion = {
-  key: 'howDidYouHear',
-  type: 'shortText',
-  label: 'How did you hear about NTHS? (optional)',
-  isRequired: false,
-}
-
 // Question keys have to match subway's NTHS_APPLICATION_FIELDS, which rejects
 // any key it does not list.
 export const NTHS_APPLICATION_QUESTIONS: NTHSQuestion[] = [
@@ -107,15 +100,18 @@ export const NTHS_APPLICATION_QUESTIONS: NTHSQuestion[] = [
       "Co-President's or Vice President's email, if you are applying with one (optional)",
     isRequired: false,
   },
-  HOW_DID_YOU_HEAR,
+  {
+    key: 'howDidYouHear',
+    type: 'shortText',
+    label: 'How did you hear about NTHS? (optional)',
+    isRequired: false,
+  },
 ]
 
 export type NTHSApplicationResponses = Record<string, string | boolean>
 
-export function buildEmptyResponses(
-  questions: NTHSQuestion[]
-): NTHSApplicationResponses {
-  return questions.reduce((responses, question) => {
+export function buildEmptyResponses(): NTHSApplicationResponses {
+  return NTHS_APPLICATION_QUESTIONS.reduce((responses, question) => {
     responses[question.key] = question.type === 'attestation' ? false : ''
     return responses
   }, {} as NTHSApplicationResponses)
@@ -124,10 +120,9 @@ export function buildEmptyResponses(
 // Keys the applicant left blank are dropped rather than stored empty, so an
 // absent answer stays distinguishable from one deliberately left empty.
 export function collectResponses(
-  questions: NTHSQuestion[],
   responses: NTHSApplicationResponses
 ): NTHSApplicationResponses {
-  return questions.reduce((collected, question) => {
+  return NTHS_APPLICATION_QUESTIONS.reduce((collected, question) => {
     const answer = responses[question.key]
     if (typeof answer === 'string' ? answer.trim() : answer)
       collected[question.key] =
