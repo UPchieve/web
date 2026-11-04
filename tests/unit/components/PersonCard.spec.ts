@@ -69,6 +69,18 @@ describe('PersonCard', () => {
     )
   })
 
+  it('renders the avatar badge slot inside the avatar only when one is passed', () => {
+    expect(
+      mountCard().find('[data-testid="person-card-avatar-badge"]').exists()
+    ).toBe(false)
+
+    const wrapper = mountCard({}, { 'avatar-badge': '<button>Star</button>' })
+    const badge = wrapper.find(
+      '.person-card__avatar [data-testid="person-card-avatar-badge"]'
+    )
+    expect(badge.text()).toBe('Star')
+  })
+
   it("shows a student's first initial on a color keyed to their id", () => {
     const wrapper = mountCard({
       type: 'student',

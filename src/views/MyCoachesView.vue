@@ -216,16 +216,17 @@ onMounted(async () => {
           :name="coach.firstName"
           :last-session="coach.lastSession"
         >
-          <template #actions>
+          <template #avatar-badge>
             <FavoritingToggle
-              class="favorite-toggle"
+              variant="badge"
               :initialIsFavorite="coach.isFavorite"
               :volunteerName="coach.firstName"
               :volunteerId="coach.volunteerId"
               @change-favorited="handleFavoriteChange"
             />
+          </template>
+          <template v-if="isDirectMessagesEnabled" #actions>
             <LargeButton
-              v-if="isDirectMessagesEnabled"
               class="message-button"
               data-testid="message-button"
               :aria-label="`Message ${coach.firstName}`"
@@ -473,10 +474,5 @@ onMounted(async () => {
 .message-button {
   border-width: 2px;
   border-radius: 24px;
-}
-
-.favorite-toggle {
-  display: flex;
-  align-items: center;
 }
 </style>

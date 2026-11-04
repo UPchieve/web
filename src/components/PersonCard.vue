@@ -9,6 +9,13 @@
         :fgColor="AVATAR_TEXT_COLOR"
       />
       <CoachIcon v-else class="person-card__icon" />
+      <div
+        v-if="$slots['avatar-badge']"
+        class="person-card__avatar-badge"
+        data-testid="person-card-avatar-badge"
+      >
+        <slot name="avatar-badge" />
+      </div>
     </div>
     <h2 class="person-card__name" data-testid="person-card-name">{{ name }}</h2>
 
@@ -119,6 +126,13 @@ const lastSessionInfo = computed(() => {
   &__icon {
     width: 70px;
     height: 70px;
+  }
+
+  &__avatar-badge {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    z-index: 1;
   }
 
   &__name {
