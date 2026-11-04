@@ -8,6 +8,9 @@ const props = defineProps({
   important: Boolean,
   backText: { type: String, default: 'Back' },
   disableModalMobileMode: { type: Boolean, default: false, required: false },
+  // Full-height panel on the right instead of a centered dialog. The content
+  // brings its own header and close button.
+  sidePanel: { type: Boolean, default: false, required: false },
 })
 
 const store = useStore()
@@ -46,10 +49,14 @@ function handleBackButton() {
     :class="{
       'modal--important': important,
       'upc-modal--disable-mobile': disableModalMobileMode,
+      'upc-modal--side-panel': sidePanel,
     }"
     @click="handleClose"
   >
-    <div v-if="mobileMode && !disableModalMobileMode" class="upc-modal-header">
+    <div
+      v-if="mobileMode && !disableModalMobileMode && !sidePanel"
+      class="upc-modal-header"
+    >
       <div
         v-if="backText"
         class="upc-modal-header-close-button"

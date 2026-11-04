@@ -7,9 +7,12 @@ import LoggerService from '@/services/LoggerService'
 import CaretIcon from '@/assets/caret.svg'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Loader from '@/components/Loader.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
 import { minutesInMs } from '@/utils/time-utils'
 import type { PastStudent } from '@/types/volunteers'
+import MessageIcon from '@/assets/message-circle.svg'
 
 interface Student extends PastStudent {
   lastSession: LastSession
@@ -100,6 +103,16 @@ function goToPreviousPage() {
   navigateTo(page.value - 1)
 }
 
+const activeConversation = ref<Student | null>(null)
+
+function openConversation(student: Student) {
+  activeConversation.value = student
+}
+
+function closeConversation() {
+  activeConversation.value = null
+}
+
 // Watch the URL as the source of truth for the current page
 // so the back button goes back on step instead of to the previous view
 watch(
@@ -141,7 +154,20 @@ onMounted(async () => {
           :user-id="student.studentId"
           :name="student.firstName"
           :last-session="student.lastSession"
-        />
+        >
+          <template #actions>
+            <LargeButton
+              class="message-button"
+              data-testid="message-button"
+              :aria-label="`Message ${student.firstName}`"
+              @click="openConversation(student)"
+              :show-arrow="false"
+              variant="outlined"
+            >
+              <MessageIcon aria-hidden="true" />
+            </LargeButton>
+          </template>
+        </PersonCard>
       </template>
       <div v-else class="students__no-students">
         <student-icon class="student-icon" />
@@ -179,6 +205,13 @@ onMounted(async () => {
         ><caret-icon class="caret caret--next" />
       </button>
     </div>
+    <DirectMessagePanel
+      v-if="activeConversation"
+      :partner-id="activeConversation.studentId"
+      :partner-name="activeConversation.firstName"
+      partner-type="student"
+      @close="closeConversation"
+    />
   </div>
 </template>
 
@@ -316,5 +349,10 @@ onMounted(async () => {
     transform: rotate(-90deg);
     margin-left: 0.4em;
   }
+}
+
+.message-button {
+  border-width: 2px;
+  border-radius: 24px;
 }
 </style>

@@ -169,6 +169,7 @@ const lastSessionInfo = computed(() => {
   &__actions {
     grid-area: actions;
     display: flex;
+    align-items: center;
     gap: 12px;
     margin-top: 12px;
 

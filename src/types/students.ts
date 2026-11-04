@@ -17,3 +17,7 @@ export type PastVolunteer = {
   isFavorite: boolean
   publicProfileStats: VolunteerPublicProfileInfoShared
 }
+
+export type PastVolunteersResponse = {
+  pastVolunteers: PastVolunteer[]
+}

@@ -999,6 +999,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR = 'volunteer-relevant-experience-fake-door',
   VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR = 'volunteer-show-online-status-fake-door',
   AMERICA_COUNTS_AUTO_JOIN_DELAY = 'america-counts-auto-join-delay',
+  DIRECT_MESSAGES = 'direct-messages',
 }
 
 export const ANALYTICS_REPORT_ROW = {

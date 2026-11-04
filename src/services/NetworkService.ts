@@ -32,6 +32,12 @@ import type {
 } from '@/types/bot-conversations'
 import type { PastStudentsResponse } from '@/types/volunteers'
 import type {
+  DirectMessagesResponse,
+  GetOrCreateConversationRequest,
+  GetOrCreateConversationResponse,
+} from '@/types/direct-messages'
+import type { PastVolunteersResponse } from '@/types/students'
+import type {
   AsyncReviewSubject,
   EssayReviewStatus,
   EssayReviewSubmission,
@@ -320,6 +326,23 @@ export function getPastStudents() {
   return httpGet<PastStudentsResponse>(`${API_ROOT}/volunteers/past-students`)
 }
 
+export function getOrCreateConversation(partnerId: Uuid) {
+  return httpPost<
+    GetOrCreateConversationResponse,
+    GetOrCreateConversationRequest
+  >(`${API_ROOT}/conversations`, { partnerId })
+}
+
+export function getDirectMessages(conversationId: Uuid) {
+  return httpGet<DirectMessagesResponse>(
+    `${API_ROOT}/conversations/${conversationId}/messages`
+  )
+}
+
+export function getPastVolunteers() {
+  return httpGet<PastVolunteersResponse>(`${API_ROOT}/students/past-volunteers`)
+}
+
 export function getNTHSChecklist(groupId: string) {
   return httpGet<NTHSChecklistResponse>(
     `${API_ROOT}/nths-groups/${groupId}/checklist`
@@ -499,6 +522,9 @@ export default {
   logout,
   checkRegister,
   getPastStudents,
+  getOrCreateConversation,
+  getDirectMessages,
+  getPastVolunteers,
   getNTHSChecklist,
   updateNTHSChecklistItemProgress,
   getNTHSRenewalSuccessors,
@@ -1278,12 +1304,6 @@ export default {
   },
   getVolunteerFirstSessionDate() {
     return httpGetDeprecated(`${API_ROOT}/sessions/first-session-date`).then(
-      this._successHandler,
-      this._errorHandler
-    )
-  },
-  getPastVolunteers() {
-    return httpGetDeprecated(`${API_ROOT}/students/past-volunteers`).then(
       this._successHandler,
       this._errorHandler
     )

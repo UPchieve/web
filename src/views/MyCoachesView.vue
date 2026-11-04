@@ -10,9 +10,12 @@ import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import StarIcon from '@/assets/icons/star_icon.svg'
 import Loader from '@/components/Loader.vue'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
+import LargeButton from '@/components/LargeButton.vue'
+import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
 import { minutesInMs } from '@/utils/time-utils'
 import type { PastVolunteer } from '@/types/students'
+import MessageIcon from '@/assets/message-circle.svg'
 
 interface Coach extends Omit<PastVolunteer, 'lastSession'> {
   lastSession: LastSession | null
@@ -33,6 +36,9 @@ const $router = useRouter()
 const store = useStore()
 
 const mobileMode = computed(() => store.getters['app/mobileMode'])
+const isDirectMessagesEnabled = computed(
+  () => store.getters['featureFlags/isDirectMessagesEnabled']
+)
 
 const allCoaches = ref<Coach[]>([])
 const filteredCoaches = ref<Coach[]>([])
@@ -58,8 +64,7 @@ function setCurrentPageFromQuery(query: typeof $route.query) {
 async function fetchCoaches() {
   isFetchingCoaches.value = true
   try {
-    const response = await NetworkService.getPastVolunteers()
-    const pastVolunteers: PastVolunteer[] = response.data.pastVolunteers || []
+    const { pastVolunteers } = await NetworkService.getPastVolunteers()
     allCoaches.value = pastVolunteers.map((volunteer) => ({
       ...volunteer,
       lastSession: toLastSession(volunteer),
@@ -67,8 +72,8 @@ async function fetchCoaches() {
 
     applyFilter()
     paginate()
-  } catch (err: any) {
-    LoggerService.noticeError(err?.response?.data?.err ?? err)
+  } catch (err) {
+    LoggerService.noticeError(err)
     error.value = 'We were unable to load your coaches. Please try again later.'
   } finally {
     isFetchingCoaches.value = false
@@ -149,6 +154,16 @@ function handleFavoriteChange(volunteerId: string, isFavorite: boolean) {
   paginate()
 }
 
+const activeConversation = ref<Coach | null>(null)
+
+function openConversation(coach: Coach) {
+  activeConversation.value = coach
+}
+
+function closeConversation() {
+  activeConversation.value = null
+}
+
 // Watch the URL as the source of truth for the current page
 // so the back button goes back on step instead of to the previous view
 watch(
@@ -203,11 +218,23 @@ onMounted(async () => {
         >
           <template #actions>
             <FavoritingToggle
+              class="favorite-toggle"
               :initialIsFavorite="coach.isFavorite"
               :volunteerName="coach.firstName"
               :volunteerId="coach.volunteerId"
               @change-favorited="handleFavoriteChange"
             />
+            <LargeButton
+              v-if="isDirectMessagesEnabled"
+              class="message-button"
+              data-testid="message-button"
+              :aria-label="`Message ${coach.firstName}`"
+              @click="openConversation(coach)"
+              :show-arrow="false"
+              variant="outlined"
+            >
+              <MessageIcon aria-hidden="true" />
+            </LargeButton>
           </template>
         </PersonCard>
       </template>
@@ -258,6 +285,13 @@ onMounted(async () => {
         ><caret-icon class="caret caret--next" />
       </button>
     </div>
+    <DirectMessagePanel
+      v-if="activeConversation"
+      :partner-id="activeConversation.volunteerId"
+      :partner-name="activeConversation.firstName"
+      partner-type="coach"
+      @close="closeConversation"
+    />
   </div>
 </template>
 
@@ -434,5 +468,15 @@ onMounted(async () => {
 
 .coach-card {
   margin: 4px 0;
+}
+
+.message-button {
+  border-width: 2px;
+  border-radius: 24px;
+}
+
+.favorite-toggle {
+  display: flex;
+  align-items: center;
 }
 </style>

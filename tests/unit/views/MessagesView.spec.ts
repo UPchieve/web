@@ -60,7 +60,7 @@ function mountView() {
           },
         }),
       ],
-      stubs: { Loader: true },
+      stubs: { Loader: true, DirectMessagePanel: true },
     },
   })
 }
@@ -136,6 +136,34 @@ describe('MessagesView', () => {
       'Sep 17, 2026',
       '1 hr 30 min',
     ])
+  })
+
+  it("opens the student's conversation when Message is clicked", async () => {
+    mockedNetworkService.getPastStudents.mockResolvedValue({
+      pastStudents: [pastStudent()],
+    })
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(
+      false
+    )
+    const messageButton = wrapper.find('[data-testid="message-button"]')
+    expect(messageButton.attributes('aria-label')).toBe('Message Jordan')
+    await messageButton.trigger('click')
+
+    const panel = wrapper.findComponent({ name: 'DirectMessagePanel' })
+    expect(panel.props()).toEqual({
+      partnerId: 'student-1',
+      partnerName: 'Jordan',
+      partnerType: 'student',
+    })
+
+    panel.vm.$emit('close')
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(
+      false
+    )
   })
 
   it('shows the empty state when the volunteer has no past students', async () => {
