@@ -95,16 +95,6 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer | isStudent"
-          to="/sessions/history"
-          text="Session History"
-          id="session-history-sidebar-link"
-        >
-          <clock-icon class="icon" />
-          <bell-icon v-if="hasUnreadDMs" class="SidebarLinks__bell-icon" />
-        </sidebar-link>
-
-        <sidebar-link
           v-if="isStudent && productFlags.impactStudyEnrollmentAt"
           to="/rewards"
           text="Rewards"
@@ -157,6 +147,25 @@
             v-if="!hasSeenCalculator"
             class="SidebarLinks__notification"
           />
+        </sidebar-link>
+
+        <sidebar-link
+          v-if="isVolunteer"
+          to="/messages"
+          text="Messages"
+          id="messages-sidebar-link"
+        >
+          <messages-icon class="icon messages-icon" />
+        </sidebar-link>
+
+        <sidebar-link
+          v-if="isVolunteer | isStudent"
+          to="/sessions/history"
+          text="Session History"
+          id="session-history-sidebar-link"
+        >
+          <clock-icon class="icon" />
+          <bell-icon v-if="hasUnreadDMs" class="SidebarLinks__bell-icon" />
         </sidebar-link>
       </div>
 
@@ -225,6 +234,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import ActivityDot from '@/components/ActivityDot.vue'
 import ChatBotIcon from '@/assets/chat-bot-icon.svg'
 import BellIcon from '@/assets/BellIcon.svg'
+import MessagesIcon from '@/assets/messages_icon.svg'
 import { EVENTS } from '@/consts'
 import { getIncompleteAssignments } from '@/utils/student-assignments-utils'
 import {
@@ -265,6 +275,7 @@ export default {
     CalculatorIcon,
     ChatBotIcon,
     BellIcon,
+    MessagesIcon,
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {
@@ -508,6 +519,12 @@ export default {
 }
 :deep(.SidebarLink .hand-wave-icon g) {
   stroke: none;
+}
+:deep(.SidebarLink .icon.messages-icon path) {
+  fill: none;
+}
+:deep(.SidebarLink--active .icon.messages-icon) {
+  color: $c-success-green;
 }
 
 // Order here matters - we want to set fill to none for

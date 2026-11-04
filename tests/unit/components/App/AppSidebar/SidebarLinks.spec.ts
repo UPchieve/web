@@ -45,6 +45,10 @@ const PROGRESS_REPORTS = {
 }
 
 // Volunteer links
+const MESSAGES_LINK = {
+  to: '/messages',
+  text: 'Messages',
+}
 const CALENDAR_LINK = { to: '/calendar', text: 'Schedule' }
 const TRAINING_LINK = {
   to: '/training',
@@ -86,8 +90,9 @@ const links = {
       DASHBOARD_LINK,
       TRAINING_LINK,
       CALENDAR_LINK,
-      SESSION_HISTORY_LINK,
       LEVEL_UP_IMPACT_LINK,
+      MESSAGES_LINK,
+      SESSION_HISTORY_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],
@@ -95,9 +100,10 @@ const links = {
       DASHBOARD_LINK,
       TRAINING_LINK,
       CALENDAR_LINK,
-      SESSION_HISTORY_LINK,
       LEVEL_UP_IMPACT_LINK,
       ADMIN_LINK,
+      MESSAGES_LINK,
+      SESSION_HISTORY_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
     ],

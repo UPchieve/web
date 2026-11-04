@@ -1,7 +1,14 @@
 <template>
   <div class="person-card">
     <div class="person-card__avatar">
-      <component :is="config.icon" class="person-card__icon" />
+      <InitialsAvatar
+        v-if="type === 'student'"
+        :initials="name.charAt(0).toUpperCase()"
+        :widthPx="60"
+        :bgColor="avatarColor(userId ?? name)"
+        :fgColor="AVATAR_TEXT_COLOR"
+      />
+      <CoachIcon v-else class="person-card__icon" />
     </div>
     <h2 class="person-card__name" data-testid="person-card-name">{{ name }}</h2>
 
@@ -36,7 +43,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
-import StudentIcon from '@/assets/user_avatars/student-icon.svg'
+import InitialsAvatar from '@/components/InitialsAvatar.vue'
+import { avatarColor, AVATAR_TEXT_COLOR } from '@/components/NTHS/member-avatar'
 import { dayjs, minutesToHoursAndMinutes } from '@/utils/time-utils'
 
 type PartnerType = 'coach' | 'student'
@@ -50,15 +58,9 @@ export interface LastSession {
 const props = defineProps<{
   type: PartnerType
   name: string
+  userId?: string
   lastSession?: LastSession | null
 }>()
-
-const CARD_CONFIG = {
-  coach: { icon: CoachIcon },
-  student: { icon: StudentIcon },
-} as const
-
-const config = computed(() => CARD_CONFIG[props.type])
 
 function formatDuration(totalMinutes: number): string {
   const result = minutesToHoursAndMinutes(Math.max(1, Math.round(totalMinutes)))

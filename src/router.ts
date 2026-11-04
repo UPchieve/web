@@ -118,6 +118,7 @@ const AdminEssayReviewDetail = () =>
 const MyCoachesView = () => import('./views/MyCoachesView.vue')
 const VolunteerRelevantExperienceThanksView = () =>
   import('./views/VolunteerRelevantExperienceThanksView.vue')
+const MessagesView = () => import('./views/MessagesView.vue')
 
 import {
   resolveNthsRoute,
@@ -270,6 +271,7 @@ async function getAuthStatus(
 }
 const VOLUNTEER_SIDEBAR_LINKED_VIEWS = [
   ProfileView,
+  MessagesView,
   TrainingView,
   CalendarView,
   SessionHistoryView,
@@ -681,6 +683,16 @@ const routes: RouteRecordRaw[] = [
       protected: true,
       preloadViews: { student: STUDENT_SIDEBAR_LINKED_VIEWS },
     },
+  },
+  {
+    path: '/messages',
+    name: 'MessagesView',
+    component: MessagesView,
+    meta: {
+      protected: true,
+      preloadViews: { volunteer: VOLUNTEER_SIDEBAR_LINKED_VIEWS },
+    },
+    beforeEnter: [autoflowRedirect, switchToVolunteerOrCancel],
   },
   {
     path: '/calendar',

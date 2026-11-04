@@ -1,4 +1,6 @@
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
+import InitialsAvatar from '@/components/InitialsAvatar.vue'
+import { avatarColor } from '@/components/NTHS/member-avatar'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
@@ -12,7 +14,12 @@ function lastSession(overrides: Partial<LastSession> = {}): LastSession {
 }
 
 function mountCard(
-  props: { lastSession?: LastSession | null } = {},
+  props: {
+    type?: 'coach' | 'student'
+    name?: string
+    userId?: string
+    lastSession?: LastSession | null
+  } = {},
   slots = {}
 ) {
   return mount(PersonCard, {
@@ -60,5 +67,24 @@ describe('PersonCard', () => {
     expect(wrapper.find('[data-testid="person-card-actions"]').text()).toBe(
       'Message'
     )
+  })
+
+  it("shows a student's first initial on a color keyed to their id", () => {
+    const wrapper = mountCard({
+      type: 'student',
+      name: 'maya',
+      userId: 'student-1',
+    })
+
+    const avatar = wrapper.findComponent(InitialsAvatar)
+    expect(avatar.props('initials')).toBe('M')
+    expect(avatar.props('bgColor')).toBe(avatarColor('student-1'))
+  })
+
+  it('shows the coach icon instead of initials for coaches', () => {
+    const wrapper = mountCard({ type: 'coach' })
+
+    expect(wrapper.findComponent(InitialsAvatar).exists()).toBe(false)
+    expect(wrapper.find('.person-card__icon').exists()).toBe(true)
   })
 })

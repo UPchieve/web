@@ -30,6 +30,7 @@ import type {
   TutorBotNewConversationPublic,
   TutorBotTranscriptPublic,
 } from '@/types/bot-conversations'
+import type { PastStudentsResponse } from '@/types/volunteers'
 import type {
   AsyncReviewSubject,
   EssayReviewStatus,
@@ -315,6 +316,10 @@ export function checkRegister(data: AuthPayload) {
   )
 }
 
+export function getPastStudents() {
+  return httpGet<PastStudentsResponse>(`${API_ROOT}/volunteers/past-students`)
+}
+
 export function getNTHSChecklist(groupId: string) {
   return httpGet<NTHSChecklistResponse>(
     `${API_ROOT}/nths-groups/${groupId}/checklist`
@@ -493,6 +498,7 @@ export default {
   login,
   logout,
   checkRegister,
+  getPastStudents,
   getNTHSChecklist,
   updateNTHSChecklistItemProgress,
   getNTHSRenewalSuccessors,
