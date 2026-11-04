@@ -25,8 +25,8 @@
 @include meta.load-css('layout/training');
 @include meta.load-css('layout/vuetify-overrides');
 
-html.plt-mobile ion-app,
-ion-app {
+// Allow selecting and copying text on touch devices by overriding Ionic's mobile styles.
+#app ion-app {
   -webkit-user-select: text;
   -moz-user-select: text;
   -ms-user-select: text;
