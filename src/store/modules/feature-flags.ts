@@ -12,6 +12,7 @@ export default {
     toggleFlags: {
       [POSTHOG_FEATURE_FLAGS.POLL_FLAGS]: false,
       [POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN]: false,
+      [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: false,
       [POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL]: false,
       [POSTHOG_FEATURE_FLAGS.USE_NEW_SIGN_UP_FLOW]: false,
       [POSTHOG_FEATURE_FLAGS.BIG_FUTURE_EMAIL_ELIGIBILITY_FLOW]: false,
@@ -55,6 +56,7 @@ export default {
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
+      [POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION]: '',
       [POSTHOG_FEATURE_FLAGS.SUBJECT_REQUEST_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT]: [],
       [POSTHOG_FEATURE_FLAGS.TUTOR_BOT_CHAT]: { type: 'unified' },
@@ -103,6 +105,10 @@ export default {
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.QUIZ_ROLLOUT] ?? [],
     showDashboardRedesign: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DASHBOARD_REDESIGN],
+    isAutoStartCollegeSessionActive: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
+    autoStartCollegeSessionTopic: (state: FeatureFlagState) =>
+      state.payloadFlags[POSTHOG_FEATURE_FLAGS.AUTO_START_COLLEGE_SESSION],
     eligibilityEmail: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.ELIGIBILITY_EMAIL],
     useNewSignUpFlow: (state: FeatureFlagState) =>

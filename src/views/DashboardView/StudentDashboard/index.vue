@@ -83,6 +83,7 @@ import { useSessionStore } from '@/stores/session'
 import { mapGetters, mapState } from 'vuex'
 import { mapState as mapPiniaState, mapActions } from 'pinia'
 import { useProductFlagsStore } from '@/stores/product-flags'
+import { useAppModalStore } from '@/stores/app/modal'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import SubjectSelection from './SubjectSelection/index.vue'
 import JoinedClassModal from './JoinedClassModal.vue'
@@ -258,6 +259,9 @@ export default {
       isSessionAlive: 'user/isSessionAlive',
       downtimeBannerMessage: 'featureFlags/downtimeBannerMessage',
       showDashboardRedesign: 'user/showDashboardRedesign',
+      isAutoStartCollegeSessionActive:
+        'featureFlags/isAutoStartCollegeSessionActive',
+      autoStartCollegeSessionTopic: 'featureFlags/autoStartCollegeSessionTopic',
       isImpactStudySurveyEnabled: 'featureFlags/isImpactStudySurveyEnabled',
       getImpactStudySurveyPayload: 'featureFlags/getImpactStudySurveyPayload',
       isMobileMode: 'app/mobileMode',
@@ -289,6 +293,7 @@ export default {
       return (
         this.isSecondaryEmailOnProfilePageEnabled &&
         !this.dismissedSecondaryEmailModal &&
+        this.user.pastSessions.length > 0 &&
         !this.user.proxyEmail &&
         !this.hasPermanentlyDismissedSecondaryEmailModal &&
         !this.hasTemporarilyDismissedSecondaryEmailModal &&
@@ -306,6 +311,7 @@ export default {
   },
   methods: {
     ...mapActions(useProductFlagsStore, ['setImpactStudyCampaigns']),
+    ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     setGradeLevelTaskDismissed() {
       this.dismissedGradeLevelTask = true
       BrowserStorageService.setGradeLevelTaskInStorage()
@@ -433,6 +439,27 @@ export default {
     },
   },
   watch: {
+    isFirstDashboardVisit(currentValue, previousValue) {
+      const hasJustDismissedWelcomeModal = !currentValue && previousValue
+      const sessionTopic = this.autoStartCollegeSessionTopic
+
+      if (
+        hasJustDismissedWelcomeModal &&
+        !this.hadASession &&
+        this.user.pastSessions.length === 0 &&
+        this.isAutoStartCollegeSessionActive &&
+        typeof sessionTopic === 'string' &&
+        sessionTopic.trim()
+      ) {
+        this.showAppModal({
+          component: 'StartCollegeSessionModal',
+          data: {
+            showTemplateButtons: false,
+            sessionTopic: sessionTopic.trim(),
+          },
+        })
+      }
+    },
     hadASession: {
       async handler(currentValue, prevValue) {
         if (currentValue && !prevValue) {

@@ -49,6 +49,7 @@ import DeleteAccountConfirmationModal from '@/components/DeleteAccountConfirmati
 import RemoveTeamMemberModal from '@/components/NTHS/RemoveTeamMemberModal.vue'
 import RemoveMemberConfirmation from '@/views/NTHS/RemoveMemberConfirmation.vue'
 import EssayHelpModal from '@/views/DashboardView/StudentDashboard/EssayHelpModal.vue'
+import StartCollegeSessionModal from '@/views/DashboardView/StudentDashboard/StartCollegeSessionModal.vue'
 
 export default {
   components: {
@@ -73,6 +74,7 @@ export default {
     RemoveTeamMemberModal,
     RemoveMemberConfirmation,
     EssayHelpModal,
+    StartCollegeSessionModal,
   },
   data() {
     return {
