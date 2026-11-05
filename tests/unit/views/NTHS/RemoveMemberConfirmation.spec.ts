@@ -1,6 +1,5 @@
 import RemoveMemberConfirmation from '@/views/NTHS/RemoveMemberConfirmation.vue'
 import LoggerService from '@/services/LoggerService'
-import type { GroupMember } from '@/services/NTHSGroupService'
 import { NetworkError } from '@/services/NetworkService'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -37,12 +36,7 @@ const SOLE_ADMIN_ERROR = new NetworkError(
   { status: 422 }
 )
 
-function getWrapper(
-  isRemovingSelf = false,
-  cachedMembers?: (typeof MEMBER)[],
-  member: GroupMember = MEMBER,
-  freshMembers?: (typeof MEMBER)[] | Error
-) {
+function getWrapper(isRemovingSelf = false, cachedMembers?: (typeof MEMBER)[]) {
   const setNTHSGroupMembers = vi.fn()
   const state = {
     nths: {
@@ -51,25 +45,18 @@ function getWrapper(
         : {},
     },
   }
-  const fetchNTHSGroupMembers = vi.fn(async () => {
-    if (freshMembers instanceof Error) throw freshMembers
-    if (freshMembers) {
-      state.nths.NTHSGroupMembers[MEMBER.nthsGroupId] = freshMembers
-    }
-  })
   const store = createStore({
     state,
     mutations: { 'nths/setNTHSGroupMembers': setNTHSGroupMembers },
     actions: {
       'nths/fetchNthsData': vi.fn(),
-      'nths/fetchNTHSGroupMembers': fetchNTHSGroupMembers,
     },
   })
   const wrapper = mount(RemoveMemberConfirmation, {
-    props: { memberToRemove: member, isRemovingSelf },
+    props: { memberToRemove: MEMBER, isRemovingSelf },
     global: { plugins: [store] },
   })
-  return { wrapper, setNTHSGroupMembers, fetchNTHSGroupMembers }
+  return { wrapper, setNTHSGroupMembers }
 }
 
 let noticeError: ReturnType<typeof vi.spyOn>
@@ -106,66 +93,24 @@ describe('RemoveMemberConfirmation', () => {
     }
   )
 
-  const OTHER_JORDAN = { ...MEMBER, userId: 'jordan' }
-
   it.each([
     [
-      'a sole admin leaving with another current member on the roster',
+      'a sole admin leaving the chapter',
       SOLE_ADMIN_ERROR,
-      [MEMBER, OTHER_JORDAN],
-      "You're the only admin. Make another member an admin before you leave.",
-      0,
-      true,
-    ],
-    [
-      'a sole admin who is also the only current member',
-      SOLE_ADMIN_ERROR,
-      [MEMBER],
       "You're the only member, so there's no one to hand the chapter to. Contact us to close it.",
       0,
-      true,
-    ],
-    [
-      'a sole admin whose only other roster row is a closed account',
-      SOLE_ADMIN_ERROR,
-      [MEMBER, { ...OTHER_JORDAN, accountClosed: true }],
-      "You're the only member, so there's no one to hand the chapter to. Contact us to close it.",
-      0,
-      true,
     ],
     [
       'a 422 that is not the sole-admin refusal',
       new NetworkError('Some other rejection', { status: 422 }),
-      undefined,
       'Something went wrong while leaving the chapter. Please refresh the page and try again.',
       1,
-      false,
-    ],
-    [
-      'the member refetch failing after a sole-admin refusal',
-      SOLE_ADMIN_ERROR,
-      new Error('network down'),
-      "You're the only admin. Make another member an admin before you leave.",
-      0,
-      true,
     ],
   ] as const)(
     'when leaving fails with %s',
-    async (
-      _label,
-      rejection,
-      freshMembers,
-      expectedMessage,
-      expectedNoticeErrorCalls,
-      expectRefetch
-    ) => {
+    async (_label, rejection, expectedMessage, expectedNoticeErrorCalls) => {
       leaveNthsChapter.mockRejectedValue(rejection)
-      const { wrapper, fetchNTHSGroupMembers } = getWrapper(
-        true,
-        undefined,
-        MEMBER,
-        freshMembers as (typeof MEMBER)[] | Error | undefined
-      )
+      const { wrapper } = getWrapper(true)
 
       await wrapper.find('[data-testid="confirm-remove-self"]').trigger('click')
       await flushPromises()
@@ -174,7 +119,6 @@ describe('RemoveMemberConfirmation', () => {
         expectedMessage
       )
       expect(noticeError).toHaveBeenCalledTimes(expectedNoticeErrorCalls)
-      expect(fetchNTHSGroupMembers).toHaveBeenCalledTimes(expectRefetch ? 1 : 0)
     }
   )
 

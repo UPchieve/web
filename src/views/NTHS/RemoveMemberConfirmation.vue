@@ -29,24 +29,6 @@ const isRemoving = ref(false)
 const SOLE_ADMIN_ERROR_MESSAGE =
   'Cannot remove the only existing admin of a group'
 
-async function soleAdminErrorMessage(): Promise<string> {
-  const groupId = props.memberToRemove.nthsGroupId
-  try {
-    await store.dispatch('nths/fetchNTHSGroupMembers', groupId)
-    const members: GroupMember[] =
-      store.state.nths.NTHSGroupMembers?.[groupId] ?? []
-    const hasOtherCurrentMember = members.some(
-      (member) =>
-        member.userId !== props.memberToRemove.userId && !member.accountClosed
-    )
-    return hasOtherCurrentMember
-      ? "You're the only admin. Make another member an admin before you leave."
-      : "You're the only member, so there's no one to hand the chapter to. Contact us to close it."
-  } catch {
-    return "You're the only admin. Make another member an admin before you leave."
-  }
-}
-
 async function removeTeamMember() {
   if (isRemoving.value) return
   isRemoving.value = true
@@ -91,7 +73,8 @@ async function removeTeamMember() {
       isNetworkError(err) &&
       err.message === SOLE_ADMIN_ERROR_MESSAGE
     ) {
-      errorMessage.value = await soleAdminErrorMessage()
+      errorMessage.value =
+        "You're the only member, so there's no one to hand the chapter to. Contact us to close it."
     } else {
       LoggerService.noticeError(
         err,
