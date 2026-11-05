@@ -15,6 +15,7 @@
     "deploy:dev": "./deploy.sh dev",
     "deploy:local": "./deploy.sh",
     "start": "node server.js",
+    "capacitor:sync": "cap sync",
     "lint": "eslint --ext .js,.vue,.ts --fix src tests",
     "lint:dry": "eslint --ext .js,.vue,.ts --no-fix src tests",
     "html-validate": "html-validate --ext html,vue src",

@@ -6,6 +6,7 @@ stages:
 
 include:
   - local: .gitlab/ci/e2e.yml
+  - local: .gitlab/ci/android/android.yml
 
 cache:
   key:
@@ -14,18 +15,16 @@ cache:
   paths:
     - .pnpm-store
 
-.node_setup:
+.pnpm_install:
   image: node:24.22.1-trixie
   before_script:
-    # keytar falls back to a native build when its prebuilt binary is unavailable.
-    - apt-get update && apt-get install -y libsecret-1-dev
     - corepack enable pnpm
     - pnpm config set store-dir .pnpm-store
     - pnpm install --frozen-lockfile
 
 .build_artifact:
   stage: build
-  extends: .node_setup
+  extends: .pnpm_install
   cache: []
   environment:
     action: prepare
@@ -34,7 +33,7 @@ cache:
     paths:
       - dist/
   before_script:
-    - !reference [.node_setup, before_script]
+    - !reference [.pnpm_install, before_script]
     # The Doppler installer verifies its download with gpgv, which Debian 13 only
     # recommends from gnupg rather than depends on, so it is not installed by default.
     - apt update && apt install -y curl gnupg gpgv
@@ -132,9 +131,9 @@ new_relic_deploy_tracker:
 
 test:
   stage: test
-  extends: .node_setup
+  extends: .pnpm_install
   before_script:
-    - !reference [.node_setup, before_script]
+    - !reference [.pnpm_install, before_script]
     - pnpm exec playwright install --with-deps chromium
   script:
     - pnpm run test
@@ -162,7 +161,7 @@ e2e-test:
 
 lint:
   stage: test
-  extends: .node_setup
+  extends: .pnpm_install
   script:
     - pnpm run lint:dry
   rules:
@@ -173,7 +172,7 @@ lint:
 
 html_validate:
   stage: test
-  extends: .node_setup
+  extends: .pnpm_install
   script:
     - pnpm run html-validate
   rules:

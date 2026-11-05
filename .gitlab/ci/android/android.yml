@@ -1,0 +1,76 @@
+build_android_staging:
+  stage: build
+  extends: .pnpm_install
+  image: $CI_REGISTRY_IMAGE/android-build-image:1.0.0
+  environment:
+    name: staging
+    action: prepare
+  needs:
+    - job: build_staging_artifact
+      artifacts: true
+  variables:
+    ANDROID_KEYSTORE_PATH: $CI_PROJECT_DIR/android/upchieve-staging-keystore.jks
+    ANDROID_KEYSTORE_PASSWORD: $ANDROID_STAGING_KEYSTORE_PASSWORD
+    ANDROID_KEY_ALIAS: $ANDROID_STAGING_KEY
+    ANDROID_KEY_PASSWORD: $ANDROID_STAGING_KEY_PASSWORD
+  before_script:
+    - !reference [.pnpm_install, before_script]
+    - glab auth login --job-token "$CI_JOB_TOKEN" --hostname "$CI_SERVER_FQDN" --api-protocol "$CI_SERVER_PROTOCOL"
+    - glab -R "$CI_PROJECT_PATH" securefile download --name upchieve-staging-keystore.jks --path "$ANDROID_KEYSTORE_PATH"
+    - chmod 600 "$ANDROID_KEYSTORE_PATH"
+  script:
+    - export ANDROID_VERSION_CODE="${ANDROID_VERSION_CODE:-$((CI_PIPELINE_IID + 1))}"
+    - pnpm run capacitor:sync android
+    - ./android/gradlew --project-dir android --no-daemon bundleStagingRelease
+  after_script:
+    - rm -f "$ANDROID_KEYSTORE_PATH"
+    - rm -rf ~/.config/glab-cli
+  artifacts:
+    name: android-staging-$CI_PIPELINE_IID
+    expire_in: 1 week
+    paths:
+      - android/app/build/outputs/bundle/stagingRelease/app-staging-release.aab
+      - android/app/build/outputs/mapping/stagingRelease/mapping.txt
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+    # Remove before merging.
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
+      when: manual
+      allow_failure: true
+
+upload_android_staging:
+  stage: deploy
+  image: ruby:3.3-bookworm
+  cache: []
+  environment:
+    name: staging
+  dependencies:
+    - build_android_staging
+  resource_group: android-staging
+  variables:
+    FASTLANE_SKIP_UPDATE_CHECK: 'true'
+    FASTLANE_OPT_OUT_USAGE: 'true'
+  before_script:
+    - gem install fastlane --version 2.241.0 --no-document
+  script:
+    - SUPPLY_JSON_KEY_DATA="$(printf '%s' "$GOOGLE_PLAY_STAGING_CREDENTIALS_B64" | base64 -d)"
+    - export SUPPLY_JSON_KEY_DATA
+    - |
+      fastlane supply \
+        --package_name org.upchieve.app \
+        --aab android/app/build/outputs/bundle/stagingRelease/app-staging-release.aab \
+        --mapping android/app/build/outputs/mapping/stagingRelease/mapping.txt \
+        --track internal \
+        --release_status completed \
+        --skip_upload_metadata true \
+        --skip_upload_changelogs true \
+        --skip_upload_images true \
+        --skip_upload_screenshots true
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+      when: manual
+      allow_failure: true
+      # Remove before merging.
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
+      when: manual
+      allow_failure: true
