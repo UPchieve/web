@@ -1,6 +1,9 @@
 import EditBackgroundInfo from '@/views/ProfileView/EditBackgroundInfo.vue'
 import BackgroundInfoField from '@/components/BackgroundInfoField.vue'
 import TutorInfoCard from '@/components/TutorInfoCard.vue'
+import ShareInfoFieldsForm from '@/components/ShareInfoFieldsForm.vue'
+import Modal from '@/components/Modal.vue'
+import VolunteerShareInfoModal from '@/components/VolunteerShareInfoModal.vue'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import NetworkService from '@/services/NetworkService'
 import UserService from '@/services/UserService'
@@ -54,6 +57,9 @@ function editButton(wrapper: VueWrapper) {
 describe('EditBackgroundInfo', () => {
   beforeEach(() => {
     vi.spyOn(NetworkService, 'setProfile').mockResolvedValue({})
+    vi.spyOn(NetworkService, 'setShareInfoModalDismissed').mockResolvedValue({
+      shareInfoModalDismissedAt: '2026-11-04T12:00:00.000Z',
+    })
     vi.spyOn(UserService, 'setProfile').mockImplementation((data, store) =>
       NetworkService.setProfile(data).then(() =>
         store.dispatch('user/addToUser', data)
@@ -86,13 +92,16 @@ describe('EditBackgroundInfo', () => {
   })
 
   it('switches to edit mode on Edit click, revealing the BackgroundInfoField form', async () => {
-    const wrapper = getWrapper({})
+    const wrapper = getWrapper({ publicProfileKeys: ['numSessionsTutored'] })
 
     await editButton(wrapper).trigger('click')
 
     expect(editButton(wrapper).text()).toBe('Save')
     expect(wrapper.findComponent(BackgroundInfoField).isVisible()).toBe(true)
-    expect(wrapper.findComponent(TutorInfoCard).isVisible()).toBe(true)
+    // The last card is the edit form's preview; the read-mode one is hidden
+    expect(wrapper.findAllComponents(TutorInfoCard).at(-1)!.isVisible()).toBe(
+      true
+    )
   })
 
   it('blocks saving and shows a validation error when no occupation is selected', async () => {
@@ -412,5 +421,166 @@ describe('EditBackgroundInfo', () => {
     await editButton(wrapper).trigger('click')
 
     expect(wrapper.text()).not.toContain('Share With Your Students')
+  })
+
+  describe('a coach who has not chosen what to share', () => {
+    const UNDECIDED_COACH = {
+      id: 'coach-1',
+      occupation: [VolunteerOccupations.WORKING_PART_TIME],
+      country: 'Canada',
+      city: 'Toronto',
+    }
+    const prompt = (wrapper: VueWrapper) =>
+      wrapper.find('[data-testid="share-info-prompt"]')
+
+    it('shows a callout asking them to choose, without inline toggles', () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      expect(prompt(wrapper).exists()).toBe(true)
+      expect(prompt(wrapper).text()).toContain(
+        'New: help students get to know you'
+      )
+      expect(
+        prompt(wrapper)
+          .find('[data-testid="share-info-prompt-button"]')
+          .exists()
+      ).toBe(true)
+      expect(prompt(wrapper).findComponent(ShareInfoFieldsForm).exists()).toBe(
+        false
+      )
+    })
+
+    it('does not prompt a coach who chose to share nothing', () => {
+      const wrapper = getWrapper({ ...UNDECIDED_COACH, publicProfileKeys: [] })
+
+      expect(prompt(wrapper).exists()).toBe(false)
+      expect(wrapper.text()).toContain(
+        'Nothing will be shared with your students.'
+      )
+    })
+
+    it('opens the share modal with everything off, even for an adult coach', async () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      await prompt(wrapper)
+        .find('[data-testid="share-info-prompt-button"]')
+        .trigger('click')
+
+      const modal = wrapper.findComponent(VolunteerShareInfoModal)
+      expect(modal.exists()).toBe(true)
+      expect(modal.text()).toContain(
+        'Nothing will be shared with your student.'
+      )
+      expect(
+        modal
+          .find('[data-testid="share-info-select-all"]')
+          .attributes('aria-hidden')
+      ).toBe('false')
+    })
+
+    it('saves their choice from the modal and stops prompting', async () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      await prompt(wrapper)
+        .find('[data-testid="share-info-prompt-button"]')
+        .trigger('click')
+      const modal = wrapper.findComponent(VolunteerShareInfoModal)
+      await modal.find('[data-testid="share-info-select-all"]').trigger('click')
+      await modal.find('.uc-form-button').trigger('click')
+      await flushPromises()
+
+      expect(NetworkService.setProfile).toHaveBeenCalledWith({
+        publicProfileKeys: [
+          'occupation',
+          'numSessionsTutored',
+          'numStudentsHelped',
+          'totalVolunteerHours',
+        ],
+      })
+      expect(wrapper.findComponent(VolunteerShareInfoModal).exists()).toBe(
+        false
+      )
+      expect(prompt(wrapper).exists()).toBe(false)
+    })
+
+    it('shows the choice they saved in the modal when they then edit their profile', async () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      await prompt(wrapper)
+        .find('[data-testid="share-info-prompt-button"]')
+        .trigger('click')
+      const modal = wrapper.findComponent(VolunteerShareInfoModal)
+      await modal.find('[data-testid="share-info-select-all"]').trigger('click')
+      await modal.find('.uc-form-button').trigger('click')
+      await flushPromises()
+      await editButton(wrapper).trigger('click')
+
+      const editForm = wrapper.findComponent(ShareInfoFieldsForm)
+      for (const key of [
+        'occupation',
+        'numSessionsTutored',
+        'numStudentsHelped',
+        'totalVolunteerHours',
+      ]) {
+        const toggle = editForm.find(
+          `[data-testid="${key}"] [data-testid="toggle-input"]`
+        )
+        expect((toggle.element as HTMLInputElement).checked).toBe(true)
+      }
+    })
+
+    it('saves nothing and keeps prompting when they dismiss the modal', async () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      await prompt(wrapper)
+        .find('[data-testid="share-info-prompt-button"]')
+        .trigger('click')
+      const dismiss = wrapper
+        .findComponent(VolunteerShareInfoModal)
+        .findComponent(Modal)
+        .props('closeModal') as () => void
+      dismiss()
+      await flushPromises()
+
+      expect(NetworkService.setProfile).not.toHaveBeenCalled()
+      expect(NetworkService.setShareInfoModalDismissed).not.toHaveBeenCalled()
+      expect(wrapper.findComponent(VolunteerShareInfoModal).exists()).toBe(
+        false
+      )
+      expect(prompt(wrapper).exists()).toBe(true)
+    })
+
+    it('does not save sharing when they turn a field on and back off', async () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      await editButton(wrapper).trigger('click')
+      const toggle = wrapper
+        .findComponent(ShareInfoFieldsForm)
+        .find('[data-testid="occupation"] [data-testid="toggle-input"]')
+      await toggle.setValue(true)
+      await toggle.setValue(false)
+      await editButton(wrapper).trigger('click')
+      await flushPromises()
+
+      expect(NetworkService.setProfile).toHaveBeenCalledTimes(1)
+      expect(NetworkService.setProfile).not.toHaveBeenCalledWith(
+        expect.objectContaining({ publicProfileKeys: expect.anything() })
+      )
+      expect(prompt(wrapper).exists()).toBe(true)
+    })
+
+    it('does not save sharing when they edit background info without touching it', async () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      await editButton(wrapper).trigger('click')
+      await editButton(wrapper).trigger('click')
+      await flushPromises()
+
+      expect(NetworkService.setProfile).toHaveBeenCalledTimes(1)
+      expect(NetworkService.setProfile).not.toHaveBeenCalledWith(
+        expect.objectContaining({ publicProfileKeys: expect.anything() })
+      )
+      expect(prompt(wrapper).exists()).toBe(true)
+    })
   })
 })

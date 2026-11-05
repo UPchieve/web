@@ -13,6 +13,7 @@ import {
   volunteerDataFromUser,
 } from '@/utils/build-share-info-message'
 import TutorInfoCard from '@/components/TutorInfoCard.vue'
+import VolunteerShareInfoModal from '@/components/VolunteerShareInfoModal.vue'
 
 const emit = defineEmits<{
   (e: 'error', err: any): void
@@ -37,6 +38,10 @@ const country = ref(user.value.country ?? '')
 const publicProfileKeys = computed<ShareInfoFieldKey[]>(
   () => user.value.publicProfileKeys ?? []
 )
+// null means the coach hasn't saved a choice yet (dismissing the dashboard
+// modal doesn't count), so they get a second prompt here
+const hasChosenSharing = computed(() => user.value.publicProfileKeys != null)
+const showShareInfoModal = ref(false)
 
 if (occupations.value.length === 0) {
   AnalyticsService.captureEvent(EVENTS.COACH_HAS_NO_OCCUPATION)
@@ -153,7 +158,11 @@ async function onEditButtonClick() {
       highSchoolName.value = ''
     }
 
-    await shareInfoFormRef.value?.save()
+    // Only save sharing when the coach changed it, so an undecided coach who
+    // edits their city isn't recorded as having chosen
+    if (shareInfoFormRef.value?.hasChanges) {
+      await shareInfoFormRef.value.save()
+    }
 
     AnalyticsService.captureEvent(EVENTS.COACH_SAVED_BACKGROUND_INFO)
     showInputErrors.value = false
@@ -231,9 +240,31 @@ async function onEditButtonClick() {
         viewer-role="volunteer"
         class="tutor-info-card"
       />
-      <div v-else class="description">
+      <div v-else-if="hasChosenSharing" class="description">
         Nothing will be shared with your students.
       </div>
+      <div v-else class="share-info-prompt" data-testid="share-info-prompt">
+        <div class="share-info-prompt-header">
+          New: help students get to know you
+        </div>
+        <div class="description">
+          Choose what students see about you during sessions.
+        </div>
+        <button
+          type="button"
+          class="uc-form-button share-info-prompt-button"
+          data-testid="share-info-prompt-button"
+          @click="showShareInfoModal = true"
+        >
+          Choose what to share
+        </button>
+      </div>
+      <VolunteerShareInfoModal
+        v-if="showShareInfoModal"
+        :info="shareInfoVolunteerData"
+        from-profile
+        :closeModal="() => (showShareInfoModal = false)"
+      />
     </div>
 
     <BackGroundInfoField
@@ -315,6 +346,28 @@ ul {
 
 .share-info-preview-section {
   margin-top: 16px;
+}
+
+.share-info-prompt {
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid $c-success-green;
+  background-color: rgba($c-success-green, 0.08);
+
+  .description {
+    margin: 4px 0 12px;
+  }
+}
+
+.share-info-prompt-header {
+  color: $c-hover-green;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.share-info-prompt-button {
+  margin: 0;
 }
 
 .field-button {

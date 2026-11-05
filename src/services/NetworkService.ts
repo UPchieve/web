@@ -19,7 +19,7 @@ import type { NTHSUnlistedSchool } from './NTHSApplicationService'
 import type { CalendarRosterPeriod } from './NTHSRosterService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
-import type { DateString, Uuid } from '@/types/shared'
+import type { DateString, ISODateString, Uuid } from '@/types/shared'
 import type {
   TutorBotAddMessagePayload,
   TutorBotAddMessageResponsePublic,
@@ -373,6 +373,13 @@ export function acceptNTHSRenewalPresidency(
   )
 }
 
+export function setShareInfoModalDismissed() {
+  return httpPost<{ shareInfoModalDismissedAt: ISODateString }>(
+    `${API_ROOT}/product-flags/share-info-modal-dismissed`,
+    {}
+  )
+}
+
 export function adminNTHSGetChapters(ids: string[]) {
   return httpGet<{ chapters: NTHSCloseChapter[] }>(
     `${ADMIN_ROOT}/nths/chapters?ids=${ids.map(encodeURIComponent).join(',')}`
@@ -492,6 +499,7 @@ export default {
   getNTHSChecklist,
   updateNTHSChecklistItemProgress,
   acceptNTHSRenewalPresidency,
+  setShareInfoModalDismissed,
   getVolunteerPartner(partnerId) {
     return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(

@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import { mapActions } from 'pinia'
+import { mapActions, mapState as mapPiniaState } from 'pinia'
 import { useAppModalStore } from '@/stores/app/modal'
 import { mapState, mapGetters } from 'vuex'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
@@ -176,13 +176,15 @@ import ListSessionsCard from '@/views/DashboardView/VolunteerDashboard/ListSessi
 import JoinedTeamModal from './JoinedTeamModal.vue'
 import { quizRoute } from '@/utils/quiz-route'
 import ImpactSummaryCard from '@/components/ImpactSummaryCard.vue'
-import VolunteerShareInfoModal from './VolunteerShareInfoModal.vue'
+import VolunteerShareInfoModal from '@/components/VolunteerShareInfoModal.vue'
 import { volunteerDataFromUser } from '@/utils/build-share-info-message'
 import ShowOnlineStatusModal from './ShowOnlineStatusModal.vue'
 import {
   hasSeenShowOnlineStatusModal,
   setHasSeenShowOnlineStatusModal,
 } from '@/services/BrowserStorageService'
+import { useProductFlagsStore } from '@/stores/product-flags'
+import { shouldShowShareInfoModal } from '@/utils/share-info-modal-utils'
 
 const ETA = {
   BACKGROUND_INFO: 1,
@@ -261,10 +263,14 @@ export default {
       hasSeenOnlineStatusModal: false,
       essayReviewCardImpressionTracked: false,
       pendingSubmissionCount: null,
-      dismissedShareInfoModal: false,
+      closedShareInfoModal: false,
     }
   },
   computed: {
+    ...mapPiniaState(useProductFlagsStore, {
+      productFlags: 'flags',
+      productFlagsLoaded: 'isLoaded',
+    }),
     ...mapState({
       user: (state) => state.user.user,
       isFirstDashboardVisit: (state) => state.user.isFirstDashboardVisit,
@@ -635,11 +641,14 @@ export default {
       )
     },
     showShareInfoModal() {
-      return (
-        !this.hasSeenShareInfoModal &&
-        !this.dismissedShareInfoModal &&
-        this.isShowInfoOptInEnabled
-      )
+      return shouldShowShareInfoModal({
+        isFeatureEnabled: this.isShowInfoOptInEnabled,
+        hasChosen: this.hasSeenShareInfoModal,
+        wasClosedThisVisit: this.closedShareInfoModal,
+        productFlagsLoaded: this.productFlagsLoaded,
+        dismissedAt: this.productFlags.shareInfoModalDismissedAt,
+        numSessionsTutored: this.user.numSessionsTutored,
+      })
     },
     showOnlineStatusModal() {
       return (
@@ -805,7 +814,7 @@ export default {
       this.showNextTaskModal = !this.showNextTaskModal
     },
     toggleShareInfoModal() {
-      this.dismissedShareInfoModal = true
+      this.closedShareInfoModal = true
     },
     closeOnlineStatusModal() {
       setHasSeenShowOnlineStatusModal(this.user.id)
