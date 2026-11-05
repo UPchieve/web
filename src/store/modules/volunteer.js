@@ -325,11 +325,16 @@ export default {
         }
       }
     },
-    isReadyToTutor: (_state, _getters, rootState, rootGetters) => {
+    isOnboardedAndApproved: (_state, _getters, rootState, rootGetters) => {
       return (
         rootGetters['user/isVolunteer'] &&
         rootState.user.user.isOnboarded &&
-        rootState.user.user.isApproved &&
+        rootState.user.user.isApproved
+      )
+    },
+    isReadyToTutor: (_state, getters, rootState) => {
+      return (
+        getters.isOnboardedAndApproved &&
         rootState.user.user.banType !== 'complete' &&
         rootState.user.user.banType !== 'shadow'
       )

@@ -1,55 +1,76 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
 import Callout from '@/components/Callout.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ModalService from '@/services/ModalService'
-import LoggerService from '@/services/LoggerService'
-import { useRenewalNaming } from '@/composables/useRenewalNaming'
+import { useRenewalAccept } from '@/composables/useRenewalAccept'
 import {
-  NEXT_PRESIDENT_UNNAMED_TITLE,
-  acceptedPresidentsTitle,
-  namedSuccessors,
-  namedSuccessorsTitle,
+  hasDismissedNTHSRenewalHandoff,
+  setDismissedNTHSRenewalHandoff,
+} from '@/services/BrowserStorageService'
+import {
   renewalCountdownTitle,
   renewalDate,
   renewalDaysLeft,
   renewalSchoolYear,
-  successorPickerHint,
-  whoWillLeadTitle,
+  renewalStartYear,
 } from '@/services/NTHSRenewalService'
 import type {
   NTHSRenewalPrompt,
   NTHSRenewalPublic,
-  NTHSRenewalSuccessorPublic,
 } from '@/services/NTHSGroupService'
 
 const props = defineProps<{ groupId: string }>()
+const router = useRouter()
+const route = useRoute()
 const store = useStore()
-const {
-  renewal,
-  chapterName,
-  isSubmitting,
-  errorMessage,
-  nameSelf,
-  accept,
-  decline,
-} = useRenewalNaming(
-  () => props.groupId,
-  () =>
-    ModalService.showNthsAcceptPresidency({
-      chapterName: chapterName.value,
-      schoolYear:
-        renewal.value?.prompt === 'step-up'
-          ? undefined
-          : renewalSchoolYear(renewal.value?.closesOn ?? null),
-    })
-)
-const successorsFailed = ref(false)
+const { renewal, chapterName, isSubmitting, errorMessage, accept } =
+  useRenewalAccept(
+    () => props.groupId,
+    () =>
+      ModalService.showNthsAcceptPresidency({
+        chapterName: chapterName.value,
+        schoolYear:
+          renewal.value?.prompt === 'step-up' ? undefined : schoolYear.value,
+        confirmReturn: renewal.value?.prompt === 'confirm-return',
+      })
+  )
 
-const successors = computed<NTHSRenewalSuccessorPublic[]>(
-  () => store.state.nths.NTHSRenewalSuccessors[props.groupId] ?? []
+const schoolYear = computed(() =>
+  renewalSchoolYear(renewal.value?.closesOn ?? null)
 )
+
+const handoffYear = computed(() =>
+  renewalStartYear(renewal.value?.closesOn ?? null)
+)
+
+const handoffDismissed = ref(false)
+watch(
+  [() => props.groupId, handoffYear],
+  ([groupId, year]) => {
+    handoffDismissed.value = hasDismissedNTHSRenewalHandoff(
+      store.state.user.user.id,
+      groupId,
+      year
+    )
+  },
+  { immediate: true }
+)
+
+function dismissHandoff() {
+  handoffDismissed.value = true
+  setDismissedNTHSRenewalHandoff(
+    store.state.user.user.id,
+    props.groupId,
+    handoffYear.value
+  )
+}
+
+function goToMembers() {
+  void router.push('/groups/members')
+}
 
 type Banner = {
   title: string
@@ -61,116 +82,72 @@ type Banner = {
 }
 
 const BANNERS: Partial<
-  Record<NTHSRenewalPrompt, (renewal: NTHSRenewalPublic) => Banner>
+  Record<NTHSRenewalPrompt, (renewal: NTHSRenewalPublic) => Banner | undefined>
 > = {
-  'name-successor-banner': (r) => ({
-    title: whoWillLeadTitle(chapterName.value),
-    body: `Name one or more members as next year's president. They'll be notified and can accept starting ${renewalDate(r.successorConfirmationOn)}.`,
-    primaryLabel: 'Name president',
-    variant: 'information',
-    onPrimary: openPicker,
-  }),
-  'name-successor-reminder': (r) => ({
-    title: NEXT_PRESIDENT_UNNAMED_TITLE,
-    body: `Name one or more members by ${renewalDate(r.namingClosesOn)}. If nobody accepts by ${renewalDate(r.closesOn)}, the chapter closes.`,
-    primaryLabel: 'Name president',
-    variant: 'information',
-    onPrimary: openPicker,
-  }),
-  'successors-named': (r) => ({
-    title: successorsFailed.value
-      ? "Next year's president"
-      : namedSuccessorsTitle(successors.value, store.state.user.user.id),
-    body: successorPickerHint(r),
-    primaryLabel: 'Change',
-    variant: 'information',
-    onPrimary: openPicker,
-  }),
-  'co-president-offer': (r) => ({
-    title: acceptedPresidentsTitle(
-      r.acceptedPresidents,
-      renewalSchoolYear(r.closesOn)
-    ),
-    body: `You were named too, so you can still join as co-president until ${renewalDate(r.closesOn)}.`,
-    primaryLabel: 'Accept as co-president',
+  'handoff-banner': () =>
+    handoffDismissed.value
+      ? undefined
+      : {
+          title: `Get your chapter ready for ${schoolYear.value}`,
+          body: `Time to set up your ${schoolYear.value} leaders! Make them admins and update their titles, especially the incoming President.`,
+          primaryLabel: 'Go to Members',
+          variant: 'information',
+          onPrimary: goToMembers,
+          secondary: { label: 'Dismiss', onClick: dismissHandoff },
+        },
+  'confirm-return': (r) => ({
+    title: `Confirm your chapter is returning for ${schoolYear.value}`,
+    body: `First, check that your ${schoolYear.value} admins and titles are right on the Members tab. If you don't confirm by ${renewalDate(r.closesOn)}, the chapter will close.`,
+    primaryLabel: 'Confirm',
     variant: 'information',
     onPrimary: accept,
-    secondary: { label: 'Step down', onClick: decline },
+    secondary: { label: 'Go to Members', onClick: goToMembers },
   }),
-  'decliner-countdown': (r) => ({
-    title: renewalCountdownTitle(
-      chapterName.value,
-      renewalDaysLeft(r.closesOn)
-    ),
-    body: `Nobody has accepted the presidency for ${renewalSchoolYear(r.closesOn)} yet. If nobody does by ${renewalDate(r.closesOn)}, the chapter closes. You can still step up.`,
+  'confirm-reminder': (r) => ({
+    title: 'Your chapter needs a returning president',
+    body: `Make sure your ${schoolYear.value} leaders are admins with the right titles, especially the incoming President, so they can confirm. If the president doesn't confirm by ${renewalDate(r.closesOn)}, the chapter will close.`,
+    primaryLabel: 'Go to Members',
+    variant: 'information',
+    onPrimary: goToMembers,
+  }),
+  'member-countdown': (r) => ({
+    title: renewalCountdownTitle(renewalDaysLeft(r.closesOn)),
+    body: `No one has stepped up to lead in ${schoolYear.value} yet. Leading a chapter is a big deal. Takes about 1-2 hours of work a week, looks great for college apps, and you'll get a lot of support from UPchieve! If no one steps up to lead by ${renewalDate(r.closesOn)}, the chapter will close.`,
     primaryLabel: 'Lead the chapter',
     variant: 'warning',
     onPrimary: accept,
   }),
   'step-up': () => ({
-    title: `${chapterName.value} needs a president`,
-    body: 'Nobody can manage your chapter right now. Step up as president to keep it going.',
+    title: 'Your chapter needs a president',
+    body: 'No one can manage your chapter right now. Step up as president to keep it going.',
     primaryLabel: 'Step up as president',
     variant: 'warning',
     onPrimary: accept,
   }),
 }
 
+const HOME_ONLY_PROMPTS: NTHSRenewalPrompt[] = [
+  'handoff-banner',
+  'confirm-return',
+  'confirm-reminder',
+]
+
 const banner = computed(() => {
   const r = renewal.value
   if (!r) return
+  if (HOME_ONLY_PROMPTS.includes(r.prompt) && route.path !== '/groups/home')
+    return
   return BANNERS[r.prompt]?.(r)
 })
-
-const successorsFetched = ref(false)
-
-async function loadSuccessors() {
-  try {
-    await store.dispatch('nths/fetchNTHSRenewalSuccessors', props.groupId)
-    successorsFailed.value = false
-  } catch (err) {
-    successorsFailed.value = true
-    LoggerService.noticeError(err, 'Could not load NTHS successors')
-  } finally {
-    successorsFetched.value = true
-  }
-}
-
-watch(
-  renewal,
-  (current) => {
-    if (current?.prompt === 'successors-named') {
-      void loadSuccessors()
-    } else {
-      successorsFetched.value = false
-    }
-  },
-  { immediate: true }
-)
-
-const isReady = computed(
-  () =>
-    renewal.value?.prompt !== 'successors-named' ||
-    (successorsFetched.value &&
-      (successorsFailed.value || namedSuccessors(successors.value).length > 0))
-)
-
-function openPicker() {
-  errorMessage.value = ''
-  ModalService.showNthsSuccessorPicker({
-    groupId: props.groupId,
-    asReminder: false,
-  })
-}
 </script>
 
 <template>
-  <div
-    v-if="(banner && isReady) || errorMessage"
-    class="renewal-banner"
-    data-testid="renewal-banner"
-  >
-    <Callout v-if="banner && isReady" :variant="banner.variant">
+  <div v-if="banner || errorMessage" class="renewal-banner">
+    <Callout
+      v-if="banner"
+      :variant="banner.variant"
+      data-testid="renewal-banner"
+    >
       <template v-slot:content>
         <div class="banner-content">
           <div class="banner-text">
@@ -178,14 +155,6 @@ function openPicker() {
             <p class="banner-body">{{ banner.body }}</p>
           </div>
           <div class="banner-actions">
-            <LargeButton
-              variant="primary-blue"
-              :showArrow="false"
-              data-testid="renewal-banner-primary"
-              :disabled="isSubmitting"
-              @click="banner.onPrimary()"
-              >{{ banner.primaryLabel }}</LargeButton
-            >
             <LargeButton
               v-if="banner.secondary"
               variant="secondary"
@@ -196,13 +165,12 @@ function openPicker() {
               >{{ banner.secondary.label }}</LargeButton
             >
             <LargeButton
-              v-if="renewal?.canNameSelf"
-              variant="secondary"
+              variant="primary-blue"
               :showArrow="false"
-              data-testid="renewal-banner-me"
+              data-testid="renewal-banner-primary"
               :disabled="isSubmitting"
-              @click="nameSelf()"
-              >Me</LargeButton
+              @click="banner.onPrimary()"
+              >{{ banner.primaryLabel }}</LargeButton
             >
           </div>
         </div>

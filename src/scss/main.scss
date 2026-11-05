@@ -129,3 +129,8 @@ textarea {
 .ion-color-sucess {
   --ion-color-base: var(--ion-color-success);
 }
+
+// Ionic sets toast text in the system font.
+ion-toast.app-font {
+  --ion-font-family: #{$font-family-default};
+}

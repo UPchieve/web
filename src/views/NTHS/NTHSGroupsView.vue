@@ -7,14 +7,9 @@ import LargeButton from '@/components/LargeButton.vue'
 import ModalService from '@/services/ModalService'
 import type { GroupMember } from '@/services/NTHSGroupService'
 import Callout from '@/components/Callout.vue'
-import RenewalAnswerPanel from '@/components/NTHS/Renewal/RenewalAnswerPanel.vue'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
 import LoggerService from '@/services/LoggerService'
-import {
-  isRenewalMustAnswer,
-  renewalWarningLine,
-} from '@/services/NTHSRenewalService'
-import { useAppModalStore } from '@/stores/app/modal'
+import { renewalWarningLine } from '@/services/NTHSRenewalService'
 import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
 
 const store = useStore()
@@ -47,23 +42,16 @@ const hidePageContentReason = computed(function ():
   }
   if (isGroupAdmin.value) return
 
-  const isReadyToTutor = store.getters['volunteer/isReadyToTutor']
-  if (isReadyToTutor) return
+  if (store.getters['volunteer/isOnboardedAndApproved']) return
   return 'not ready to tutor'
 })
-
-const showRenewalAnswer = computed(() =>
-  isRenewalMustAnswer(group.value?.renewal?.prompt)
-)
 
 const chapterName = computed(
   () => group.value?.groupInfo?.name ?? 'your chapter'
 )
 
 const renewalLine = computed(() =>
-  group.value?.renewal
-    ? renewalWarningLine(group.value.renewal, chapterName.value)
-    : undefined
+  group.value?.renewal ? renewalWarningLine(group.value.renewal) : undefined
 )
 
 const hidePageContentMessage = computed(() => {
@@ -111,7 +99,7 @@ onBeforeUnmount(() => {
 
 // loadNTHSData skips the fetch once groups are loaded, so renewal prompts
 // would otherwise stay as they were when the coach first opened Chapter HQ.
-async function refreshNTHSData(): Promise<boolean> {
+async function refreshNTHSData(): Promise<void> {
   try {
     const groups = await store.dispatch('nths/refreshNTHSGroups')
     // The /groups route guard runs only on entry, so a coach removed mid-visit is moved here.
@@ -125,26 +113,13 @@ async function refreshNTHSData(): Promise<boolean> {
         await router.replace(redirect)
       }
     }
-    return true
   } catch (err) {
     LoggerService.noticeError(err, 'Could not refresh NTHS data')
-    return false
   }
 }
 
-const modalStore = useAppModalStore()
-
-onMounted(async () => {
-  const refreshed = await refreshNTHSData()
-  if (isUnmounted || !refreshed || modalStore.isShown) return
-  const groupId = group.value?.groupInfo?.id
-  if (
-    groupId &&
-    !hidePageContentReason.value &&
-    group.value?.renewal?.prompt === 'name-successor-reminder'
-  ) {
-    ModalService.showNthsSuccessorPicker({ groupId, asReminder: true })
-  }
+onMounted(() => {
+  void refreshNTHSData()
 })
 
 watch(
@@ -196,7 +171,7 @@ watch(
       <nav
         class="tabs"
         ref="tabsNav"
-        v-if="!hidePageContentReason && !showRenewalAnswer"
+        v-if="!hidePageContentReason"
         aria-label="Chapter sections"
       >
         <RouterLink
@@ -260,10 +235,6 @@ watch(
           </template>
         </Callout>
       </div>
-      <RenewalAnswerPanel
-        v-else-if="showRenewalAnswer"
-        :groupId="group.groupInfo.id"
-      />
       <template v-else>
         <RenewalBanner
           v-if="group?.groupInfo?.id"
@@ -360,7 +331,6 @@ watch(
   }
 }
 .warning-line {
-  font-weight: 700;
   margin: 0 0 12px;
 }
 .callout-content {

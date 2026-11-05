@@ -8,7 +8,7 @@ import type { NTHSRenewalCommitments } from '@/services/NTHSGroupService'
 export type AcceptPresidencyProps = {
   chapterName: string
   schoolYear?: string
-  submitting?: boolean
+  confirmReturn?: boolean
 }
 
 defineProps<AcceptPresidencyProps>()
@@ -43,15 +43,17 @@ defineExpose({ onCancel })
 
 <template>
   <div class="accept-presidency">
-    <p class="eyebrow">Accept the presidency</p>
+    <p class="eyebrow">
+      {{ confirmReturn ? 'Confirm your return' : 'Accept the presidency' }}
+    </p>
     <h2 class="title">
-      Lead {{ chapterName
-      }}<template v-if="schoolYear"> in {{ schoolYear }}</template>
+      Lead your chapter<template v-if="schoolYear">
+        in {{ schoolYear }}</template
+      >
     </h2>
     <p class="body">
-      Confirm each of the president's commitments<template v-if="schoolYear">
-        for next school year</template
-      >. Nothing is saved until you accept.
+      Confirm your commitment to lead <strong>{{ chapterName }}</strong
+      >.
     </p>
     <div class="commitments">
       <FormCheckBox
@@ -67,7 +69,6 @@ defineExpose({ onCancel })
         :showArrow="false"
         variant="secondary"
         data-testid="accept-presidency-cancel"
-        :disabled="submitting"
         @click="onCancel"
         >Cancel</LargeButton
       >
@@ -75,9 +76,11 @@ defineExpose({ onCancel })
         :showArrow="false"
         variant="primary-blue"
         data-testid="accept-presidency-accept"
-        :disabled="!canAccept || submitting"
+        :disabled="!canAccept"
         @click="onAccept"
-        >Accept the presidency</LargeButton
+        >{{
+          confirmReturn ? 'Confirm return' : 'Accept the presidency'
+        }}</LargeButton
       >
     </div>
   </div>

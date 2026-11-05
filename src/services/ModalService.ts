@@ -8,9 +8,6 @@ import MemberTitleModal, {
 import AcceptPresidency, {
   type AcceptPresidencyProps,
 } from '@/components/NTHS/Renewal/AcceptPresidency.vue'
-import SuccessorPickerModal, {
-  type SuccessorPickerModalProps,
-} from '@/components/NTHS/Renewal/SuccessorPickerModal.vue'
 import type {
   NTHSRenewalCommitments,
   NTHSTitle,
@@ -121,19 +118,6 @@ export default {
     })
   },
 
-  showNthsSuccessorPicker(props: SuccessorPickerModalProps) {
-    show(
-      SuccessorPickerModal,
-      {
-        showAccept: false,
-        showSeparator: false,
-        showTemplateButtons: false,
-      },
-      props
-    )
-  },
-
-  // Bound through props; settle hides here because AcceptPresidency also renders inside the picker.
   showNthsAcceptPresidency(
     props: AcceptPresidencyProps
   ): Promise<NTHSRenewalCommitments | undefined> {

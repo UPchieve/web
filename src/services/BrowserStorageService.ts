@@ -5,6 +5,7 @@ import type { NTHSApplicationDraft } from '@/services/NTHSApplicationService'
 const HAS_SEEN_VOLUNTEER_HOURS = 'has-seen-volunteer-calculator'
 const HAS_SEEN_SHOW_ONLINE_STATUS_MODAL = 'has-seen-show-online-status-modal'
 const NTHS_APPLICATION_DRAFT = 'nths-application-draft'
+const NTHS_RENEWAL_HANDOFF_DISMISSED = 'nths-renewal-handoff-dismissed'
 
 function get(key: string, storage: Storage = localStorage) {
   const r = storage.getItem(key)
@@ -72,6 +73,43 @@ export function clearNTHSApplicationDraft(userId: string | undefined): void {
   if (!userId) return
   try {
     localStorage.removeItem(getUserCacheKey(NTHS_APPLICATION_DRAFT, userId))
+  } catch {
+    // best effort, as in getNTHSApplicationDraft
+  }
+}
+
+function nthsRenewalHandoffKey(
+  userId: string | undefined,
+  groupId: string,
+  schoolYear: string
+): string {
+  return getUserCacheKey(
+    `${NTHS_RENEWAL_HANDOFF_DISMISSED}-${groupId}-${schoolYear}`,
+    userId
+  )
+}
+
+export function hasDismissedNTHSRenewalHandoff(
+  userId: string | undefined,
+  groupId: string,
+  schoolYear: string
+): boolean {
+  if (!userId) return false
+  try {
+    return get(nthsRenewalHandoffKey(userId, groupId, schoolYear)) === true
+  } catch {
+    return false
+  }
+}
+
+export function setDismissedNTHSRenewalHandoff(
+  userId: string | undefined,
+  groupId: string,
+  schoolYear: string
+): void {
+  if (!userId) return
+  try {
+    set(nthsRenewalHandoffKey(userId, groupId, schoolYear), true)
   } catch {
     // best effort, as in getNTHSApplicationDraft
   }

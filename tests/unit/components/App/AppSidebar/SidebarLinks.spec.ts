@@ -7,11 +7,6 @@ import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
-import {
-  CHAPTER_NEEDS_PRESIDENT_DOT_TITLE,
-  NAMED_PRESIDENT_DOT_TITLE,
-  NEXT_PRESIDENT_UNNAMED_TITLE,
-} from '@/services/NTHSRenewalService'
 
 // General links
 const CONTACT_LINK = { to: '/contact', text: 'Contact us' }
@@ -714,45 +709,47 @@ describe('SidebarLinks', () => {
       })
 
       it.each([
-        ['name-successor-reminder', NEXT_PRESIDENT_UNNAMED_TITLE],
-        ['successor-must-answer', NAMED_PRESIDENT_DOT_TITLE],
-        ['member-must-answer', CHAPTER_NEEDS_PRESIDENT_DOT_TITLE],
-      ])('labels the chapter dot for renewal prompt %s', (prompt, label) => {
-        const wrapper = getWrapper({
-          props: { authenticated: true },
-          stubs: {
-            SidebarLink: {
-              render() {
-                return h('div', (this as any).$slots.default?.())
+        { prompt: 'confirm-return', shown: true },
+        { prompt: 'none', shown: false },
+      ])(
+        'shows the chapter dot ($shown) for the $prompt renewal prompt',
+        ({ prompt, shown }) => {
+          const wrapper = getWrapper({
+            props: { authenticated: true },
+            stubs: {
+              SidebarLink: {
+                render() {
+                  return h('div', (this as any).$slots.default?.())
+                },
               },
             },
-          },
-          featureFlags: {
-            getters: { isNTHSApplicationPageEnabled: () => true },
-          },
-          user: {
-            getters: {
-              isStudent: () => false,
-              isVolunteer: () => true,
-              hasVolunteerRole: () => true,
-              isTeacher: () => false,
+            featureFlags: {
+              getters: { isNTHSApplicationPageEnabled: () => true },
             },
-          },
-          nths: {
-            state: {
-              NTHSGroups: [
-                {
-                  groupInfo: { id: 'group-1' },
-                  memberInfo: { roleName: 'admin' },
-                  renewal: { prompt },
-                },
-              ],
+            user: {
+              getters: {
+                isStudent: () => false,
+                isVolunteer: () => true,
+                hasVolunteerRole: () => true,
+                isTeacher: () => false,
+              },
             },
-          },
-        })
-        const dot = wrapper.find('.SidebarLinks__notification')
-        expect(dot.attributes('label')).toBe(label)
-      })
+            nths: {
+              state: {
+                NTHSGroups: [
+                  {
+                    groupInfo: { id: 'group-1' },
+                    memberInfo: { roleName: 'admin' },
+                    renewal: { prompt },
+                  },
+                ],
+              },
+            },
+          })
+
+          expect(wrapper.find('[data-testid="nths-dot"]').exists()).toBe(shown)
+        }
+      )
 
       it('does not show the chapter creation dot when the approval has expired', () => {
         const wrapper = getWrapper({

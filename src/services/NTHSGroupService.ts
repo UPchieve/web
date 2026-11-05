@@ -132,15 +132,12 @@ export type AffiliationStatus =
 // Chapter renewal payloads, mirroring server/contracts/nths-group.ts in subway.
 export type NTHSRenewalPrompt =
   | 'none'
-  | 'co-president-offer'
-  | 'successor-must-answer'
-  | 'successor-not-cleared'
-  | 'decliner-countdown'
-  | 'member-must-answer'
+  | 'handoff-banner'
+  | 'confirm-return'
+  | 'confirm-reminder'
+  | 'president-not-cleared'
   | 'member-not-cleared'
-  | 'successors-named'
-  | 'name-successor-reminder'
-  | 'name-successor-banner'
+  | 'member-countdown'
   | 'step-up'
 
 // Dates are YYYY-MM-DD, null when the chapter isn't renewing.
@@ -148,28 +145,6 @@ export type NTHSRenewalPublic = {
   prompt: NTHSRenewalPrompt
   closesOn: string | null
   successorConfirmationOn: string | null
-  namingClosesOn: string | null
-  commitmentsRequired: boolean
-  canNameSelf: boolean
-  namingSelfAccepts: boolean
-  namedSelf: boolean
-  memberStageOpen: boolean
-  acceptedPresidents: { firstName: string; lastInitial: string }[]
-}
-
-export type NTHSRenewalSuccessorPublic = {
-  userId: Uuid
-  firstName: string
-  lastInitial: string
-  // false: stepped down this cycle; null: named, not answered yet.
-  accepted: boolean | null
-  // null on member-stage rows, or when the namer's account is gone.
-  namedBy: { userId: Uuid; firstName: string; lastInitial: string } | null
-}
-
-export type NTHSRenewalSuccessorsResponse = {
-  successors: NTHSRenewalSuccessorPublic[]
-  canEditSuccessors: boolean
 }
 
 export type NTHSRenewalResponse = { renewal: NTHSRenewalPublic }
@@ -190,9 +165,3 @@ export type NTHSRenewalCommitmentKey =
 export type NTHSRenewalCommitments = Record<NTHSRenewalCommitmentKey, true>
 
 export type NTHSAcceptanceReason = 'renewal' | 'step-up'
-
-export type NTHSRenewalSuccessorsUpdate = {
-  userIds: Uuid[]
-  expectedUserIds: Uuid[]
-  commitments?: NTHSRenewalCommitments
-}

@@ -106,6 +106,9 @@ $c-nths-warm-fg: #8a3d14;
     @include nths-page-subtitle;
     margin-top: 10px;
   }
+  strong {
+    font-weight: 600;
+  }
   .actions {
     display: flex;
     justify-content: flex-end;

@@ -50,6 +50,7 @@ vi.mock('@vueuse/core', async (importOriginal) => {
 const getNTHSChapterRoster = vi.fn()
 const getNTHSChapterImpact = vi.fn()
 const updateNTHSGroupMember = vi.fn()
+const refreshNTHSGroups = vi.fn()
 vi.mock('@/services/NetworkService', () => ({
   default: {
     getNTHSChapterRoster: (...args: unknown[]) => getNTHSChapterRoster(...args),
@@ -137,6 +138,9 @@ function storeFor(
     getters: {
       'nths/hasAdminRole': () => roleName === 'admin',
     },
+    actions: {
+      'nths/refreshNTHSGroups': () => refreshNTHSGroups(),
+    },
   })
 }
 
@@ -168,6 +172,8 @@ beforeEach(() => {
   getNTHSChapterRoster.mockReset()
   getNTHSChapterImpact.mockReset()
   updateNTHSGroupMember.mockReset()
+  refreshNTHSGroups.mockReset()
+  refreshNTHSGroups.mockResolvedValue(undefined)
   showNthsUserManagementModal.mockReset()
   showNthsMemberTitleModal.mockReset()
   showNthsMemberTitleModal.mockResolvedValue('Member')
@@ -305,7 +311,7 @@ describe('NTHSMembersView', () => {
       const [group] = $store.state.nths.NTHSGroups as unknown as {
         renewal?: { prompt: string }
       }[]
-      group.renewal = { prompt: 'successors-named' }
+      group.renewal = { prompt: 'confirm-return' }
       await flushPromises()
 
       expect(getNTHSChapterRoster).toHaveBeenCalledTimes(2)
@@ -689,6 +695,28 @@ describe('NTHSMembersView', () => {
         false
       )
     })
+
+    it.each([
+      { viewerId: 'sam', refreshes: true },
+      { viewerId: 'president', refreshes: false },
+    ])(
+      'refreshes the viewer renewal state only for their own row, viewer $viewerId',
+      async ({ viewerId, refreshes }) => {
+        updateNTHSGroupMember.mockResolvedValue(undefined)
+        showNthsMemberTitleModal.mockResolvedValue('Executive Board Member')
+        const wrapper = await getWrapper({ viewerId })
+
+        await wrapper
+          .find('[data-testid="member-actions-sam"]')
+          .trigger('click')
+        await wrapper
+          .find('[data-testid="member-change-title-sam"]')
+          .trigger('click')
+        await flushPromises()
+
+        expect(refreshNTHSGroups).toHaveBeenCalledTimes(refreshes ? 1 : 0)
+      }
+    )
 
     it('sends nothing when the title choice is cancelled', async () => {
       showNthsMemberTitleModal.mockResolvedValue(undefined)

@@ -201,6 +201,13 @@ async function updateMember(
     )
     patchMember(member.userId, patch)
     refreshRoster(groupId.value, now)
+    if (member.userId === currentUserId.value) {
+      store
+        .dispatch('nths/refreshNTHSGroups')
+        .catch((err) =>
+          LoggerService.noticeError(err, 'Could not refresh NTHS groups')
+        )
+    }
   } catch (err) {
     LoggerService.noticeError(err)
     errorMessage.value = failureMessage

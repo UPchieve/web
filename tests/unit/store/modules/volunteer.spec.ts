@@ -158,3 +158,24 @@ describe('isReadyToTutor', () => {
     expect(store.getters['volunteer/isReadyToTutor']).toEqual(true)
   })
 })
+
+describe('isOnboardedAndApproved', () => {
+  it.each([{ banType: 'complete' }, { banType: 'shadow' }, { banType: null }])(
+    'ignores bans, banType $banType',
+    ({ banType }) => {
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              userType: 'volunteer',
+              isOnboarded: true,
+              isApproved: true,
+              banType,
+            },
+          },
+        },
+      })
+      expect(store.getters['volunteer/isOnboardedAndApproved']).toEqual(true)
+    }
+  )
+})

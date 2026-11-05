@@ -13,7 +13,7 @@ import { useAppModalStore } from '@/stores/app/modal'
 
 type UserOverrides = {
   occupation?: string[] | null
-  isReadyToTutor?: boolean
+  isOnboardedAndApproved?: boolean
   renewalPrompt?: string
 }
 
@@ -33,15 +33,10 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
                   prompt: userOverrides.renewalPrompt,
                   closesOn: '2027-09-30',
                   successorConfirmationOn: '2027-08-01',
-                  namingClosesOn: '2027-09-14',
-                  commitmentsRequired: true,
-                  canNameSelf: true,
-                  namingSelfAccepts: false,
                 }
               : undefined,
           },
         ],
-        NTHSRenewalSuccessors: {},
       },
       // A member who isn't a high-school student or isn't ready to tutor has
       // the whole tab strip hidden behind a callout, which is a separate gate
@@ -61,7 +56,8 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
         userModule.getters.isVolunteerInHighSchool(
           state.user as unknown as UserStoreState
         ),
-      'volunteer/isReadyToTutor': () => userOverrides.isReadyToTutor ?? true,
+      'volunteer/isOnboardedAndApproved': () =>
+        userOverrides.isOnboardedAndApproved ?? true,
       'nths/hasAdminRole': () => roleName === 'admin',
     },
     mutations: {
@@ -156,7 +152,7 @@ describe('NTHSGroupsView', () => {
       {
         name: 'a plain member who is not ready to tutor',
         role: 'member',
-        overrides: { isReadyToTutor: false },
+        overrides: { isOnboardedAndApproved: false },
         hidden: true,
       },
       {
@@ -168,7 +164,7 @@ describe('NTHSGroupsView', () => {
       {
         name: 'an admin with high school who is not ready to tutor',
         role: 'admin',
-        overrides: { isReadyToTutor: false },
+        overrides: { isOnboardedAndApproved: false },
         hidden: false,
       },
     ])(
@@ -192,7 +188,7 @@ describe('NTHSGroupsView', () => {
     // must win over the onboarding one.
     const roles = [
       { role: 'admin', ready: {} },
-      { role: 'member', ready: { isReadyToTutor: false } },
+      { role: 'member', ready: { isOnboardedAndApproved: false } },
     ]
     it.each(
       [
@@ -339,91 +335,12 @@ describe('NTHSGroupsView', () => {
       expect(wrapper.vm.$router.currentRoute.value.path).toBe('/groups/home')
     })
 
-    it('skips the reminder when another modal is already open', async () => {
-      const showReminder = vi
-        .spyOn(ModalService, 'showNthsSuccessorPicker')
-        .mockImplementation(() => undefined)
-      useAppModalStore().show()
-
-      await getWrapper('/groups/home', 'admin', {
-        renewalPrompt: 'name-successor-reminder',
-      })
-
-      expect(showReminder).not.toHaveBeenCalled()
-    })
-
-    it('skips the reminder when the view unmounts before the refresh lands', async () => {
-      const showReminder = vi
-        .spyOn(ModalService, 'showNthsSuccessorPicker')
-        .mockImplementation(() => undefined)
-      let finishRefresh: (groups: unknown[]) => void = () => undefined
-      refreshNTHSGroups.mockReturnValue(
-        new Promise<unknown[]>((resolve) => {
-          finishRefresh = resolve
-        })
-      )
-      const wrapper = await getWrapper('/groups/home', 'admin', {
-        renewalPrompt: 'name-successor-reminder',
-      })
-
-      wrapper.unmount()
-      finishRefresh([{}])
-      await flushPromises()
-
-      expect(showReminder).not.toHaveBeenCalled()
-    })
-
-    it.each([
-      {
-        name: 'the reminder prompt',
-        prompt: 'name-successor-reminder',
-        overrides: {},
-        opens: true,
-      },
-      {
-        name: 'the May banner prompt',
-        prompt: 'name-successor-banner',
-        overrides: {},
-        opens: false,
-      },
-      {
-        name: 'the reminder prompt behind the high school notice',
-        prompt: 'name-successor-reminder',
-        overrides: { occupation: [] },
-        opens: false,
-      },
-    ])(
-      'opens the reminder once per mount for $name: $opens',
-      async ({ prompt, overrides, opens }) => {
-        const showReminder = vi
-          .spyOn(ModalService, 'showNthsSuccessorPicker')
-          .mockImplementation(() => undefined)
-        const wrapper = await getWrapper('/groups/home', 'admin', {
-          ...overrides,
-          renewalPrompt: prompt,
-        })
-        await wrapper.vm.$router.push('/groups/members')
-        await flushPromises()
-
-        expect(showReminder).toHaveBeenCalledTimes(opens ? 1 : 0)
-        if (opens) {
-          expect(showReminder).toHaveBeenCalledWith({
-            groupId: 'group-123',
-            asReminder: true,
-          })
-        }
-      }
-    )
-
     it('shows the renewal banner only with the page content', async () => {
-      vi.spyOn(ModalService, 'showNthsSuccessorPicker').mockImplementation(
-        () => undefined
-      )
       const shown = await getWrapper('/groups/home', 'admin', {
-        renewalPrompt: 'name-successor-reminder',
+        renewalPrompt: 'confirm-reminder',
       })
       const gated = await getWrapper('/groups/home', 'admin', {
-        renewalPrompt: 'name-successor-reminder',
+        renewalPrompt: 'confirm-reminder',
         occupation: [],
       })
 

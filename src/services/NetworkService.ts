@@ -12,9 +12,6 @@ import type {
   NTHSMemberUpdate,
   NTHSRenewalAcceptResponse,
   NTHSRenewalCommitments,
-  NTHSRenewalResponse,
-  NTHSRenewalSuccessorsResponse,
-  NTHSRenewalSuccessorsUpdate,
   NTHSTitle,
   Role,
 } from './NTHSGroupService'
@@ -363,32 +360,6 @@ export function updateNTHSChecklistItemProgress(
   )
 }
 
-export function getNTHSRenewalSuccessors(groupId: string) {
-  return httpGet<NTHSRenewalSuccessorsResponse>(
-    `${API_ROOT}/nths-groups/${groupId}/renewal`
-  )
-}
-
-export function setNTHSRenewalSuccessors(
-  groupId: string,
-  data: NTHSRenewalSuccessorsUpdate
-) {
-  return httpPut<NTHSRenewalResponse, NTHSRenewalSuccessorsUpdate>(
-    `${API_ROOT}/nths-groups/${groupId}/renewal/successors`,
-    data
-  )
-}
-
-export function nameSelfAsNTHSRenewalSuccessor(
-  groupId: string,
-  data: { commitments?: NTHSRenewalCommitments }
-) {
-  return httpPost<NTHSRenewalResponse>(
-    `${API_ROOT}/nths-groups/${groupId}/renewal/successors/self`,
-    data
-  )
-}
-
 export function acceptNTHSRenewalPresidency(
   groupId: string,
   data: {
@@ -399,13 +370,6 @@ export function acceptNTHSRenewalPresidency(
   return httpPost<NTHSRenewalAcceptResponse>(
     `${API_ROOT}/nths-groups/${groupId}/renewal/accept`,
     data
-  )
-}
-
-export function declineNTHSRenewalPresidency(groupId: string) {
-  return httpPost<NTHSRenewalResponse>(
-    `${API_ROOT}/nths-groups/${groupId}/renewal/decline`,
-    {}
   )
 }
 
@@ -527,11 +491,7 @@ export default {
   getPastVolunteers,
   getNTHSChecklist,
   updateNTHSChecklistItemProgress,
-  getNTHSRenewalSuccessors,
-  setNTHSRenewalSuccessors,
-  nameSelfAsNTHSRenewalSuccessor,
   acceptNTHSRenewalPresidency,
-  declineNTHSRenewalPresidency,
   getVolunteerPartner(partnerId) {
     return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(

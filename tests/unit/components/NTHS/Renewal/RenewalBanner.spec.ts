@@ -1,75 +1,56 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { h } from 'vue'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
-import NetworkService, { NetworkError } from '@/services/NetworkService'
+import NetworkService from '@/services/NetworkService'
 import ModalService from '@/services/ModalService'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
-import LoggerService from '@/services/LoggerService'
 import { NTHS_COMMITMENTS } from '@/services/NTHSApplicationService'
 import type {
   NTHSRenewalCommitments,
+  NTHSRenewalPrompt,
   NTHSRenewalPublic,
-  NTHSRenewalSuccessorPublic,
 } from '@/services/NTHSGroupService'
 
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: {
-    getNTHSRenewalSuccessors: vi.fn(),
-    nameSelfAsNTHSRenewalSuccessor: vi.fn(),
     acceptNTHSRenewalPresidency: vi.fn(),
   },
 }))
-const present = vi.fn()
 vi.mock('@ionic/vue', () => ({
-  toastController: { create: vi.fn(async () => ({ present })) },
+  toastController: { create: vi.fn(async () => ({ present: vi.fn() })) },
 }))
 
-const refreshNTHSGroups = vi.fn()
+const COMMITMENTS = Object.fromEntries(
+  NTHS_COMMITMENTS.map(({ key }) => [key, true])
+) as NTHSRenewalCommitments
 const nthsModule = (storeOptions.modules as any).nths
-const VIEWER = { id: 'viewer', firstname: 'Ana', lastName: 'Rivera' }
 const BASE_RENEWAL: NTHSRenewalPublic = {
-  prompt: 'name-successor-banner',
+  prompt: 'none',
   closesOn: '2027-09-30',
   successorConfirmationOn: '2027-08-01',
-  namingClosesOn: '2027-09-14',
-  commitmentsRequired: true,
-  canNameSelf: true,
-  namingSelfAccepts: false,
-  namedSelf: false,
-  memberStageOpen: false,
-  acceptedPresidents: [],
 }
 
-function successor(
-  userId: string,
-  firstName: string,
-  namedBy: NTHSRenewalSuccessorPublic['namedBy']
-): NTHSRenewalSuccessorPublic {
-  return {
-    userId,
-    firstName,
-    lastInitial: firstName[0],
-    accepted: null,
-    namedBy,
-  }
-}
+const refreshNTHSGroups = vi.fn()
 
 async function mountBanner(
-  renewal: Partial<NTHSRenewalPublic>,
-  successors: NTHSRenewalSuccessorPublic[] = []
+  prompt: NTHSRenewalPrompt,
+  groupId = 'group-1',
+  closesOn = '2027-09-30',
+  userId = 'user-1'
 ) {
-  vi.mocked(NetworkService.getNTHSRenewalSuccessors).mockResolvedValue({
-    successors,
-    canEditSuccessors: true,
-  })
   const store = createStore<any>({
     modules: {
       ...storeOptions.modules,
       user: {
         ...(storeOptions.modules as any).user,
-        state: { user: VIEWER },
+        state: {
+          ...(storeOptions.modules as any).user.state,
+          user: { id: userId },
+        },
       },
       nths: {
         ...nthsModule,
@@ -77,12 +58,11 @@ async function mountBanner(
           ...nthsModule.state,
           NTHSGroups: [
             {
-              groupInfo: { id: 'group-1', name: 'Lincoln High NTHS' },
+              groupInfo: { id: groupId, name: 'Lincoln High NTHS' },
               memberInfo: { roleName: 'admin' },
-              renewal: { ...BASE_RENEWAL, ...renewal },
+              renewal: { ...BASE_RENEWAL, prompt, closesOn },
             },
           ],
-          NTHSRenewalSuccessors: {},
         },
         actions: {
           ...nthsModule.actions,
@@ -92,368 +72,235 @@ async function mountBanner(
       },
     },
   })
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: ['/groups/home', '/groups/members'].map((path) => ({
+      path,
+      component: { render: () => h('div') },
+    })),
+  })
+  await router.push('/groups/home')
   const wrapper = mount(RenewalBanner, {
-    props: { groupId: 'group-1' },
-    global: { plugins: [store] },
+    props: { groupId },
+    global: { plugins: [store, router] },
   })
   await flushPromises()
-  return wrapper
+  return { wrapper, router }
 }
 
-const buttonLabels = (wrapper: Awaited<ReturnType<typeof mountBanner>>) =>
-  wrapper.findAll('button').map((b) => b.text())
+type Wrapper = Awaited<ReturnType<typeof mountBanner>>['wrapper']
+const has = (wrapper: Wrapper, id: string) =>
+  wrapper.find(`[data-testid="${id}"]`).exists()
+async function click(wrapper: Wrapper, id: string) {
+  await wrapper.get(`[data-testid="${id}"]`).trigger('click')
+  await flushPromises()
+}
 
 describe('RenewalBanner', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
-  })
-
-  it.each([
-    {
-      prompt: 'name-successor-banner',
-      title: 'Who will lead Lincoln High NTHS next year?',
-      body: "Name one or more members as next year's president. They'll be notified and can accept starting Aug 1.",
-    },
-    {
-      prompt: 'name-successor-reminder',
-      title: "Next year's president hasn't been named yet",
-      body: 'Name one or more members by Sept 14. If nobody accepts by Sept 30, the chapter closes.',
-    },
-  ] as const)('shows the $prompt copy', async ({ prompt, title, body }) => {
-    const wrapper = await mountBanner({ prompt })
-    expect(wrapper.text()).toContain(title)
-    expect(wrapper.text()).toContain(body)
-    expect(buttonLabels(wrapper)).toEqual(['Name president', 'Me'])
-  })
-
-  it.each(['none', 'successor-must-answer'] as const)(
-    'renders nothing for %s',
-    async (prompt) => {
-      const wrapper = await mountBanner({ prompt })
-      expect(wrapper.find('[data-testid="renewal-banner"]').exists()).toBe(
-        false
-      )
-    }
-  )
-
-  it('stays hidden when the named list comes back empty', async () => {
-    const wrapper = await mountBanner({ prompt: 'successors-named' })
-    expect(wrapper.find('[data-testid="renewal-banner"]').exists()).toBe(false)
-  })
-
-  it('hides "Me" when the viewer cannot name themselves', async () => {
-    const wrapper = await mountBanner({ canNameSelf: false })
-    expect(buttonLabels(wrapper)).toEqual(['Name president'])
-  })
-
-  it('shows who is named, with the change and Me buttons', async () => {
-    const wrapper = await mountBanner({ prompt: 'successors-named' }, [
-      successor('leo', 'Leo', {
-        userId: 'viewer',
-        firstName: 'Ana',
-        lastInitial: 'R',
-      }),
-    ])
-
-    expect(buttonLabels(wrapper)).toEqual(['Change', 'Me'])
-  })
-
-  it('keeps the banner with a generic title when the named list fails to load', async () => {
-    const wrapper = await mountBanner({ prompt: 'successors-named' })
-    vi.mocked(NetworkService.getNTHSRenewalSuccessors).mockRejectedValue(
-      new Error('down')
-    )
-    ;(wrapper.vm as any).$store.commit('nths/setNTHSGroupRenewal', {
-      groupId: 'group-1',
-      renewal: { ...BASE_RENEWAL, prompt: 'none' },
-    })
-    await flushPromises()
-    ;(wrapper.vm as any).$store.commit('nths/setNTHSGroupRenewal', {
-      groupId: 'group-1',
-      renewal: { ...BASE_RENEWAL, prompt: 'successors-named' },
-    })
-    await flushPromises()
-
-    expect(wrapper.get('.banner-title').text()).toBe("Next year's president")
-    expect(buttonLabels(wrapper)).toContain('Change')
-  })
-
-  it('names the viewer without commitments before the successor date', async () => {
-    vi.mocked(NetworkService.nameSelfAsNTHSRenewalSuccessor).mockResolvedValue({
-      renewal: {
-        ...BASE_RENEWAL,
-        prompt: 'successors-named',
-        canNameSelf: false,
-      },
-    })
-    const askCommitments = vi.spyOn(ModalService, 'showNthsAcceptPresidency')
-    const wrapper = await mountBanner({})
-    vi.mocked(NetworkService.getNTHSRenewalSuccessors).mockClear()
-
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
-
-    expect(askCommitments).not.toHaveBeenCalled()
-    expect(NetworkService.nameSelfAsNTHSRenewalSuccessor).toHaveBeenCalledWith(
-      'group-1',
-      { commitments: undefined }
-    )
-    expect(NetworkService.getNTHSRenewalSuccessors).toHaveBeenCalledTimes(1)
-    expect(present).not.toHaveBeenCalled()
-  })
-
-  it('reloads the named list when the renewal is replaced with the same prompt', async () => {
-    vi.mocked(NetworkService.nameSelfAsNTHSRenewalSuccessor).mockResolvedValue({
-      renewal: {
-        ...BASE_RENEWAL,
-        prompt: 'successors-named',
-        canNameSelf: false,
-      },
-    })
-    const wrapper = await mountBanner({ prompt: 'successors-named' }, [
-      successor('leo', 'Leo', {
-        userId: 'x',
-        firstName: 'Sam',
-        lastInitial: 'T',
-      }),
-    ])
-    vi.mocked(NetworkService.getNTHSRenewalSuccessors).mockClear()
-    vi.mocked(NetworkService.getNTHSRenewalSuccessors).mockResolvedValue({
-      successors: [
-        successor('leo', 'Leo', {
-          userId: 'x',
-          firstName: 'Sam',
-          lastInitial: 'T',
-        }),
-        successor('viewer', 'Ana', {
-          userId: 'viewer',
-          firstName: 'Ana',
-          lastInitial: 'R',
-        }),
-      ],
-      canEditSuccessors: true,
-    })
-
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
-
-    expect(NetworkService.getNTHSRenewalSuccessors).toHaveBeenCalledTimes(1)
-    expect(wrapper.text()).toContain('Leo L. (named by Sam T.) and you')
-  })
-
-  it('waits for the fresh list before naming anyone after the prompt comes back', async () => {
-    const wrapper = await mountBanner({ prompt: 'successors-named' }, [
-      successor('leo', 'Leo', null),
-    ])
-    const store = (wrapper.vm as any).$store
-    const setPrompt = (prompt: NTHSRenewalPublic['prompt']) =>
-      store.commit('nths/setNTHSGroupRenewal', {
-        groupId: 'group-1',
-        renewal: { ...BASE_RENEWAL, prompt },
-      })
-
-    setPrompt('name-successor-banner')
-    await flushPromises()
-
-    let finishLoad: () => void = () => undefined
-    vi.mocked(NetworkService.getNTHSRenewalSuccessors).mockReturnValue(
-      new Promise((resolve) => {
-        finishLoad = () =>
-          resolve({
-            successors: [successor('sam', 'Sam', null)],
-            canEditSuccessors: true,
-          })
-      })
-    )
-    setPrompt('successors-named')
-    await flushPromises()
-    expect(wrapper.text()).not.toContain('Leo')
-
-    finishLoad()
-    await flushPromises()
-    expect(wrapper.text()).toContain('Sam S.')
-  })
-
-  it('does not reload the named list when the commitments step is cancelled', async () => {
-    vi.spyOn(ModalService, 'showNthsAcceptPresidency').mockResolvedValue(
-      undefined
-    )
-    const wrapper = await mountBanner(
-      { prompt: 'successors-named', namingSelfAccepts: true },
-      [successor('leo', 'Leo', null)]
-    )
-    vi.mocked(NetworkService.getNTHSRenewalSuccessors).mockClear()
-
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
-
-    expect(NetworkService.getNTHSRenewalSuccessors).not.toHaveBeenCalled()
-  })
-
-  it('accepts with the commitments from the successor date', async () => {
-    const commitments = Object.fromEntries(
-      NTHS_COMMITMENTS.map(({ key }) => [key, true])
-    ) as NTHSRenewalCommitments
-    vi.spyOn(ModalService, 'showNthsAcceptPresidency').mockResolvedValue(
-      commitments
-    )
-    vi.mocked(NetworkService.nameSelfAsNTHSRenewalSuccessor).mockResolvedValue({
-      renewal: {
-        ...BASE_RENEWAL,
-        prompt: 'none',
-        canNameSelf: false,
-        namingSelfAccepts: true,
-      },
-    })
-    const wrapper = await mountBanner({ namingSelfAccepts: true })
-
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
-
-    expect(NetworkService.nameSelfAsNTHSRenewalSuccessor).toHaveBeenCalledWith(
-      'group-1',
-      { commitments }
-    )
-    const { toastController } = await import('@ionic/vue')
-    expect(toastController.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: "You're Lincoln High NTHS's president for 2027–28.",
-      })
-    )
-  })
-
-  it('steps up through the commitments modal with reason step-up', async () => {
-    const commitments = Object.fromEntries(
-      NTHS_COMMITMENTS.map(({ key }) => [key, true])
-    ) as NTHSRenewalCommitments
-    const askCommitments = vi
-      .spyOn(ModalService, 'showNthsAcceptPresidency')
-      .mockResolvedValue(commitments)
+    refreshNTHSGroups.mockReset()
+    localStorage.clear()
     vi.mocked(NetworkService.acceptNTHSRenewalPresidency).mockResolvedValue({
       renewal: { ...BASE_RENEWAL, prompt: 'none' },
       outcome: 'accepted',
     })
-    const wrapper = await mountBanner({
-      prompt: 'step-up',
-      commitmentsRequired: false,
-    })
-
-    await wrapper.get('[data-testid="renewal-banner-primary"]').trigger('click')
-    await flushPromises()
-
-    expect(askCommitments).toHaveBeenCalledWith(
-      expect.objectContaining({ schoolYear: undefined })
-    )
-    expect(NetworkService.acceptNTHSRenewalPresidency).toHaveBeenCalledWith(
-      'group-1',
-      { commitments, reason: 'step-up' }
-    )
   })
 
-  it('accepts in one click when the viewer is the President', async () => {
-    const askCommitments = vi.spyOn(ModalService, 'showNthsAcceptPresidency')
-    vi.mocked(NetworkService.nameSelfAsNTHSRenewalSuccessor).mockResolvedValue({
-      renewal: {
-        ...BASE_RENEWAL,
-        prompt: 'none',
-        canNameSelf: false,
-        namingSelfAccepts: true,
-        commitmentsRequired: false,
-      },
-    })
-    const wrapper = await mountBanner({
-      namingSelfAccepts: true,
-      commitmentsRequired: false,
-    })
-
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
-
-    expect(askCommitments).not.toHaveBeenCalled()
-    expect(NetworkService.nameSelfAsNTHSRenewalSuccessor).toHaveBeenCalledTimes(
-      1
-    )
-    const { toastController } = await import('@ionic/vue')
-    expect(toastController.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: "You're Lincoln High NTHS's president for 2027–28.",
-      })
-    )
-  })
-
-  it('shows the server message and reloads the groups when naming fails', async () => {
-    vi.mocked(NetworkService.nameSelfAsNTHSRenewalSuccessor).mockRejectedValue(
-      new NetworkError('closed', {
-        status: 409,
-        code: 'renewal_not_open',
-        clientMessage: 'Someone has already accepted the presidency.',
-      })
-    )
-    refreshNTHSGroups.mockImplementation(({ commit, state }: any) => {
-      commit(
-        'setNTHSGroups',
-        state.NTHSGroups.map((g: any) => ({
-          ...g,
-          renewal: { ...g.renewal, prompt: 'none' },
-        }))
+  it.each<{
+    prompt: NTHSRenewalPrompt
+    primary: 'members' | 'accept' | null
+    secondary: 'members' | 'dismiss' | null
+  }>([
+    { prompt: 'none', primary: null, secondary: null },
+    { prompt: 'handoff-banner', primary: 'members', secondary: 'dismiss' },
+    { prompt: 'confirm-return', primary: 'accept', secondary: 'members' },
+    { prompt: 'confirm-reminder', primary: 'members', secondary: null },
+    { prompt: 'president-not-cleared', primary: null, secondary: null },
+    { prompt: 'member-not-cleared', primary: null, secondary: null },
+    { prompt: 'member-countdown', primary: 'accept', secondary: null },
+    { prompt: 'step-up', primary: 'accept', secondary: null },
+  ])(
+    'on $prompt offers primary $primary and secondary $secondary',
+    async ({ prompt, primary, secondary }) => {
+      vi.spyOn(ModalService, 'showNthsAcceptPresidency').mockResolvedValue(
+        undefined
       )
-    })
-    const noticeError = vi.spyOn(LoggerService, 'noticeError')
-    const wrapper = await mountBanner({})
+      const { wrapper } = await mountBanner(prompt)
 
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
+      expect(has(wrapper, 'renewal-banner')).toBe(!!primary)
+      expect(has(wrapper, 'renewal-banner-primary')).toBe(!!primary)
+      expect(has(wrapper, 'renewal-banner-secondary')).toBe(!!secondary)
+    }
+  )
 
-    expect(
-      wrapper.find('[data-testid="renewal-banner-primary"]').exists()
-    ).toBe(false)
-    expect(wrapper.get('[data-testid="renewal-banner-error"]').text()).toBe(
-      'Someone has already accepted the presidency.'
+  it.each([
+    { prompt: 'handoff-banner', shown: false },
+    { prompt: 'confirm-return', shown: false },
+    { prompt: 'confirm-reminder', shown: false },
+    { prompt: 'step-up', shown: true },
+    { prompt: 'member-countdown', shown: true },
+  ] as const)(
+    'on the Members tab, $prompt shows: $shown',
+    async ({ prompt, shown }) => {
+      const { wrapper, router } = await mountBanner(prompt)
+
+      await router.push('/groups/members')
+      await flushPromises()
+
+      expect(has(wrapper, 'renewal-banner')).toBe(shown)
+    }
+  )
+
+  it.each([
+    { prompt: 'handoff-banner', button: 'renewal-banner-primary' },
+    { prompt: 'confirm-return', button: 'renewal-banner-secondary' },
+    { prompt: 'confirm-reminder', button: 'renewal-banner-primary' },
+  ] as const)(
+    'goes to the Members tab from $prompt',
+    async ({ prompt, button }) => {
+      const { wrapper, router } = await mountBanner(prompt)
+
+      await click(wrapper, button)
+
+      expect(router.currentRoute.value.path).toBe('/groups/members')
+    }
+  )
+
+  it.each([
+    {
+      prompt: 'confirm-return',
+      modal: { schoolYear: '2027–⁠28', confirmReturn: true },
+      body: { commitments: COMMITMENTS, reason: undefined },
+    },
+    {
+      prompt: 'member-countdown',
+      modal: { schoolYear: '2027–⁠28', confirmReturn: false },
+      body: { commitments: COMMITMENTS, reason: undefined },
+    },
+    {
+      prompt: 'step-up',
+      modal: { schoolYear: undefined, confirmReturn: false },
+      body: { commitments: COMMITMENTS, reason: 'step-up' },
+    },
+  ] as const)(
+    'accepts $prompt with the commitments',
+    async ({ prompt, modal, body }) => {
+      const askCommitments = vi
+        .spyOn(ModalService, 'showNthsAcceptPresidency')
+        .mockResolvedValue(COMMITMENTS)
+      const { wrapper } = await mountBanner(prompt)
+
+      await click(wrapper, 'renewal-banner-primary')
+
+      expect(askCommitments).toHaveBeenCalledWith(
+        expect.objectContaining(modal)
+      )
+      expect(NetworkService.acceptNTHSRenewalPresidency).toHaveBeenCalledWith(
+        'group-1',
+        body
+      )
+    }
+  )
+
+  it('posts nothing when the commitments step is cancelled', async () => {
+    vi.spyOn(ModalService, 'showNthsAcceptPresidency').mockResolvedValue(
+      undefined
     )
-    expect(refreshNTHSGroups).toHaveBeenCalledTimes(1)
-    expect(noticeError).not.toHaveBeenCalled()
+    const { wrapper } = await mountBanner('confirm-return')
+
+    await click(wrapper, 'renewal-banner-primary')
+
+    expect(NetworkService.acceptNTHSRenewalPresidency).not.toHaveBeenCalled()
   })
 
-  it('clears an earlier error when the picker opens', async () => {
-    refreshNTHSGroups.mockReset()
-    vi.mocked(NetworkService.nameSelfAsNTHSRenewalSuccessor).mockRejectedValue(
+  it('shows a failed confirm in the banner and lets the president retry', async () => {
+    vi.spyOn(ModalService, 'showNthsAcceptPresidency').mockResolvedValue(
+      COMMITMENTS
+    )
+    vi.mocked(NetworkService.acceptNTHSRenewalPresidency).mockRejectedValue(
       new Error('boom')
     )
-    vi.spyOn(ModalService, 'showNthsSuccessorPicker').mockImplementation(
-      () => undefined
-    )
-    const wrapper = await mountBanner({})
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
-    expect(wrapper.find('[data-testid="renewal-banner-error"]').exists()).toBe(
-      true
-    )
+    const { wrapper } = await mountBanner('confirm-return')
 
-    await wrapper.get('[data-testid="renewal-banner-primary"]').trigger('click')
+    await click(wrapper, 'renewal-banner-primary')
 
-    expect(ModalService.showNthsSuccessorPicker).toHaveBeenCalledWith(
-      expect.objectContaining({ groupId: 'group-1' })
-    )
-    expect(wrapper.find('[data-testid="renewal-banner-error"]').exists()).toBe(
-      false
-    )
+    expect(has(wrapper, 'renewal-banner-error')).toBe(true)
+    expect(
+      wrapper.get('[data-testid="renewal-banner-primary"]').attributes()
+    ).not.toHaveProperty('disabled')
   })
 
-  it('logs an unexpected failure and shows the generic message', async () => {
-    const failure = new Error('boom')
-    vi.mocked(NetworkService.nameSelfAsNTHSRenewalSuccessor).mockRejectedValue(
-      failure
+  it('shows a failed accept even when the refreshed prompt has no banner', async () => {
+    vi.spyOn(ModalService, 'showNthsAcceptPresidency').mockResolvedValue(
+      COMMITMENTS
     )
-    const noticeError = vi.spyOn(LoggerService, 'noticeError')
-    const wrapper = await mountBanner({})
+    vi.mocked(NetworkService.acceptNTHSRenewalPresidency).mockRejectedValue(
+      new Error('boom')
+    )
+    refreshNTHSGroups.mockImplementation(({ commit }) =>
+      commit('setNTHSGroupRenewal', {
+        groupId: 'group-1',
+        renewal: { ...BASE_RENEWAL, prompt: 'president-not-cleared' },
+      })
+    )
+    const { wrapper } = await mountBanner('step-up')
 
-    await wrapper.get('[data-testid="renewal-banner-me"]').trigger('click')
-    await flushPromises()
+    await click(wrapper, 'renewal-banner-primary')
 
-    expect(
-      wrapper.get('[data-testid="renewal-banner-error"]').text()
-    ).toContain('Something went wrong')
-    expect(noticeError).toHaveBeenCalledWith(failure, expect.any(String))
+    expect(has(wrapper, 'renewal-banner')).toBe(false)
+    expect(has(wrapper, 'renewal-banner-error')).toBe(true)
+  })
+
+  describe('dismissing the handoff banner', () => {
+    it('keeps it hidden for that user, chapter and school year after a remount', async () => {
+      const { wrapper } = await mountBanner('handoff-banner')
+      await click(wrapper, 'renewal-banner-secondary')
+      expect(has(wrapper, 'renewal-banner')).toBe(false)
+
+      const again = await mountBanner('handoff-banner')
+      const otherChapter = await mountBanner('handoff-banner', 'group-2')
+      const nextYear = await mountBanner(
+        'handoff-banner',
+        'group-1',
+        '2028-09-30'
+      )
+      const otherUser = await mountBanner(
+        'handoff-banner',
+        'group-1',
+        '2027-09-30',
+        'user-2'
+      )
+
+      expect(has(again.wrapper, 'renewal-banner')).toBe(false)
+      expect(has(otherChapter.wrapper, 'renewal-banner')).toBe(true)
+      expect(has(nextYear.wrapper, 'renewal-banner')).toBe(true)
+      expect(has(otherUser.wrapper, 'renewal-banner')).toBe(true)
+    })
+
+    it('still shows the confirm-return banner after the handoff banner was dismissed', async () => {
+      const { wrapper } = await mountBanner('handoff-banner')
+      await click(wrapper, 'renewal-banner-secondary')
+
+      const confirm = await mountBanner('confirm-return')
+
+      expect(has(confirm.wrapper, 'renewal-banner')).toBe(true)
+      expect(has(confirm.wrapper, 'renewal-banner-primary')).toBe(true)
+    })
+
+    it('still shows and dismisses the banner when localStorage throws', async () => {
+      const blocked = () => {
+        throw new DOMException('blocked', 'SecurityError')
+      }
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(blocked)
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(blocked)
+      const { wrapper } = await mountBanner('handoff-banner')
+      expect(has(wrapper, 'renewal-banner')).toBe(true)
+
+      await click(wrapper, 'renewal-banner-secondary')
+
+      expect(has(wrapper, 'renewal-banner')).toBe(false)
+    })
   })
 })

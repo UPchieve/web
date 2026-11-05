@@ -123,6 +123,7 @@
           <groups-icon class="icon" />
           <activity-dot
             v-if="nthsDotLabel"
+            data-testid="nths-dot"
             class="SidebarLinks__notification"
             :label="nthsDotLabel"
           />
@@ -242,11 +243,7 @@ import {
   NTHS_DESTINATION_LABELS,
   NTHS_DESTINATION_PATHS,
 } from '@/views/NTHS/nths-route-helpers'
-import {
-  CHAPTER_NEEDS_PRESIDENT_DOT_TITLE,
-  NAMED_PRESIDENT_DOT_TITLE,
-  NEXT_PRESIDENT_UNNAMED_TITLE,
-} from '@/services/NTHSRenewalService'
+import { renewalDotLabel } from '@/services/NTHSRenewalService'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
@@ -315,7 +312,6 @@ export default {
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
       isNthsGroupMemberOnly: 'nths/isGroupMemberOnly',
       hasNthsAdminRole: 'nths/hasAdminRole',
-      nthsRenewalNeedsAttention: 'nths/renewalNeedsAttention',
       nthsRenewalPrompt: 'nths/renewalPrompt',
     }),
     hasSeenCalculator() {
@@ -351,16 +347,7 @@ export default {
       if (this.shouldShowNthsChapterCreationDot) {
         return 'Create your NTHS chapter'
       }
-      if (this.nthsRenewalPrompt === 'successor-must-answer') {
-        return NAMED_PRESIDENT_DOT_TITLE
-      }
-      if (this.nthsRenewalPrompt === 'member-must-answer') {
-        return CHAPTER_NEEDS_PRESIDENT_DOT_TITLE
-      }
-      if (this.nthsRenewalNeedsAttention) {
-        return NEXT_PRESIDENT_UNNAMED_TITLE
-      }
-      return undefined
+      return renewalDotLabel(this.nthsRenewalPrompt)
     },
     isNthsChapterCreationDotShown() {
       if (this.mobileMode && this.isSidebarCollapsed) return false
