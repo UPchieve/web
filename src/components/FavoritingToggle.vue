@@ -17,12 +17,6 @@
       :class="favoritedStatus.class"
       v-on:click="toggleFavoritedStatus"
     />
-    <volunteer-unfavoriting-modal
-      v-if="showVolunteerUnfavoritingModal"
-      :closeModal="toggleVolunteerUnfavoritingModal"
-      :volunteerName="volunteerName"
-      @unfavorite="unfavorite"
-    />
     <favorited-list-full-modal
       v-if="showFavoritedListFullModal"
       :closeModal="toggleFavoritedListFullModal"
@@ -33,7 +27,6 @@
 <script>
 import StarIcon from '@/assets/icons/star_icon.svg'
 import StarIconFilled from '@/assets/icons/star_icon_filled.svg'
-import VolunteerUnfavoritingModal from '@/views/VolunteerUnfavoritingModal.vue'
 import FavoritedListFullModal from '@/views/FavoritedListFullModal.vue'
 import NetworkService from '@/services/NetworkService'
 
@@ -42,7 +35,6 @@ export default {
   components: {
     StarIcon,
     StarIconFilled,
-    VolunteerUnfavoritingModal,
     FavoritedListFullModal,
   },
   props: {
@@ -80,16 +72,11 @@ export default {
   },
   data() {
     return {
-      showVolunteerUnfavoritingModal: false,
       showFavoritedListFullModal: false,
       isFavorite: false,
     }
   },
   methods: {
-    async unfavorite(value) {
-      await this.setIsFavorite(value)
-      this.showVolunteerUnfavoritingModal = false
-    },
     async setIsFavorite(value) {
       try {
         const response = await NetworkService.updateFavoriteVolunteerStatus(
@@ -106,7 +93,7 @@ export default {
     },
     async toggleFavoritedStatus() {
       if (this.isFavorite) {
-        this.toggleVolunteerUnfavoritingModal()
+        await this.setIsFavorite(false)
         return
       }
       const {
@@ -114,9 +101,6 @@ export default {
       } = await NetworkService.getRemainingFavoriteVolunteers()
       if (remaining > 0) this.setIsFavorite(true)
       else this.toggleFavoritedListFullModal()
-    },
-    toggleVolunteerUnfavoritingModal() {
-      this.showVolunteerUnfavoritingModal = !this.showVolunteerUnfavoritingModal
     },
     toggleFavoritedListFullModal() {
       this.showFavoritedListFullModal = !this.showFavoritedListFullModal

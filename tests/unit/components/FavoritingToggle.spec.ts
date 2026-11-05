@@ -19,7 +19,6 @@ function mountToggle(
     props: { volunteerId: 'coach-1', volunteerName: 'Kenji', ...props },
     global: {
       stubs: {
-        VolunteerUnfavoritingModal: true,
         FavoritedListFullModal: true,
       },
     },
@@ -102,19 +101,22 @@ describe('FavoritingToggle', () => {
     ).not.toHaveBeenCalled()
   })
 
-  it('asks for confirmation instead of unfavoriting right away', async () => {
+  it('unfavorites the coach right away without a confirmation modal', async () => {
+    mockedNetworkService.updateFavoriteVolunteerStatus.mockResolvedValue({
+      data: { isFavorite: false },
+    } as never)
     const wrapper = mountToggle({ variant: 'badge', initialIsFavorite: true })
 
     await badge(wrapper).trigger('click')
+    await flushPromises()
 
-    expect(
-      wrapper.findComponent({ name: 'VolunteerUnfavoritingModal' }).exists()
-    ).toBe(true)
     expect(
       mockedNetworkService.getRemainingFavoriteVolunteers
     ).not.toHaveBeenCalled()
     expect(
       mockedNetworkService.updateFavoriteVolunteerStatus
-    ).not.toHaveBeenCalled()
+    ).toHaveBeenCalledWith('coach-1', { isFavorite: false })
+    expect(wrapper.emitted('change-favorited')).toEqual([['coach-1', false]])
+    expect(badge(wrapper).classes('favorite-badge--active')).toBe(false)
   })
 })
