@@ -1,13 +1,11 @@
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
-import nths from '@/store/modules/nths'
+import { useNthsStore } from '@/stores/nths'
 import NetworkService from '@/services/NetworkService'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { createStore } from 'vuex'
 import type { NTHSChecklistPublic } from '@upchieve/api-contracts/nths-checklist'
 
-vi.mock('@/store', () => ({ default: { dispatch: vi.fn() } }))
 vi.mock('@/services/NetworkService')
 
 const GROUP_ID = 'group-123'
@@ -53,22 +51,12 @@ const router = createRouter({
 async function getWrapper(
   existingChecklist: NTHSChecklistPublic | null = null
 ) {
-  const store = createStore({
-    modules: {
-      nths: {
-        ...nths,
-        state: {
-          ...nths.state,
-          NTHSChecklistData: existingChecklist,
-        },
-      },
-    },
-  })
+  useNthsStore().NTHSChecklistData = existingChecklist
   await router.push('/')
   await router.isReady()
   const wrapper = mount(DoThisNextCard, {
     props: { groupId: GROUP_ID },
-    global: { plugins: [store, router] },
+    global: { plugins: [router] },
   })
   await flushPromises()
   return wrapper
@@ -95,7 +83,7 @@ describe('DoThisNextCard', () => {
     )
   })
 
-  it('reuses a checklist that is already in Vuex', async () => {
+  it('reuses a checklist that is already in the store', async () => {
     const wrapper = await getWrapper(structuredClone(CHECKLIST))
 
     expect(NetworkService.getNTHSChecklist).not.toHaveBeenCalled()

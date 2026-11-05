@@ -4,7 +4,7 @@ import {
 } from '@/services/NTHSGroupService'
 import { STANDING_LABELS, standingFor } from '@/services/NTHSImpactService'
 import { rosterPeriodStarts } from '@/services/NTHSRosterService'
-import nths from '@/store/modules/nths'
+import { useNthsStore } from '@/stores/nths'
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import NTHSHomeView from '@/views/NTHS/Tabs/NTHSHomeView.vue'
 import {
@@ -17,7 +17,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
 import { impact } from '../../fixtures/nths'
 
-vi.mock('@/store', () => ({ default: { dispatch: vi.fn() } }))
 vi.mock('vue-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('vue-router')>()),
   useRouter: () => ({ push: vi.fn() }),
@@ -25,7 +24,8 @@ vi.mock('vue-router', async (importOriginal) => ({
 
 const getNTHSChapterImpact = vi.fn()
 const getNTHSChecklist = vi.fn()
-vi.mock('@/services/NetworkService', () => ({
+vi.mock('@/services/NetworkService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: {
     getNTHSChapterImpact: (groupId: string, monthStartsAt: Date) =>
       getNTHSChapterImpact(groupId, monthStartsAt),
@@ -50,28 +50,21 @@ function storeFor(
   userId: string,
   schoolAffiliationStatus: AffiliationStatus | null
 ) {
+  const nths = useNthsStore()
+  nths.NTHSGroups = [
+    {
+      groupInfo: {
+        id: 'group-123',
+        name: 'Test Chapter',
+        inviteCode: 'ABC123',
+      },
+      memberInfo: { roleName },
+      schoolAffiliationStatus,
+    },
+  ]
   return createStore({
     state: {
       user: { user: { id: userId, referralCode: 'PERSON123' } },
-    },
-    modules: {
-      nths: {
-        ...nths,
-        state: () => ({
-          ...nths.state,
-          NTHSGroups: [
-            {
-              groupInfo: {
-                id: 'group-123',
-                name: 'Test Chapter',
-                inviteCode: 'ABC123',
-              },
-              memberInfo: { roleName },
-              schoolAffiliationStatus,
-            },
-          ],
-        }),
-      },
     },
   })
 }

@@ -1,7 +1,7 @@
 import Checklist from '@/components/NTHS/Checklist.vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { createStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 import type {
   NTHSChecklistItemPublic,
   NTHSChecklistPublic,
@@ -32,22 +32,14 @@ const secondItem: NTHSChecklistItemPublic = {
 
 function getWrapper(item = ITEM) {
   const update = vi.fn().mockResolvedValue(undefined)
-  const store = createStore({
-    modules: {
-      nths: {
-        namespaced: true,
-        actions: {
-          updateNTHSChecklistItemProgress: (_context, payload) =>
-            update(payload),
-        },
-      },
-    },
-  })
+  vi.spyOn(
+    useNthsStore(),
+    'updateNTHSChecklistItemProgress'
+  ).mockImplementation(update)
   return {
     update,
     wrapper: mount(Checklist, {
       props: { groupId: GROUP_ID, checklist: checklistWith(item) },
-      global: { plugins: [store] },
     }),
   }
 }

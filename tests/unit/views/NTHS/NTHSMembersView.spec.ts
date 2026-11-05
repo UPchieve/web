@@ -31,9 +31,8 @@ import {
 } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 import { ref } from 'vue'
-
-vi.mock('@/store', () => ({ default: { dispatch: vi.fn() } }))
 
 // The view reads its layout width through @vueuse/core's useElementSize,
 // which needs a real ResizeObserver measuring a laid-out element. Mocking it
@@ -51,7 +50,8 @@ const getNTHSChapterRoster = vi.fn()
 const getNTHSChapterImpact = vi.fn()
 const updateNTHSGroupMember = vi.fn()
 const refreshNTHSGroups = vi.fn()
-vi.mock('@/services/NetworkService', () => ({
+vi.mock('@/services/NetworkService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: {
     getNTHSChapterRoster: (...args: unknown[]) => getNTHSChapterRoster(...args),
     getNTHSChapterImpact: (...args: unknown[]) => getNTHSChapterImpact(...args),
@@ -122,24 +122,20 @@ function storeFor(
   roleName: 'admin' | 'member' = 'admin',
   viewerId = 'president'
 ) {
+  const nths = useNthsStore()
+  nths.NTHSGroups = [
+    {
+      groupInfo: { id: 'group-123', name: 'Test Chapter' },
+      memberInfo: { roleName },
+    },
+  ]
+  nths.NTHSGroupMembers = {}
+  vi.spyOn(nths, 'refreshNTHSGroups').mockImplementation(() =>
+    refreshNTHSGroups()
+  )
   return createStore({
     state: {
-      nths: {
-        NTHSGroups: [
-          {
-            groupInfo: { id: 'group-123', name: 'Test Chapter' },
-            memberInfo: { roleName },
-          },
-        ],
-        NTHSGroupMembers: {},
-      },
       user: { user: { id: viewerId } },
-    },
-    getters: {
-      'nths/hasAdminRole': () => roleName === 'admin',
-    },
-    actions: {
-      'nths/refreshNTHSGroups': () => refreshNTHSGroups(),
     },
   })
 }
@@ -302,13 +298,10 @@ describe('NTHSMembersView', () => {
     )
 
     it('reloads the roster when the renewal prompt changes', async () => {
-      const wrapper = await getWrapper()
-      const { $store } = wrapper.vm as unknown as {
-        $store: ReturnType<typeof storeFor>
-      }
+      await getWrapper()
       expect(getNTHSChapterRoster).toHaveBeenCalledTimes(1)
 
-      const [group] = $store.state.nths.NTHSGroups as unknown as {
+      const [group] = useNthsStore().NTHSGroups as {
         renewal?: { prompt: string }
       }[]
       group.renewal = { prompt: 'confirm-return' }

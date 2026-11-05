@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { h } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { createStore } from 'vuex'
+import { createPinia, setActivePinia } from 'pinia'
 import { storeOptions } from '@/store'
+import { useNthsStore } from '@/stores/nths'
 import NetworkService from '@/services/NetworkService'
 import ModalService from '@/services/ModalService'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
@@ -27,7 +29,6 @@ vi.mock('@ionic/vue', () => ({
 const COMMITMENTS = Object.fromEntries(
   NTHS_COMMITMENTS.map(({ key }) => [key, true])
 ) as NTHSRenewalCommitments
-const nthsModule = (storeOptions.modules as any).nths
 const BASE_RENEWAL: NTHSRenewalPublic = {
   prompt: 'none',
   closesOn: '2027-09-30',
@@ -52,26 +53,21 @@ async function mountBanner(
           user: { id: userId },
         },
       },
-      nths: {
-        ...nthsModule,
-        state: {
-          ...nthsModule.state,
-          NTHSGroups: [
-            {
-              groupInfo: { id: groupId, name: 'Lincoln High NTHS' },
-              memberInfo: { roleName: 'admin' },
-              renewal: { ...BASE_RENEWAL, prompt, closesOn },
-            },
-          ],
-        },
-        actions: {
-          ...nthsModule.actions,
-          fetchNthsData: vi.fn(),
-          refreshNTHSGroups,
-        },
-      },
     },
   })
+  // A test can mount several banners, each needing its own chapter.
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  const nths = useNthsStore()
+  nths.NTHSGroups = [
+    {
+      groupInfo: { id: groupId, name: 'Lincoln High NTHS' },
+      memberInfo: { roleName: 'admin' },
+      renewal: { ...BASE_RENEWAL, prompt, closesOn },
+    },
+  ]
+  vi.spyOn(nths, 'fetchNthsData').mockImplementation(async () => [])
+  vi.spyOn(nths, 'refreshNTHSGroups').mockImplementation(refreshNTHSGroups)
   const router = createRouter({
     history: createMemoryHistory(),
     routes: ['/groups/home', '/groups/members'].map((path) => ({
@@ -82,7 +78,7 @@ async function mountBanner(
   await router.push('/groups/home')
   const wrapper = mount(RenewalBanner, {
     props: { groupId },
-    global: { plugins: [store, router] },
+    global: { plugins: [store, pinia, router] },
   })
   await flushPromises()
   return { wrapper, router }
@@ -239,8 +235,8 @@ describe('RenewalBanner', () => {
     vi.mocked(NetworkService.acceptNTHSRenewalPresidency).mockRejectedValue(
       new Error('boom')
     )
-    refreshNTHSGroups.mockImplementation(({ commit }) =>
-      commit('setNTHSGroupRenewal', {
+    refreshNTHSGroups.mockImplementation(async () =>
+      useNthsStore().setNTHSGroupRenewal({
         groupId: 'group-1',
         renewal: { ...BASE_RENEWAL, prompt: 'president-not-cleared' },
       })

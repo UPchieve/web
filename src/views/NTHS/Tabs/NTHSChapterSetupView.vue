@@ -10,19 +10,21 @@ import type {
   AffiliationStatus,
   GroupMember,
 } from '@/services/NTHSGroupService'
+import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
-const group = computed(() => store.state.nths.NTHSGroups?.[0])
+const nths = useNthsStore()
+const group = computed(() => nths.NTHSGroups?.[0])
 
 const groupMembers = computed(() => {
-  return store.state.nths.NTHSGroupMembers?.[group.value?.groupInfo?.id]
+  return nths.NTHSGroupMembers?.[group.value?.groupInfo?.id]
 })
 const currentGroupMember = computed(() =>
   groupMembers.value?.find(
     (member: GroupMember) => member.userId === store.state.user.user.id
   )
 )
-const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
+const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const SCHOOL_PATH_STATUSES: AffiliationStatus[] = [
   'PENDING_SCHOOL_AFFILIATION',
@@ -42,10 +44,7 @@ async function onLeaveTeam() {
     // would hand the modal an undefined member.
     if (!groupMembers.value?.length && group.value) {
       isFetchingGroupMembers.value = true
-      await store.dispatch(
-        'nths/fetchNTHSGroupMembers',
-        group.value?.groupInfo?.id
-      )
+      await nths.fetchNTHSGroupMembers(group.value?.groupInfo?.id)
     }
 
     ModalService.showLeaveTeamModal({

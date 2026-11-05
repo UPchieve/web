@@ -4,6 +4,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { h } from 'vue'
 import { createStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 
 const push = vi.fn()
 
@@ -16,7 +17,8 @@ vi.mock('vue-router', async (importOriginal) => ({
   useRouter: () => ({ push, replace: vi.fn(), go: vi.fn() }),
 }))
 
-vi.mock('@/services/NetworkService', () => ({
+vi.mock('@/services/NetworkService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: {
     authStatus: vi.fn(),
     getNTHSGroupByCode: vi.fn(),
@@ -29,12 +31,12 @@ const mockedNetworkService = vi.mocked(NetworkService)
 const mountView = (
   user: Record<string, unknown> = {},
   userOnServer: Record<string, unknown> = {}
-) =>
-  mount(JoinNTHSGroupView, {
+) => {
+  vi.spyOn(useNthsStore(), 'fetchNthsData').mockResolvedValue([])
+  return mount(JoinNTHSGroupView, {
     global: {
       plugins: [
         createStore({
-          state: { nths: { NTHSGroups: [] } },
           modules: {
             user: {
               namespaced: true,
@@ -67,6 +69,7 @@ const mountView = (
       },
     },
   })
+}
 
 describe('JoinNTHSGroupView', () => {
   beforeEach(() => {

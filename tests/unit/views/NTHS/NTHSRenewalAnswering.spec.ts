@@ -4,6 +4,7 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 import { h } from 'vue'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
+import { useNthsStore } from '@/stores/nths'
 import NTHSGroupsView from '@/views/NTHS/NTHSGroupsView.vue'
 import NetworkService from '@/services/NetworkService'
 import { VolunteerOccupations } from '@/services/VolunteerService'
@@ -24,7 +25,6 @@ vi.mock('@ionic/vue', () => ({
 const GROUP_ID = 'group-1'
 const CHAPTER = 'Lincoln High NTHS'
 const CLOSES_ON = '2027-09-30'
-const nthsModule = (storeOptions.modules as any).nths
 const volunteerModule = (storeOptions.modules as any).volunteer
 
 let serverRenewal: NTHSRenewalPublic
@@ -93,15 +93,9 @@ async function mountHq(
           isOnboardedAndApproved: () => viewer.isOnboardedAndApproved ?? true,
         },
       },
-      nths: {
-        ...nthsModule,
-        state: {
-          ...nthsModule.state,
-          NTHSGroups: [groupFor(serverRenewal, viewer.role)],
-        },
-      },
     },
   })
+  useNthsStore().NTHSGroups = [groupFor(serverRenewal, viewer.role)]
   const routed = (testid: string) => ({
     render: () => h('div', { 'data-testid': testid }),
   })

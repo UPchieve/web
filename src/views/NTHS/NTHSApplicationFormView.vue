@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 import useVuelidate from '@vuelidate/core'
 import FormSchoolSearch from '@/components/FormSchoolSearch.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
@@ -40,6 +41,7 @@ import {
 
 const router = useRouter()
 const store = useStore()
+const nths = useNthsStore()
 const v = useVuelidate()
 
 const step = ref<'school' | 'questions'>('school')
@@ -142,7 +144,7 @@ function restoreDraft(draft: NTHSApplicationDraft) {
 function saveDraft() {
   // fetchNthsData can learn of an application (say, from another tab) while
   // this form is open and clears the draft; saving would bring it back.
-  if (store.state.nths.NTHSCandidateApplicationStatus) return
+  if (nths.NTHSCandidateApplicationStatus) return
   setNTHSApplicationDraft(userId, {
     schoolId: school.schoolId,
     schoolName: school.schoolId ? selectedSchoolName.value : '',
@@ -206,12 +208,12 @@ async function submit() {
 
   // The refresh below can fail; without this the guards still read the applicant
   // as eligible and send them back to the apply page.
-  store.commit('nths/setNTHSCandidateApplicationStatus', 'applied')
+  nths.setNTHSCandidateApplicationStatus('applied')
 
   try {
     // user/fetchUser blanks the user on failure, so fetch directly and let errors reach the catch.
     await Promise.all([
-      store.dispatch('nths/fetchNthsData'),
+      nths.fetchNthsData(),
       NetworkService.user().then((res) => {
         if (res.data.user) {
           store.commit('user/updateUser', res.data.user)

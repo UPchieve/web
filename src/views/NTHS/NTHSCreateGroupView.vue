@@ -7,17 +7,19 @@ import { computed, ref, watch } from 'vue'
 import LoggerService from '@/services/LoggerService'
 import { isErrorWithResponse } from '@/utils/error-utils'
 import { dayjs } from '@/utils/time-utils'
+import { useNthsStore } from '@/stores/nths'
 import { nthsDestination } from '@/views/NTHS/nths-route-helpers'
 import NTHSPageLayout from '@/components/NTHS/NTHSPageLayout.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 
 const store = useStore()
+const nths = useNthsStore()
 const router = useRouter()
-const hasGroup = computed(() => store.state.nths.NTHSGroups.length)
+const hasGroup = computed(() => nths.NTHSGroups.length)
 const errorMessage = ref('')
 const approvalDeadline = computed(() => {
-  const expiresAt = store.state.nths.approvalExpiresAt
+  const expiresAt = nths.approvalExpiresAt
   return expiresAt ? dayjs(expiresAt).format('MMMM Do [at] h:mmA z') : null
 })
 
@@ -32,7 +34,7 @@ async function createTeam() {
   try {
     errorMessage.value = ''
     const results = await NetworkService.createNTHSGroup()
-    store.commit('nths/setNTHSGroups', [results.data.group])
+    nths.setNTHSGroups([results.data.group])
     AnalyticsService.captureEvent(EVENTS.NTHS_CHAPTER_CREATED)
   } catch (e) {
     if (isErrorWithResponse(e)) {

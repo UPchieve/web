@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import router from '@/router'
 import store from '@/store'
+import { useNthsStore } from '@/stores/nths'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import NTHSApplicationFormView from '@/views/NTHS/NTHSApplicationFormView.vue'
@@ -41,7 +42,7 @@ const USER_ID = 'coach-1'
 describe('NTHSApplicationFormView submit', () => {
   beforeEach(() => {
     vi.mocked(LoggerService.noticeError).mockClear()
-    store.commit('nths/setNTHSCandidateApplicationStatus', undefined)
+    useNthsStore().setNTHSCandidateApplicationStatus(undefined)
     store.commit('user/setUser', { id: USER_ID })
     localStorage.clear()
   })
@@ -82,7 +83,7 @@ describe('NTHSApplicationFormView submit', () => {
   it('does not re-save a draft once another tab reports the coach applied', async () => {
     const vm = await mountAtQuestions()
     const [firstKey] = Object.keys(vm.responses)
-    store.commit('nths/setNTHSCandidateApplicationStatus', 'applied')
+    useNthsStore().setNTHSCandidateApplicationStatus('applied')
 
     vm.responses[firstKey] = 'Changed after applying'
     await flushPromises()
@@ -137,7 +138,7 @@ describe('NTHSApplicationFormView submit', () => {
       data: { application: {} },
     } as never)
     const boom = new Error('network down')
-    vi.spyOn(store, 'dispatch').mockRejectedValue(boom)
+    vi.spyOn(useNthsStore(), 'fetchNthsData').mockRejectedValue(boom)
     vi.spyOn(NetworkService, 'user').mockResolvedValue({
       data: { user: { id: USER_ID } },
     } as never)
@@ -148,7 +149,7 @@ describe('NTHSApplicationFormView submit', () => {
     await flushPromises()
 
     expect(vm.error).toEqual('')
-    expect(store.state.nths.NTHSCandidateApplicationStatus).toEqual('applied')
+    expect(useNthsStore().NTHSCandidateApplicationStatus).toEqual('applied')
     expect(replace).toHaveBeenCalledWith('/groups/application-pending')
     expect(LoggerService.noticeError).toHaveBeenCalledWith(
       boom,
@@ -160,7 +161,7 @@ describe('NTHSApplicationFormView submit', () => {
     vi.spyOn(NetworkService, 'submitNTHSApplication').mockResolvedValue({
       data: { application: {} },
     } as never)
-    vi.spyOn(store, 'dispatch').mockResolvedValue([] as never)
+    vi.spyOn(useNthsStore(), 'fetchNthsData').mockResolvedValue([] as never)
     vi.spyOn(NetworkService, 'user').mockResolvedValue({
       data: { user: { id: USER_ID, occupation: ['A high school student'] } },
     } as never)
@@ -203,7 +204,7 @@ describe('NTHSApplicationFormView submit', () => {
 
 describe('NTHSApplicationFormView unlisted school', () => {
   beforeEach(() => {
-    store.commit('nths/setNTHSCandidateApplicationStatus', undefined)
+    useNthsStore().setNTHSCandidateApplicationStatus(undefined)
     localStorage.clear()
   })
 

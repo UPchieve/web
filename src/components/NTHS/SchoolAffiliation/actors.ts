@@ -9,7 +9,7 @@ import type {
   NTHSSchoolAffiliationActionName,
 } from '@/services/NTHSGroupService'
 import NetworkService from '@/services/NetworkService'
-import store from '@/store'
+import { useNthsStore } from '@/stores/nths'
 
 // UNAFFILIATED is not a decision, so it starts on the same panel as a chapter
 // with no affiliation row at all.
@@ -79,11 +79,11 @@ export function recordAffiliationStatus(
   _: unknown,
   params: { groupId: string; schoolAffiliationStatus: AffiliationStatus }
 ) {
-  store.commit('nths/setNTHSGroupSchoolAffiliationStatus', params)
+  useNthsStore().setNTHSGroupSchoolAffiliationStatus(params)
 }
 
 // Same staleness, but this response nests the new status under `action` rather
 // than returning it as the actor's output, so refetch instead.
 export function refetchGroup() {
-  store.dispatch('nths/fetchNthsData')
+  useNthsStore().fetchNthsData()
 }

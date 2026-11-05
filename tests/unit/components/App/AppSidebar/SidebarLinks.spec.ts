@@ -3,6 +3,7 @@ import { h, nextTick, type Component } from 'vue'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
+import { useNthsStore } from '@/stores/nths'
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -173,14 +174,12 @@ const getWrapper = (options: WrapperOptions = {}) => {
           ...(options.featureFlags?.getters ?? {}),
         },
       },
-      nths: {
-        ...storeOptions.modules.nths,
-        state: {
-          ...DEFAULTS.nths.state,
-          ...(options.nths?.state ?? {}),
-        },
-      },
     },
+  })
+  const nths = useNthsStore()
+  Object.assign(nths, {
+    ...DEFAULTS.nths.state,
+    ...(options.nths?.state ?? {}),
   })
 
   return shallowMount(SidebarLinks, {

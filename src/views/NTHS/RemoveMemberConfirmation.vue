@@ -4,16 +4,16 @@ import type { GroupMember } from '@/services/NTHSGroupService'
 import LargeButton from '@/components/LargeButton.vue'
 import NetworkService, { isNetworkError } from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
-import { useStore } from 'vuex'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useNthsStore } from '@/stores/nths'
 
 export type RemoveMemberConfirmationProps = {
   memberToRemove: GroupMember
   isRemovingSelf: boolean
 }
 
-const store = useStore()
+const nths = useNthsStore()
 
 const modalStore = useAppModalStore()
 const router = useRouter()
@@ -37,11 +37,11 @@ async function removeTeamMember() {
     const groupId = props.memberToRemove.nthsGroupId
     if (props.isRemovingSelf) {
       await NetworkService.leaveNthsChapter(props.memberToRemove.nthsGroupId)
-      store.commit('nths/setNTHSGroupMembers', {
+      nths.setNTHSGroupMembers({
         groupId,
         groupMembers: [],
       })
-      await store.dispatch('nths/fetchNthsData')
+      await nths.fetchNthsData()
       await router.push('/dashboard')
     } else {
       await NetworkService.updateNTHSGroupMember(
@@ -52,12 +52,12 @@ async function removeTeamMember() {
         }
       )
       // The Members tab reads the roster endpoint and never fills
-      // nths/NTHSGroupMembers, so only filter the cache when Chapter setup
-      // has loaded it; committing [] would leave its Leave Team button with
+      // the store's NTHSGroupMembers, so only filter the cache when Chapter
+      // setup has loaded it; setting [] would leave its Leave Team button with
       // no current member.
-      const cached = store.state.nths.NTHSGroupMembers?.[groupId]
+      const cached = nths.NTHSGroupMembers?.[groupId]
       if (cached) {
-        store.commit('nths/setNTHSGroupMembers', {
+        nths.setNTHSGroupMembers({
           groupId,
           groupMembers: cached.filter(
             (member: GroupMember) =>

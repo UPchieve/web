@@ -41,12 +41,14 @@ import {
   type RosterSortKey,
 } from '@/services/NTHSRosterService'
 import { plural } from '@/utils/plural'
+import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
-const group = computed(() => store.state.nths.NTHSGroups?.[0])
+const nths = useNthsStore()
+const group = computed(() => nths.NTHSGroups?.[0])
 const groupId = computed(() => group.value?.groupInfo?.id)
 const currentUserId = computed(() => store.state.user.user.id)
-const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
+const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const {
   members,
@@ -202,8 +204,8 @@ async function updateMember(
     patchMember(member.userId, patch)
     refreshRoster(groupId.value, now)
     if (member.userId === currentUserId.value) {
-      store
-        .dispatch('nths/refreshNTHSGroups')
+      nths
+        .refreshNTHSGroups()
         .catch((err) =>
           LoggerService.noticeError(err, 'Could not refresh NTHS groups')
         )

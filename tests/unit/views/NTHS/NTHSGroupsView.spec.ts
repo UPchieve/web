@@ -10,6 +10,7 @@ import userModule, { type UserStoreState } from '@/store/modules/user'
 import { createStore, type Store } from 'vuex'
 import { h } from 'vue'
 import { useAppModalStore } from '@/stores/app/modal'
+import { useNthsStore } from '@/stores/nths'
 
 type UserOverrides = {
   occupation?: string[] | null
@@ -21,23 +22,24 @@ const fetchNthsData = vi.fn()
 const refreshNTHSGroups = vi.fn()
 
 function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
+  const nths = useNthsStore()
+  nths.NTHSGroups = [
+    {
+      groupInfo: { id: 'group-123', name: 'Test Chapter' },
+      memberInfo: { roleName },
+      renewal: userOverrides.renewalPrompt
+        ? {
+            prompt: userOverrides.renewalPrompt,
+            closesOn: '2027-09-30',
+            successorConfirmationOn: '2027-08-01',
+          }
+        : undefined,
+    },
+  ]
+  vi.spyOn(nths, 'fetchNthsData').mockImplementation(fetchNthsData)
+  vi.spyOn(nths, 'refreshNTHSGroups').mockImplementation(refreshNTHSGroups)
   return createStore({
     state: {
-      nths: {
-        NTHSGroups: [
-          {
-            groupInfo: { id: 'group-123', name: 'Test Chapter' },
-            memberInfo: { roleName },
-            renewal: userOverrides.renewalPrompt
-              ? {
-                  prompt: userOverrides.renewalPrompt,
-                  closesOn: '2027-09-30',
-                  successorConfirmationOn: '2027-08-01',
-                }
-              : undefined,
-          },
-        ],
-      },
       // A member who isn't a high-school student or isn't ready to tutor has
       // the whole tab strip hidden behind a callout, which is a separate gate
       // from admin/member tab visibility - keep it out of the way here.
@@ -58,26 +60,17 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
         ),
       'volunteer/isOnboardedAndApproved': () =>
         userOverrides.isOnboardedAndApproved ?? true,
-      'nths/hasAdminRole': () => roleName === 'admin',
     },
     mutations: {
       setOccupation(state, occupation) {
         state.user.user.occupation = occupation
       },
     },
-    actions: {
-      'nths/fetchNthsData': fetchNthsData,
-      'nths/refreshNTHSGroups': refreshNTHSGroups,
-    },
   })
 }
 
-function removeCoachFromChapter({
-  state,
-}: {
-  state: { nths: { NTHSGroups: unknown[] } }
-}) {
-  state.nths.NTHSGroups = []
+function removeCoachFromChapter() {
+  useNthsStore().setNTHSGroups([])
   return []
 }
 
@@ -308,9 +301,9 @@ describe('NTHSGroupsView', () => {
     it('leaves the route alone when the view unmounts before the refresh lands', async () => {
       let finishRefresh: () => void = () => undefined
       refreshNTHSGroups.mockImplementation(
-        (context) =>
+        () =>
           new Promise((resolve) => {
-            finishRefresh = () => resolve(removeCoachFromChapter(context))
+            finishRefresh = () => resolve(removeCoachFromChapter())
           })
       )
       const wrapper = await getWrapper('/groups/home')

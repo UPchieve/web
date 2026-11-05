@@ -2,14 +2,10 @@ import SchoolAffiliation from '@/components/NTHS/SchoolAffiliation.vue'
 import Spinner from '@/components/Spinner.vue'
 import type { AffiliationStatus } from '@/services/NTHSGroupService'
 import NetworkService from '@/services/NetworkService'
-import store from '@/store'
+import { useNthsStore } from '@/stores/nths'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { AxiosError } from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-vi.mock('@/store', () => ({
-  default: { dispatch: vi.fn(), commit: vi.fn() },
-}))
 
 const GROUP_ID = 'group-123'
 
@@ -87,11 +83,12 @@ function labelledBy(wrapper: VueWrapper, selector: string) {
 // The POST answers with the new status, so the card writes that one field back
 // rather than refetching the group.
 function expectRecordedStatus(schoolAffiliationStatus: AffiliationStatus) {
-  expect(store.commit).toHaveBeenCalledWith(
-    'nths/setNTHSGroupSchoolAffiliationStatus',
-    { groupId: GROUP_ID, schoolAffiliationStatus }
-  )
-  expect(store.dispatch).not.toHaveBeenCalled()
+  expect(nthsActions).toEqual([
+    {
+      name: 'setNTHSGroupSchoolAffiliationStatus',
+      args: [{ groupId: GROUP_ID, schoolAffiliationStatus }],
+    },
+  ])
 }
 
 function isHighlighted(wrapper: VueWrapper, selector: string) {
@@ -122,10 +119,15 @@ function holdCreateAction() {
     release(schoolAffiliationStatus)
 }
 
+let nthsActions: { name: string; args: unknown[] }[]
+
 describe('SchoolAffiliation', () => {
   beforeEach(() => {
-    vi.mocked(store.dispatch).mockClear()
-    vi.mocked(store.commit).mockClear()
+    const nths = useNthsStore()
+    nthsActions = []
+    nths.$onAction(({ name, args }) => {
+      nthsActions.push({ name, args })
+    })
     NetworkService.createActionForNTHSGroup = vi
       .fn()
       .mockResolvedValue({ data: { schoolAffiliationStatus: 'OPTED_OUT' } })
@@ -327,7 +329,7 @@ describe('SchoolAffiliation', () => {
     expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(true)
     expect(wrapper.find(TRY_AGAIN_BUTTON).exists()).toBe(true)
     expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(store.commit).not.toHaveBeenCalled()
+    expect(nthsActions).toEqual([])
 
     wrapper.unmount()
   })
@@ -455,7 +457,7 @@ describe('SchoolAffiliation', () => {
     expect(wrapper.findComponent(Spinner).exists()).toBe(false)
     expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
     expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(store.commit).not.toHaveBeenCalled()
+    expect(nthsActions).toEqual([])
 
     vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
       data: { schoolAffiliationStatus: 'OPTED_OUT' },
@@ -483,7 +485,7 @@ describe('SchoolAffiliation', () => {
     expect(wrapper.findComponent(Spinner).exists()).toBe(false)
     expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(true)
     expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(store.commit).not.toHaveBeenCalled()
+    expect(nthsActions).toEqual([])
 
     vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
       data: { schoolAffiliationStatus: 'PENDING_SCHOOL_AFFILIATION' },

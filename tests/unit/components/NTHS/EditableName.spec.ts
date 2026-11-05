@@ -8,7 +8,7 @@ import {
   mount,
 } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 
 const GROUP_ID = 'group-123'
 const SAVED_NAME = 'NTHS at Lincoln High School'
@@ -16,14 +16,11 @@ const SAVED_NAME = 'NTHS at Lincoln High School'
 const setNTHSGroupName = vi.fn()
 
 function getWrapper() {
-  const store = createStore({
-    modules: {
-      nths: { namespaced: true, mutations: { setNTHSGroupName } },
-    },
-  })
+  vi.spyOn(useNthsStore(), 'setNTHSGroupName').mockImplementation(
+    setNTHSGroupName
+  )
   return mount(EditableName, {
     props: { groupId: GROUP_ID, groupName: SAVED_NAME },
-    global: { plugins: [store] },
     attachTo: document.body,
   })
 }
@@ -71,7 +68,7 @@ describe('EditableName', () => {
       groupId: GROUP_ID,
       name: 'Bay Area Tutors',
     })
-    expect(setNTHSGroupName).toHaveBeenCalledWith(expect.anything(), {
+    expect(setNTHSGroupName).toHaveBeenCalledWith({
       groupId: GROUP_ID,
       groupName: 'Bay Area Tutors',
     })

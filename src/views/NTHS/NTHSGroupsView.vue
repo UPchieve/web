@@ -11,11 +11,13 @@ import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
 import LoggerService from '@/services/LoggerService'
 import { renewalWarningLine } from '@/services/NTHSRenewalService'
 import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
+import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
+const nths = useNthsStore()
 const router = useRouter()
-const group = computed(() => store.state.nths.NTHSGroups?.[0])
-const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
+const group = computed(() => nths.NTHSGroups?.[0])
+const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const tabs = computed(() =>
   [
@@ -101,7 +103,7 @@ onBeforeUnmount(() => {
 // would otherwise stay as they were when the coach first opened Chapter HQ.
 async function refreshNTHSData(): Promise<void> {
   try {
-    const groups = await store.dispatch('nths/refreshNTHSGroups')
+    const groups = await nths.refreshNTHSGroups()
     // The /groups route guard runs only on entry, so a coach removed mid-visit is moved here.
     if (!groups.length) {
       const redirect = await resolveNthsRoute(

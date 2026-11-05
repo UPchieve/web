@@ -8,6 +8,7 @@ import {
 } from 'vue-router'
 import store from './store'
 import { useAppModalStore } from '@/stores/app/modal'
+import { useNthsStore } from '@/stores/nths'
 const AdminView = () => import('./views/Admin/index.vue')
 const AdminCleverRoster = () => import('./views/Admin/AdminCleverRoster.vue')
 const AdminNTHS = () => import('./views/Admin/AdminNTHS.vue')
@@ -154,8 +155,11 @@ const nthsRouteGuard =
 // The tab strip hides To do from a member; this keeps a typed URL or an old
 // bookmark from rendering a view whose endpoints would 403.
 const nthsAdminOnly: NavigationGuard = (_to, _from, next) => {
-  if (store.getters['nths/hasAdminRole']) next()
-  else next('/groups/home')
+  if (useNthsStore().hasAdminRole) {
+    next()
+  } else {
+    next('/groups/home')
+  }
 }
 
 const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {

@@ -10,7 +10,6 @@ import botConversationsModule, {
 } from './modules/bot-conversations'
 import liveMediaModule from './modules/liveMedia'
 import americaCountsVolunteerModule from './modules/america-counts-volunteer'
-import nthsModule from './modules/nths'
 
 // TODO: Update with the type of all the modules once convert to TS.
 // TODO: Move to a types store file to avoid any potential circular dependency issues
@@ -32,7 +31,6 @@ export const storeOptions = {
     liveMedia: liveMediaModule,
     botConversations: botConversationsModule,
     americaCountsVolunteer: americaCountsVolunteerModule,
-    nths: nthsModule,
   },
 }
 

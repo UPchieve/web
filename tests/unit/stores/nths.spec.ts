@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createStore } from 'vuex'
-import { storeOptions } from '@/store'
+import vuexStore from '@/store'
+import { useNthsStore } from '@/stores/nths'
 import NetworkService from '@/services/NetworkService'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
@@ -13,12 +13,13 @@ import type { NTHSChecklistPublic } from '@upchieve/api-contracts/nths-checklist
 vi.mock('@/services/NetworkService')
 vi.mock('@/services/AnalyticsService')
 
-const nthsModule = (storeOptions.modules as any).nths
-
-describe('nths/fetchNthsData', () => {
+describe('fetchNthsData', () => {
   const USER_ID = 'coach-1'
 
-  beforeEach(() => localStorage.clear())
+  beforeEach(() => {
+    localStorage.clear()
+    vuexStore.commit('user/setUser', {})
+  })
 
   it.each([
     { candidateApplicationStatus: 'applied', keepsDraft: false },
@@ -33,19 +34,83 @@ describe('nths/fetchNthsData', () => {
         { data: { eligible: false } } as never
       )
       const store = getStore()
-      store.commit('user/setUser', { id: USER_ID })
+      vuexStore.commit('user/setUser', { id: USER_ID })
       setNTHSApplicationDraft(USER_ID, {
         schoolId: 'school-1',
         schoolName: 'Riverside High',
         cannotFindSchool: false,
-        unlistedSchool: { name: '', city: '', state: '', website: '' },
+        unlistedSchool: {
+          name: '',
+          city: '',
+          country: '',
+          state: '',
+          region: '',
+          website: '',
+        },
         gradeLevel: '10th grade',
         responses: {},
       })
 
-      await store.dispatch('nths/fetchNthsData')
+      await store.fetchNthsData()
 
       expect(getNTHSApplicationDraft(USER_ID) !== undefined).toBe(keepsDraft)
+    }
+  )
+
+  function mockGroups(groups: unknown[]) {
+    vi.mocked(NetworkService.getNTHSGroupsForUser).mockResolvedValue({
+      data: { groups },
+    } as never)
+    vi.mocked(NetworkService.getNTHSApplicationEligibility).mockResolvedValue({
+      data: { eligible: false },
+    } as never)
+    vi.mocked(AnalyticsService.setContactCustomData).mockClear()
+  }
+
+  it('sends no NTHS status to Gleap without a signed-in user', async () => {
+    mockGroups([{ memberInfo: { roleName: 'admin', title: 'President' } }])
+
+    await getStore().fetchNthsData()
+
+    expect(AnalyticsService.setContactCustomData).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    {
+      who: 'a plain member',
+      memberInfo: { roleName: 'member', title: 'Member' },
+      isNthsAdmin: false,
+      isNthsPresident: false,
+    },
+    {
+      who: 'an admin who is not President',
+      memberInfo: { roleName: 'admin', title: 'Vice President' },
+      isNthsAdmin: true,
+      isNthsPresident: false,
+    },
+    {
+      who: 'a President admin',
+      memberInfo: { roleName: 'admin', title: 'President' },
+      isNthsAdmin: true,
+      isNthsPresident: true,
+    },
+  ])(
+    'sends the NTHS status of $who to Gleap',
+    async ({ memberInfo, isNthsAdmin, isNthsPresident }) => {
+      mockGroups([{ memberInfo }])
+      vuexStore.commit('user/setUser', { id: USER_ID })
+
+      await getStore().fetchNthsData()
+
+      expect(AnalyticsService.setContactCustomData).toHaveBeenCalledWith(
+        USER_ID,
+        {
+          nthsStatus: 'group',
+          isNthsMember: true,
+          isNthsAdmin,
+          isNthsPresident,
+        }
+      )
     }
   )
 
@@ -55,7 +120,7 @@ describe('nths/fetchNthsData', () => {
     } as never)
     vi.mocked(NetworkService.getNTHSApplicationEligibility).mockClear()
 
-    await getStore().dispatch('nths/refreshNTHSGroups')
+    await getStore().refreshNTHSGroups()
 
     expect(NetworkService.getNTHSApplicationEligibility).not.toHaveBeenCalled()
   })
@@ -74,9 +139,9 @@ describe('nths/fetchNthsData', () => {
     } as never)
     const store = getStore()
 
-    await store.dispatch('nths/fetchNthsData')
+    await store.fetchNthsData()
 
-    expect(store.state.nths.approvalExpiresAt).toBe(approvalExpiresAt)
+    expect(store.approvalExpiresAt).toBe(approvalExpiresAt)
   })
 })
 
@@ -102,15 +167,9 @@ const DYNAMIC_CHECKLIST: NTHSChecklistPublic = {
 }
 
 function getStore(checklist: NTHSChecklistPublic | null = null) {
-  return createStore({
-    modules: {
-      ...storeOptions.modules,
-      nths: {
-        ...nthsModule,
-        state: { ...nthsModule.state, NTHSChecklistData: checklist },
-      },
-    },
-  })
+  const nths = useNthsStore()
+  nths.NTHSChecklistData = checklist
+  return nths
 }
 
 describe('nths dynamic checklist state', () => {
@@ -122,9 +181,9 @@ describe('nths dynamic checklist state', () => {
     })
     const store = getStore()
 
-    await store.dispatch('nths/fetchNTHSChecklist', 'group-1')
+    await store.fetchNTHSChecklist('group-1')
 
-    expect(store.state.nths.NTHSChecklistData).toEqual(DYNAMIC_CHECKLIST)
+    expect(store.NTHSChecklistData).toEqual(DYNAMIC_CHECKLIST)
   })
 
   it('tracks a failed checklist load with its HTTP status', async () => {
@@ -135,26 +194,24 @@ describe('nths dynamic checklist state', () => {
     vi.mocked(NetworkService.getNTHSChecklist).mockRejectedValueOnce(failure)
     const store = getStore()
 
-    await expect(
-      store.dispatch('nths/fetchNTHSChecklist', 'group-1')
-    ).rejects.toBe(failure)
+    await expect(store.fetchNTHSChecklist('group-1')).rejects.toBe(failure)
 
     expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
       EVENTS.NTHS_CHECKLIST_LOAD_FAILED,
       { groupId: 'group-1', httpStatus: 503 }
     )
-    expect(store.state.nths.NTHSChecklistData).toBeNull()
+    expect(store.NTHSChecklistData).toBeNull()
   })
 
   it.each(['complete', 'incomplete', 'skipped'] as const)(
-    'persists %s and saves the backend response in Vuex',
+    'persists %s and saves the backend response in the store',
     async (status) => {
       vi.mocked(
         NetworkService.updateNTHSChecklistItemProgress
       ).mockResolvedValue({ itemKey: 'invite-members', status })
       const store = getStore(structuredClone(DYNAMIC_CHECKLIST))
 
-      await store.dispatch('nths/updateNTHSChecklistItemProgress', {
+      await store.updateNTHSChecklistItemProgress({
         groupId: 'group-1',
         itemKey: 'invite-members',
         status,
@@ -163,9 +220,7 @@ describe('nths dynamic checklist state', () => {
       expect(
         NetworkService.updateNTHSChecklistItemProgress
       ).toHaveBeenLastCalledWith('group-1', 'invite-members', { status })
-      expect(
-        store.state.nths.NTHSChecklistData.sections[0].items[0].status
-      ).toBe(status)
+      expect(store.NTHSChecklistData!.sections[0].items[0].status).toBe(status)
       expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
         EVENTS.NTHS_CHECKLIST_ITEM_UPDATED,
         {
@@ -190,7 +245,7 @@ describe('nths dynamic checklist state', () => {
     const store = getStore(structuredClone(DYNAMIC_CHECKLIST))
 
     await expect(
-      store.dispatch('nths/updateNTHSChecklistItemProgress', {
+      store.updateNTHSChecklistItemProgress({
         groupId: 'group-1',
         itemKey: 'invite-members',
         status: 'complete',

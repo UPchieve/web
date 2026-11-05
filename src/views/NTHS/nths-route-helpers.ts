@@ -3,6 +3,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
 import { dayjs } from '@/utils/time-utils'
+import { useNthsStore } from '@/stores/nths'
 
 export type NTHSDestination =
   | 'group'
@@ -33,10 +34,11 @@ export const NTHS_DESTINATION_LABELS: Record<NTHSDestination, string> = {
 // A rejection here would abort the navigation and leave every NTHS route
 // unreachable, so a failed load falls through to whatever the store already has.
 // Returns whether the store can be trusted to describe the coach.
-export async function loadNTHSData(store: Store<any>): Promise<boolean> {
-  if (store.state.nths.NTHSGroups.length > 0) return true
+export async function loadNTHSData(): Promise<boolean> {
+  const nths = useNthsStore()
+  if (nths.NTHSGroups.length > 0) return true
   try {
-    await store.dispatch('nths/fetchNthsData')
+    await nths.fetchNthsData()
     return true
   } catch (err) {
     LoggerService.noticeError(err, 'Could not load NTHS data for routing')
@@ -45,30 +47,27 @@ export async function loadNTHSData(store: Store<any>): Promise<boolean> {
 }
 
 export type NTHSDestinationSource = {
-  state: { nths: Record<string, any> }
   getters: Record<string, any>
 }
 
 export function nthsDestination(
   store: NTHSDestinationSource
 ): NTHSDestination | undefined {
-  const {
-    NTHSGroups,
-    NTHSCandidateApplicationStatus,
-    canApplyForNTHSPresident,
-    approvalExpiresAt,
-  } = store.state.nths
+  const nths = useNthsStore()
 
-  if (NTHSGroups.length > 0) return 'group'
-  if (NTHSCandidateApplicationStatus === 'approved') {
-    if (approvalExpiresAt && !dayjs(approvalExpiresAt).isAfter(dayjs()))
+  if (nths.NTHSGroups.length > 0) return 'group'
+  if (nths.NTHSCandidateApplicationStatus === 'approved') {
+    if (
+      nths.approvalExpiresAt &&
+      !dayjs(nths.approvalExpiresAt).isAfter(dayjs())
+    )
       return 'expired'
     return 'create'
   }
-  if (NTHSCandidateApplicationStatus === 'applied') return 'pending'
+  if (nths.NTHSCandidateApplicationStatus === 'applied') return 'pending'
 
   if (!store.getters['featureFlags/isNTHSApplicationPageEnabled']) return
-  if (canApplyForNTHSPresident) return 'apply'
+  if (nths.canApplyForNTHSPresident) return 'apply'
 }
 
 // Every NTHS route asks the same question, so they all defer to nthsDestination.
@@ -79,23 +78,20 @@ export async function resolveNthsRoute(
   destination: NTHSDestination,
   attemptedPath: string
 ): Promise<string | undefined> {
-  const loaded = await loadNTHSData(store)
+  const loaded = await loadNTHSData()
   const belongsAt = nthsDestination(store)
   // A failed load leaves the store empty, which looks the same as an ineligible
   // coach. Skip the analytics event here since it would record a network error
   // as an eligibility block.
   if (!belongsAt && !loaded) return '/dashboard'
-  if (!belongsAt) return redirectBlockedApplicant(store, attemptedPath)
+  if (!belongsAt) return redirectBlockedApplicant(attemptedPath)
   if (belongsAt === destination) return
   return NTHS_DESTINATION_PATHS[belongsAt]
 }
 
-export function redirectBlockedApplicant(
-  store: Store<any>,
-  attemptedPath: string
-): string {
+export function redirectBlockedApplicant(attemptedPath: string): string {
   AnalyticsService.captureEvent(EVENTS.NTHS_APPLICATION_BLOCKED, {
-    reasons: store.state.nths.NTHSApplicationIneligibilityReasons,
+    reasons: useNthsStore().NTHSApplicationIneligibilityReasons,
     attemptedRoute: attemptedPath,
   })
   return '/dashboard'

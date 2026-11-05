@@ -11,17 +11,19 @@ import InviteLink from '@/components/NTHS/InviteLink.vue'
 import TopTutorCard from '@/components/NTHS/TopTutorCard.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { NTHS_RECRUITMENT_TEMPLATES_URL } from '@/services/NTHSGroupService'
+import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
+const nths = useNthsStore()
 const router = useRouter()
 
-const group = computed(() => store.state.nths.NTHSGroups?.[0])
+const group = computed(() => nths.NTHSGroups?.[0])
 const groupId = computed(() => group.value?.groupInfo?.id)
 const currentUserId = computed(() => store.state.user.user.id)
 const currentUserReferralCode = computed(
   () => store.state.user.user.referralCode
 )
-const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
+const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const { impact, isLoading, loadFailed, load } = useChapterImpact()
 

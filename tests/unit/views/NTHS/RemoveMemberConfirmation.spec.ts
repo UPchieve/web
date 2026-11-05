@@ -3,9 +3,8 @@ import LoggerService from '@/services/LoggerService'
 import { NetworkError } from '@/services/NetworkService'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 
-vi.mock('@/store', () => ({ default: { dispatch: vi.fn() } }))
 vi.mock('vue-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('vue-router')>()),
   useRouter: () => ({ push: vi.fn() }),
@@ -37,24 +36,16 @@ const SOLE_ADMIN_ERROR = new NetworkError(
 )
 
 function getWrapper(isRemovingSelf = false, cachedMembers?: (typeof MEMBER)[]) {
-  const setNTHSGroupMembers = vi.fn()
-  const state = {
-    nths: {
-      NTHSGroupMembers: cachedMembers
-        ? { [MEMBER.nthsGroupId]: cachedMembers }
-        : {},
-    },
-  }
-  const store = createStore({
-    state,
-    mutations: { 'nths/setNTHSGroupMembers': setNTHSGroupMembers },
-    actions: {
-      'nths/fetchNthsData': vi.fn(),
-    },
-  })
+  const nths = useNthsStore()
+  nths.NTHSGroupMembers = cachedMembers
+    ? { [MEMBER.nthsGroupId]: cachedMembers }
+    : {}
+  const setNTHSGroupMembers = vi
+    .spyOn(nths, 'setNTHSGroupMembers')
+    .mockImplementation(() => {})
+  vi.spyOn(nths, 'fetchNthsData').mockImplementation(async () => [])
   const wrapper = mount(RemoveMemberConfirmation, {
     props: { memberToRemove: MEMBER, isRemovingSelf },
-    global: { plugins: [store] },
   })
   return { wrapper, setNTHSGroupMembers }
 }
@@ -160,7 +151,7 @@ describe('RemoveMemberConfirmation', () => {
 
       if (expectedRemainingIds) {
         expect(setNTHSGroupMembers).toHaveBeenCalledTimes(1)
-        const [, payload] = setNTHSGroupMembers.mock.calls[0]
+        const [payload] = setNTHSGroupMembers.mock.calls[0]
         expect(
           payload.groupMembers.map((m: { userId: string }) => m.userId)
         ).toEqual(expectedRemainingIds)

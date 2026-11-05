@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 import Spinner from '@/components/Spinner.vue'
 import ExternalPage from '@/assets/ExternalPage.svg'
 import HQSection from './HQ/HQSection.vue'
@@ -15,7 +15,7 @@ const props = defineProps<{
   groupId: string
   checklist: NTHSChecklistPublic
 }>()
-const store = useStore()
+const nths = useNthsStore()
 const savingItems = ref(new Set<string>())
 const itemErrors = ref<Record<string, string>>({})
 
@@ -50,7 +50,7 @@ async function updateStatus(
   savingItems.value = new Set(savingItems.value).add(item.key)
   itemErrors.value = { ...itemErrors.value, [item.key]: '' }
   try {
-    await store.dispatch('nths/updateNTHSChecklistItemProgress', {
+    await nths.updateNTHSChecklistItemProgress({
       groupId: props.groupId,
       itemKey: item.key,
       status,

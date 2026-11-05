@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeMount, ref } from 'vue'
-import { useStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 import { RouterLink } from 'vue-router'
 import LoggerService from '@/services/LoggerService'
 import type {
@@ -10,9 +10,9 @@ import type {
 
 const props = defineProps<{ groupId: string }>()
 const emit = defineEmits<{ (e: 'finished'): void }>()
-const store = useStore()
+const nths = useNthsStore()
 const checklist = computed<NTHSChecklistPublic | null>(
-  () => store.state.nths.NTHSChecklistData
+  () => nths.NTHSChecklistData
 )
 const isLoading = ref(true)
 const loadFailed = ref(false)
@@ -20,7 +20,7 @@ const loadFailed = ref(false)
 onBeforeMount(async () => {
   try {
     if (!checklist.value) {
-      await store.dispatch('nths/fetchNTHSChecklist', props.groupId)
+      await nths.fetchNTHSChecklist(props.groupId)
     }
   } catch (err) {
     loadFailed.value = true
@@ -54,7 +54,7 @@ async function updateItem(
   errorMessage.value = ''
   announcement.value = ''
   try {
-    await store.dispatch('nths/updateNTHSChecklistItemProgress', {
+    await nths.updateNTHSChecklistItemProgress({
       groupId: props.groupId,
       itemKey: current.key,
       status,

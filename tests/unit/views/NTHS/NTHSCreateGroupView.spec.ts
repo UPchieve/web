@@ -2,6 +2,7 @@ import NTHSCreateGroupView from '@/views/NTHS/NTHSCreateGroupView.vue'
 import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 import NetworkService from '@/services/NetworkService'
 
 const replace = vi.fn()
@@ -9,20 +10,17 @@ vi.mock('vue-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('vue-router')>()),
   useRouter: () => ({ replace }),
 }))
-vi.mock('@/services/NetworkService', () => ({
+vi.mock('@/services/NetworkService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: { createNTHSGroup: vi.fn() },
 }))
 
 function mountView(approvalExpiresAt: string | null) {
-  const store = createStore({
-    state: {
-      nths: {
-        NTHSGroups: [],
-        NTHSCandidateApplicationStatus: 'approved',
-        approvalExpiresAt,
-      },
-    },
-  })
+  const store = createStore({})
+  const nths = useNthsStore()
+  nths.NTHSGroups = []
+  nths.NTHSCandidateApplicationStatus = 'approved'
+  nths.approvalExpiresAt = approvalExpiresAt
   return mount(NTHSCreateGroupView, { global: { plugins: [store] } })
 }
 

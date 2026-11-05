@@ -2,25 +2,17 @@ import {
   NTHS_ORIENTATION_URL,
   NTHS_RESOURCES_URL,
 } from '@/services/NTHSGroupService'
+import { useNthsStore } from '@/stores/nths'
 import NTHSResourcesView from '@/views/NTHS/Tabs/NTHSResourcesView.vue'
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
-import { createStore } from 'vuex'
 
 function linksFor(roleName: string) {
-  const store = createStore({
-    state: {
-      nths: {
-        NTHSGroups: [
-          { groupInfo: { id: 'group-123' }, memberInfo: { roleName } },
-        ],
-      },
-    },
-    getters: {
-      'nths/hasAdminRole': () => roleName === 'admin',
-    },
-  })
-  const wrapper = mount(NTHSResourcesView, { global: { plugins: [store] } })
+  const nths = useNthsStore()
+  nths.NTHSGroups = [
+    { groupInfo: { id: 'group-123' }, memberInfo: { roleName } },
+  ]
+  const wrapper = mount(NTHSResourcesView)
   return wrapper.findAll('a').map((link) => link.attributes('href'))
 }
 

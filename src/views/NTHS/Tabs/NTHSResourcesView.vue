@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useStore } from 'vuex'
 import {
   NTHS_ORIENTATION_URL,
   NTHS_RESOURCES_URL,
 } from '@/services/NTHSGroupService'
 import GraduationCap from '@/assets/icons/graduation_cap_icon.svg'
 import OpenBook from '@/assets/icons/open_book_icon.svg'
+import { useNthsStore } from '@/stores/nths'
 
-const store = useStore()
-const isGroupAdmin = computed(() => store.getters['nths/hasAdminRole'])
+const nths = useNthsStore()
+const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const allResources = [
   {

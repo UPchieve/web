@@ -8,6 +8,7 @@ import {
   redirectBlockedApplicant,
 } from '@/views/NTHS/nths-route-helpers'
 import LoggerService from '@/services/LoggerService'
+import { useNthsStore } from '@/stores/nths'
 import { hoursInMs } from '@/utils/time-utils'
 
 vi.mock('@/services/LoggerService', () => ({
@@ -35,18 +36,15 @@ function fakeStore({
   reasons = [],
   expiresAt = null,
 }: StoreShape) {
+  const nths = useNthsStore()
+  nths.NTHSGroups = [...groups]
+  nths.NTHSCandidateApplicationStatus = status
+  nths.canApplyForNTHSPresident = canApply
+  nths.approvalExpiresAt = expiresAt
+  nths.NTHSApplicationIneligibilityReasons = reasons
+  vi.spyOn(nths, 'fetchNthsData').mockResolvedValue([])
   return {
-    state: {
-      nths: {
-        NTHSGroups: groups,
-        NTHSCandidateApplicationStatus: status,
-        canApplyForNTHSPresident: canApply,
-        approvalExpiresAt: expiresAt,
-        NTHSApplicationIneligibilityReasons: reasons,
-      },
-    },
     getters: { 'featureFlags/isNTHSApplicationPageEnabled': applicationPageOn },
-    dispatch: vi.fn().mockResolvedValue([]),
   } as never
 }
 
@@ -151,27 +149,27 @@ describe('nthsDestination', () => {
 
 describe('loadNTHSData', () => {
   it('fetches when the store holds no chapter', async () => {
-    const store = fakeStore({ groups: [] })
-    await loadNTHSData(store)
-    expect((store as any).dispatch).toHaveBeenCalledWith('nths/fetchNthsData')
+    fakeStore({ groups: [] })
+    await loadNTHSData()
+    expect(useNthsStore().fetchNthsData).toHaveBeenCalled()
   })
 
   // Membership is the top destination, so there is nothing a refetch could
   // change about the answer.
   it('skips the fetch once a chapter is in the store', async () => {
-    const store = fakeStore({ groups: [{ groupId: 123 }] })
-    await loadNTHSData(store)
-    expect((store as any).dispatch).not.toHaveBeenCalled()
+    fakeStore({ groups: [{ groupId: 123 }] })
+    await loadNTHSData()
+    expect(useNthsStore().fetchNthsData).not.toHaveBeenCalled()
   })
 
   // Rejecting here would reject the route guard and cancel the navigation, so
   // a sick eligibility endpoint would make every NTHS route unreachable.
   it('reports a failed fetch instead of rejecting the guard', async () => {
-    const store = fakeStore({ groups: [] })
+    fakeStore({ groups: [] })
     const boom = new Error('network down')
-    ;(store as any).dispatch = vi.fn().mockRejectedValue(boom)
+    vi.mocked(useNthsStore().fetchNthsData).mockRejectedValue(boom)
 
-    await expect(loadNTHSData(store)).resolves.toBe(false)
+    await expect(loadNTHSData()).resolves.toBe(false)
     expect(LoggerService.noticeError).toHaveBeenCalledWith(
       boom,
       'Could not load NTHS data for routing'
@@ -185,10 +183,8 @@ describe('redirectBlockedApplicant', () => {
   })
 
   it('reports the server reasons and the route that was refused', () => {
-    const redirect = redirectBlockedApplicant(
-      fakeStore({ canApply: false, reasons: ['banned'] }),
-      '/groups/apply'
-    )
+    fakeStore({ canApply: false, reasons: ['banned'] })
+    const redirect = redirectBlockedApplicant('/groups/apply')
 
     expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
       EVENTS.NTHS_APPLICATION_BLOCKED,
@@ -275,7 +271,7 @@ describe('resolveNthsRoute', () => {
   // ineligible coach. Capturing that would put outage traffic in the funnel.
   it('does not report a failed load as a business-rule block', async () => {
     const store = fakeStore({ canApply: false, reasons: [] })
-    ;(store as any).dispatch = vi.fn().mockRejectedValue(new Error('down'))
+    vi.mocked(useNthsStore().fetchNthsData).mockRejectedValue(new Error('down'))
 
     await expect(
       resolveNthsRoute(store, 'apply', '/groups/apply')
@@ -288,8 +284,8 @@ describe('resolveNthsRoute', () => {
 
   it('loads before deciding, so a cold store does not send everyone away', async () => {
     const store = fakeStore({ canApply: false })
-    ;(store as any).dispatch = vi.fn().mockImplementation(async () => {
-      ;(store as any).state.nths.canApplyForNTHSPresident = true
+    vi.mocked(useNthsStore().fetchNthsData).mockImplementation(async () => {
+      useNthsStore().canApplyForNTHSPresident = true
       return []
     })
     await expect(

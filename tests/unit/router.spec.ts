@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 import axios from 'axios'
 import router from '@/router'
-import store from '@/store'
+import { useNthsStore } from '@/stores/nths'
 import NetworkService, { axiosInstance } from '@/services/NetworkService'
 
 const subjects = {
@@ -135,14 +135,14 @@ describe('response interceptor', () => {
 
 describe('nthsAdminOnly route guard', () => {
   it('redirects a plain member away from the to-do tab but lets them reach members', async () => {
-    store.commit('nths/setNTHSGroups', nthsGroupWithRole('member'))
+    useNthsStore().setNTHSGroups(nthsGroupWithRole('member'))
 
     expect(await visit('/groups/to-do')).toBe('/groups/home')
     expect(await visit('/groups/members')).toBe('/groups/members')
   })
 
   it('lets an admin reach the to-do tab', async () => {
-    store.commit('nths/setNTHSGroups', nthsGroupWithRole('admin'))
+    useNthsStore().setNTHSGroups(nthsGroupWithRole('admin'))
 
     expect(await visit('/groups/to-do')).toBe('/groups/to-do')
   })
@@ -152,7 +152,7 @@ describe('legacy NTHS tab redirects', () => {
   beforeEach(() => {
     // Any NTHS group, of either role, satisfies the parent /groups route
     // guard (nthsRouteGuard('group')) so these redirects can land at all.
-    store.commit('nths/setNTHSGroups', nthsGroupWithRole('member'))
+    useNthsStore().setNTHSGroups(nthsGroupWithRole('member'))
   })
 
   it.each([

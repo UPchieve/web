@@ -149,6 +149,7 @@
 <script>
 import { mapActions, mapState as mapPiniaState } from 'pinia'
 import { useAppModalStore } from '@/stores/app/modal'
+import { useNthsStore } from '@/stores/nths'
 import { mapState, mapGetters } from 'vuex'
 import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
@@ -277,10 +278,12 @@ export default {
       hasSharedMilestone: (state) => state.user.hasSharedMilestone,
       availabilityLastModifiedAt: (state) =>
         state.user.user?.availabilityLastModifiedAt,
-      group: (state) => state.nths.NTHSGroups?.[0],
       hasSeenShareInfoModal() {
         return this.user.publicProfileKeys != null
       },
+    }),
+    ...mapPiniaState(useNthsStore, {
+      group: (store) => store.NTHSGroups?.[0],
     }),
     ...mapGetters({
       isSessionAlive: 'user/isSessionAlive',

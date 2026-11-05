@@ -213,6 +213,7 @@ import { mapState as mapPiniaState, mapActions } from 'pinia'
 import { useAppModalStore } from '@/stores/app/modal'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { useProductFlagsStore } from '@/stores/product-flags'
+import { useNthsStore } from '@/stores/nths'
 import { defineAsyncComponent } from 'vue'
 import SidebarLink from './SidebarLink.vue'
 import BookIcon from '@/assets/icons/open_book_icon.svg'
@@ -276,7 +277,7 @@ export default {
   },
   created() {
     if (import.meta.env.NODE_ENV !== 'test') {
-      this.$store.dispatch('nths/fetchNthsData')
+      this.fetchNthsData()
     }
   },
   props: {
@@ -310,9 +311,11 @@ export default {
       aiTutor: 'featureFlags/aiTutor',
       hasUnreadDMs: 'user/hasUnreadDMs',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
-      isNthsGroupMemberOnly: 'nths/isGroupMemberOnly',
-      hasNthsAdminRole: 'nths/hasAdminRole',
-      nthsRenewalPrompt: 'nths/renewalPrompt',
+    }),
+    ...mapPiniaState(useNthsStore, {
+      isNthsGroupMemberOnly: 'isGroupMemberOnly',
+      hasNthsAdminRole: 'hasAdminRole',
+      nthsRenewalPrompt: 'renewalPrompt',
     }),
     hasSeenCalculator() {
       if (this.shouldShowStudentToVolunteerHoursPage) {
@@ -385,6 +388,7 @@ export default {
   },
   methods: {
     ...mapActions(useAppModalStore, { showAppModal: 'show' }),
+    ...mapActions(useNthsStore, ['fetchNthsData']),
     // Fires before the route switches a student-mode user to coach mode, so
     // userType is the role they clicked from.
     nthsSidebarLinkClicked() {

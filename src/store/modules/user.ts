@@ -17,6 +17,7 @@ import {
 } from '@/utils/user-type'
 import AnalyticsService from '@/services/AnalyticsService'
 import { useNotificationsStore } from '@/stores/notifications'
+import { useNthsStore } from '@/stores/nths'
 import { minutesInMs } from '@/utils/time-utils'
 import type {
   CurrentSessionPublic,
@@ -781,12 +782,7 @@ export default {
     // preventing any caching issues that might interfere
     // with the dynamic loading of feature flags
     getUserPropsForAnalytics:
-      (
-        state: UserStoreState,
-        getters: UserStoreGetterValues,
-        rootState: RootState
-      ) =>
-      () => {
+      (state: UserStoreState, getters: UserStoreGetterValues) => () => {
         let userProps = {
           ucId: state.user.id,
           userType: state.user.userType,
@@ -875,8 +871,9 @@ export default {
           userProps.usesClassLink = !!state.user.usesClassLink
         }
 
-        if (rootState.nths.NTHSGroups.length) {
-          userProps.NTHSGroupId = rootState.nths.NTHSGroups[0].groupInfo.id
+        const nths = useNthsStore()
+        if (nths.NTHSGroups.length) {
+          userProps.NTHSGroupId = nths.NTHSGroups[0].groupInfo.id
         }
 
         return userProps

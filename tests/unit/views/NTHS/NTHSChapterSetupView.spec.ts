@@ -1,11 +1,10 @@
 import HQSection from '@/components/NTHS/HQ/HQSection.vue'
 import SchoolAffiliation from '@/components/NTHS/SchoolAffiliation.vue'
+import { useNthsStore } from '@/stores/nths'
 import NTHSChapterSetupView from '@/views/NTHS/Tabs/NTHSChapterSetupView.vue'
 import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { createStore } from 'vuex'
-
-vi.mock('@/store', () => ({ default: { dispatch: vi.fn() } }))
 
 const LEAVE_TEAM_BUTTON = '[data-testid="leave-team-button"]'
 const SETUP_SUBTITLE = '[data-testid="setup-subtitle"]'
@@ -18,16 +17,12 @@ const GROUP = {
 }
 
 function storeFor(roleName: string) {
+  const nths = useNthsStore()
+  nths.NTHSGroups = [{ ...GROUP, memberInfo: { roleName } }]
+  nths.NTHSGroupMembers = {}
   return createStore({
     state: {
-      nths: {
-        NTHSGroups: [{ ...GROUP, memberInfo: { roleName } }],
-        NTHSGroupMembers: {},
-      },
       user: { user: { id: 'user-1' } },
-    },
-    getters: {
-      'nths/hasAdminRole': () => roleName === 'admin',
     },
   })
 }
@@ -47,11 +42,12 @@ async function getWrapper(roleName = 'admin') {
 describe('NTHSChapterSetupView', () => {
   it('keeps the name card, the path picker and the subtitle away from a member, but not Leave Team', async () => {
     const admin = await getWrapper('admin')
-    const member = await getWrapper('member')
-
     expect(admin.findComponent(HQSection).exists()).toBe(true)
     expect(admin.findComponent(SchoolAffiliation).exists()).toBe(true)
     expect(admin.find(SETUP_SUBTITLE).exists()).toBe(true)
+
+    // both wrappers share one Pinia store, so seed the member after checking the admin
+    const member = await getWrapper('member')
 
     expect(member.findComponent(HQSection).exists()).toBe(false)
     expect(member.findComponent(SchoolAffiliation).exists()).toBe(false)

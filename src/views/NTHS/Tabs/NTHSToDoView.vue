@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
-import { useStore } from 'vuex'
 import Checklist from '@/components/NTHS/Checklist.vue'
 import Spinner from '@/components/Spinner.vue'
 import LoggerService from '@/services/LoggerService'
+import { useNthsStore } from '@/stores/nths'
 
-const store = useStore()
-const group = computed(() => store.state.nths.NTHSGroups?.[0])
-const checklist = computed(() => store.state.nths.NTHSChecklistData)
+const nths = useNthsStore()
+const group = computed(() => nths.NTHSGroups?.[0])
+const checklist = computed(() => nths.NTHSChecklistData)
 const hasItems = computed(() =>
   checklist.value?.sections.some(({ items }) => items.length > 0)
 )
@@ -18,7 +18,9 @@ const loadFailed = ref(false)
 onBeforeMount(async () => {
   try {
     const groupId = group.value?.groupInfo?.id
-    if (groupId) await store.dispatch('nths/fetchNTHSChecklist', groupId)
+    if (groupId) {
+      await nths.fetchNTHSChecklist(groupId)
+    }
   } catch (err) {
     loadFailed.value = true
     LoggerService.noticeError(err, 'Could not load the NTHS chapter checklist')

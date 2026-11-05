@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
-import { useStore } from 'vuex'
 import { toastController } from '@ionic/vue'
+import { useNthsStore } from '@/stores/nths'
 import LoggerService from '@/services/LoggerService'
 import { secondsInMs } from '@/utils/time-utils'
 import { isNetworkError } from '@/services/NetworkService'
@@ -21,9 +21,9 @@ export function useRenewalAccept(
   // Resolves undefined when the caller backs out of the commitments.
   askCommitments: () => Promise<NTHSRenewalCommitments | undefined>
 ) {
-  const store = useStore()
+  const nths = useNthsStore()
   const group = computed(() =>
-    store.state.nths.NTHSGroups.find(
+    nths.NTHSGroups.find(
       (g: { groupInfo: { id: string } }) => g.groupInfo.id === groupId()
     )
   )
@@ -53,14 +53,14 @@ export function useRenewalAccept(
       LoggerService.noticeError(err, 'Could not save NTHS renewal')
     }
     try {
-      await store.dispatch('nths/refreshNTHSGroups')
+      await nths.refreshNTHSGroups()
     } catch (refreshErr) {
       LoggerService.noticeError(refreshErr, 'Could not refresh NTHS groups')
     }
   }
 
   function reloadNthsData() {
-    void store.dispatch('nths/fetchNthsData').catch((err) => {
+    void nths.fetchNthsData().catch((err) => {
       LoggerService.noticeError(err, 'Could not refresh NTHS data')
     })
   }
@@ -85,10 +85,10 @@ export function useRenewalAccept(
   async function accept(): Promise<void> {
     const before = renewal.value
     if (!before) return
-    const wasAdmin: boolean = store.getters['nths/hasAdminRole']
+    const wasAdmin: boolean = nths.hasAdminRole
     let outcome = undefined as NTHSAcceptanceOutcome | undefined
     const saved = await save(async (commitments) => {
-      outcome = await store.dispatch('nths/acceptNTHSRenewalPresidency', {
+      outcome = await nths.acceptNTHSRenewalPresidency({
         groupId: groupId(),
         commitments,
         reason: before.prompt === 'step-up' ? 'step-up' : undefined,

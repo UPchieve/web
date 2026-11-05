@@ -3,9 +3,9 @@ import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import { isErrorWithResponse } from '@/utils/error-utils'
 import { ref, watch } from 'vue'
-import { useStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 
-const store = useStore()
+const nths = useNthsStore()
 const props = defineProps<{
   groupName: string
   groupId: string
@@ -67,7 +67,7 @@ async function save() {
       groupId: props.groupId,
       name: trimmed,
     })
-    store.commit('nths/setNTHSGroupName', {
+    nths.setNTHSGroupName({
       groupId: props.groupId,
       groupName: result.data.group.name,
     })

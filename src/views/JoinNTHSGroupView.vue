@@ -2,6 +2,7 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useNthsStore } from '@/stores/nths'
 import AnalyticsService from '@/services/AnalyticsService'
 import AuthService, { getStatus } from '@/services/AuthService'
 import FeatureFlagService from '@/services/FeatureFlagService'
@@ -16,6 +17,7 @@ import useVuelidate from '@vuelidate/core'
 import { EVENTS } from '@/consts'
 
 const $store = useStore()
+const nths = useNthsStore()
 const $route = useRoute()
 const $router = useRouter()
 
@@ -62,9 +64,9 @@ onBeforeMount(async () => {
   // otherwise we get `Not Authorized` and are redirected to /login
   if ($store.state.user.user.id) {
     // Redirect to group page if user is already in a group
-    await $store.dispatch('nths/fetchNthsData')
+    await nths.fetchNthsData()
   }
-  if ($store.state.nths.NTHSGroups.length) {
+  if (nths.NTHSGroups.length) {
     $router.replace('/groups')
   }
 
@@ -149,7 +151,7 @@ async function addVolunteerToTeam() {
       AnalyticsService.captureEvent(EVENTS.VOLUNTEER_JOINED_TEAM, {
         inviteCode: inviteCode.value,
       })
-      await $store.commit('nths/setNTHSGroups', response.data.groups)
+      nths.setNTHSGroups(response.data.groups)
       return $router.push(`/dashboard?inviteCode=${inviteCode.value}`)
     }
 
