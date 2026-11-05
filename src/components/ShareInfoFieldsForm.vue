@@ -21,8 +21,15 @@ const props = withDefaults(
     // Undecided coaches start with adults on and high schoolers off, instead
     // of everything off
     applyOptInDefaults?: boolean
+    // Where the choice is made, sent with the share events
+    eventSource?: 'dashboard_modal' | 'profile_modal' | 'profile'
   }>(),
-  { showButtons: true, stackedLayout: false, applyOptInDefaults: false }
+  {
+    showButtons: true,
+    stackedLayout: false,
+    applyOptInDefaults: false,
+    eventSource: 'profile',
+  }
 )
 
 const emit = defineEmits<{
@@ -100,7 +107,7 @@ async function save(fields: ShareInfoFieldKey[]) {
     fields.length > 0
       ? EVENTS.VOLUNTEER_SELECTED_TO_SHARE_INFO
       : EVENTS.VOLUNTEER_OPTED_OUT_OF_SHARE_INFO,
-    { fields }
+    { fields, source: props.eventSource }
   )
   emit('saved')
 }

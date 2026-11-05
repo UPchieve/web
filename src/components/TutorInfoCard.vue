@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import Chip from '@/components/Chip.vue'
 import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
 import { EVENTS } from '@/consts'
@@ -8,6 +8,9 @@ import AnalyticsService from '@/services/AnalyticsService'
 const props = defineProps<{
   info: VolunteerPublicProfileInfoShared
   viewerRole: 'student' | 'volunteer'
+  // Only passed in the student's session view, for analytics
+  sessionId?: string
+  volunteerId?: string
 }>()
 
 const VOLUNTEER_SHAREABLE_STATS = [
@@ -39,7 +42,13 @@ function toggleCollapsed() {
     !studentOpenedShowTutorInfo.value
   ) {
     studentOpenedShowTutorInfo.value = true
-    AnalyticsService.captureEvent(EVENTS.STUDENT_CLICKED_LEARN_MORE_ABOUT_COACH)
+    AnalyticsService.captureEvent(
+      EVENTS.STUDENT_CLICKED_LEARN_MORE_ABOUT_COACH,
+      {
+        sessionId: props.sessionId,
+        volunteerId: props.volunteerId,
+      }
+    )
   }
 }
 
@@ -61,6 +70,21 @@ const occupations = computed(() => props.info.occupation ?? [])
 const hasOccupations = computed(() => occupations.value.length > 0)
 const hasAnyStat = computed(() => statsToShow.value.length > 0)
 const hasAnyInfo = computed(() => hasOccupations.value || hasAnyStat.value)
+
+const fieldsShown = computed(() => [
+  ...(hasOccupations.value ? ['occupation'] : []),
+  ...statsToShow.value.map((stat) => stat.key),
+])
+
+// The card starts collapsed, so this means the student saw its header
+onMounted(() => {
+  if (props.viewerRole !== 'student' || !hasAnyInfo.value) return
+  AnalyticsService.captureEvent(EVENTS.STUDENT_SAW_LEARN_MORE_ABOUT_COACH, {
+    sessionId: props.sessionId,
+    volunteerId: props.volunteerId,
+    fieldsShown: fieldsShown.value,
+  })
+})
 </script>
 
 <template>

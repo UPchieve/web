@@ -165,6 +165,23 @@ describe('ShareInfoFieldsForm', () => {
     expect(wrapper.emitted('saved')).toHaveLength(1)
   })
 
+  it('tags the share event with where the choice was made', async () => {
+    const captureEvent = vi
+      .spyOn(AnalyticsService, 'captureEvent')
+      .mockImplementation(() => {})
+    const wrapper = getWrapper(
+      { occupations: [VolunteerOccupations.WORKING_FULL_TIME] },
+      { applyOptInDefaults: true, eventSource: 'dashboard_modal' }
+    )
+
+    await clickSave(wrapper)
+
+    expect(captureEvent).toHaveBeenCalledWith(
+      EVENTS.VOLUNTEER_SELECTED_TO_SHARE_INFO,
+      { fields: ALL_FIELDS, source: 'dashboard_modal' }
+    )
+  })
+
   it("keeps the coach's toggles when Don't share anything fails to save", async () => {
     ;(UserService.setProfile as any).mockRejectedValueOnce(new Error('offline'))
     vi.spyOn(LoggerService, 'noticeError').mockImplementation(() => {})

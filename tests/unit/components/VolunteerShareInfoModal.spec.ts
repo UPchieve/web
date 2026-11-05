@@ -2,6 +2,8 @@ import VolunteerShareInfoModal from '@/components/VolunteerShareInfoModal.vue'
 import Modal from '@/components/Modal.vue'
 import UserService from '@/services/UserService'
 import NetworkService from '@/services/NetworkService'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 import { useProductFlagsStore } from '@/stores/product-flags'
 import { it, describe, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
@@ -39,6 +41,8 @@ describe('VolunteerShareInfoModal', () => {
     ;(NetworkService.setShareInfoModalDismissed as any).mockClear()
     vi.spyOn(UserService, 'setProfile').mockResolvedValue(undefined as any)
     ;(UserService.setProfile as any).mockClear()
+    vi.spyOn(AnalyticsService, 'captureEvent').mockImplementation(() => {})
+    ;(AnalyticsService.captureEvent as any).mockClear()
   })
 
   it('saves nothing to the profile when dismissed, and records the dismissal', async () => {
@@ -57,6 +61,10 @@ describe('VolunteerShareInfoModal', () => {
     expect(useProductFlagsStore().flags.shareInfoModalDismissedAt).toBe(
       '2026-11-03T15:00:00.000Z'
     )
+    expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
+      EVENTS.VOLUNTEER_DISMISSED_SHARE_INFO_MODAL,
+      { source: 'dashboard_modal' }
+    )
   })
 
   it('does not record a dismissal when closed from the profile', async () => {
@@ -71,6 +79,10 @@ describe('VolunteerShareInfoModal', () => {
 
     expect(closeModal).toHaveBeenCalledTimes(1)
     expect(NetworkService.setShareInfoModalDismissed).not.toHaveBeenCalled()
+    expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
+      EVENTS.VOLUNTEER_DISMISSED_SHARE_INFO_MODAL,
+      { source: 'profile_modal' }
+    )
     expect(
       useProductFlagsStore().flags.shareInfoModalDismissedAt
     ).toBeUndefined()

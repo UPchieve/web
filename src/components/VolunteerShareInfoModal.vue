@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import Modal from '@/components/Modal.vue'
 import ShareInfoFieldsForm from '@/components/ShareInfoFieldsForm.vue'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 import { useProductFlagsStore } from '@/stores/product-flags'
 import type { ShareableVolunteerData } from '@/utils/build-share-info-message'
 
@@ -16,10 +18,14 @@ const props = withDefaults(
 )
 
 const productFlags = useProductFlagsStore()
+const eventSource = props.fromProfile ? 'profile_modal' : 'dashboard_modal'
 
 // Closing without choosing saves nothing to the profile. Only a close on the
 // dashboard stops it asking again; the profile callout stays either way.
 function handleDismiss() {
+  AnalyticsService.captureEvent(EVENTS.VOLUNTEER_DISMISSED_SHARE_INFO_MODAL, {
+    source: eventSource,
+  })
   if (!props.fromProfile) productFlags.markShareInfoModalDismissed()
   props.closeModal()
 }
@@ -42,6 +48,7 @@ function handleDismiss() {
     <ShareInfoFieldsForm
       :info="info"
       :applyOptInDefaults="!fromProfile"
+      :eventSource="eventSource"
       @saved="props.closeModal"
     />
   </modal>

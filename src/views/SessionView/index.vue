@@ -175,7 +175,12 @@
           v-if="isStudent && isShowInfoOptInEnabled && hasPartnerSharedInfo"
           class="tutor-info"
         >
-          <TutorInfoCard :info="partnerSharedInfo" viewerRole="student" />
+          <TutorInfoCard
+            :info="partnerSharedInfo"
+            viewerRole="student"
+            :sessionId="sessionId"
+            :volunteerId="sessionPartner.id"
+          />
         </div>
         <div
           v-if="showSessionMetadataContainer"
