@@ -141,6 +141,12 @@ export default {
         }
       })
     },
+    subjectIconLinksBySubject: (state) => {
+      return Object.values(state.subjects).reduce((acc, subject) => {
+        acc[subject.name] = subject.topicIconLink
+        return acc
+      }, {})
+    },
     sessionRequestableSubjectsByTopics: (
       state,
       getters,

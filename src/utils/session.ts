@@ -61,18 +61,28 @@ export function maybeGetActiveSessionHoldForUser(session, forUserId) {
   return activeHolds.find((hold) => hold.coachId === forUserId)
 }
 
-export function getWaitTimeDisplay(session: { createdAt: Date }): string {
+export function getWaitTime(session: { createdAt: Date }): {
+  displayValue: string
+  milliseconds: number
+} {
   const createdAt = dayjs(new Date(session.createdAt))
   const now = dayjs(new Date())
   const waitDuration = dayjs.duration(now.diff(createdAt))
 
-  const hours = waitDuration.hours()
+  // Total hours, since `hours()` wraps around every 24 hours
+  const hours = Math.floor(waitDuration.asHours())
   const minutes = waitDuration.minutes()
   const seconds = waitDuration.seconds()
 
+  // total ms waiting
+  const milliseconds = waitDuration.asMilliseconds()
+
   if (hours > 0) {
-    return `${hours}hr+`
+    return {
+      displayValue: `${hours}hr+`,
+      milliseconds,
+    }
   }
   const secondsDisplay = seconds > 9 ? seconds : `0${seconds}`
-  return `${minutes}:${secondsDisplay}`
+  return { displayValue: `${minutes}:${secondsDisplay}`, milliseconds }
 }

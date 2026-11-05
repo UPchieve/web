@@ -359,6 +359,54 @@ describe('Locked sessions', () => {
     expect(tableRows.length).toEqual(2)
   })
 
+  it('Keeps a locked session in the list for 1 minute after it is picked up', async () => {
+    wrapper = await getWrapper({
+      props: { showLockedSessions: true },
+      user: {
+        state: {
+          user: {
+            mutedSubjectAlerts: [],
+            subjects: ['prealgebra', 'algebraOne'],
+          },
+        },
+      },
+      sessions: testSessions,
+    })
+    const store = (wrapper.vm as any).$store
+    const context = {
+      $router: { currentRoute: { value: { path: '/dashboard' } } },
+    }
+    const rowIds = () =>
+      getSessionRows(wrapper).map((row) => row.attributes('id'))
+    expect(rowIds()).toContain('session-4')
+
+    vi.useFakeTimers()
+    try {
+      // Another coach picks up the locked biology session (session-4)
+      await store.dispatch('volunteer/handleIncomingSessions', {
+        context,
+        sessions: testSessions.filter((s) => s.id !== 'session-4'),
+      })
+      await nextTick()
+      expect(rowIds()).toContain('session-4')
+
+      // A later update within the minute shouldn't reset or remove it early
+      vi.advanceTimersByTime(30 * 1000)
+      await store.dispatch('volunteer/handleIncomingSessions', {
+        context,
+        sessions: testSessions.filter((s) => s.id !== 'session-4'),
+      })
+      await nextTick()
+      expect(rowIds()).toContain('session-4')
+
+      vi.advanceTimersByTime(30 * 1000)
+      await nextTick()
+      expect(rowIds()).not.toContain('session-4')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('Clicking a locked session should take you to the subject quiz', async () => {
     const routerPushSpy = vi.spyOn(router, 'push')
     const getTestWrapper = () =>
@@ -491,5 +539,39 @@ describe('Pagination', () => {
     expect(range()).toEqual('11–11 of 11')
     expect(prevButton().attributes('disabled')).toBeUndefined()
     expect(nextButton().attributes('disabled')).toBeDefined() // cannot navigate to a next page
+  })
+
+  it('Goes back to the first page when a new exclusive session comes in', async () => {
+    wrapper = await getWrapper({ sessions: testSessions })
+    const pageSizeSelect = wrapper.findComponent(
+      '[data-testid="page-size-select"]'
+    )
+    pageSizeSelect.vm.$emit('update:modelValue', 5)
+    await nextTick()
+    await wrapper.find('[data-testid="next-page"]').trigger('click')
+    const range = () =>
+      wrapper.find('[data-testid="page-controls-range"]').text()
+    expect(range()).toEqual('6–10 of 11') // on page 2
+
+    const exclusiveSession = {
+      ...testSessions[0],
+      id: 'exclusive-1',
+      isExclusive: true,
+      requestedVolunteerId: USER_ID,
+      createdAt: new Date(),
+    }
+    await (wrapper.vm as any).$store.dispatch(
+      'volunteer/handleIncomingSessions',
+      {
+        context: {
+          $router: { currentRoute: { value: { path: '/dashboard' } } },
+        },
+        sessions: [...testSessions, exclusiveSession],
+      }
+    )
+    await nextTick()
+
+    expect(range()).toEqual('1–5 of 12') // back on page 1
+    expect(getSessionRows(wrapper)[0].attributes('id')).toEqual('exclusive-1')
   })
 })

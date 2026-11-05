@@ -68,6 +68,12 @@ function toggleMenuOpen(value: boolean) {
   isMenuOpen.value = value
 }
 
+const studentsCardSubtitle = computed(() => {
+  return store.getters['volunteer/isReadyToTutor']
+    ? undefined
+    : 'Students waiting for help will show up below'
+})
+
 const heading = ref()
 function scrollToTop() {
   heading.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -77,8 +83,9 @@ function scrollToTop() {
 <template ref="heading">
   <div>
     <TaskCard
-      title="Waiting Students"
-      subtitle="Students waiting for help will show up below"
+      title="Students"
+      :subtitle="studentsCardSubtitle"
+      headingAlign="left"
     >
       <template v-slot:heading-content>
         <div class="heading-content" ref="heading">

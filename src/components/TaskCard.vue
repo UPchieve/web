@@ -26,6 +26,7 @@ const props = defineProps<TaskCardProps>()
     :title="props.title"
     :subtitle="props.subtitle"
     :dismissOptions="props.dismissOptions"
+    :headingAlign="props.headingAlign"
   >
     <template #icon>
       <slot name="icon" />

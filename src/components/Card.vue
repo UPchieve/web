@@ -9,8 +9,11 @@ export type CardProps = {
   title: string
   subtitle: string
   dismissOptions?: DismissOptions
+  headingAlign?: 'center' | 'left'
 }
-const props = defineProps<CardProps>()
+const props = withDefaults(defineProps<CardProps>(), {
+  headingAlign: 'center',
+})
 </script>
 
 <template>
@@ -24,7 +27,10 @@ const props = defineProps<CardProps>()
       <CrossIcon class="dismiss-icon" />
     </div>
     <slot name="icon" />
-    <div class="heading-container">
+    <div
+      class="heading-container"
+      :class="{ 'heading-container--left': props.headingAlign === 'left' }"
+    >
       <slot name="heading-content" />
       <div class="title">{{ props.title }}</div>
       <div v-if="props.subtitle" class="subtitle">{{ props.subtitle }}</div>
@@ -62,6 +68,15 @@ const props = defineProps<CardProps>()
     @include font-category('body');
     color: $c-secondary-grey;
     text-align: center;
+  }
+
+  &--left {
+    align-items: flex-start;
+
+    .title,
+    .subtitle {
+      text-align: left;
+    }
   }
 }
 

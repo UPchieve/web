@@ -19,11 +19,9 @@
         >
       </span>
     </div>
-    <table class="table table-striped">
-      <tr>
-        <th scope="col">Student</th>
-        <th scope="col">Help Topic</th>
-        <th scope="col">Wait Time</th>
+    <table class="table">
+      <tr v-if="paginatedSessions.length">
+        <th scope="rowgroup">Requests</th>
       </tr>
       <tbody>
         <tr
@@ -36,30 +34,15 @@
           @click="sessionClicked(session)"
         >
           <td>
-            <span
-              v-if="session.isExclusive"
-              class="session-row__eyebrow"
-              data-testid="exclusive-eyebrow"
-              >Specifically Requested You</span
-            >
-            <span v-if="session.isExclusive" class="exclusive-emoji">🙋</span>
-            <!--            Anonymize first name of student for locked sessions only-->
-            {{
-              session.isUnlocked
-                ? (session.student?.firstname ?? 'Student')
-                : 'Student'
-            }}
-            <span
-              v-if="session.student?.isShadowBanned && user.isAdmin"
-              class="shadow-ban"
-              >Shadow Banned</span
-            >
-          </td>
-          <td :data-testid="`subject-${session.id}`">
-            {{ session.isUnlocked ? '' : '🔒' }}{{ session.subjectDisplayName }}
-          </td>
-          <td :data-testid="`wait-time-${session.id}`">
-            {{ waitTime(session) }}
+            <SessionListItem
+              :session="{
+                ...session,
+                waitTime: waitTime(session).displayValue,
+                isLongWait: isLongWait(waitTime(session).milliseconds),
+                topic: session.type,
+                isLocked: !session.isUnlocked,
+              }"
+            />
           </td>
         </tr>
       </tbody>
@@ -149,17 +132,18 @@ import SessionService from '@/services/SessionService'
 import { computed, defineAsyncComponent, nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
-import { getWaitTimeDisplay } from '@/utils/session'
+import { getWaitTime } from '@/utils/session'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { IonIcon } from '@ionic/vue'
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons'
+import SessionListItem from '@/views/DashboardView/VolunteerDashboard/ListSessions/SessionListItem.vue'
+import { minutesInMs } from '@/utils/time-utils'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
 
 const hasError = ref<boolean>(false)
 const ambassadorReferralModalIsOpen = ref<boolean>(false)
-const MAX_AVAILABLE_SECTIONS = 5
 
 const store = useStore()
 const router = useRouter()
@@ -170,7 +154,6 @@ const props = defineProps<{
 }>()
 const emit = defineEmits(['changedPage'])
 
-const user = computed(() => store.state.user.user)
 const isVolunteer = computed(() => store.getters['user/isVolunteer'])
 const isAmbassador = computed(() => store.getters['user/isAmbassador'])
 
@@ -235,12 +218,8 @@ const sessionClicked = (session) => {
 const sortedSessions = computed(() => {
   // Exclusive requests pin to the top of the list — these students hand-picked
   // this volunteer specifically, so the prompt should be impossible to miss.
-  // There must be no more than MAX_AVAILABLE_SECTIONS unlocked sessions for us to display the locked ones,
-  // and to display locked ones, props.showLockedSessions must be true.
-  if (
-    sortedUnlockedSessions.value.length > MAX_AVAILABLE_SECTIONS ||
-    !props.showLockedSessions
-  ) {
+  // Locked sessions go last, and only when the volunteer has chosen to show them.
+  if (!props.showLockedSessions) {
     return [...sortedExclusiveSessions.value, ...sortedUnlockedSessions.value]
   }
   return [
@@ -288,6 +267,16 @@ async function changePage(toPage: number) {
 watch(totalPages, () => {
   currentPage.value = clampPage(currentPage.value)
 })
+// Exclusive sessions are pinned to the top of the first page, so jump there
+// when a new one comes in to make sure the volunteer sees it.
+watch(
+  () => sortedExclusiveSessions.value.map((session) => session.id),
+  (newIds, oldIds) => {
+    if (newIds.some((id) => !oldIds.includes(id))) {
+      currentPage.value = 0
+    }
+  }
+)
 
 function openAmbassadorReferralModal() {
   AnalyticsService.captureEvent(
@@ -330,7 +319,11 @@ const ticks = computed(() => store.state.volunteer.ticks)
 function waitTime(args: { createdAt: any }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   ticks.value //This line makes waitTime recalculate as `ticks` changes in the store.
-  return getWaitTimeDisplay(args)
+  return getWaitTime(args)
+}
+
+function isLongWait(msDuration: number) {
+  return msDuration > minutesInMs(3)
 }
 </script>
 
@@ -372,8 +365,6 @@ function waitTime(args: { createdAt: any }) {
     background: lighten($c-information-blue, 50%);
   }
 
-  // Tutor-exclusive request rows: tinted background overrides zebra,
-  // brighter border to stand out, eyebrow + emoji prefix in the first cell.
   &--exclusive {
     background: #fff8e6 !important;
     border-left: 3px solid #f3c244;
@@ -382,34 +373,11 @@ function waitTime(args: { createdAt: any }) {
       background: darken(#fff8e6, 3%) !important;
     }
   }
-
-  &__eyebrow {
-    display: block;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-size: 11px;
-    font-weight: 600;
-    color: #4d3a00;
-    margin-bottom: 2px;
-  }
-}
-
-.exclusive-emoji {
-  margin-right: 4px;
 }
 
 .session-row td {
   text-align: left;
-}
-.shadow-ban {
-  margin-right: 8px;
-  font-size: 12px;
-  border-radius: 5px;
-  background: $c-warning-orange;
-  color: #fff;
-  padding: 5px;
-  font-weight: 500;
-  white-space: nowrap;
+  padding: 8px 16px;
 }
 
 .no-students-message-container {
@@ -435,6 +403,11 @@ function waitTime(args: { createdAt: any }) {
 tfoot td {
   padding: 0;
   border-top: 1px solid $c-border-grey;
+}
+
+th {
+  @include font-category('heading');
+  font-weight: $font-weight-medium;
 }
 
 // Range text on the left; page size + prev/next grouped on the right.
