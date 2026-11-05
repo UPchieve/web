@@ -67,16 +67,21 @@ const isMenuOpen = ref<boolean>(false)
 function toggleMenuOpen(value: boolean) {
   isMenuOpen.value = value
 }
+
+const heading = ref()
+function scrollToTop() {
+  heading.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 </script>
 
-<template>
+<template ref="heading">
   <div>
     <TaskCard
       title="Waiting Students"
       subtitle="Students waiting for help will show up below"
     >
       <template v-slot:heading-content>
-        <div class="heading-content">
+        <div class="heading-content" ref="heading">
           <Menu
             location="bottom center"
             :buttonHeightPx="20"
@@ -106,6 +111,7 @@ function toggleMenuOpen(value: boolean) {
               v-if="!isSessionAlive"
               :showLockedSessions="showLockedSessions"
               :sessionClickOverride="props.sessionClickOverride"
+              @changedPage="scrollToTop"
             />
             <div v-else class="rejoin-session-container">
               <LargeButton

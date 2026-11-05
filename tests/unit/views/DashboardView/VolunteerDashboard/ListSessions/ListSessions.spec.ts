@@ -1,11 +1,12 @@
 import { storeOptions } from '@/store'
 import router from '@/router'
 import { createStore } from 'vuex'
-import { mount } from '@vue/test-utils'
+import { mount, VueWrapper } from '@vue/test-utils'
 import ListSessions from '@/views/DashboardView/VolunteerDashboard/ListSessions/ListSessions.vue'
 import { dayjs } from '@/utils/time-utils'
 import { it, describe, vi, expect, beforeEach } from 'vitest'
 import { merge } from 'lodash-es'
+import { nextTick } from 'vue'
 
 vi.mock('@/services/PresenceService')
 
@@ -126,6 +127,13 @@ const getWrapper = async (overrides = {}) => {
       ...(overrides.props ?? {}),
     },
   })
+}
+
+/**
+ * Get table rows that are specifically listing sessions (not header or footer rows)
+ */
+function getSessionRows(wrapper: VueWrapper) {
+  return wrapper.findAll('[data-testid^="session-row-"]')
 }
 
 describe('Dashboard with Muted Subjects', () => {
@@ -286,46 +294,46 @@ describe('Locked sessions', () => {
       sessions: testSessions,
     })
 
-    const tableRows = wrapper.findAll('tr')
-    expect(tableRows.length).toEqual(5) // 1 header row and 4 sessions
+    const tableRows = getSessionRows(wrapper)
+    expect(tableRows.length).toEqual(4)
     // They are also ordered correctly: Available sessions at the top, ordered by wait time,
     // and locked sessions at the bottom, ordered by wait time.
 
     // First session should be prealgebra, with a wait time of 5 minutes
-    const session1WaitTime = tableRows[1].find(
+    const session1WaitTime = tableRows[0].find(
       '[data-testid="wait-time-session-1"]'
     )
-    const session1Subject = tableRows[1].find(
+    const session1Subject = tableRows[0].find(
       '[data-testid="subject-session-1"]'
     )
     expect(session1WaitTime.text()).toEqual('5:00')
     expect(session1Subject.text()).toEqual('Prealgebra')
 
     // Second session should be algebra one, with a wait time of 3 minutes
-    const session2WaitTime = tableRows[2].find(
+    const session2WaitTime = tableRows[1].find(
       '[data-testid="wait-time-session-2"]'
     )
-    const session2Subject = tableRows[2].find(
+    const session2Subject = tableRows[1].find(
       '[data-testid="subject-session-2"]'
     )
     expect(session2WaitTime.text()).toEqual('3:00')
     expect(session2Subject.text()).toEqual('Algebra 1')
 
     // Third session is session-4, Biology, locked, with a wait time of 10 minutes
-    const session3WaitTime = tableRows[3].find(
+    const session3WaitTime = tableRows[2].find(
       '[data-testid="wait-time-session-4"]'
     )
-    const session3Subject = tableRows[3].find(
+    const session3Subject = tableRows[2].find(
       '[data-testid="subject-session-4"]'
     )
     expect(session3WaitTime.text()).toEqual('10:00')
     expect(session3Subject.text()).toEqual('🔒Biology')
 
     // Fourth session is session-3, Calculus BC, locked, with a wait time of 9 minutes
-    const session4WaitTime = tableRows[4].find(
+    const session4WaitTime = tableRows[3].find(
       '[data-testid="wait-time-session-3"]'
     )
-    const session4Subject = tableRows[4].find(
+    const session4Subject = tableRows[3].find(
       '[data-testid="subject-session-3"]'
     )
     expect(session4WaitTime.text()).toEqual('9:00')
@@ -345,10 +353,10 @@ describe('Locked sessions', () => {
           },
         },
       },
-      sessions: testSessions,
+      sessions: testSessions, // 4 sessions open, but user should only see 2
     })
-    const tableRows = wrapper.findAll('tr')
-    expect(tableRows.length).toEqual(3)
+    const tableRows = getSessionRows(wrapper)
+    expect(tableRows.length).toEqual(2)
   })
 
   it('Clicking a locked session should take you to the subject quiz', async () => {
@@ -434,5 +442,54 @@ describe('Locked sessions', () => {
       1,
       '/training?openTo=integratedMathOne'
     )
+  })
+})
+
+describe('Pagination', () => {
+  // Let there be 11 sessions staggered a minute apart
+  const testSessions = Array.from({ length: 11 }, (_, i) => ({
+    id: `session-${i + 1}`,
+    student: {
+      firstname: `Student${i + 1}`,
+      isTestUser: false,
+    },
+    studentFirstName: `Student${i + 1}`,
+    subTopic: 'algebraOne',
+    subjectDisplayName: 'Algebra 1',
+    type: 'math',
+    createdAt: dayjs()
+      .subtract(11 - i, 'minutes')
+      .toDate(),
+  }))
+
+  it('Displays the correct page information', async () => {
+    wrapper = await getWrapper({ sessions: testSessions })
+    const pageSizeSelect = wrapper.findComponent(
+      '[data-testid="page-size-select"]'
+    ) // set page size to 5
+    pageSizeSelect.vm.$emit('update:modelValue', 5)
+    await nextTick()
+
+    const range = () =>
+      wrapper.find('[data-testid="page-controls-range"]').text()
+    const prevButton = () => wrapper.find('[data-testid="prev-page"]')
+    const nextButton = () => wrapper.find('[data-testid="next-page"]')
+
+    // First page
+    expect(range()).toEqual('1–5 of 11')
+    expect(prevButton().attributes('disabled')).toBeDefined() // cannot navigate to a previous page
+    expect(nextButton().attributes('disabled')).toBeUndefined()
+
+    // Second page
+    await nextButton().trigger('click')
+    expect(range()).toEqual('6–10 of 11')
+    expect(prevButton().attributes('disabled')).toBeUndefined()
+    expect(nextButton().attributes('disabled')).toBeUndefined()
+
+    // Third page
+    await nextButton().trigger('click')
+    expect(range()).toEqual('11–11 of 11')
+    expect(prevButton().attributes('disabled')).toBeUndefined()
+    expect(nextButton().attributes('disabled')).toBeDefined() // cannot navigate to a next page
   })
 })

@@ -27,7 +27,7 @@
       </tr>
       <tbody>
         <tr
-          v-for="(session, index) in sortedSessions"
+          v-for="(session, index) in paginatedSessions"
           :key="`session-${index}`"
           :id="session.id"
           :data-testid="`session-row-${session.id}`"
@@ -63,6 +63,54 @@
           </td>
         </tr>
       </tbody>
+
+      <tfoot v-if="sortedSessions.length">
+        <tr>
+          <td colspan="3">
+            <div class="page-controls">
+              <span
+                class="page-controls__range"
+                data-testid="page-controls-range"
+                >{{ pageStart }}–{{ pageEnd }} of
+                {{ sortedSessions.length }}</span
+              >
+              <div class="page-controls__actions">
+                <div class="page-controls__size">
+                  <label for="page-size-dropdown">Show</label>
+                  <FormSelect
+                    name="page-size-dropdown"
+                    :options="pageSizeOptions"
+                    v-model="pageSize"
+                    data-testid="page-size-select"
+                  />
+                </div>
+                <div class="page-controls__buttons">
+                  <button
+                    type="button"
+                    class="page-controls__button"
+                    aria-label="Previous page"
+                    data-testid="prev-page"
+                    @click="changePage(currentPage - 1)"
+                    :disabled="currentPage === 0"
+                  >
+                    <IonIcon :icon="chevronBackOutline" />
+                  </button>
+                  <button
+                    type="button"
+                    class="page-controls__button"
+                    aria-label="Next page"
+                    data-testid="next-page"
+                    @click="changePage(currentPage + 1)"
+                    :disabled="currentPage === totalPages - 1"
+                  >
+                    <IonIcon :icon="chevronForwardOutline" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
     </table>
     <div
       class="no-students-message-container"
@@ -98,10 +146,13 @@ import { quizRoute } from '@/utils/quiz-route'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import SessionService from '@/services/SessionService'
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { computed, defineAsyncComponent, nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import { getWaitTimeDisplay } from '@/utils/session'
+import FormSelect from '@/components/FormInputs/FormSelect.vue'
+import { IonIcon } from '@ionic/vue'
+import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons'
 const AmbassadorReferralModal = defineAsyncComponent(
   () => import('@/views/AmbassadorReferralModal.vue')
 )
@@ -117,6 +168,7 @@ const props = defineProps<{
   showLockedSessions: boolean
   sessionClickOverride?: (session: any) => void
 }>()
+const emit = defineEmits(['changedPage'])
 
 const user = computed(() => store.state.user.user)
 const isVolunteer = computed(() => store.getters['user/isVolunteer'])
@@ -196,6 +248,45 @@ const sortedSessions = computed(() => {
     ...sortedUnlockedSessions.value,
     ...sortedLockedSessions.value,
   ]
+})
+
+// Pagination logic
+const pageSizeOptions = [5, 10, 15]
+const pageSize = ref<number>(pageSizeOptions[1])
+const currentPage = ref<number>(0)
+
+const totalPages = computed(() =>
+  Math.ceil(sortedSessions.value.length / pageSize.value)
+)
+const pageStart = computed(() => currentPage.value * pageSize.value + 1) // i.e. the 1 "1-10 of 15"
+const pageEnd = computed(() =>
+  // i.e. the 10 "1-10 of 15"
+  Math.min(
+    (currentPage.value + 1) * pageSize.value,
+    sortedSessions.value.length // Handle partial final page
+  )
+)
+
+const paginatedSessions = computed(() => {
+  const sorted = sortedSessions.value
+  const start = currentPage.value * pageSize.value
+  return sorted.slice(start, start + pageSize.value)
+})
+
+// Clamp page number to [0, totalPages)
+// so that it never goes out of range even as the session list changes.
+function clampPage(page: number): number {
+  return Math.min(Math.max(page, 0), Math.max(totalPages.value - 1, 0))
+}
+async function changePage(toPage: number) {
+  const nextPage = clampPage(toPage)
+  currentPage.value = nextPage
+  // Wait for the new page's rows to render, then bring the top of the table into view
+  await nextTick()
+  emit('changedPage')
+}
+watch(totalPages, () => {
+  currentPage.value = clampPage(currentPage.value)
 })
 
 function openAmbassadorReferralModal() {
@@ -338,6 +429,92 @@ function waitTime(args: { createdAt: any }) {
   button {
     line-height: 2;
     color: $c-success-green;
+  }
+}
+
+tfoot td {
+  padding: 0;
+  border-top: 1px solid $c-border-grey;
+}
+
+// Range text on the left; page size + prev/next grouped on the right.
+.page-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  padding: $spacing-xs $spacing-sm;
+  font-size: 14px;
+  color: $c-default-grey;
+
+  &__range {
+    white-space: nowrap;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__size {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    label {
+      margin: 0;
+      font-weight: 400;
+    }
+
+    // FormSelect is built for full-width forms (w-full, 48px tall, top
+    // margin), so shrink it down to a compact inline control here.
+    :deep(.uc-form-element) {
+      width: auto;
+      margin-top: 0;
+
+      label:empty {
+        display: none;
+      }
+    }
+
+    // The popover sizes itself to match the select, so the select needs a
+    // fixed width or the options collapse to an unreadable sliver.
+    :deep(ion-select) {
+      min-height: 32px;
+      width: 72px;
+      padding: 0 $spacing-xs;
+      font-size: 14px;
+      border-radius: $radius-sm;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    gap: $spacing-xs;
+  }
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: #fff;
+    border: 1px solid $border-grey;
+    border-radius: $radius-sm;
+    color: $c-default-grey;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: $button-secondary-border-hover;
+    }
+
+    &:disabled {
+      color: $c-disabled-grey;
+      cursor: not-allowed;
+    }
   }
 }
 </style>
