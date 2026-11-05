@@ -50,6 +50,6 @@ export function setTemporarilyDismissSecondaryEmailModal(userId: string): void {
 }
 
 export function isTargetEmailDomain(email: string): boolean {
-  const r: RegExp = /(.*@.*.edu)|(.*@.*isd.*)|(.*@.*k12.*)/g
+  const r: RegExp = /(.*@.*\.(edu|org))|(.*@.*isd.*)|(.*@.*k12.*)/g
   return r.test(email)
 }

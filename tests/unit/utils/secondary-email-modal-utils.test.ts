@@ -46,11 +46,9 @@ describe('Secondary email modal utils', () => {
 
   describe('isTargetEmailDomain', () => {
     it.each([
-      [false, 'louise.belcher@upchieve.org'],
-      [false, 'louise.belcherk12@upchieve.org'],
-      [false, 'louise.belcher.isd@upchieve.org'],
-      [false, 'louise.belcher.eduedu@upchieve.org'],
+      [false, 'louise.belcher@example.com'],
       [true, 'louise.belcher@someschool.edu'],
+      [true, 'louise.belcher@upchieve.org'],
       [true, 'louisebelcher@someschool.k12.org'],
       [true, 'louisebelcher@someschoolk12.org'],
       [true, 'louisebelcher@someschool.isd.blah.us'],
