@@ -23,8 +23,15 @@ const props = withDefaults(
     pastSessionId?: string
     coachStatus?: CoachStatus
     disabled?: boolean
+    variant?: string
+    isVolunteerOffline?: boolean
   }>(),
-  { backText: 'My Coaches', disabled: false }
+  {
+    backText: 'My Coaches',
+    disabled: false,
+    variant: 'primary-blue',
+    isVolunteerOffline: false,
+  }
 )
 
 const store = useStore()
@@ -111,6 +118,7 @@ function requestCoach() {
           showTemplateButtons: false,
           volunteerSubjects: options,
           volunteerName: props.volunteerName,
+          isVolunteerOffline: props.isVolunteerOffline,
           sessionArgs: { requestedVolunteerId: props.volunteerId },
           onSubjectSelected: (name: string) => {
             const subject = options.find((option) => option.name === name)
@@ -141,7 +149,7 @@ function requestCoach() {
 <template>
   <div v-if="canRequest">
     <large-button
-      variant="primary-blue"
+      :variant="variant"
       :showArrow="false"
       :disabled="disabled || loading"
       @click.stop="requestCoach"

@@ -420,6 +420,7 @@ onMounted(async () => {
 .message-button {
   border-width: 2px;
   border-radius: 24px;
+  height: 40px;
 
   :deep(.ButtonTemplate-content) {
     overflow: visible;
@@ -428,6 +429,8 @@ onMounted(async () => {
   &__icon {
     position: relative;
     display: inline-flex;
+    width: 20px;
+    height: 20px;
   }
 
   &__unread-dot {

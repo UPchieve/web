@@ -13,6 +13,7 @@
       v-else-if="modalData.volunteerSubjects"
       :subjects="modalData.volunteerSubjects"
       :volunteerName="modalData.volunteerName"
+      :isVolunteerOffline="modalData.isVolunteerOffline"
       :selectedSubject="selectedSubtopic"
       :totalSteps="requestTotalSteps"
       :isLoading="isLoadingSurvey"

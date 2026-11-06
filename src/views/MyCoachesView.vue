@@ -14,10 +14,12 @@ import LargeButton from '@/components/LargeButton.vue'
 import ActivityDot from '@/components/ActivityDot.vue'
 import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
+import RequestCoachButton from '@/components/RequestCoachButton.vue'
 import { useCoachStatuses } from '@/composables/useCoachStatuses'
 import { minutesInMs } from '@/utils/time-utils'
 import type { PastVolunteer } from '@/types/students'
 import MessageIcon from '@/assets/message-circle.svg'
+import { vTooltip } from 'maz-ui'
 
 interface Coach extends Omit<PastVolunteer, 'lastSession'> {
   lastSession: LastSession | null
@@ -56,6 +58,10 @@ function messageButtonLabel(coach: Coach) {
 }
 
 const { statuses: coachStatuses } = useCoachStatuses()
+
+function inSessionText(coach: Coach) {
+  return `${coach.firstName} is in a session right now.`
+}
 
 const allCoaches = ref<Coach[]>([])
 const filteredCoaches = ref<Coach[]>([])
@@ -243,8 +249,12 @@ onMounted(async () => {
               @change-favorited="handleFavoriteChange"
             />
           </template>
-          <template v-if="isDirectMessagesEnabled" #actions>
+          <template
+            v-if="isDirectMessagesEnabled || coach.subjects?.length"
+            #actions
+          >
             <LargeButton
+              v-if="isDirectMessagesEnabled"
               class="message-button"
               data-testid="message-button"
               :aria-label="messageButtonLabel(coach)"
@@ -262,6 +272,50 @@ onMounted(async () => {
                 />
               </span>
             </LargeButton>
+            <span
+              v-if="
+                coach.subjects?.length &&
+                coachStatuses[coach.volunteerId] === 'in-session'
+              "
+              class="request-coach-button-tooltip"
+              data-testid="request-coach-button-tooltip"
+              v-tooltip="{
+                text: inSessionText(coach),
+                color: 'black',
+                position: 'top',
+              }"
+            >
+              <RequestCoachButton
+                class="request-coach-button"
+                data-testid="request-coach-button"
+                :volunteerId="coach.volunteerId"
+                :volunteerName="coach.firstName"
+                :subjects="coach.subjects"
+                :disabled="true"
+                sourceView="my-coaches"
+                backText="My Coaches"
+                >Request session</RequestCoachButton
+              >
+            </span>
+            <RequestCoachButton
+              v-else-if="coach.subjects?.length"
+              class="request-coach-button"
+              data-testid="request-coach-button"
+              :volunteerId="coach.volunteerId"
+              :volunteerName="coach.firstName"
+              :subjects="coach.subjects"
+              :variant="
+                coachStatuses[coach.volunteerId] === 'offline'
+                  ? 'outlined'
+                  : 'primary-blue'
+              "
+              :isVolunteerOffline="
+                coachStatuses[coach.volunteerId] === 'offline'
+              "
+              sourceView="my-coaches"
+              backText="My Coaches"
+              >Request session</RequestCoachButton
+            >
           </template>
         </PersonCard>
       </template>
@@ -497,9 +551,30 @@ onMounted(async () => {
   margin: 4px 0;
 }
 
+.request-coach-button :deep(.ButtonTemplate) {
+  height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.request-coach-button :deep(.LargeButton-outlined) {
+  border-width: 2px;
+}
+
+.request-coach-button-tooltip {
+  display: inline-flex;
+  font-size: 12px;
+}
+
+.request-coach-button :deep(.ButtonTemplate:disabled) {
+  border: 2px solid $c-border-grey;
+  cursor: not-allowed;
+}
+
 .message-button {
   border-width: 2px;
   border-radius: 24px;
+  height: 40px;
 
   :deep(.ButtonTemplate-content) {
     overflow: visible;
@@ -508,6 +583,8 @@ onMounted(async () => {
   &__icon {
     position: relative;
     display: inline-flex;
+    width: 20px;
+    height: 20px;
   }
 
   &__unread-dot {

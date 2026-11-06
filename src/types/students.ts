@@ -17,6 +17,7 @@ export type PastVolunteer = {
   lastSession: PastVolunteerSession
   isFavorite: boolean
   publicProfileStats: VolunteerPublicProfileInfoShared
+  subjects: string[]
 }
 
 export type PastVolunteersResponse = {

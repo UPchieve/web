@@ -8,6 +8,7 @@ import {
   mdiPencilOutline,
   mdiFileDocumentOutline,
   mdiCurrencyUsd,
+  mdiClockOutline,
 } from '@mdi/js'
 import type { Subject, TopicSubjects } from '@/types/subjects'
 
@@ -18,9 +19,10 @@ const props = withDefaults(
     isLoading?: boolean
     selectedSubject?: string
     volunteerName: string
+    isVolunteerOffline?: boolean
     onSelect: (name: string) => void
   }>(),
-  { totalSteps: 0, isLoading: false }
+  { totalSteps: 0, isLoading: false, isVolunteerOffline: false }
 )
 
 const modal = useAppModalStore()
@@ -78,6 +80,20 @@ defineExpose({ onAccept })
     </button>
     <h1>Choose a subject</h1>
     <p>Request a session with {{ volunteerName }}.</p>
+    <div
+      v-if="isVolunteerOffline"
+      class="offline-memo"
+      role="status"
+      data-testid="volunteer-offline-memo"
+    >
+      <svg class="offline-memo__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path :d="mdiClockOutline" />
+      </svg>
+      <span>
+        {{ volunteerName }} is offline, so your request may take longer. Want
+        help sooner? You can ask any available tutor.
+      </span>
+    </div>
     <stepper
       v-if="totalSteps"
       :totalSteps="totalSteps"
@@ -142,6 +158,24 @@ defineExpose({ onAccept })
     text-align: left;
     font-size: 20px;
     margin: 30px 0;
+  }
+
+  .offline-memo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    background: $c-volunteer;
+    color: $c-soft-black;
+  }
+  .offline-memo__icon {
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    fill: currentColor;
+    flex-shrink: 0;
   }
 
   .subject-stepper {
