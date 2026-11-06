@@ -131,6 +131,7 @@
             data-testid="nths-dot"
             class="SidebarLinks__notification"
             :label="nthsDotLabel"
+            :title="nthsDotLabel"
           />
         </sidebar-link>
 

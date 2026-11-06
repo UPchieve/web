@@ -6,15 +6,10 @@ import type {
   NTHSRenewalPublic,
 } from '@/services/NTHSGroupService'
 
-const DAYJS_SEPTEMBER = 8
-
-// "Aug 1", "Sept 15": dayjs abbreviates September as "Sep".
 export function renewalDate(ymd: string | null): string {
   if (!ymd) return ''
   const date = dayjs(ymd, 'YYYY-MM-DD')
-  return date.month() === DAYJS_SEPTEMBER
-    ? `Sept ${date.date()}`
-    : date.format('MMM D')
+  return date.format('MMMM Do')
 }
 
 // The close date falls in the autumn of the school year being renewed for.
@@ -71,7 +66,7 @@ export function renewalErrorMessage(err: unknown): string {
 const CHAPTER_NEEDS_PRESIDENT_DOT_TITLE = 'Your chapter needs a president'
 
 const RENEWAL_DOT_LABELS: Partial<Record<NTHSRenewalPrompt, string>> = {
-  'confirm-return': 'Confirm your chapter is returning',
+  'confirm-return': 'Confirm your chapter is continuing',
   'president-not-cleared': 'Your chapter needs a returning president',
   'member-not-cleared': CHAPTER_NEEDS_PRESIDENT_DOT_TITLE,
   'member-countdown': CHAPTER_NEEDS_PRESIDENT_DOT_TITLE,
