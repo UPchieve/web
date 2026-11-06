@@ -19,7 +19,8 @@ vi.mock('vue-router', async (importOriginal) => ({
   useRouter: () => ({ push: router.push, replace: router.replace }),
 }))
 
-vi.mock('@/services/NetworkService', () => ({
+vi.mock('@/services/NetworkService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: {
     getPastStudents: vi.fn(),
   },

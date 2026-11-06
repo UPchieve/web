@@ -181,3 +181,5 @@ export type LegacyUserPublic = {
   lastSuccessfulCleverSync?: ISODateString
   sponsorships?: SponsorshipPublic[]
 }
+
+export type VolunteerStatus = 'online' | 'in-session' | 'offline'

@@ -16,8 +16,23 @@
       >
         <slot name="avatar-badge" />
       </div>
+      <PresenceDot
+        v-if="status && isShowCoachStatusEnabled"
+        class="person-card__presence-dot"
+        :status="status"
+      />
     </div>
-    <h2 class="person-card__name" data-testid="person-card-name">{{ name }}</h2>
+    <div class="person-card__name-row">
+      <h2 class="person-card__name" data-testid="person-card-name">
+        {{ name }}
+      </h2>
+      <span
+        v-if="status && STATUS_LABELS[status] && isShowCoachStatusEnabled"
+        class="person-card__status"
+        data-testid="person-card-status"
+        >{{ STATUS_LABELS[status] }}</span
+      >
+    </div>
 
     <div class="person-card__last-session">
       <span class="person-card__label">Last session</span>
@@ -51,8 +66,11 @@
 import { computed } from 'vue'
 import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import InitialsAvatar from '@/components/InitialsAvatar.vue'
+import PresenceDot from '@/components/PresenceDot.vue'
+import type { VolunteerStatus } from '@/types/users'
 import { avatarColor, AVATAR_TEXT_COLOR } from '@/components/NTHS/member-avatar'
 import { dayjs, minutesToHoursAndMinutes } from '@/utils/time-utils'
+import store from '@/store'
 
 type PartnerType = 'coach' | 'student'
 
@@ -67,7 +85,13 @@ const props = defineProps<{
   name: string
   userId?: string
   lastSession?: LastSession | null
+  status?: VolunteerStatus
 }>()
+
+const STATUS_LABELS: Partial<Record<VolunteerStatus, string>> = {
+  'in-session': 'In session',
+  offline: 'Offline',
+}
 
 function formatDuration(totalMinutes: number): string {
   const result = minutesToHoursAndMinutes(Math.max(1, Math.round(totalMinutes)))
@@ -92,6 +116,10 @@ const lastSessionInfo = computed(() => {
   }
   return info
 })
+
+const isShowCoachStatusEnabled = computed(
+  () => store.getters['featureFlags/isShowCoachStatusEnabled']
+)
 </script>
 
 <style lang="scss" scoped>
@@ -135,8 +163,26 @@ const lastSessionInfo = computed(() => {
     z-index: 1;
   }
 
-  &__name {
+  &__presence-dot {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+
+  &__name-row {
     grid-area: name;
+    display: flex;
+    // The status drops below the name when they don't fit on one line
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 8px;
+    row-gap: 2px;
+    min-width: 0;
+  }
+
+  &__name {
+    min-width: 0;
     font-size: 18px;
     font-weight: 500;
     color: $c-soft-black;
@@ -144,6 +190,13 @@ const lastSessionInfo = computed(() => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  &__status {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: $c-secondary-grey;
+    font-weight: 500;
   }
 
   &__last-session {

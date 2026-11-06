@@ -1002,6 +1002,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR = 'volunteer-show-online-status-fake-door',
   AMERICA_COUNTS_AUTO_JOIN_DELAY = 'america-counts-auto-join-delay',
   DIRECT_MESSAGES = 'direct-messages',
+  SHOW_COACH_STATUS = 'show-coach-status',
 }
 
 export const ANALYTICS_REPORT_ROW = {

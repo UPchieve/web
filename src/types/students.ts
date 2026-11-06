@@ -1,5 +1,6 @@
 import type { ISODateString, Uuid } from './shared'
 import type { VolunteerPublicProfileInfoShared } from './sessions'
+import type { VolunteerStatus } from './users'
 
 export type PastVolunteerSession = {
   sessionId: Uuid
@@ -20,4 +21,8 @@ export type PastVolunteer = {
 
 export type PastVolunteersResponse = {
   pastVolunteers: PastVolunteer[]
+}
+
+export type VolunteerStatusesResponse = {
+  statuses: Record<Uuid, VolunteerStatus>
 }

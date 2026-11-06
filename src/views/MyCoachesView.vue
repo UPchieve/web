@@ -13,6 +13,7 @@ import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
+import { useCoachStatuses } from '@/composables/useCoachStatuses'
 import { minutesInMs } from '@/utils/time-utils'
 import type { PastVolunteer } from '@/types/students'
 import MessageIcon from '@/assets/message-circle.svg'
@@ -39,6 +40,8 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
 const isDirectMessagesEnabled = computed(
   () => store.getters['featureFlags/isDirectMessagesEnabled']
 )
+
+const { statuses: coachStatuses } = useCoachStatuses()
 
 const allCoaches = ref<Coach[]>([])
 const filteredCoaches = ref<Coach[]>([])
@@ -215,6 +218,7 @@ onMounted(async () => {
           type="coach"
           :name="coach.firstName"
           :last-session="coach.lastSession"
+          :status="coachStatuses[coach.volunteerId]"
         >
           <template #avatar-badge>
             <FavoritingToggle

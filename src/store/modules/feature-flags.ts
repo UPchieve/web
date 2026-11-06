@@ -41,6 +41,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.SHOW_VOLUNTEER_OPT_IN_TO_SHARE_INFO]: false,
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR]: false,
       [POSTHOG_FEATURE_FLAGS.DIRECT_MESSAGES]: false,
+      [POSTHOG_FEATURE_FLAGS.SHOW_COACH_STATUS]: false,
       // The following flags are for gating risky features, NOT features being
       // experimented/slowly rolled out.
       // They are never to be removed as part of a "launch".
@@ -218,6 +219,8 @@ export default {
       ],
     isDirectMessagesEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.DIRECT_MESSAGES],
+    isShowCoachStatusEnabled: (state: FeatureFlagState) =>
+      state.toggleFlags[POSTHOG_FEATURE_FLAGS.SHOW_COACH_STATUS],
     // Risky features gates.
     isForceSmsVerificationEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.FORCE_SMS_VERIFICATION],
