@@ -19,6 +19,7 @@
 @include meta.load-css('vuetify/styles');
 
 @include meta.load-css('layout/utils');
+@include meta.load-css('layout/alert');
 @include meta.load-css('layout/form');
 @include meta.load-css('layout/modal');
 @include meta.load-css('layout/spacing');

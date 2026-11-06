@@ -128,7 +128,7 @@ function captureSsoClickEvent(provider: SsoProvider): void {
       </h1>
       <div
         v-if="hasLoginError"
-        class="alert alert-danger"
+        class="login-error"
         role="alert"
         data-testid="error"
       >
@@ -231,12 +231,12 @@ function captureSsoClickEvent(provider: SsoProvider): void {
 </template>
 
 <style lang="scss" scoped>
-.alert {
-  margin: 25px 0;
+.login-error {
   border: 2px solid #fbbc05;
   border-radius: 8px;
   background-color: rgba(251, 188, 5, 0.1);
   padding: 8px 12px;
+  margin: 25px 0;
 
   strong,
   div,

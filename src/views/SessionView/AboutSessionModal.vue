@@ -13,8 +13,8 @@
           </large-button>
         </div>
         <div class="alert-container">
-          <div class="alert">
-            <alert-icon class="alert-icon" />
+          <div class="total-sessions">
+            <alert-icon class="total-sessions-icon" />
             <div class="subheading" data-testid="total-sessions">
               {{ totalSessionsTextTitle }}
             </div>
@@ -242,9 +242,8 @@ export default {
   }
 }
 
-.alert {
+.total-sessions {
   @include flex-container(row, normal, center);
-  padding: 0;
   margin-top: 1.25em;
 
   &-icon {

@@ -1,0 +1,32 @@
+@use 'sass:color';
+@use '../setup/colors' as *;
+
+@mixin alert-variant($color) {
+  background-color: color.mix(#fff, $color, 80%);
+  border-color: color.mix(#fff, $color, 72%);
+  color: color.mix(#000, $color, 48%);
+}
+
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.alert-info {
+  @include alert-variant($c-information-blue);
+}
+
+.alert-success {
+  @include alert-variant($c-success-green);
+}
+
+.alert-warning {
+  @include alert-variant($c-warning-orange);
+}
+
+.alert-danger {
+  @include alert-variant($c-error-red);
+}

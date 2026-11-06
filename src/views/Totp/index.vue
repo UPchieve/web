@@ -76,8 +76,5 @@ async function verify() {
 
 .alert {
   margin-bottom: 20px;
-  &.alert-danger {
-    color: $c-error-red;
-  }
 }
 </style>
