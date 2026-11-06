@@ -49,18 +49,6 @@ export function setHasSeenScreenShareDisclaimerThisSession() {
   )
 }
 
-function getActiveHolds(session) {
-  const now = new Date()
-  return (session?.holds ?? []).filter(
-    (hold) => new Date(hold.startsAt) <= now && new Date(hold.endsAt) > now
-  )
-}
-
-export function maybeGetActiveSessionHoldForUser(session, forUserId) {
-  const activeHolds = getActiveHolds(session)
-  return activeHolds.find((hold) => hold.coachId === forUserId)
-}
-
 export function getWaitTime(session: { createdAt: Date }): {
   displayValue: string
   milliseconds: number

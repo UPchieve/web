@@ -10,6 +10,7 @@ import botConversationsModule, {
 } from './modules/bot-conversations'
 import liveMediaModule from './modules/liveMedia'
 import americaCountsVolunteerModule from './modules/america-counts-volunteer'
+import type { SessionOffer } from '@/types/sessions'
 
 // TODO: Update with the type of all the modules once convert to TS.
 // TODO: Move to a types store file to avoid any potential circular dependency issues
@@ -17,6 +18,7 @@ import americaCountsVolunteerModule from './modules/america-counts-volunteer'
 export type RootState = {
   user: UserStoreState
   botConversations: TutorBotStoreState
+  volunteer: { sessionOffer: SessionOffer | null }
 }
 export type RootGetters = any
 

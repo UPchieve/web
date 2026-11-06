@@ -2,7 +2,11 @@ import type { ActionContext } from 'vuex'
 import router from '@/router'
 import { socket } from '@/socket'
 import type { RootState } from '@/store/index'
-import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
+import type {
+  SessionOffer,
+  SessionOfferClosed,
+  VolunteerPublicProfileInfoShared,
+} from '@/types/sessions'
 import LoggerService from '@/services/LoggerService'
 import {
   IMAGE_UPLOAD_EVENTS,
@@ -191,6 +195,30 @@ export default {
       socket.on('session-change', (sessionData: any) => {
         dispatch('user/updateSession', sessionData, { root: true })
       })
+
+      socket.on('session-offer', (offer: SessionOffer) => {
+        if (rootGetters['user/isVolunteer']) {
+          commit('volunteer/setSessionOffer', offer, { root: true })
+        }
+      })
+
+      socket.on(
+        'session-offer:closed',
+        ({ sessionId, outcome }: SessionOfferClosed) => {
+          const isShownOffer =
+            rootState.volunteer.sessionOffer?.sessionId === sessionId
+          if (isShownOffer && outcome === 'withdrawn-by-student') {
+            AnalyticsService.captureEvent(EVENTS.OFFERS_OFFER_WITHDRAWN, {
+              sessionId,
+              countOfAvailableSessionsInList:
+                rootGetters['volunteer/availableSessions'].length,
+              countOfExclusiveSessionsInList:
+                rootGetters['volunteer/exclusiveSessions'].length,
+            })
+          }
+          commit('volunteer/clearSessionOffer', sessionId, { root: true })
+        }
+      )
 
       socket.on('sessions', async (sessions: any[]) => {
         if (rootGetters['user/isVolunteer']) {

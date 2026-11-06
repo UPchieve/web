@@ -93,3 +93,17 @@ export type SessionMessage =
   | SystemMessage
   | ChatBotMessage
   | PendingMessage
+
+export type SessionOffer = {
+  sessionId: string
+  subject: string
+  subjectDisplayName: string
+  topic: string
+  studentFirstName: string
+  expiresAt: string
+}
+
+export type SessionOfferClosed = {
+  sessionId: string
+  outcome: 'declined' | 'expired' | 'accepted' | 'withdrawn-by-student'
+}

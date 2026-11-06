@@ -9,7 +9,7 @@ import App from '@/components/App/index.vue'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
 import AppModal from '@/components/App/AppModal/index.vue'
-import ModalService from '@/services/ModalService'
+import SessionOfferAlert from '@/views/SessionOffers/SessionOfferAlert.vue'
 
 const getWrapper = (options = {}) => {
   options = {
@@ -38,6 +38,7 @@ const getWrapper = (options = {}) => {
       mocks: {
         $route: options.mockRoute,
       },
+      stubs: options.stubs,
     },
   })
 }
@@ -133,42 +134,64 @@ describe('App', () => {
     expect(refreshAppAlert.exists()).toBeFalsy()
   })
 
-  describe('sessionHoldData watcher', () => {
-    const hold = { endsAt: new Date() }
-    const state = (extra = {}) => ({
-      hold,
-      hideAlert: false,
-      isVolunteer: true,
-      isInSession: false,
-      ...extra,
-    })
+  describe('SessionOfferAlert', () => {
+    const offer = { sessionId: 'session-1', expiresAt: new Date() }
+    const liveSession = { id: 'session-2', createdAt: new Date() }
+
+    const mountWith = async ({
+      userType = 'volunteer',
+      sessionOffer = offer,
+      session = {},
+    } = {}) => {
+      const wrapper = getWrapper({ stubs: { SessionOfferAlert: true } })
+      wrapper.vm.$store.commit('user/setUser', { userType })
+      wrapper.vm.$store.commit('user/setSession', session)
+      wrapper.vm.$store.commit('volunteer/setSessionOffer', sessionOffer)
+      await wrapper.vm.$nextTick()
+      return wrapper
+    }
 
     it.each([
-      [
-        'a volunteer whose session goes live hides the modal',
-        state({ isInSession: true }),
-        state(),
-        1,
-      ],
-      [
-        'a volunteer already in session does not hide again',
-        state({ isInSession: true }),
-        state({ isInSession: true }),
-        0,
-      ],
-      [
-        'a non-volunteer whose session goes live does not hide',
-        state({ isInSession: true, isVolunteer: false }),
-        state({ isVolunteer: false }),
-        0,
-      ],
-    ])('%s', (_label, current, previous, hideCalls) => {
-      const hide = vi.spyOn(ModalService, 'hide').mockImplementation(() => {})
-      const fakeThis = { $store: { commit: vi.fn() } }
+      ['shows for a volunteer with an offer', {}, true],
+      ['hides with no offer', { sessionOffer: null }, false],
+      ['hides for a non-volunteer', { userType: 'student' }, false],
+      ['hides while in a live session', { session: liveSession }, false],
+    ])('%s', async (_label, state, shown) => {
+      const wrapper = await mountWith(state)
 
-      App.watch.sessionHoldData.handler.call(fakeThis, current, previous)
+      expect(wrapper.findComponent(SessionOfferAlert).exists()).toBe(shown)
+    })
 
-      expect(hide).toHaveBeenCalledTimes(hideCalls)
+    it('hides once the offer is cleared', async () => {
+      const wrapper = await mountWith()
+
+      wrapper.vm.$store.commit('volunteer/clearSessionOffer', 'session-1')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(SessionOfferAlert).exists()).toBe(false)
+    })
+
+    it('remounts for a new offer', async () => {
+      const wrapper = await mountWith()
+      const first = wrapper.findComponent(SessionOfferAlert).vm
+
+      wrapper.vm.$store.commit('volunteer/setSessionOffer', {
+        ...offer,
+        sessionId: 'session-3',
+      })
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(SessionOfferAlert).vm).not.toBe(first)
+    })
+
+    it('does not touch the app modal', async () => {
+      const wrapper = await mountWith()
+      useAppModalStore().show({ component: 'ConfirmModal' })
+
+      wrapper.vm.$store.commit('volunteer/clearSessionOffer', 'session-1')
+      await wrapper.vm.$nextTick()
+
+      expect(useAppModalStore().isShown).toBe(true)
     })
   })
 })

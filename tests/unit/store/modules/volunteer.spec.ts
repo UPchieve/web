@@ -179,3 +179,34 @@ describe('isOnboardedAndApproved', () => {
     }
   )
 })
+
+describe('session offers', () => {
+  const buildOffer = (overrides = {}) => ({
+    sessionId: 'session-1',
+    subject: 'algebraOne',
+    subjectDisplayName: 'Algebra 1',
+    topic: 'math',
+    studentFirstName: 'Ada',
+    expiresAt: '2026-11-04T12:00:30.000Z',
+    ...overrides,
+  })
+
+  it('clears the offer for its session', () => {
+    const store = getStore()
+    store.commit('volunteer/setSessionOffer', buildOffer())
+
+    store.commit('volunteer/clearSessionOffer', 'session-1')
+
+    expect(store.state.volunteer.sessionOffer).toBeNull()
+  })
+
+  it('keeps the offer when a different session is cleared', () => {
+    const store = getStore()
+    const offer = buildOffer()
+    store.commit('volunteer/setSessionOffer', offer)
+
+    store.commit('volunteer/clearSessionOffer', 'session-2')
+
+    expect(store.state.volunteer.sessionOffer).toEqual(offer)
+  })
+})

@@ -97,6 +97,7 @@ onBeforeUnmount(() => {
   .count-text {
     @include font-category('heading');
     font-weight: $font-weight-bold;
+    text-align: center;
   }
 
   .seconds-text {

@@ -3,8 +3,6 @@ import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
-import { maybeGetActiveSessionHoldForUser } from '@/utils/session'
-import { union } from 'lodash-es'
 import { useNotificationsStore } from '@/stores/notifications'
 
 export default {
@@ -14,21 +12,14 @@ export default {
     allOpenSessions: [],
     tickIntervalId: null,
     ticks: 0,
-    dismissedSessionHolds: [],
-    // manual state for whether to force hide the alert modal
-    // without having to wait for subway to send the updated holds data.
-    hideSessionHoldAlert: false,
-    alertedSessionIds: [],
+    sessionOffer: null,
   },
   mutations: {
-    setAlertedSessionIds: (state, value) => {
-      state.alertedSessionIds = value
+    setSessionOffer: (state, offer) => {
+      state.sessionOffer = offer
     },
-    setHideSessionHoldAlert: (state, value) => {
-      state.hideSessionHoldAlert = value
-    },
-    addDismissedSessionHold: (state, sessionId) => {
-      state.dismissedSessionHolds.push(sessionId)
+    clearSessionOffer: (state, sessionId) => {
+      if (state.sessionOffer?.sessionId === sessionId) state.sessionOffer = null
     },
     setNewWaitingStudentAudioElement: (state, element) =>
       (state.newWaitingStudentAudioElement = element),
@@ -45,24 +36,6 @@ export default {
     },
   },
   actions: {
-    alertForReleasedHolds(
-      { getters, state, dispatch, commit, rootGetters },
-      { context }
-    ) {
-      const availableSessions = getters.availableSessions
-      const availableSessionIds = availableSessions.map((s) => s.id)
-      const needsAlert = availableSessions.filter(
-        (s) => !state.alertedSessionIds.includes(s.id)
-      )
-      commit('setAlertedSessionIds', availableSessionIds)
-      if (!needsAlert.length || rootGetters['user/isSessionAlive']) {
-        return
-      }
-      needsAlert.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-      const oldest = needsAlert[0]
-      dispatch('alertVolunteer', { context, session: oldest })
-      PresenceService.checkForInactivity()
-    },
     gotoSession({ dispatch }, { context, session }) {
       const { type, subTopic, id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
@@ -82,10 +55,7 @@ export default {
       }
     },
 
-    alertVolunteer(
-      { dispatch, rootGetters, getters, rootState },
-      { context, session }
-    ) {
+    alertVolunteer({ dispatch, rootGetters, getters }, { context, session }) {
       const availableSessions = getters['availableSessions']
       const isAvailableSession = availableSessions.some(
         (s) => s?.id === session.id
@@ -95,9 +65,6 @@ export default {
       }
 
       dispatch('playAudio')
-      if (maybeGetActiveSessionHoldForUser(session, rootState.user.user.id)) {
-        return // Do not send the toast notification if they are already getting the session hold notif
-      }
       sendWebNotification(
         `${session.student?.firstname ?? 'A student'} needs help`,
         {
@@ -159,7 +126,7 @@ export default {
      *  - rendering a dynamic wait time for specific students
      *  - dispatching an audio or visual alert at specified times
      */
-    tickInterval({ dispatch, commit, state }, { context, wait = 1000 }) {
+    tickInterval({ commit, state }, wait = 1000) {
       commit(
         'setTickIntervalId',
         setInterval(() => {
@@ -169,7 +136,6 @@ export default {
             commit('resetTicks', null)
           } else {
             commit('incTicks', null)
-            dispatch('alertForReleasedHolds', { context })
           }
         }, wait)
       )
@@ -205,7 +171,7 @@ export default {
 
       // Trigger tick dispatch at interval if there is no timer running
       if (sessions.length > 0 && !state.tickIntervalId) {
-        dispatch('tickInterval', { context, wait: 1000 })
+        dispatch('tickInterval', 1000)
       }
 
       const eligibleSessions = []
@@ -284,13 +250,6 @@ export default {
       if (volunteerIsNotInSession && newSession) {
         PresenceService.checkForInactivity()
         dispatch('alertVolunteer', { context, session: newSession })
-        commit(
-          'setAlertedSessionIds',
-          union(
-            state.alertedSessionIds,
-            alertableSessions.map((s) => s.id)
-          )
-        )
       }
 
       if (
@@ -305,26 +264,6 @@ export default {
   },
 
   getters: {
-    currentSessionHold: (state, _getters, rootState) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      state.ticks // this is here to make the getter reactive to the tick cycle.
-      const userId = rootState.user.user.id
-      for (const session of state.allOpenSessions) {
-        const maybeActiveHold = maybeGetActiveSessionHoldForUser(
-          session,
-          userId
-        )
-        if (
-          maybeActiveHold &&
-          !state.dismissedSessionHolds.includes(session.id)
-        ) {
-          return {
-            ...session,
-            hold: maybeActiveHold,
-          }
-        }
-      }
-    },
     isOnboardedAndApproved: (_state, _getters, rootState, rootGetters) => {
       return (
         rootGetters['user/isVolunteer'] &&
@@ -340,30 +279,12 @@ export default {
       )
     },
     availableSessions: (state, getters, rootState) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      state.ticks // make this reactive to the tick cycle
       if (getters['isReadyToTutor']) {
         const unlockedSubjects = rootState.user.user.subjects ?? []
-        const now = new Date()
-        return state.allOpenSessions.filter((session) => {
-          const activeHold = session.holds?.find(
-            (hold) =>
-              new Date(hold.startsAt) <= now && new Date(hold.endsAt) > now
-          )
-
-          const hasFutureHolds = session.holds?.some(
-            (hold) => new Date(hold.endsAt) > now
-          )
-
-          const dismissed = state.dismissedSessionHolds.includes(session.id)
-
-          return (
-            unlockedSubjects.includes(session.subTopic) &&
-            !session.isExclusive &&
-            !(dismissed && hasFutureHolds) &&
-            (!activeHold || activeHold.coachId === rootState.user.user.id)
-          )
-        })
+        return state.allOpenSessions.filter(
+          (session) =>
+            unlockedSubjects.includes(session.subTopic) && !session.isExclusive
+        )
       } else {
         return []
       }

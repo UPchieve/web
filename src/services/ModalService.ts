@@ -13,7 +13,6 @@ import type {
   NTHSTitle,
 } from '@/services/NTHSGroupService'
 import type { RemoveMemberConfirmationProps } from '@/views/NTHS/RemoveMemberConfirmation.vue'
-import SessionHoldAlert from '@/views/SessionHolds/SessionHoldAlert.vue'
 
 type ModalTemplateProps = {
   acceptText?: string
@@ -194,13 +193,6 @@ export default {
         onConfirm: () => resolve(),
         onCancel: () => resolve(),
       })
-    })
-  },
-  showSessionHoldAlert() {
-    show(SessionHoldAlert, {
-      showAccept: true,
-      showSeparator: false,
-      showTemplateButtons: false,
     })
   },
 }

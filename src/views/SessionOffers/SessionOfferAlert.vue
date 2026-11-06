@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useAppModalStore } from '@/stores/app/modal'
 import Modal from '@/components/Modal.vue'
 import SessionService from '@/services/SessionService'
 import { socket } from '@/socket'
@@ -10,58 +9,63 @@ import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import * as PresenceService from '@/services/PresenceService'
+import type { SessionOffer } from '@/types/sessions'
 const store = useStore()
-const modalStore = useAppModalStore()
 
-const sessionHold = computed(
-  () => store.getters['volunteer/currentSessionHold']
+const offer = computed<SessionOffer | null>(
+  () => store.state.volunteer.sessionOffer
 )
 const studentFirstName = computed(
-  () => sessionHold.value?.studentFirstName ?? 'Student'
+  () => offer.value?.studentFirstName ?? 'Student'
 )
-const subjectDisplayName = computed(() => sessionHold.value?.subjectDisplayName)
+const subjectDisplayName = computed(() => offer.value?.subjectDisplayName)
 const article = computed(() => {
-  const firstLetter = Array.from(subjectDisplayName.value)[0]?.toLowerCase()
+  const firstLetter = Array.from<string>(
+    subjectDisplayName.value ?? ''
+  )[0]?.toLowerCase()
   return ['a', 'e', 'i', 'o', 'u'].includes(firstLetter) ? 'an' : 'a'
 })
-const sessionId = computed(() => sessionHold.value?.id)
-function onAcceptSession() {
-  AnalyticsService.captureEvent(EVENTS.HOLDS_ACCEPTED_SESSION, {
+const sessionId = computed(() => offer.value?.sessionId)
+
+function captureEvent(event: string) {
+  AnalyticsService.captureEvent(event, {
     sessionId: sessionId.value,
+    countOfAvailableSessionsInList:
+      store.getters['volunteer/availableSessions'].length,
+    countOfExclusiveSessionsInList:
+      store.getters['volunteer/exclusiveSessions'].length,
   })
-  store.commit('volunteer/setHideSessionHoldAlert', true) // prevents this alert from flickering
-  SessionService.goToSession({
-    id: sessionHold.value?.id,
-    subTopic: sessionHold.value?.subTopic,
-    type: sessionHold.value?.type,
-  })
+}
+
+function clearOffer() {
+  store.commit('volunteer/clearSessionOffer', sessionId.value)
+}
+
+function onAcceptSession() {
+  captureEvent(EVENTS.OFFERS_ACCEPTED_SESSION)
+  const { sessionId: id, subject: subTopic, topic: type } = offer.value!
+  clearOffer()
+  SessionService.goToSession({ id, subTopic, type })
 }
 
 function onPassSession() {
-  AnalyticsService.captureEvent(EVENTS.HOLDS_DISMISSED_HOLD, {
-    sessionId: sessionId.value,
-  })
-  socket.emit('dismissSessionHold', { sessionId: sessionId.value })
-  store.commit('volunteer/addDismissedSessionHold', sessionId.value)
-  modalStore.hide()
+  captureEvent(EVENTS.OFFERS_DECLINED_OFFER)
+  socket.emit('session-offer:decline', { sessionId: sessionId.value })
+  clearOffer()
 }
 
 function onTimeout() {
-  AnalyticsService.captureEvent(EVENTS.HOLDS_HOLD_TIMED_OUT, {
-    sessionId: sessionId.value,
-  })
+  captureEvent(EVENTS.OFFERS_OFFER_TIMED_OUT)
+  clearOffer()
 }
 
-const hold = computed(() => store.getters['volunteer/currentSessionHold'].hold)
 const totalSeconds = Math.floor(
-  (new Date(hold.value.endsAt).getTime() - new Date().getTime()) / 1000
+  (new Date(offer.value!.expiresAt).getTime() - new Date().getTime()) / 1000
 )
 
 onMounted(async () => {
   store.dispatch('volunteer/playAudio')
-  AnalyticsService.captureEvent(EVENTS.HOLDS_SAW_SESSION_HOLD_ALERT, {
-    sessionId: sessionId.value,
-  })
+  captureEvent(EVENTS.OFFERS_SAW_SESSION_OFFER_ALERT)
   PresenceService.checkForInactivity()
 })
 </script>

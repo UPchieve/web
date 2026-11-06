@@ -9,6 +9,10 @@
           <app-header v-show="showHeader" />
           <app-sidebar v-if="showSidebar" />
           <app-modal v-if="showModal" />
+          <session-offer-alert
+            v-if="showSessionOffer"
+            :key="sessionOffer.sessionId"
+          />
           <app-banner v-if="bannerIsShown" />
           <div
             :class="{
@@ -64,7 +68,7 @@ import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS, MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import RouteLoadingIndicator from '@/components/RouteLoadingIndicator.vue'
 import AppTheme from './AppTheme.vue'
-import ModalService from '@/services/ModalService'
+import SessionOfferAlert from '@/views/SessionOffers/SessionOfferAlert.vue'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 const MOBILE_MODE_QUERY = `(max-width: ${MAX_MOBILE_MODE_WIDTH}px)`
@@ -83,6 +87,7 @@ export default {
     Celebration,
     RouteLoadingIndicator,
     AppTheme,
+    SessionOfferAlert,
   },
   data() {
     return {
@@ -283,7 +288,7 @@ export default {
       isConnected: (state) => state.socket.isConnected,
       messageData: (state) => state.socket.messageData,
       fadeInContent: (state) => state.app.fadeInContent,
-      hideSessionHoldAlert: (state) => state.volunteer.hideSessionHoldAlert,
+      sessionOffer: (state) => state.volunteer.sessionOffer,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -293,7 +298,6 @@ export default {
       isTeacher: 'user/isTeacher',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       isReadyToTutor: 'volunteer/isReadyToTutor',
-      currentSessionHold: 'volunteer/currentSessionHold',
       isSessionAlive: 'user/isSessionAlive',
     }),
     doMountRefreshAppAlert() {
@@ -308,44 +312,13 @@ export default {
         this.user.banType !== 'shadow'
       )
     },
-    sessionHoldData() {
-      return {
-        hold: this.currentSessionHold,
-        hideAlert: this.hideSessionHoldAlert,
-        isVolunteer: this.isVolunteer,
-        isInSession: this.isSessionAlive,
-      }
+    showSessionOffer() {
+      return (
+        Boolean(this.sessionOffer) && this.isVolunteer && !this.isSessionAlive
+      )
     },
   },
   watch: {
-    sessionHoldData: {
-      handler(current, previous) {
-        if (current.hideAlert && !current.hold) {
-          // Now that there is no hold coming back from subway,
-          // set the force hide flag back to false in case a new hold comes in.
-          this.$store.commit('volunteer/setHideSessionHoldAlert', false)
-        }
-        if (current.hold && !current.hideAlert) {
-          if (!current.isVolunteer) return
-          if (current.isInSession) {
-            if (previous.hold && !previous.isInSession) {
-              ModalService.hide()
-            }
-            return
-          }
-          ModalService.showSessionHoldAlert({
-            sessionId: current.id,
-            subTopic: current.subTopic,
-            studentFirstName: current.studentFirstName,
-            type: current.type,
-            holdEndsAt: current.hold.endsAt,
-          })
-        } else if (previous.hold && !current.hold) {
-          ModalService.hide()
-        }
-      },
-      deep: true,
-    },
     async user(currentUserValue, previousUserValue) {
       const nowLoggedIn = currentUserValue.id && !previousUserValue.id
       if (nowLoggedIn) {
