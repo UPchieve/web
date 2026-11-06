@@ -14,6 +14,7 @@ import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
 import { minutesInMs } from '@/utils/time-utils'
 import type { PastStudent } from '@/types/volunteers'
 import MessageIcon from '@/assets/message-circle.svg'
+import { vTooltip } from 'maz-ui'
 
 interface Student extends PastStudent {
   lastSession: LastSession
@@ -32,6 +33,9 @@ const $router = useRouter()
 const store = useStore()
 
 const mobileMode = computed(() => store.getters['app/mobileMode'])
+const isDirectMessagesEnabled = computed(
+  () => store.getters['featureFlags/isDirectMessagesEnabled']
+)
 const unreadDirectMessageSenderIds = computed<string[]>(
   () => store.getters['user/unreadDirectMessageSenderIds']
 )
@@ -44,6 +48,10 @@ function messageButtonLabel(student: Student) {
   return hasUnreadMessages(student)
     ? `Message ${student.firstName}, new message`
     : `Message ${student.firstName}`
+}
+
+function messagingUnavailableText(student: Student) {
+  return `${student.firstName} can't receive direct messages yet. You can message them from your session recap page.`
 }
 
 const allStudents = ref<Student[]>([])
@@ -120,6 +128,7 @@ function goToPreviousPage() {
 const activeConversation = ref<Student | null>(null)
 
 function openConversation(student: Student) {
+  if (!isDirectMessagesEnabled.value || !student.canDirectMessage) return
   activeConversation.value = student
 }
 
@@ -169,8 +178,38 @@ onMounted(async () => {
           :name="student.firstName"
           :last-session="student.lastSession"
         >
-          <template #actions>
+          <template v-if="isDirectMessagesEnabled" #actions>
+            <span
+              v-if="!student.canDirectMessage"
+              class="message-button-tooltip"
+              data-testid="message-button-tooltip"
+              v-tooltip="{
+                text: messagingUnavailableText(student),
+                color: 'black',
+                position: 'top',
+              }"
+            >
+              <LargeButton
+                class="message-button"
+                data-testid="message-button"
+                :aria-label="messagingUnavailableText(student)"
+                :disabled="true"
+                :show-arrow="false"
+                variant="outlined"
+              >
+                <span class="message-button__icon">
+                  <MessageIcon aria-hidden="true" />
+                  <ActivityDot
+                    v-if="hasUnreadMessages(student)"
+                    class="message-button__unread-dot"
+                    data-testid="unread-message-dot"
+                    aria-hidden="true"
+                  />
+                </span>
+              </LargeButton>
+            </span>
             <LargeButton
+              v-else
               class="message-button"
               data-testid="message-button"
               :aria-label="messageButtonLabel(student)"
@@ -371,6 +410,11 @@ onMounted(async () => {
     transform: rotate(-90deg);
     margin-left: 0.4em;
   }
+}
+
+.message-button-tooltip {
+  display: inline-flex;
+  font-size: 12px;
 }
 
 .message-button {

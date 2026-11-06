@@ -8,6 +8,7 @@ export type PastStudent = {
   subjectDisplayName: string
   createdAt: ISODateString
   timeTutored: number
+  canDirectMessage: boolean
 }
 
 export type PastStudentsResponse = {

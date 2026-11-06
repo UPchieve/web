@@ -324,6 +324,7 @@ export default {
       mobileMode: 'app/mobileMode',
       exclusiveSessions: 'volunteer/exclusiveSessions',
       isSessionSummaryEnabled: 'featureFlags/isSessionSummaryEnabled',
+      isDirectMessagesEnabled: 'featureFlags/isDirectMessagesEnabled',
       isStudentRequestSpecificVolunteerSessionsEnabled:
         'featureFlags/isStudentRequestSpecificVolunteerSessionsEnabled',
     }),
@@ -397,7 +398,12 @@ export default {
         this.$route.params.sessionId
       )
       this.session = response.data.session
-      this.isRecapDmsAvailable = response.data.isRecapDmsAvailable
+      this.isRecapDmsAvailable =
+        response.data.isRecapDmsAvailable &&
+        !(await this.canUseDirectMessagesInstead())
+      if (this.isStudent && this.isDirectMessagesEnabled) {
+        this.markRecapDmsAsSeen()
+      }
       this.sessionSummary = response.data.summary
       this.$store.dispatch('user/fetchRecapSessionForDms', this.session.id)
 
@@ -487,6 +493,44 @@ export default {
     this.zwibblerCtx?.destroy()
   },
   methods: {
+    // Students with direct messages enabled only get the read-only chat log,
+    // which doesn't mark recap DMs from before the switch as seen. Opening
+    // the recap counts as reading them so their unread indicators clear.
+    async markRecapDmsAsSeen() {
+      try {
+        if (!this.session?.id || !this.user?.id) {
+          return
+        }
+        await NetworkService.updateSessionLastSeen(
+          this.session.id,
+          this.user.id
+        )
+        this.$store.dispatch('user/fetchUnreadDMs')
+      } catch (error) {
+        LoggerService.noticeError(error)
+      }
+    },
+    // Recap DMs are only for pairs who can't use direct messages yet
+    // because the student's direct-messages FF is off
+    async canUseDirectMessagesInstead() {
+      if (!this.isDirectMessagesEnabled) {
+        return false
+      }
+      if (this.isStudent) {
+        return true
+      }
+
+      try {
+        const { pastStudents } = await NetworkService.getPastStudents()
+        const student = pastStudents.find(
+          (pastStudent) => pastStudent.studentId === this.session.studentId
+        )
+        return !!student?.canDirectMessage
+      } catch (err) {
+        LoggerService.noticeError(err)
+        return false
+      }
+    },
     ...mapActions(useAppModalStore, { showAppModal: 'show' }),
     joinExclusiveRequest() {
       if (!this.exclusiveRequest) return

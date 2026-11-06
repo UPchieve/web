@@ -44,11 +44,15 @@ function pastStudent(overrides: Partial<PastStudent> = {}): PastStudent {
     subjectDisplayName: 'Precalculus',
     createdAt: '2026-09-17T17:45:00',
     timeTutored: 90 * 60 * 1000,
+    canDirectMessage: true,
     ...overrides,
   }
 }
 
-function mountView({ unreadDirectMessageSenderIds = [] as string[] } = {}) {
+function mountView({
+  unreadDirectMessageSenderIds = [] as string[],
+  isDirectMessagesEnabled = true,
+} = {}) {
   return mount(MessagesView, {
     global: {
       plugins: [
@@ -63,6 +67,12 @@ function mountView({ unreadDirectMessageSenderIds = [] as string[] } = {}) {
               getters: {
                 unreadDirectMessageSenderIds: () =>
                   unreadDirectMessageSenderIds,
+              },
+            },
+            featureFlags: {
+              namespaced: true,
+              getters: {
+                isDirectMessagesEnabled: () => isDirectMessagesEnabled,
               },
             },
           },
@@ -264,5 +274,42 @@ describe('MessagesView', () => {
     expect(
       secondCard.find('[data-testid="message-button"]').attributes('aria-label')
     ).toBe('Message Student 2, new message')
+  })
+
+  it('hides the message button when direct messages are off for the volunteer', async () => {
+    mockedNetworkService.getPastStudents.mockResolvedValue({
+      pastStudents: [
+        pastStudent(),
+        pastStudent({ studentId: 'student-2', canDirectMessage: false }),
+      ],
+    })
+    const wrapper = mountView({ isDirectMessagesEnabled: false })
+    await flushPromises()
+
+    expect(wrapper.findAll('.student-card')).toHaveLength(2)
+    expect(wrapper.find('[data-testid="message-button"]').exists()).toBe(false)
+    expect(
+      wrapper.find('[data-testid="message-button-tooltip"]').exists()
+    ).toBe(false)
+  })
+
+  it('points the volunteer to the session recap when the student cannot be messaged', async () => {
+    mockedNetworkService.getPastStudents.mockResolvedValue({
+      pastStudents: [pastStudent({ canDirectMessage: false })],
+    })
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="message-button-tooltip"]').exists()
+    ).toBe(true)
+    const messageButton = wrapper.find('[data-testid="message-button"]')
+    expect(messageButton.attributes('aria-label')).toBe(
+      "Jordan can't receive direct messages yet. You can message them from your session recap page."
+    )
+    await messageButton.trigger('click')
+    expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(
+      false
+    )
   })
 })
