@@ -32,6 +32,7 @@ import type {
   DirectMessagesResponse,
   GetOrCreateConversationRequest,
   GetOrCreateConversationResponse,
+  UnreadDirectMessagesResponse,
 } from '@/types/direct-messages'
 import type { PastVolunteersResponse } from '@/types/students'
 import type {
@@ -336,6 +337,19 @@ export function getDirectMessages(conversationId: Uuid) {
   )
 }
 
+export function markConversationSeen(conversationId: Uuid) {
+  return httpPost<void>(
+    `${API_ROOT}/conversations/${conversationId}/last-seen`,
+    {}
+  )
+}
+
+export function getUnreadDirectMessages() {
+  return httpGet<UnreadDirectMessagesResponse>(
+    `${API_ROOT}/conversations/unread`
+  )
+}
+
 export function getPastVolunteers() {
   return httpGet<PastVolunteersResponse>(`${API_ROOT}/students/past-volunteers`)
 }
@@ -495,6 +509,8 @@ export default {
   getPastStudents,
   getOrCreateConversation,
   getDirectMessages,
+  markConversationSeen,
+  getUnreadDirectMessages,
   getPastVolunteers,
   getNTHSChecklist,
   updateNTHSChecklistItemProgress,

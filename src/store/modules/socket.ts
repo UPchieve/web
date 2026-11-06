@@ -7,6 +7,7 @@ import type {
   SessionOfferClosed,
   VolunteerPublicProfileInfoShared,
 } from '@/types/sessions'
+import type { NewDirectMessageEvent } from '@/types/direct-messages'
 import LoggerService from '@/services/LoggerService'
 import {
   IMAGE_UPLOAD_EVENTS,
@@ -271,6 +272,18 @@ export default {
 
       socket.on('dm:received', () => {
         dispatch('user/fetchUnreadDMs', null, { root: true })
+      })
+
+      // Mark the sender as unread when someone else messages us, unless their
+      // chat is already open. Updating locally instead of refetching avoids an
+      // older response bringing the unread dot back after the chat marks it seen.
+      socket.on('direct-message:new', (data: NewDirectMessageEvent) => {
+        const { user, activeDirectMessagePartnerId } = rootState.user
+        if (data.senderId === user?.id) return
+        if (data.senderId === activeDirectMessagePartnerId) return
+        commit('user/addUnreadDirectMessageSender', data.senderId, {
+          root: true,
+        })
       })
 
       socket.on('sessions/recap:joined', () => {

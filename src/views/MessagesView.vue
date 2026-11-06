@@ -8,6 +8,7 @@ import CaretIcon from '@/assets/caret.svg'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import Loader from '@/components/Loader.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import ActivityDot from '@/components/ActivityDot.vue'
 import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
 import { minutesInMs } from '@/utils/time-utils'
@@ -31,6 +32,19 @@ const $router = useRouter()
 const store = useStore()
 
 const mobileMode = computed(() => store.getters['app/mobileMode'])
+const unreadDirectMessageSenderIds = computed<string[]>(
+  () => store.getters['user/unreadDirectMessageSenderIds']
+)
+
+function hasUnreadMessages(student: Student) {
+  return unreadDirectMessageSenderIds.value.includes(student.studentId)
+}
+
+function messageButtonLabel(student: Student) {
+  return hasUnreadMessages(student)
+    ? `Message ${student.firstName}, new message`
+    : `Message ${student.firstName}`
+}
 
 const allStudents = ref<Student[]>([])
 const students = ref<Student[]>([])
@@ -159,12 +173,20 @@ onMounted(async () => {
             <LargeButton
               class="message-button"
               data-testid="message-button"
-              :aria-label="`Message ${student.firstName}`"
+              :aria-label="messageButtonLabel(student)"
               @click="openConversation(student)"
               :show-arrow="false"
               variant="outlined"
             >
-              <MessageIcon aria-hidden="true" />
+              <span class="message-button__icon">
+                <MessageIcon aria-hidden="true" />
+                <ActivityDot
+                  v-if="hasUnreadMessages(student)"
+                  class="message-button__unread-dot"
+                  data-testid="unread-message-dot"
+                  aria-hidden="true"
+                />
+              </span>
             </LargeButton>
           </template>
         </PersonCard>
@@ -354,5 +376,23 @@ onMounted(async () => {
 .message-button {
   border-width: 2px;
   border-radius: 24px;
+
+  :deep(.ButtonTemplate-content) {
+    overflow: visible;
+  }
+
+  &__icon {
+    position: relative;
+    display: inline-flex;
+  }
+
+  &__unread-dot {
+    position: absolute;
+    top: -3px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    background-color: $c-warning-orange;
+  }
 }
 </style>

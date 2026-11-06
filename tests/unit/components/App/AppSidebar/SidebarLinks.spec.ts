@@ -1,12 +1,15 @@
-import { shallowMount } from '@vue/test-utils'
-import { h, nextTick, type Component } from 'vue'
+import { config, shallowMount } from '@vue/test-utils'
+import { h, nextTick, ref, type Component, type Ref } from 'vue'
+import { vi, type MockInstance } from 'vitest'
 import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { useNthsStore } from '@/stores/nths'
 import SidebarLink from '@/components/App/AppSidebar/SidebarLink.vue'
 import SidebarLinks from '@/components/App/AppSidebar/SidebarLinks.vue'
+import ActivityDot from '@/components/ActivityDot.vue'
 import AnalyticsService from '@/services/AnalyticsService'
+import NetworkService from '@/services/NetworkService'
 import { EVENTS } from '@/consts'
 
 // General links
@@ -843,6 +846,117 @@ describe('SidebarLinks', () => {
           })
           expect(isTargetLinkPresent).toEqual(true)
           expect(wrapper.vm.shouldShowNthsChapterCreationDot).toEqual(false)
+        }
+      )
+    })
+  })
+
+  describe('unread direct messages', () => {
+    let getUnreadDirectMessages: MockInstance<
+      typeof NetworkService.getUnreadDirectMessages
+    >
+
+    beforeEach(() => {
+      getUnreadDirectMessages = vi
+        .spyOn(NetworkService, 'getUnreadDirectMessages')
+        .mockResolvedValue({ senderIds: [] })
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    const getDirectMessagesWrapper = (
+      isDirectMessagesEnabled: Ref<boolean>,
+      authenticated = true
+    ) =>
+      getWrapper({
+        props: { authenticated },
+        featureFlags: {
+          getters: {
+            isDirectMessagesEnabled: () => isDirectMessagesEnabled.value,
+          },
+        },
+      })
+
+    it('fetches them on mount when the direct messages flag is on', () => {
+      getDirectMessagesWrapper(ref(true))
+
+      expect(getUnreadDirectMessages).toHaveBeenCalledTimes(1)
+    })
+
+    it('fetches them once the direct messages flag turns on', async () => {
+      const isDirectMessagesEnabled = ref(false)
+      getDirectMessagesWrapper(isDirectMessagesEnabled)
+      expect(getUnreadDirectMessages).not.toHaveBeenCalled()
+
+      isDirectMessagesEnabled.value = true
+      await nextTick()
+
+      expect(getUnreadDirectMessages).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not fetch them when the user is logged out', () => {
+      getDirectMessagesWrapper(ref(true), false)
+
+      expect(getUnreadDirectMessages).not.toHaveBeenCalled()
+    })
+
+    describe('dot', () => {
+      beforeEach(() => {
+        config.global.renderStubDefaultSlot = true
+      })
+
+      afterEach(() => {
+        config.global.renderStubDefaultSlot = false
+      })
+
+      const hasUnreadDot = (
+        wrapper: ReturnType<typeof getWrapper>,
+        linkId: string
+      ) =>
+        wrapper
+          .findAllComponents(SidebarLink)
+          .find((link) => link.attributes('id') === linkId)!
+          .findComponent(ActivityDot)
+          .exists()
+
+      it.each([true, false])(
+        'shows on "My Coaches" for a student only when there are unread messages (%s)',
+        (hasUnreadDirectMessages) => {
+          const wrapper = getWrapper({
+            props: { authenticated: true },
+            user: {
+              state: { user: { studentAssignments: [] } },
+              getters: {
+                hasUnreadDirectMessages: () => hasUnreadDirectMessages,
+              },
+            },
+          })
+
+          expect(hasUnreadDot(wrapper, 'my-coaches-sidebar-link')).toBe(
+            hasUnreadDirectMessages
+          )
+        }
+      )
+
+      it.each([true, false])(
+        'shows on "Messages" for a volunteer only when there are unread messages (%s)',
+        (hasUnreadDirectMessages) => {
+          const wrapper = getWrapper({
+            props: { authenticated: true },
+            user: {
+              getters: {
+                isStudent: () => false,
+                isVolunteer: () => true,
+                hasUnreadDirectMessages: () => hasUnreadDirectMessages,
+              },
+            },
+          })
+
+          expect(hasUnreadDot(wrapper, 'messages-sidebar-link')).toBe(
+            hasUnreadDirectMessages
+          )
         }
       )
     })

@@ -12,6 +12,7 @@ vi.mock('@/services/NetworkService', () => ({
   default: {
     getOrCreateConversation: vi.fn(),
     getDirectMessages: vi.fn(),
+    markConversationSeen: vi.fn(),
   },
 }))
 
@@ -45,6 +46,16 @@ vi.mock('@/services/LoggerService', () => ({
 const mockedNetworkService = vi.mocked(NetworkService)
 const mockedSocket = vi.mocked(socket)
 const mockedLoggerService = vi.mocked(LoggerService)
+const removeUnreadDirectMessageSender = vi.fn()
+const setActiveDirectMessagePartnerId = vi.fn(
+  (
+    state: { activeDirectMessagePartnerId: string | null },
+    id: string | null
+  ) => {
+    state.activeDirectMessagePartnerId = id
+  }
+)
+let store: ReturnType<typeof createStore>
 
 const USER_ID = 'student-1'
 const PARTNER_ID = 'coach-1'
@@ -62,22 +73,25 @@ function directMessage(overrides: Partial<DirectMessage> = {}): DirectMessage {
 }
 
 function mountChat() {
+  store = createStore({
+    modules: {
+      user: {
+        namespaced: true,
+        state: { user: { id: USER_ID }, activeDirectMessagePartnerId: null },
+        mutations: {
+          removeUnreadDirectMessageSender,
+          setActiveDirectMessagePartnerId,
+        },
+      },
+    },
+  })
   return mount(DirectMessageChat, {
     props: {
       partnerId: PARTNER_ID,
       partnerName: 'Alex',
     },
     global: {
-      plugins: [
-        createStore({
-          modules: {
-            user: {
-              namespaced: true,
-              state: { user: { id: USER_ID } },
-            },
-          },
-        }),
-      ],
+      plugins: [store],
       stubs: { Loader: true },
     },
   })
@@ -355,5 +369,106 @@ describe('DirectMessageChat', () => {
       'direct-message:error',
       expect.any(Function)
     )
+  })
+
+  describe('tracking the open chat', () => {
+    function activePartnerId() {
+      return (
+        store.state as { user: { activeDirectMessagePartnerId: string | null } }
+      ).user.activeDirectMessagePartnerId
+    }
+
+    it('marks the partner as the open chat when it mounts', async () => {
+      await mountWithNoMessages()
+
+      expect(activePartnerId()).toBe(PARTNER_ID)
+    })
+
+    it('switches to the new partner when the partner changes', async () => {
+      const wrapper = await mountWithNoMessages()
+
+      await wrapper.setProps({ partnerId: 'coach-2' })
+
+      expect(activePartnerId()).toBe('coach-2')
+    })
+
+    it('clears the open chat when closed', async () => {
+      const wrapper = await mountWithNoMessages()
+
+      wrapper.unmount()
+
+      expect(activePartnerId()).toBeNull()
+    })
+
+    it('leaves another open chat alone when closed', async () => {
+      const wrapper = await mountWithNoMessages()
+      store.commit('user/setActiveDirectMessagePartnerId', 'coach-2')
+
+      wrapper.unmount()
+
+      expect(activePartnerId()).toBe('coach-2')
+    })
+  })
+
+  describe('marking the conversation seen', () => {
+    it('marks it seen and clears the partner from unread once it loads', async () => {
+      await mountWithNoMessages()
+
+      expect(mockedNetworkService.markConversationSeen).toHaveBeenCalledWith(
+        CONVERSATION_ID
+      )
+      expect(removeUnreadDirectMessageSender).toHaveBeenCalledTimes(1)
+      expect(removeUnreadDirectMessageSender).toHaveBeenCalledWith(
+        expect.anything(),
+        PARTNER_ID
+      )
+    })
+
+    it('does not mark it seen when the messages fail to load', async () => {
+      mockedNetworkService.getDirectMessages.mockRejectedValue(
+        new Error('Network error')
+      )
+      mountChat()
+      await flushPromises()
+
+      expect(mockedNetworkService.markConversationSeen).not.toHaveBeenCalled()
+    })
+
+    it('marks it seen again when a new message from the partner arrives', async () => {
+      await mountWithNoMessages()
+      vi.clearAllMocks()
+
+      await receive('direct-message:new', directMessage())
+
+      expect(mockedNetworkService.markConversationSeen).toHaveBeenCalledWith(
+        CONVERSATION_ID
+      )
+      expect(removeUnreadDirectMessageSender).toHaveBeenCalledWith(
+        expect.anything(),
+        PARTNER_ID
+      )
+    })
+
+    it("does not mark it seen for the user's own new messages", async () => {
+      await mountWithNoMessages()
+      vi.clearAllMocks()
+
+      await receive(
+        'direct-message:new',
+        directMessage({ id: 'message-2', senderId: USER_ID })
+      )
+
+      expect(mockedNetworkService.markConversationSeen).not.toHaveBeenCalled()
+    })
+
+    it('logs the error without showing it when marking fails', async () => {
+      const error = new Error('Network error')
+      mockedNetworkService.markConversationSeen.mockRejectedValueOnce(error)
+      const wrapper = await mountWithNoMessages()
+
+      expect(mockedLoggerService.noticeError).toHaveBeenCalledWith(error)
+      expect(removeUnreadDirectMessageSender).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="load-error"]').exists()).toBe(false)
+    })
   })
 })

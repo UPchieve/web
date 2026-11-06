@@ -48,7 +48,7 @@ function pastStudent(overrides: Partial<PastStudent> = {}): PastStudent {
   }
 }
 
-function mountView() {
+function mountView({ unreadDirectMessageSenderIds = [] as string[] } = {}) {
   return mount(MessagesView, {
     global: {
       plugins: [
@@ -57,6 +57,13 @@ function mountView() {
             app: {
               namespaced: true,
               getters: { mobileMode: () => false },
+            },
+            user: {
+              namespaced: true,
+              getters: {
+                unreadDirectMessageSenderIds: () =>
+                  unreadDirectMessageSenderIds,
+              },
             },
           },
         }),
@@ -235,5 +242,27 @@ describe('MessagesView', () => {
     await flushPromises()
 
     expect(wrapper.find('.page-actions').exists()).toBe(false)
+  })
+
+  it('shows the unread dot only for students who sent unread messages', async () => {
+    mockedNetworkService.getPastStudents.mockResolvedValue({
+      pastStudents: students(2),
+    })
+    const wrapper = mountView({ unreadDirectMessageSenderIds: ['student-2'] })
+    await flushPromises()
+
+    const [firstCard, secondCard] = wrapper.findAll('.student-card')
+    expect(firstCard.find('[data-testid="unread-message-dot"]').exists()).toBe(
+      false
+    )
+    expect(
+      firstCard.find('[data-testid="message-button"]').attributes('aria-label')
+    ).toBe('Message Student 1')
+    expect(secondCard.find('[data-testid="unread-message-dot"]').exists()).toBe(
+      true
+    )
+    expect(
+      secondCard.find('[data-testid="message-button"]').attributes('aria-label')
+    ).toBe('Message Student 2, new message')
   })
 })

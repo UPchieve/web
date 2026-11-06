@@ -34,3 +34,7 @@ export type GetOrCreateConversationRequest = {
 export type GetOrCreateConversationResponse = {
   conversationId: Uuid
 }
+
+export type UnreadDirectMessagesResponse = {
+  senderIds: Uuid[]
+}

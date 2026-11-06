@@ -3,6 +3,8 @@ import { createStore } from 'vuex'
 import { storeOptions } from '@/store'
 import { useNotificationsStore } from '@/stores/notifications'
 import SessionService from '@/services/SessionService'
+import NetworkService from '@/services/NetworkService'
+import LoggerService from '@/services/LoggerService'
 
 describe('User store module', () => {
   const baseUser = {
@@ -647,6 +649,133 @@ describe('User store module', () => {
       expect(store.getters['user/sessionStatus'].class).toBe(
         'indicator--bannedindicator--session'
       )
+    })
+  })
+
+  describe('fetchUnreadDirectMessages', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('stores the ids of users who sent unread messages', async () => {
+      const store = getStore()
+      vi.spyOn(NetworkService, 'getUnreadDirectMessages').mockResolvedValue({
+        senderIds: ['volunteer-1', 'volunteer-2'],
+      })
+
+      await store.dispatch('user/fetchUnreadDirectMessages')
+
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([
+        'volunteer-1',
+        'volunteer-2',
+      ])
+      expect(store.getters['user/hasUnreadDirectMessages']).toBe(true)
+    })
+
+    it('has no unread messages when no one has sent any', async () => {
+      const store = getStore()
+      vi.spyOn(NetworkService, 'getUnreadDirectMessages').mockResolvedValue({
+        senderIds: [],
+      })
+
+      await store.dispatch('user/fetchUnreadDirectMessages')
+
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([])
+      expect(store.getters['user/hasUnreadDirectMessages']).toBe(false)
+    })
+
+    it('logs the error and keeps the previous ids if the request fails', async () => {
+      const store = getStore()
+      store.commit('user/setUnreadDirectMessageSenderIds', ['volunteer-1'])
+      const error = new Error('Network error')
+      vi.spyOn(NetworkService, 'getUnreadDirectMessages').mockRejectedValue(
+        error
+      )
+      const noticeError = vi
+        .spyOn(LoggerService, 'noticeError')
+        .mockImplementation(() => {})
+
+      await store.dispatch('user/fetchUnreadDirectMessages')
+
+      expect(noticeError).toHaveBeenCalledWith(error)
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([
+        'volunteer-1',
+      ])
+    })
+  })
+
+  describe('addUnreadDirectMessageSender', () => {
+    it('adds the sender to the unread list', () => {
+      const store = getStore()
+      store.commit('user/setUnreadDirectMessageSenderIds', [])
+
+      store.commit('user/addUnreadDirectMessageSender', 'volunteer-1')
+
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([
+        'volunteer-1',
+      ])
+      expect(store.getters['user/hasUnreadDirectMessages']).toBe(true)
+    })
+
+    it('does not add the same sender twice', () => {
+      const store = getStore()
+      store.commit('user/setUnreadDirectMessageSenderIds', ['volunteer-1'])
+
+      store.commit('user/addUnreadDirectMessageSender', 'volunteer-1')
+
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([
+        'volunteer-1',
+      ])
+    })
+  })
+
+  describe('setActiveDirectMessagePartnerId', () => {
+    it('stores and clears whose chat is open', () => {
+      const store = getStore()
+
+      store.commit('user/setActiveDirectMessagePartnerId', 'volunteer-1')
+      expect(store.state.user.activeDirectMessagePartnerId).toBe('volunteer-1')
+
+      store.commit('user/setActiveDirectMessagePartnerId', null)
+      expect(store.state.user.activeDirectMessagePartnerId).toBeNull()
+    })
+  })
+
+  describe('removeUnreadDirectMessageSender', () => {
+    it('removes only that sender from the unread list', () => {
+      const store = getStore()
+      store.commit('user/setUnreadDirectMessageSenderIds', [
+        'volunteer-1',
+        'volunteer-2',
+      ])
+
+      store.commit('user/removeUnreadDirectMessageSender', 'volunteer-1')
+
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([
+        'volunteer-2',
+      ])
+      expect(store.getters['user/hasUnreadDirectMessages']).toBe(true)
+    })
+
+    it('has no unread messages once the last sender is removed', () => {
+      const store = getStore()
+      store.commit('user/setUnreadDirectMessageSenderIds', ['volunteer-1'])
+
+      store.commit('user/removeUnreadDirectMessageSender', 'volunteer-1')
+
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([])
+      expect(store.getters['user/hasUnreadDirectMessages']).toBe(false)
+    })
+
+    it('leaves the list alone when the sender is not in it', () => {
+      const store = getStore()
+      store.commit('user/setUnreadDirectMessageSenderIds', ['volunteer-1'])
+
+      store.commit('user/removeUnreadDirectMessageSender', 'volunteer-2')
+
+      expect(store.getters['user/unreadDirectMessageSenderIds']).toEqual([
+        'volunteer-1',
+      ])
     })
   })
 })

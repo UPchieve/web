@@ -57,6 +57,7 @@ async function loadConversation() {
     )
     messages.value = mergeMessages(response.messages, messages.value)
     isLoading.value = false
+    markConversationSeen()
     await scrollToBottom()
   } catch (err) {
     LoggerService.noticeError(err)
@@ -65,6 +66,16 @@ async function loadConversation() {
       'We were unable to load your messages. Please try again later.'
   } finally {
     isLoading.value = false
+  }
+}
+
+async function markConversationSeen() {
+  if (!conversationId.value) return
+  try {
+    await NetworkService.markConversationSeen(conversationId.value)
+    store.commit('user/removeUnreadDirectMessageSender', props.partnerId)
+  } catch (err) {
+    LoggerService.noticeError(err)
   }
 }
 
@@ -121,6 +132,7 @@ async function handleNewMessage(data: NewDirectMessageEvent) {
 
   if (messages.value.some((m) => m.id === message.id)) return
   messages.value.push(message)
+  if (message.senderId !== userId.value) markConversationSeen()
   await scrollToBottom()
 }
 
@@ -183,6 +195,13 @@ async function resizeComposer() {
   input.style.height = `${input.scrollHeight}px`
 }
 
+// Let the store know whose chat is open so new messages from them don't
+// show up as unread
+function setActivePartner(partnerId: string) {
+  store.commit('user/setActiveDirectMessagePartnerId', partnerId)
+}
+
+watch(() => props.partnerId, setActivePartner, { immediate: true })
 watch(() => props.partnerId, loadConversation, { immediate: true })
 watch(draft, resizeComposer)
 
@@ -194,6 +213,8 @@ onMounted(() => {
 onUnmounted(() => {
   socket.off('direct-message:new', handleNewMessage)
   socket.off('direct-message:error', handleSendError)
+  if (store.state.user.activeDirectMessagePartnerId === props.partnerId)
+    store.commit('user/setActiveDirectMessagePartnerId', null)
 })
 </script>
 

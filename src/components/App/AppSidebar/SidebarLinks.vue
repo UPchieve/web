@@ -73,6 +73,11 @@
           id="my-coaches-sidebar-link"
         >
           <star-icon class="icon star-icon" />
+          <activity-dot
+            v-if="hasUnreadDirectMessages"
+            class="SidebarLinks__notification"
+            label="New messages"
+          />
         </sidebar-link>
 
         <sidebar-link
@@ -157,6 +162,11 @@
           id="messages-sidebar-link"
         >
           <messages-icon class="icon messages-icon" />
+          <activity-dot
+            v-if="hasUnreadDirectMessages"
+            class="SidebarLinks__notification"
+            label="New messages"
+          />
         </sidebar-link>
 
         <sidebar-link
@@ -310,13 +320,18 @@ export default {
         'featureFlags/shouldShowStudentToVolunteerHoursPage',
       aiTutor: 'featureFlags/aiTutor',
       hasUnreadDMs: 'user/hasUnreadDMs',
+      hasUnreadDirectMessages: 'user/hasUnreadDirectMessages',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
+      isDirectMessagesEnabled: 'featureFlags/isDirectMessagesEnabled',
     }),
     ...mapPiniaState(useNthsStore, {
       isNthsGroupMemberOnly: 'isGroupMemberOnly',
       hasNthsAdminRole: 'hasAdminRole',
       nthsRenewalPrompt: 'renewalPrompt',
     }),
+    shouldFetchUnreadDirectMessages() {
+      return this.authenticated && this.isDirectMessagesEnabled
+    },
     hasSeenCalculator() {
       if (this.shouldShowStudentToVolunteerHoursPage) {
         void this.$route.path // run this each time the route changes
@@ -440,6 +455,12 @@ export default {
             { destination: 'create', userType: this.userType }
           )
         }
+      },
+      immediate: true,
+    },
+    shouldFetchUnreadDirectMessages: {
+      handler(shouldFetch) {
+        if (shouldFetch) this.$store.dispatch('user/fetchUnreadDirectMessages')
       },
       immediate: true,
     },

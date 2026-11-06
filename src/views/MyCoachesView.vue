@@ -11,6 +11,7 @@ import StarIcon from '@/assets/icons/star_icon.svg'
 import Loader from '@/components/Loader.vue'
 import FavoritingToggle from '@/components/FavoritingToggle.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import ActivityDot from '@/components/ActivityDot.vue'
 import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
 import { useCoachStatuses } from '@/composables/useCoachStatuses'
@@ -40,6 +41,19 @@ const mobileMode = computed(() => store.getters['app/mobileMode'])
 const isDirectMessagesEnabled = computed(
   () => store.getters['featureFlags/isDirectMessagesEnabled']
 )
+const unreadDirectMessageSenderIds = computed<string[]>(
+  () => store.getters['user/unreadDirectMessageSenderIds']
+)
+
+function hasUnreadMessages(coach: Coach) {
+  return unreadDirectMessageSenderIds.value.includes(coach.volunteerId)
+}
+
+function messageButtonLabel(coach: Coach) {
+  return hasUnreadMessages(coach)
+    ? `Message ${coach.firstName}, new message`
+    : `Message ${coach.firstName}`
+}
 
 const { statuses: coachStatuses } = useCoachStatuses()
 
@@ -233,12 +247,20 @@ onMounted(async () => {
             <LargeButton
               class="message-button"
               data-testid="message-button"
-              :aria-label="`Message ${coach.firstName}`"
+              :aria-label="messageButtonLabel(coach)"
               @click="openConversation(coach)"
               :show-arrow="false"
               variant="outlined"
             >
-              <MessageIcon aria-hidden="true" />
+              <span class="message-button__icon">
+                <MessageIcon aria-hidden="true" />
+                <ActivityDot
+                  v-if="hasUnreadMessages(coach)"
+                  class="message-button__unread-dot"
+                  data-testid="unread-message-dot"
+                  aria-hidden="true"
+                />
+              </span>
             </LargeButton>
           </template>
         </PersonCard>
@@ -478,5 +500,23 @@ onMounted(async () => {
 .message-button {
   border-width: 2px;
   border-radius: 24px;
+
+  :deep(.ButtonTemplate-content) {
+    overflow: visible;
+  }
+
+  &__icon {
+    position: relative;
+    display: inline-flex;
+  }
+
+  &__unread-dot {
+    position: absolute;
+    top: -3px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    background-color: $c-warning-orange;
+  }
 }
 </style>

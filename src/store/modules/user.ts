@@ -55,6 +55,8 @@ export type UserStoreState = {
   progressReportIntervalId: number | null
   hasUnreadDMs: boolean
   sessionsWithUnreadDMs: string[]
+  unreadDirectMessageSenderIds: string[]
+  activeDirectMessagePartnerId: string | null
   fetchingSessionPromise: null | Promise<Record<string, never>>
 }
 
@@ -85,6 +87,8 @@ type UserStoreGetterValues = {
   getUserPropsForAnalytics: () => Record<string, unknown>
   sessionsWithUnreadDMs: string[]
   hasUnreadDMs: boolean
+  unreadDirectMessageSenderIds: string[]
+  hasUnreadDirectMessages: boolean
 }
 
 type UserActionContext = Omit<
@@ -114,6 +118,8 @@ export default {
     progressReportIntervalId: null,
     hasUnreadDMs: false,
     sessionsWithUnreadDMs: [],
+    unreadDirectMessageSenderIds: [],
+    activeDirectMessagePartnerId: null,
     fetchingSessionPromise: null,
   } as UserStoreState,
   mutations: {
@@ -257,6 +263,32 @@ export default {
     setSessionsWithUnreadDMs: (state: UserStoreState, sessionIds: string[]) => {
       state.sessionsWithUnreadDMs = sessionIds
     },
+    setUnreadDirectMessageSenderIds: (
+      state: UserStoreState,
+      senderIds: string[]
+    ) => {
+      state.unreadDirectMessageSenderIds = senderIds
+    },
+    addUnreadDirectMessageSender: (state: UserStoreState, senderId: string) => {
+      if (state.unreadDirectMessageSenderIds.includes(senderId)) return
+      state.unreadDirectMessageSenderIds = [
+        ...state.unreadDirectMessageSenderIds,
+        senderId,
+      ]
+    },
+    setActiveDirectMessagePartnerId: (
+      state: UserStoreState,
+      partnerId: string | null
+    ) => {
+      state.activeDirectMessagePartnerId = partnerId
+    },
+    removeUnreadDirectMessageSender: (
+      state: UserStoreState,
+      senderId: string
+    ) => {
+      state.unreadDirectMessageSenderIds =
+        state.unreadDirectMessageSenderIds.filter((id) => id !== senderId)
+    },
     setFetchSessionPromise: (
       state: UserStoreState,
       p: Promise<Record<string, never>> | null
@@ -334,6 +366,15 @@ export default {
         const response = await NetworkService.checkForUnreadDMs()
 
         commit('setSessionsWithUnreadDMs', response.data.sessionsWithUnreadDMs)
+      } catch (err) {
+        LoggerService.noticeError(err)
+      }
+    },
+
+    fetchUnreadDirectMessages: async ({ commit }: UserActionContext) => {
+      try {
+        const { senderIds } = await NetworkService.getUnreadDirectMessages()
+        commit('setUnreadDirectMessageSenderIds', senderIds)
       } catch (err) {
         LoggerService.noticeError(err)
       }
@@ -899,5 +940,13 @@ export default {
 
     sessionsWithUnreadDMs: (state: UserStoreState) =>
       state.sessionsWithUnreadDMs,
+
+    hasUnreadDirectMessages: (
+      _state: UserStoreState,
+      getters: UserStoreGetterValues
+    ) => getters.unreadDirectMessageSenderIds.length > 0,
+
+    unreadDirectMessageSenderIds: (state: UserStoreState) =>
+      state.unreadDirectMessageSenderIds,
   },
 }
