@@ -8,6 +8,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
 import type { Subject } from '@/types/subjects'
+import type { CoachStatus } from '@/composables/useCoachStatuses'
 
 // When a subject is already provided, go straight to the presession form.
 // Otherwise, let the student choose from the volunteer's subjects first.
@@ -20,6 +21,7 @@ const props = withDefaults(
     subject?: { name?: string; topicName?: string; displayName?: string }
     subjects?: string[]
     pastSessionId?: string
+    coachStatus?: CoachStatus
     disabled?: boolean
   }>(),
   { backText: 'My Coaches', disabled: false }
@@ -55,6 +57,7 @@ function openPresessionSurvey(subject: Subject) {
     subject: subject.name,
     topic: subject.topicName,
     ...(props.pastSessionId ? { pastSessionId: props.pastSessionId } : {}),
+    ...(props.coachStatus ? { coachStatus: props.coachStatus } : {}),
   })
 
   modal.show({

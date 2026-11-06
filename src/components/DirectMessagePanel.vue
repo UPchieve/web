@@ -5,6 +5,8 @@ import DirectMessageChat from '@/components/DirectMessageChat.vue'
 import HeavyCrossIcon from '@/assets/heavy-cross.svg'
 import StudentIcon from '@/assets/user_avatars/student-icon.svg'
 import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
+import AnalyticsService from '@/services/AnalyticsService'
+import { EVENTS } from '@/consts'
 
 const props = defineProps<{
   partnerId: string
@@ -34,6 +36,10 @@ function handleKeydown(event: KeyboardEvent) {
 // Panel is off screen while it slides in. We prevent scroll to prevent
 // the panel from jumping/glitching
 onMounted(async () => {
+  AnalyticsService.captureEvent(EVENTS.DM_CONVERSATION_OPENED, {
+    partnerId: props.partnerId,
+    partnerType: props.partnerType,
+  })
   window.addEventListener('keydown', handleKeydown)
   previouslyFocused = document.activeElement as HTMLElement | null
   await nextTick()
