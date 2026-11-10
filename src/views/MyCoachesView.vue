@@ -14,9 +14,11 @@ import LargeButton from '@/components/LargeButton.vue'
 import ActivityDot from '@/components/ActivityDot.vue'
 import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
+import CoachInfoPopover from '@/components/CoachInfoPopover.vue'
 import RequestCoachButton from '@/components/RequestCoachButton.vue'
 import { useCoachStatuses } from '@/composables/useCoachStatuses'
 import { minutesInMs } from '@/utils/time-utils'
+import { hasSharedInfo } from '@/utils/volunteer-shared-stats'
 import type { PastVolunteer } from '@/types/students'
 import MessageIcon from '@/assets/message-circle.svg'
 import { vTooltip } from 'maz-ui'
@@ -55,6 +57,14 @@ function messageButtonLabel(coach: Coach) {
   return hasUnreadMessages(coach)
     ? `Message ${coach.firstName}, new message`
     : `Message ${coach.firstName}`
+}
+
+const isShowInfoOptInEnabled = computed(
+  () => store.getters['featureFlags/isShowInfoOptInEnabled']
+)
+
+function canShowCoachInfo(coach: Coach) {
+  return isShowInfoOptInEnabled.value && hasSharedInfo(coach.publicProfileStats)
 }
 
 const { statuses: coachStatuses } = useCoachStatuses()
@@ -239,7 +249,18 @@ onMounted(async () => {
           :name="coach.firstName"
           :last-session="coach.lastSession"
           :status="coachStatuses[coach.volunteerId]"
+          :name-clickable="isDirectMessagesEnabled"
+          @name-click="openConversation(coach)"
         >
+          <template v-if="canShowCoachInfo(coach)" #name-popover>
+            <CoachInfoPopover
+              :name="coach.firstName"
+              :info="coach.publicProfileStats"
+              :subject="coach.lastSession?.subject"
+              :status="coachStatuses[coach.volunteerId]"
+              :isFavorite="coach.isFavorite"
+            />
+          </template>
           <template #avatar-badge>
             <FavoritingToggle
               variant="badge"

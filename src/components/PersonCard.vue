@@ -8,22 +8,48 @@
         :bgColor="avatarColor(userId ?? name)"
         :fgColor="AVATAR_TEXT_COLOR"
       />
-      <CoachIcon v-else class="person-card__icon" />
-      <div
-        v-if="$slots['avatar-badge']"
-        class="person-card__avatar-badge"
-        data-testid="person-card-avatar-badge"
-      >
-        <slot name="avatar-badge" />
-      </div>
-      <PresenceDot
-        v-if="status && isShowCoachStatusEnabled"
-        class="person-card__presence-dot"
-        :status="status"
-      />
+      <CoachAvatar v-else :status="status">
+        <template v-if="$slots['avatar-badge']" #badge>
+          <slot name="avatar-badge" />
+        </template>
+      </CoachAvatar>
     </div>
     <div class="person-card__name-row">
-      <h2 class="person-card__name" data-testid="person-card-name">
+      <div
+        v-if="hasNamePopover || nameClickable"
+        ref="nameTriggerRef"
+        class="person-card__name-trigger"
+        @pointerenter="onPointerEnter"
+        @pointerleave="onPointerLeave"
+        @focusout="onFocusOut"
+        @keydown.esc="closeNamePopover"
+      >
+        <h2 class="person-card__name" data-testid="person-card-name">
+          <button
+            type="button"
+            class="person-card__name-button"
+            :class="{ 'person-card__name-button--open': isNamePopoverOpen }"
+            :aria-expanded="hasNamePopover ? isNamePopoverOpen : undefined"
+            :aria-controls="hasNamePopover ? namePopoverId : undefined"
+            data-testid="person-card-name-button"
+            @pointerdown="lastPointerType = $event.pointerType"
+            @focus="onFocus"
+            @click="onNameClick"
+          >
+            {{ name }}
+          </button>
+        </h2>
+        <div
+          v-if="hasNamePopover"
+          v-show="isNamePopoverOpen"
+          :id="namePopoverId"
+          class="person-card__name-popover"
+          data-testid="person-card-name-popover"
+        >
+          <slot name="name-popover" />
+        </div>
+      </div>
+      <h2 v-else class="person-card__name" data-testid="person-card-name">
         {{ name }}
       </h2>
       <span
@@ -63,10 +89,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import CoachIcon from '@/assets/user_avatars/volunteer-icon.svg'
+import { computed, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue'
 import InitialsAvatar from '@/components/InitialsAvatar.vue'
-import PresenceDot from '@/components/PresenceDot.vue'
+import CoachAvatar from '@/components/CoachAvatar.vue'
 import type { VolunteerStatus } from '@/types/users'
 import { avatarColor, AVATAR_TEXT_COLOR } from '@/components/NTHS/member-avatar'
 import { dayjs, minutesToHoursAndMinutes } from '@/utils/time-utils'
@@ -86,7 +111,10 @@ const props = defineProps<{
   userId?: string
   lastSession?: LastSession | null
   status?: VolunteerStatus
+  nameClickable?: boolean
 }>()
+
+const emit = defineEmits<{ 'name-click': [] }>()
 
 const STATUS_LABELS: Partial<Record<VolunteerStatus, string>> = {
   'in-session': 'In session',
@@ -120,6 +148,66 @@ const lastSessionInfo = computed(() => {
 const isShowCoachStatusEnabled = computed(
   () => store.getters['featureFlags/isShowCoachStatusEnabled']
 )
+
+const slots = useSlots()
+const hasNamePopover = computed(() => !!slots['name-popover'])
+const namePopoverId = `person-card-popover-${useId()}`
+const nameTriggerRef = ref<HTMLElement | null>(null)
+const isNamePopoverOpen = ref(false)
+const lastPointerType = ref('')
+
+function openNamePopover() {
+  if (!hasNamePopover.value) return
+  isNamePopoverOpen.value = true
+}
+
+function closeNamePopover() {
+  isNamePopoverOpen.value = false
+}
+
+function onPointerEnter(event: PointerEvent) {
+  if (event.pointerType === 'mouse') openNamePopover()
+}
+
+function onPointerLeave(event: PointerEvent) {
+  if (event.pointerType === 'mouse') closeNamePopover()
+}
+
+function onFocus() {
+  if (!lastPointerType.value) openNamePopover()
+}
+
+function onFocusOut(event: FocusEvent) {
+  const next = event.relatedTarget as Node | null
+  if (!next || !nameTriggerRef.value?.contains(next)) closeNamePopover()
+}
+
+function onNameClick() {
+  if (props.nameClickable) {
+    lastPointerType.value = ''
+    closeNamePopover()
+    emit('name-click')
+    return
+  }
+
+  if (lastPointerType.value === 'mouse') openNamePopover()
+  else if (isNamePopoverOpen.value) closeNamePopover()
+  else openNamePopover()
+  lastPointerType.value = ''
+}
+
+function onDocumentPointerDown(event: PointerEvent) {
+  if (!nameTriggerRef.value?.contains(event.target as Node)) closeNamePopover()
+}
+
+watch(isNamePopoverOpen, (isOpen) => {
+  if (isOpen) document.addEventListener('pointerdown', onDocumentPointerDown)
+  else document.removeEventListener('pointerdown', onDocumentPointerDown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', onDocumentPointerDown)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -151,25 +239,6 @@ const isShowCoachStatusEnabled = computed(
     height: 70px;
   }
 
-  &__icon {
-    width: 70px;
-    height: 70px;
-  }
-
-  &__avatar-badge {
-    position: absolute;
-    top: -6px;
-    left: -6px;
-    z-index: 1;
-  }
-
-  &__presence-dot {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-  }
-
   &__name-row {
     grid-area: name;
     display: flex;
@@ -190,6 +259,39 @@ const isShowCoachStatusEnabled = computed(
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  &__name-trigger {
+    position: relative;
+    min-width: 0;
+  }
+
+  &__name-button {
+    max-width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible,
+    &--open {
+      text-decoration: underline;
+    }
+  }
+
+  &__name-popover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    padding-top: 8px;
   }
 
   &__status {

@@ -1,8 +1,9 @@
 import PersonCard, { type LastSession } from '@/components/PersonCard.vue'
 import InitialsAvatar from '@/components/InitialsAvatar.vue'
+import CoachAvatar from '@/components/CoachAvatar.vue'
 import { avatarColor } from '@/components/NTHS/member-avatar'
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 function lastSession(overrides: Partial<LastSession> = {}): LastSession {
   return {
@@ -19,12 +20,15 @@ function mountCard(
     name?: string
     userId?: string
     lastSession?: LastSession | null
+    nameClickable?: boolean
   } = {},
-  slots = {}
+  slots = {},
+  options: { attachTo?: HTMLElement } = {}
 ) {
   return mount(PersonCard, {
     props: { type: 'coach', name: 'Riley', ...props },
     slots,
+    ...options,
   })
 }
 
@@ -71,12 +75,12 @@ describe('PersonCard', () => {
 
   it('renders the avatar badge slot inside the avatar only when one is passed', () => {
     expect(
-      mountCard().find('[data-testid="person-card-avatar-badge"]').exists()
+      mountCard().find('[data-testid="coach-avatar-badge"]').exists()
     ).toBe(false)
 
     const wrapper = mountCard({}, { 'avatar-badge': '<button>Star</button>' })
     const badge = wrapper.find(
-      '.person-card__avatar [data-testid="person-card-avatar-badge"]'
+      '.person-card__avatar [data-testid="coach-avatar-badge"]'
     )
     expect(badge.text()).toBe('Star')
   })
@@ -93,10 +97,110 @@ describe('PersonCard', () => {
     expect(avatar.props('bgColor')).toBe(avatarColor('student-1'))
   })
 
-  it('shows the coach icon instead of initials for coaches', () => {
+  it('shows the coach avatar instead of initials for coaches', () => {
     const wrapper = mountCard({ type: 'coach' })
 
     expect(wrapper.findComponent(InitialsAvatar).exists()).toBe(false)
-    expect(wrapper.find('.person-card__icon').exists()).toBe(true)
+    expect(wrapper.findComponent(CoachAvatar).exists()).toBe(true)
+  })
+  describe('name popover', () => {
+    let wrapper: ReturnType<typeof mountCard> | undefined
+
+    afterEach(() => {
+      wrapper?.unmount()
+      wrapper = undefined
+    })
+
+    // Attached so isVisible() reflects the v-show state in the browser
+    function mountWithPopover(props: { nameClickable?: boolean } = {}) {
+      wrapper = mountCard(
+        props,
+        { 'name-popover': '<p>Coach info</p>' },
+        { attachTo: document.body }
+      )
+      return wrapper
+    }
+
+    function popover(wrapper: ReturnType<typeof mountCard>) {
+      return wrapper.find('[data-testid="person-card-name-popover"]')
+    }
+
+    it('keeps the name as plain text when no popover slot is passed', () => {
+      const wrapper = mountCard()
+
+      expect(
+        wrapper.find('[data-testid="person-card-name-button"]').exists()
+      ).toBe(false)
+      expect(popover(wrapper).exists()).toBe(false)
+      expect(wrapper.find('[data-testid="person-card-name"]').text()).toBe(
+        'Riley'
+      )
+    })
+
+    it('opens on mouse hover and closes when the mouse leaves', async () => {
+      const wrapper = mountWithPopover()
+      const trigger = wrapper.find('.person-card__name-trigger')
+
+      expect(popover(wrapper).isVisible()).toBe(false)
+
+      await trigger.trigger('pointerenter', { pointerType: 'mouse' })
+      expect(popover(wrapper).isVisible()).toBe(true)
+      expect(popover(wrapper).text()).toBe('Coach info')
+
+      await trigger.trigger('pointerleave', { pointerType: 'mouse' })
+      expect(popover(wrapper).isVisible()).toBe(false)
+    })
+
+    it('opens on keyboard focus and closes on Escape', async () => {
+      const wrapper = mountWithPopover()
+      const button = wrapper.find('[data-testid="person-card-name-button"]')
+
+      await button.trigger('focus')
+      expect(popover(wrapper).isVisible()).toBe(true)
+      expect(button.attributes('aria-expanded')).toBe('true')
+
+      await wrapper.find('.person-card__name-trigger').trigger('keydown', {
+        key: 'Escape',
+      })
+      expect(popover(wrapper).isVisible()).toBe(false)
+    })
+
+    it('emits name-click and closes the popover when the name is clickable', async () => {
+      const wrapper = mountWithPopover({ nameClickable: true })
+      const button = wrapper.find('[data-testid="person-card-name-button"]')
+
+      await wrapper
+        .find('.person-card__name-trigger')
+        .trigger('pointerenter', { pointerType: 'mouse' })
+      expect(popover(wrapper).isVisible()).toBe(true)
+
+      await button.trigger('pointerdown', { pointerType: 'mouse' })
+      await button.trigger('click')
+      expect(wrapper.emitted('name-click')).toHaveLength(1)
+      expect(popover(wrapper).isVisible()).toBe(false)
+    })
+
+    it('makes the name a button without a popover when only clickable', async () => {
+      const wrapper = mountCard({ nameClickable: true })
+      const button = wrapper.find('[data-testid="person-card-name-button"]')
+
+      expect(popover(wrapper).exists()).toBe(false)
+      expect(button.attributes('aria-expanded')).toBeUndefined()
+      await button.trigger('click')
+      expect(wrapper.emitted('name-click')).toHaveLength(1)
+    })
+
+    it('toggles on tap', async () => {
+      const wrapper = mountWithPopover()
+      const button = wrapper.find('[data-testid="person-card-name-button"]')
+
+      await button.trigger('pointerdown', { pointerType: 'touch' })
+      await button.trigger('click')
+      expect(popover(wrapper).isVisible()).toBe(true)
+
+      await button.trigger('pointerdown', { pointerType: 'touch' })
+      await button.trigger('click')
+      expect(popover(wrapper).isVisible()).toBe(false)
+    })
   })
 })

@@ -4,6 +4,7 @@ import Chip from '@/components/Chip.vue'
 import type { VolunteerPublicProfileInfoShared } from '@/types/sessions'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
+import { getSharedStats } from '@/utils/volunteer-shared-stats'
 
 const props = defineProps<{
   info: VolunteerPublicProfileInfoShared
@@ -12,20 +13,6 @@ const props = defineProps<{
   sessionId?: string
   volunteerId?: string
 }>()
-
-const VOLUNTEER_SHAREABLE_STATS = [
-  { key: 'numSessionsTutored', singular: 'session', plural: 'sessions' },
-  {
-    key: 'numStudentsHelped',
-    singular: 'student helped',
-    plural: 'students helped',
-  },
-  {
-    key: 'totalVolunteerHours',
-    singular: 'hour tutored',
-    plural: 'hours tutored',
-  },
-] as const
 
 // Only collapse the student's view, not the volunteer's
 const isCollapsible = computed(() => props.viewerRole === 'student')
@@ -52,19 +39,7 @@ function toggleCollapsed() {
   }
 }
 
-const statsToShow = computed(() =>
-  VOLUNTEER_SHAREABLE_STATS.flatMap((stat) => {
-    const value = props.info[stat.key]
-    if (value == null) return []
-    return [
-      {
-        key: stat.key,
-        value,
-        label: value === 1 ? stat.singular : stat.plural,
-      },
-    ]
-  })
-)
+const statsToShow = computed(() => getSharedStats(props.info))
 
 const occupations = computed(() => props.info.occupation ?? [])
 const hasOccupations = computed(() => occupations.value.length > 0)
