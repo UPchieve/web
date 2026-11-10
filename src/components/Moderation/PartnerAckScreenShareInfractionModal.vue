@@ -42,7 +42,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useSessionStore } from '@/stores/session'
 import { computed } from 'vue'
 import { toastController } from '@ionic/vue'
 import { closeCircleOutline } from 'ionicons/icons'
@@ -53,11 +52,9 @@ import Modal from '@/components/Modal.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Link from '@/components/Link.vue'
 import LoggerService from '@/services/LoggerService'
-import SessionService from '@/services/SessionService'
 import Warning from '@/assets/warning.svg'
 
 const store = useStore()
-const sessionStore = useSessionStore()
 
 const partner = store.getters['user/isStudent'] ? 'coach' : 'student'
 
@@ -71,56 +68,45 @@ const hasPotentialPartnerInfraction = computed(
 )
 
 const banPartner = () => {
-  handlePotentialViolation('addPartnerLiveMediaBan', {})
+  handlePotentialViolation(false)
 }
 
 const removeBan = () => {
-  handlePotentialViolation('removePartnerLiveMediaBan', {
-    banType: null,
-  })
+  handlePotentialViolation(true)
 }
 
-const handlePotentialViolation = async (
-  socketEvent: string,
-  data: {
-    banType?: null
-  }
-) => {
+const handlePotentialViolation = async (wasBanMistake: boolean) => {
   try {
-    const lastSession = sessionStore.latestSession
-      ? sessionStore.latestSession
-      : (await SessionService.getLatestSession()).sessionData
+    if (wasBanMistake) {
+      socket.emit('removePartnerLiveMediaBan')
+    }
 
-    socket.emit(socketEvent, { ...data, sessionId: lastSession.id })
+    store.commit('liveMedia/setPotentialPartnerInfraction', null)
+
+    const message = wasBanMistake
+      ? `Thanks for letting us know! Let the ${partner} know they can screen share again.`
+      : `Thanks for letting us know! The ${partner} is banned from screen sharing.`
+    const toast = await toastController.create({
+      message,
+      color: 'dark',
+      position: 'middle',
+      animated: true,
+      duration: 5000,
+      swipeGesture: 'vertical',
+      buttons: [
+        {
+          icon: closeCircleOutline,
+          role: 'cancel',
+        },
+      ],
+    })
+    await toast.present()
   } catch (err) {
     LoggerService.noticeError(
       err,
       'Could not update session and user after potential moderation violation'
     )
   }
-
-  const message =
-    data.banType !== undefined
-      ? `Thanks letting us know! Let the ${partner} know they can screen share again.`
-      : `Thanks for lettings us know! The ${partner} is banned from screen sharing. `
-
-  const toast = await toastController.create({
-    message,
-    color: 'dark',
-    position: 'middle',
-    animated: true,
-    duration: 5000,
-    swipeGesture: 'vertical',
-    buttons: [
-      {
-        icon: closeCircleOutline,
-        role: 'cancel',
-      },
-    ],
-  })
-  await toast.present()
-
-  store.commit('liveMedia/setPotentialPartnerInfraction', null)
 }
 </script>
 
