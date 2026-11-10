@@ -187,14 +187,21 @@ function handleFavoriteChange(volunteerId: string, isFavorite: boolean) {
   paginate()
 }
 
-const activeConversation = ref<Coach | null>(null)
+// Track by id so favoriting from either the card or the panel stays in sync
+const activeConversationId = ref<string | null>(null)
+const activeConversation = computed(
+  () =>
+    allCoaches.value.find(
+      (coach) => coach.volunteerId === activeConversationId.value
+    ) ?? null
+)
 
 function openConversation(coach: Coach) {
-  activeConversation.value = coach
+  activeConversationId.value = coach.volunteerId
 }
 
 function closeConversation() {
-  activeConversation.value = null
+  activeConversationId.value = null
 }
 
 // Watch the URL as the source of truth for the current page
@@ -392,8 +399,57 @@ onMounted(async () => {
       :partner-id="activeConversation.volunteerId"
       :partner-name="activeConversation.firstName"
       partner-type="coach"
+      :status="coachStatuses[activeConversation.volunteerId]"
       @close="closeConversation"
-    />
+    >
+      <template #avatar-badge>
+        <FavoritingToggle
+          variant="badge"
+          :initialIsFavorite="activeConversation.isFavorite"
+          :volunteerName="activeConversation.firstName"
+          :volunteerId="activeConversation.volunteerId"
+          @change-favorited="handleFavoriteChange"
+        />
+      </template>
+      <template v-if="activeConversation.subjects?.length" #actions>
+        <span
+          v-if="coachStatuses[activeConversation.volunteerId] === 'in-session'"
+          class="dm-request-button-tooltip"
+          data-testid="dm-request-coach-button-tooltip"
+          v-tooltip="{
+            text: inSessionText(activeConversation),
+            color: 'black',
+            position: 'bottom',
+          }"
+        >
+          <RequestCoachButton
+            class="request-coach-button dm-request-button"
+            data-testid="dm-request-coach-button"
+            :volunteerId="activeConversation.volunteerId"
+            :volunteerName="activeConversation.firstName"
+            :subjects="activeConversation.subjects"
+            :disabled="true"
+            sourceView="my-coaches-dm"
+            backText="My Coaches"
+            >Request session</RequestCoachButton
+          >
+        </span>
+        <RequestCoachButton
+          v-else
+          class="request-coach-button dm-request-button"
+          data-testid="dm-request-coach-button"
+          :volunteerId="activeConversation.volunteerId"
+          :volunteerName="activeConversation.firstName"
+          :subjects="activeConversation.subjects"
+          :isVolunteerOffline="
+            coachStatuses[activeConversation.volunteerId] === 'offline'
+          "
+          sourceView="my-coaches-dm"
+          backText="My Coaches"
+          >Request session</RequestCoachButton
+        >
+      </template>
+    </DirectMessagePanel>
   </div>
 </template>
 
@@ -590,6 +646,15 @@ onMounted(async () => {
 .request-coach-button :deep(.ButtonTemplate:disabled) {
   border: 2px solid $c-border-grey;
   cursor: not-allowed;
+}
+
+.dm-request-button-tooltip {
+  display: block;
+}
+
+.dm-request-button :deep(.ButtonTemplate) {
+  width: 100%;
+  height: 48px;
 }
 
 .message-button {

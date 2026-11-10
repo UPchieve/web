@@ -3,15 +3,19 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import Modal from '@/components/Modal.vue'
 import DirectMessageChat from '@/components/DirectMessageChat.vue'
 import HeavyCrossIcon from '@/assets/heavy-cross.svg'
-import StudentIcon from '@/assets/user_avatars/student-icon.svg'
-import VolunteerIcon from '@/assets/user_avatars/volunteer-icon.svg'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
+import CoachAvatar from '@/components/CoachAvatar.vue'
+import InitialsAvatar from '@/components/InitialsAvatar.vue'
+import { avatarColor, AVATAR_TEXT_COLOR } from '@/components/NTHS/member-avatar'
+import type { VolunteerStatus } from '@/types/users'
+import store from '@/store'
 
 const props = defineProps<{
   partnerId: string
   partnerName: string
   partnerType: 'coach' | 'student'
+  status?: VolunteerStatus
 }>()
 
 const emit = defineEmits<{ close: [] }>()
@@ -20,8 +24,20 @@ const panel = ref<HTMLElement | null>(null)
 const isOpen = ref(true)
 let previouslyFocused: HTMLElement | null = null
 
-const partnerAvatar = computed(() =>
-  props.partnerType === 'coach' ? VolunteerIcon : StudentIcon
+const STATUS_LABELS: Record<VolunteerStatus, string> = {
+  online: 'Online now',
+  'in-session': 'In session',
+  offline: 'Offline',
+}
+
+const isShowCoachStatusEnabled = computed(
+  () => store.getters['featureFlags/isShowCoachStatusEnabled']
+)
+
+const statusLabel = computed(() =>
+  props.status && isShowCoachStatusEnabled.value
+    ? STATUS_LABELS[props.status]
+    : ''
 )
 
 // Slide out first; `close` is emitted once the transition ends
@@ -69,17 +85,51 @@ onUnmounted(() => {
         tabindex="-1"
       >
         <header class="dm-panel__header">
-          <component :is="partnerAvatar" class="dm-panel__avatar" />
-          <h2 class="dm-panel__name">{{ partnerName }}</h2>
-          <button
-            type="button"
-            class="dm-panel__close"
-            aria-label="Close messages"
-            data-testid="dm-panel-close"
-            @click="close"
+          <div class="dm-panel__identity">
+            <CoachAvatar
+              v-if="partnerType === 'coach'"
+              class="dm-panel__avatar"
+              :status="status"
+              :size="56"
+            >
+              <template v-if="$slots['avatar-badge']" #badge>
+                <slot name="avatar-badge" />
+              </template>
+            </CoachAvatar>
+            <InitialsAvatar
+              v-else
+              class="dm-panel__avatar"
+              :initials="partnerName.charAt(0).toUpperCase()"
+              :widthPx="56"
+              :bgColor="avatarColor(partnerId)"
+              :fgColor="AVATAR_TEXT_COLOR"
+            />
+            <div class="dm-panel__name-group">
+              <h2 class="dm-panel__name">{{ partnerName }}</h2>
+              <span
+                v-if="statusLabel"
+                :class="['dm-panel__status', `dm-panel__status--${status}`]"
+                data-testid="dm-panel-status"
+                >{{ statusLabel }}</span
+              >
+            </div>
+            <button
+              type="button"
+              class="dm-panel__close"
+              aria-label="Close messages"
+              data-testid="dm-panel-close"
+              @click="close"
+            >
+              <HeavyCrossIcon class="dm-panel__close-icon" />
+            </button>
+          </div>
+          <div
+            v-if="$slots.actions"
+            class="dm-panel__actions"
+            data-testid="dm-panel-actions"
           >
-            <HeavyCrossIcon class="dm-panel__close-icon" />
-          </button>
+            <slot name="actions" />
+          </div>
         </header>
         <DirectMessageChat
           class="dm-panel__chat"
@@ -101,21 +151,51 @@ onUnmounted(() => {
 
   &__header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 16px;
     padding: 24px;
     border-bottom: 1px solid $c-border-grey;
   }
 
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
   &__avatar {
     flex-shrink: 0;
-    width: 56px;
-    height: 56px;
+  }
+
+  &__name-group {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__status {
+    font-size: 14px;
+    font-weight: 500;
+    color: $c-secondary-grey;
+
+    &--online {
+      color: $c-hover-green;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+
+    :deep(.ButtonTemplate) {
+      width: 100%;
+    }
   }
 
   &__name {
     @include font-category('display-small');
-    flex: 1;
     min-width: 0;
     margin: 0;
     overflow: hidden;

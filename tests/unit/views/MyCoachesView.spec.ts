@@ -22,8 +22,9 @@ vi.mock('@/services/NetworkService', async (importOriginal) => ({
   },
 }))
 
+const mockedStatuses = ref<Record<string, string>>({})
 vi.mock('@/composables/useCoachStatuses', () => ({
-  useCoachStatuses: () => ({ statuses: ref({}) }),
+  useCoachStatuses: () => ({ statuses: mockedStatuses }),
 }))
 
 const mockedNetworkService = vi.mocked(NetworkService)
@@ -97,6 +98,7 @@ function nameButtons(wrapper: Awaited<ReturnType<typeof mountView>>) {
 describe('MyCoachesView coach name', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    mockedStatuses.value = {}
     mockedNetworkService.getPastVolunteers.mockResolvedValue({
       pastVolunteers: [
         pastVolunteer({
@@ -141,5 +143,18 @@ describe('MyCoachesView coach name', () => {
     const panel = wrapper.findComponent({ name: 'DirectMessagePanel' })
     expect(panel.exists()).toBe(true)
     expect(panel.props('partnerId')).toBe('private')
+  })
+
+  it('passes the coach status to the DM panel', async () => {
+    mockedStatuses.value = { private: 'online' }
+    const wrapper = await mountView({ isDirectMessagesEnabled: true })
+
+    await wrapper
+      .findAll('[data-testid="person-card-name-button"]')[1]
+      .trigger('click')
+
+    expect(
+      wrapper.findComponent({ name: 'DirectMessagePanel' }).props('status')
+    ).toBe('online')
   })
 })

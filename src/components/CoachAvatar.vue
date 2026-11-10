@@ -5,9 +5,18 @@ import PresenceDot from '@/components/PresenceDot.vue'
 import type { VolunteerStatus } from '@/types/users'
 import store from '@/store'
 
-defineProps<{
-  status?: VolunteerStatus
-}>()
+const props = withDefaults(
+  defineProps<{
+    status?: VolunteerStatus
+    size?: number
+  }>(),
+  { size: 70 }
+)
+
+const sizeStyle = computed(() => ({
+  width: `${props.size}px`,
+  height: `${props.size}px`,
+}))
 
 const isShowCoachStatusEnabled = computed(
   () => store.getters['featureFlags/isShowCoachStatusEnabled']
@@ -15,7 +24,7 @@ const isShowCoachStatusEnabled = computed(
 </script>
 
 <template>
-  <div class="coach-avatar">
+  <div class="coach-avatar" :style="sizeStyle" data-testid="coach-avatar">
     <CoachIcon class="coach-avatar__icon" aria-hidden="true" />
     <div
       v-if="$slots.badge"
@@ -36,12 +45,10 @@ const isShowCoachStatusEnabled = computed(
 .coach-avatar {
   position: relative;
   flex-shrink: 0;
-  width: 70px;
-  height: 70px;
 
   &__icon {
-    width: 70px;
-    height: 70px;
+    width: 100%;
+    height: 100%;
   }
 
   &__badge {

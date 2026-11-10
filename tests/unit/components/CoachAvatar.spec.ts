@@ -6,7 +6,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 function mountAvatar(
-  props: { status?: VolunteerStatus } = {},
+  props: { status?: VolunteerStatus; size?: number } = {},
   slots: Record<string, string> = {}
 ) {
   return mount(CoachAvatar, { props, slots })
@@ -50,5 +50,19 @@ describe('CoachAvatar', () => {
     expect(
       mountAvatar({ status: 'online' }).findComponent(PresenceDot).exists()
     ).toBe(false)
+  })
+
+  it('is 70px by default', () => {
+    const avatar = mountAvatar().find('[data-testid="coach-avatar"]')
+    expect(avatar.attributes('style')).toContain('width: 70px')
+    expect(avatar.attributes('style')).toContain('height: 70px')
+  })
+
+  it('can be made a different size', () => {
+    const avatar = mountAvatar({ size: 56 }).find(
+      '[data-testid="coach-avatar"]'
+    )
+    expect(avatar.attributes('style')).toContain('width: 56px')
+    expect(avatar.attributes('style')).toContain('height: 56px')
   })
 })
