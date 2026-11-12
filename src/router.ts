@@ -139,6 +139,7 @@ import { getStatus } from '@/services/AuthService'
 import LoggerService from './services/LoggerService'
 import { EVENTS } from './consts'
 import CoachModeTransition from '@/views/CoachModeTransition.vue'
+import { toastController } from '@ionic/vue'
 
 const autoflowRedirect: NavigationGuard = (_to, _from, next) => {
   if (store.getters['user/isAutoFlowUser']) next('/welcome')
@@ -163,7 +164,16 @@ const nthsAdminOnly: NavigationGuard = (_to, _from, next) => {
 }
 
 const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {
-  if (store.getters['user/isVolunteer']) {
+  if (store.getters['featureFlags/isStudentCoachModeBlocked']) {
+    const toast = await toastController.create({
+      message:
+        'Your Coach account is under review. You currently only have access to Student mode.',
+      duration: 6000,
+      position: 'bottom',
+    })
+    await toast.present()
+    next('/dashboard')
+  } else if (store.getters['user/isVolunteer']) {
     next() // already volunteer, continue
   } else if (store.getters['user/hasVolunteerRole']) {
     try {

@@ -39,6 +39,9 @@ const sessionStatus = computed(() => store.getters['user/sessionStatus'])
 const isStudentVolunteer = computed(
   () => store.getters['user/isStudentVolunteer']
 )
+const isStudentCoachModeBlocked = computed(
+  () => store.getters['featureFlags/isStudentCoachModeBlocked']
+)
 const userTypeDisplayName = computed(() => {
   const userType = store.getters['user/userType']
   if (userType === 'volunteer') return 'coach'
@@ -82,7 +85,10 @@ const userAccountType = computed(() => {
       :class="[
         'avatar-container',
         { 'avatar-container--indicator-ring': props.showIndicatorRing },
-        { 'avatar-container--indicator-ring-s2v': isStudentVolunteer },
+        {
+          'avatar-container--indicator-ring-s2v':
+            isStudentVolunteer && !isStudentCoachModeBlocked,
+        },
       ]"
     >
       <component
@@ -95,11 +101,17 @@ const userAccountType = computed(() => {
         v-if="props.showIndicatorRing"
         :class="[
           'indicator-container',
-          { 'indicator-container--s2v': isStudentVolunteer },
+          {
+            'indicator-container--s2v':
+              isStudentVolunteer && !isStudentCoachModeBlocked,
+          },
         ]"
         :aria-label="sessionStatus?.text"
       >
-        <div v-if="isStudentVolunteer" class="switch-mode-icon-container">
+        <div
+          v-if="isStudentVolunteer && !isStudentCoachModeBlocked"
+          class="switch-mode-icon-container"
+        >
           <SwitchModeIcon />
         </div>
         <div v-else :class="['indicator', sessionStatus?.class]" />

@@ -999,6 +999,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   BLOCK_SESSION_IMAGE_UPLOAD = 'block-session-image-upload',
   BLOCK_SCREENSHARE = 'block-screenshare',
   BLOCK_AUDIO_CALL = 'block-audio-call',
+  BLOCK_STUDENT_COACH_MODE = 'block-student-coach-mode',
   VOLUNTEER_RELEVANT_EXPERIENCE_FAKE_DOOR = 'volunteer-relevant-experience-fake-door',
   VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR = 'volunteer-show-online-status-fake-door',
   AMERICA_COUNTS_AUTO_JOIN_DELAY = 'america-counts-auto-join-delay',

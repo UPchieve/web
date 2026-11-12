@@ -609,6 +609,15 @@ export default {
     ) =>
       getters.userRoles.includes('student') &&
       getters.userRoles.includes('volunteer'),
+    shouldForceStudentMode: (
+      _state: UserStoreState,
+      getters: UserStoreGetterValues,
+      _rootState: unknown,
+      rootGetters: Record<string, boolean>
+    ) =>
+      rootGetters['featureFlags/isStudentCoachModeBlocked'] &&
+      getters.isStudentVolunteer &&
+      getters.isVolunteer,
     hasStudentRole: (_state: UserStoreState, getters: UserStoreGetterValues) =>
       getters.userRoles.includes('student'),
     // the student role owns this school, so the volunteer forms show it as

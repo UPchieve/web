@@ -56,6 +56,15 @@ describe('Navigation', () => {
             mobileMode: () => options?.app?.getters?.mobileMode?.() ?? false,
           },
         },
+        featureFlags: {
+          ...storeOptions.modules.featureFlags,
+          getters: {
+            ...storeOptions.modules.featureFlags.getters,
+            isStudentCoachModeBlocked: () =>
+              options?.featureFlags?.getters?.isStudentCoachModeBlocked?.() ??
+              false,
+          },
+        },
       },
     })
 
@@ -131,6 +140,20 @@ describe('Navigation', () => {
 
     expect(isDrawerCollapsed()).toBe(true)
     expect(component.emitted('update:isMenuOpen')).toContainEqual([false])
+  })
+
+  it('hides the mode toggle when coach mode is blocked', async () => {
+    const { component } = getWrapper({
+      isMenuOpen: true,
+      user: { getters: { isStudentVolunteer: () => true } },
+      featureFlags: {
+        getters: { isStudentCoachModeBlocked: () => true },
+      },
+    })
+
+    await nextTick()
+
+    expect(component.findComponent(UserModeToggle).exists()).toBe(false)
   })
 
   it('Can log out', async () => {

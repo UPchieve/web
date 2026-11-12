@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 import axios from 'axios'
 import router from '@/router'
 import { useNthsStore } from '@/stores/nths'
 import NetworkService, { axiosInstance } from '@/services/NetworkService'
+import store from '@/store'
+import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 
 const subjects = {
   apChemistry: {
@@ -45,6 +47,13 @@ const nthsGroupWithRole = (roleName: 'admin' | 'member') => [
 beforeEach(() => {
   NetworkService.authStatus = vi.fn().mockResolvedValue({ authenticated: true })
   NetworkService.user = vi.fn().mockResolvedValue({ data: { user: volunteer } })
+})
+
+afterEach(() => {
+  store.state.featureFlags.toggleFlags[
+    POSTHOG_FEATURE_FLAGS.BLOCK_STUDENT_COACH_MODE
+  ] = false
+  store.state.user.user = { ...volunteer }
 })
 
 describe('quiz route alias redirect', () => {
@@ -148,8 +157,40 @@ describe('nthsAdminOnly route guard', () => {
   })
 })
 
+describe('blocked student-volunteer route guard', () => {
+  it('redirects blocked users away from volunteer routes', async () => {
+    NetworkService.user = vi.fn().mockResolvedValue({
+      data: {
+        user: {
+          ...volunteer,
+          isOnboarded: true,
+          roleContext: { roles: ['student', 'volunteer'] },
+        },
+      },
+    })
+    store.state.user.user.autoFlow = false
+    store.state.user.user.isOnboarded = true
+    store.state.user.user.roleContext = { roles: ['student', 'volunteer'] }
+    store.state.featureFlags.toggleFlags[
+      POSTHOG_FEATURE_FLAGS.BLOCK_STUDENT_COACH_MODE
+    ] = true
+
+    try {
+      expect(await visit('/training')).toBe('/dashboard')
+    } finally {
+      store.state.featureFlags.toggleFlags[
+        POSTHOG_FEATURE_FLAGS.BLOCK_STUDENT_COACH_MODE
+      ] = false
+      store.state.user.user = { ...volunteer }
+    }
+  })
+})
+
 describe('legacy NTHS tab redirects', () => {
   beforeEach(() => {
+    store.state.featureFlags.toggleFlags[
+      POSTHOG_FEATURE_FLAGS.BLOCK_STUDENT_COACH_MODE
+    ] = false
     // Any NTHS group, of either role, satisfies the parent /groups route
     // guard (nthsRouteGuard('group')) so these redirects can land at all.
     useNthsStore().setNTHSGroups(nthsGroupWithRole('member'))

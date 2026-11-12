@@ -46,7 +46,7 @@ import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { useAppModalStore } from '@/stores/app/modal'
 import { useProductFlagsStore } from '@/stores/product-flags'
 import { useSessionStore } from '@/stores/session'
-import { IonApp, IonContent } from '@ionic/vue'
+import { IonApp, IonContent, toastController } from '@ionic/vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
 import '@/scss/main.scss'
@@ -68,6 +68,7 @@ import getNotificationPermission from '@/utils/get-notification-permission'
 import { EVENTS, MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import RouteLoadingIndicator from '@/components/RouteLoadingIndicator.vue'
 import AppTheme from './AppTheme.vue'
+import UserService from '@/services/UserService'
 import SessionOfferAlert from '@/views/SessionOffers/SessionOfferAlert.vue'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
@@ -295,6 +296,8 @@ export default {
       mobileMode: 'app/mobileMode',
       isVolunteer: 'user/isVolunteer',
       isStudent: 'user/isStudent',
+      isStudentVolunteer: 'user/isStudentVolunteer',
+      shouldForceStudentMode: 'user/shouldForceStudentMode',
       isTeacher: 'user/isTeacher',
       getUserPropsForAnalytics: 'user/getUserPropsForAnalytics',
       isReadyToTutor: 'volunteer/isReadyToTutor',
@@ -327,6 +330,18 @@ export default {
         }
 
         await this.getUserProductFlags()
+
+        if (this.shouldForceStudentMode) {
+          await UserService.switchActiveRole({ $store: this.$store }, 'student')
+          const toast = await toastController.create({
+            message:
+              'Your Coach account is under review. You currently only have access to Student mode.',
+            duration: 6000,
+            position: 'bottom',
+          })
+          await toast.present()
+        }
+
         const userProps = this.getUserPropsForAnalytics()
         AnalyticsService.identify(currentUserValue.id, userProps)
         LoggerService.identify(currentUserValue.id)

@@ -31,6 +31,9 @@ const isMobileMode = computed(() => store.getters['app/mobileMode'])
 const isStudentVolunteer = computed(
   () => store.getters['user/isStudentVolunteer']
 )
+const isStudentCoachModeBlocked = computed(
+  () => store.getters['featureFlags/isStudentCoachModeBlocked']
+)
 const isS2VThemingEnabled = store.getters['featureFlags/isS2VThemingEnabled']
 
 // Menu
@@ -123,7 +126,7 @@ function resetErrorMessage() {
           <UserModeToggle
             id="mode-toggle"
             class="user-menu-toggle"
-            v-if="isStudentVolunteer"
+            v-if="!isStudentCoachModeBlocked && isStudentVolunteer"
             @switchModeError="onSwitchModeError"
             @switchedMode="onSwitchedMode"
           />
