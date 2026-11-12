@@ -90,7 +90,6 @@ const links = {
       TRAINING_LINK,
       CALENDAR_LINK,
       LEVEL_UP_IMPACT_LINK,
-      MESSAGES_LINK,
       SESSION_HISTORY_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
@@ -101,7 +100,6 @@ const links = {
       CALENDAR_LINK,
       LEVEL_UP_IMPACT_LINK,
       ADMIN_LINK,
-      MESSAGES_LINK,
       SESSION_HISTORY_LINK,
       CONTACT_LINK,
       COMMUNITY_LINK,
@@ -257,6 +255,37 @@ describe('SidebarLinks', () => {
       })
       testLinks(wrapper, links.default.volunteer)
     })
+
+    it.each([true, false])(
+      'renders the Messages link for a volunteer only when the turn-messages-on-for-coaches flag is on (%s)',
+      (isMessagesForCoachesEnabled) => {
+        const wrapper = getWrapper({
+          props: { authenticated: true },
+          user: {
+            getters: {
+              isVolunteer: () => true,
+              hasVolunteerRole: () => true,
+              isStudent: () => false,
+              hasCertification: () => true,
+            },
+            state: {
+              isOnboarded: true,
+            },
+          },
+          featureFlags: {
+            getters: {
+              isMessagesForCoachesEnabled: () => isMessagesForCoachesEnabled,
+            },
+          },
+        })
+        const messagesLink = wrapper
+          .findAllComponents(SidebarLink)
+          .find((link) => link.props('text') === MESSAGES_LINK.text)
+        expect(messagesLink?.props('to')).toBe(
+          isMessagesForCoachesEnabled ? MESSAGES_LINK.to : undefined
+        )
+      }
+    )
 
     it('does not render any links for an autoflow volunteer', () => {
       const wrapper = getWrapper({
@@ -951,6 +980,9 @@ describe('SidebarLinks', () => {
                 isVolunteer: () => true,
                 hasUnreadDirectMessages: () => hasUnreadDirectMessages,
               },
+            },
+            featureFlags: {
+              getters: { isMessagesForCoachesEnabled: () => true },
             },
           })
 

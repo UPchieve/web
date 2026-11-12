@@ -1005,6 +1005,7 @@ export enum POSTHOG_FEATURE_FLAGS {
   AMERICA_COUNTS_AUTO_JOIN_DELAY = 'america-counts-auto-join-delay',
   DIRECT_MESSAGES = 'direct-messages',
   SHOW_COACH_STATUS = 'show-coach-status',
+  TURN_MESSAGES_ON_FOR_COACHES = 'turn-messages-on-for-coaches',
 }
 
 export const ANALYTICS_REPORT_ROW = {

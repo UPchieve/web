@@ -157,7 +157,7 @@
         </sidebar-link>
 
         <sidebar-link
-          v-if="isVolunteer"
+          v-if="isVolunteer && isMessagesForCoachesEnabled"
           to="/messages"
           text="Messages"
           id="messages-sidebar-link"
@@ -324,6 +324,7 @@ export default {
       hasUnreadDirectMessages: 'user/hasUnreadDirectMessages',
       isNTHSApplicationPageEnabled: 'featureFlags/isNTHSApplicationPageEnabled',
       isDirectMessagesEnabled: 'featureFlags/isDirectMessagesEnabled',
+      isMessagesForCoachesEnabled: 'featureFlags/isMessagesForCoachesEnabled',
     }),
     ...mapPiniaState(useNthsStore, {
       isNthsGroupMemberOnly: 'isGroupMemberOnly',
