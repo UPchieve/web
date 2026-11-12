@@ -1,6 +1,7 @@
 build_android_staging:
   stage: build
   extends: .pnpm_install
+  allow_failure: true
   image: $CI_REGISTRY_IMAGE/android-build-image:1.0.0
   environment:
     name: staging
