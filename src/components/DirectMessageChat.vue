@@ -24,6 +24,10 @@ const props = defineProps<{
   partnerName: string
 }>()
 
+const emit = defineEmits<{
+  'conversation-ready': [conversationId: string | null]
+}>()
+
 const store = useStore()
 const userId = computed<string>(() => store.state.user.user.id)
 
@@ -46,12 +50,14 @@ async function loadConversation() {
   isLoading.value = true
   loadError.value = ''
   conversationId.value = null
+  emit('conversation-ready', null)
   messages.value = []
   try {
     const conversation = await NetworkService.getOrCreateConversation(
       props.partnerId
     )
     conversationId.value = conversation.conversationId
+    emit('conversation-ready', conversation.conversationId)
     const response = await NetworkService.getDirectMessages(
       conversation.conversationId
     )

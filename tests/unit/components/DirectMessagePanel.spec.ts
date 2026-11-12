@@ -1,6 +1,6 @@
 import DirectMessagePanel from '@/components/DirectMessagePanel.vue'
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
 import { avatarColor, AVATAR_TEXT_COLOR } from '@/components/NTHS/member-avatar'
 
@@ -18,6 +18,7 @@ function mountPanel({
   slots?: Record<string, string>
 } = {}) {
   return mount(DirectMessagePanel, {
+    attachTo: document.body,
     props: {
       partnerId: 'coach-1',
       partnerName: 'Alex',
@@ -38,7 +39,11 @@ function mountPanel({
       ],
       // Use the real Transition so the close is emitted after the panel
       // slides out
-      stubs: { transition: false, DirectMessageChat: true },
+      stubs: {
+        transition: false,
+        DirectMessageChat: true,
+        DirectMessageReport: true,
+      },
     },
   })
 }
@@ -46,9 +51,14 @@ function mountPanel({
 describe('DirectMessagePanel', () => {
   let wrapper: ReturnType<typeof mountPanel> | undefined
 
+  beforeEach(() => {
+    document.body.appendChild(document.createElement('ion-app'))
+  })
+
   afterEach(() => {
     wrapper?.unmount()
     wrapper = undefined
+    document.querySelector('ion-app')?.remove()
   })
 
   it('shows the partner name and passes the conversation to the chat', () => {
@@ -111,6 +121,7 @@ describe('DirectMessagePanel', () => {
 
     wrapper.unmount()
     wrapper = undefined
+    document.querySelector('ion-app')?.remove()
     expect(document.body.classList.contains('disable-scroll')).toBe(false)
   })
 
@@ -186,5 +197,135 @@ describe('DirectMessagePanel', () => {
       fgColor: AVATAR_TEXT_COLOR,
     })
     expect(wrapper.findComponent({ name: 'CoachAvatar' }).exists()).toBe(false)
+  })
+
+  it.each(['coach', 'student'])(
+    'shows a named report option in the %s menu',
+    async (partnerType) => {
+      wrapper = mountPanel({ props: { partnerType, partnerName: 'Nalini' } })
+      expect(wrapper.find('[data-testid="dm-report"]').exists()).toBe(false)
+      wrapper
+        .findComponent({ name: 'DirectMessageChat' })
+        .vm.$emit('conversation-ready', 'conversation-1')
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-testid="dm-menu"]').trigger('click')
+      expect(wrapper.find('[data-testid="dm-report"]').text()).toBe(
+        'Report Nalini'
+      )
+      expect(
+        wrapper.find('[data-testid="dm-menu"]').attributes('aria-expanded')
+      ).toBe('true')
+      await wrapper.find('[data-testid="dm-report"]').trigger('click')
+      expect(
+        wrapper
+          .findComponent({ name: 'DirectMessageReport' })
+          .props('partnerType')
+      ).toBe(partnerType)
+      expect(wrapper.find('[role="menu"]').exists()).toBe(false)
+    }
+  )
+
+  it('opens the menu with the keyboard and closes it on Escape without closing the panel', async () => {
+    wrapper = mountPanel()
+    wrapper
+      .findComponent({ name: 'DirectMessageChat' })
+      .vm.$emit('conversation-ready', 'conversation-1')
+    await wrapper.vm.$nextTick()
+    await wrapper
+      .find('[data-testid="dm-menu"]')
+      .trigger('keydown', { key: 'ArrowDown' })
+    expect(wrapper.find('[role="menu"]').exists()).toBe(true)
+    await wrapper
+      .find('[data-testid="dm-report"]')
+      .trigger('keydown', { key: 'Escape' })
+    expect(wrapper.find('[role="menu"]').exists()).toBe(false)
+    expect(wrapper.emitted('close')).toBeUndefined()
+  })
+
+  it('closes the menu when clicking elsewhere in the panel', async () => {
+    wrapper = mountPanel()
+    wrapper
+      .findComponent({ name: 'DirectMessageChat' })
+      .vm.$emit('conversation-ready', 'conversation-1')
+    await wrapper.vm.$nextTick()
+    await wrapper.find('[data-testid="dm-menu"]').trigger('click')
+    await wrapper.find('.dm-panel__name').trigger('pointerdown')
+    expect(wrapper.find('[role="menu"]').exists()).toBe(false)
+    expect(wrapper.emitted('close')).toBeUndefined()
+  })
+
+  it('enables reporting only after the conversation is ready', async () => {
+    wrapper = mountPanel()
+    expect(
+      wrapper.find('[data-testid="dm-menu"]').attributes('disabled')
+    ).toBeDefined()
+    wrapper
+      .findComponent({ name: 'DirectMessageChat' })
+      .vm.$emit('conversation-ready', 'conversation-1')
+    await wrapper.vm.$nextTick()
+    await wrapper.find('[data-testid="dm-menu"]').trigger('click')
+    await wrapper.find('[data-testid="dm-report"]').trigger('click')
+    const reportModal = document.querySelector(
+      '[data-testid="dm-report-modal"]'
+    )!
+    expect(reportModal.parentElement).toBe(document.querySelector('ion-app'))
+    expect(wrapper.find('.dm-panel').element.contains(reportModal)).toBe(false)
+    expect(wrapper.find('.dm-panel').attributes('inert')).toBeDefined()
+    expect(
+      wrapper.findComponent({ name: 'DirectMessageChat' }).isVisible()
+    ).toBe(true)
+    const report = wrapper.findComponent({ name: 'DirectMessageReport' })
+    expect(report.props()).toEqual({
+      conversationId: 'conversation-1',
+      partnerType: 'coach',
+    })
+    report.vm.$emit('submitted')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('Your report has been submitted')
+    expect(wrapper.find('[data-testid="dm-menu"]').exists()).toBe(true)
+    await wrapper.find('[data-testid="dm-menu"]').trigger('click')
+    await wrapper.find('[data-testid="dm-report"]').trigger('click')
+    expect(
+      wrapper.findComponent({ name: 'DirectMessageReport' }).exists()
+    ).toBe(true)
+    expect(wrapper.text()).not.toContain('Your report has been submitted')
+  })
+
+  it('returns to chat on Escape while reporting instead of closing the panel', async () => {
+    wrapper = mountPanel()
+    wrapper
+      .findComponent({ name: 'DirectMessageChat' })
+      .vm.$emit('conversation-ready', 'conversation-1')
+    await wrapper.vm.$nextTick()
+    await wrapper.find('[data-testid="dm-menu"]').trigger('click')
+    await wrapper.find('[data-testid="dm-report"]').trigger('click')
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await wrapper.vm.$nextTick()
+    expect(
+      wrapper.findComponent({ name: 'DirectMessageReport' }).exists()
+    ).toBe(false)
+    expect(wrapper.emitted('close')).toBeUndefined()
+  })
+  it('keeps the panel open while a report is submitting', async () => {
+    wrapper = mountPanel()
+    wrapper
+      .findComponent({ name: 'DirectMessageChat' })
+      .vm.$emit('conversation-ready', 'conversation-1')
+    await wrapper.vm.$nextTick()
+    await wrapper.find('[data-testid="dm-menu"]').trigger('click')
+    await wrapper.find('[data-testid="dm-report"]').trigger('click')
+    wrapper
+      .findComponent({ name: 'DirectMessageReport' })
+      .vm.$emit('submitting', true)
+    await wrapper.vm.$nextTick()
+    expect(
+      wrapper.find('[data-testid="dm-panel-close"]').attributes('disabled')
+    ).toBeDefined()
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await wrapper.find('[data-testid="dm-panel-scrim"]').trigger('click')
+    expect(
+      wrapper.findComponent({ name: 'DirectMessageReport' }).exists()
+    ).toBe(true)
+    expect(wrapper.emitted('close')).toBeUndefined()
   })
 })

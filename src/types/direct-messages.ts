@@ -12,6 +12,15 @@ export type DirectMessagesResponse = {
   messages: DirectMessage[]
 }
 
+export type ReportDirectMessagePayload = {
+  reportReason: string
+  reportMessage?: string
+}
+
+export type ReportDirectMessageResponse = {
+  reportId: Uuid
+}
+
 export type SendDirectMessagePayload = {
   conversationId: Uuid
   contents: string
