@@ -3,6 +3,8 @@ stages:
   - test
   - deploy
   - post-deploy
+  - mobile-build
+  - mobile-deploy
 
 include:
   - local: .gitlab/ci/e2e.yml
@@ -84,6 +86,7 @@ deploy_staging:
     - job: build_staging_artifact
       artifacts: true
     - job: test
+      optional: true
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
 
@@ -97,6 +100,8 @@ deploy_production:
   needs:
     - job: build_production_artifact
       artifacts: true
+    - job: test
+      optional: true
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
       when: manual
@@ -131,12 +136,8 @@ new_relic_deploy_tracker:
 
 test:
   stage: test
-  needs:
-    - job: build_staging_artifact
-      optional: true
-    - job: build_production_artifact
-      optional: true
   extends: .pnpm_install
+  needs: []
   before_script:
     - !reference [.pnpm_install, before_script]
     - pnpm exec playwright install --with-deps chromium
@@ -166,12 +167,8 @@ e2e-test:
 
 lint:
   stage: test
-  needs:
-    - job: build_staging_artifact
-      optional: true
-    - job: build_production_artifact
-      optional: true
   extends: .pnpm_install
+  needs: []
   script:
     - pnpm run lint:dry
   rules:
@@ -182,12 +179,8 @@ lint:
 
 html_validate:
   stage: test
-  needs:
-    - job: build_staging_artifact
-      optional: true
-    - job: build_production_artifact
-      optional: true
   extends: .pnpm_install
+  needs: []
   script:
     - pnpm run html-validate
   rules:

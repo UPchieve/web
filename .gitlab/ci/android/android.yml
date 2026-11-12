@@ -1,10 +1,10 @@
 build_android_staging:
-  stage: build
+  stage: mobile-build
   extends: .pnpm_install
   allow_failure: true
   image: $CI_REGISTRY_IMAGE/android-build-image:1.0.0
   environment:
-    name: staging
+    name: android-staging
     action: prepare
   needs:
     - job: build_staging_artifact
@@ -34,19 +34,20 @@ build_android_staging:
       - android/app/build/outputs/mapping/stagingRelease/mapping.txt
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Committed to main.
+      when: manual
     # Remove before merging.
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' # MR is created or updated.
       when: manual
-      allow_failure: true
 
 upload_android_staging:
-  stage: deploy
+  stage: mobile-deploy
   image: ruby:3.3-bookworm
   cache: []
   environment:
-    name: staging
-  dependencies:
-    - build_android_staging
+    name: android-staging
+  needs:
+    - job: build_android_staging
+      artifacts: true
   resource_group: android-staging
   variables:
     FASTLANE_SKIP_UPDATE_CHECK: 'true'
