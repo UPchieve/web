@@ -23,6 +23,8 @@ type SessionListItemProps = {
     topic: string // i.e. 'math'
     isLocked: boolean
     isExclusive?: boolean
+    // The session is no longer open (picked up by another coach, or cancelled)
+    isClaimed?: boolean
   }
 }
 
@@ -40,7 +42,7 @@ const studentName = computed(() =>
 </script>
 
 <template>
-  <div class="grid">
+  <div class="grid" :class="{ 'grid--claimed': props.session.isClaimed }">
     <!--  Leftmost cell: Topic icon-->
     <div class="topic-icon-cell centered">
       <img class="subject-icon" :src="iconLink" />
@@ -75,8 +77,19 @@ const studentName = computed(() =>
       </span>
     </div>
 
-    <!--  Third cell: Wait time-->
+    <!--  Third cell: Wait time, or a "Claimed!" badge once the session is gone-->
     <div
+      v-if="props.session.isClaimed"
+      class="wait-time-cell claimed-cell"
+      :data-testid="`claimed-badge-${props.session.id}`"
+    >
+      <span class="claimed-badge"
+        ><span class="claimed-badge__sparkle" aria-hidden="true">✦</span>
+        Claimed!</span
+      >
+    </div>
+    <div
+      v-else
       class="wait-time-cell"
       :class="{ 'wait-time-cell--long': props.session.isLongWait }"
       :data-testid="`wait-time-${props.session.id}`"
@@ -95,7 +108,7 @@ const studentName = computed(() =>
 .grid {
   display: grid;
   grid-template-rows: 1fr;
-  grid-template-columns: [topicIcon] 0.5fr [basicInfo] 6fr [waitTime] 0.5fr [acceptIcon] 0.5fr;
+  grid-template-columns: [topicIcon] 0.5fr [basicInfo] 6fr [waitTime] max-content [acceptIcon] 0.5fr;
   grid-column-gap: 16px;
 
   div {
@@ -166,6 +179,73 @@ const studentName = computed(() =>
   .accept-session-icon-cell {
     grid-row: 1;
     grid-column: acceptIcon;
+  }
+
+  // Claimed: dim everything except the badge
+  &--claimed {
+    .topic-icon-cell,
+    .basic-info-cell,
+    .accept-session-icon-cell {
+      opacity: 0.45;
+      transition: opacity 200ms ease-out;
+    }
+  }
+
+  .claimed-cell {
+    align-items: flex-end;
+  }
+}
+
+.claimed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: $font-weight-medium;
+  color: $c-soft-black;
+  background: #ffe76c;
+  border: 2px solid #171733;
+  border-radius: 999px;
+  box-shadow: 0 2px 0 #171733;
+  transform: rotate(-3deg);
+  animation: claimed-badge-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  &__sparkle {
+    font-size: 10px;
+  }
+}
+
+// Pops in from small and faint, overshoots, then wobbles to a slight tilt
+@keyframes claimed-badge-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-3deg);
+  }
+}
+
+// With reduced motion, the badge only fades in (it keeps its static tilt)
+@keyframes claimed-badge-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .claimed-badge {
+    animation: claimed-badge-fade-in 400ms ease-out both;
   }
 }
 

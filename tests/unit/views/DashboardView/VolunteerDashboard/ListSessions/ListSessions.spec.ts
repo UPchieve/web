@@ -389,6 +389,10 @@ describe('Locked sessions', () => {
       })
       await nextTick()
       expect(rowIds()).toContain('session-4')
+      // Locked sessions just linger; they don't get the "Claimed!" badge
+      expect(
+        wrapper.find('[data-testid="claimed-badge-session-4"]').exists()
+      ).toBe(false)
 
       // A later update within the minute shouldn't reset or remove it early
       vi.advanceTimersByTime(30 * 1000)
@@ -573,5 +577,62 @@ describe('Pagination', () => {
 
     expect(range()).toEqual('1–5 of 12') // back on page 1
     expect(getSessionRows(wrapper)[0].attributes('id')).toEqual('exclusive-1')
+  })
+})
+
+describe('Claimed sessions', () => {
+  const testSessions = Array.from({ length: 3 }, (_, i) => ({
+    id: `session-${i + 1}`,
+    student: {
+      firstname: `Student${i + 1}`,
+      isTestUser: false,
+    },
+    studentFirstName: `Student${i + 1}`,
+    subTopic: 'algebraOne',
+    subjectDisplayName: 'Algebra 1',
+    type: 'math',
+    createdAt: dayjs()
+      .subtract(3 - i, 'minutes')
+      .toDate(),
+  }))
+  const context = {
+    $router: { currentRoute: { value: { path: '/dashboard' } } },
+  }
+  const rowIds = () =>
+    getSessionRows(wrapper).map((row) => row.attributes('id'))
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('Shows a "Claimed!" badge in place of a session that was picked up, then removes it', async () => {
+    wrapper = await getWrapper({ sessions: testSessions })
+    const store = (wrapper.vm as any).$store
+    const routerPushSpy = vi.spyOn(router, 'push')
+    vi.useFakeTimers()
+
+    // Another coach picks up the middle session
+    await store.dispatch('volunteer/handleIncomingSessions', {
+      context,
+      sessions: testSessions.filter((s) => s.id !== 'session-2'),
+    })
+    await nextTick()
+
+    // It keeps its place in the list, with a badge instead of a wait time
+    expect(rowIds()).toEqual(['session-1', 'session-2', 'session-3'])
+    expect(
+      wrapper.find('[data-testid="claimed-badge-session-2"]').text()
+    ).toContain('Claimed!')
+    expect(wrapper.find('[data-testid="wait-time-session-2"]').exists()).toBe(
+      false
+    )
+
+    // Clicking it does nothing, since the session is gone
+    await wrapper.find('[data-testid="session-row-session-2"]').trigger('click')
+    expect(routerPushSpy).not.toHaveBeenCalled()
+
+    vi.advanceTimersByTime(1000)
+    await nextTick()
+    expect(rowIds()).toEqual(['session-1', 'session-3'])
   })
 })

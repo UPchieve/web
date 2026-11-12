@@ -23,31 +23,43 @@
       <tr v-if="paginatedSessions.length">
         <th scope="rowgroup">Requests</th>
       </tr>
-      <tbody>
+      <TransitionGroup
+        tag="tbody"
+        name="session-row"
+        @before-leave="addClosingClass"
+      >
         <tr
-          v-for="(session, index) in paginatedSessions"
-          :key="`session-${index}`"
+          v-for="session in paginatedSessions"
+          :key="session.id"
           :id="session.id"
           :data-testid="`session-row-${session.id}`"
           class="session-row"
-          :class="{ 'session-row--exclusive': session.isExclusive }"
+          :class="{
+            'session-row--exclusive': session.isExclusive,
+            'session-row--claimed': session.isClaimed,
+          }"
           @click="sessionClicked(session)"
         >
           <td>
-            <SessionListItem
-              :session="{
-                ...session,
-                waitTime: waitTime(session).displayValue,
-                isLongWait: isLongWait(waitTime(session).milliseconds),
-                topic: session.type,
-                isLocked: !session.isUnlocked,
-              }"
-            />
+            <!-- Two wrappers so the row's height can collapse in CSS (see .session-row__content) -->
+            <div class="session-row__content">
+              <div class="session-row__content-inner">
+                <SessionListItem
+                  :session="{
+                    ...session,
+                    waitTime: waitTime(session).displayValue,
+                    isLongWait: isLongWait(waitTime(session).milliseconds),
+                    topic: session.type,
+                    isLocked: !session.isUnlocked,
+                  }"
+                />
+              </div>
+            </div>
           </td>
         </tr>
-      </tbody>
+      </TransitionGroup>
 
-      <tfoot v-if="sortedSessions.length">
+      <tfoot v-if="displaySessions.length">
         <tr>
           <td colspan="3">
             <div class="page-controls">
@@ -55,7 +67,7 @@
                 class="page-controls__range"
                 data-testid="page-controls-range"
                 >{{ pageStart }}–{{ pageEnd }} of
-                {{ sortedSessions.length }}</span
+                {{ displaySessions.length }}</span
               >
               <div class="page-controls__actions">
                 <div class="page-controls__size">
@@ -97,7 +109,7 @@
     </table>
     <div
       class="no-students-message-container"
-      v-if="!sortedSessions?.length"
+      v-if="!displaySessions.length"
       data-testid="no-students-waiting-message"
     >
       Currently there are no students waiting for help.
@@ -129,7 +141,14 @@ import { quizRoute } from '@/utils/quiz-route'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
 import SessionService from '@/services/SessionService'
-import { computed, defineAsyncComponent, nextTick, ref, watch } from 'vue'
+import {
+  computed,
+  defineAsyncComponent,
+  nextTick,
+  ref,
+  watch,
+  onBeforeUnmount,
+} from 'vue'
 import { useRouter } from 'vue-router'
 import HyperlinkButton from '@/components/HyperlinkButton.vue'
 import { getWaitTime } from '@/utils/session'
@@ -190,6 +209,8 @@ const sortedExclusiveSessions = computed(() => {
 const isReadyToTutor = computed(() => store.getters['volunteer/isReadyToTutor'])
 
 const sessionClicked = (session) => {
+  // The session is already gone; its row is only showing the "Claimed!" badge
+  if (session.isClaimed) return
   if (session.isExclusive) {
     AnalyticsService.captureEvent(
       EVENTS.VOLUNTEER_CLICKED_EXCLUSIVE_REQUEST_ROW,
@@ -229,27 +250,87 @@ const sortedSessions = computed(() => {
   ]
 })
 
+// Show a "Claimed!" badge on sessions that got picked up or cancelled before
+// taking them out of the list.
+// Locked sessions already linger in the store for a minute,
+// so they just slide out when the store removes them.
+const CLAIMED_BADGE_DURATION_MS = 1000
+const claimedSessions = ref<{ session: any; index: number }[]>([])
+const claimedTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
+
+const openSessionIds = computed(
+  () => new Set(store.state.volunteer.allOpenSessions.map((s: any) => s.id))
+)
+
+watch(sortedSessions, (newSessions, oldSessions) => {
+  const newIds = new Set(newSessions.map((s) => s.id))
+  oldSessions.forEach((session, index) => {
+    const isClaimedOrCancelled =
+      session.isUnlocked && // an available session
+      !newIds.has(session.id) && // that went away
+      // Still open but hidden (e.g. held for another coach) isn't claimed
+      !openSessionIds.value.has(session.id) &&
+      !claimedTimeouts.has(session.id)
+    if (!isClaimedOrCancelled) return
+
+    claimedSessions.value.push({
+      session: { ...session, isClaimed: true },
+      index,
+    })
+    claimedTimeouts.set(
+      session.id,
+      setTimeout(() => {
+        claimedTimeouts.delete(session.id)
+        claimedSessions.value = claimedSessions.value.filter(
+          (claimed) => claimed.session.id !== session.id
+        )
+      }, CLAIMED_BADGE_DURATION_MS)
+    )
+  })
+})
+onBeforeUnmount(() => {
+  claimedTimeouts.forEach((timeout) => clearTimeout(timeout))
+})
+
+// The sessions to render: open sessions, plus claimed ones put back where they were
+const displaySessions = computed(() => {
+  const sessions = [...sortedSessions.value]
+  const openIds = new Set(sessions.map((s) => s.id))
+  const claimed = [...claimedSessions.value].sort((a, b) => a.index - b.index)
+  for (const { session, index } of claimed) {
+    if (openIds.has(session.id)) continue
+    sessions.splice(Math.min(index, sessions.length), 0, session)
+  }
+  return sessions
+})
+
+function addClosingClass(el: Element) {
+  if (!openSessionIds.value.has(el.id)) {
+    el.classList.add('session-row--closing')
+  }
+}
+
 // Pagination logic
 const pageSizeOptions = [5, 10, 15]
 const pageSize = ref<number>(pageSizeOptions[1])
 const currentPage = ref<number>(0)
 
 const totalPages = computed(() =>
-  Math.ceil(sortedSessions.value.length / pageSize.value)
+  Math.ceil(displaySessions.value.length / pageSize.value)
 )
 const pageStart = computed(() => currentPage.value * pageSize.value + 1) // i.e. the 1 "1-10 of 15"
 const pageEnd = computed(() =>
   // i.e. the 10 "1-10 of 15"
   Math.min(
     (currentPage.value + 1) * pageSize.value,
-    sortedSessions.value.length // Handle partial final page
+    displaySessions.value.length // Handle partial final page
   )
 )
 
 const paginatedSessions = computed(() => {
-  const sorted = sortedSessions.value
+  const sessions = displaySessions.value
   const start = currentPage.value * pageSize.value
-  return sorted.slice(start, start + pageSize.value)
+  return sessions.slice(start, start + pageSize.value)
 })
 
 // Clamp page number to [0, totalPages)
@@ -328,10 +409,15 @@ function isLongWait(msDuration: number) {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:math';
+
+$row-cell-padding-y: 8px;
+
 .session-list {
   width: 100%;
   padding: 10px 20px;
   overflow-x: auto;
+  word-wrap: anywhere;
 
   &__error {
     color: $c-error-red;
@@ -377,7 +463,113 @@ function isLongWait(msDuration: number) {
 
 .session-row td {
   text-align: left;
-  padding: 8px 16px;
+  padding: $row-cell-padding-y 16px;
+}
+
+.session-row--claimed {
+  cursor: default;
+}
+
+// Rows fade in as they appear, e.g. when a row from the next page moves up
+.session-row-enter-from {
+  opacity: 0;
+}
+.session-row-enter-active {
+  transition: opacity 300ms ease-out;
+}
+
+// Exit animation for session rows
+$row-slide-out-duration: 450ms;
+$row-collapse-duration: 350ms;
+$row-exit-duration: $row-slide-out-duration + $row-collapse-duration;
+$row-reduced-motion-fade-duration: 800ms;
+
+// The row's height can't animate from `auto`, so the content collapses with
+// a one-row grid going from 1fr to 0fr, with the inner wrapper shrinking to fit.
+.session-row__content {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+.session-row__content-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.session-row--closing.session-row-leave-active {
+  animation: session-row-slide-out $row-exit-duration both;
+  pointer-events: none;
+
+  td {
+    animation: session-row-cell-collapse $row-collapse-duration ease-in-out
+      $row-slide-out-duration both;
+  }
+
+  .session-row__content {
+    animation: session-row-content-collapse $row-collapse-duration ease-in-out
+      $row-slide-out-duration both;
+  }
+}
+
+@keyframes session-row-slide-out {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); // ease-in
+  }
+  // Done sliding once $row-slide-out-duration has passed, then holds
+  #{math.percentage(math.div($row-slide-out-duration, $row-exit-duration))},
+  100% {
+    transform: translateX(40%);
+    opacity: 0;
+  }
+}
+
+@keyframes session-row-cell-collapse {
+  from {
+    padding-top: $row-cell-padding-y;
+    padding-bottom: $row-cell-padding-y;
+  }
+  to {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top-width: 0;
+  }
+}
+
+@keyframes session-row-content-collapse {
+  from {
+    grid-template-rows: 1fr;
+  }
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+// With reduced motion, a closed row only fades away slowly, and new rows
+// appear without fading in
+@keyframes session-row-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-row-enter-active {
+    transition: none;
+  }
+
+  .session-row--closing.session-row-leave-active {
+    animation: session-row-fade-out $row-reduced-motion-fade-duration ease-out
+      both;
+
+    td,
+    .session-row__content {
+      animation: none;
+    }
+  }
 }
 
 .no-students-message-container {
