@@ -26,10 +26,10 @@ This repository is the frontend SPA only. It relies on the API server and worker
 
 ### Local Dependencies
 
-1. The recommended tool for runtime version management is [`nvm`][nvm]. We currently run on Node v24.15.0.
+1. The recommended tool for runtime version management is [`nvm`][nvm]. We currently run on Node v24.22.3.
 
  ```shell
-$ nvm install v24.22.1 && nvm use v24.22.1
+$ nvm install v24.22.3 && nvm use v24.22.3
  ```
 
 2. Install dependencies.

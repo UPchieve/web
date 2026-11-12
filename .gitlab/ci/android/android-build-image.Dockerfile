@@ -14,7 +14,7 @@
 # - Push the image.
 #     $ docker push registry.gitlab.com/upchieve/application/high-line/android-build-image:<version>
 
-FROM node:24.22.1-trixie
+FROM node:24.22.3-trixie
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openjdk-21-jdk-headless \
