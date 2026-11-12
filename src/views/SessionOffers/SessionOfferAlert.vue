@@ -4,12 +4,13 @@ import SessionService from '@/services/SessionService'
 import { socket } from '@/socket'
 import Countdown from '@/components/Countdown.vue'
 import { useStore } from 'vuex'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import * as PresenceService from '@/services/PresenceService'
 import type { SessionOffer } from '@/types/sessions'
+import sendWebNotification from '@/utils/send-web-notification'
 const store = useStore()
 
 const offer = computed<SessionOffer | null>(
@@ -63,10 +64,24 @@ const totalSeconds = Math.floor(
   (new Date(offer.value!.expiresAt).getTime() - new Date().getTime()) / 1000
 )
 
+let webNotification: Notification | undefined
+
 onMounted(async () => {
   store.dispatch('volunteer/playAudio')
+  webNotification = sendWebNotification(
+    `${studentFirstName.value} has requested ${article.value} ${subjectDisplayName.value} tutor`,
+    {
+      body: `We're holding this session for you. Accept in the next ${totalSeconds} seconds.`,
+      tag: 'session-offer',
+    },
+    { type: 'session-offer', sessionId: sessionId.value }
+  )
   captureEvent(EVENTS.OFFERS_SAW_SESSION_OFFER_ALERT)
   PresenceService.checkForInactivity()
+})
+
+onUnmounted(() => {
+  webNotification?.close()
 })
 </script>
 

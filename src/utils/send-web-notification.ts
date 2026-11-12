@@ -5,6 +5,7 @@ import { EVENTS } from '@/consts'
 
 type NotificationData = {
   body: string
+  tag?: string
 }
 
 type AnalyticsMetadata = {
@@ -15,7 +16,7 @@ const sendWebNotification = (
   title: string,
   data: NotificationData,
   analyticsMetadata: AnalyticsMetadata = {}
-) => {
+): Notification | undefined => {
   // Check browser support
   if (!('Notification' in window)) return
 
@@ -28,12 +29,14 @@ const sendWebNotification = (
     }
 
     notification.onclick = () => {
+      window.focus()
       AnalyticsService.captureEvent(
         EVENTS.USER_CLICKED_WEB_NOTIFICATION,
         payload
       )
     }
     AnalyticsService.captureEvent(EVENTS.USER_SENT_WEB_NOTIFICATION, payload)
+    return notification
   }
 }
 

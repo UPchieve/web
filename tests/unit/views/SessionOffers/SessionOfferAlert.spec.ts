@@ -6,6 +6,7 @@ import SessionOfferAlert from '@/views/SessionOffers/SessionOfferAlert.vue'
 import Countdown from '@/components/Countdown.vue'
 import { socket } from '@/socket'
 import router from '@/router'
+import * as PresenceService from '@/services/PresenceService'
 
 vi.mock('@/socket', () => ({ socket: { emit: vi.fn() } }))
 vi.mock('@/router', () => ({ default: { push: vi.fn() } }))
@@ -60,6 +61,12 @@ describe('SessionOfferAlert', () => {
     const { wrapper } = mountWithOffer()
 
     expect(wrapper.text()).toContain('Ada has requested an Algebra 1 tutor')
+  })
+
+  it('checks whether the coach has gone inactive', () => {
+    mountWithOffer()
+
+    expect(PresenceService.checkForInactivity).toHaveBeenCalledTimes(1)
   })
 
   it('counts down to when the offer expires', () => {
