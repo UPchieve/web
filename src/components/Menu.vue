@@ -65,14 +65,16 @@ const isMenuOpen = computed({
           :aria-expanded="isMenuOpen"
           aria-haspopup="menu"
         >
-          <CaretIcon
-            :class="[
-              'caret',
-              { 'caret--open': isMenuOpen },
-              { 'caret--regular': props.caretThickness === 'regular' },
-              { 'caret--bold': props.caretThickness === 'bold' },
-            ]"
-          />
+          <slot name="icon" :is-open="isMenuOpen">
+            <CaretIcon
+              :class="[
+                'caret',
+                { 'caret--open': isMenuOpen },
+                { 'caret--regular': props.caretThickness === 'regular' },
+                { 'caret--bold': props.caretThickness === 'bold' },
+              ]"
+            />
+          </slot>
         </div>
       </template>
       <!--      On Mobile Mode, open the menu in a bottom drawer-->

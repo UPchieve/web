@@ -31,8 +31,11 @@ const props = defineProps<TaskCardProps>()
     <template #icon>
       <slot name="icon" />
     </template>
-    <template #heading-content>
-      <slot name="heading-content" />
+    <template #top-controls>
+      <slot name="top-controls" />
+    </template>
+    <template v-if="$slots.header" #header="headerProps">
+      <slot name="header" v-bind="headerProps" />
     </template>
     <template #content>
       <slot name="content" />

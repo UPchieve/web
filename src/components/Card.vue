@@ -6,7 +6,7 @@ export type DismissOptions = {
 }
 
 export type CardProps = {
-  title: string
+  title?: string
   subtitle: string
   dismissOptions?: DismissOptions
   headingAlign?: 'center' | 'left'
@@ -31,8 +31,12 @@ const props = withDefaults(defineProps<CardProps>(), {
       class="heading-container"
       :class="{ 'heading-container--left': props.headingAlign === 'left' }"
     >
-      <slot name="heading-content" />
-      <div class="title">{{ props.title }}</div>
+      <slot name="top-controls" />
+      <div class="header">
+        <slot name="header" :title="props.title">
+          <div v-if="props.title" class="title">{{ props.title }}</div>
+        </slot>
+      </div>
       <div v-if="props.subtitle" class="subtitle">{{ props.subtitle }}</div>
     </div>
     <slot name="content" />
@@ -58,10 +62,18 @@ const props = withDefaults(defineProps<CardProps>(), {
   gap: 8px;
   width: 90%;
 
-  .title {
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .title,
+  :slotted(.title) {
     @include font-category('display-small');
     text-align: center;
-    width: 80%;
   }
 
   .subtitle {
@@ -73,7 +85,12 @@ const props = withDefaults(defineProps<CardProps>(), {
   &--left {
     align-items: flex-start;
 
+    .header {
+      justify-content: flex-start;
+    }
+
     .title,
+    :slotted(.title),
     .subtitle {
       text-align: left;
     }

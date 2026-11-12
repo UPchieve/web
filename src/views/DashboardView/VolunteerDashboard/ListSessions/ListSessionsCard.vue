@@ -15,6 +15,7 @@ import MenuContent from '@/views/DashboardView/VolunteerDashboard/ListSessions/M
 import Menu from '@/components/Menu.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { rejoinSession } from '@/utils/session'
+import GearIcon from '@/assets/icons/gear.svg'
 
 const store = useStore()
 const router = useRouter()
@@ -80,15 +81,16 @@ function scrollToTop() {
 }
 </script>
 
-<template ref="heading">
+<template>
   <div>
     <TaskCard
       title="Students"
       :subtitle="studentsCardSubtitle"
       headingAlign="left"
     >
-      <template v-slot:heading-content>
-        <div class="heading-content" ref="heading">
+      <template v-slot:header>
+        <div ref="heading" class="header">
+          <span class="title">Students</span>
           <Menu
             location="bottom center"
             :buttonHeightPx="20"
@@ -96,6 +98,9 @@ function scrollToTop() {
             :isOpen="isMenuOpen"
             @update:isOpen="toggleMenuOpen"
           >
+            <template v-slot:icon>
+              <GearIcon class="icon" />
+            </template>
             <template v-slot:content>
               <MenuContent
                 :showLockedSessions="showLockedSessions"
@@ -141,14 +146,21 @@ function scrollToTop() {
   width: 100%;
 }
 
-.heading-content {
-  display: flex;
-  position: relative;
-  margin-left: auto;
-}
 .rejoin-session-container {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
 }
 </style>

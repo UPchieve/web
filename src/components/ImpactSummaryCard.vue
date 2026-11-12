@@ -255,7 +255,7 @@ watch(
 </script>
 <template>
   <TaskCard title="Your Impact Summary" subtitle="">
-    <template v-slot:heading-content>
+    <template v-slot:top-controls>
       <div v-if="isVerifyHoursButtonEnabled" class="verify-hours">
         <LargeButton
           target="_blank"
