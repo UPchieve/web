@@ -18,6 +18,7 @@ type SessionListItemProps = {
     }
     subject: string
     subjectDisplayName: string
+    currentGradeName: string
     waitTime: string
     isLongWait: boolean
     topic: string // i.e. 'math'
@@ -39,6 +40,7 @@ const studentName = computed(() =>
       props.session.student?.firstname ??
       'Student')
 )
+const gradeLevel = computed((): string => props.session.currentGradeName)
 </script>
 
 <template>
@@ -67,7 +69,7 @@ const studentName = computed(() =>
         <span>{{ props.session.subjectDisplayName }}</span>
       </div>
       <span class="student-name">
-        {{ studentName }}
+        {{ studentName }} · {{ gradeLevel }}
         <span
           v-if="props.session.student?.isShadowBanned && isAdmin"
           class="shadow-ban"
