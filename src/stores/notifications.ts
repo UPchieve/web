@@ -10,6 +10,10 @@ export type Notification = {
     text: string
     action: () => void
   }
+  secondaryCta?: {
+    text: string
+    action?: () => void
+  }
   type?: string
   duration?: number
 }

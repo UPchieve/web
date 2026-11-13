@@ -100,6 +100,7 @@ export default {
               text: 'Go to dashboard',
               action: () => context.$router.push('/'),
             },
+            secondaryCta: { text: 'Pass' },
             type: 'secondary',
             duration: 1000 * 60 * 2,
           })
@@ -108,11 +109,19 @@ export default {
         notificationsStore.add({
           id: session.id,
           icon: StudentIcon,
-          title: `${session.student?.firstname ?? 'A student'} needs help with ${session.subjectDisplayName}`,
+          title: session.subjectDisplayName,
+          description: [
+            session.student?.firstname,
+            session.student?.currentGradeName,
+            !session.isExclusive && 'Any coach can join',
+          ]
+            .filter(Boolean)
+            .join(' · '),
           cta: {
-            text: 'Join session',
+            text: 'Join',
             action: () => dispatch('gotoSession', { context, session }),
           },
+          secondaryCta: { text: 'Pass' },
           type: 'secondary',
           duration: 1000 * 60 * 2,
         })
