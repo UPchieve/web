@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, defineProps, toRefs } from 'vue'
+import { computed, defineProps, toRefs, useId } from 'vue'
 import { QUESTION_TYPES } from '@/consts'
 import FormInput from '@/components/FormInput.vue'
 import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
 import SurveyImage from '@/components/Surveys/SurveyImage.vue'
 import SurveyCheckbox from '@/components/Surveys/SurveyCheckbox.vue'
+import SurveyRateNumber from '@/components/Surveys/SurveyRateNumber.vue'
 import type {
   SurveyQuestionDefinition,
   SurveyResponseDefinition,
@@ -20,7 +21,7 @@ const props = withDefaults(
       responseId: number | undefined,
       response?: string
     ) => void
-    updateUserResponseMultiselect: (
+    updateUserResponseMultiselect?: (
       questionId: number,
       responseId: number | undefined
     ) => void
@@ -33,10 +34,23 @@ const props = withDefaults(
 
 const { question, userResponse, updateUserResponse, readOnly } = toRefs(props)
 
+const titleId = useId()
+
+const isScale = computed(() => question.value.display === 'scale')
+
 const isRowOfImages = computed(() => {
   const responses = question.value.responses
   return responses.length > 0 && responses.every((a) => a.responseDisplayImage)
 })
+
+const responsesClass = computed(() => ({
+  'question__responses-images': isRowOfImages.value || isScale.value,
+  'question__responses-scale': isScale.value,
+}))
+
+const radioGroupAttrs = computed(() =>
+  isScale.value ? { role: 'radiogroup', 'aria-labelledby': titleId } : {}
+)
 
 function isSelected(response: SurveyResponseDefinition) {
   if (Array.isArray(userResponse.value.responseId))
@@ -51,19 +65,32 @@ function isSelected(response: SurveyResponseDefinition) {
 
 <template>
   <div>
-    <div class="question__title">
+    <div :id="titleId" class="question__title">
       {{ question.questionText }}
     </div>
     <div
       class="question__responses"
-      :class="isRowOfImages ? 'question__responses-images' : ''"
+      :class="responsesClass"
+      v-bind="radioGroupAttrs"
     >
       <template
-        v-for="response in question.responses"
+        v-for="(response, index) in question.responses"
         :key="response.responseId"
       >
+        <SurveyRateNumber
+          v-if="isScale"
+          class="question__response"
+          :data-testid="`survey-question-${response.responseText}`"
+          :rating="(index + 1).toString()"
+          :label="index % 2 === 0 ? response.responseText : ''"
+          :questionId="question.questionId"
+          :responseId="response.responseId"
+          :isSelected="Boolean(isSelected(response))"
+          @survey-rate-click="updateUserResponse"
+          :readOnly="readOnly"
+        />
         <SurveyImage
-          v-if="response.responseDisplayImage"
+          v-else-if="response.responseDisplayImage"
           :data-testid="`survey-question-${response.responseText}`"
           class="question__response question__response-image"
           :src="response.responseDisplayImage"
@@ -159,6 +186,14 @@ function isSelected(response: SurveyResponseDefinition) {
       @include flex-container(row, center);
       flex-wrap: wrap;
       margin-top: 2em;
+    }
+
+    // The end labels are wider than their buttons, and the pre-session modal
+    // clips at its edge. Padding gives labels space to overflow.
+    &-scale {
+      @media only screen and (max-width: 660px) {
+        padding: 0 $spacing-xs;
+      }
     }
   }
 

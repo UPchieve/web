@@ -18,7 +18,13 @@
         :currentStep="currentStep + (hasSubjectSelection ? 1 : 0)"
         class="stepper"
       />
-      <div v-if="survey.length">
+      <survey-question
+        v-if="currentQuestion?.display === 'scale'"
+        :question="currentQuestion"
+        :userResponse="userResponse[currentQuestion.questionId]"
+        :updateUserResponse="updateUserResponse"
+      />
+      <div v-else-if="survey.length">
         <div class="question__title">
           {{ currentQuestion.questionText }}
         </div>
@@ -119,6 +125,7 @@ import CrossIcon from '@/assets/cross.svg'
 import { QUESTION_TYPES } from '@/consts'
 import SurveyRadio from '@/components/Surveys/SurveyRadio.vue'
 import SurveyImage from '@/components/Surveys/SurveyImage.vue'
+import SurveyQuestion from '@/components/Surveys/SurveyQuestion.vue'
 
 export default {
   components: {
@@ -127,6 +134,7 @@ export default {
     CrossIcon,
     SurveyRadio,
     SurveyImage,
+    SurveyQuestion,
   },
 
   props: {

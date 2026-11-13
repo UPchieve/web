@@ -19,6 +19,7 @@ export type SurveyQuestionDefinition = {
   questionId: number
   questionText: string
   questionType: string
+  display?: 'scale'
   responses: SurveyResponseDefinition[]
   userResponse?: SurveryUserResponseDefinition
 }

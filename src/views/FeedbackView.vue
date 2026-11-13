@@ -40,10 +40,11 @@
                   {{ questionInfo.headerText }}
                 </div>
               </div>
-              <div class="question__title">
+              <div :id="titleId(questionInfo)" class="question__title">
                 {{ questionInfo.question.questionText }}
               </div>
               <div
+                v-bind="radioGroupAttrs(questionInfo)"
                 :class="{
                   'question__responses-images': isRowOfImages(
                     questionInfo.question
@@ -416,6 +417,14 @@ export default {
     ...mapActions(useAppSidebarStore, { hideSidebar: 'hide' }),
     scrollToTop() {
       this.$refs.feedbackMainContainer.scrollIntoView({ behavior: 'smooth' })
+    },
+    titleId(questionInfo) {
+      return `question-title-${questionInfo.questionId}`
+    },
+    radioGroupAttrs(questionInfo) {
+      return questionInfo.questionType === 'number-rating'
+        ? { role: 'radiogroup', 'aria-labelledby': this.titleId(questionInfo) }
+        : {}
     },
     getQuestionDisplayType(question) {
       if (question.questionType === 'multiple choice') {
