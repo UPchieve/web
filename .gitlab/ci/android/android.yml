@@ -55,7 +55,7 @@ upload_android_staging:
   before_script:
     - gem install fastlane --version 2.241.0 --no-document
   script:
-    - SUPPLY_JSON_KEY_DATA="$(printf '%s' "$GOOGLE_PLAY_STAGING_CREDENTIALS_B64" | base64 -d)"
+    - SUPPLY_JSON_KEY_DATA="$(printf '%s' "$GOOGLE_PLAY_STORE_STAGING_CREDENTIAL_B64" | base64 -d)"
     - export SUPPLY_JSON_KEY_DATA
     - |
       fastlane supply \
