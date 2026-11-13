@@ -154,6 +154,7 @@ export default {
       this.handleMobileModeChange
     )
     clearInterval(this.checkForUpdateIntervalId)
+    this.$store.dispatch('volunteer/stopPollingForGlobalStats')
 
     if (this.isMobileApp) {
       if (getOperatingSystem() === 'iOS') {
@@ -362,6 +363,10 @@ export default {
 
         if (!this.topics.length) {
           this.$store.dispatch('subjects/getTopics')
+        }
+
+        if (this.isVolunteer) {
+          this.$store.dispatch('volunteer/startPollingForGlobalStats')
         }
 
         this.$store.dispatch('user/getProgressReportOverviewSubjectStats')

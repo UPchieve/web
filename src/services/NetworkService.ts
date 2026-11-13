@@ -1117,6 +1117,12 @@ export default {
       this._errorHandler
     )
   },
+  getVolunteerFacingStats() {
+    return httpGet<{
+      ongoingSessions: number
+      studentsOnline: number
+    }>(`${API_ROOT}/stats/volunteer`)
+  },
   searchSchool({ query }) {
     return httpGetDeprecated(
       `${ELIGIBILITY_API_ROOT}/school/search?q=${encodeURIComponent(query)}`

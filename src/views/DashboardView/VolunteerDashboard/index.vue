@@ -1,6 +1,6 @@
 <template>
   <div class="volunteer-dashboard">
-    <dashboard-banner />
+    <VolunteerDashboardBanner />
 
     <!-- TODO: Make notices into a reusable component. -->
     <div v-if="downtimeBannerMessage" class="dashboard-notice">
@@ -151,7 +151,6 @@ import { mapActions, mapState as mapPiniaState } from 'pinia'
 import { useAppModalStore } from '@/stores/app/modal'
 import { useNthsStore } from '@/stores/nths'
 import { mapState, mapGetters } from 'vuex'
-import DashboardBanner from '@/views/DashboardView/DashboardBanner.vue'
 import PhotoUploadModal from './PhotoUploadModal.vue'
 import NextTaskModal from './NextTaskModal.vue'
 import VolunteerWelcomeModal from '@/views/DashboardView/VolunteerDashboard/VolunteerWelcomeModal.vue'
@@ -186,6 +185,7 @@ import {
 } from '@/services/BrowserStorageService'
 import { useProductFlagsStore } from '@/stores/product-flags'
 import { shouldShowShareInfoModal } from '@/utils/share-info-modal-utils'
+import VolunteerDashboardBanner from '@/views/DashboardView/VolunteerDashboard/VolunteerDashboardBanner.vue'
 
 const ETA = {
   BACKGROUND_INFO: 1,
@@ -197,9 +197,9 @@ const ETA = {
 export default {
   name: 'volunteer-dashboard',
   components: {
+    VolunteerDashboardBanner,
     ListSessionsCard,
     TaskCard,
-    DashboardBanner,
     PhotoUploadModal,
 
     SquareTextIcon,
@@ -897,21 +897,32 @@ export default {
 }
 
 .volunteer-dashboard {
+  --banner-overlap: 60px;
+
   @include flex-container(column);
-  padding: 40px 15px;
+  // Lets the body below pick its column layout from the width the dashboard
+  // actually has (the window minus the sidebar), not the window width.
+  container-type: inline-size;
 
   @include breakpoint-above('medium') {
-    display: inline-flex;
-    min-width: 100%;
-    padding: 40px;
+    --banner-overlap: 100px;
   }
 
   &__body {
+    position: relative;
+    margin-top: calc(-1 * var(--banner-overlap));
+    padding: 0 15px;
+
     @include child-spacing(top, 16px);
     @include child-spacing(right, 0);
-    margin-top: 40px;
 
-    @include breakpoint-above('huge') {
+    @include breakpoint-above('medium') {
+      padding: 0 40px;
+    }
+
+    // Two columns only once both fit: the Students card (~380px) and the
+    // Impact Summary card (~554px) at their narrowest, plus the gap and padding.
+    @container (min-width: 1060px) {
       @include child-spacing(top, 0);
       display: grid;
       grid-template-columns: 1fr 1fr;

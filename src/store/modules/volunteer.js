@@ -4,6 +4,11 @@ import Case from 'case'
 import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import * as PresenceService from '@/services/PresenceService'
 import { useNotificationsStore } from '@/stores/notifications'
+import NetworkService from '@/services/NetworkService'
+import LoggerService from '@/services/LoggerService'
+import { secondsInMs } from '@/utils/time-utils'
+
+const GLOBAL_STATS_POLL_INTERVAL_MS = secondsInMs(10)
 
 export default {
   namespaced: true,
@@ -13,6 +18,8 @@ export default {
     tickIntervalId: null,
     ticks: 0,
     sessionOffer: null,
+    globalStats: null,
+    globalStatsIntervalId: null,
   },
   mutations: {
     setSessionOffer: (state, offer) => {
@@ -27,6 +34,9 @@ export default {
       (state.allOpenSessions = allOpenSessions),
     setTickIntervalId: (state, tickIntervalId) =>
       (state.tickIntervalId = tickIntervalId),
+    setGlobalStats: (state, stats) => (state.globalStats = stats),
+    setGlobalStatsIntervalId: (state, intervalId) =>
+      (state.globalStatsIntervalId = intervalId),
     incTicks: (state) => (state.ticks = state.ticks + 1),
     resetTicks: (state) => (state.ticks = 0),
     removeSession: (state, sessionId) => {
@@ -36,6 +46,32 @@ export default {
     },
   },
   actions: {
+    startPollingForGlobalStats({ dispatch, commit, state }) {
+      if (state.globalStatsIntervalId) return
+
+      const fetchStats = async () => {
+        try {
+          await dispatch('getGlobalStats')
+        } catch (error) {
+          // Keep showing the last stats we got; the next poll will try again.
+          LoggerService.noticeError(error)
+        }
+      }
+
+      fetchStats()
+      commit(
+        'setGlobalStatsIntervalId',
+        setInterval(fetchStats, GLOBAL_STATS_POLL_INTERVAL_MS)
+      )
+    },
+    stopPollingForGlobalStats({ commit, state }) {
+      clearInterval(state.globalStatsIntervalId)
+      commit('setGlobalStatsIntervalId', null)
+    },
+    async getGlobalStats({ commit }) {
+      const response = await NetworkService.getVolunteerFacingStats()
+      commit('setGlobalStats', response)
+    },
     gotoSession({ dispatch }, { context, session }) {
       const { type, subTopic, id } = session
       const path = `/session/${Case.kebab(type)}/${Case.kebab(subTopic)}/${id}`
