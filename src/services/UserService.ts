@@ -80,4 +80,11 @@ export default {
     await NetworkService.addVolunteerRoleForStudent()
     await router.push('/building-your-coach-experience')
   },
+  async firstTransitionToHonorSocietyCoachMode(router) {
+    await NetworkService.joinNThs()
+    await router.push({
+      path: '/building-your-coach-experience',
+      query: { destination: 'nths' },
+    })
+  },
 }

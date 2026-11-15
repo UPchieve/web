@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { secondsInMs } from '@/utils/time-utils'
-import NetworkService from '@/services/NetworkService'
-import { useRouter } from 'vue-router'
+import UserService from '@/services/UserService'
+import { useRoute, useRouter } from 'vue-router'
 import { useCelebrationsStore } from '@/stores/celebrations'
+import { useStore } from 'vuex'
 
 const router = useRouter()
+const route = useRoute()
+const store = useStore()
 const celebrationsStore = useCelebrationsStore()
 
 const targetMode = 'volunteer'
@@ -30,7 +33,7 @@ function tickProgressBar() {
 
 onMounted(() => {
   intervalId.value = setInterval(tickProgressBar, TOTAL_TIME / 100)
-  NetworkService.switchActiveRole(targetMode)
+  UserService.switchActiveRole({ $store: store }, targetMode)
     .then(() => {
       isSwitchModePromiseResolved.value = true
     })
@@ -45,7 +48,9 @@ watch(
   [isSwitchModePromiseResolved, readyToSwitch],
   async ([isResolved, readyToSwitch]) => {
     if (isResolved && readyToSwitch) {
-      await router.push('/dashboard')
+      await router.push(
+        route.query.destination === 'nths' ? '/groups' : '/dashboard'
+      )
     }
   }
 )

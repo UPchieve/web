@@ -54,6 +54,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SHOW_ONLINE_STATUS_FAKE_DOOR]: false,
     },
     multivariantFlags: {
+      [POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE]: 'control', // control | honor-society
       [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE]: '', // tutor-count-shown | tutor-count-hidden
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY]: '', // completed-first-hour-of-tutoring | tutored-first-three-students
@@ -145,6 +146,10 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.SECONDARY_EMAIL_ON_PROFILE_PAGE],
     volunteerSubjectPresenceVariant: (state: FeatureFlagState) =>
       state.multivariantFlags[POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE],
+    studentToVolunteerHoursPageVariant: (state: FeatureFlagState) =>
+      state.multivariantFlags[
+        POSTHOG_FEATURE_FLAGS.SHOW_STUDENT_TO_VOLUNTEER_HOURS_PAGE
+      ],
     isPendingMessagesEnabled: (state: FeatureFlagState) =>
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.PENDING_MESSAGES],
     isStudentRequestSpecificVolunteerSessionsEnabled: (

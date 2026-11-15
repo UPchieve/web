@@ -1601,6 +1601,9 @@ export default {
       this._errorHandler
     )
   },
+  joinNThs() {
+    return httpPost<void>(`${API_ROOT}/nths-groups/at-large/member`, {})
+  },
   switchActiveRole(activeRole: 'student' | 'volunteer') {
     return httpPutDeprecated(`${API_ROOT}/user/roles/active`, {
       activeRole,

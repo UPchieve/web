@@ -146,7 +146,7 @@
         <sidebar-link
           v-if="shouldShowStudentToVolunteerHoursPage"
           to="/volunteer-hours"
-          text="Volunteer Hours"
+          :text="studentToVolunteerHoursLabel"
           id="hour-calculator-modal-link"
         >
           <calculator-icon class="icon" />
@@ -319,6 +319,8 @@ export default {
         'featureFlags/isDisabledSlackButtonForUnapprovedVolunteersEnabled',
       shouldShowStudentToVolunteerHoursPage:
         'featureFlags/shouldShowStudentToVolunteerHoursPage',
+      studentToVolunteerHoursPageVariant:
+        'featureFlags/studentToVolunteerHoursPageVariant',
       aiTutor: 'featureFlags/aiTutor',
       hasUnreadDMs: 'user/hasUnreadDMs',
       hasUnreadDirectMessages: 'user/hasUnreadDirectMessages',
@@ -333,6 +335,12 @@ export default {
     }),
     shouldFetchUnreadDirectMessages() {
       return this.authenticated && this.isDirectMessagesEnabled
+    },
+    studentToVolunteerHoursLabel() {
+      if (this.hasVolunteerRole) return 'Volunteer Hours'
+      return this.studentToVolunteerHoursPageVariant === 'honor-society'
+        ? 'Join Honor Society'
+        : 'Volunteer Hours'
     },
     hasSeenCalculator() {
       if (this.shouldShowStudentToVolunteerHoursPage) {
