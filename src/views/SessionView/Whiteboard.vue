@@ -1266,7 +1266,7 @@ export default {
 
     async loadZwibbler() {
       const collabRoot = this.isZwibserveSession
-        ? `${config.websocketRoot}/graffiti`
+        ? config.zwibblerCollabServerRoot
         : config.websocketRoot
       const zwibblerCtx = window.Zwibbler.create('zwib-div', {
         allowZoom: true,

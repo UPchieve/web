@@ -67,6 +67,14 @@
     - export SUBWAY_REDIS_PORT=$REDIS_PORT
     - export SUBWAY_SERVER_HOST=localhost:8081
     - export VUE_APP_GOOGLE_RECAPTCHA_KEY=$GOOGLE_RECAPTCHA_KEY
+    - export SUBWAY_POSTHOG_LOCAL_FLAGS=zwibserve
+    - echo 'Build and start graffiti, the whiteboard server...'
+    - curl -fsSL https://go.dev/dl/go1.25.14.linux-amd64.tar.gz | tar -C /usr/local -xz
+    - git clone --depth=1 https://gitlab.com/upchieve/graffiti.git /tmp/graffiti
+    - CGO_ENABLED=0 /usr/local/go/bin/go build -C /tmp/graffiti -o /usr/local/bin/graffiti
+    # New Relic's agent won't start without a 40-character key. New Relic rejects this one.
+    - PORT=5503 NEW_RELIC_LICENSE_KEY=0000000000000000000000000000000000000000 graffiti > $CI_PROJECT_DIR/graffiti.log 2>&1 &
+    - curl -sf --retry 15 --retry-connrefused --retry-delay 1 http://localhost:5503/graffiti/healthz || (cat $CI_PROJECT_DIR/graffiti.log; exit 1)
     - echo 'Start subway server...'
     - pnpm run e2e:backend > $CI_PROJECT_DIR/subway.log 2>&1 &
     - |
@@ -100,6 +108,7 @@
     when: always
     paths:
       - subway.log
+      - graffiti.log
       - high-line.log
       - playwright-report/
     expire_in: 7 days

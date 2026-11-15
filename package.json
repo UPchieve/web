@@ -8,7 +8,6 @@
     "api-contracts:prod": "pnpm update @upchieve/api-contracts@latest --save-exact",
     "api-contracts:preview": "if [ -z \"$API_CONTRACTS_PREVIEW_MR_ID\" ]; then echo \"API_CONTRACTS_PREVIEW_MR_ID is required\"; exit 1; fi; pnpm update @upchieve/api-contracts@mr-$API_CONTRACTS_PREVIEW_MR_ID --save-exact",
     "serve": "op run --no-masking --env-file=./.env.op -- doppler run -- env VITE_CJS_TRACE=true vite",
-    "serve:local-whiteboard": "op run --env-file=./.env.op -- doppler run -- env VUE_APP_MAIN_WEBSOCKET_ROOT=ws://localhost:4545 VITE_CJS_TRACE=true vite",
     "build": "vite build",
     "build:analyze": "BUNDLE_ANALYZE=true pnpm run build",
     "preview": "vite preview",

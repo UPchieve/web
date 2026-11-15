@@ -4,6 +4,9 @@ config.serverRoot = import.meta.env.VUE_APP_SERVER_ROOT
 config.appRoot = import.meta.env.VUE_APP_ROOT
 config.socketAddress = import.meta.env.VUE_APP_WEBSOCKET_ADDRESS
 config.websocketRoot = import.meta.env.VUE_APP_MAIN_WEBSOCKET_ROOT
+config.zwibblerCollabServerRoot =
+  import.meta.env.VUE_APP_ZWIBBLER_COLLAB_SERVER_ROOT ||
+  `${config.websocketRoot}/graffiti`
 config.zwibblerUrl = import.meta.env.VUE_APP_ZWIBBLER_URL
 config.posthogToken = import.meta.env.VUE_APP_POSTHOG_TOKEN
 config.gleapSdkKey = import.meta.env.VUE_APP_GLEAP_SDK_KEY

@@ -63,11 +63,13 @@ const localServers = [
     name: 'SUBWAY',
     url: `http://localhost:${subwayPort}/healthz`,
     reuseExistingServer: false,
-    timeout: 60000,
+    // The first run after pulling subway also builds graffiti's image.
+    timeout: 180000,
     stdout: 'pipe',
     stderr: 'pipe',
     env: {
       NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+      SUBWAY_POSTHOG_LOCAL_FLAGS: 'zwibserve',
     },
     gracefulShutdown: {
       signal: 'SIGTERM', // Sends a Ctrl+C signal to your server
