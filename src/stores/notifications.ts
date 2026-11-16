@@ -14,8 +14,12 @@ export type Notification = {
     text: string
     action?: () => void
   }
+  label?: string
   type?: string
   duration?: number
+  countdown?: boolean
+  onExpire?: () => void
+  modal?: boolean
 }
 
 export const useNotificationsStore = defineStore('notifications', () => {
@@ -31,8 +35,10 @@ export const useNotificationsStore = defineStore('notifications', () => {
     },
   })
 
-  function add(notification: Notification) {
-    _notifications.value = [..._notifications.value, notification]
+  function add(notification: Notification, toFront = false) {
+    _notifications.value = toFront
+      ? [notification, ..._notifications.value]
+      : [..._notifications.value, notification]
   }
 
   function remove(notificationId: Notification['id']) {

@@ -1,16 +1,17 @@
 <template>
   <div class="notifications-container">
-    <!--
-      TODO: right now depth is sorted by oldest in front.
-      we will need to special case exclusive and session offers
-      to skip to the front
-    -->
+    <div
+      v-if="notifications[0]?.modal"
+      class="backdrop"
+      @click="$refs.front[0].clickSecondaryCta()"
+    />
     <transition-group class="transition-group" name="list" tag="div">
       <attention-box
         v-for="(notification, index) in notifications"
         v-bind:key="notification.id"
         :notification="notification"
         :data-testid="`notification-${notification.id}`"
+        :ref="index ? undefined : 'front'"
         :others-waiting="index ? 0 : othersWaiting"
         :style="{ '--depth': index }"
         :class="{
@@ -60,6 +61,20 @@ export default {
     width: auto;
   }
 }
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 40%);
+  pointer-events: auto;
+  animation: fade-in 0.3s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
 .transition-group {
   display: grid;
   align-items: end;

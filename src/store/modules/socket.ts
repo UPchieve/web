@@ -16,6 +16,7 @@ import {
 import AnalyticsService from '@/services/AnalyticsService'
 import { useCelebrationsStore } from '@/stores/celebrations'
 import { useSessionStore } from '@/stores/session'
+import { useSessionOfferStore } from '@/stores/session-offer'
 import { EVENTS } from '@/consts'
 
 /**
@@ -199,7 +200,7 @@ export default {
 
       socket.on('session-offer', (offer: SessionOffer) => {
         if (rootGetters['user/isVolunteer']) {
-          commit('volunteer/setSessionOffer', offer, { root: true })
+          useSessionOfferStore().show(offer)
         }
       })
 
@@ -207,7 +208,7 @@ export default {
         'session-offer:closed',
         ({ sessionId, outcome }: SessionOfferClosed) => {
           const isShownOffer =
-            rootState.volunteer.sessionOffer?.sessionId === sessionId
+            useSessionOfferStore().offer?.sessionId === sessionId
           if (isShownOffer && outcome === 'withdrawn-by-student') {
             AnalyticsService.captureEvent(EVENTS.OFFERS_OFFER_WITHDRAWN, {
               sessionId,
@@ -217,7 +218,7 @@ export default {
                 rootGetters['volunteer/exclusiveSessions'].length,
             })
           }
-          commit('volunteer/clearSessionOffer', sessionId, { root: true })
+          useSessionOfferStore().clear(sessionId)
         }
       )
 

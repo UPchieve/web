@@ -9,10 +9,6 @@
           <app-header v-show="showHeader" />
           <app-sidebar v-if="showSidebar" />
           <app-modal v-if="showModal" />
-          <session-offer-alert
-            v-if="showSessionOffer"
-            :key="sessionOffer.sessionId"
-          />
           <app-banner v-if="bannerIsShown" />
           <div
             :class="{
@@ -69,7 +65,6 @@ import { EVENTS, MAX_MOBILE_MODE_WIDTH } from '@/consts'
 import RouteLoadingIndicator from '@/components/RouteLoadingIndicator.vue'
 import AppTheme from './AppTheme.vue'
 import UserService from '@/services/UserService'
-import SessionOfferAlert from '@/views/SessionOffers/SessionOfferAlert.vue'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 const MOBILE_MODE_QUERY = `(max-width: ${MAX_MOBILE_MODE_WIDTH}px)`
@@ -88,7 +83,6 @@ export default {
     Celebration,
     RouteLoadingIndicator,
     AppTheme,
-    SessionOfferAlert,
   },
   data() {
     return {
@@ -290,7 +284,6 @@ export default {
       isConnected: (state) => state.socket.isConnected,
       messageData: (state) => state.socket.messageData,
       fadeInContent: (state) => state.app.fadeInContent,
-      sessionOffer: (state) => state.volunteer.sessionOffer,
     }),
     ...mapGetters({
       userAuthenticated: 'user/isAuthenticated',
@@ -314,11 +307,6 @@ export default {
         !!this.user.isApproved &&
         this.user.banType !== 'complete' &&
         this.user.banType !== 'shadow'
-      )
-    },
-    showSessionOffer() {
-      return (
-        Boolean(this.sessionOffer) && this.isVolunteer && !this.isSessionAlive
       )
     },
   },

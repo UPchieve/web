@@ -17,17 +17,10 @@ export default {
     allOpenSessions: [],
     tickIntervalId: null,
     ticks: 0,
-    sessionOffer: null,
     globalStats: null,
     globalStatsIntervalId: null,
   },
   mutations: {
-    setSessionOffer: (state, offer) => {
-      state.sessionOffer = offer
-    },
-    clearSessionOffer: (state, sessionId) => {
-      if (state.sessionOffer?.sessionId === sessionId) state.sessionOffer = null
-    },
     setNewWaitingStudentAudioElement: (state, element) =>
       (state.newWaitingStudentAudioElement = element),
     setAllOpenSessions: (state, allOpenSessions) =>
@@ -127,7 +120,9 @@ export default {
             title: `There are ${availableSessions.length} students that need help`,
           })
         } else {
-          notificationsStore.clear()
+          notifications
+            .filter(({ type }) => type !== 'session-offer')
+            .forEach(({ id }) => notificationsStore.remove(id))
           notificationsStore.add({
             id: 'rollup-alert',
             icon: StudentIcon,

@@ -9,7 +9,6 @@ import App from '@/components/App/index.vue'
 import AppHeader from '@/components/App/AppHeader/index.vue'
 import AppSidebar from '@/components/App/AppSidebar/index.vue'
 import AppModal from '@/components/App/AppModal/index.vue'
-import SessionOfferAlert from '@/views/SessionOffers/SessionOfferAlert.vue'
 
 const getWrapper = (options = {}) => {
   options = {
@@ -132,66 +131,5 @@ describe('App', () => {
     const wrapper = getWrapper({ mockRoute: mockSessionRoute })
     const refreshAppAlert = wrapper.find('[data-testid="refresh-app-alert"]')
     expect(refreshAppAlert.exists()).toBeFalsy()
-  })
-
-  describe('SessionOfferAlert', () => {
-    const offer = { sessionId: 'session-1', expiresAt: new Date() }
-    const liveSession = { id: 'session-2', createdAt: new Date() }
-
-    const mountWith = async ({
-      userType = 'volunteer',
-      sessionOffer = offer,
-      session = {},
-    } = {}) => {
-      const wrapper = getWrapper({ stubs: { SessionOfferAlert: true } })
-      wrapper.vm.$store.commit('user/setUser', { userType })
-      wrapper.vm.$store.commit('user/setSession', session)
-      wrapper.vm.$store.commit('volunteer/setSessionOffer', sessionOffer)
-      await wrapper.vm.$nextTick()
-      return wrapper
-    }
-
-    it.each([
-      ['shows for a volunteer with an offer', {}, true],
-      ['hides with no offer', { sessionOffer: null }, false],
-      ['hides for a non-volunteer', { userType: 'student' }, false],
-      ['hides while in a live session', { session: liveSession }, false],
-    ])('%s', async (_label, state, shown) => {
-      const wrapper = await mountWith(state)
-
-      expect(wrapper.findComponent(SessionOfferAlert).exists()).toBe(shown)
-    })
-
-    it('hides once the offer is cleared', async () => {
-      const wrapper = await mountWith()
-
-      wrapper.vm.$store.commit('volunteer/clearSessionOffer', 'session-1')
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.findComponent(SessionOfferAlert).exists()).toBe(false)
-    })
-
-    it('remounts for a new offer', async () => {
-      const wrapper = await mountWith()
-      const first = wrapper.findComponent(SessionOfferAlert).vm
-
-      wrapper.vm.$store.commit('volunteer/setSessionOffer', {
-        ...offer,
-        sessionId: 'session-3',
-      })
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.findComponent(SessionOfferAlert).vm).not.toBe(first)
-    })
-
-    it('does not touch the app modal', async () => {
-      const wrapper = await mountWith()
-      useAppModalStore().show({ component: 'ConfirmModal' })
-
-      wrapper.vm.$store.commit('volunteer/clearSessionOffer', 'session-1')
-      await wrapper.vm.$nextTick()
-
-      expect(useAppModalStore().isShown).toBe(true)
-    })
   })
 })

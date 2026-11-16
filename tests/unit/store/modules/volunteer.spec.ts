@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import { createPinia, setActivePinia } from 'pinia'
 import { storeOptions } from '@/store'
 import * as PresenceService from '@/services/PresenceService'
+import { useNotificationsStore } from '@/stores/notifications'
 
 vi.mock('@/services/PresenceService')
 vi.mock('@/utils/send-web-notification')
@@ -267,33 +268,45 @@ describe('isOnboardedAndApproved', () => {
   )
 })
 
-describe('session offers', () => {
-  const buildOffer = (overrides = {}) => ({
-    sessionId: 'session-1',
-    subject: 'algebraOne',
-    subjectDisplayName: 'Algebra 1',
-    topic: 'math',
-    studentFirstName: 'Ada',
-    expiresAt: '2026-11-04T12:00:30.000Z',
-    ...overrides,
-  })
+describe('alertVolunteer', () => {
+  it('keeps a session offer when replacing session alerts with the rollup', async () => {
+    setActivePinia(createPinia())
+    const sessions = [1, 2, 3, 4, 5].map((n) => ({
+      id: `session-${n}`,
+      subTopic: 'algebraOne',
+      subjectDisplayName: 'Algebra 1',
+      student: { firstname: 'Ada' },
+      isExclusive: false,
+    }))
+    const store = getStore({
+      user: {
+        state: {
+          user: {
+            userType: 'volunteer',
+            isApproved: true,
+            isOnboarded: true,
+            subjects: ['algebraOne'],
+          },
+        },
+      },
+      volunteer: { state: { allOpenSessions: sessions } },
+    })
+    const notificationsStore = useNotificationsStore()
+    notificationsStore.add({
+      id: 'offer',
+      title: 'Offer',
+      type: 'session-offer',
+    })
+    notificationsStore.add({ id: 'session-1', title: 'Algebra 1' })
 
-  it('clears the offer for its session', () => {
-    const store = getStore()
-    store.commit('volunteer/setSessionOffer', buildOffer())
+    await store.dispatch('volunteer/alertVolunteer', {
+      context: { $router: { currentRoute: { value: { path: '/profile' } } } },
+      session: sessions[4],
+    })
 
-    store.commit('volunteer/clearSessionOffer', 'session-1')
-
-    expect(store.state.volunteer.sessionOffer).toBeNull()
-  })
-
-  it('keeps the offer when a different session is cleared', () => {
-    const store = getStore()
-    const offer = buildOffer()
-    store.commit('volunteer/setSessionOffer', offer)
-
-    store.commit('volunteer/clearSessionOffer', 'session-2')
-
-    expect(store.state.volunteer.sessionOffer).toEqual(offer)
+    expect(notificationsStore.notifications.map(({ id }) => id)).toEqual([
+      'offer',
+      'rollup-alert',
+    ])
   })
 })
