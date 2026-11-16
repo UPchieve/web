@@ -1,8 +1,14 @@
-import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
+import {
+  enableAutoUnmount,
+  flushPromises,
+  mount,
+  RouterLinkStub,
+} from '@vue/test-utils'
 import { createStore } from 'vuex'
 import { vi } from 'vitest'
 import { page, userEvent } from '@vitest/browser/context'
 import FeedbackView from '@/views/FeedbackView.vue'
+import NetworkService from '@/services/NetworkService'
 import { caresChoices, caresQuestion } from '../fixtures/surveys'
 
 vi.mock('@/services/AnalyticsService', () => ({
@@ -23,13 +29,14 @@ vi.mock('@/services/NetworkService', () => ({
           },
         },
       }),
-    getPostsessionSurveyResponse: () => Promise.resolve({ data: [] }),
-    getPostsessionSurvey: () =>
+    getPostsessionSurveyResponse: vi.fn(() => Promise.resolve({ data: [] })),
+    getPostsessionSurvey: vi.fn(() =>
       Promise.resolve({
         data: {
           survey: { surveyId: 33, surveyTypeId: 2, survey: [caresQuestion] },
         },
-      }),
+      })
+    ),
     checkIsFavoriteVolunteer: () =>
       Promise.resolve({ data: { isFavorite: false } }),
     getRemainingFavoriteVolunteers: () =>
@@ -39,17 +46,22 @@ vi.mock('@/services/NetworkService', () => ({
 
 describe('FeedbackView', () => {
   enableAutoUnmount(afterEach)
+  const router = { replace: vi.fn() }
 
-  it('lets the student answer a 1 to 5 question grouped under its title', async () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  function mountFeedback(userType = 'student') {
     const store = createStore({
       modules: {
         user: {
           namespaced: true,
           state: { user: { id: 'student-id' } },
           getters: {
-            userType: () => 'student',
-            isVolunteer: () => false,
-            isStudent: () => true,
+            userType: () => userType,
+            isVolunteer: () => userType === 'volunteer',
+            isStudent: () => userType === 'student',
           },
         },
         subjects: { namespaced: true, state: { subjects: {} } },
@@ -62,13 +74,21 @@ describe('FeedbackView', () => {
         },
       },
     })
-    mount(FeedbackView, {
+    return mount(FeedbackView, {
       attachTo: document.body,
       global: {
         plugins: [store],
-        mocks: { $route: { params: { sessionId: 'session-id' } } },
+        mocks: {
+          $route: { params: { sessionId: 'session-id' } },
+          $router: router,
+        },
+        stubs: { RouterLink: RouterLinkStub },
       },
     })
+  }
+
+  it('lets the student answer a 1 to 5 question grouped under its title', async () => {
+    mountFeedback()
     await flushPromises()
 
     await userEvent.click(page.getByText('Somewhat'))
@@ -77,5 +97,42 @@ describe('FeedbackView', () => {
     await expect
       .element(page.getByRole('button', { name: 'Submit' }))
       .toBeEnabled()
+    expect(router.replace).not.toHaveBeenCalled()
+  })
+
+  describe.each(['student', 'volunteer'])('as a %s', (userType) => {
+    const noSurveyCases = [
+      { description: 'no survey', response: { data: {} } },
+      {
+        description: 'a survey with no questions',
+        response: {
+          data: { survey: { surveyId: 33, surveyTypeId: 2, survey: [] } },
+        },
+      },
+    ]
+    it.each(noSurveyCases)(
+      'redirects to the dashboard when there is $description',
+      async ({ response }) => {
+        NetworkService.getPostsessionSurvey.mockResolvedValueOnce(response)
+        mountFeedback(userType)
+        await flushPromises()
+
+        expect(router.replace).toHaveBeenCalledExactlyOnceWith('/dashboard')
+      }
+    )
+
+    it('shows the thank-you message without fetching the survey when feedback was already submitted', async () => {
+      NetworkService.getPostsessionSurveyResponse.mockResolvedValueOnce({
+        data: [{}],
+      })
+      mountFeedback(userType)
+      await flushPromises()
+
+      await expect
+        .element(page.getByText('Thank you for your feedback!'))
+        .toBeVisible()
+      expect(router.replace).not.toHaveBeenCalled()
+      expect(NetworkService.getPostsessionSurvey).not.toHaveBeenCalled()
+    })
   })
 })

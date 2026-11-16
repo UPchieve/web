@@ -284,6 +284,7 @@ export default {
       isLoading: true,
       isSubmitting: false,
       completedFeedback: false,
+      surveyDefinition: null,
       isFavoriteCoach: false,
       isFavoriteCoachLimitReached: false,
       allQuestions: [],
@@ -348,6 +349,12 @@ export default {
     } = sessionResponse
 
     this.session = session
+    if (postsessionAlreadySavedResponse.data.length > 0) {
+      this.isLoading = false
+      this.completedFeedback = true
+      return
+    }
+
     const postsessionSurveyDefinitionResponse =
       await NetworkService.getPostsessionSurvey(
         this.session.subTopic,
@@ -355,6 +362,11 @@ export default {
         this.userType
       )
     this.surveyDefinition = postsessionSurveyDefinitionResponse.data.survey
+    if (!this.surveyDefinition?.survey?.length) {
+      await this.$router.replace('/dashboard')
+      return
+    }
+
     const orderedQuestions = orderBy(
       this.surveyDefinition.survey,
       (q) => q.displayPriority
@@ -383,12 +395,6 @@ export default {
     })
     this.buildUserResponse()
 
-    if (postsessionAlreadySavedResponse.data.length > 0) {
-      this.loading = false
-      this.completedFeedback = true
-      return
-    }
-
     if (this.isStudent) {
       const response = await NetworkService.checkIsFavoriteVolunteer(
         this.session.volunteer._id
@@ -405,13 +411,11 @@ export default {
         EVENTS.VOLUNTEER_SHOWN_STUDENT_FEEDBACK_QUESTION
       )
 
-    this.isLoading = false
-  },
-  async mounted() {
     AnalyticsService.captureEvent(EVENTS.POST_SESSION_SURVEY_SHOWN, {
       sessionId: this.session.id,
       surveyNameVariant: this.getStudentPostSessionSurveyNameVariant,
     })
+    this.isLoading = false
   },
   methods: {
     ...mapActions(useAppSidebarStore, { hideSidebar: 'hide' }),
