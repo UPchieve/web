@@ -57,6 +57,7 @@ function inputType() {
 }
 
 .has-append {
+  // stylelint-disable-next-line scale-unlimited/declaration-strict-value
   padding-right: 36px;
 }
 

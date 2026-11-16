@@ -50,16 +50,17 @@ const isVisible = ref(false)
 
 <style lang="scss" scoped>
 .password-requirements {
-  margin-top: 8px;
-  font-size: 0.875rem;
+  @include font-category('helper-text');
+  margin-top: $spacing-xs;
 }
 
 .requirement {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: $spacing-xs;
+  // stylelint-disable-next-line scale-unlimited/declaration-strict-value
   padding: 4px 0;
-  transition: color 0.2s ease;
+  transition: color $transition-standard;
 }
 
 .requirement.valid {
@@ -71,14 +72,15 @@ const isVisible = ref(false)
 }
 
 .requirement-icon {
-  font-weight: bold;
-  font-size: 1rem;
+  @include font-category('body');
+  font-weight: $font-weight-bold;
 }
 
 .password-toggle {
   height: 28px;
   display: flex;
   align-items: center;
+  // stylelint-disable-next-line scale-unlimited/declaration-strict-value
   padding: 0 4px;
   color: $c-secondary-grey;
 

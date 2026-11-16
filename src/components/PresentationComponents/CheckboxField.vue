@@ -27,6 +27,6 @@ const { wrapperAttrs, inputAttrs } = useInputAttrs(['type'])
 
 <style lang="scss" scoped>
 .checkbox-label {
-  margin-left: 8px;
+  margin-left: $spacing-xs;
 }
 </style>

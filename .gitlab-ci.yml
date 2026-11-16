@@ -171,6 +171,7 @@ lint:
   needs: []
   script:
     - pnpm run lint:dry
+    - pnpm run lint:styles
   rules:
     - if: '$TEST_DISABLED'
       when: never
