@@ -22,6 +22,14 @@ describe('Admin User Detail', () => {
     pastSessions: [],
   }
 
+  // The volunteer role renders background/reference sections that DEFAULT_USER,
+  // written for a student, never populated.
+  const VOLUNTEER_RENDER_FIELDS = {
+    isApproved: true,
+    background: {},
+    references: [],
+  }
+
   const getWrapper = async () => {
     const wrapper = mount(AdminUserDetail, {
       global: {
@@ -60,6 +68,48 @@ describe('Admin User Detail', () => {
     const result = wrapper.find(`[data-testid="user-detail-label-${label}"]`)
 
     expect(result.exists()).toBeTruthy()
+  })
+
+  it.each([
+    [['volunteer'], ['volunteer']],
+    [['student'], ['student']],
+    [['teacher'], ['teacher']],
+    [
+      ['student', 'volunteer'],
+      ['volunteer', 'student'],
+    ],
+    [
+      ['admin', 'volunteer'],
+      ['volunteer', 'admin'],
+    ],
+  ])('shows a chip for each of the roles %j', async (roles, expectedChips) => {
+    NetworkService.adminGetUser = vi.fn().mockResolvedValue({
+      data: { ...DEFAULT_USER, ...VOLUNTEER_RENDER_FIELDS, roles },
+    })
+
+    const wrapper = await getWrapper()
+
+    for (const role of ['volunteer', 'student', 'teacher', 'admin']) {
+      const chip = wrapper.find(`[data-testid="user-detail-role-${role}"]`)
+      expect(chip.exists()).toBe(expectedChips.includes(role))
+    }
+  })
+
+  it('does not describe the volunteer role as experimental', async () => {
+    NetworkService.adminGetUser = vi.fn().mockResolvedValue({
+      data: {
+        ...DEFAULT_USER,
+        ...VOLUNTEER_RENDER_FIELDS,
+        roles: ['student', 'volunteer'],
+      },
+    })
+
+    const wrapper = await getWrapper()
+    const text = wrapper.text()
+
+    expect(text).not.toContain('experimental')
+    expect(text).not.toContain('primary')
+    expect(text).not.toContain('part of an experiment')
   })
 
   it.each([

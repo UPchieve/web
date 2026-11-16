@@ -9,11 +9,6 @@
           Edit
         </button>
       </div>
-      <div v-if="isStudentVolunteer" class="student-volunteer-notice">
-        <InformationIcon class="info-icon" />
-        This student is part of an experiment where they can also become
-        volunteers on the same account.
-      </div>
       <admin-edit-user
         v-if="isEditMode"
         :user="user"
@@ -68,7 +63,16 @@
         {{ user.firstName }} {{ user.lastName }}
       </div>
       <div class="user-detail__subtitle mb-0">ID: {{ user.id }}</div>
-      <div class="user-detail__subtitle">{{ userTypeLabel }}</div>
+      <div class="user-detail__roles">
+        <span
+          v-for="chip in roleChips"
+          :key="chip.role"
+          class="user-detail__role-chip"
+          :class="`user-detail__role-chip--${chip.role}`"
+          :data-testid="`user-detail-role-${chip.role}`"
+          >{{ chip.label }}</span
+        >
+      </div>
       <admin-pending-volunteer-detail
         v-if="readyToReviewId && !isEditMode"
         :volunteer="user"
@@ -178,10 +182,15 @@ import PageControl from '@/components/Admin/PageControl.vue'
 import {
   isVolunteerUserType,
   isStudentUserType,
-  isStudentVolunteer,
   hasVolunteerRole,
 } from '@/utils/user-type'
-import InformationIcon from '@/assets/information.svg'
+
+const ROLE_CHIPS = [
+  { role: 'volunteer', label: 'Volunteer' },
+  { role: 'student', label: 'Student' },
+  { role: 'teacher', label: 'Teacher' },
+  { role: 'admin', label: 'Admin' },
+]
 
 const getUser = async (userId, page) => {
   const { data } = await NetworkService.adminGetUser(userId, page)
@@ -196,7 +205,6 @@ export default {
     SessionsList,
     AdminEditUser,
     PageControl,
-    InformationIcon,
   },
 
   data() {
@@ -217,15 +225,9 @@ export default {
     readyToReviewId() {
       return this.hasVolunteerRole && !this.user.isApproved
     },
-    userTypeLabel() {
-      const primaryType = this.user.userType
-      if (this.isStudentVolunteer) {
-        return `Type: ${primaryType} (primary), volunteer (experimental)`
-      }
-      return `Type: ${primaryType}`
-    },
-    isStudentVolunteer() {
-      return isStudentVolunteer(this.user?.roles ?? [])
+    roleChips() {
+      const roles = this.user?.roles ?? []
+      return ROLE_CHIPS.filter((chip) => roles.includes(chip.role))
     },
     hasVolunteerRole() {
       return hasVolunteerRole(this.user?.roles ?? [])
@@ -334,6 +336,37 @@ export default {
     margin-bottom: 20px;
   }
 
+  &__roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  &__role-chip {
+    font-size: 14px;
+    border-radius: 3px;
+    color: $c-soft-black;
+    padding: 5px 7px;
+    font-weight: 500;
+
+    &--volunteer {
+      background: $c-volunteer;
+    }
+
+    &--student {
+      background: $c-student;
+    }
+
+    &--teacher {
+      background: $c-teacher;
+    }
+
+    &--admin {
+      background: $upchieve-green;
+    }
+  }
+
   &__account-notice {
     margin-right: 8px;
     font-size: 14px;
@@ -410,20 +443,5 @@ export default {
   &:hover {
     color: #2c3e50;
   }
-}
-
-.student-volunteer-notice {
-  background-color: lightyellow;
-  text-align: center;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  padding: 24px;
-}
-
-.info-icon {
-  height: 48px;
-  width: 48px;
 }
 </style>
