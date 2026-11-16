@@ -27,7 +27,7 @@ const {
 } = withDefaults(defineProps<OnboardingFrameProps>(), {
   nextButtonText: () => 'Continue',
   acceptButtonText: () => 'Got it!',
-  previousButtonText: () => 'Previous',
+  previousButtonText: () => 'Back',
 })
 
 const currentPage = ref(0)
@@ -84,6 +84,7 @@ const hasPreviousPage = () => {
           class="button back-button"
           @click="previousPage"
           v-if="hasPreviousPage()"
+          :show-arrow="false"
         >
           {{ previousButtonText }}
         </LargeButton>
@@ -172,18 +173,38 @@ const hasPreviousPage = () => {
 }
 
 .footer {
-  @include flex-container(row, space-between, center);
+  // Equal-width side columns keep the dots optically centered while each
+  // button sizes to its own label. The fixed-width columns this replaces left
+  // ~60px for text once the arrow icon was accounted for, so anything longer
+  // than "Next" ellipsised.
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: 'back dots next';
+  align-items: center;
+  gap: 16px;
   padding: 18px;
   position: relative;
   margin-top: 16px;
-  .button {
-    width: 100%;
+
+  // At phone widths the two labels plus the dots can't share a row, so the
+  // dots move above the actions rather than squeezing them back into ellipses.
+  @include breakpoint-below('small') {
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      'dots dots'
+      'back next';
+    justify-content: space-between;
+    row-gap: 20px;
   }
 
-  .back-button-container,
+  .back-button-container {
+    grid-area: back;
+    justify-self: start;
+  }
+
   .next-button-container {
-    flex: 0 0 auto;
-    width: 130px;
+    grid-area: next;
+    justify-self: end;
 
     .next-button {
       background: $c-information-blue;
@@ -193,6 +214,8 @@ const hasPreviousPage = () => {
 
   .dots {
     @include flex-container(row, center, center);
+    grid-area: dots;
+    justify-self: center;
     gap: 10px;
 
     .dot {
