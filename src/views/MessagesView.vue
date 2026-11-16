@@ -51,6 +51,8 @@ function messageButtonLabel(student: Student) {
 }
 
 function messagingUnavailableText(student: Student) {
+  if (student.directMessageUnavailableReason === 'UNAVAILABLE')
+    return "You can't message this student right now."
   return `${student.firstName} can't receive direct messages yet. You can message them from your session recap page.`
 }
 

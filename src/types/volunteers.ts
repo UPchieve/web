@@ -1,5 +1,7 @@
 import type { ISODateString, Uuid } from './shared'
 
+export type DirectMessageUnavailableReason = 'NOT_ENABLED' | 'UNAVAILABLE'
+
 export type PastStudent = {
   studentId: Uuid
   firstName: string
@@ -9,6 +11,7 @@ export type PastStudent = {
   createdAt: ISODateString
   timeTutored: number
   canDirectMessage: boolean
+  directMessageUnavailableReason?: DirectMessageUnavailableReason
 }
 
 export type PastStudentsResponse = {

@@ -312,4 +312,30 @@ describe('MessagesView', () => {
       false
     )
   })
+
+  it('tells the volunteer they cannot message the student when student is shadowbanned', async () => {
+    mockedNetworkService.getPastStudents.mockResolvedValue({
+      pastStudents: [
+        pastStudent({
+          canDirectMessage: false,
+          directMessageUnavailableReason: 'UNAVAILABLE',
+        }),
+      ],
+    })
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="message-button-tooltip"]').exists()
+    ).toBe(true)
+    const messageButton = wrapper.find('[data-testid="message-button"]')
+    expect(messageButton.attributes('disabled')).toBeDefined()
+    expect(messageButton.attributes('aria-label')).toBe(
+      "You can't message this student right now."
+    )
+    await messageButton.trigger('click')
+    expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(
+      false
+    )
+  })
 })
