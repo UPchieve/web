@@ -1,11 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { getClient } from '../db.ts'
-import {
-  createStudent,
-  endSessionsFor,
-  loginStudent,
-  requestSession,
-} from '../utils'
+import { test, expect } from '../fixtures.ts'
+import { loginStudent, requestSession } from '../utils'
 
 // The layout switcher is MathLive's own markup, so these are its class names
 // rather than our test ids.
@@ -53,22 +47,11 @@ async function expectLayoutTabIsClickable(page, tabLabel) {
   }).toPass({ timeout: 5000 })
 }
 
-const dbClient = getClient()
 test.describe('Session math keyboard', async () => {
-  let studentUser
-
-  test.beforeAll(async () => {
-    studentUser = await createStudent(dbClient)
-  })
-
-  test.afterAll(async () => {
-    await endSessionsFor(dbClient, studentUser.id)
-  })
-
-  test('can switch back from the abc layout', async ({ browser }) => {
+  test('can switch back from the abc layout', async ({ browser, student }) => {
     const { studentPage, studentDashboard } = await loginStudent(
       browser,
-      studentUser,
+      student,
       // SessionView opens the notifications modal once its session context
       // loads, which can land mid-test and close the keyboard. A granted
       // permission keeps it from opening.
@@ -100,8 +83,8 @@ test.describe('Session math keyboard', async () => {
 
   test('Enter in the math field inserts without sending', async ({
     browser,
+    student,
   }) => {
-    const student = await createStudent(dbClient)
     const { studentContext, studentPage, studentDashboard } =
       await loginStudent(browser, student, { permissions: ['notifications'] })
 
@@ -130,7 +113,6 @@ test.describe('Session math keyboard', async () => {
         .filter({ has: studentPage.locator('.katex') })
     ).toContainText('is the answer')
 
-    await endSessionsFor(dbClient, student.id)
     await studentContext.close()
   })
 })

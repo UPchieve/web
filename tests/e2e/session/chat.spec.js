@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../fixtures.ts'
 import { getClient } from '../db.ts'
 import {
-  createStudent,
   createVolunteer,
   endSessionsFor,
   loginAs,
@@ -14,11 +13,9 @@ import { VolunteerDashboard } from '../page-object-models/volunteer-dashboard.js
 
 const dbClient = getClient()
 test.describe('Session', async () => {
-  let studentUser
   let volunteerUser
 
   test.beforeAll(async () => {
-    studentUser = await createStudent(dbClient)
     volunteerUser = await createVolunteer(dbClient)
     await withCertifications(dbClient, {
       userId: volunteerUser.id,
@@ -26,15 +23,11 @@ test.describe('Session', async () => {
     })
   })
 
-  test.afterAll(async () => {
-    await endSessionsFor(dbClient, studentUser.id)
-  })
-
-  test('can chat', async ({ browser }) => {
+  test('can chat', async ({ browser, student }) => {
     /* Sign in student */
     const { studentPage, studentDashboard } = await loginStudent(
       browser,
-      studentUser
+      student
     )
     const studentSessionView = new SessionView(studentPage)
 
@@ -51,7 +44,7 @@ test.describe('Session', async () => {
       await studentDashboard.dismissNotificationModal()
     }
 
-    const studentMessage = `hello from ${studentUser.firstName}`
+    const studentMessage = `hello from ${student.firstName}`
     await studentSessionView.sendMessage(studentMessage)
 
     await volunteerDashboard.joinSessionFor(sessionId)
@@ -65,8 +58,8 @@ test.describe('Session', async () => {
 
   test('lands on the review after reloading an ended session', async ({
     browser,
+    student,
   }) => {
-    const student = await createStudent(dbClient)
     const volunteer = await createVolunteer(dbClient)
     await withCertifications(dbClient, {
       userId: volunteer.id,
@@ -109,10 +102,10 @@ test.describe('Session', async () => {
 
   test('shows the ended session in place after the connection comes back', async ({
     browser,
+    student,
   }) => {
     // Two sign-ins, a session, and up to 15 s for the reconnect.
     test.slow()
-    const student = await createStudent(dbClient)
     const volunteer = await createVolunteer(dbClient)
     await withCertifications(dbClient, {
       userId: volunteer.id,
