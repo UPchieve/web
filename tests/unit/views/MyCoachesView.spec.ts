@@ -6,13 +6,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { createStore } from 'vuex'
 
-vi.mock('vue-router', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('vue-router')>()),
-  useRoute: () => ({ query: {} }),
-  useRouter: () => ({
+const { mockedRoute, mockedRouter } = vi.hoisted(() => ({
+  mockedRoute: { query: {} as Record<string, string> },
+  mockedRouter: {
     push: vi.fn(() => Promise.resolve()),
     replace: vi.fn(() => Promise.resolve()),
-  }),
+  },
+}))
+
+vi.mock('vue-router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('vue-router')>()),
+  useRoute: () => mockedRoute,
+  useRouter: () => mockedRouter,
 }))
 
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
@@ -51,6 +56,7 @@ function pastVolunteer(overrides: Partial<PastVolunteer> = {}): PastVolunteer {
 async function mountView({
   isShowInfoOptInEnabled = true,
   isDirectMessagesEnabled = false,
+  unreadDirectMessageSenderIds = [] as string[],
 } = {}) {
   const wrapper = mount(MyCoachesView, {
     global: {
@@ -63,7 +69,10 @@ async function mountView({
             },
             user: {
               namespaced: true,
-              getters: { unreadDirectMessageSenderIds: () => [] },
+              getters: {
+                unreadDirectMessageSenderIds: () =>
+                  unreadDirectMessageSenderIds,
+              },
             },
             featureFlags: {
               namespaced: true,
@@ -81,7 +90,7 @@ async function mountView({
         DirectMessagePanel: true,
         FavoritingToggle: true,
         RequestCoachButton: true,
-        ViewFavoritesToggle: true,
+        MessageFilterDropdown: true,
       },
     },
   })
@@ -98,6 +107,9 @@ function nameButtons(wrapper: Awaited<ReturnType<typeof mountView>>) {
 describe('MyCoachesView coach name', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    mockedRoute.query = {}
+    mockedRouter.push.mockResolvedValue(undefined)
+    mockedRouter.replace.mockResolvedValue(undefined)
     mockedStatuses.value = {}
     mockedNetworkService.getPastVolunteers.mockResolvedValue({
       pastVolunteers: [
@@ -156,5 +168,128 @@ describe('MyCoachesView coach name', () => {
     expect(
       wrapper.findComponent({ name: 'DirectMessagePanel' }).props('status')
     ).toBe('online')
+  })
+})
+
+describe('MyCoachesView filters', () => {
+  // unreadFav: favorite, unread | readFav: favorite, read | unreadOther: not favorite, unread
+  const unreadDirectMessageSenderIds = ['unread-fav', 'unread-other']
+
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockedRoute.query = {}
+    mockedRouter.push.mockResolvedValue(undefined)
+    mockedRouter.replace.mockResolvedValue(undefined)
+    mockedStatuses.value = {}
+    mockedNetworkService.getPastVolunteers.mockResolvedValue({
+      pastVolunteers: [
+        pastVolunteer({
+          volunteerId: 'unread-fav',
+          firstName: 'Nalini',
+          isFavorite: true,
+        }),
+        pastVolunteer({
+          volunteerId: 'read-fav',
+          firstName: 'Fatima',
+          isFavorite: true,
+        }),
+        pastVolunteer({
+          volunteerId: 'unread-other',
+          firstName: 'Kenji',
+          isFavorite: false,
+        }),
+      ],
+    })
+  })
+
+  function mountWithMessages() {
+    return mountView({
+      isDirectMessagesEnabled: true,
+      unreadDirectMessageSenderIds,
+    })
+  }
+
+  function messageFilter(wrapper: Awaited<ReturnType<typeof mountView>>) {
+    return wrapper.findComponent({ name: 'MessageFilterDropdown' })
+  }
+
+  describe('filtering', () => {
+    it('shows only coaches with unread messages for "New message"', async () => {
+      mockedRoute.query = { messages: 'new' }
+      const wrapper = await mountWithMessages()
+
+      expect(nameButtons(wrapper)).toEqual(['Nalini', 'Kenji'])
+    })
+
+    it('shows only coaches without unread messages for "No new messages"', async () => {
+      mockedRoute.query = { messages: 'none' }
+      const wrapper = await mountWithMessages()
+
+      expect(nameButtons(wrapper)).toEqual(['Fatima'])
+    })
+
+    it('shows only favorite coaches for Favorites', async () => {
+      mockedRoute.query = { favoritesOnly: 'true' }
+      const wrapper = await mountWithMessages()
+
+      expect(nameButtons(wrapper)).toEqual(['Nalini', 'Fatima'])
+    })
+
+    it('combines Favorites with "New message"', async () => {
+      mockedRoute.query = { favoritesOnly: 'true', messages: 'new' }
+      const wrapper = await mountWithMessages()
+
+      expect(nameButtons(wrapper)).toEqual(['Nalini'])
+    })
+  })
+
+  describe('URL', () => {
+    it('reads the message filter from the URL', async () => {
+      mockedRoute.query = { messages: 'new' }
+      const wrapper = await mountWithMessages()
+
+      expect(messageFilter(wrapper).props('modelValue')).toEqual(['new'])
+    })
+
+    it('shows every coach when both options are in the URL', async () => {
+      mockedRoute.query = { messages: 'new,none' }
+      const wrapper = await mountWithMessages()
+
+      expect(messageFilter(wrapper).props('modelValue')).toEqual([
+        'new',
+        'none',
+      ])
+      expect(nameButtons(wrapper)).toEqual(['Nalini', 'Fatima', 'Kenji'])
+    })
+
+    it('ignores unknown message filter values in the URL', async () => {
+      mockedRoute.query = { messages: 'bogus' }
+      const wrapper = await mountWithMessages()
+
+      expect(messageFilter(wrapper).props('modelValue')).toEqual([])
+      expect(nameButtons(wrapper)).toEqual(['Nalini', 'Fatima', 'Kenji'])
+    })
+
+    it('writes the message filter to the URL and goes back to page 1', async () => {
+      mockedRoute.query = { page: '2', favoritesOnly: 'true' }
+      const wrapper = await mountWithMessages()
+
+      messageFilter(wrapper).vm.$emit('update:modelValue', ['new'])
+
+      expect(mockedRouter.push).toHaveBeenCalledWith({
+        query: { page: 1, favoritesOnly: 'true', messages: 'new' },
+      })
+    })
+
+    it('removes the message filter from the URL when it is cleared', async () => {
+      mockedRoute.query = { messages: 'new' }
+      const wrapper = await mountWithMessages()
+
+      messageFilter(wrapper).vm.$emit('update:modelValue', [])
+
+      expect(mockedRouter.push).toHaveBeenCalledWith({
+        query: { page: 1, favoritesOnly: 'false' },
+      })
+    })
   })
 })

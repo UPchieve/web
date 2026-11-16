@@ -2,7 +2,9 @@
 import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import ViewFavoritesToggle from '@/components/ViewFavoritesToggle.vue'
+import FavoritesFilterChip from '@/components/FavoritesFilterChip.vue'
+import MessageFilterDropdown from '@/components/MessageFilterDropdown.vue'
+import type { MessageFilterOption } from '@/types/direct-messages'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import CaretIcon from '@/assets/caret.svg'
@@ -78,6 +80,7 @@ const filteredCoaches = ref<Coach[]>([])
 const coaches = ref<Coach[]>([])
 const filters = reactive({
   favoritesOnly: false,
+  messageFilter: [] as MessageFilterOption[],
 })
 const page = ref(1)
 const isLastPage = ref(false)
@@ -89,9 +92,39 @@ const coachLimitPerPage = 5
 const isFirstPage = computed(() => page.value === 1)
 const total = computed(() => filteredCoaches.value.length)
 
+const isMessageFilterActive = computed(
+  () => isDirectMessagesEnabled.value && filters.messageFilter.length === 1
+)
+
+function passesFavoritesFilter(coach: Coach) {
+  return !filters.favoritesOnly || coach.isFavorite
+}
+
+function passesMessageFilter(coach: Coach) {
+  if (!isMessageFilterActive.value) return true
+  return filters.messageFilter[0] === 'new'
+    ? hasUnreadMessages(coach)
+    : !hasUnreadMessages(coach)
+}
+
+const messageCounts = computed<Record<MessageFilterOption, number>>(() => {
+  const candidates = allCoaches.value.filter(passesFavoritesFilter)
+  const withNew = candidates.filter(hasUnreadMessages).length
+  return { new: withNew, none: candidates.length - withNew }
+})
+
+const MESSAGE_FILTER_OPTIONS: MessageFilterOption[] = ['new', 'none']
+
+function parseMessagesQuery(value: unknown): MessageFilterOption[] {
+  if (typeof value !== 'string') return []
+  const selected = value.split(',')
+  return MESSAGE_FILTER_OPTIONS.filter((option) => selected.includes(option))
+}
+
 function setCurrentPageFromQuery(query: typeof $route.query) {
   page.value = parseInt(query.page as string) || 1
   filters.favoritesOnly = query.favoritesOnly === 'true'
+  filters.messageFilter = parseMessagesQuery(query.messages)
 }
 
 async function fetchCoaches() {
@@ -115,7 +148,7 @@ async function fetchCoaches() {
 
 function applyFilter() {
   filteredCoaches.value = allCoaches.value.filter(
-    (coach) => !filters.favoritesOnly || coach.isFavorite
+    (coach) => passesFavoritesFilter(coach) && passesMessageFilter(coach)
   )
 }
 
@@ -143,12 +176,18 @@ function paginate() {
 //Create a new browser history entry and use as the source of truth for navigating
 //using the back button. Steps back through pages and whenever the filter is updated
 //instead of going back to the previous view.
-function navigateTo(query: { page?: number; favoritesOnly?: boolean }) {
+function navigateTo(query: {
+  page?: number
+  favoritesOnly?: boolean
+  messageFilter?: MessageFilterOption[]
+}) {
+  const messageFilter = query.messageFilter ?? filters.messageFilter
   $router
     .push({
       query: {
         page: query.page ?? page.value,
         favoritesOnly: String(query.favoritesOnly ?? filters.favoritesOnly),
+        ...(messageFilter.length ? { messages: messageFilter.join(',') } : {}),
       },
     })
     .catch(() => {})
@@ -175,6 +214,15 @@ function toggleFavoritesFilter({ value }: { value: boolean }) {
   if (!value) pageBeforeFavoritesFilter.value = null
 
   navigateTo({ page: newPage, favoritesOnly: value })
+}
+
+function setMessageFilter(value: MessageFilterOption[]) {
+  navigateTo({ page: 1, messageFilter: value })
+}
+
+function clearFilters() {
+  pageBeforeFavoritesFilter.value = null
+  navigateTo({ page: 1, favoritesOnly: false, messageFilter: [] })
 }
 
 function handleFavoriteChange(volunteerId: string, isFavorite: boolean) {
@@ -215,6 +263,12 @@ watch(
   }
 )
 
+// Reading a coach's messages moves them between "New message" and "No new messages"
+watch(unreadDirectMessageSenderIds, () => {
+  applyFilter()
+  paginate()
+})
+
 onMounted(async () => {
   setCurrentPageFromQuery($route.query)
   await fetchCoaches()
@@ -225,19 +279,25 @@ onMounted(async () => {
   <div class="container">
     <section class="header">
       <h1 class="title">My Coaches</h1>
-      <p class="subtitle">
-        Here's the list of all your coaches! You can use the Favorites toggle to
-        see your favorite coaches. Currently, the maximum favorite coaches you
-        can have is 20.
-      </p>
+      <div class="header__row">
+        <p class="subtitle">
+          Coaches you've worked with before. You can favorite up to 20.
+        </p>
+        <div class="filters" data-testid="coach-filters">
+          <span class="filters__label">Show</span>
+          <MessageFilterDropdown
+            v-if="isDirectMessagesEnabled"
+            :model-value="filters.messageFilter"
+            :counts="messageCounts"
+            @update:model-value="setMessageFilter"
+          />
+          <FavoritesFilterChip
+            :value="filters.favoritesOnly"
+            @change="toggleFavoritesFilter"
+          />
+        </div>
+      </div>
     </section>
-    <div class="filters">
-      <view-favorites-toggle
-        :value="filters.favoritesOnly"
-        :labels="{ checked: 'Favorites', unchecked: 'All coaches' }"
-        @change="toggleFavoritesFilter"
-      />
-    </div>
     <section class="favorite-coaches">
       <div v-if="error" class="info">
         {{ error }}
@@ -348,7 +408,26 @@ onMounted(async () => {
         </PersonCard>
       </template>
       <div v-else class="coach-list">
-        <div v-if="filters.favoritesOnly" class="favorite-coaches__no-coaches">
+        <div
+          v-if="isMessageFilterActive && allCoaches.length > 0"
+          class="favorite-coaches__no-coaches"
+          data-testid="no-matching-coaches"
+        >
+          <coach-icon class="coach-icon" />
+          <h2 class="secondary-header">No coaches match these filters.</h2>
+          <button
+            type="button"
+            class="clear-filters-button"
+            data-testid="clear-filters-button"
+            @click="clearFilters"
+          >
+            Clear filters
+          </button>
+        </div>
+        <div
+          v-else-if="filters.favoritesOnly"
+          class="favorite-coaches__no-coaches"
+        >
           <star-icon class="star-icon" />
           <h2 class="secondary-header">You can now favorite a coach!</h2>
           <p class="favorite-coaches__no-coaches-description">
@@ -456,7 +535,20 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .header {
   text-align: left;
-  margin-bottom: 2em;
+  margin-bottom: 1.5em;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1em;
+
+    @include breakpoint-above('large') {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
 }
 
 .secondary-header {
@@ -465,7 +557,7 @@ onMounted(async () => {
 
 .title {
   @include font-category('display-small');
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
 }
 
 .subtitle {
@@ -482,8 +574,27 @@ onMounted(async () => {
 }
 
 .filters {
-  @include flex-container(row, flex-start, center);
-  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+
+  &__label {
+    @include font-category('body');
+    color: $c-secondary-grey;
+    font-size: 14px;
+  }
+}
+
+.clear-filters-button {
+  margin-top: 1em;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: $c-information-blue;
+  font: inherit;
+  cursor: pointer;
 }
 
 .info {

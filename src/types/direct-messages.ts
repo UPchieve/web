@@ -47,3 +47,5 @@ export type GetOrCreateConversationResponse = {
 export type UnreadDirectMessagesResponse = {
   senderIds: Uuid[]
 }
+
+export type MessageFilterOption = 'new' | 'none'
