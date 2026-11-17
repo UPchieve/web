@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { EVENTS, type ShareInfoFieldKey } from '@/consts'
+import {
+  EVENTS,
+  SHARED_ONLINE_STATUS_DESCRIPTION,
+  type ShareInfoFieldKey,
+} from '@/consts'
 import UserService from '@/services/UserService'
 import BackGroundInfoField from '@/components/BackgroundInfoField.vue'
 import ShareInfoFieldsForm from '@/components/ShareInfoFieldsForm.vue'
@@ -9,6 +13,7 @@ import PencilIcon from '@/assets/pencil.svg'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import AnalyticsService from '@/services/AnalyticsService'
 import {
+  isProfileInfoField,
   toPublicProfileInfoShared,
   volunteerDataFromUser,
 } from '@/utils/build-share-info-message'
@@ -41,6 +46,12 @@ const publicProfileKeys = computed<ShareInfoFieldKey[]>(
 // null means the coach hasn't saved a choice yet (dismissing the dashboard
 // modal doesn't count), so they get a second prompt here
 const hasChosenSharing = computed(() => user.value.publicProfileKeys != null)
+const sharesProfileInfo = computed(() =>
+  publicProfileKeys.value.some(isProfileInfoField)
+)
+const sharesOnlineStatus = computed(() =>
+  publicProfileKeys.value.includes('onlineStatus')
+)
 const showShareInfoModal = ref(false)
 
 if (occupations.value.length === 0) {
@@ -235,15 +246,22 @@ async function onEditButtonClick() {
     >
       <div class="prompt">Information shared with students</div>
       <TutorInfoCard
-        v-if="publicProfileKeys.length"
+        v-if="sharesProfileInfo"
         :info="sharedInfoPreview"
         viewer-role="volunteer"
         class="tutor-info-card"
       />
-      <div v-else-if="hasChosenSharing" class="description">
+      <div
+        v-else-if="hasChosenSharing && !sharesOnlineStatus"
+        class="description"
+      >
         Nothing will be shared with your students.
       </div>
-      <div v-else class="share-info-prompt" data-testid="share-info-prompt">
+      <div
+        v-else-if="!hasChosenSharing"
+        class="share-info-prompt"
+        data-testid="share-info-prompt"
+      >
         <div class="share-info-prompt-header">
           New: help students get to know you
         </div>
@@ -258,6 +276,13 @@ async function onEditButtonClick() {
         >
           Choose what to share
         </button>
+      </div>
+      <div
+        v-if="sharesOnlineStatus"
+        class="description"
+        data-testid="shared-online-status"
+      >
+        {{ SHARED_ONLINE_STATUS_DESCRIPTION }}
       </div>
       <VolunteerShareInfoModal
         v-if="showShareInfoModal"

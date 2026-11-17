@@ -4,6 +4,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import { VolunteerOccupations } from '@/services/VolunteerService'
 import { EVENTS, SHARE_INFO_FIELDS } from '@/consts'
+import TutorInfoCard from '@/components/TutorInfoCard.vue'
 import { it, describe, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createStore } from 'vuex'
@@ -243,5 +244,37 @@ describe('ShareInfoFieldsForm', () => {
     await clickSave(wrapper)
     expect(wrapper.find('[role="alert"]').exists()).toBe(false)
     expect(wrapper.emitted('saved')).toHaveLength(1)
+  })
+
+  describe('online status', () => {
+    const STATUS_PREVIEW = '[data-testid="share-info-online-status-preview"]'
+
+    it('saves online status when the coach turns it on', async () => {
+      const wrapper = getWrapper({ publicProfileKeys: ['occupation'] })
+
+      await wrapper
+        .find('[data-testid="onlineStatus"] input[type="checkbox"]')
+        .setValue(true)
+      await clickSave(wrapper)
+
+      expect(UserService.setProfile).toHaveBeenCalledWith(
+        { publicProfileKeys: ['occupation', 'onlineStatus'] },
+        expect.anything()
+      )
+    })
+
+    it('previews online status on its own when nothing else is shared', () => {
+      const wrapper = getWrapper({ publicProfileKeys: ['onlineStatus'] })
+
+      expect(wrapper.findComponent(TutorInfoCard).exists()).toBe(false)
+      expect(wrapper.find(STATUS_PREVIEW).exists()).toBe(true)
+      expect(wrapper.text()).not.toContain('Nothing will be shared')
+    })
+
+    it('leaves online status out of the preview when it is off', () => {
+      const wrapper = getWrapper({ publicProfileKeys: ['occupation'] })
+
+      expect(wrapper.find(STATUS_PREVIEW).exists()).toBe(false)
+    })
   })
 })

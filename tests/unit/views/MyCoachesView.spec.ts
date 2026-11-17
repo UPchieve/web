@@ -157,6 +157,17 @@ describe('MyCoachesView coach name', () => {
     expect(panel.props('partnerId')).toBe('private')
   })
 
+  it('passes no status for a coach who is not sharing theirs', async () => {
+    mockedStatuses.value = { sharer: 'online' }
+    const wrapper = await mountView()
+
+    const cards = wrapper.findAllComponents({ name: 'PersonCard' })
+    expect(cards.map((card) => card.props('status'))).toEqual([
+      'online',
+      undefined,
+    ])
+  })
+
   it('passes the coach status to the DM panel', async () => {
     mockedStatuses.value = { private: 'online' }
     const wrapper = await mountView({ isDirectMessagesEnabled: true })

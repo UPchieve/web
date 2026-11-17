@@ -17,6 +17,16 @@ export function volunteerDataFromUser(user: any): ShareableVolunteerData {
   }
 }
 
+// Every share-info choice except online status is a field on the coach's
+// info card. Online status is shown to students separately, as a live status.
+export type ProfileInfoFieldKey = Exclude<ShareInfoFieldKey, 'onlineStatus'>
+
+export function isProfileInfoField(
+  key: ShareInfoFieldKey
+): key is ProfileInfoFieldKey {
+  return key !== 'onlineStatus'
+}
+
 export function toPublicProfileInfoShared(
   data: ShareableVolunteerData,
   fields: ShareInfoFieldKey[]
@@ -27,5 +37,7 @@ export function toPublicProfileInfoShared(
     numStudentsHelped: data.numStudentsTutored,
     totalVolunteerHours: data.totalHoursTutored,
   }
-  return Object.fromEntries(fields.map((key) => [key, allInfo[key]]))
+  return Object.fromEntries(
+    fields.filter(isProfileInfoField).map((key) => [key, allInfo[key]])
+  )
 }

@@ -404,6 +404,52 @@ describe('EditBackgroundInfo', () => {
     )
   })
 
+  describe('shared online status in read mode', () => {
+    const COACH = {
+      occupation: [VolunteerOccupations.WORKING_PART_TIME],
+      country: 'Canada',
+      city: 'Toronto',
+    }
+    const STATUS_LINE = '[data-testid="shared-online-status"]'
+
+    it('shows online status below the info card when both are shared', () => {
+      const wrapper = getWrapper({
+        ...COACH,
+        publicProfileKeys: ['occupation', 'onlineStatus'],
+      })
+
+      expect(
+        Object.keys(wrapper.findComponent(TutorInfoCard).props('info'))
+      ).toEqual(['occupation'])
+      expect(wrapper.find(STATUS_LINE).text()).toBe(
+        "Students can see when you're online, in a session, or offline."
+      )
+    })
+
+    it('shows online status without an empty card when it is all that is shared', () => {
+      const wrapper = getWrapper({
+        ...COACH,
+        publicProfileKeys: ['onlineStatus'],
+      })
+
+      expect(wrapper.findComponent(TutorInfoCard).exists()).toBe(false)
+      expect(wrapper.find(STATUS_LINE).exists()).toBe(true)
+      expect(wrapper.text()).not.toContain('Nothing will be shared')
+      expect(wrapper.find('[data-testid="share-info-prompt"]').exists()).toBe(
+        false
+      )
+    })
+
+    it('shows no online status line when the coach has not shared it', () => {
+      const wrapper = getWrapper({
+        ...COACH,
+        publicProfileKeys: ['occupation'],
+      })
+
+      expect(wrapper.find(STATUS_LINE).exists()).toBe(false)
+    })
+  })
+
   it('hides the share-info sections when the feature flag is off', async () => {
     const wrapper = getWrapper(
       {
@@ -495,6 +541,7 @@ describe('EditBackgroundInfo', () => {
           'numSessionsTutored',
           'numStudentsHelped',
           'totalVolunteerHours',
+          'onlineStatus',
         ],
       })
       expect(wrapper.findComponent(VolunteerShareInfoModal).exists()).toBe(

@@ -6,8 +6,14 @@ import TutorInfoCard from '@/components/TutorInfoCard.vue'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import UserService from '@/services/UserService'
-import { EVENTS, SHARE_INFO_FIELDS, type ShareInfoFieldKey } from '@/consts'
 import {
+  EVENTS,
+  SHARE_INFO_FIELDS,
+  SHARED_ONLINE_STATUS_DESCRIPTION,
+  type ShareInfoFieldKey,
+} from '@/consts'
+import {
+  isProfileInfoField,
   toPublicProfileInfoShared,
   type ShareableVolunteerData,
 } from '@/utils/build-share-info-message'
@@ -78,7 +84,10 @@ function toggleField(key: ShareInfoFieldKey, checked: boolean) {
     : selectedFields.value.filter((field) => field !== key)
 }
 
-const hasSelection = computed(() => selectedFields.value.length > 0)
+const sharesProfileInfo = computed(() =>
+  selectedFields.value.some(isProfileInfoField)
+)
+const sharesOnlineStatus = computed(() => isSelected('onlineStatus'))
 const allSelected = computed(() =>
   ALL_FIELDS.every((field) => selectedFields.value.includes(field))
 )
@@ -137,19 +146,26 @@ defineExpose({
     class="share-info-form"
     :class="{ 'share-info-form--stacked': stackedLayout }"
   >
-    <div class="preview" :class="{ 'preview--empty': !hasSelection }">
+    <div class="preview" :class="{ 'preview--empty': !sharesProfileInfo }">
       <TutorInfoCard
-        v-if="hasSelection"
+        v-if="sharesProfileInfo"
         :info="previewInfo"
         viewer-role="volunteer"
         data-testid="share-info-preview"
       />
       <p
-        v-else
+        v-else-if="!sharesOnlineStatus"
         class="preview-text preview-text--empty"
         data-testid="share-info-preview"
       >
         Nothing will be shared with your student.
+      </p>
+      <p
+        v-if="sharesOnlineStatus"
+        class="preview-text preview-text--status"
+        data-testid="share-info-online-status-preview"
+      >
+        {{ SHARED_ONLINE_STATUS_DESCRIPTION }}
       </p>
     </div>
     <div
@@ -261,9 +277,14 @@ defineExpose({
   font-style: italic;
 }
 
-.preview-text--empty {
+.preview-text--empty,
+.preview-text--status {
   color: $c-secondary-grey;
   font-style: normal;
+}
+
+.preview > * + .preview-text--status {
+  margin-top: 12px;
 }
 
 .uc-form-button {

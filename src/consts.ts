@@ -1110,9 +1110,13 @@ export const SHARE_INFO_FIELDS = [
   { key: 'numSessionsTutored', label: 'Number of sessions tutored' },
   { key: 'numStudentsHelped', label: 'Number of students tutored' },
   { key: 'totalVolunteerHours', label: 'Total hours of tutoring' },
+  { key: 'onlineStatus', label: 'Online status' },
 ] as const
 
 export type ShareInfoFieldKey = (typeof SHARE_INFO_FIELDS)[number]['key']
+
+export const SHARED_ONLINE_STATUS_DESCRIPTION =
+  "Students can see when you're online, in a session, or offline."
 
 export const BIG_FUTURE_INTRO_COPY =
   "UPchieve and BigFuture are working together to connect you to 100% FREE, online college counseling and tutoring available 24/7! Students who can't afford a tutor are eligible. Create your account now!"
