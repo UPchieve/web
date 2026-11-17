@@ -49,3 +49,49 @@ export type UnreadDirectMessagesResponse = {
 }
 
 export type MessageFilterOption = 'new' | 'none'
+
+export type DirectMessageReviewConversation = {
+  id: Uuid
+  studentId: Uuid
+  volunteerId: Uuid
+  studentName: string
+  volunteerName: string
+}
+
+export type DirectMessageReviewSummary = DirectMessageReviewConversation & {
+  oldestFlagAt: ISODateString
+  pendingFlags: number
+  reasons: string[]
+}
+
+export type DirectMessageReviewFlag = {
+  id: Uuid
+  category: string
+  createdAt: ISODateString
+  censoredMessage?: string
+  senderId?: Uuid
+  blocked?: boolean
+  censoredBy?: string
+  reasons?: string[]
+  reportMessage?: string
+  reportReason?: string
+  reportingUserId?: Uuid
+  reportedUserId?: Uuid
+}
+
+export type DirectMessageReviewMessage = {
+  id: Uuid
+  senderId: Uuid
+  contents: string
+  createdAt: ISODateString
+}
+
+export type DirectMessageReviewHistory = {
+  messages: DirectMessageReviewMessage[]
+  hasMore: boolean
+}
+
+export type DirectMessageReview = DirectMessageReviewHistory & {
+  conversation: DirectMessageReviewConversation
+  flags: DirectMessageReviewFlag[]
+}

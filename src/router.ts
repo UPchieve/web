@@ -120,6 +120,10 @@ const MyCoachesView = () => import('./views/MyCoachesView.vue')
 const VolunteerRelevantExperienceThanksView = () =>
   import('./views/VolunteerRelevantExperienceThanksView.vue')
 const MessagesView = () => import('./views/MessagesView.vue')
+const AdminDirectMessageReviews = () =>
+  import('./views/Admin/AdminDirectMessageReviews.vue')
+const AdminDirectMessageReview = () =>
+  import('./views/Admin/AdminDirectMessageReview.vue')
 
 import {
   resolveNthsRoute,
@@ -734,6 +738,18 @@ const routes: RouteRecordRaw[] = [
     path: '/admin/sessions',
     name: 'AdminSessions',
     component: AdminSessions,
+    meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/direct-messages/review',
+    name: 'AdminDirectMessageReviews',
+    component: AdminDirectMessageReviews,
+    meta: { protected: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/direct-messages/:conversationId',
+    name: 'AdminDirectMessageReview',
+    component: AdminDirectMessageReview,
     meta: { protected: true, requiresAdmin: true },
   },
   {

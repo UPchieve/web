@@ -6,7 +6,7 @@
         >Sessions</router-link
       >
       <router-link to="/admin/sessions/review" class="admin-link btn">
-        Session Review
+        Safety Review
       </router-link>
       <router-link to="/admin/volunteers/review" class="admin-link btn">
         Volunteer Review

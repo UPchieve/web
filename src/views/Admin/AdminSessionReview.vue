@@ -1,5 +1,6 @@
 <template>
   <div class="admin-sessions">
+    <AdminReviewTabs />
     <div>
       <label for="studentFirstName">Student First Name</label>
       <input
@@ -26,6 +27,7 @@
 </template>
 
 <script>
+import AdminReviewTabs from '@/components/Admin/AdminReviewTabs.vue'
 import NetworkService from '@/services/NetworkService'
 import SessionsList from '@/components/Admin/SessionsList.vue'
 import PageControl from '@/components/Admin/PageControl.vue'
@@ -33,7 +35,7 @@ import Loader from '@/components/Loader.vue'
 
 export default {
   name: 'AdminSessionReview',
-  components: { SessionsList, PageControl, Loader },
+  components: { SessionsList, PageControl, Loader, AdminReviewTabs },
   data() {
     return {
       page: 1,

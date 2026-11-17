@@ -35,6 +35,9 @@ import type {
   UnreadDirectMessagesResponse,
   ReportDirectMessagePayload,
   ReportDirectMessageResponse,
+  DirectMessageReview,
+  DirectMessageReviewSummary,
+  DirectMessageReviewHistory,
 } from '@/types/direct-messages'
 import type { PastVolunteersResponse } from '@/types/students'
 import type {
@@ -319,6 +322,44 @@ export function checkRegister(data: AuthPayload) {
   return httpPost<CheckCredentialResponse>(
     `${AUTH_ROOT}/register/checkcred`,
     data
+  )
+}
+
+export function getAdminSafetyReviewCounts() {
+  return httpGet<{ sessions: number; conversations: number }>(
+    `${API_ROOT}/admin/safety-reviews/counts`
+  )
+}
+
+export function getAdminDirectMessageReviews(page: number) {
+  return httpGet<{
+    conversations: DirectMessageReviewSummary[]
+    isLastPage: boolean
+  }>(`${API_ROOT}/admin/direct-message-reviews?page=${page}`)
+}
+
+export function getAdminDirectMessageReview(conversationId: string) {
+  return httpGet<DirectMessageReview>(
+    `${API_ROOT}/admin/direct-message-reviews/${conversationId}`
+  )
+}
+
+export function getAdminDirectMessageHistory(
+  conversationId: string,
+  beforeId: string
+) {
+  return httpGet<DirectMessageReviewHistory>(
+    `${API_ROOT}/admin/direct-message-reviews/${conversationId}/messages?beforeId=${encodeURIComponent(beforeId)}`
+  )
+}
+
+export function reviewAdminDirectMessageFlags(
+  conversationId: string,
+  flagIds: string[]
+) {
+  return httpPost<{ reviewedCount: number }, { flagIds: string[] }>(
+    `${API_ROOT}/admin/direct-message-reviews/${conversationId}/review`,
+    { flagIds }
   )
 }
 
