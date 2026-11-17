@@ -78,7 +78,12 @@ function mountView({
           },
         }),
       ],
-      stubs: { Loader: true, DirectMessagePanel: true },
+      stubs: {
+        Loader: true,
+        DirectMessagePanel: true,
+        MessageFilterDropdown: true,
+        SortDropdown: true,
+      },
     },
   })
 }
@@ -337,5 +342,82 @@ describe('MessagesView', () => {
     expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(
       false
     )
+  })
+
+  describe('filters', () => {
+    const filterStudents = [
+      pastStudent({
+        studentId: 'jordan',
+        firstName: 'Jordan',
+        createdAt: '2026-11-08T15:00:00',
+      }),
+      pastStudent({
+        studentId: 'mateo',
+        firstName: 'Mateo',
+        createdAt: '2026-11-05T15:00:00',
+      }),
+      pastStudent({
+        studentId: 'maya',
+        firstName: 'Maya',
+        createdAt: '2026-11-10T15:00:00',
+      }),
+    ]
+
+    async function mountWithFilterStudents() {
+      mockedNetworkService.getPastStudents.mockResolvedValue({
+        pastStudents: filterStudents,
+      })
+      const wrapper = mountView({
+        unreadDirectMessageSenderIds: ['maya', 'mateo'],
+      })
+      await flushPromises()
+      return wrapper
+    }
+
+    async function setMessageFilter(
+      wrapper: ReturnType<typeof mountView>,
+      value: string[]
+    ) {
+      wrapper
+        .findComponent({ name: 'MessageFilterDropdown' })
+        .vm.$emit('update:modelValue', value)
+      await flushPromises()
+    }
+
+    it('shows only students with unread messages for "New message"', async () => {
+      const wrapper = await mountWithFilterStudents()
+
+      await setMessageFilter(wrapper, ['new'])
+
+      expect(cardNames(wrapper)).toEqual(['Maya', 'Mateo'])
+    })
+
+    it('shows only students without unread messages for "No new messages"', async () => {
+      const wrapper = await mountWithFilterStudents()
+
+      await setMessageFilter(wrapper, ['none'])
+
+      expect(cardNames(wrapper)).toEqual(['Jordan'])
+    })
+
+    it('sorts by most recent session first by default', async () => {
+      const wrapper = await mountWithFilterStudents()
+
+      expect(
+        wrapper.findComponent({ name: 'SortDropdown' }).props('modelValue')
+      ).toBe('recent')
+      expect(cardNames(wrapper)).toEqual(['Maya', 'Jordan', 'Mateo'])
+    })
+
+    it('sorts by oldest session first when "Oldest session" is picked', async () => {
+      const wrapper = await mountWithFilterStudents()
+
+      wrapper
+        .findComponent({ name: 'SortDropdown' })
+        .vm.$emit('update:modelValue', 'oldest')
+      await flushPromises()
+
+      expect(cardNames(wrapper)).toEqual(['Mateo', 'Jordan', 'Maya'])
+    })
   })
 })

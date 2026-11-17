@@ -1,7 +1,12 @@
 <script lang="ts" setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { reactive, ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { debounce } from 'lodash-es'
+import MessageFilterDropdown from '@/components/MessageFilterDropdown.vue'
+import type { MessageFilterOption } from '@/types/direct-messages'
+import SearchInput from '@/components/SearchInput.vue'
+import SortDropdown, { type SortOption } from '@/components/SortDropdown.vue'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import CaretIcon from '@/assets/caret.svg'
@@ -56,8 +61,23 @@ function messagingUnavailableText(student: Student) {
   return `${student.firstName} can't receive direct messages yet. You can message them from your session recap page.`
 }
 
+type SortValue = 'recent' | 'oldest'
+
+const sortOptions: SortOption<SortValue>[] = [
+  { value: 'recent', label: 'Most recent session' },
+  { value: 'oldest', label: 'Oldest session' },
+]
+const DEFAULT_SORT: SortValue = 'recent'
+const MESSAGE_FILTER_OPTIONS: MessageFilterOption[] = ['new', 'none']
+
 const allStudents = ref<Student[]>([])
+const filteredStudents = ref<Student[]>([])
 const students = ref<Student[]>([])
+const filters = reactive({
+  search: '',
+  messages: [] as MessageFilterOption[],
+  sort: DEFAULT_SORT as SortValue,
+})
 const isFetchingStudents = ref(true)
 const error = ref('')
 const page = ref(1)
@@ -65,10 +85,63 @@ const isLastPage = ref(false)
 const studentLimitPerPage = 5
 
 const isFirstPage = computed(() => page.value === 1)
-const total = computed(() => allStudents.value.length)
+const total = computed(() => filteredStudents.value.length)
+
+// Unread state only exists when DMs are on. Checking both options means everyone.
+const isMessageFilterActive = computed(
+  () => isDirectMessagesEnabled.value && filters.messages.length === 1
+)
+const hasActiveFilters = computed(
+  () => filters.search.trim() !== '' || isMessageFilterActive.value
+)
+
+function passesSearch(student: Student) {
+  const search = filters.search.trim().toLowerCase()
+  return !search || student.firstName.toLowerCase().includes(search)
+}
+
+function passesMessageFilter(student: Student) {
+  if (!isMessageFilterActive.value) return true
+  return filters.messages[0] === 'new'
+    ? hasUnreadMessages(student)
+    : !hasUnreadMessages(student)
+}
+
+// Counted within the search so each count matches what checking it shows
+const messageCounts = computed<Record<MessageFilterOption, number>>(() => {
+  const candidates = allStudents.value.filter(passesSearch)
+  const withNew = candidates.filter(hasUnreadMessages).length
+  return { new: withNew, none: candidates.length - withNew }
+})
+
+function parseMessagesQuery(value: unknown): MessageFilterOption[] {
+  if (typeof value !== 'string') return []
+  const selected = value.split(',')
+  return MESSAGE_FILTER_OPTIONS.filter((option) => selected.includes(option))
+}
+
+function parseSortQuery(value: unknown): SortValue {
+  return sortOptions.some((option) => option.value === value)
+    ? (value as SortValue)
+    : DEFAULT_SORT
+}
 
 function setCurrentPageFromQuery(query: typeof $route.query) {
   page.value = parseInt(query.page as string) || 1
+  filters.search = typeof query.search === 'string' ? query.search : ''
+  filters.messages = parseMessagesQuery(query.messages)
+  filters.sort = parseSortQuery(query.sort)
+}
+
+function sessionTime(student: Student) {
+  return new Date(student.lastSession.date).getTime()
+}
+
+function applyFilter() {
+  const direction = filters.sort === 'oldest' ? 1 : -1
+  filteredStudents.value = allStudents.value
+    .filter((student) => passesSearch(student) && passesMessageFilter(student))
+    .sort((a, b) => direction * (sessionTime(a) - sessionTime(b)))
 }
 
 async function fetchStudents() {
@@ -80,6 +153,7 @@ async function fetchStudents() {
       lastSession: toLastSession(student),
     }))
 
+    applyFilter()
     paginate()
   } catch (err) {
     LoggerService.noticeError(err)
@@ -93,7 +167,7 @@ async function fetchStudents() {
 function paginate() {
   const maxPage = Math.max(
     1,
-    Math.ceil(allStudents.value.length / studentLimitPerPage)
+    Math.ceil(filteredStudents.value.length / studentLimitPerPage)
   )
   if (page.value > maxPage) {
     page.value = maxPage
@@ -107,24 +181,66 @@ function paginate() {
   const start = (page.value - 1) * studentLimitPerPage
   const end = page.value * studentLimitPerPage
 
-  isLastPage.value = end >= allStudents.value.length
-  students.value = allStudents.value.slice(start, end)
+  isLastPage.value = end >= filteredStudents.value.length
+  students.value = filteredStudents.value.slice(start, end)
+}
+
+function buildQuery(query: {
+  page?: number
+  search?: string
+  messages?: MessageFilterOption[]
+  sort?: SortValue
+}) {
+  const search = query.search ?? filters.search
+  const messages = query.messages ?? filters.messages
+  const sort = query.sort ?? filters.sort
+  return {
+    page: query.page ?? page.value,
+    ...(search.trim() ? { search } : {}),
+    ...(messages.length ? { messages: messages.join(',') } : {}),
+    ...(sort !== DEFAULT_SORT ? { sort } : {}),
+  }
 }
 
 //Create a new browser history entry and use as the source of truth for navigating
-//using the back button.
-function navigateTo(newPage: number) {
-  $router.push({ query: { page: newPage } }).catch(() => {})
+//using the back button. Steps back through pages and filter changes.
+function navigateTo(query: Parameters<typeof buildQuery>[0]) {
+  $router.push({ query: buildQuery(query) }).catch(() => {})
 }
 
 function goToNextPage() {
   if (isLastPage.value) return
-  navigateTo(page.value + 1)
+  navigateTo({ page: page.value + 1 })
 }
 
 function goToPreviousPage() {
   if (isFirstPage.value) return
-  navigateTo(page.value - 1)
+  navigateTo({ page: page.value - 1 })
+}
+
+const syncSearchToUrl = debounce(() => {
+  $router.replace({ query: buildQuery({ page: 1 }) }).catch(() => {})
+}, 300)
+
+function setSearch(value: string) {
+  filters.search = value
+  page.value = 1
+  applyFilter()
+  paginate()
+  syncSearchToUrl()
+}
+
+function setMessageFilter(value: MessageFilterOption[]) {
+  navigateTo({ page: 1, messages: value })
+}
+
+function setSort(value: SortValue) {
+  navigateTo({ page: 1, sort: value })
+}
+
+function clearFilters() {
+  syncSearchToUrl.cancel()
+  navigateTo({ page: 1, search: '', messages: [], sort: filters.sort })
 }
 
 const activeConversation = ref<Student | null>(null)
@@ -144,13 +260,23 @@ watch(
   () => $route.query,
   (query) => {
     setCurrentPageFromQuery(query)
+    applyFilter()
     paginate()
   }
 )
 
+watch(unreadDirectMessageSenderIds, () => {
+  applyFilter()
+  paginate()
+})
+
 onMounted(async () => {
   setCurrentPageFromQuery($route.query)
   await fetchStudents()
+})
+
+onUnmounted(() => {
+  syncSearchToUrl.cancel()
 })
 </script>
 
@@ -158,7 +284,28 @@ onMounted(async () => {
   <div class="container">
     <section class="header">
       <h1 class="title">Messages</h1>
-      <p class="subtitle">Students you've worked with before.</p>
+      <div class="header__row">
+        <p class="subtitle">Students you've worked with before.</p>
+        <div class="filters" data-testid="student-filters">
+          <SearchInput
+            :model-value="filters.search"
+            @update:model-value="setSearch"
+          />
+          <MessageFilterDropdown
+            v-if="isDirectMessagesEnabled"
+            :model-value="filters.messages"
+            :counts="messageCounts"
+            default-label="All messages"
+            @update:model-value="setMessageFilter"
+          />
+          <SortDropdown
+            :model-value="filters.sort"
+            :options="sortOptions"
+            aria-label="Sort students"
+            @update:model-value="setSort"
+          />
+        </div>
+      </div>
     </section>
 
     <section class="students">
@@ -232,6 +379,22 @@ onMounted(async () => {
           </template>
         </PersonCard>
       </template>
+      <div
+        v-else-if="hasActiveFilters && allStudents.length > 0"
+        class="students__no-students"
+        data-testid="no-matching-students"
+      >
+        <student-icon class="student-icon" />
+        <h2 class="secondary-header">No students match these filters.</h2>
+        <button
+          type="button"
+          class="clear-filters-button"
+          data-testid="clear-filters-button"
+          @click="clearFilters"
+        >
+          Clear filters
+        </button>
+      </div>
       <div v-else class="students__no-students">
         <student-icon class="student-icon" />
         <h2 class="secondary-header">You haven't had any students yet!</h2>
@@ -289,12 +452,46 @@ onMounted(async () => {
 
 .header {
   text-align: left;
-  margin-bottom: 2em;
+  margin-bottom: 1.5em;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1em;
+
+    @include breakpoint-above('large') {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
 }
 
 .title {
   @include font-category('display-small');
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+
+  @include breakpoint-above('large') {
+    justify-content: flex-end;
+  }
+}
+
+.clear-filters-button {
+  margin-top: 1em;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: $c-information-blue;
+  font: inherit;
+  cursor: pointer;
 }
 
 .subtitle {
