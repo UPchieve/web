@@ -5,6 +5,7 @@ import { socket } from '@/socket'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import Loader from '@/components/Loader.vue'
+import SafetyNotice from '@/components/PresentationComponents/SafetyNotice.vue'
 import SendMessageIcon from '@/assets/voice_message_icons/send-message.svg'
 import { dayjs } from '@/utils/time-utils'
 import type {
@@ -294,9 +295,10 @@ onUnmounted(() => {
           <SendMessageIcon />
         </button>
       </div>
-      <p class="safety-notice" data-testid="dm-chat-safety-notice">
-        We review every session. Please be respectful.
-      </p>
+      <SafetyNotice
+        type="direct-message-chat"
+        data-testid="dm-chat-safety-notice"
+      />
     </footer>
   </section>
 </template>
@@ -321,7 +323,7 @@ onUnmounted(() => {
   }
 
   &__footer {
-    padding: 16px 24px 24px;
+    padding: 16px;
     background-color: $upchieve-white;
   }
 
@@ -441,21 +443,6 @@ onUnmounted(() => {
         fill: $c-disabled-grey;
       }
     }
-  }
-}
-
-.safety-notice {
-  flex-shrink: 0;
-  color: #4f4f55;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.4;
-  margin: 0;
-  padding: 0.375rem 1rem;
-  text-align: center;
-
-  @include breakpoint-below('medium') {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 }
 </style>

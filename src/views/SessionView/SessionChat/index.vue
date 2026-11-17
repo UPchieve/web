@@ -210,9 +210,7 @@
       </button>
       <slot name="session-tool-toggle" />
     </div>
-    <p class="safety-notice" data-testid="chat-safety-notice">
-      We review every session. Please be respectful.
-    </p>
+    <SafetyNotice type="session-chat" data-testid="chat-safety-notice" />
     <div class="math-keyboard-container" ref="mathKeyboardContainer"></div>
   </div>
 </template>
@@ -237,6 +235,7 @@ import DocumentTitle from '@/components/DocumentTitle.vue'
 import LoadingMessage from '@/components/LoadingMessage.vue'
 import CallStatusIndicator from '@/components/ScreenShare/CallStatusIndicator.vue'
 import ScrollToLatestButton from '@/components/ScrollToLatestButton.vue'
+import SafetyNotice from '@/components/PresentationComponents/SafetyNotice.vue'
 import TranscribedMessage from './TranscribedMessage.vue'
 import CelebrationButton from './CelebrationButton.vue'
 
@@ -284,6 +283,7 @@ export default {
     ScrollToLatestButton,
     TranscribedMessage,
     CelebrationButton,
+    SafetyNotice,
     EditorContent,
   },
 
@@ -1102,20 +1102,6 @@ export default {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-}
-.safety-notice {
-  flex-shrink: 0;
-  color: #4f4f55;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.4;
-  margin: 0;
-  padding: 0.375rem 1rem;
-  text-align: center;
-
-  @include breakpoint-below('medium') {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
 }
 .moderation-body {
   /*
