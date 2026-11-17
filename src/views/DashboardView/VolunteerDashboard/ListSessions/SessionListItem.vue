@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useStore } from 'vuex'
 import { computed } from 'vue'
-import RightArrowCircled from '@/assets/icons/right_arrow_circled.svg'
+import CaretIcon from '@/assets/right-caret.svg'
 
 const store = useStore()
 const iconLink = computed(
@@ -101,7 +101,7 @@ const gradeLevel = computed((): string => props.session.currentGradeName)
 
     <!--  Rightmost cell: Pick up session button-->
     <div class="accept-session-icon-cell centered">
-      <RightArrowCircled class="accept-icon" />
+      <CaretIcon class="accept-icon" />
     </div>
   </div>
 </template>
@@ -259,6 +259,11 @@ const gradeLevel = computed((): string => props.session.currentGradeName)
 .accept-icon {
   width: 24px;
   height: 24px;
+
+  :deep(path) {
+    stroke-width: 1.75px;
+    stroke: $c-disabled-grey;
+  }
 }
 
 .centered {
