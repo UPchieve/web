@@ -3,10 +3,16 @@ import { reactive, ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { debounce } from 'lodash-es'
-import MessageFilterDropdown from '@/components/MessageFilterDropdown.vue'
-import type { MessageFilterOption } from '@/types/direct-messages'
+import UnreadFilterChip from '@/components/UnreadFilterChip.vue'
 import SearchInput from '@/components/SearchInput.vue'
-import SortDropdown, { type SortOption } from '@/components/SortDropdown.vue'
+import SortDropdown from '@/components/SortDropdown.vue'
+import {
+  DEFAULT_PERSON_SORT,
+  PERSON_SORT_OPTIONS,
+  sortPeople,
+  parsePersonSortQuery,
+  type PersonSort,
+} from '@/utils/person-sort'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import CaretIcon from '@/assets/caret.svg'
@@ -61,22 +67,13 @@ function messagingUnavailableText(student: Student) {
   return `${student.firstName} can't receive direct messages yet. You can message them from your session recap page.`
 }
 
-type SortValue = 'recent' | 'oldest'
-
-const sortOptions: SortOption<SortValue>[] = [
-  { value: 'recent', label: 'Most recent session' },
-  { value: 'oldest', label: 'Oldest session' },
-]
-const DEFAULT_SORT: SortValue = 'recent'
-const MESSAGE_FILTER_OPTIONS: MessageFilterOption[] = ['new', 'none']
-
 const allStudents = ref<Student[]>([])
 const filteredStudents = ref<Student[]>([])
 const students = ref<Student[]>([])
 const filters = reactive({
   search: '',
-  messages: [] as MessageFilterOption[],
-  sort: DEFAULT_SORT as SortValue,
+  unreadOnly: false,
+  sort: DEFAULT_PERSON_SORT as PersonSort,
 })
 const isFetchingStudents = ref(true)
 const error = ref('')
@@ -87,12 +84,11 @@ const studentLimitPerPage = 5
 const isFirstPage = computed(() => page.value === 1)
 const total = computed(() => filteredStudents.value.length)
 
-// Unread state only exists when DMs are on. Checking both options means everyone.
-const isMessageFilterActive = computed(
-  () => isDirectMessagesEnabled.value && filters.messages.length === 1
+const isUnreadFilterActive = computed(
+  () => isDirectMessagesEnabled.value && filters.unreadOnly
 )
 const hasActiveFilters = computed(
-  () => filters.search.trim() !== '' || isMessageFilterActive.value
+  () => filters.search.trim() !== '' || isUnreadFilterActive.value
 )
 
 function passesSearch(student: Student) {
@@ -100,48 +96,25 @@ function passesSearch(student: Student) {
   return !search || student.firstName.toLowerCase().includes(search)
 }
 
-function passesMessageFilter(student: Student) {
-  if (!isMessageFilterActive.value) return true
-  return filters.messages[0] === 'new'
-    ? hasUnreadMessages(student)
-    : !hasUnreadMessages(student)
+function passesUnreadFilter(student: Student) {
+  return !isUnreadFilterActive.value || hasUnreadMessages(student)
 }
 
-// Counted within the search so each count matches what checking it shows
-const messageCounts = computed<Record<MessageFilterOption, number>>(() => {
-  const candidates = allStudents.value.filter(passesSearch)
-  const withNew = candidates.filter(hasUnreadMessages).length
-  return { new: withNew, none: candidates.length - withNew }
-})
-
-function parseMessagesQuery(value: unknown): MessageFilterOption[] {
-  if (typeof value !== 'string') return []
-  const selected = value.split(',')
-  return MESSAGE_FILTER_OPTIONS.filter((option) => selected.includes(option))
-}
-
-function parseSortQuery(value: unknown): SortValue {
-  return sortOptions.some((option) => option.value === value)
-    ? (value as SortValue)
-    : DEFAULT_SORT
-}
+const unreadCount = computed(
+  () => allStudents.value.filter(passesSearch).filter(hasUnreadMessages).length
+)
 
 function setCurrentPageFromQuery(query: typeof $route.query) {
   page.value = parseInt(query.page as string) || 1
   filters.search = typeof query.search === 'string' ? query.search : ''
-  filters.messages = parseMessagesQuery(query.messages)
-  filters.sort = parseSortQuery(query.sort)
-}
-
-function sessionTime(student: Student) {
-  return new Date(student.lastSession.date).getTime()
+  filters.unreadOnly = query.unreadOnly === 'true'
+  filters.sort = parsePersonSortQuery(query.sort)
 }
 
 function applyFilter() {
-  const direction = filters.sort === 'oldest' ? 1 : -1
   filteredStudents.value = allStudents.value
-    .filter((student) => passesSearch(student) && passesMessageFilter(student))
-    .sort((a, b) => direction * (sessionTime(a) - sessionTime(b)))
+    .filter((student) => passesSearch(student) && passesUnreadFilter(student))
+    .sort(sortPeople(filters.sort))
 }
 
 async function fetchStudents() {
@@ -188,17 +161,17 @@ function paginate() {
 function buildQuery(query: {
   page?: number
   search?: string
-  messages?: MessageFilterOption[]
-  sort?: SortValue
+  unreadOnly?: boolean
+  sort?: PersonSort
 }) {
   const search = query.search ?? filters.search
-  const messages = query.messages ?? filters.messages
+  const unreadOnly = query.unreadOnly ?? filters.unreadOnly
   const sort = query.sort ?? filters.sort
   return {
     page: query.page ?? page.value,
     ...(search.trim() ? { search } : {}),
-    ...(messages.length ? { messages: messages.join(',') } : {}),
-    ...(sort !== DEFAULT_SORT ? { sort } : {}),
+    ...(unreadOnly ? { unreadOnly: 'true' } : {}),
+    ...(sort !== DEFAULT_PERSON_SORT ? { sort } : {}),
   }
 }
 
@@ -230,17 +203,17 @@ function setSearch(value: string) {
   syncSearchToUrl()
 }
 
-function setMessageFilter(value: MessageFilterOption[]) {
-  navigateTo({ page: 1, messages: value })
+function toggleUnreadFilter({ value }: { value: boolean }) {
+  navigateTo({ page: 1, unreadOnly: value })
 }
 
-function setSort(value: SortValue) {
+function setSort(value: PersonSort) {
   navigateTo({ page: 1, sort: value })
 }
 
 function clearFilters() {
   syncSearchToUrl.cancel()
-  navigateTo({ page: 1, search: '', messages: [], sort: filters.sort })
+  navigateTo({ page: 1, search: '', unreadOnly: false, sort: filters.sort })
 }
 
 const activeConversation = ref<Student | null>(null)
@@ -291,16 +264,15 @@ onUnmounted(() => {
             :model-value="filters.search"
             @update:model-value="setSearch"
           />
-          <MessageFilterDropdown
+          <UnreadFilterChip
             v-if="isDirectMessagesEnabled"
-            :model-value="filters.messages"
-            :counts="messageCounts"
-            default-label="All messages"
-            @update:model-value="setMessageFilter"
+            :value="filters.unreadOnly"
+            :count="unreadCount"
+            @change="toggleUnreadFilter"
           />
           <SortDropdown
             :model-value="filters.sort"
-            :options="sortOptions"
+            :options="PERSON_SORT_OPTIONS"
             aria-label="Sort students"
             @update:model-value="setSort"
           />
@@ -497,6 +469,7 @@ onUnmounted(() => {
 .subtitle {
   @include font-category('body');
   color: $c-secondary-grey;
+  margin-bottom: 0;
 }
 
 .secondary-header {

@@ -81,7 +81,7 @@ function mountView({
       stubs: {
         Loader: true,
         DirectMessagePanel: true,
-        MessageFilterDropdown: true,
+        UnreadFilterChip: true,
         SortDropdown: true,
       },
     },
@@ -374,30 +374,52 @@ describe('MessagesView', () => {
       return wrapper
     }
 
-    async function setMessageFilter(
-      wrapper: ReturnType<typeof mountView>,
-      value: string[]
-    ) {
-      wrapper
-        .findComponent({ name: 'MessageFilterDropdown' })
-        .vm.$emit('update:modelValue', value)
-      await flushPromises()
+    function unreadChip(wrapper: ReturnType<typeof mountView>) {
+      return wrapper.findComponent({ name: 'UnreadFilterChip' })
     }
 
-    it('shows only students with unread messages for "New message"', async () => {
+    it('shows the number of students with unread messages on the toggle', async () => {
       const wrapper = await mountWithFilterStudents()
 
-      await setMessageFilter(wrapper, ['new'])
+      expect(unreadChip(wrapper).props('count')).toBe(2)
+      expect(unreadChip(wrapper).props('value')).toBe(false)
+    })
 
+    it('shows only students with unread messages when Unread is toggled on', async () => {
+      const wrapper = await mountWithFilterStudents()
+
+      unreadChip(wrapper).vm.$emit('change', { value: true })
+      await flushPromises()
+
+      expect(router.push).toHaveBeenCalledWith({
+        query: { page: 1, unreadOnly: 'true' },
+      })
+      expect(unreadChip(wrapper).props('value')).toBe(true)
       expect(cardNames(wrapper)).toEqual(['Maya', 'Mateo'])
     })
 
-    it('shows only students without unread messages for "No new messages"', async () => {
+    it('shows every student again when Unread is toggled off', async () => {
+      router.route.query = { unreadOnly: 'true' }
+      const wrapper = await mountWithFilterStudents()
+      expect(cardNames(wrapper)).toEqual(['Maya', 'Mateo'])
+
+      unreadChip(wrapper).vm.$emit('change', { value: false })
+      await flushPromises()
+
+      expect(router.push).toHaveBeenCalledWith({ query: { page: 1 } })
+      expect(cardNames(wrapper)).toEqual(['Maya', 'Jordan', 'Mateo'])
+    })
+
+    it('counts unread students within the search', async () => {
+      router.route.query = { search: 'ma' }
       const wrapper = await mountWithFilterStudents()
 
-      await setMessageFilter(wrapper, ['none'])
+      expect(unreadChip(wrapper).props('count')).toBe(2)
 
-      expect(cardNames(wrapper)).toEqual(['Jordan'])
+      router.route.query = { search: 'jor' }
+      await flushPromises()
+
+      expect(unreadChip(wrapper).props('count')).toBe(0)
     })
 
     it('sorts by most recent session first by default', async () => {
@@ -418,6 +440,74 @@ describe('MessagesView', () => {
       await flushPromises()
 
       expect(cardNames(wrapper)).toEqual(['Mateo', 'Jordan', 'Maya'])
+    })
+
+    it('offers "Alphabetically" as a sort option', async () => {
+      const wrapper = await mountWithFilterStudents()
+
+      expect(
+        wrapper.findComponent({ name: 'SortDropdown' }).props('options')
+      ).toContainEqual({ value: 'alphabetical', label: 'Alphabetically' })
+    })
+
+    it('sorts by first name when "Alphabetically" is picked', async () => {
+      const wrapper = await mountWithFilterStudents()
+
+      wrapper
+        .findComponent({ name: 'SortDropdown' })
+        .vm.$emit('update:modelValue', 'alphabetical')
+      await flushPromises()
+
+      expect(router.push).toHaveBeenCalledWith({
+        query: { page: 1, sort: 'alphabetical' },
+      })
+      expect(cardNames(wrapper)).toEqual(['Jordan', 'Mateo', 'Maya'])
+    })
+
+    it('sorts alphabetically when the URL has sort=alphabetical', async () => {
+      router.route.query = { sort: 'alphabetical' }
+
+      const wrapper = await mountWithFilterStudents()
+
+      expect(
+        wrapper.findComponent({ name: 'SortDropdown' }).props('modelValue')
+      ).toBe('alphabetical')
+      expect(cardNames(wrapper)).toEqual(['Jordan', 'Mateo', 'Maya'])
+    })
+
+    it('ignores case and puts the most recent session first for the same name', async () => {
+      router.route.query = { sort: 'alphabetical' }
+      mockedNetworkService.getPastStudents.mockResolvedValue({
+        pastStudents: [
+          pastStudent({
+            studentId: 'sam-older',
+            firstName: 'Sam',
+            subjectDisplayName: 'Algebra',
+            createdAt: '2026-11-01T15:00:00',
+          }),
+          pastStudent({
+            studentId: 'alex',
+            firstName: 'alex',
+            createdAt: '2026-10-01T15:00:00',
+          }),
+          pastStudent({
+            studentId: 'sam-newer',
+            firstName: 'Sam',
+            subjectDisplayName: 'Biology',
+            createdAt: '2026-11-09T15:00:00',
+          }),
+        ],
+      })
+
+      const wrapper = mountView()
+      await flushPromises()
+
+      const cards = wrapper.findAllComponents({ name: 'PersonCard' })
+      expect(cards.map((card) => card.props('userId'))).toEqual([
+        'alex',
+        'sam-newer',
+        'sam-older',
+      ])
     })
   })
 })

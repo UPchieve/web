@@ -3,8 +3,15 @@ import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import FavoritesFilterChip from '@/components/FavoritesFilterChip.vue'
-import MessageFilterDropdown from '@/components/MessageFilterDropdown.vue'
-import type { MessageFilterOption } from '@/types/direct-messages'
+import UnreadFilterChip from '@/components/UnreadFilterChip.vue'
+import SortDropdown from '@/components/SortDropdown.vue'
+import {
+  DEFAULT_PERSON_SORT,
+  PERSON_SORT_OPTIONS,
+  sortPeople,
+  parsePersonSortQuery,
+  type PersonSort,
+} from '@/utils/person-sort'
 import NetworkService from '@/services/NetworkService'
 import LoggerService from '@/services/LoggerService'
 import CaretIcon from '@/assets/caret.svg'
@@ -80,7 +87,8 @@ const filteredCoaches = ref<Coach[]>([])
 const coaches = ref<Coach[]>([])
 const filters = reactive({
   favoritesOnly: false,
-  messageFilter: [] as MessageFilterOption[],
+  unreadOnly: false,
+  sort: DEFAULT_PERSON_SORT as PersonSort,
 })
 const page = ref(1)
 const isLastPage = ref(false)
@@ -92,39 +100,30 @@ const coachLimitPerPage = 5
 const isFirstPage = computed(() => page.value === 1)
 const total = computed(() => filteredCoaches.value.length)
 
-const isMessageFilterActive = computed(
-  () => isDirectMessagesEnabled.value && filters.messageFilter.length === 1
+const isUnreadFilterActive = computed(
+  () => isDirectMessagesEnabled.value && filters.unreadOnly
 )
 
 function passesFavoritesFilter(coach: Coach) {
   return !filters.favoritesOnly || coach.isFavorite
 }
 
-function passesMessageFilter(coach: Coach) {
-  if (!isMessageFilterActive.value) return true
-  return filters.messageFilter[0] === 'new'
-    ? hasUnreadMessages(coach)
-    : !hasUnreadMessages(coach)
+function passesUnreadFilter(coach: Coach) {
+  return !isUnreadFilterActive.value || hasUnreadMessages(coach)
 }
 
-const messageCounts = computed<Record<MessageFilterOption, number>>(() => {
-  const candidates = allCoaches.value.filter(passesFavoritesFilter)
-  const withNew = candidates.filter(hasUnreadMessages).length
-  return { new: withNew, none: candidates.length - withNew }
-})
-
-const MESSAGE_FILTER_OPTIONS: MessageFilterOption[] = ['new', 'none']
-
-function parseMessagesQuery(value: unknown): MessageFilterOption[] {
-  if (typeof value !== 'string') return []
-  const selected = value.split(',')
-  return MESSAGE_FILTER_OPTIONS.filter((option) => selected.includes(option))
-}
+// Counted within Favorites so it matches what turning the toggle on shows
+const unreadCount = computed(
+  () =>
+    allCoaches.value.filter(passesFavoritesFilter).filter(hasUnreadMessages)
+      .length
+)
 
 function setCurrentPageFromQuery(query: typeof $route.query) {
   page.value = parseInt(query.page as string) || 1
   filters.favoritesOnly = query.favoritesOnly === 'true'
-  filters.messageFilter = parseMessagesQuery(query.messages)
+  filters.unreadOnly = query.unreadOnly === 'true'
+  filters.sort = parsePersonSortQuery(query.sort)
 }
 
 async function fetchCoaches() {
@@ -147,9 +146,11 @@ async function fetchCoaches() {
 }
 
 function applyFilter() {
-  filteredCoaches.value = allCoaches.value.filter(
-    (coach) => passesFavoritesFilter(coach) && passesMessageFilter(coach)
-  )
+  filteredCoaches.value = allCoaches.value
+    .filter(
+      (coach) => passesFavoritesFilter(coach) && passesUnreadFilter(coach)
+    )
+    .sort(sortPeople(filters.sort))
 }
 
 function paginate() {
@@ -179,15 +180,18 @@ function paginate() {
 function navigateTo(query: {
   page?: number
   favoritesOnly?: boolean
-  messageFilter?: MessageFilterOption[]
+  unreadOnly?: boolean
+  sort?: PersonSort
 }) {
-  const messageFilter = query.messageFilter ?? filters.messageFilter
+  const unreadOnly = query.unreadOnly ?? filters.unreadOnly
+  const sort = query.sort ?? filters.sort
   $router
     .push({
       query: {
         page: query.page ?? page.value,
         favoritesOnly: String(query.favoritesOnly ?? filters.favoritesOnly),
-        ...(messageFilter.length ? { messages: messageFilter.join(',') } : {}),
+        ...(unreadOnly ? { unreadOnly: 'true' } : {}),
+        ...(sort !== DEFAULT_PERSON_SORT ? { sort } : {}),
       },
     })
     .catch(() => {})
@@ -216,13 +220,17 @@ function toggleFavoritesFilter({ value }: { value: boolean }) {
   navigateTo({ page: newPage, favoritesOnly: value })
 }
 
-function setMessageFilter(value: MessageFilterOption[]) {
-  navigateTo({ page: 1, messageFilter: value })
+function toggleUnreadFilter({ value }: { value: boolean }) {
+  navigateTo({ page: 1, unreadOnly: value })
+}
+
+function setSort(value: PersonSort) {
+  navigateTo({ page: 1, sort: value })
 }
 
 function clearFilters() {
   pageBeforeFavoritesFilter.value = null
-  navigateTo({ page: 1, favoritesOnly: false, messageFilter: [] })
+  navigateTo({ page: 1, favoritesOnly: false, unreadOnly: false })
 }
 
 function handleFavoriteChange(volunteerId: string, isFavorite: boolean) {
@@ -263,7 +271,6 @@ watch(
   }
 )
 
-// Reading a coach's messages moves them between "New message" and "No new messages"
 watch(unreadDirectMessageSenderIds, () => {
   applyFilter()
   paginate()
@@ -284,16 +291,21 @@ onMounted(async () => {
           Coaches you've worked with before. You can favorite up to 20.
         </p>
         <div class="filters" data-testid="coach-filters">
-          <span class="filters__label">Show</span>
-          <MessageFilterDropdown
+          <UnreadFilterChip
             v-if="isDirectMessagesEnabled"
-            :model-value="filters.messageFilter"
-            :counts="messageCounts"
-            @update:model-value="setMessageFilter"
+            :value="filters.unreadOnly"
+            :count="unreadCount"
+            @change="toggleUnreadFilter"
           />
           <FavoritesFilterChip
             :value="filters.favoritesOnly"
             @change="toggleFavoritesFilter"
+          />
+          <SortDropdown
+            :model-value="filters.sort"
+            :options="PERSON_SORT_OPTIONS"
+            aria-label="Sort coaches"
+            @update:model-value="setSort"
           />
         </div>
       </div>
@@ -409,7 +421,7 @@ onMounted(async () => {
       </template>
       <div v-else class="coach-list">
         <div
-          v-if="isMessageFilterActive && allCoaches.length > 0"
+          v-if="isUnreadFilterActive && allCoaches.length > 0"
           class="favorite-coaches__no-coaches"
           data-testid="no-matching-coaches"
         >
@@ -538,15 +550,11 @@ onMounted(async () => {
   margin-bottom: 1.5em;
 
   &__row {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    @include flex-container(column, center, center);
     gap: 1em;
 
     @include breakpoint-above('large') {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+      @include flex-container(row, space-between, center);
     }
   }
 }
@@ -563,6 +571,7 @@ onMounted(async () => {
 .subtitle {
   @include font-category('body');
   color: $c-secondary-grey;
+  margin-bottom: 0;
 }
 
 .container {
@@ -579,12 +588,6 @@ onMounted(async () => {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-
-  &__label {
-    @include font-category('body');
-    color: $c-secondary-grey;
-    font-size: 14px;
-  }
 }
 
 .clear-filters-button {

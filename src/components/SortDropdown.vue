@@ -1,6 +1,7 @@
 <script lang="ts" setup generic="T extends string">
-import { computed, ref, useId } from 'vue'
+import { computed, ref } from 'vue'
 import ArrowDownUpIcon from '@/assets/arrow-down-up.svg'
+import DropdownMenu from '@/components/PresentationComponents/DropdownMenu.vue'
 
 export interface SortOption<V extends string = string> {
   value: V
@@ -23,8 +24,6 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-// Each dropdown needs its own radio group name so two on a page don't share one
-const radioName = `sort-${useId()}`
 
 const buttonLabel = computed(
   () =>
@@ -40,120 +39,105 @@ function select(value: T) {
 </script>
 
 <template>
-  <v-menu
-    v-model="isOpen"
-    location="bottom end"
-    :offset="8"
-    :close-on-content-click="false"
+  <DropdownMenu
+    v-model:open="isOpen"
+    :label="buttonLabel"
+    :button-aria-label="`${ariaLabel}: ${buttonLabel}`"
+    menu-role="menu"
+    :menu-aria-label="ariaLabel"
+    test-id="sort-dropdown"
   >
-    <template #activator="{ props: activatorProps }">
-      <button
-        v-bind="activatorProps"
-        type="button"
-        class="sort-dropdown__button"
-        :class="{ 'sort-dropdown__button--open': isOpen }"
-        data-testid="sort-dropdown-button"
-        aria-haspopup="true"
-        :aria-expanded="isOpen"
-        :aria-label="`${ariaLabel}: ${buttonLabel}`"
-      >
-        <ArrowDownUpIcon class="sort-dropdown__icon" aria-hidden="true" />
-        <span>{{ buttonLabel }}</span>
-      </button>
+    <template #leading-icon>
+      <ArrowDownUpIcon class="sort-dropdown__icon" aria-hidden="true" />
     </template>
 
-    <div
-      class="sort-dropdown__menu"
-      role="radiogroup"
-      :aria-label="ariaLabel"
-      data-testid="sort-dropdown-menu"
+    <p class="sort-dropdown__heading" aria-hidden="true">Sort by</p>
+    <button
+      v-for="option in options"
+      :key="option.value"
+      type="button"
+      role="menuitemradio"
+      class="sort-dropdown__option"
+      :class="{
+        'sort-dropdown__option--selected': option.value === modelValue,
+      }"
+      :aria-checked="option.value === modelValue"
+      :data-testid="`sort-dropdown-option-${option.value}`"
+      @click="select(option.value)"
     >
-      <label
-        v-for="option in options"
-        :key="option.value"
-        class="sort-dropdown__option"
-        :data-testid="`sort-dropdown-option-${option.value}`"
-      >
-        <input
-          type="radio"
-          class="sort-dropdown__radio"
-          :name="radioName"
-          :value="option.value"
-          :checked="option.value === modelValue"
-          @change="select(option.value)"
-        />
-        <span>{{ option.label }}</span>
-      </label>
-    </div>
-  </v-menu>
+      <span
+        class="sort-dropdown__radio"
+        :class="{
+          'sort-dropdown__radio--checked': option.value === modelValue,
+        }"
+        data-testid="sort-dropdown-radio"
+        aria-hidden="true"
+      />
+      <span>{{ option.label }}</span>
+    </button>
+  </DropdownMenu>
 </template>
 
 <style lang="scss" scoped>
 .sort-dropdown {
-  &__button {
-    @include font-category('body');
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    height: 40px;
-    padding: 0 1.25em 0 1em;
-    border: 1px solid $c-border-grey;
-    border-radius: 20px;
-    background-color: $upchieve-white;
-    color: $c-soft-black;
-    font-size: 14px;
-    font-weight: 500;
-    white-space: nowrap;
-    cursor: pointer;
-    transition:
-      background-color 0.2s,
-      border-color 0.2s;
-
-    &:hover {
-      background-color: $c-background-grey;
-    }
-
-    &--open,
-    &:focus-visible {
-      outline: none;
-      border-color: $c-information-blue;
-    }
-  }
-
   &__icon {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
   }
 
-  &__menu {
-    display: flex;
-    flex-direction: column;
-    min-width: 200px;
-    padding: 12px 16px;
-    background-color: $upchieve-white;
-    border: 1px solid $c-border-grey;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  &__heading {
+    margin: 0.25em 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: $c-secondary-grey;
   }
 
   &__option {
     display: flex;
     align-items: center;
     gap: 0.75em;
-    padding: 0.5em 0;
+    margin: 0 (-$spacing-sm);
+    padding: 0.5em $spacing-sm;
+    border: none;
+    background: transparent;
+    font: inherit;
     font-size: 14px;
     color: $c-soft-black;
+    text-align: left;
     cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      outline: none;
+      background-color: $c-background-grey;
+    }
+
+    &--selected {
+      color: $c-information-blue;
+    }
   }
 
   &__radio {
+    position: relative;
     width: 18px;
     height: 18px;
-    margin: 0;
     flex-shrink: 0;
-    accent-color: $c-information-blue;
-    cursor: pointer;
+    border: 2px solid $c-secondary-grey;
+    border-radius: 50%;
+    background-color: $upchieve-white;
+
+    &--checked {
+      border-color: $c-information-blue;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        background-color: $c-information-blue;
+      }
+    }
   }
 }
 </style>

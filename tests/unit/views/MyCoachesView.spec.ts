@@ -90,7 +90,8 @@ async function mountView({
         DirectMessagePanel: true,
         FavoritingToggle: true,
         RequestCoachButton: true,
-        MessageFilterDropdown: true,
+        UnreadFilterChip: true,
+        SortDropdown: true,
       },
     },
   })
@@ -220,23 +221,16 @@ describe('MyCoachesView filters', () => {
     })
   }
 
-  function messageFilter(wrapper: Awaited<ReturnType<typeof mountView>>) {
-    return wrapper.findComponent({ name: 'MessageFilterDropdown' })
+  function unreadChip(wrapper: Awaited<ReturnType<typeof mountView>>) {
+    return wrapper.findComponent({ name: 'UnreadFilterChip' })
   }
 
   describe('filtering', () => {
-    it('shows only coaches with unread messages for "New message"', async () => {
-      mockedRoute.query = { messages: 'new' }
+    it('shows only coaches with unread messages when Unread is on', async () => {
+      mockedRoute.query = { unreadOnly: 'true' }
       const wrapper = await mountWithMessages()
 
       expect(nameButtons(wrapper)).toEqual(['Nalini', 'Kenji'])
-    })
-
-    it('shows only coaches without unread messages for "No new messages"', async () => {
-      mockedRoute.query = { messages: 'none' }
-      const wrapper = await mountWithMessages()
-
-      expect(nameButtons(wrapper)).toEqual(['Fatima'])
     })
 
     it('shows only favorite coaches for Favorites', async () => {
@@ -246,61 +240,197 @@ describe('MyCoachesView filters', () => {
       expect(nameButtons(wrapper)).toEqual(['Nalini', 'Fatima'])
     })
 
-    it('combines Favorites with "New message"', async () => {
-      mockedRoute.query = { favoritesOnly: 'true', messages: 'new' }
+    it('combines Favorites with Unread', async () => {
+      mockedRoute.query = { favoritesOnly: 'true', unreadOnly: 'true' }
       const wrapper = await mountWithMessages()
 
       expect(nameButtons(wrapper)).toEqual(['Nalini'])
     })
+
+    it('ignores Unread when direct messages are off', async () => {
+      mockedRoute.query = { unreadOnly: 'true' }
+      const wrapper = await mountView({ unreadDirectMessageSenderIds })
+
+      expect(unreadChip(wrapper).exists()).toBe(false)
+      expect(
+        wrapper
+          .findAllComponents({ name: 'PersonCard' })
+          .map((card) => card.props('name'))
+      ).toEqual(['Nalini', 'Fatima', 'Kenji'])
+    })
   })
 
-  describe('URL', () => {
-    it('reads the message filter from the URL', async () => {
-      mockedRoute.query = { messages: 'new' }
+  describe('Unread toggle', () => {
+    it('counts coaches with unread messages', async () => {
       const wrapper = await mountWithMessages()
 
-      expect(messageFilter(wrapper).props('modelValue')).toEqual(['new'])
+      expect(unreadChip(wrapper).props('count')).toBe(2)
+      expect(unreadChip(wrapper).props('value')).toBe(false)
     })
 
-    it('shows every coach when both options are in the URL', async () => {
-      mockedRoute.query = { messages: 'new,none' }
+    it('counts only favorites when Favorites is on', async () => {
+      mockedRoute.query = { favoritesOnly: 'true' }
       const wrapper = await mountWithMessages()
 
-      expect(messageFilter(wrapper).props('modelValue')).toEqual([
-        'new',
-        'none',
-      ])
-      expect(nameButtons(wrapper)).toEqual(['Nalini', 'Fatima', 'Kenji'])
+      expect(unreadChip(wrapper).props('count')).toBe(1)
     })
 
-    it('ignores unknown message filter values in the URL', async () => {
-      mockedRoute.query = { messages: 'bogus' }
+    it('reads Unread from the URL', async () => {
+      mockedRoute.query = { unreadOnly: 'true' }
       const wrapper = await mountWithMessages()
 
-      expect(messageFilter(wrapper).props('modelValue')).toEqual([])
-      expect(nameButtons(wrapper)).toEqual(['Nalini', 'Fatima', 'Kenji'])
+      expect(unreadChip(wrapper).props('value')).toBe(true)
     })
 
-    it('writes the message filter to the URL and goes back to page 1', async () => {
+    it('writes Unread to the URL and goes back to page 1', async () => {
       mockedRoute.query = { page: '2', favoritesOnly: 'true' }
       const wrapper = await mountWithMessages()
 
-      messageFilter(wrapper).vm.$emit('update:modelValue', ['new'])
+      unreadChip(wrapper).vm.$emit('change', { value: true })
 
       expect(mockedRouter.push).toHaveBeenCalledWith({
-        query: { page: 1, favoritesOnly: 'true', messages: 'new' },
+        query: { page: 1, favoritesOnly: 'true', unreadOnly: 'true' },
       })
     })
 
-    it('removes the message filter from the URL when it is cleared', async () => {
-      mockedRoute.query = { messages: 'new' }
+    it('removes Unread from the URL when it is toggled off', async () => {
+      mockedRoute.query = { unreadOnly: 'true' }
       const wrapper = await mountWithMessages()
 
-      messageFilter(wrapper).vm.$emit('update:modelValue', [])
+      unreadChip(wrapper).vm.$emit('change', { value: false })
 
       expect(mockedRouter.push).toHaveBeenCalledWith({
         query: { page: 1, favoritesOnly: 'false' },
       })
+    })
+  })
+})
+
+describe('MyCoachesView sort', () => {
+  function session(createdAt: string) {
+    return { ...pastVolunteer().lastSession!, createdAt }
+  }
+
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockedRoute.query = {}
+    mockedRouter.push.mockResolvedValue(undefined)
+    mockedRouter.replace.mockResolvedValue(undefined)
+    mockedStatuses.value = {}
+    mockedNetworkService.getPastVolunteers.mockResolvedValue({
+      pastVolunteers: [
+        pastVolunteer({
+          volunteerId: 'kenji',
+          firstName: 'Kenji',
+          lastSession: session('2026-11-08T15:00:00'),
+        }),
+        pastVolunteer({
+          volunteerId: 'no-session',
+          firstName: 'Ada',
+          // The type says there's always one, but the view guards for a missing one
+          lastSession: null as unknown as PastVolunteer['lastSession'],
+        }),
+        pastVolunteer({
+          volunteerId: 'fatima',
+          firstName: 'Fatima',
+          lastSession: session('2026-11-10T15:00:00'),
+        }),
+        pastVolunteer({
+          volunteerId: 'nalini',
+          firstName: 'nalini',
+          lastSession: session('2026-11-05T15:00:00'),
+        }),
+      ],
+    })
+  })
+
+  function sortDropdown(wrapper: Awaited<ReturnType<typeof mountView>>) {
+    return wrapper.findComponent({ name: 'SortDropdown' })
+  }
+
+  function cardIds(wrapper: Awaited<ReturnType<typeof mountView>>) {
+    return wrapper
+      .findAllComponents({ name: 'PersonCard' })
+      .map((card) => card.props('name'))
+  }
+
+  it('offers the three sort options', async () => {
+    const wrapper = await mountView()
+
+    expect(sortDropdown(wrapper).props('options')).toEqual([
+      { value: 'recent', label: 'Most recent session' },
+      { value: 'oldest', label: 'Oldest session' },
+      { value: 'alphabetical', label: 'Alphabetically' },
+    ])
+  })
+
+  it('sorts by most recent session by default, with no-session coaches last', async () => {
+    const wrapper = await mountView()
+
+    expect(sortDropdown(wrapper).props('modelValue')).toBe('recent')
+    expect(cardIds(wrapper)).toEqual(['Fatima', 'Kenji', 'nalini', 'Ada'])
+  })
+
+  it('sorts by oldest session from the URL, still with no-session coaches last', async () => {
+    mockedRoute.query = { sort: 'oldest' }
+    const wrapper = await mountView()
+
+    expect(sortDropdown(wrapper).props('modelValue')).toBe('oldest')
+    expect(cardIds(wrapper)).toEqual(['nalini', 'Kenji', 'Fatima', 'Ada'])
+  })
+
+  it('sorts by first name, ignoring case, from the URL', async () => {
+    mockedRoute.query = { sort: 'alphabetical' }
+    const wrapper = await mountView()
+
+    expect(cardIds(wrapper)).toEqual(['Ada', 'Fatima', 'Kenji', 'nalini'])
+  })
+
+  it('ignores an unknown sort in the URL', async () => {
+    mockedRoute.query = { sort: 'bogus' }
+    const wrapper = await mountView()
+
+    expect(sortDropdown(wrapper).props('modelValue')).toBe('recent')
+  })
+
+  it('writes the sort to the URL and goes back to page 1', async () => {
+    mockedRoute.query = { page: '2', favoritesOnly: 'true' }
+    const wrapper = await mountView()
+
+    sortDropdown(wrapper).vm.$emit('update:modelValue', 'alphabetical')
+
+    expect(mockedRouter.push).toHaveBeenCalledWith({
+      query: { page: 1, favoritesOnly: 'true', sort: 'alphabetical' },
+    })
+  })
+
+  it('keeps the sort in the URL when paging', async () => {
+    mockedRoute.query = { sort: 'oldest' }
+    mockedNetworkService.getPastVolunteers.mockResolvedValue({
+      pastVolunteers: Array.from({ length: 6 }, (_, i) =>
+        pastVolunteer({ volunteerId: `coach-${i}`, firstName: `Coach ${i}` })
+      ),
+    })
+    const wrapper = await mountView()
+
+    await wrapper
+      .findAll('.page-actions__stepper')
+      .find((button) => button.text() === 'Next')!
+      .trigger('click')
+
+    expect(mockedRouter.push).toHaveBeenCalledWith({
+      query: { page: 2, favoritesOnly: 'false', sort: 'oldest' },
+    })
+  })
+
+  it('leaves the default sort out of the URL', async () => {
+    mockedRoute.query = { sort: 'oldest' }
+    const wrapper = await mountView()
+
+    sortDropdown(wrapper).vm.$emit('update:modelValue', 'recent')
+
+    expect(mockedRouter.push).toHaveBeenCalledWith({
+      query: { page: 1, favoritesOnly: 'false' },
     })
   })
 })
