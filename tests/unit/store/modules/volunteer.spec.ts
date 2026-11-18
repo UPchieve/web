@@ -309,4 +309,49 @@ describe('alertVolunteer', () => {
       'rollup-alert',
     ])
   })
+
+  async function alertOn(path: string) {
+    setActivePinia(createPinia())
+    const session = {
+      id: 'session-1',
+      subTopic: 'algebraOne',
+      subjectDisplayName: 'Algebra 1',
+      student: { firstname: 'Ada' },
+      isExclusive: false,
+    }
+    const store = getStore({
+      user: {
+        state: {
+          user: {
+            userType: 'volunteer',
+            isApproved: true,
+            isOnboarded: true,
+            subjects: ['algebraOne'],
+          },
+        },
+      },
+      volunteer: { state: { allOpenSessions: [session] } },
+    })
+
+    await store.dispatch('volunteer/alertVolunteer', {
+      context: { $router: { currentRoute: { value: { path } } } },
+      session,
+    })
+
+    return useNotificationsStore().notifications
+  }
+
+  it.each([
+    ['/session/math/algebra-one/1', 0],
+    ['/feedback/1', 1],
+    ['/sessions/history', 1],
+  ])('on %s, adds %i session alert(s)', async (path, count) => {
+    expect(await alertOn(path)).toHaveLength(count)
+  })
+
+  it('auto-dismisses a session alert after 15 seconds', async () => {
+    const [alert] = await alertOn('/dashboard')
+
+    expect(alert.duration).toBe(15000)
+  })
 })

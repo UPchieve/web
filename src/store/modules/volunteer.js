@@ -100,6 +100,8 @@ export default {
           body: `Can you help them with ${session.subjectDisplayName}?`,
         }
       )
+      if (context.$router.currentRoute.value.path.startsWith('/session/'))
+        return
       const isMobile = rootGetters['app/mobileMode']
       const isDashboard =
         context.$router.currentRoute.value.path === '/dashboard'
@@ -133,7 +135,7 @@ export default {
             },
             secondaryCta: { text: 'Pass' },
             type: 'secondary',
-            duration: 1000 * 60 * 2,
+            duration: 1000 * 15,
           })
         }
       } else {
@@ -154,7 +156,7 @@ export default {
           },
           secondaryCta: { text: 'Pass' },
           type: 'secondary',
-          duration: 1000 * 60 * 2,
+          duration: 1000 * 15,
         })
         notificationsStore.remove('rollup-alert')
       }
