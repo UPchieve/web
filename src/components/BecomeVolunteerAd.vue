@@ -23,6 +23,12 @@ const isHonorSocietyVariant = computed(
     store.getters['featureFlags/studentToVolunteerHoursPageVariant'] ===
     'honor-society'
 )
+const needsNthsGradeLevel = computed(
+  () =>
+    isHonorSocietyVariant.value &&
+    !hasVolunteerRole.value &&
+    !user.value.gradeLevel
+)
 onMounted(() => {
   AnalyticsService.captureEvent(
     isHonorSocietyVariant.value
@@ -67,6 +73,10 @@ const switchRole = async () => {
     )
   }
 }
+
+const addGradeLevel = async () => {
+  await router.push('/profile')
+}
 </script>
 
 <template>
@@ -87,6 +97,22 @@ const switchRole = async () => {
           <li>✅ Earn verified volunteer hours</li>
           <li>✅ Become a Nationally Certified Tutor</li>
         </ul>
+        <div v-if="needsNthsGradeLevel" class="grade-level-callout">
+          <p class="grade-level-title">
+            Set your grade to check your NTHS eligibility
+          </p>
+          <p class="grade-level-description">
+            NTHS is for high school students.
+          </p>
+          <LargeButton
+            class="grade-level-cta"
+            variant="primary-blue"
+            :show-arrow="false"
+            @click="addGradeLevel"
+          >
+            Add grade
+          </LargeButton>
+        </div>
       </template>
       <template v-else>
         <span class="title">Earn Service Hours</span>
@@ -111,7 +137,7 @@ const switchRole = async () => {
         Switch to Volunteer View
       </LargeButton>
       <LargeButton
-        v-else
+        v-else-if="!needsNthsGradeLevel"
         class="cta"
         variant="primary-blue"
         :show-arrow="false"
@@ -178,6 +204,27 @@ const switchRole = async () => {
 
 .honor-society-description {
   margin: 16px 0 0;
+}
+
+.grade-level-callout {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid $c-success-green;
+  border-radius: 16px;
+  background-color: lighten($c-success-green, 45%);
+}
+
+.grade-level-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.grade-level-description {
+  margin: 8px 0 0;
+}
+
+.grade-level-cta {
+  margin-top: 16px;
 }
 
 .cta {
