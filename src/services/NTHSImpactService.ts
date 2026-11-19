@@ -1,5 +1,4 @@
 import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
-import { plural } from '@/utils/plural'
 
 export type Standing = 'pending' | 'official' | 'official-good-standing'
 
@@ -9,19 +8,25 @@ export const STANDING_LABELS: Record<Standing, string> = {
   'official-good-standing': 'Official in Good Standing',
 }
 
+export const LOADING_IMPACT_PLACEHOLDER: NTHSChapterImpactPublic = {
+  groupId: '',
+  schoolYear: { label: '0000–00', startsAt: '', endsAt: '' },
+  schoolYearToDate: {
+    studentsHelped: 0,
+    sessionsCompleted: 0,
+    hoursTutored: 0,
+    membersTutoring: 0,
+  },
+  allTime: { studentsHelped: 0, sessionsCompleted: 0, hoursTutored: 0 },
+  goals: { hoursTutored: 0, membersTutoring: 0 },
+  official: false,
+}
+
 export function standingFor(impact: NTHSChapterImpactPublic): Standing {
   if (!impact.official) return 'pending'
   return impact.schoolYearToDate.hoursTutored >= impact.goals.hoursTutored
     ? 'official-good-standing'
     : 'official'
-}
-
-export function allTimeLine(impact: NTHSChapterImpactPublic): string {
-  const { studentsHelped, hoursTutored } = impact.allTime
-  const formattedHours = isUnderOneTenth(hoursTutored)
-    ? UNDER_ONE_TENTH_HOURS_LABEL
-    : formatDecimalHours(hoursTutored)
-  return `All time: ${formattedHours} ${plural(formattedHours, 'hour')} · ${studentsHelped} ${plural(studentsHelped, 'student')} helped`
 }
 
 // One decimal place turns a few minutes of tutoring into '0', which reads as
@@ -37,12 +42,8 @@ export function formatDecimalHours(hours: number): string {
   return (Math.round(hours * 10) / 10).toFixed(1).replace(/\.0$/, '')
 }
 
-/**
- * Round toward zero while short of the goal, so 39.96 of 40 reads '39.9' rather
- * than a complete-looking '40'.
- */
-export function formatProgressHours(hours: number, goal: number): string {
-  if (hours >= goal) return formatDecimalHours(hours)
+/** Round toward zero, so 39.96 of 40 reads '39.9' rather than a complete-looking '40'. */
+export function formatProgressHours(hours: number): string {
   if (isUnderOneTenth(hours)) return UNDER_ONE_TENTH_HOURS_LABEL
   return formatDecimalHours(Math.floor(hours * 10) / 10)
 }

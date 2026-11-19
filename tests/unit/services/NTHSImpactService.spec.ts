@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  allTimeLine,
   formatDecimalHours,
   formatProgressHours,
   meterPercent,
@@ -54,51 +53,15 @@ describe('formatDecimalHours', () => {
   })
 })
 
-describe('allTimeLine', () => {
-  it('reports all-time hours and students helped, not sessions', () => {
-    const line = allTimeLine(
-      impact({
-        allTime: {
-          hoursTutored: 12.5,
-          studentsHelped: 7,
-          sessionsCompleted: 31,
-        },
-      })
-    )
-    expect(line).toContain('12.5')
-    expect(line).toContain('7')
-    expect(line).not.toContain('31')
-  })
-
-  it.each([
-    [0, 'All time: 0 hours'],
-    [0.02, 'All time: <0.1 hours'],
-  ])('shows %s all-time hours as "%s"', (hoursTutored, expected) => {
-    expect(
-      allTimeLine(
-        impact({
-          allTime: { studentsHelped: 2, sessionsCompleted: 6, hoursTutored },
-        })
-      )
-    ).toContain(expected)
-  })
-})
-
 describe('formatProgressHours', () => {
-  it('rounds toward zero while short of the goal, so it never looks complete early', () => {
-    expect(formatProgressHours(39.96, 40)).toBe('39.9')
-  })
-
   it.each([
     [0, '0'],
     [0.02, '<0.1'],
-  ])('shows %s hours short of the goal as %s', (hours, expected) => {
-    expect(formatProgressHours(hours, 40)).toBe(expected)
-  })
-
-  it('rounds normally once the goal is met', () => {
-    expect(formatProgressHours(40, 40)).toBe('40')
-    expect(formatProgressHours(42.37, 40)).toBe('42.4')
+    [39.96, '39.9'],
+    [40, '40'],
+    [158.97, '158.9'],
+  ])('shows %s hours as %s, rounded toward zero', (hours, expected) => {
+    expect(formatProgressHours(hours)).toBe(expected)
   })
 })
 

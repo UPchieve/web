@@ -1,4 +1,4 @@
-import ImpactPanel from '@/components/NTHS/HQ/ImpactPanel.vue'
+import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
 import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
@@ -17,36 +17,30 @@ const IMPACT: NTHSChapterImpactPublic = {
   official: false,
 }
 
-describe('ImpactPanel', () => {
+describe('GoodStandingCard', () => {
   it('hides the placeholder numbers from assistive tech while loading', () => {
-    const wrapper = mount(ImpactPanel)
+    const wrapper = mount(GoodStandingCard)
 
     expect(
-      wrapper.find('[data-testid="impact-loading"]').attributes('aria-busy')
+      wrapper
+        .find('[data-testid="good-standing-loading"]')
+        .attributes('aria-busy')
     ).toBe('true')
     expect(
-      wrapper.find('[data-testid="impact-header"]').attributes('aria-hidden')
+      wrapper
+        .find('[data-testid="good-standing-meters"]')
+        .attributes('aria-hidden')
     ).toBe('true')
-    expect(
-      wrapper.find('[data-testid="impact-cards"]').attributes('aria-hidden')
-    ).toBe('true')
-
-    const status = wrapper.find('[role="status"]')
-    expect(status.exists()).toBe(true)
-    expect(status.text().length).toBeGreaterThan(0)
   })
 
   it('exposes the real numbers once loaded, with nothing hidden', () => {
-    const wrapper = mount(ImpactPanel, { props: { impact: IMPACT } })
+    const wrapper = mount(GoodStandingCard, { props: { impact: IMPACT } })
 
     expect(
-      wrapper.find('[data-testid="impact-header"]').attributes('aria-hidden')
+      wrapper
+        .find('[data-testid="good-standing-meters"]')
+        .attributes('aria-hidden')
     ).toBeUndefined()
-    expect(
-      wrapper.find('[data-testid="impact-cards"]').attributes('aria-hidden')
-    ).toBeUndefined()
-    expect(wrapper.find('[role="status"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="students-helped"]').text()).toBe('2')
   })
 
   it.each([
@@ -55,7 +49,7 @@ describe('ImpactPanel', () => {
   ])(
     'shows the members note only while pending (official: $official)',
     ({ official, shown }) => {
-      const wrapper = mount(ImpactPanel, {
+      const wrapper = mount(GoodStandingCard, {
         props: { impact: { ...IMPACT, official } },
       })
 

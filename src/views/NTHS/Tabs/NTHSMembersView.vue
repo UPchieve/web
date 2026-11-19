@@ -142,10 +142,7 @@ const summary = computed(() => {
   const memberCount = `${activeMemberCount.value} active ${plural(activeMemberCount.value, 'member')}`
   if (!impactLoaded.value || !impact.value) return memberCount
   // Floored like Home's hours meter, so the two never disagree.
-  const hours = formatProgressHours(
-    impact.value.schoolYearToDate.hoursTutored,
-    impact.value.goals.hoursTutored
-  )
+  const hours = formatProgressHours(impact.value.schoolYearToDate.hoursTutored)
   return `${memberCount} · ${tutoredThisYearCount.value} tutored this year · ${hours} ${plural(hours, 'hour')} this school year`
 })
 

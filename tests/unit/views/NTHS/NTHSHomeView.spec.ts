@@ -124,19 +124,19 @@ afterEach(() => {
 })
 
 describe('NTHSHomeView', () => {
-  it('shows the impact numbers the endpoint returned', async () => {
-    const wrapper = await getWrapper()
+  it.each(['admin', 'member'])(
+    'shows a chapter %s the impact numbers the endpoint returned',
+    async (roleName) => {
+      const wrapper = await getWrapper(roleName)
 
-    expect(getNTHSChapterImpact).toHaveBeenCalledWith(
-      'group-123',
-      rosterPeriodStarts(NOW).thisMonth
-    )
-    expect(wrapper.find('[data-testid="students-helped"]').text()).toBe('2')
-    expect(wrapper.find('[data-testid="sessions-completed"]').text()).toBe('4')
-    expect(wrapper.find('[data-testid="impact-all-time"]').text()).toContain(
-      '4.5'
-    )
-  })
+      expect(getNTHSChapterImpact).toHaveBeenCalledWith(
+        'group-123',
+        rosterPeriodStarts(NOW).thisMonth
+      )
+      expect(wrapper.find('[data-testid="impact-students"]').text()).toBe('2')
+      expect(wrapper.find('[data-testid="impact-sessions"]').text()).toBe('4')
+    }
+  )
 
   it('gives a member the invite link and scripts', async () => {
     const wrapper = await getWrapper('member')
@@ -178,7 +178,7 @@ describe('NTHSHomeView', () => {
 
     expect(wrapper.find(DO_THIS_NEXT).exists()).toBe(false)
     expect(wrapper.findComponent({ name: 'InviteLink' }).exists()).toBe(true)
-    expect(wrapper.find('[data-testid="students-helped"]').text()).toBe('2')
+    expect(wrapper.find('[data-testid="impact-students"]').text()).toBe('2')
     expect(wrapper.find('[data-testid="home-members"]').exists()).toBe(true)
   })
 

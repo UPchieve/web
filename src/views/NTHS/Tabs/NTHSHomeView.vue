@@ -5,8 +5,9 @@ import { useRouter } from 'vue-router'
 import Callout from '@/components/Callout.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
+import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
 import HQSection from '@/components/NTHS/HQ/HQSection.vue'
-import ImpactPanel from '@/components/NTHS/HQ/ImpactPanel.vue'
+import ImpactCard from '@/components/NTHS/HQ/ImpactCard.vue'
 import InviteLink from '@/components/NTHS/InviteLink.vue'
 import TopTutorCard from '@/components/NTHS/TopTutorCard.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
@@ -80,14 +81,21 @@ onBeforeMount(async () => {
         </span>
       </template>
     </Callout>
-    <ImpactPanel v-else :impact="isLoading ? undefined : impact" />
-
-    <TopTutorCard
-      v-if="impact"
-      :topTutor="impact.topTutorThisMonth"
-      :currentUserId="currentUserId"
-      :viewerHoursThisMonth="impact.viewerHoursThisMonth"
-    />
+    <template v-else>
+      <ImpactCard :impact="isLoading ? undefined : impact" />
+      <div class="impact-row">
+        <TopTutorCard
+          v-if="impact"
+          :topTutor="impact.topTutorThisMonth"
+          :currentUserId="currentUserId"
+          :viewerHoursThisMonth="impact.viewerHoursThisMonth"
+        />
+        <GoodStandingCard
+          class="good-standing"
+          :impact="isLoading ? undefined : impact"
+        />
+      </div>
+    </template>
 
     <HQSection
       v-if="isGroupAdmin"
@@ -142,6 +150,19 @@ onBeforeMount(async () => {
   font-weight: 500;
   line-height: 1.35;
   margin: 10px 0 14px;
+}
+.impact-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+
+  @include breakpoint-below('large') {
+    grid-template-columns: 1fr;
+  }
+}
+.good-standing {
+  grid-column: -2;
 }
 .members {
   padding: 24px 26px;
