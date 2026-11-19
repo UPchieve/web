@@ -279,6 +279,13 @@ export default {
         useSessionOfferStore().onLeftQueue(reason)
       })
 
+      socket.on(
+        'queue:rejoinedAfterSession',
+        ({ joinedAt }: { joinedAt: Date }) => {
+          useSessionOfferStore().onRejoinedQueue(new Date(joinedAt))
+        }
+      )
+
       socket.on('dm:received', () => {
         dispatch('user/fetchUnreadDMs', null, { root: true })
       })
