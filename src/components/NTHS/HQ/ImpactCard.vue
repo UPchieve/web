@@ -329,7 +329,7 @@ p {
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 24px;
+  height: 100%;
 
   line {
     stroke: $c-soft-black;
