@@ -28,7 +28,6 @@ export async function handleLogout(
 ) {
   const { router, store } = context
   await store.dispatch('user/clear')
-  await store.dispatch('volunteer/stopPollingForGlobalStats')
   resetServices()
   socket.disconnect()
   await router.push(logoutRoute ?? '/logout')

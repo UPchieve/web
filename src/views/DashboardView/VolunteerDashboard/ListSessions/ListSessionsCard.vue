@@ -16,11 +16,15 @@ import Menu from '@/components/Menu.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import { rejoinSession } from '@/utils/session'
 import GearIcon from '@/assets/icons/gear.svg'
+import QueueButton from '@/views/DashboardView/VolunteerDashboard/QueueButton.vue'
+import { useSessionOfferStore } from '@/stores/session-offer'
+import { storeToRefs } from 'pinia'
 
 const store = useStore()
 const router = useRouter()
 const isSessionAlive = computed(() => store.getters['user/isSessionAlive'])
 const sessionPath = computed(() => store.getters['user/sessionPath'])
+const { isQueueEligible } = storeToRefs(useSessionOfferStore())
 
 const props = defineProps<{
   notificationsCardWasDismissed: false
@@ -117,6 +121,11 @@ function scrollToTop() {
         </div>
       </template>
       <template v-slot:content>
+        <QueueButton
+          v-if="isQueueEligible"
+          class="queue-button"
+          data-testid="queue-button"
+        />
         <div class="waiting-students-content">
           <div class="available-sessions-container sessions-list-container">
             <ListSessions
@@ -162,5 +171,14 @@ function scrollToTop() {
 .icon {
   width: 20px;
   height: 20px;
+}
+
+.queue-button {
+  --queue-width: 118px;
+
+  height: var(--queue-width);
+  width: var(--queue-width);
+  position: absolute;
+  top: calc(-1 * (var(--queue-width) / 2)); // shift it up by 1/2 the size of it
 }
 </style>

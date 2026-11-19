@@ -8,7 +8,7 @@ const iconLink = computed(
   () =>
     store.getters['subjects/subjectIconLinksBySubject'][props.session.subject]
 )
-type SessionListItemProps = {
+export type SessionListItemProps = {
   session: {
     id: string
     studentFirstName?: string
@@ -18,11 +18,11 @@ type SessionListItemProps = {
     }
     subject: string
     subjectDisplayName: string
-    currentGradeName: string
     waitTime: string
     isLongWait: boolean
     topic: string // i.e. 'math'
     isLocked: boolean
+    currentGradeName?: string
     isExclusive?: boolean
     // The session is no longer open (picked up by another coach, or cancelled)
     isClaimed?: boolean
@@ -68,8 +68,8 @@ const gradeLevel = computed((): string => props.session.currentGradeName)
         <span v-if="props.session.isLocked">🔒</span>
         <span>{{ props.session.subjectDisplayName }}</span>
       </div>
-      <span class="student-name">
-        {{ studentName }} · {{ gradeLevel }}
+      <span class="student-name" data-testid="student-name-and-grade">
+        {{ studentName }}{{ gradeLevel ? ' · ' : '' }}{{ gradeLevel }}
         <span
           v-if="props.session.student?.isShadowBanned && isAdmin"
           class="shadow-ban"

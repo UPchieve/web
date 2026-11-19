@@ -1,12 +1,36 @@
 <script lang="ts" setup>
 import Wave from '@/assets/volunteer_dashboard_banner/banner_wave.svg'
 import Dust from '@/assets/volunteer_dashboard_banner/dust.svg'
-import { useStore } from 'vuex'
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Spinner from '@/components/Spinner.vue'
+import NetworkService from '@/services/NetworkService'
+import LoggerService from '@/services/LoggerService'
+import { secondsInMs } from '@/utils/time-utils'
 
-const store = useStore()
-const stats = computed(() => store.state.volunteer.globalStats)
+const POLL_INTERVAL_MS = secondsInMs(10)
+
+const stats = ref<Awaited<
+  ReturnType<typeof NetworkService.getVolunteerFacingStats>
+> | null>(null)
+let pollIntervalId: ReturnType<typeof setInterval> | undefined
+
+async function fetchStats() {
+  try {
+    stats.value = await NetworkService.getVolunteerFacingStats()
+  } catch (error) {
+    LoggerService.noticeError(error)
+  }
+}
+
+onMounted(() => {
+  fetchStats()
+  pollIntervalId = setInterval(fetchStats, POLL_INTERVAL_MS)
+})
+
+onUnmounted(() => {
+  clearInterval(pollIntervalId)
+})
+
 const displayStats = computed(() => {
   return [
     { label: 'students online', value: stats.value?.studentsOnline },

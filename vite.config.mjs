@@ -147,6 +147,7 @@ export default defineConfig({
       'vuetify/components/VProgressCircular',
       'vuetify/components/VProgressLinear',
       'vuetify/components/VSelect',
+      'vuetify/components/VSnackbar',
       'vuetify/components/VTextField',
       'vuetify/directives',
     ],

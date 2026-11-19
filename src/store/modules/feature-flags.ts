@@ -58,6 +58,7 @@ export default {
       [POSTHOG_FEATURE_FLAGS.AI_TUTOR]: '', // stand-alone | stand-alone-in-session | stand-alone-in-session-handoff
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_SUBJECT_PRESENCE]: '', // tutor-count-shown | tutor-count-hidden
       [POSTHOG_FEATURE_FLAGS.VOLUNTEER_MILESTONE_SHARING_STUDY]: '', // completed-first-hour-of-tutoring | tutored-first-three-students
+      [POSTHOG_FEATURE_FLAGS.SESSION_OFFERS_COACH]: '', // 'control' | 'test'
     },
     payloadFlags: {
       [POSTHOG_FEATURE_FLAGS.DOWNTIME_BANNER]: '',
@@ -243,5 +244,8 @@ export default {
       state.toggleFlags[POSTHOG_FEATURE_FLAGS.BLOCK_STUDENT_COACH_MODE],
     americaCountsAutoJoinDelayPayload: (state: FeatureFlagState) =>
       state.payloadFlags[POSTHOG_FEATURE_FLAGS.AMERICA_COUNTS_AUTO_JOIN_DELAY],
+    isSessionOffersEnabledForCoach: (state: FeatureFlagState) =>
+      state.multivariantFlags[POSTHOG_FEATURE_FLAGS.SESSION_OFFERS_COACH] ===
+      'test',
   },
 }

@@ -1164,6 +1164,19 @@ export default {
       studentsOnline: number
     }>(`${API_ROOT}/stats/volunteer`)
   },
+  joinVolunteerQueue() {
+    return httpPost<void>(`${API_ROOT}/volunteers/queue/join`)
+  },
+  leaveVolunteerQueue() {
+    return httpPost<void>(`${API_ROOT}/volunteers/queue/leave`)
+  },
+  getVolunteerQueueStatus() {
+    return httpGet<{
+      isInQueue: boolean
+      // ISO date string: when the coach last joined the queue; null when not in it
+      inQueueSince: string | null
+    }>(`${API_ROOT}/volunteers/queue`)
+  },
   searchSchool({ query }) {
     return httpGetDeprecated(
       `${ELIGIBILITY_API_ROOT}/school/search?q=${encodeURIComponent(query)}`

@@ -3,6 +3,7 @@ import AnalyticsService from '@/services/AnalyticsService'
 import { EVENTS } from '@/consts'
 import Gleap from 'gleap'
 import LoggerService from './LoggerService'
+import { useSessionOfferStore } from '@/stores/session-offer'
 
 export default {
   getUser() {
@@ -65,6 +66,9 @@ export default {
         : EVENTS.ROLE_SWITCHING_USER_SWITCHED_TO_STUDENT_MODE
     )
     Gleap.getInstance().softReInitialize()
+    if (newActiveRole === 'volunteer') {
+      await useSessionOfferStore().loadQueueStatus()
+    }
     return newActiveRole
   },
 

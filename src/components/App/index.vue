@@ -42,6 +42,7 @@ import { useAppSidebarStore } from '@/stores/app/sidebar'
 import { useAppModalStore } from '@/stores/app/modal'
 import { useProductFlagsStore } from '@/stores/product-flags'
 import { useSessionStore } from '@/stores/session'
+import { useSessionOfferStore } from '@/stores/session-offer'
 import { IonApp, IonContent, toastController } from '@ionic/vue'
 import Gleap from 'gleap'
 import posthog from 'posthog-js'
@@ -148,7 +149,6 @@ export default {
       this.handleMobileModeChange
     )
     clearInterval(this.checkForUpdateIntervalId)
-    this.$store.dispatch('volunteer/stopPollingForGlobalStats')
 
     if (this.isMobileApp) {
       if (getOperatingSystem() === 'iOS') {
@@ -354,7 +354,7 @@ export default {
         }
 
         if (this.isVolunteer) {
-          this.$store.dispatch('volunteer/startPollingForGlobalStats')
+          useSessionOfferStore().loadQueueStatus()
         }
 
         this.$store.dispatch('user/getProgressReportOverviewSubjectStats')

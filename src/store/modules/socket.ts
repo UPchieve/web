@@ -18,6 +18,7 @@ import { useCelebrationsStore } from '@/stores/celebrations'
 import { useSessionStore } from '@/stores/session'
 import { useSessionOfferStore } from '@/stores/session-offer'
 import { EVENTS } from '@/consts'
+import type { LeaveQueueReason } from '@/stores/session-offer'
 
 /**
  * These errors handled internally and shouldn't be forwarded to our logger.
@@ -174,6 +175,9 @@ export default {
       socket.io.on('reconnect', () => {
         socket.emit('client_reconnect')
         commit('setIsConnected', false)
+        // we may have missed a `queue:left` event while disconnected
+        if (rootGetters['user/isVolunteer'])
+          useSessionOfferStore().loadQueueStatus()
       })
 
       socket.io.on('reconnect_failed', () => {
@@ -270,6 +274,10 @@ export default {
           }
         }
       )
+
+      socket.on('queue:left', ({ reason }: { reason: LeaveQueueReason }) => {
+        useSessionOfferStore().onLeftQueue(reason)
+      })
 
       socket.on('dm:received', () => {
         dispatch('user/fetchUnreadDMs', null, { root: true })
