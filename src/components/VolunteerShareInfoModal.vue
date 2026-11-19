@@ -37,11 +37,11 @@ function handleDismiss() {
       <h1>Help your students get to know you better!</h1>
       <p v-if="fromProfile">
         Turn on anything you'd like your students to see during sessions. You
-        can change this anytime.
+        can change this any time.
       </p>
       <p v-else>
         Here's what your students will see. Uncheck anything you'd rather keep
-        private. You can change this anytime from
+        private. You can change this any time from
         <router-link :to="`/profile`">your profile</router-link>.
       </p>
     </div>

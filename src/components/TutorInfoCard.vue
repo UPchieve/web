@@ -146,6 +146,8 @@ onMounted(() => {
 
 .tutor-info-stat {
   @include flex-container(column, flex-start, flex-start);
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .tutor-info-stat-number {

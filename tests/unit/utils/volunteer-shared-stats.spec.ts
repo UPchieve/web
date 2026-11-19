@@ -11,7 +11,21 @@ describe('getSharedStats', () => {
       getSharedStats({ totalVolunteerHours: 1.75, numSessionsTutored: 3 })
     ).toEqual([
       { key: 'numSessionsTutored', value: 3, label: 'sessions' },
-      { key: 'totalVolunteerHours', value: 1.75, label: 'hours tutored' },
+      { key: 'totalVolunteerHours', value: 2, label: 'hours tutored' },
+    ])
+  })
+
+  it('rounds hours to a whole number and labels by the rounded value', () => {
+    expect(
+      [31.19, 31.5, 1.2, 0.4].map((totalVolunteerHours) => {
+        const [stat] = getSharedStats({ totalVolunteerHours })
+        return `${stat.value} ${stat.label}`
+      })
+    ).toEqual([
+      '31 hours tutored',
+      '32 hours tutored',
+      '1 hour tutored',
+      '0 hours tutored',
     ])
   })
 

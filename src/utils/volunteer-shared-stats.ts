@@ -39,8 +39,9 @@ export function getSharedStats(
   labels: SharedStatLabels = LONG_STAT_LABELS
 ): SharedStat[] {
   return SHARED_STAT_KEYS.flatMap((key) => {
-    const value = info[key]
-    if (value == null) return []
+    const raw = info[key]
+    if (raw == null) return []
+    const value = Math.round(raw)
     const { singular, plural } = labels[key]
     return [{ key, value, label: value === 1 ? singular : plural }]
   })
