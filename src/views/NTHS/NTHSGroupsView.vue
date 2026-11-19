@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
-import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import { useDocumentVisibility } from '@vueuse/core'
 import LargeButton from '@/components/LargeButton.vue'
 import ModalService from '@/services/ModalService'
 import type { GroupMember } from '@/services/NTHSGroupService'
 import Callout from '@/components/Callout.vue'
+import ChapterHeader from '@/components/NTHS/HQ/ChapterHeader.vue'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
 import LoggerService from '@/services/LoggerService'
+import { useChapterImpact } from '@/composables/useChapterImpact'
 import { renewalWarningLine } from '@/services/NTHSRenewalService'
 import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
 import { useNthsStore } from '@/stores/nths'
@@ -18,16 +20,6 @@ const nths = useNthsStore()
 const router = useRouter()
 const group = computed(() => nths.NTHSGroups?.[0])
 const isGroupAdmin = computed(() => nths.hasAdminRole)
-
-const tabs = computed(() =>
-  [
-    { to: '/groups/home', name: 'home', label: 'Home' },
-    { to: '/groups/to-do', name: 'to_do', label: 'To do', adminOnly: true },
-    { to: '/groups/members', name: 'members', label: 'Members' },
-    { to: '/groups/resources', name: 'resources', label: 'Resources' },
-    { to: '/groups/setup', name: 'setup', label: 'Chapter setup' },
-  ].filter(({ adminOnly }) => !adminOnly || isGroupAdmin.value)
-)
 
 const hidePageContentReason = computed(function ():
   | 'not ready to tutor'
@@ -120,13 +112,29 @@ async function refreshNTHSData(): Promise<void> {
   }
 }
 
+const { impact, refresh: refreshImpact } = useChapterImpact()
+
+function loadHeaderImpact() {
+  const groupId = group.value?.groupInfo?.id
+  if (!groupId || hidePageContentReason.value) return
+  void refreshImpact(groupId, new Date())
+}
+watch(
+  [() => group.value?.groupInfo?.id, hidePageContentReason],
+  loadHeaderImpact,
+  { immediate: true }
+)
+
 onMounted(() => {
   void refreshNTHSData()
 })
 
 watch(
   () => router.currentRoute.value.path,
-  () => void refreshNTHSData()
+  () => {
+    void refreshNTHSData()
+    loadHeaderImpact()
+  }
 )
 
 // The renewal countdown reads today's date, which nothing reactive changes in
@@ -136,58 +144,18 @@ watch(useDocumentVisibility(), (visibility) => {
     void refreshNTHSData()
   }
 })
-
-// The tab strip scrolls horizontally below ~1100px. Landing directly on a tab
-// route (e.g. from the checklist's "Edit in Chapter setup") mounts the active
-// tab already off the visible strip, with no scroll event to reveal it.
-const tabsNav = ref<HTMLElement | null>(null)
-function revealActiveTab() {
-  tabsNav.value
-    ?.querySelector('.tab.active')
-    ?.scrollIntoView({ inline: 'nearest', block: 'nearest' })
-}
-watch(
-  () => router.currentRoute.value.path,
-  async () => {
-    await nextTick()
-    revealActiveTab()
-    // Work Sans usually finishes loading after mount and widens every tab, which
-    // pushes the active one back out of view.
-    await document.fonts?.ready
-    revealActiveTab()
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
   <div class="chapter-hq">
-    <div class="band">
-      <div class="identity">
-        <img class="logo" src="@/assets/nths/nths-logo.svg?url" alt="" />
-        <div class="identity-text">
-          <p class="band-eyebrow">National Tutoring Honor Society</p>
-          <p class="chapter-name">{{ group?.groupInfo?.name }}</p>
-        </div>
-      </div>
-      <nav
-        class="tabs"
-        ref="tabsNav"
-        v-if="!hidePageContentReason"
-        aria-label="Chapter sections"
-      >
-        <RouterLink
-          v-for="tab in tabs"
-          :key="tab.to"
-          class="tab"
-          activeClass="active"
-          :to="tab.to"
-          v-ph:nthshq="`tab.${tab.name}`"
-        >
-          {{ tab.label }}
-        </RouterLink>
-      </nav>
-    </div>
+    <ChapterHeader
+      :name="group?.groupInfo?.name"
+      :isGroupAdmin="isGroupAdmin"
+      :gated="!!hidePageContentReason"
+      :impact="impact"
+      :inviteCode="group?.groupInfo?.inviteCode"
+      :referralCode="store.state.user.user.referralCode"
+    />
 
     <div class="content">
       <div
@@ -258,67 +226,6 @@ watch(
   background: $c-background-grey;
   color: $c-soft-black;
   text-align: left;
-}
-.band {
-  background: $c-nths-navy;
-  color: $upchieve-white;
-  padding: clamp(18px, 3vw, 26px) clamp(16px, 4vw, 36px) 0;
-}
-.identity {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 18px;
-  padding-bottom: 22px;
-}
-.logo {
-  height: 56px;
-  width: 56px;
-  flex: none;
-  background: $c-nths-cream;
-  border-radius: 9999px;
-  padding: 5px;
-}
-.identity-text {
-  flex: 1;
-}
-.band-eyebrow {
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: $c-college;
-}
-.chapter-name {
-  font-size: 26px;
-  font-weight: 500;
-  line-height: 1.25;
-  margin-top: 5px;
-}
-.tabs {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.tab {
-  padding: 11px 16px;
-  border-radius: 8px 8px 0 0;
-  flex: none;
-  white-space: nowrap;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.2;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-}
-// The active tab takes the page background so it reads as a folder tab
-// joined to the content below.
-.tab.active {
-  background: $c-background-grey;
-  color: $c-nths-navy;
 }
 .content {
   flex: 1;

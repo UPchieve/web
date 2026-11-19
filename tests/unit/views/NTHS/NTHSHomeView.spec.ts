@@ -2,7 +2,6 @@ import {
   NTHS_RECRUITMENT_TEMPLATES_URL,
   type AffiliationStatus,
 } from '@/services/NTHSGroupService'
-import { STANDING_LABELS, standingFor } from '@/services/NTHSImpactService'
 import { rosterPeriodStarts } from '@/services/NTHSRosterService'
 import { useNthsStore } from '@/stores/nths'
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
@@ -136,9 +135,6 @@ describe('NTHSHomeView', () => {
     expect(wrapper.find('[data-testid="sessions-completed"]').text()).toBe('4')
     expect(wrapper.find('[data-testid="impact-all-time"]').text()).toContain(
       '4.5'
-    )
-    expect(wrapper.find('[data-testid="standing-chip"]').text()).toBe(
-      STANDING_LABELS[standingFor(IMPACT)]
     )
   })
 

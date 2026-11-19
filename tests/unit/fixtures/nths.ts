@@ -81,6 +81,7 @@ export function impact(
     },
     allTime: { studentsHelped: 6, sessionsCompleted: 12, hoursTutored: 9 },
     goals: { hoursTutored: 40, membersTutoring: 3 },
+    official: true,
     viewerHoursThisMonth: 0,
     ...overrides,
   }

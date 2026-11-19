@@ -14,6 +14,7 @@ const IMPACT: NTHSChapterImpactPublic = {
   },
   allTime: { studentsHelped: 2, sessionsCompleted: 6, hoursTutored: 4.5 },
   goals: { hoursTutored: 40, membersTutoring: 3 },
+  official: false,
 }
 
 describe('ImpactPanel', () => {
@@ -47,4 +48,23 @@ describe('ImpactPanel', () => {
     expect(wrapper.find('[role="status"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="students-helped"]').text()).toBe('2')
   })
+
+  it.each([
+    { official: false, shown: true },
+    { official: true, shown: false },
+  ])(
+    'shows the members note only while pending (official: $official)',
+    ({ official, shown }) => {
+      const wrapper = mount(ImpactPanel, {
+        props: { impact: { ...IMPACT, official } },
+      })
+
+      expect(
+        wrapper
+          .find('[data-testid="members-meter"]')
+          .text()
+          .includes('makes you official')
+      ).toBe(shown)
+    }
+  )
 })

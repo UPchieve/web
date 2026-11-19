@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
 import { allTimeLine, formatProgressHours } from '@/services/NTHSImpactService'
 import RequirementMeter from '@/components/NTHS/HQ/RequirementMeter.vue'
-import StandingChip from '@/components/NTHS/HQ/StandingChip.vue'
 
 const props = defineProps<{ impact?: NTHSChapterImpactPublic }>()
 
@@ -20,6 +19,7 @@ const PLACEHOLDER: NTHSChapterImpactPublic = {
   },
   allTime: { studentsHelped: 0, sessionsCompleted: 0, hoursTutored: 0 },
   goals: { hoursTutored: 0, membersTutoring: 0 },
+  official: false,
 }
 
 const shown = computed(() => props.impact ?? PLACEHOLDER)
@@ -72,10 +72,7 @@ const isLoading = computed(() => !props.impact)
       </div>
 
       <div class="card">
-        <div class="card-header">
-          <span class="card-eyebrow">Good standing</span>
-          <StandingChip :impact="shown" />
-        </div>
+        <span class="card-eyebrow">Good standing</span>
         <div class="meters">
           <RequirementMeter
             label="Hours tutored"
@@ -99,7 +96,7 @@ const isLoading = computed(() => !props.impact)
             :value="shown.schoolYearToDate.membersTutoring"
             :goal="shown.goals.membersTutoring"
             :note="
-              isLoading
+              isLoading || shown.official
                 ? undefined
                 : `${shown.goals.membersTutoring} makes you official`
             "
@@ -154,15 +151,6 @@ const isLoading = computed(() => !props.impact)
   flex-direction: column;
   gap: 18px;
 }
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  .standing-chip {
-    margin-left: auto;
-  }
-}
 .card-eyebrow {
   @include nths-card-eyebrow;
   color: $c-nths-navy;
@@ -200,8 +188,7 @@ const isLoading = computed(() => !props.impact)
   .figure-value,
   .figure-caption,
   :deep(.meter-label),
-  :deep(.meter-value),
-  :deep(.standing-chip) {
+  :deep(.meter-value) {
     color: transparent;
     background: $c-border-grey;
     border-radius: 4px;

@@ -11,30 +11,33 @@ import { impact } from '../fixtures/nths'
 describe('standingFor', () => {
   it.each([
     {
-      name: 'in progress while the chapter is short of three members',
-      yearToDate: {},
-      standing: 'in-progress',
+      name: 'pending when not official, even at the hours goal',
+      official: false,
+      hours: 40,
+      standing: 'pending',
     },
     {
-      name: 'members met once three have tutored but the hours are short',
-      yearToDate: { membersTutoring: 3 },
-      standing: 'members-met',
+      name: 'official under the hours goal',
+      official: true,
+      hours: 39.9,
+      standing: 'official',
     },
     {
-      name: 'requirements met once both numbers reach their goal',
-      yearToDate: { membersTutoring: 4, hoursTutored: 42 },
-      standing: 'requirements-met',
+      name: 'official in good standing exactly at the goal',
+      official: true,
+      hours: 40,
+      standing: 'official-good-standing',
     },
-  ])('is $name', ({ yearToDate, standing }) => {
+  ])('is $name', ({ official, hours, standing }) => {
     expect(
       standingFor(
         impact({
+          official,
           schoolYearToDate: {
             studentsHelped: 2,
             sessionsCompleted: 4,
-            hoursTutored: 3,
+            hoursTutored: hours,
             membersTutoring: 2,
-            ...yearToDate,
           },
         })
       )

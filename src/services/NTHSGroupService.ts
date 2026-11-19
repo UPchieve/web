@@ -48,6 +48,7 @@ export type NTHSChapterImpactPublic = {
   schoolYearToDate: NTHSImpactTotalsPublic & { membersTutoring: number }
   allTime: NTHSImpactTotalsPublic
   goals: { hoursTutored: number; membersTutoring: number }
+  official: boolean
 }
 // From the request's monthStartsAt (or the UTC 1st of the month) to now.
 export type NTHSChapterMonthPublic = {

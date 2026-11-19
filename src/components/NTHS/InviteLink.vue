@@ -1,38 +1,19 @@
 <script setup lang="ts">
-import config from '@/config'
-import { useClipboard } from '@vueuse/core'
-import { computed, ref } from 'vue'
-import { EVENTS } from '@/consts'
-import AnalyticsService from '@/services/AnalyticsService'
+import { ref } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
+import { useInviteLink } from '@/composables/useInviteLink'
 
 const props = defineProps<{ code: string; referralCode: string }>()
-const copyMessage = ref('Copy link')
 const linkElement = ref<HTMLElement>()
-const link = computed(() => {
-  const query = new URLSearchParams({ referral: props.referralCode })
-  return `${config.appRoot}/join-team/${props.code}?${query.toString()}`
-})
+const { link, justCopied, copyLink } = useInviteLink(
+  () => props.code,
+  () => props.referralCode
+)
 
-function copyURL() {
-  copyMessage.value = 'Copied'
-
-  const { copy } = useClipboard()
-  copy(link.value)
-  AnalyticsService.captureEvent(EVENTS.VOLUNTEER_COPIED_TEAM_LINK, {
-    inviteCode: props.code,
-  })
-
-  setTimeout(() => {
-    copyMessage.value = 'Copy link'
-  }, 1000)
-}
-
-// useClipboard is created here on each click, so its async permission check
-// hasn't resolved yet and it always copies through a hidden textarea; copy
-// first, since that textarea would clear a selection made before it.
+// copyLink copies through a hidden textarea, which would clear a selection
+// made before it, so copy first.
 function selectAndCopyURL() {
-  copyURL()
+  copyLink()
   window.getSelection()?.selectAllChildren(linkElement.value!)
 }
 </script>
@@ -50,12 +31,12 @@ function selectAndCopyURL() {
     <div class="button-container">
       <LargeButton
         v-ph:nthshq="'home.invite.copy'"
-        @click="copyURL"
+        @click="copyLink"
         class="button-text"
         :show-arrow="false"
         variant="primary-blue"
       >
-        <span>{{ copyMessage }}</span>
+        <span>{{ justCopied ? 'Copied' : 'Copy link' }}</span>
       </LargeButton>
       <slot />
     </div>

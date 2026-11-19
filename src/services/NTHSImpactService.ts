@@ -1,24 +1,19 @@
 import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
 import { plural } from '@/utils/plural'
 
-export type Standing = 'requirements-met' | 'members-met' | 'in-progress'
+export type Standing = 'pending' | 'official' | 'official-good-standing'
 
 export const STANDING_LABELS: Record<Standing, string> = {
-  'requirements-met': 'Requirements met',
-  'members-met': 'Members met',
-  'in-progress': 'In progress',
+  pending: 'Pending',
+  official: 'Official',
+  'official-good-standing': 'Official in Good Standing',
 }
 
-// Derived from the same goal numbers Home shows beside it, so the label
-// can never contradict them. This reports progress toward the chapter's
-// official status, a separate server-side determination.
 export function standingFor(impact: NTHSChapterImpactPublic): Standing {
-  const { membersTutoring, hoursTutored } = impact.schoolYearToDate
-  const membersMet = membersTutoring >= impact.goals.membersTutoring
-  const hoursMet = hoursTutored >= impact.goals.hoursTutored
-  if (membersMet && hoursMet) return 'requirements-met'
-  if (membersMet) return 'members-met'
-  return 'in-progress'
+  if (!impact.official) return 'pending'
+  return impact.schoolYearToDate.hoursTutored >= impact.goals.hoursTutored
+    ? 'official-good-standing'
+    : 'official'
 }
 
 export function allTimeLine(impact: NTHSChapterImpactPublic): string {

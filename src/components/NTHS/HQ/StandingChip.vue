@@ -17,18 +17,27 @@ const label = computed(() => STANDING_LABELS[standing.value])
 
 <style scoped lang="scss">
 .standing-chip {
-  @include nths-badge;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 11px;
+  display: inline-block;
+  padding: 0 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  border: 1px solid;
+  border-radius: 20px;
+  white-space: nowrap;
+  color: $c-soft-black;
 }
-.requirements-met,
-.members-met {
+.pending {
+  background: rgba($c-volunteer, 0.4);
+  border-color: $c-nths-gold;
+}
+.official {
   background: $selected-green;
-  color: $c-nths-deep-teal;
+  border-color: $c-success-green;
+  color: $c-hover-green;
 }
-.in-progress {
-  background: $c-nths-warm-bg;
-  color: $c-nths-warm-fg;
+.official-good-standing {
+  background: $c-success-green;
+  border-color: $c-success-green;
 }
 </style>

@@ -11,6 +11,7 @@ import { createStore, type Store } from 'vuex'
 import { h } from 'vue'
 import { useAppModalStore } from '@/stores/app/modal'
 import { useNthsStore } from '@/stores/nths'
+import { impact } from '../../fixtures/nths'
 
 type UserOverrides = {
   occupation?: string[] | null
@@ -25,7 +26,11 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
   const nths = useNthsStore()
   nths.NTHSGroups = [
     {
-      groupInfo: { id: 'group-123', name: 'Test Chapter' },
+      groupInfo: {
+        id: 'group-123',
+        name: 'Test Chapter',
+        inviteCode: 'ABC123',
+      },
       memberInfo: { roleName },
       renewal: userOverrides.renewalPrompt
         ? {
@@ -46,6 +51,7 @@ function storeFor(roleName: string, userOverrides: UserOverrides = {}) {
       user: {
         user: {
           id: 'user-1',
+          referralCode: 'PERSON123',
           occupation:
             userOverrides.occupation === undefined
               ? [VolunteerOccupations.HIGH_SCHOOL_STUDENT]
@@ -116,6 +122,40 @@ describe('NTHSGroupsView', () => {
     refreshNTHSGroups.mockReset().mockResolvedValue([{}])
     useAppModalStore().hide()
     vi.restoreAllMocks()
+    vi.spyOn(NetworkService, 'getNTHSChapterImpact').mockResolvedValue({
+      data: { impact: impact() },
+    } as never)
+  })
+
+  it.each(['member', 'admin'])(
+    'shows a %s the standing chip and invite button with the tabs',
+    async (role) => {
+      const wrapper = await getWrapper('/groups/home', role)
+
+      expect(wrapper.find('[data-testid="standing-chip"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="header-invite"]').exists()).toBe(true)
+    }
+  )
+
+  it('reloads the impact on each tab change', async () => {
+    const wrapper = await getWrapper('/groups/home')
+    expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(1)
+
+    await wrapper.vm.$router.push('/groups/members')
+    await flushPromises()
+    expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(2)
+  })
+
+  it('copies the join link from the header', async () => {
+    let copied = ''
+    vi.spyOn(document, 'execCommand').mockImplementation(() => {
+      copied = (document.activeElement as HTMLTextAreaElement).value
+      return true
+    })
+    const wrapper = await getWrapper('/groups/home')
+
+    await wrapper.get('[data-testid="header-invite"]').trigger('click')
+    expect(copied).toContain('/join-team/ABC123?referral=PERSON123')
   })
 
   it.each([
@@ -169,11 +209,32 @@ describe('NTHSGroupsView', () => {
           hidden
         )
         expect(wrapper.find('nav.tabs').exists()).toBe(!hidden)
+        expect(wrapper.find('[data-testid="header-invite"]').exists()).toBe(
+          !hidden
+        )
+        expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(
+          hidden ? 0 : 1
+        )
         expect(wrapper.find('[data-testid="routed-members"]').exists()).toBe(
           !hidden
         )
       }
     )
+
+    it('hides the chip and invite button once the notice replaces the tabs', async () => {
+      const wrapper = await getWrapper('/groups/home', 'member')
+      expect(wrapper.find('[data-testid="standing-chip"]').exists()).toBe(true)
+
+      const { $store } = wrapper.vm as unknown as { $store: Store<unknown> }
+      $store.commit('setOccupation', [])
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="hide-page-content"]').exists()).toBe(
+        true
+      )
+      expect(wrapper.find('[data-testid="standing-chip"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="header-invite"]').exists()).toBe(false)
+    })
   })
 
   describe('the high school notice', () => {
