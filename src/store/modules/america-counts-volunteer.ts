@@ -14,7 +14,7 @@ export default {
   actions: {
     maybeJoin({ getters, rootGetters }) {
       if (getters['isAmericaCountsVolunteer']) {
-        const sessions = rootGetters['volunteer/availableSessions']
+        const sessions = rootGetters['volunteer/autoJoinableSessions']
         AmericaCountsVolunteerService.maybeAutoJoinOldestSession(sessions)
       }
     },
@@ -22,7 +22,7 @@ export default {
       if (getters['isAmericaCountsVolunteer']) {
         const id = setTimeout(() => {
           commit('setCooldownId', null)
-          const sessions = rootGetters['volunteer/availableSessions']
+          const sessions = rootGetters['volunteer/autoJoinableSessions']
           AmericaCountsVolunteerService.maybeAutoJoinOldestSession(sessions)
         }, cooldown)
         commit('setCooldownId', id)

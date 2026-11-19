@@ -299,7 +299,7 @@ export default {
         !this.state.user.session?.id
       ) {
         AmericaCountsVolunteerService.maybeAutoJoinOldestSession(
-          eligibleSessions
+          getters.autoJoinableSessions
         )
       }
     },
@@ -331,6 +331,10 @@ export default {
         return []
       }
     },
+    autoJoinableSessions: (_state, getters) => [
+      ...getters.availableSessions,
+      ...getters.exclusiveSessions,
+    ],
     lockedOpenSessions: (state, getters, rootState) => {
       if (getters['isReadyToTutor']) {
         const unlockedSubjects = rootState.user.user.subjects ?? []

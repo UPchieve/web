@@ -3,9 +3,11 @@ import { createStore } from 'vuex'
 import { createPinia, setActivePinia } from 'pinia'
 import { storeOptions } from '@/store'
 import * as PresenceService from '@/services/PresenceService'
+import * as AmericaCountsVolunteerService from '@/services/AmericaCountsVolunteerService'
 import { useNotificationsStore } from '@/stores/notifications'
 
 vi.mock('@/services/PresenceService')
+vi.mock('@/services/AmericaCountsVolunteerService', { spy: true })
 vi.mock('@/utils/send-web-notification')
 
 beforeEach(() => {
@@ -99,6 +101,53 @@ describe('handleIncomingSessions', () => {
   it.todo(
     'Does not include test user or shadowbanned user sessions unless current user is an admin'
   )
+
+  it('passes available and personally requested sessions to America Counts auto-join', async () => {
+    setActivePinia(createPinia())
+    const autoJoin = vi.mocked(
+      AmericaCountsVolunteerService.maybeAutoJoinOldestSession
+    )
+    autoJoin.mockResolvedValue(undefined)
+    const store = getStore({
+      user: {
+        state: {
+          user: {
+            id: 'coach',
+            userType: 'volunteer',
+            isApproved: true,
+            isOnboarded: true,
+            subjects: ['algebraOne'],
+            mutedSubjectAlerts: [],
+            sponsorships: [{ key: 'america-counts' }],
+          },
+        },
+      },
+      volunteer: { state: { tickIntervalId: 1, allOpenSessions: [] } },
+    })
+    const session = {
+      id: 'available',
+      subTopic: 'algebraOne',
+      student: { currentGradeName: '8th' },
+      isExclusive: false,
+    }
+    const reserved = {
+      ...session,
+      id: 'reserved',
+      isExclusive: true,
+      requestedVolunteerId: 'another-coach',
+    }
+    const requested = {
+      ...reserved,
+      id: 'requested',
+      requestedVolunteerId: 'coach',
+    }
+
+    await store.dispatch('volunteer/handleIncomingSessions', {
+      context: mockVueContext,
+      sessions: [reserved, session, requested],
+    })
+    expect(autoJoin).toHaveBeenCalledWith([session, requested])
+  })
 
   describe('checking whether the coach has gone inactive', () => {
     function buildSession(id: string) {
