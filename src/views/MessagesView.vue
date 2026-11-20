@@ -61,7 +61,14 @@ function messageButtonLabel(student: Student) {
     : `Message ${student.firstName}`
 }
 
+const isBanned = computed(() => store.getters['user/banType'] === 'complete')
+
+function canMessage(student: Student) {
+  return !isBanned.value && student.canDirectMessage
+}
+
 function messagingUnavailableText(student: Student) {
+  if (isBanned.value) return "You can't send messages right now."
   if (student.directMessageUnavailableReason === 'UNAVAILABLE')
     return "You can't message this student right now."
   return `${student.firstName} can't receive direct messages yet. You can message them from your session recap page.`
@@ -219,7 +226,7 @@ function clearFilters() {
 const activeConversation = ref<Student | null>(null)
 
 function openConversation(student: Student) {
-  if (!isDirectMessagesEnabled.value || !student.canDirectMessage) return
+  if (!isDirectMessagesEnabled.value || !canMessage(student)) return
   activeConversation.value = student
 }
 
@@ -301,7 +308,7 @@ onUnmounted(() => {
         >
           <template v-if="isDirectMessagesEnabled" #actions>
             <span
-              v-if="!student.canDirectMessage"
+              v-if="!canMessage(student)"
               class="message-button-tooltip"
               data-testid="message-button-tooltip"
               v-tooltip="{

@@ -57,6 +57,7 @@ async function mountView({
   isShowInfoOptInEnabled = true,
   isDirectMessagesEnabled = false,
   unreadDirectMessageSenderIds = [] as string[],
+  banType = null as string | null,
 } = {}) {
   const wrapper = mount(MyCoachesView, {
     global: {
@@ -72,6 +73,7 @@ async function mountView({
               getters: {
                 unreadDirectMessageSenderIds: () =>
                   unreadDirectMessageSenderIds,
+                banType: () => banType,
               },
             },
             featureFlags: {
@@ -180,6 +182,141 @@ describe('MyCoachesView coach name', () => {
     expect(
       wrapper.findComponent({ name: 'DirectMessagePanel' }).props('status')
     ).toBe('online')
+  })
+})
+
+describe('MyCoachesView unavailable coach', () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockedRoute.query = {}
+    mockedRouter.push.mockResolvedValue(undefined)
+    mockedRouter.replace.mockResolvedValue(undefined)
+    mockedStatuses.value = {}
+    mockedNetworkService.getPastVolunteers.mockResolvedValue({
+      pastVolunteers: [
+        pastVolunteer({
+          volunteerId: 'unavailable',
+          firstName: 'Nalini',
+          subjects: ['algebraOne'],
+          isUnavailable: true,
+        }),
+        pastVolunteer({
+          volunteerId: 'available',
+          firstName: 'Max',
+          subjects: ['algebraOne'],
+        }),
+      ],
+    })
+  })
+
+  function cards(wrapper: Awaited<ReturnType<typeof mountView>>) {
+    return wrapper.findAll('.coach-card')
+  }
+
+  it('disables messaging an unavailable coach with a tooltip', async () => {
+    const wrapper = await mountView({ isDirectMessagesEnabled: true })
+    const [unavailableCard, availableCard] = cards(wrapper)
+
+    expect(
+      unavailableCard.find('[data-testid="message-button-tooltip"]').exists()
+    ).toBe(true)
+    const messageButton = unavailableCard.find('[data-testid="message-button"]')
+    expect(messageButton.attributes('disabled')).toBeDefined()
+    expect(messageButton.attributes('aria-label')).toBe(
+      "You can't message this coach right now."
+    )
+
+    expect(
+      availableCard.find('[data-testid="message-button-tooltip"]').exists()
+    ).toBe(false)
+    expect(
+      availableCard
+        .find('[data-testid="message-button"]')
+        .attributes('disabled')
+    ).toBeUndefined()
+  })
+
+  it('does not open the DM panel from an unavailable coach name', async () => {
+    const wrapper = await mountView({ isDirectMessagesEnabled: true })
+
+    expect(nameButtons(wrapper)).toEqual(['Max'])
+    expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(
+      false
+    )
+  })
+
+  it('disables requesting a session with an unavailable coach', async () => {
+    const wrapper = await mountView()
+    const [unavailableCard, availableCard] = cards(wrapper)
+
+    expect(
+      unavailableCard
+        .find('[data-testid="request-coach-button-tooltip"]')
+        .exists()
+    ).toBe(true)
+    expect(
+      unavailableCard
+        .findComponent({ name: 'RequestCoachButton' })
+        .props('disabled')
+    ).toBe(true)
+
+    expect(
+      availableCard
+        .find('[data-testid="request-coach-button-tooltip"]')
+        .exists()
+    ).toBe(false)
+    expect(
+      availableCard
+        .findComponent({ name: 'RequestCoachButton' })
+        .props('disabled')
+    ).toBeFalsy()
+  })
+})
+
+describe('MyCoachesView completely banned student', () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockedRoute.query = {}
+    mockedRouter.push.mockResolvedValue(undefined)
+    mockedRouter.replace.mockResolvedValue(undefined)
+    mockedStatuses.value = {}
+    mockedNetworkService.getPastVolunteers.mockResolvedValue({
+      pastVolunteers: [pastVolunteer({ subjects: ['algebraOne'] })],
+    })
+  })
+
+  it('disables messaging and requesting a session for every coach', async () => {
+    const wrapper = await mountView({
+      isDirectMessagesEnabled: true,
+      banType: 'complete',
+    })
+
+    const messageButton = wrapper.find('[data-testid="message-button"]')
+    expect(messageButton.attributes('disabled')).toBeDefined()
+    expect(messageButton.attributes('aria-label')).toBe(
+      "You can't send messages right now."
+    )
+    expect(nameButtons(wrapper)).toEqual([])
+    expect(
+      wrapper.find('[data-testid="request-coach-button-tooltip"]').exists()
+    ).toBe(true)
+    expect(
+      wrapper.findComponent({ name: 'RequestCoachButton' }).props('disabled')
+    ).toBe(true)
+  })
+
+  it('leaves the buttons on for a shadow-banned student', async () => {
+    const wrapper = await mountView({
+      isDirectMessagesEnabled: true,
+      banType: 'shadow',
+    })
+
+    expect(
+      wrapper.find('[data-testid="message-button"]').attributes('disabled')
+    ).toBeUndefined()
+    expect(
+      wrapper.findComponent({ name: 'RequestCoachButton' }).props('disabled')
+    ).toBeFalsy()
   })
 })
 

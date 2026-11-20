@@ -52,6 +52,7 @@ function pastStudent(overrides: Partial<PastStudent> = {}): PastStudent {
 function mountView({
   unreadDirectMessageSenderIds = [] as string[],
   isDirectMessagesEnabled = true,
+  banType = null as string | null,
 } = {}) {
   return mount(MessagesView, {
     global: {
@@ -67,6 +68,7 @@ function mountView({
               getters: {
                 unreadDirectMessageSenderIds: () =>
                   unreadDirectMessageSenderIds,
+                banType: () => banType,
               },
             },
             featureFlags: {
@@ -311,6 +313,27 @@ describe('MessagesView', () => {
     const messageButton = wrapper.find('[data-testid="message-button"]')
     expect(messageButton.attributes('aria-label')).toBe(
       "Jordan can't receive direct messages yet. You can message them from your session recap page."
+    )
+    await messageButton.trigger('click')
+    expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(
+      false
+    )
+  })
+
+  it('does not let a completely banned volunteer message students', async () => {
+    mockedNetworkService.getPastStudents.mockResolvedValue({
+      pastStudents: [pastStudent()],
+    })
+    const wrapper = mountView({ banType: 'complete' })
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="message-button-tooltip"]').exists()
+    ).toBe(true)
+    const messageButton = wrapper.find('[data-testid="message-button"]')
+    expect(messageButton.attributes('disabled')).toBeDefined()
+    expect(messageButton.attributes('aria-label')).toBe(
+      "You can't send messages right now."
     )
     await messageButton.trigger('click')
     expect(wrapper.findComponent({ name: 'DirectMessagePanel' }).exists()).toBe(

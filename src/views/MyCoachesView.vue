@@ -82,6 +82,28 @@ function inSessionText(coach: Coach) {
   return `${coach.firstName} is in a session right now.`
 }
 
+const UNAVAILABLE_MESSAGE_TEXT = "You can't message this coach right now."
+const UNAVAILABLE_REQUEST_TEXT =
+  "You can't request a session with this coach right now."
+const BANNED_MESSAGE_TEXT = "You can't send messages right now."
+const BANNED_REQUEST_TEXT = "You can't request a session right now."
+
+const isBanned = computed(() => store.getters['user/banType'] === 'complete')
+
+function messageDisabledText(coach: Coach) {
+  if (isBanned.value) return BANNED_MESSAGE_TEXT
+  if (coach.isUnavailable) return UNAVAILABLE_MESSAGE_TEXT
+  return null
+}
+
+function requestDisabledText(coach: Coach) {
+  if (isBanned.value) return BANNED_REQUEST_TEXT
+  if (coach.isUnavailable) return UNAVAILABLE_REQUEST_TEXT
+  if (coachStatuses.value[coach.volunteerId] === 'in-session')
+    return inSessionText(coach)
+  return null
+}
+
 const allCoaches = ref<Coach[]>([])
 const filteredCoaches = ref<Coach[]>([])
 const coaches = ref<Coach[]>([])
@@ -253,6 +275,7 @@ const activeConversation = computed(
 )
 
 function openConversation(coach: Coach) {
+  if (messageDisabledText(coach)) return
   activeConversationId.value = coach.volunteerId
 }
 
@@ -328,7 +351,9 @@ onMounted(async () => {
           :name="coach.firstName"
           :last-session="coach.lastSession"
           :status="coachStatuses[coach.volunteerId]"
-          :name-clickable="isDirectMessagesEnabled"
+          :name-clickable="
+            isDirectMessagesEnabled && !messageDisabledText(coach)
+          "
           @name-click="openConversation(coach)"
         >
           <template v-if="canShowCoachInfo(coach)" #name-popover>
@@ -353,8 +378,37 @@ onMounted(async () => {
             v-if="isDirectMessagesEnabled || coach.subjects?.length"
             #actions
           >
+            <span
+              v-if="isDirectMessagesEnabled && messageDisabledText(coach)"
+              class="message-button-tooltip"
+              data-testid="message-button-tooltip"
+              v-tooltip="{
+                text: messageDisabledText(coach),
+                color: 'black',
+                position: 'top',
+              }"
+            >
+              <LargeButton
+                class="message-button"
+                data-testid="message-button"
+                :aria-label="messageDisabledText(coach) ?? undefined"
+                :disabled="true"
+                :show-arrow="false"
+                variant="outlined"
+              >
+                <span class="message-button__icon">
+                  <MessageIcon aria-hidden="true" />
+                  <ActivityDot
+                    v-if="hasUnreadMessages(coach)"
+                    class="message-button__unread-dot"
+                    data-testid="unread-message-dot"
+                    aria-hidden="true"
+                  />
+                </span>
+              </LargeButton>
+            </span>
             <LargeButton
-              v-if="isDirectMessagesEnabled"
+              v-else-if="isDirectMessagesEnabled"
               class="message-button"
               data-testid="message-button"
               :aria-label="messageButtonLabel(coach)"
@@ -373,14 +427,11 @@ onMounted(async () => {
               </span>
             </LargeButton>
             <span
-              v-if="
-                coach.subjects?.length &&
-                coachStatuses[coach.volunteerId] === 'in-session'
-              "
+              v-if="coach.subjects?.length && requestDisabledText(coach)"
               class="request-coach-button-tooltip"
               data-testid="request-coach-button-tooltip"
               v-tooltip="{
-                text: inSessionText(coach),
+                text: requestDisabledText(coach),
                 color: 'black',
                 position: 'top',
               }"
@@ -504,11 +555,11 @@ onMounted(async () => {
       </template>
       <template v-if="activeConversation.subjects?.length" #actions>
         <span
-          v-if="coachStatuses[activeConversation.volunteerId] === 'in-session'"
+          v-if="requestDisabledText(activeConversation)"
           class="dm-request-button-tooltip"
           data-testid="dm-request-coach-button-tooltip"
           v-tooltip="{
-            text: inSessionText(activeConversation),
+            text: requestDisabledText(activeConversation),
             color: 'black',
             position: 'bottom',
           }"
@@ -750,6 +801,11 @@ onMounted(async () => {
 
 .request-coach-button :deep(.LargeButton-outlined) {
   border-width: 2px;
+}
+
+.message-button-tooltip {
+  display: inline-flex;
+  font-size: 12px;
 }
 
 .request-coach-button-tooltip {
