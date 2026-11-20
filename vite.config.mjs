@@ -149,6 +149,7 @@ export default defineConfig({
       'vuetify/components/VSelect',
       'vuetify/components/VSnackbar',
       'vuetify/components/VTextField',
+      'vuetify/components/VTooltip',
       'vuetify/directives',
     ],
   },

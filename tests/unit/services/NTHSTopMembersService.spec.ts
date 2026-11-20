@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  contributionBar,
   minutesToOvertake,
   rankMembers,
   topMembersBoard,
@@ -59,6 +60,29 @@ describe('minutesToOvertake', () => {
     { target: 1.1, viewer: 1, expected: '7m' },
   ])('gives $expected from $viewer to $target hours', (c) => {
     expect(minutesToOvertake(c.target, c.viewer)).toBe(c.expected)
+  })
+})
+
+describe('contributionBar', () => {
+  it.each([
+    { label: 'under the goal', args: [5, 20, 40], expected: [12.5, 37.5, 15] },
+    {
+      label: 'chapter past the goal',
+      args: [10, 60, 40],
+      expected: [50 / 3, 250 / 3, 50],
+    },
+    {
+      label: 'member alone past the goal',
+      args: [50, 50, 40],
+      expected: [100, 0, 0],
+    },
+    { label: 'zero hours', args: [0, 0, 40], expected: [0, 0, 0] },
+    { label: 'own above chapter', args: [8, 5, 40], expected: [20, 0, 0] },
+  ])('splits the bar for $label', ({ args, expected }) => {
+    const [own, chapter, goal] = args
+    const bar = contributionBar(own, chapter, goal)
+    const actual = [bar.ownWidth, bar.restWidth, bar.restHours]
+    actual.forEach((v, i) => expect(v).toBeCloseTo(expected[i], 9))
   })
 })
 

@@ -2,6 +2,7 @@ import {
   NTHS_RECRUITMENT_TEMPLATES_URL,
   type AffiliationStatus,
 } from '@/services/NTHSGroupService'
+import vuetify from '@/plugins/vuetify'
 import { useNthsStore } from '@/stores/nths'
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import NTHSHomeView from '@/views/NTHS/Tabs/NTHSHomeView.vue'
@@ -79,7 +80,7 @@ async function getWrapper(
   store = storeFor(roleName, userId, schoolAffiliationStatus)
   const wrapper = mount(NTHSHomeView, {
     global: {
-      plugins: [store],
+      plugins: [store, vuetify],
       stubs: { RouterLink: RouterLinkStub, transition: false },
     },
     attachTo: 'body',
@@ -160,6 +161,21 @@ describe('NTHSHomeView', () => {
     const link = wrapper.find('[data-testid="invite-scripts"]')
     expect(link.attributes('href')).toBe(NTHS_RECRUITMENT_TEMPLATES_URL)
   })
+
+  it.each([
+    { roleName: 'admin', goals: true, contribution: false },
+    { roleName: 'member', goals: false, contribution: true },
+  ])(
+    'shows a $roleName the goals card: $goals and contribution card: $contribution',
+    async ({ roleName, goals, contribution }) => {
+      const wrapper = await getWrapper(roleName)
+
+      expect(wrapper.find('[data-testid="good-standing"]').exists()).toBe(goals)
+      expect(wrapper.find('[data-testid="contribution"]').exists()).toBe(
+        contribution
+      )
+    }
+  )
 
   it('keeps the rest of the page when the numbers fail to load', async () => {
     getNTHSChapterImpact.mockRejectedValue(new Error('boom'))

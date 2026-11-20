@@ -24,8 +24,31 @@ function formatMinutes(totalMinutes: number): string {
   ) as string
 }
 
-function formatHours(hours: number): string {
+export function formatHoursMinutes(hours: number): string {
   return formatMinutes(Math.round(hours * 60))
+}
+
+export function findOpenViewer(
+  members: NTHSRosterMemberPublic[],
+  currentUserId: string
+): NTHSRosterMemberPublic | undefined {
+  return members.find(
+    (member) => member.userId === currentUserId && !member.accountClosed
+  )
+}
+
+export function contributionBar(
+  ownHours: number,
+  chapterHours: number,
+  goalHours: number
+) {
+  const restHours = Math.max(0, chapterHours - ownHours)
+  const scale = Math.max(ownHours + restHours, goalHours)
+  return {
+    ownWidth: (ownHours / scale) * 100,
+    restWidth: (restHours / scale) * 100,
+    restHours,
+  }
 }
 
 export function rankMembers(
@@ -67,7 +90,7 @@ export function topMembersBoard(
     return {
       userId: member.userId,
       name: isViewer ? `${name} (you)` : name,
-      hours: formatHours(member.periodHours.thisSchoolYear),
+      hours: formatHoursMinutes(member.periodHours.thisSchoolYear),
       place: index + 1,
       line:
         isViewer && index > 0
@@ -76,9 +99,7 @@ export function topMembersBoard(
     }
   })
 
-  const viewer = members.find(
-    (member) => member.userId === currentUserId && !member.accountClosed
-  )
+  const viewer = findOpenViewer(members, currentUserId)
   if (
     !viewer ||
     !listed.length ||
@@ -94,7 +115,7 @@ export function topMembersBoard(
     viewerRow: {
       userId: viewer.userId,
       name: `${memberDisplayName(viewer)} (you)`,
-      hours: formatHours(viewerHours),
+      hours: formatHoursMinutes(viewerHours),
       place: place === -1 ? undefined : place + 1,
       line:
         listed.length === TOP_BOARD_SIZE

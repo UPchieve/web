@@ -1,7 +1,9 @@
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
 import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { impact } from '../../../fixtures/nths'
+import vuetify from '@/plugins/vuetify'
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const IMPACT: NTHSChapterImpactPublic = {
   groupId: 'group-123',
@@ -18,8 +20,24 @@ const IMPACT: NTHSChapterImpactPublic = {
 }
 
 describe('GoodStandingCard', () => {
+  let mounted: VueWrapper | undefined
+
+  afterEach(() => {
+    mounted?.unmount()
+    mounted = undefined
+  })
+
+  function card(impact?: NTHSChapterImpactPublic) {
+    mounted = mount(GoodStandingCard, {
+      attachTo: document.body,
+      props: { impact },
+      global: { plugins: [vuetify] },
+    })
+    return mounted
+  }
+
   it('hides the placeholder numbers from assistive tech while loading', () => {
-    const wrapper = mount(GoodStandingCard)
+    const wrapper = card()
 
     expect(
       wrapper
@@ -34,7 +52,7 @@ describe('GoodStandingCard', () => {
   })
 
   it('exposes the real numbers once loaded, with nothing hidden', () => {
-    const wrapper = mount(GoodStandingCard, { props: { impact: IMPACT } })
+    const wrapper = card(IMPACT)
 
     expect(
       wrapper
@@ -44,21 +62,54 @@ describe('GoodStandingCard', () => {
   })
 
   it.each([
-    { official: false, shown: true },
-    { official: true, shown: false },
-  ])(
-    'shows the members note only while pending (official: $official)',
-    ({ official, shown }) => {
-      const wrapper = mount(GoodStandingCard, {
-        props: { impact: { ...IMPACT, official } },
-      })
+    {
+      name: 'pending',
+      overrides: { official: false },
+      text: 'Your chapter will be official with 3 active members who have each tutored at least once, and in good standing with 40 hours tutored this school year.',
+    },
+    {
+      name: 'official',
+      overrides: {
+        official: true,
+        schoolYearToDate: { ...impact().schoolYearToDate, hoursTutored: 3 },
+      },
+      text: 'Your chapter is official. It will be in good standing with 40 hours tutored this school year.',
+    },
+    {
+      name: 'official-good-standing',
+      overrides: {
+        official: true,
+        schoolYearToDate: { ...impact().schoolYearToDate, hoursTutored: 40 },
+      },
+      text: 'Your chapter is in good standing with 3 active members who have each tutored at least once, and 40 hours tutored this school year.',
+    },
+  ])('describes the $name standing in the tooltip', ({ overrides, text }) => {
+    const wrapper = card(impact(overrides))
 
-      expect(
-        wrapper
-          .find('[data-testid="members-meter"]')
-          .text()
-          .includes('makes you official')
-      ).toBe(shown)
+    expect(wrapper.find('[data-testid="goals-tooltip"]').text()).toBe(text)
+  })
+
+  it.each([
+    { device: 'one that hovers', canHover: true },
+    { device: 'a touch screen', canHover: false },
+  ])(
+    'leaves the tooltip open after mouseenter then click on $device',
+    async ({ canHover }) => {
+      const matchMedia = window.matchMedia.bind(window)
+      vi.spyOn(window, 'matchMedia').mockImplementation((query) =>
+        query === '(hover: hover)'
+          ? ({ matches: canHover } as MediaQueryList)
+          : matchMedia(query)
+      )
+      const wrapper = card(IMPACT)
+      const button = wrapper.find('[data-testid="goals-info-button"]')
+      const tooltip = wrapper.find('[data-testid="goals-tooltip"]')
+
+      expect(tooltip.element.checkVisibility()).toBe(false)
+      await button.trigger('mouseenter')
+      await button.trigger('click')
+      await flushPromises()
+      expect(tooltip.element.checkVisibility()).toBe(true)
     }
   )
 })

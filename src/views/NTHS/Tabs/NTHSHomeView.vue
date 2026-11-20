@@ -4,6 +4,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import Callout from '@/components/Callout.vue'
 import LargeButton from '@/components/LargeButton.vue'
+import ContributionCard from '@/components/NTHS/HQ/ContributionCard.vue'
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
 import HQSection from '@/components/NTHS/HQ/HQSection.vue'
@@ -30,6 +31,7 @@ const isGroupAdmin = computed(() => nths.hasAdminRole)
 const { impact, isLoading, loadFailed, load } = useChapterImpact()
 const {
   members,
+  currentMembers,
   isLoading: isRosterLoading,
   loadFailed: rosterLoadFailed,
   load: loadRoster,
@@ -92,8 +94,19 @@ onBeforeMount(async () => {
     </Callout>
     <template v-else>
       <ImpactCard :impact="isLoading ? undefined : impact" />
-      <div class="impact-row">
-        <GoodStandingCard :impact="isLoading ? undefined : impact" />
+      <div class="impact-row" :class="{ 'impact-row-member': !isGroupAdmin }">
+        <GoodStandingCard
+          v-if="isGroupAdmin"
+          :impact="isLoading ? undefined : impact"
+        />
+        <ContributionCard
+          v-else
+          :members="currentMembers"
+          :currentUserId="currentUserId"
+          :impact="isLoading ? undefined : impact"
+          :isLoading="isRosterLoading"
+          :loadFailed="rosterLoadFailed"
+        />
         <TopMembersBoard
           :members="members"
           :currentUserId="currentUserId"
@@ -162,6 +175,13 @@ onBeforeMount(async () => {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 20px;
+
+  @include breakpoint-below('large') {
+    grid-template-columns: 1fr;
+  }
+}
+.impact-row-member {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
 
   @include breakpoint-below('large') {
     grid-template-columns: 1fr;

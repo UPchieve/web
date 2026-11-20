@@ -7,8 +7,6 @@ const props = defineProps<{
   value: number
   goal: number
   displayValue?: string
-  variant: 'hours' | 'members'
-  note?: string
   loading?: boolean
 }>()
 
@@ -38,9 +36,8 @@ const valueText = computed(() => `${shown.value} of ${props.goal}`)
       :aria-valuemax="goal"
       :aria-valuetext="valueText"
     >
-      <div class="bar" :class="`bar--${variant}`" :style="{ width }" />
+      <div class="bar" :style="{ width }" />
     </div>
-    <p v-if="note" class="meter-note">{{ note }}</p>
   </div>
 </template>
 
@@ -52,30 +49,25 @@ const valueText = computed(() => `${shown.value} of ${props.goal}`)
   gap: 8px;
 }
 .meter-label {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.3;
 }
 .meter-value {
   margin-left: auto;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.3;
   white-space: nowrap;
+  color: $c-secondary-grey;
+  font-variant-numeric: tabular-nums;
 }
 .meter-goal {
   font-weight: 400;
-  color: $c-secondary-grey;
-}
-.meter-note {
-  font-size: 13px;
-  line-height: 1.4;
-  color: $c-secondary-grey;
-  margin: 6px 0 0;
 }
 .track {
   margin-top: 8px;
-  height: 8px;
+  height: 10px;
   border-radius: 9999px;
   background: $c-nths-track;
   overflow: hidden;
@@ -83,11 +75,6 @@ const valueText = computed(() => `${shown.value} of ${props.goal}`)
 .bar {
   height: 100%;
   border-radius: 9999px;
-}
-.bar--hours {
-  background: $c-college;
-}
-.bar--members {
   background: $c-success-green;
 }
 </style>
