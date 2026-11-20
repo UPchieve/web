@@ -27,13 +27,14 @@ const props = withDefaults(
     // Undecided coaches start with adults on and high schoolers off, instead
     // of everything off
     applyOptInDefaults?: boolean
-    // Where the choice is made, sent with the share events
+    defaultOnlineStatusOn?: boolean
     eventSource?: 'dashboard_modal' | 'profile_modal' | 'profile'
   }>(),
   {
     showButtons: true,
     stackedLayout: false,
     applyOptInDefaults: false,
+    defaultOnlineStatusOn: false,
     eventSource: 'profile',
   }
 )
@@ -52,13 +53,17 @@ function initialSelection(): ShareInfoFieldKey[] {
     | undefined
     | null
   if (saved != null) return [...saved]
-  if (!props.applyOptInDefaults) return []
   // Minors are never opted in by default. Occupation is self-reported and can
   // be stale (graduated coaches still listed as high school), which errs safe.
-  const isHighSchoolCoach = (props.info.occupations ?? []).includes(
+  if (isHighSchoolCoach()) return []
+  if (props.applyOptInDefaults) return [...ALL_FIELDS]
+  return props.defaultOnlineStatusOn ? ['onlineStatus'] : []
+}
+
+function isHighSchoolCoach() {
+  return (props.info.occupations ?? []).includes(
     VolunteerOccupations.HIGH_SCHOOL_STUDENT
   )
-  return isHighSchoolCoach ? [] : [...ALL_FIELDS]
 }
 
 function isSameSelection(a: ShareInfoFieldKey[], b: ShareInfoFieldKey[]) {

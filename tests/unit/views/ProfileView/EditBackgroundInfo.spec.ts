@@ -505,7 +505,7 @@ describe('EditBackgroundInfo', () => {
       )
     })
 
-    it('opens the share modal with everything off, even for an adult coach', async () => {
+    it('opens the share modal with only online status on for an adult coach', async () => {
       const wrapper = getWrapper(UNDECIDED_COACH)
 
       await prompt(wrapper)
@@ -514,14 +514,30 @@ describe('EditBackgroundInfo', () => {
 
       const modal = wrapper.findComponent(VolunteerShareInfoModal)
       expect(modal.exists()).toBe(true)
-      expect(modal.text()).toContain(
-        'Nothing will be shared with your student.'
-      )
+      expect(modal.findComponent(TutorInfoCard).exists()).toBe(false)
+      expect(
+        modal.find('[data-testid="share-info-online-status-preview"]').exists()
+      ).toBe(true)
       expect(
         modal
           .find('[data-testid="share-info-select-all"]')
           .attributes('aria-hidden')
       ).toBe('false')
+    })
+
+    it('saves online status when they keep the modal defaults', async () => {
+      const wrapper = getWrapper(UNDECIDED_COACH)
+
+      await prompt(wrapper)
+        .find('[data-testid="share-info-prompt-button"]')
+        .trigger('click')
+      const modal = wrapper.findComponent(VolunteerShareInfoModal)
+      await modal.find('.uc-form-button').trigger('click')
+      await flushPromises()
+
+      expect(NetworkService.setProfile).toHaveBeenCalledWith({
+        publicProfileKeys: ['onlineStatus'],
+      })
     })
 
     it('saves their choice from the modal and stops prompting', async () => {

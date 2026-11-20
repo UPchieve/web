@@ -48,6 +48,7 @@ function handleDismiss() {
     <ShareInfoFieldsForm
       :info="info"
       :applyOptInDefaults="!fromProfile"
+      :defaultOnlineStatusOn="fromProfile"
       :eventSource="eventSource"
       @saved="props.closeModal"
     />

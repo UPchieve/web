@@ -126,6 +126,54 @@ describe('ShareInfoFieldsForm', () => {
     )
   })
 
+  describe('with online status on by default', () => {
+    it('starts an undecided adult coach with only online status on', async () => {
+      const wrapper = getWrapper(
+        { occupations: [VolunteerOccupations.WORKING_FULL_TIME] },
+        { defaultOnlineStatusOn: true }
+      )
+
+      expect(
+        wrapper
+          .find('[data-testid="share-info-online-status-preview"]')
+          .exists()
+      ).toBe(true)
+      expect(wrapper.findComponent(TutorInfoCard).exists()).toBe(false)
+      await clickSave(wrapper)
+      expect(UserService.setProfile).toHaveBeenCalledWith(
+        { publicProfileKeys: ['onlineStatus'] },
+        expect.anything()
+      )
+    })
+
+    it('starts an undecided high school coach with everything off', () => {
+      const wrapper = getWrapper(
+        { occupations: [VolunteerOccupations.HIGH_SCHOOL_STUDENT] },
+        { defaultOnlineStatusOn: true }
+      )
+
+      expect(wrapper.text()).toContain(
+        'Nothing will be shared with your student.'
+      )
+    })
+
+    it("keeps a coach's saved choice", async () => {
+      const wrapper = getWrapper(
+        {
+          occupations: [VolunteerOccupations.WORKING_FULL_TIME],
+          publicProfileKeys: ['occupation'],
+        },
+        { defaultOnlineStatusOn: true }
+      )
+
+      await clickSave(wrapper)
+      expect(UserService.setProfile).toHaveBeenCalledWith(
+        { publicProfileKeys: ['occupation'] },
+        expect.anything()
+      )
+    })
+  })
+
   it("keeps a coach's saved choice over any default", async () => {
     const wrapper = getWrapper(
       {
