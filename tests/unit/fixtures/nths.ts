@@ -1,9 +1,6 @@
 import type {
   NTHSChapterImpactPublic,
-  NTHSChapterMonthPublic,
-  NTHSChapterRosterPublic,
   NTHSRosterMemberPublic,
-  NTHSTopTutorPublic,
 } from '@/services/NTHSGroupService'
 
 export const NO_PERIOD_ACTIVITY: NTHSRosterMemberPublic['periodHours'] = {
@@ -54,22 +51,9 @@ const schoolYear = {
   endsAt: '2027-07-01T00:00:00.000Z',
 }
 
-export function topTutor(
-  overrides: Partial<NTHSTopTutorPublic> = {}
-): NTHSTopTutorPublic {
-  return {
-    userId: 'riley',
-    firstName: 'Riley',
-    lastInitial: 'K',
-    hoursTutored: 4.5,
-    sessionsCompleted: 3,
-    ...overrides,
-  }
-}
-
 export function impact(
-  overrides: Partial<NTHSChapterImpactPublic & NTHSChapterMonthPublic> = {}
-): NTHSChapterImpactPublic & NTHSChapterMonthPublic {
+  overrides: Partial<NTHSChapterImpactPublic> = {}
+): NTHSChapterImpactPublic {
   return {
     groupId: 'group-123',
     schoolYear,
@@ -82,22 +66,17 @@ export function impact(
     allTime: { studentsHelped: 6, sessionsCompleted: 12, hoursTutored: 9 },
     goals: { hoursTutored: 40, membersTutoring: 3 },
     official: true,
-    viewerHoursThisMonth: 0,
     ...overrides,
   }
 }
 
-export function rosterResponse(
-  members: NTHSRosterMemberPublic[],
-  extras: Partial<NTHSChapterRosterPublic> = {}
-) {
+export function rosterResponse(members: NTHSRosterMemberPublic[]) {
   return {
     data: {
       roster: {
         groupId: 'group-123',
         schoolYear,
         members,
-        ...extras,
       },
     },
   }

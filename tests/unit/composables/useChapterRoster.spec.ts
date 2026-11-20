@@ -2,7 +2,7 @@ import { useChapterRoster } from '@/composables/useChapterRoster'
 import LoggerService from '@/services/LoggerService'
 import { rosterPeriodStarts } from '@/services/NTHSRosterService'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { member, rosterResponse, topTutor } from '../fixtures/nths'
+import { member, rosterResponse } from '../fixtures/nths'
 
 const getNTHSChapterRoster = vi.fn()
 vi.mock('@/services/NetworkService', () => ({
@@ -66,22 +66,17 @@ describe('useChapterRoster', () => {
   })
 
   describe('refresh', () => {
-    it('updates members and the top tutor without flipping isLoading, so a caller can refetch in the background', async () => {
+    it('updates members without flipping isLoading, so a caller can refetch in the background', async () => {
       getNTHSChapterRoster.mockResolvedValue(rosterResponse(MEMBERS))
-      const { members, topTutorThisMonth, isLoading, load, refresh } =
-        useChapterRoster()
+      const { members, isLoading, load, refresh } = useChapterRoster()
       await load('group-1', NOW)
 
-      const newTopTutor = topTutor()
-      getNTHSChapterRoster.mockResolvedValueOnce(
-        rosterResponse([], { topTutorThisMonth: newTopTutor })
-      )
+      getNTHSChapterRoster.mockResolvedValueOnce(rosterResponse([]))
       const refreshPromise = refresh('group-1', NOW)
       expect(isLoading.value).toBe(false)
       await refreshPromise
 
       expect(members.value).toEqual([])
-      expect(topTutorThisMonth.value).toEqual(newTopTutor)
       expect(isLoading.value).toBe(false)
     })
 

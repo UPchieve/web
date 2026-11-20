@@ -1784,12 +1784,9 @@ export default {
       name,
     }).then(this._successHandler, this._errorHandler)
   },
-  getNTHSChapterImpact(groupId: string, monthStartsAt?: Date) {
+  getNTHSChapterImpact(groupId: string) {
     return httpGetDeprecated<NTHSChapterImpactResponse>(
-      `${API_ROOT}/nths-groups/${groupId}/impact`,
-      monthStartsAt
-        ? { params: { monthStartsAt: monthStartsAt.toISOString() } }
-        : undefined
+      `${API_ROOT}/nths-groups/${groupId}/impact`
     ).catch(this._axiosErrorHandler)
   },
   getNTHSChapterRoster(

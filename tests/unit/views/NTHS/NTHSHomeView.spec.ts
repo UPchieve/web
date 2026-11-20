@@ -2,7 +2,6 @@ import {
   NTHS_RECRUITMENT_TEMPLATES_URL,
   type AffiliationStatus,
 } from '@/services/NTHSGroupService'
-import { rosterPeriodStarts } from '@/services/NTHSRosterService'
 import { useNthsStore } from '@/stores/nths'
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import NTHSHomeView from '@/views/NTHS/Tabs/NTHSHomeView.vue'
@@ -14,7 +13,7 @@ import {
 } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
-import { impact } from '../../fixtures/nths'
+import { impact, member, rosterResponse } from '../../fixtures/nths'
 
 vi.mock('vue-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('vue-router')>()),
@@ -22,12 +21,13 @@ vi.mock('vue-router', async (importOriginal) => ({
 }))
 
 const getNTHSChapterImpact = vi.fn()
+const getNTHSChapterRoster = vi.fn()
 const getNTHSChecklist = vi.fn()
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: {
-    getNTHSChapterImpact: (groupId: string, monthStartsAt: Date) =>
-      getNTHSChapterImpact(groupId, monthStartsAt),
+    getNTHSChapterImpact: (groupId: string) => getNTHSChapterImpact(groupId),
+    getNTHSChapterRoster: (groupId: string) => getNTHSChapterRoster(groupId),
     getNTHSChecklist: (groupId: string) => getNTHSChecklist(groupId),
   },
 }))
@@ -94,6 +94,10 @@ beforeEach(() => {
   vi.setSystemTime(NOW)
   getNTHSChapterImpact.mockReset()
   getNTHSChapterImpact.mockResolvedValue({ data: { impact: IMPACT } })
+  getNTHSChapterRoster.mockReset()
+  getNTHSChapterRoster.mockResolvedValue(
+    rosterResponse([member({ userId: 'user-1' })])
+  )
   getNTHSChecklist.mockReset()
   getNTHSChecklist.mockResolvedValue({
     checklist: {
@@ -129,12 +133,18 @@ describe('NTHSHomeView', () => {
     async (roleName) => {
       const wrapper = await getWrapper(roleName)
 
-      expect(getNTHSChapterImpact).toHaveBeenCalledWith(
-        'group-123',
-        rosterPeriodStarts(NOW).thisMonth
-      )
+      expect(getNTHSChapterImpact).toHaveBeenCalledWith('group-123')
       expect(wrapper.find('[data-testid="impact-students"]').text()).toBe('2')
       expect(wrapper.find('[data-testid="impact-sessions"]').text()).toBe('4')
+    }
+  )
+
+  it.each(['admin', 'member'])(
+    'shows a chapter %s the top members board built from the roster',
+    async (roleName) => {
+      const wrapper = await getWrapper(roleName)
+
+      expect(wrapper.findAll('[data-testid="top-members-row"]')).toHaveLength(1)
     }
   )
 

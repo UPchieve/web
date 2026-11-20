@@ -1,42 +1,18 @@
 import { ref } from 'vue'
 import NetworkService from '@/services/NetworkService'
-import type {
-  NTHSChapterImpactPublic,
-  NTHSChapterMonthPublic,
-} from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
 import LoggerService from '@/services/LoggerService'
-import {
-  isPeriodStartRejection,
-  rosterPeriodStarts,
-} from '@/services/NTHSRosterService'
-
-type NTHSChapterImpactAndMonth = NTHSChapterImpactPublic &
-  NTHSChapterMonthPublic
 
 export function useChapterImpact() {
-  const impact = ref<NTHSChapterImpactAndMonth>()
+  const impact = ref<NTHSChapterImpactPublic>()
   const isLoading = ref(true)
   const loadFailed = ref(false)
 
-  // now drives the same monthStartsAt the roster sends, so Home's and
-  // Members' top-tutor cards always agree.
-  async function fetchImpact(groupId: string, now: Date) {
-    try {
-      return await NetworkService.getNTHSChapterImpact(
-        groupId,
-        rosterPeriodStarts(now).thisMonth
-      )
-    } catch (err) {
-      if (!isPeriodStartRejection(err)) throw err
-      return NetworkService.getNTHSChapterImpact(groupId)
-    }
-  }
-
-  async function load(groupId: string, now: Date) {
+  async function load(groupId: string) {
     isLoading.value = true
     loadFailed.value = false
     try {
-      const response = await fetchImpact(groupId, now)
+      const response = await NetworkService.getNTHSChapterImpact(groupId)
       impact.value = response.data.impact
     } catch (err) {
       loadFailed.value = true
@@ -49,10 +25,10 @@ export function useChapterImpact() {
   // Overlapping refreshes can resolve out of order, so only the newest writes.
   let latestRefreshId = 0
 
-  async function refresh(groupId: string, now: Date) {
+  async function refresh(groupId: string) {
     const refreshId = ++latestRefreshId
     try {
-      const response = await fetchImpact(groupId, now)
+      const response = await NetworkService.getNTHSChapterImpact(groupId)
       if (refreshId === latestRefreshId) impact.value = response.data.impact
     } catch (err) {
       LoggerService.noticeError(

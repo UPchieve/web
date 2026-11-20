@@ -21,7 +21,6 @@ import {
   member,
   NO_PERIOD_ACTIVITY,
   rosterResponse,
-  topTutor,
 } from '../../fixtures/nths'
 import {
   enableAutoUnmount,
@@ -86,7 +85,6 @@ vi.mock('@/services/NTHSRosterService', async (importOriginal) => {
 const NOW = new Date('2026-10-15T00:00:00.000Z')
 
 const IMPACT = impact()
-const TOP_TUTOR = topTutor()
 
 const MEMBERS = [
   member({ userId: 'president', firstName: 'Pat', roleName: 'admin' }),
@@ -324,7 +322,6 @@ describe('NTHSMembersView', () => {
       expect(activeMemberCount(wrapper)).toBe(5)
       expect(tutoredThisYearCount(wrapper)).toBe(4)
       expect(hoursThisSchoolYear(wrapper)).toBe(7.5)
-      expect(wrapper.find('[data-testid="top-tutor"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="roster-invite-nudge"]').exists()).toBe(
         false
       )
@@ -407,9 +404,7 @@ describe('NTHSMembersView', () => {
       'keeps the roster and activity card fully usable while /impact %s, showing the member count alone',
       async (_label, setUp, expectImpactError) => {
         setUp()
-        getNTHSChapterRoster.mockResolvedValue(
-          rosterResponse(MEMBERS, { topTutorThisMonth: TOP_TUTOR })
-        )
+        getNTHSChapterRoster.mockResolvedValue(rosterResponse(MEMBERS))
         const wrapper = await getWrapper()
 
         expect(activeMemberCount(wrapper)).toBe(5)
@@ -422,25 +417,14 @@ describe('NTHSMembersView', () => {
         )
       }
     )
-
-    it('shows the top tutor card when the roster has a top tutor', async () => {
-      getNTHSChapterRoster.mockResolvedValue(
-        rosterResponse(MEMBERS, { topTutorThisMonth: TOP_TUTOR })
-      )
-      const wrapper = await getWrapper()
-
-      expect(wrapper.find('[data-testid="top-tutor"]').exists()).toBe(true)
-    })
   })
 
   describe('period and filters', () => {
-    it('asks for the roster with the local calendar starts of each period, taken from the page load instant, and sends /impact the same month start so their top-tutor data cannot drift apart', async () => {
+    it('asks for the roster with the local calendar starts of each period, taken from the page load instant', async () => {
       await getWrapper()
 
       const [, starts] = getNTHSChapterRoster.mock.calls[0]
       expect(starts).toEqual(rosterPeriodStarts(NOW))
-      const [, monthStartsAt] = getNTHSChapterImpact.mock.calls[0]
-      expect(monthStartsAt).toEqual(starts.thisMonth)
     })
 
     it('counts members who tutored in the selected period, defaulting to this week', async () => {

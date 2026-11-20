@@ -50,15 +50,8 @@ export type NTHSChapterImpactPublic = {
   goals: { hoursTutored: number; membersTutoring: number }
   official: boolean
 }
-// From the request's monthStartsAt (or the UTC 1st of the month) to now.
-export type NTHSChapterMonthPublic = {
-  // Omitted when no current member tutored a counted session this month.
-  topTutorThisMonth?: NTHSTopTutorPublic
-  // Only ever the requester's own hours.
-  viewerHoursThisMonth: number
-}
 export type NTHSChapterImpactResponse = {
-  impact: NTHSChapterImpactPublic & NTHSChapterMonthPublic
+  impact: NTHSChapterImpactPublic
 }
 
 export type NTHSRosterMemberPublic = {
@@ -83,20 +76,10 @@ export type NTHSRosterMemberPublic = {
   periodSessions: NTHSRosterMemberPublic['periodHours']
   lastActiveAt?: DateString
 }
-export type NTHSTopTutorPublic = {
-  userId: Uuid
-  firstName: string
-  lastInitial: string
-  hoursTutored: number
-  sessionsCompleted: number
-}
 export type NTHSChapterRosterPublic = {
   groupId: Uuid
   schoolYear: NTHSSchoolYearPublic
   members: NTHSRosterMemberPublic[]
-  // Absent when no current member tutored a counted session since the
-  // monthStartsAt the request sent.
-  topTutorThisMonth?: NTHSTopTutorPublic
 }
 export type NTHSChapterRosterResponse = { roster: NTHSChapterRosterPublic }
 

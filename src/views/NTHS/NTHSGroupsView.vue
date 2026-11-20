@@ -117,7 +117,7 @@ const { impact, refresh: refreshImpact } = useChapterImpact()
 function loadHeaderImpact() {
   const groupId = group.value?.groupInfo?.id
   if (!groupId || hidePageContentReason.value) return
-  void refreshImpact(groupId, new Date())
+  void refreshImpact(groupId)
 }
 watch(
   [() => group.value?.groupInfo?.id, hidePageContentReason],

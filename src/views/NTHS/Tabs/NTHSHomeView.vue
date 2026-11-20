@@ -8,9 +8,10 @@ import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
 import HQSection from '@/components/NTHS/HQ/HQSection.vue'
 import ImpactCard from '@/components/NTHS/HQ/ImpactCard.vue'
+import TopMembersBoard from '@/components/NTHS/HQ/TopMembersBoard.vue'
 import InviteLink from '@/components/NTHS/InviteLink.vue'
-import TopTutorCard from '@/components/NTHS/TopTutorCard.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
+import { useChapterRoster } from '@/composables/useChapterRoster'
 import { NTHS_RECRUITMENT_TEMPLATES_URL } from '@/services/NTHSGroupService'
 import { useNthsStore } from '@/stores/nths'
 
@@ -27,13 +28,21 @@ const currentUserReferralCode = computed(
 const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const { impact, isLoading, loadFailed, load } = useChapterImpact()
+const {
+  members,
+  isLoading: isRosterLoading,
+  loadFailed: rosterLoadFailed,
+  load: loadRoster,
+} = useChapterRoster()
 
 const inviteSection = ref<HTMLElement>()
 
 const now = new Date()
 
 onBeforeMount(async () => {
-  if (groupId.value) await load(groupId.value, now)
+  if (groupId.value) {
+    await Promise.all([load(groupId.value), loadRoster(groupId.value, now)])
+  }
 })
 </script>
 
@@ -84,15 +93,12 @@ onBeforeMount(async () => {
     <template v-else>
       <ImpactCard :impact="isLoading ? undefined : impact" />
       <div class="impact-row">
-        <TopTutorCard
-          v-if="impact"
-          :topTutor="impact.topTutorThisMonth"
+        <GoodStandingCard :impact="isLoading ? undefined : impact" />
+        <TopMembersBoard
+          :members="members"
           :currentUserId="currentUserId"
-          :viewerHoursThisMonth="impact.viewerHoursThisMonth"
-        />
-        <GoodStandingCard
-          class="good-standing"
-          :impact="isLoading ? undefined : impact"
+          :isLoading="isRosterLoading"
+          :loadFailed="rosterLoadFailed"
         />
       </div>
     </template>
@@ -160,9 +166,6 @@ onBeforeMount(async () => {
   @include breakpoint-below('large') {
     grid-template-columns: 1fr;
   }
-}
-.good-standing {
-  grid-column: -2;
 }
 .members {
   padding: 24px 26px;

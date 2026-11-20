@@ -8,7 +8,6 @@ import RosterCards from '@/components/NTHS/Members/RosterCards.vue'
 import RosterFilterChips from '@/components/NTHS/Members/RosterFilterChips.vue'
 import RosterSortControl from '@/components/NTHS/Members/RosterSortControl.vue'
 import RosterTable from '@/components/NTHS/Members/RosterTable.vue'
-import TopTutorCard from '@/components/NTHS/TopTutorCard.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import { useRosterPreferences } from '@/composables/useRosterPreferences'
@@ -54,7 +53,6 @@ const {
   members,
   currentMembers,
   schoolYear,
-  topTutorThisMonth,
   isLoading,
   loadFailed,
   load,
@@ -91,10 +89,7 @@ const isStacked = computed(() => rosterAreaWidth.value < ROSTER_TABLE_MIN_WIDTH)
 
 onBeforeMount(async () => {
   if (groupId.value) {
-    await Promise.all([
-      load(groupId.value, now),
-      loadImpact(groupId.value, now),
-    ])
+    await Promise.all([load(groupId.value, now), loadImpact(groupId.value)])
   }
 })
 
@@ -181,7 +176,7 @@ function closeMenu(userId: string) {
 
 function refreshAfterMembershipChange() {
   refreshRoster(groupId.value, now)
-  refreshImpact(groupId.value, now)
+  refreshImpact(groupId.value)
 }
 
 async function updateMember(
@@ -326,12 +321,6 @@ function removeMember(member: NTHSRosterMemberPublic) {
     >
       {{ errorMessage }}
     </p>
-
-    <TopTutorCard
-      v-if="rosterLoaded && topTutorThisMonth"
-      :topTutor="topTutorThisMonth"
-      :currentUserId="currentUserId"
-    />
 
     <section
       v-if="rosterLoaded && members.length"
