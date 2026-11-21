@@ -1,6 +1,6 @@
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
-import { enableAutoUnmount, mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { enableAutoUnmount, mount, type VueWrapper } from '@vue/test-utils'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { member, NO_PERIOD_ACTIVITY } from '../../../fixtures/nths'
 
@@ -13,6 +13,24 @@ const OTHER = member({
   lastActiveAt: '2026-10-12T12:00:00.000Z',
 })
 
+const ANA = member({
+  userId: 'ana',
+  firstName: 'Ana',
+  trainingComplete: false,
+  periodHours: { ...NO_PERIOD_ACTIVITY, thisSchoolYear: 1 },
+})
+const CAL = member({
+  userId: 'cal',
+  firstName: 'Cal',
+  periodHours: { ...NO_PERIOD_ACTIVITY, thisSchoolYear: 5 },
+})
+const DEE = member({
+  userId: 'dee',
+  firstName: 'Dee',
+  periodHours: { ...NO_PERIOD_ACTIVITY, thisSchoolYear: 3 },
+})
+const TEAM = [ME, OTHER, ANA, CAL, DEE]
+
 enableAutoUnmount(afterEach)
 
 function table(
@@ -21,6 +39,7 @@ function table(
     isGroupAdmin?: boolean
     isLoading?: boolean
     loadFailed?: boolean
+    schoolYearLabel?: string
   } = {}
 ) {
   return mount(MembersTable, {
@@ -31,6 +50,7 @@ function table(
       inviteCode: 'ABC123',
       referralCode: 'PERSON123',
       now: NOW,
+      schoolYearLabel: '2026–27',
       ...props,
     },
     attachTo: 'body',
@@ -41,6 +61,15 @@ const ROW = '[data-testid="members-table-row"]'
 const EXPAND = '[data-testid="members-table-expand"]'
 const PROMPT = '[data-testid="members-table-invite"]'
 const SCROLL = '[data-testid="members-table-scroll"]'
+const DOWNLOAD = '[data-testid="members-table-download"]'
+const chip = (filter: string) => `[data-testid="members-table-chip-${filter}"]`
+const sortButton = (key: string) => `[data-testid="members-table-sort-${key}"]`
+
+function shownNames(wrapper: VueWrapper) {
+  return wrapper
+    .findAll('[data-testid="member-name"]')
+    .map((name) => name.text().split(',')[0])
+}
 
 describe('MembersTable', () => {
   it('lists every member in name order', () => {
@@ -69,6 +98,7 @@ describe('MembersTable', () => {
       expect(wrapper.find('[data-testid="member-days"]').exists()).toBe(
         !adminColumns
       )
+      expect(wrapper.find(sortButton('days')).exists()).toBe(!adminColumns)
     }
   )
 
@@ -268,10 +298,10 @@ describe('MembersTable', () => {
   })
 
   it.each([
-    { from: 'region', shiftKey: false, wrapsTo: 'expand' },
-    { from: 'expand', shiftKey: true, wrapsTo: 'region' },
+    { from: 'lastHeading', shiftKey: false, wrapsTo: 'expand' },
+    { from: 'expand', shiftKey: true, wrapsTo: 'lastHeading' },
     { from: 'expand', shiftKey: false, wrapsTo: undefined },
-    { from: 'region', shiftKey: true, wrapsTo: undefined },
+    { from: 'lastHeading', shiftKey: true, wrapsTo: undefined },
   ])(
     'wraps Tab at the ends of the expanded card (from $from, shift $shiftKey)',
     async ({ from, shiftKey, wrapsTo }) => {
@@ -279,7 +309,7 @@ describe('MembersTable', () => {
       await wrapper.find(EXPAND).trigger('click')
       const elements: Record<string, HTMLElement> = {
         expand: wrapper.find(EXPAND).element as HTMLElement,
-        region: wrapper.find(SCROLL).element as HTMLElement,
+        lastHeading: wrapper.find(sortButton('first')).element as HTMLElement,
       }
       elements[from].focus()
       const event = new KeyboardEvent('keydown', {
@@ -316,7 +346,7 @@ describe('MembersTable', () => {
 
   it.each([
     { shiftKey: false, target: 'expand button' },
-    { shiftKey: true, target: 'scroll region' },
+    { shiftKey: true, target: 'last heading button' },
   ])(
     'pulls Tab back into the expanded card when focus is outside it (shift $shiftKey: $target)',
     async ({ shiftKey }) => {
@@ -333,7 +363,7 @@ describe('MembersTable', () => {
 
       expect(event.defaultPrevented).toBe(true)
       const expected = shiftKey
-        ? wrapper.find(SCROLL).element
+        ? wrapper.find(sortButton('first')).element
         : wrapper.find(EXPAND).element
       expect(document.activeElement).toBe(expected)
     }
@@ -347,6 +377,171 @@ describe('MembersTable', () => {
 
     expect(wrapper.find('[data-testid="members-table-title"]').text()).toBe(
       title
+    )
+  })
+
+  it.each([
+    { props: {}, tools: true },
+    { props: { isGroupAdmin: false }, tools: false },
+    { props: { members: [ME] }, tools: false },
+    { props: { isLoading: true }, tools: false },
+    { props: { loadFailed: true }, tools: false },
+  ])(
+    'shows the filters and download for $props: $tools',
+    ({ props, tools }) => {
+      const wrapper = table(props)
+
+      expect(wrapper.find(chip('everyone')).exists()).toBe(tools)
+      expect(wrapper.find(DOWNLOAD).exists()).toBe(tools)
+    }
+  )
+
+  it('shows only the members of the pressed filter and counts them', async () => {
+    const wrapper = table({ members: TEAM })
+
+    await wrapper.find(chip('needs-training')).trigger('click')
+
+    expect(
+      wrapper.find(chip('needs-training')).attributes('aria-pressed')
+    ).toBe('true')
+    expect(shownNames(wrapper)).toEqual(['Ana R.'])
+    expect(wrapper.find(chip('needs-training')).text()).toContain('(1)')
+    expect(wrapper.find(chip('everyone')).text()).toContain('(5)')
+  })
+
+  it('keeps the headings and says so when a filter matches no one', async () => {
+    const wrapper = table({ members: TEAM })
+
+    await wrapper.find(chip('needs-approval')).trigger('click')
+
+    expect(wrapper.find(ROW).exists()).toBe(false)
+    expect(wrapper.find('[data-testid="members-table-empty"]').exists()).toBe(
+      true
+    )
+    expect(wrapper.find(sortButton('name')).exists()).toBe(true)
+  })
+
+  it('reports the name sort at rest', () => {
+    const wrapper = table({ members: TEAM })
+
+    expect(
+      wrapper
+        .find('[data-testid="members-table-th-name"]')
+        .attributes('aria-sort')
+    ).toBe('ascending')
+  })
+
+  it('reverses the names on the first press on Name', async () => {
+    const wrapper = table({ members: TEAM })
+
+    await wrapper.find(sortButton('name')).trigger('click')
+
+    expect(shownNames(wrapper)[0]).toBe('Zoe R. (you)')
+    expect(
+      wrapper
+        .find('[data-testid="members-table-th-name"]')
+        .attributes('aria-sort')
+    ).toBe('descending')
+  })
+
+  it('sorts by Vol hours from most on the second press', async () => {
+    const wrapper = table({ members: TEAM })
+
+    await wrapper.find(sortButton('hours')).trigger('click')
+    await wrapper.find(sortButton('hours')).trigger('click')
+
+    expect(shownNames(wrapper)[0]).toBe('Cal R.')
+    expect(
+      wrapper
+        .find('[data-testid="members-table-th-hours"]')
+        .attributes('aria-sort')
+    ).toBe('descending')
+  })
+
+  it('keeps a rank badge under a filter and a sort', async () => {
+    const wrapper = table({ members: TEAM })
+
+    await wrapper.find(chip('needs-training')).trigger('click')
+    await wrapper.find(sortButton('hours')).trigger('click')
+
+    expect(wrapper.find('[data-testid="member-name"]').text()).toBe(
+      'Ana R., rank 5'
+    )
+  })
+
+  describe('download', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('downloads the rows shown with the school-year columns and the full roster labels', async () => {
+      const blobs: Blob[] = []
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob) => {
+        blobs.push(blob as Blob)
+        return 'blob:test'
+      })
+      vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
+        () => {}
+      )
+      const coPresident = member({
+        userId: 'co',
+        firstName: 'Eve',
+        title: 'President',
+      })
+      const president = member({
+        userId: 'pres',
+        firstName: 'Fay',
+        title: 'President',
+        trainingComplete: false,
+      })
+      const wrapper = table({
+        members: [ME, coPresident, president, ANA, CAL, DEE],
+      })
+      await wrapper.find(chip('needs-training')).trigger('click')
+      await wrapper.find(sortButton('hours')).trigger('click')
+      await wrapper.find(sortButton('hours')).trigger('click')
+
+      await wrapper.find(DOWNLOAD).trigger('click')
+
+      const [header, ...lines] = (await blobs[0].text()).split('\r\n')
+      expect(lines.filter(Boolean).map((line) => line.split(',')[0])).toEqual([
+        'Fay R.',
+        'Ana R.',
+      ])
+      expect(lines[0].split(',')[1]).toBe('Co-President')
+      expect(header).toContain('Hours (2026–27 school year)')
+      expect(header).not.toContain('This week')
+    })
+
+    it('is disabled while the filter shows no one', async () => {
+      const wrapper = table({ members: TEAM })
+
+      await wrapper.find(chip('needs-approval')).trigger('click')
+
+      expect(wrapper.find(DOWNLOAD).attributes('disabled')).toBeDefined()
+    })
+
+    it.each([
+      { elapsed: 1999, disabled: true },
+      { elapsed: 2000, disabled: false },
+    ])(
+      'is disabled $elapsed ms after a press: $disabled',
+      async ({ elapsed, disabled }) => {
+        vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test')
+        vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
+          () => {}
+        )
+        vi.useFakeTimers()
+        const wrapper = table()
+
+        await wrapper.find(DOWNLOAD).trigger('click')
+        vi.advanceTimersByTime(elapsed)
+        await nextTick()
+
+        expect(
+          wrapper.find(DOWNLOAD).attributes('disabled') !== undefined
+        ).toBe(disabled)
+      }
     )
   })
 })

@@ -29,6 +29,7 @@ const { impact, isLoading, loadFailed, load } = useChapterImpact()
 const {
   members,
   currentMembers,
+  schoolYear,
   isLoading: isRosterLoading,
   loadFailed: rosterLoadFailed,
   load: loadRoster,
@@ -47,6 +48,7 @@ const membersTableProps = computed(() => ({
   now,
   isLoading: isRosterLoading.value,
   loadFailed: rosterLoadFailed.value,
+  schoolYearLabel: schoolYear.value?.label ?? '',
 }))
 
 onBeforeMount(async () => {

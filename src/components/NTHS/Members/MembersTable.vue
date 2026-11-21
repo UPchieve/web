@@ -3,22 +3,32 @@ import { onKeyStroke } from '@vueuse/core'
 import { computed, nextTick, ref } from 'vue'
 import CheckIcon from '@/assets/check.svg'
 import CopyIcon from '@/assets/copy-icon.svg'
+import DownloadIcon from '@/assets/download.svg'
 import CollapseIcon from '@/assets/image-collapse.svg'
 import ExpandIcon from '@/assets/image-expand.svg'
+import SortArrowIcon from '@/assets/sort-arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import { avatarColor } from '@/components/NTHS/member-avatar'
 import { useInviteLink } from '@/composables/useInviteLink'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import {
+  DEFAULT_MEMBER_SORT,
+  filterMembers,
+  MEMBER_FILTERS,
   memberStatus,
+  nextMemberSort,
+  sortMembers,
+  type MemberFilter,
+  type MemberSort,
+  type MemberSortKey,
   type MemberStatus,
 } from '@/services/NTHSMembersTableService'
 import {
   daysSince,
-  DEFAULT_ROSTER_SORT,
+  downloadRosterCsv,
   memberDisplayName,
   NEVER_ACTIVE_LABEL,
-  sortRoster,
+  rosterPeriodStarts,
 } from '@/services/NTHSRosterService'
 import {
   formatHoursMinutes,
@@ -35,6 +45,7 @@ const props = defineProps<{
   now: Date
   isLoading?: boolean
   loadFailed?: boolean
+  schoolYearLabel: string
 }>()
 
 const STATUSES: Record<MemberStatus, { label: string; tone: string }> = {
@@ -42,6 +53,16 @@ const STATUSES: Record<MemberStatus, { label: string; tone: string }> = {
   'needs-approval': { label: 'Needs approval', tone: 'bad' },
   'active-this-week': { label: 'Active this week', tone: 'good' },
   'no-hours-this-week': { label: 'No hours this week', tone: 'warn' },
+}
+
+const SORT_LABELS: Record<MemberSortKey, string> = {
+  name: 'Name',
+  hours: 'Vol hours',
+  status: 'Status',
+  screen: 'Screen',
+  training: 'Training',
+  first: '1st',
+  days: 'Days since last session',
 }
 
 const isLoaded = computed(() => !props.isLoading && !props.loadFailed)
@@ -53,6 +74,7 @@ const isAlone = computed(
         props.members[0].userId === props.currentUserId))
 )
 const showsTable = computed(() => isLoaded.value && !isAlone.value)
+const showsTools = computed(() => showsTable.value && props.isGroupAdmin)
 const title = computed(() =>
   showsTable.value
     ? `${props.members.length} ${plural(props.members.length, 'Member')}`
@@ -68,28 +90,80 @@ const ranks = computed(
       ])
     )
 )
-const rows = computed(() =>
-  sortRoster(props.members, DEFAULT_ROSTER_SORT, 'thisSchoolYear').map(
-    (member) => {
-      const name = memberDisplayName(member)
-      const status = STATUSES[memberStatus(member)]
-      return {
-        userId: member.userId,
-        name: member.userId === props.currentUserId ? `${name} (you)` : name,
-        rank: ranks.value.get(member.userId),
-        color: avatarColor(member.userId),
-        hours: formatHoursMinutes(member.periodHours.thisSchoolYear),
-        status,
-        marks: [
-          { label: 'Screen', done: member.safetyApproved },
-          { label: 'Training', done: member.trainingComplete },
-          { label: '1st', done: member.periodSessions.allTime > 0 },
-        ],
-        days: daysSince(member.lastActiveAt, props.now),
-      }
-    }
+
+const activeFilter = ref<MemberFilter>('everyone')
+const activeSort = ref<MemberSort>(DEFAULT_MEMBER_SORT)
+const visibleMembers = computed(() =>
+  sortMembers(
+    filterMembers(props.members, activeFilter.value),
+    activeSort.value,
+    props.now
   )
 )
+const rows = computed(() =>
+  visibleMembers.value.map((member) => {
+    const name = memberDisplayName(member)
+    const status = STATUSES[memberStatus(member)]
+    return {
+      userId: member.userId,
+      name: member.userId === props.currentUserId ? `${name} (you)` : name,
+      rank: ranks.value.get(member.userId),
+      color: avatarColor(member.userId),
+      hours: formatHoursMinutes(member.periodHours.thisSchoolYear),
+      status,
+      marks: [
+        { label: 'Screen', done: member.safetyApproved },
+        { label: 'Training', done: member.trainingComplete },
+        { label: '1st', done: member.periodSessions.allTime > 0 },
+      ],
+      days: daysSince(member.lastActiveAt, props.now),
+    }
+  })
+)
+
+const columns = computed<{ key: MemberSortKey; align: string }[]>(() =>
+  props.isGroupAdmin
+    ? [
+        { key: 'name', align: 'l' },
+        { key: 'hours', align: 'r' },
+        { key: 'status', align: 'l' },
+        { key: 'screen', align: '' },
+        { key: 'training', align: '' },
+        { key: 'first', align: '' },
+      ]
+    : [
+        { key: 'name', align: 'l' },
+        { key: 'hours', align: 'r' },
+        { key: 'days', align: 'r' },
+      ]
+)
+function filterLabel(filter: MemberFilter) {
+  return filter === 'everyone' ? 'Everyone' : STATUSES[filter].label
+}
+
+function ariaSort(key: MemberSortKey) {
+  if (activeSort.value.key !== key) return 'none'
+  return activeSort.value.direction === 'asc' ? 'ascending' : 'descending'
+}
+
+function sortBy(key: MemberSortKey) {
+  activeSort.value = nextMemberSort(activeSort.value, key)
+}
+
+const justDownloaded = ref(false)
+
+function download() {
+  downloadRosterCsv(visibleMembers.value, {
+    roster: props.members,
+    period: 'thisSchoolYear',
+    periodStarts: rosterPeriodStarts(props.now),
+    schoolYearLabel: props.schoolYearLabel,
+  })
+  justDownloaded.value = true
+  setTimeout(() => {
+    justDownloaded.value = false
+  }, 2000)
+}
 
 const { link, justCopied, copyLink } = useInviteLink(
   () => props.inviteCode ?? '',
@@ -183,23 +257,65 @@ onKeyStroke('Tab', (event) => {
         >
           {{ title }}
         </h2>
-        <span v-if="showsTable" ref="expandSlot" class="expand-slot">
+        <div v-if="showsTable" class="tools">
+          <span ref="expandSlot" class="expand-slot">
+            <LargeButton
+              class="expand"
+              variant="secondary"
+              :showArrow="false"
+              :aria-label="isExpanded ? 'Collapse table' : 'Expand table'"
+              :aria-pressed="isExpanded"
+              data-testid="members-table-expand"
+              v-ph:nthshq="'home.members_expand'"
+              @click="toggleExpanded"
+            >
+              <CollapseIcon v-if="isExpanded" class="icon" aria-hidden="true" />
+              <ExpandIcon v-else class="icon" aria-hidden="true" />
+            </LargeButton>
+          </span>
           <LargeButton
-            class="expand"
+            v-if="showsTools"
+            class="download"
             variant="secondary"
             :showArrow="false"
-            :aria-label="isExpanded ? 'Collapse table' : 'Expand table'"
-            :aria-pressed="isExpanded"
-            data-testid="members-table-expand"
-            v-ph:nthshq="'home.members_expand'"
-            @click="toggleExpanded"
+            :disabled="justDownloaded || !visibleMembers.length"
+            :aria-label="justDownloaded ? 'Downloaded' : 'Download member list'"
+            data-testid="members-table-download"
+            v-ph:nthshq="'home.members_download'"
+            @click="download"
           >
-            <CollapseIcon v-if="isExpanded" class="icon" aria-hidden="true" />
-            <ExpandIcon v-else class="icon" aria-hidden="true" />
+            <CheckIcon v-if="justDownloaded" class="icon" aria-hidden="true" />
+            <DownloadIcon v-else class="icon" aria-hidden="true" />
           </LargeButton>
-        </span>
+          <span class="sr" aria-live="polite">{{
+            justDownloaded ? 'Downloaded' : ''
+          }}</span>
+        </div>
       </div>
 
+      <div
+        v-if="showsTools"
+        class="chips"
+        role="group"
+        aria-labelledby="members-table-show"
+      >
+        <span id="members-table-show" class="show">Show</span>
+        <button
+          v-for="filter in MEMBER_FILTERS"
+          :key="filter"
+          type="button"
+          class="chip"
+          :class="{ on: filter === activeFilter }"
+          :aria-pressed="filter === activeFilter"
+          :data-testid="`members-table-chip-${filter}`"
+          v-ph:nthshq="`home.members_filter.${filter}`"
+          @click="activeFilter = filter"
+        >
+          {{ filterLabel(filter) }} ({{
+            filterMembers(members, filter).length
+          }})
+        </button>
+      </div>
       <p v-if="loadFailed" class="note" data-testid="members-table-error">
         We couldn't load your members. Refresh the page to try again.
       </p>
@@ -254,15 +370,33 @@ onKeyStroke('Tab', (event) => {
           <thead>
             <tr>
               <th class="av"><span class="sr">Rank</span></th>
-              <th class="l">Name</th>
-              <th class="r">Vol hours</th>
-              <template v-if="isGroupAdmin">
-                <th class="l">Status</th>
-                <th>Screen</th>
-                <th>Training</th>
-                <th>1st</th>
-              </template>
-              <th v-else class="r">Days since last session</th>
+              <th
+                v-for="column in columns"
+                :key="column.key"
+                :class="column.align"
+                :aria-sort="ariaSort(column.key)"
+                :data-testid="`members-table-th-${column.key}`"
+              >
+                <button
+                  type="button"
+                  class="sort"
+                  :data-testid="`members-table-sort-${column.key}`"
+                  v-ph:nthshq="`home.members_sort.${column.key}`"
+                  @click="sortBy(column.key)"
+                >
+                  {{ SORT_LABELS[column.key] }}
+                  <SortArrowIcon
+                    class="arr"
+                    :class="{
+                      on: activeSort.key === column.key,
+                      desc:
+                        activeSort.key === column.key &&
+                        activeSort.direction === 'desc',
+                    }"
+                    aria-hidden="true"
+                  />
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -319,6 +453,13 @@ onKeyStroke('Tab', (event) => {
           </tbody>
         </table>
       </div>
+      <p
+        v-if="showsTable && !rows.length"
+        class="empty"
+        data-testid="members-table-empty"
+      >
+        No one here right now.
+      </p>
     </section>
   </div>
 </template>
@@ -357,7 +498,13 @@ onKeyStroke('Tab', (event) => {
 .expand-slot {
   display: contents;
 }
-.expand {
+.tools {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+.expand,
+.download {
   flex: none;
   padding: 4px 15px;
 }
@@ -570,6 +717,88 @@ tbody th {
     border: solid $c-soft-black;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
+  }
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.show {
+  padding-right: 8px;
+  font-size: 14px;
+  color: $c-secondary-grey;
+}
+.chip {
+  min-height: 32px;
+  padding: 4px 16px;
+  border: 1px solid $c-border-grey;
+  border-radius: 20px;
+  background: $upchieve-white;
+  color: $c-soft-black;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $c-soft-black;
+  }
+  &:focus-visible {
+    outline: 2px solid $c-information-blue;
+    outline-offset: 2px;
+  }
+}
+.chip.on {
+  background: $c-soft-black;
+  border-color: $c-soft-black;
+  color: $upchieve-white;
+}
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: $c-soft-black;
+  }
+  &:focus-visible {
+    outline: 2px solid $c-information-blue;
+    outline-offset: 2px;
+  }
+}
+.r .sort {
+  flex-direction: row-reverse;
+}
+.arr {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  opacity: 0.3;
+}
+.arr.on {
+  opacity: 1;
+  color: $c-soft-black;
+}
+.arr.desc {
+  transform: rotate(180deg);
+}
+.empty {
+  margin: 16px 0 0;
+  color: $c-secondary-grey;
+}
+
+@include breakpoint-below('medium') {
+  .chip {
+    min-height: 44px;
   }
 }
 </style>
