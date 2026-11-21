@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onKeyStroke } from '@vueuse/core'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, shallowRef } from 'vue'
 import CheckIcon from '@/assets/check.svg'
 import CopyIcon from '@/assets/copy-icon.svg'
 import DownloadIcon from '@/assets/download.svg'
@@ -92,7 +92,7 @@ const ranks = computed(
 )
 
 const activeFilter = ref<MemberFilter>('everyone')
-const activeSort = ref<MemberSort>(DEFAULT_MEMBER_SORT)
+const activeSort = shallowRef<MemberSort>(DEFAULT_MEMBER_SORT)
 const visibleMembers = computed(() =>
   sortMembers(
     filterMembers(props.members, activeFilter.value),
@@ -137,6 +137,17 @@ const columns = computed<{ key: MemberSortKey; align: string }[]>(() =>
         { key: 'days', align: 'r' },
       ]
 )
+const selectKeys = computed<MemberSortKey[]>(() =>
+  props.isGroupAdmin ? ['name', 'status', 'hours'] : ['name', 'hours', 'days']
+)
+
+const selectValue = computed(() =>
+  activeSort.value !== DEFAULT_MEMBER_SORT &&
+  selectKeys.value.includes(activeSort.value.key)
+    ? activeSort.value.key
+    : ''
+)
+
 function filterLabel(filter: MemberFilter) {
   return filter === 'everyone' ? 'Everyone' : STATUSES[filter].label
 }
@@ -148,6 +159,13 @@ function ariaSort(key: MemberSortKey) {
 
 function sortBy(key: MemberSortKey) {
   activeSort.value = nextMemberSort(activeSort.value, key)
+}
+
+function selectSort(event: Event) {
+  const key = (event.target as HTMLSelectElement).value as MemberSortKey | ''
+  activeSort.value = key
+    ? { key, direction: key === 'hours' ? 'desc' : 'asc' }
+    : DEFAULT_MEMBER_SORT
 }
 
 const justDownloaded = ref(false)
@@ -197,10 +215,12 @@ function toggleExpanded() {
 }
 
 function wrapTab(event: KeyboardEvent) {
-  const elements = card.value?.querySelectorAll<HTMLElement>(
-    'button:not([disabled]), [tabindex="0"]'
-  )
-  if (!elements?.length) return
+  const elements = Array.from(
+    card.value?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), select, [tabindex="0"]'
+    ) ?? []
+  ).filter((element) => element.checkVisibility?.() ?? true)
+  if (!elements.length) return
   const first = elements[0]
   const last = elements[elements.length - 1]
   const focusIsOutside = !card.value?.contains(document.activeElement)
@@ -316,6 +336,22 @@ onKeyStroke('Tab', (event) => {
           }})
         </button>
       </div>
+      <label v-if="showsTable" class="msort">
+        <span>Sort by</span>
+        <select
+          :value="selectValue"
+          autocomplete="off"
+          data-testid="members-table-sort-select"
+          v-ph:nthshq="'home.members_sort_select'"
+          @change="selectSort"
+        >
+          <option value="">Default order</option>
+          <option v-for="key in selectKeys" :key="key" :value="key">
+            {{ SORT_LABELS[key] }}
+          </option>
+        </select>
+      </label>
+
       <p v-if="loadFailed" class="note" data-testid="members-table-error">
         We couldn't load your members. Refresh the page to try again.
       </p>
@@ -423,9 +459,15 @@ onKeyStroke('Tab', (event) => {
                   row.rank ? `, rank ${row.rank}` : ', not ranked yet'
                 }}</span>
               </th>
-              <td class="r hrs" data-testid="member-hours">{{ row.hours }}</td>
+              <td
+                class="r hrs"
+                data-label="Vol hours"
+                data-testid="member-hours"
+              >
+                {{ row.hours }}
+              </td>
               <template v-if="isGroupAdmin">
-                <td class="l" data-testid="member-status">
+                <td class="l" data-label="Status" data-testid="member-status">
                   <span class="pill" :class="row.status.tone">{{
                     row.status.label
                   }}</span>
@@ -433,6 +475,7 @@ onKeyStroke('Tab', (event) => {
                 <td
                   v-for="mark in row.marks"
                   :key="mark.label"
+                  :data-label="mark.label"
                   data-testid="member-marks"
                 >
                   <span class="mark" :class="{ done: mark.done }">
@@ -440,7 +483,12 @@ onKeyStroke('Tab', (event) => {
                   </span>
                 </td>
               </template>
-              <td v-else class="r" data-testid="member-days">
+              <td
+                v-else
+                class="r"
+                data-label="Days since last session"
+                data-testid="member-days"
+              >
                 <template v-if="row.days !== undefined">{{
                   row.days
                 }}</template>
@@ -791,14 +839,142 @@ tbody th {
 .arr.desc {
   transform: rotate(180deg);
 }
+.msort {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: $c-secondary-grey;
+
+  select {
+    min-height: 44px;
+    appearance: none;
+    padding: 0 40px 0 16px;
+    border: 1px solid $c-border-grey;
+    border-radius: 4px;
+    background: $upchieve-white
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%2377778b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      no-repeat right 14px center;
+    color: $c-soft-black;
+    font: inherit;
+    cursor: pointer;
+  }
+}
 .empty {
   margin: 16px 0 0;
   color: $c-secondary-grey;
 }
 
 @include breakpoint-below('medium') {
+  .msort {
+    display: flex;
+  }
   .chip {
     min-height: 44px;
+  }
+  .table,
+  .table.member,
+  .table tbody {
+    display: block;
+    min-width: 0;
+  }
+  .table colgroup,
+  .table thead {
+    display: none;
+  }
+  .table tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 0;
+    margin-bottom: 8px;
+    padding: 16px;
+    background: $c-background-grey;
+    border-radius: 8px;
+  }
+  .table td,
+  .table tbody th {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: left;
+  }
+  .table td.av {
+    flex: none;
+    margin-right: 8px;
+  }
+  .table tbody th.name {
+    flex: 1 1 calc(100% - 48px);
+    min-width: 0;
+  }
+  .table td[data-label] {
+    flex: 0 0 50%;
+    min-width: 0;
+    padding-right: 8px;
+
+    &::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 2px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $c-secondary-grey;
+    }
+  }
+  .table:not(.member) tr {
+    gap: 8px 0;
+    margin-bottom: 16px;
+    background: $upchieve-white;
+    border: 1px solid $c-border-grey;
+  }
+  .table:not(.member) tbody th.name {
+    flex: 1 1 0;
+    font-weight: 500;
+  }
+  .table:not(.member) td.hrs {
+    flex: none;
+    padding-right: 0;
+    text-align: right;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: $c-soft-black;
+
+    &::before {
+      text-align: right;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 400;
+    }
+  }
+  .table td[data-label='Status'] {
+    flex-basis: 100%;
+    padding-right: 0;
+
+    &::before {
+      display: none;
+    }
+  }
+  .table td[data-label='Screen'],
+  .table td[data-label='Training'],
+  .table td[data-label='1st'] {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+    padding-right: 16px;
+
+    &::before {
+      order: 2;
+      margin: 0;
+      text-transform: none;
+      letter-spacing: 0;
+    }
   }
 }
 </style>

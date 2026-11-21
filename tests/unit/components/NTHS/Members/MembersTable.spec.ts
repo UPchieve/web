@@ -1,5 +1,6 @@
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
 import { enableAutoUnmount, mount, type VueWrapper } from '@vue/test-utils'
+import { page } from '@vitest/browser/context'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { member, NO_PERIOD_ACTIVITY } from '../../../fixtures/nths'
@@ -32,6 +33,9 @@ const DEE = member({
 const TEAM = [ME, OTHER, ANA, CAL, DEE]
 
 enableAutoUnmount(afterEach)
+afterEach(async () => {
+  await page.viewport(414, 896)
+})
 
 function table(
   props: {
@@ -298,17 +302,21 @@ describe('MembersTable', () => {
   })
 
   it.each([
-    { from: 'lastHeading', shiftKey: false, wrapsTo: 'expand' },
-    { from: 'expand', shiftKey: true, wrapsTo: 'lastHeading' },
-    { from: 'expand', shiftKey: false, wrapsTo: undefined },
-    { from: 'lastHeading', shiftKey: true, wrapsTo: undefined },
+    { width: 1024, from: 'lastHeading', shiftKey: false, wrapsTo: 'expand' },
+    { width: 1024, from: 'expand', shiftKey: true, wrapsTo: 'lastHeading' },
+    { width: 1024, from: 'expand', shiftKey: false, wrapsTo: undefined },
+    { width: 1024, from: 'lastHeading', shiftKey: true, wrapsTo: undefined },
+    { width: 414, from: 'region', shiftKey: false, wrapsTo: 'expand' },
+    { width: 414, from: 'expand', shiftKey: true, wrapsTo: 'region' },
   ])(
-    'wraps Tab at the ends of the expanded card (from $from, shift $shiftKey)',
-    async ({ from, shiftKey, wrapsTo }) => {
+    'wraps Tab at the visible ends of the expanded card ($width px, from $from, shift $shiftKey)',
+    async ({ width, from, shiftKey, wrapsTo }) => {
+      await page.viewport(width, 896)
       const wrapper = table()
       await wrapper.find(EXPAND).trigger('click')
       const elements: Record<string, HTMLElement> = {
         expand: wrapper.find(EXPAND).element as HTMLElement,
+        region: wrapper.find(SCROLL).element as HTMLElement,
         lastHeading: wrapper.find(sortButton('first')).element as HTMLElement,
       }
       elements[from].focus()
@@ -350,6 +358,7 @@ describe('MembersTable', () => {
   ])(
     'pulls Tab back into the expanded card when focus is outside it (shift $shiftKey: $target)',
     async ({ shiftKey }) => {
+      await page.viewport(1024, 896)
       const wrapper = table()
       await wrapper.find(EXPAND).trigger('click')
       ;(document.activeElement as HTMLElement).blur()
@@ -468,6 +477,73 @@ describe('MembersTable', () => {
       'Ana R., rank 5'
     )
   })
+
+  it.each([
+    {
+      choices: ['hours'],
+      names: ['Cal R.', 'Dee R.', 'Zoe R. (you)', 'Ben R.', 'Ana R.'],
+    },
+    {
+      choices: ['status'],
+      names: ['Ben R.', 'Zoe R. (you)', 'Cal R.', 'Dee R.', 'Ana R.'],
+    },
+    {
+      choices: ['hours', ''],
+      names: ['Ana R.', 'Ben R.', 'Cal R.', 'Dee R.', 'Zoe R. (you)'],
+    },
+  ])('sorts from the Sort by select: $choices', async ({ choices, names }) => {
+    const wrapper = table({ members: TEAM })
+    const select = wrapper.find('[data-testid="members-table-sort-select"]')
+
+    for (const choice of choices) {
+      await select.setValue(choice)
+    }
+
+    expect(shownNames(wrapper)).toEqual(names)
+  })
+
+  it.each([
+    { isGroupAdmin: true, options: ['', 'name', 'status', 'hours'] },
+    { isGroupAdmin: false, options: ['', 'name', 'hours', 'days'] },
+  ])(
+    'offers $options in the Sort by select when admin is $isGroupAdmin',
+    ({ isGroupAdmin, options }) => {
+      const select = table({ isGroupAdmin }).find(
+        '[data-testid="members-table-sort-select"]'
+      ).element as HTMLSelectElement
+
+      expect(Array.from(select.options, (option) => option.value)).toEqual(
+        options
+      )
+    }
+  )
+
+  it('shows Default order in the Sort by select at rest', () => {
+    const select = table({ members: TEAM }).find(
+      '[data-testid="members-table-sort-select"]'
+    ).element as HTMLSelectElement
+
+    expect(select.value).toBe('')
+  })
+
+  it.each([
+    { sort: 'hours', value: 'hours' },
+    { sort: 'training', value: '' },
+  ])(
+    'shows "$value" in the Sort by select after sorting $sort',
+    async ({ sort, value }) => {
+      const wrapper = table({ members: TEAM })
+
+      await wrapper.find(sortButton(sort)).trigger('click')
+
+      expect(
+        (
+          wrapper.find('[data-testid="members-table-sort-select"]')
+            .element as HTMLSelectElement
+        ).value
+      ).toBe(value)
+    }
+  )
 
   describe('download', () => {
     afterEach(() => {
