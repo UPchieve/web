@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
 import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
 import Callout from '@/components/Callout.vue'
-import LargeButton from '@/components/LargeButton.vue'
 import ContributionCard from '@/components/NTHS/HQ/ContributionCard.vue'
 import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
-import HQSection from '@/components/NTHS/HQ/HQSection.vue'
 import ImpactCard from '@/components/NTHS/HQ/ImpactCard.vue'
 import TopMembersBoard from '@/components/NTHS/HQ/TopMembersBoard.vue'
 import InviteLink from '@/components/NTHS/InviteLink.vue'
+import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import { NTHS_RECRUITMENT_TEMPLATES_URL } from '@/services/NTHSGroupService'
@@ -18,7 +16,6 @@ import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
 const nths = useNthsStore()
-const router = useRouter()
 
 const group = computed(() => nths.NTHSGroups?.[0])
 const groupId = computed(() => group.value?.groupInfo?.id)
@@ -40,6 +37,17 @@ const {
 const inviteSection = ref<HTMLElement>()
 
 const now = new Date()
+
+const membersTableProps = computed(() => ({
+  members: currentMembers.value,
+  currentUserId: currentUserId.value,
+  isGroupAdmin: isGroupAdmin.value,
+  inviteCode: group.value?.groupInfo?.inviteCode,
+  referralCode: currentUserReferralCode.value,
+  now,
+  isLoading: isRosterLoading.value,
+  loadFailed: rosterLoadFailed.value,
+}))
 
 onBeforeMount(async () => {
   if (groupId.value) {
@@ -92,15 +100,23 @@ onBeforeMount(async () => {
         </span>
       </template>
     </Callout>
-    <template v-else>
-      <ImpactCard :impact="isLoading ? undefined : impact" />
-      <div class="impact-row" :class="{ 'impact-row-member': !isGroupAdmin }">
-        <GoodStandingCard
-          v-if="isGroupAdmin"
-          :impact="isLoading ? undefined : impact"
+    <ImpactCard v-else :impact="isLoading ? undefined : impact" />
+
+    <div v-if="isGroupAdmin" class="admin-grid" :class="{ single: loadFailed }">
+      <MembersTable v-bind="membersTableProps" />
+      <div v-if="!loadFailed" class="side-column">
+        <TopMembersBoard
+          :members="members"
+          :currentUserId="currentUserId"
+          :isLoading="isRosterLoading"
+          :loadFailed="rosterLoadFailed"
         />
+        <GoodStandingCard :impact="isLoading ? undefined : impact" />
+      </div>
+    </div>
+    <template v-else>
+      <div v-if="!loadFailed" class="impact-row">
         <ContributionCard
-          v-else
           :members="currentMembers"
           :currentUserId="currentUserId"
           :impact="isLoading ? undefined : impact"
@@ -114,29 +130,8 @@ onBeforeMount(async () => {
           :loadFailed="rosterLoadFailed"
         />
       </div>
+      <MembersTable v-bind="membersTableProps" />
     </template>
-
-    <HQSection
-      v-if="isGroupAdmin"
-      class="members"
-      eyebrow="Your members"
-      muted
-      data-testid="home-members"
-    >
-      <h2 class="members-title">Track your members' progress</h2>
-      <p class="members-line">
-        See who's finished training, who's tutored, and who hasn't started yet.
-      </p>
-      <LargeButton
-        class="members-button"
-        variant="secondary"
-        :showArrow="false"
-        v-ph:nthshq="'home.view_members'"
-        @click="router.push('/groups/members')"
-      >
-        See all members
-      </LargeButton>
-    </HQSection>
   </div>
 </template>
 
@@ -172,7 +167,7 @@ onBeforeMount(async () => {
 }
 .impact-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   align-items: start;
   gap: 20px;
 
@@ -180,28 +175,23 @@ onBeforeMount(async () => {
     grid-template-columns: 1fr;
   }
 }
-.impact-row-member {
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+.admin-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
+  gap: 32px;
 
   @include breakpoint-below('large') {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  &.single {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
-.members {
-  padding: 24px 26px;
-}
-.members-title {
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1.35;
-  margin-top: 12px;
-}
-.members-line {
-  @include nths-page-subtitle;
-  line-height: 1.6;
-  margin-top: 8px;
-}
-.members-button {
-  margin-top: 18px;
+.side-column {
+  display: grid;
+  gap: 32px;
+  min-width: 0;
 }
 </style>

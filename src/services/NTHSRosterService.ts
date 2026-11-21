@@ -488,22 +488,30 @@ export function rosterMemberActions(
   return [roleAction, 'change_title', 'remove']
 }
 
-const NEVER_ACTIVE_LABEL = 'No sessions yet'
+export const NEVER_ACTIVE_LABEL = 'No sessions yet'
 
 // Counts local calendar days, so 13 hours ago can already be "Yesterday".
 // Math.round covers zones like America/Santiago, where a DST change skips
 // midnight and startOf('day') lands at 01:00.
-export function formatLastActive(value: string | undefined, now: Date): string {
-  if (!value) return NEVER_ACTIVE_LABEL
+export function daysSince(
+  value: string | undefined,
+  now: Date
+): number | undefined {
+  if (!value) return undefined
   const lastActive = dayjs(value)
-  if (!lastActive.isValid()) return NEVER_ACTIVE_LABEL
+  if (!lastActive.isValid()) return undefined
 
-  const days = Math.round(
+  return Math.round(
     Math.max(
       0,
       dayjs(now).startOf('day').diff(lastActive.startOf('day'), 'day', true)
     )
   )
+}
+
+export function formatLastActive(value: string | undefined, now: Date): string {
+  const days = daysSince(value, now)
+  if (days === undefined) return NEVER_ACTIVE_LABEL
   if (days === 0) return 'Today'
   if (days === 1) return 'Yesterday'
   if (days < 7) return `${days} days ago`

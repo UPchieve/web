@@ -194,7 +194,24 @@ describe('NTHSHomeView', () => {
       const wrapper = await getWrapper(roleName)
 
       expect(wrapper.find(DO_THIS_NEXT).exists()).toBe(shown)
-      expect(wrapper.find('[data-testid="home-members"]').exists()).toBe(shown)
+    }
+  )
+
+  it.each(['admin', 'member'])(
+    'shows a chapter %s the current members table',
+    async (roleName) => {
+      getNTHSChapterRoster.mockResolvedValue(
+        rosterResponse([
+          member({ userId: 'user-1' }),
+          member({ userId: 'user-2' }),
+          member({ userId: 'user-3', accountClosed: true }),
+        ])
+      )
+      const wrapper = await getWrapper(roleName)
+
+      expect(wrapper.findAll('[data-testid="members-table-row"]')).toHaveLength(
+        2
+      )
     }
   )
 
@@ -205,7 +222,6 @@ describe('NTHSHomeView', () => {
     expect(wrapper.find(DO_THIS_NEXT).exists()).toBe(false)
     expect(wrapper.findComponent({ name: 'InviteLink' }).exists()).toBe(true)
     expect(wrapper.find('[data-testid="impact-students"]').text()).toBe('2')
-    expect(wrapper.find('[data-testid="home-members"]').exists()).toBe(true)
   })
 
   it('moves focus to Invite members once DoThisNextCard finishes', async () => {
