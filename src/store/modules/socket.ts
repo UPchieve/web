@@ -279,12 +279,17 @@ export default {
         useSessionOfferStore().onLeftQueue(reason)
       })
 
+      // @TODO: Delete me once high-line is deployed and listening for queue:joined instead
       socket.on(
         'queue:rejoinedAfterSession',
         ({ joinedAt }: { joinedAt: Date }) => {
-          useSessionOfferStore().onRejoinedQueue(new Date(joinedAt))
+          useSessionOfferStore().onJoinedQueue(new Date(joinedAt))
         }
       )
+
+      socket.on('queue:joined', ({ joinedAt }: { joinedAt: Date }) => {
+        useSessionOfferStore().onJoinedQueue(new Date(joinedAt))
+      })
 
       socket.on('dm:received', () => {
         dispatch('user/fetchUnreadDMs', null, { root: true })

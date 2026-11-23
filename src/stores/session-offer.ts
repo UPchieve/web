@@ -112,7 +112,7 @@ export const useSessionOfferStore = defineStore('sessionOffer', () => {
    * Coaches automatically rejoin the queue after a session ends.
    * This is triggered from subway over the sockets.
    */
-  function onRejoinedQueue(joinedAt: Date) {
+  function onJoinedQueue(joinedAt: Date) {
     setQueueStatus('joined', joinedAt)
   }
 
@@ -215,7 +215,7 @@ export const useSessionOfferStore = defineStore('sessionOffer', () => {
     joinQueue,
     leaveQueue,
     onLeftQueue,
-    onRejoinedQueue,
+    onJoinedQueue,
     clearLeftQueueReason,
     isQueueEligible,
   }
