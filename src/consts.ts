@@ -1,4 +1,14 @@
 import type { Language } from '@/types/languages'
+import type { CountryCode } from 'maz-ui/components/MazPhoneNumberInput'
+
+export const NATIONAL_PHONE_COUNTRY_CODES: CountryCode[] = [
+  'US',
+  'PR',
+  'VI',
+  'GU',
+  'AS',
+  'MP',
+]
 
 /** Maximum width considered to still be in "mobile mode." */
 export const MAX_MOBILE_MODE_WIDTH = 768 - 1 // 768 = "medium" scss breakpoint

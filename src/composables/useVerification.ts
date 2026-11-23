@@ -15,7 +15,12 @@ import type {
   CountryCode,
   Result as PhoneResults,
 } from 'maz-ui/components/MazPhoneNumberInput'
-import { EVENTS, VERIFICATION_METHOD, VERIFICATION_TYPE } from '@/consts'
+import {
+  EVENTS,
+  NATIONAL_PHONE_COUNTRY_CODES,
+  VERIFICATION_METHOD,
+  VERIFICATION_TYPE,
+} from '@/consts'
 import NetworkService from '@/services/NetworkService'
 import AuthService from '@/services/AuthService'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -88,9 +93,11 @@ export function useVerification(data: UseVerificationPayload = {}) {
     () => !v$.value.verificationCode.$invalid
   )
 
-  const isInternationalCountryCode = computed(
-    () => phoneInput.value.countryCode !== 'US'
-  )
+  const isInternationalCountryCode = computed(() => {
+    const { countryCode } = phoneInput.value
+    if (!countryCode) return true
+    return !NATIONAL_PHONE_COUNTRY_CODES.includes(countryCode)
+  })
   const internationalPhoneInfo = computed(() => {
     if (!phone.value) return { number: '', country: 'US' as CountryCode }
 

@@ -156,7 +156,11 @@
               show-code-on-list
               @update="onPhoneInputUpdate"
               :country-code="showNationalPhoneNumbersOnly ? 'US' : null"
-              :only-countries="showNationalPhoneNumbersOnly ? ['US'] : null"
+              :only-countries="
+                showNationalPhoneNumbersOnly
+                  ? NATIONAL_PHONE_COUNTRY_CODES
+                  : null
+              "
               :no-search="showNationalPhoneNumbersOnly ? true : false"
             />
 
@@ -470,7 +474,11 @@ import { SsoProvider, signInWithSso } from '@/services/SsoService'
 import DeactivateAccountModal from '@/views/DeactivateAccountModal.vue'
 import setNotificationPermission from '@/utils/set-notification-permission'
 import getNotificationPermission from '@/utils/get-notification-permission'
-import { EVENTS, VERIFICATION_METHOD } from '@/consts'
+import {
+  EVENTS,
+  NATIONAL_PHONE_COUNTRY_CODES,
+  VERIFICATION_METHOD,
+} from '@/consts'
 import { getAcademicYear } from '@/utils/academic-year'
 import Loader from '@/components/Loader.vue'
 import VerificationModal from '@/views/VerificationModal.vue'
@@ -633,6 +641,9 @@ export default {
     },
     VERIFICATION_METHOD() {
       return VERIFICATION_METHOD
+    },
+    NATIONAL_PHONE_COUNTRY_CODES() {
+      return NATIONAL_PHONE_COUNTRY_CODES
     },
     shouldSeeSmsConsentCheckbox() {
       return !!this.user.phone
