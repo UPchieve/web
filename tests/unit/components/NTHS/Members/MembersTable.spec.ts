@@ -1,4 +1,5 @@
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
+import vuetify from '@/plugins/vuetify'
 import { enableAutoUnmount, mount, type VueWrapper } from '@vue/test-utils'
 import { page } from '@vitest/browser/context'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -57,6 +58,7 @@ function table(
       schoolYearLabel: '2026–27',
       ...props,
     },
+    global: { plugins: [vuetify] },
     attachTo: 'body',
   })
 }
@@ -240,25 +242,29 @@ describe('MembersTable', () => {
     {
       safetyApproved: true,
       trainingComplete: false,
-      allTime: 0,
+      thisSchoolYear: 0,
       marks: ['Done', 'Not yet', 'Not yet'],
     },
     {
       safetyApproved: false,
       trainingComplete: true,
-      allTime: 1,
+      thisSchoolYear: 1,
       marks: ['Not yet', 'Done', 'Done'],
     },
   ])(
     'marks Screen, Training and 1st from their own fields: $marks',
-    ({ safetyApproved, trainingComplete, allTime, marks }) => {
+    ({ safetyApproved, trainingComplete, thisSchoolYear, marks }) => {
       const wrapper = table({
         members: [
           member({
             userId: 'u',
             safetyApproved,
             trainingComplete,
-            periodSessions: { ...NO_PERIOD_ACTIVITY, allTime },
+            periodSessions: {
+              ...NO_PERIOD_ACTIVITY,
+              allTime: 3,
+              thisSchoolYear,
+            },
           }),
         ],
       })

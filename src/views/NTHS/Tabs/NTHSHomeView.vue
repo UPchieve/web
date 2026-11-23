@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import Callout from '@/components/Callout.vue'
 import ContributionCard from '@/components/NTHS/HQ/ContributionCard.vue'
-import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
 import ImpactCard from '@/components/NTHS/HQ/ImpactCard.vue'
+import RightNowCard from '@/components/NTHS/HQ/RightNowCard.vue'
 import TopMembersBoard from '@/components/NTHS/HQ/TopMembersBoard.vue'
-import InviteLink from '@/components/NTHS/InviteLink.vue'
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
-import { NTHS_RECRUITMENT_TEMPLATES_URL } from '@/services/NTHSGroupService'
 import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
@@ -34,8 +32,6 @@ const {
   loadFailed: rosterLoadFailed,
   load: loadRoster,
 } = useChapterRoster()
-
-const inviteSection = ref<HTMLElement>()
 
 const now = new Date()
 
@@ -62,39 +58,6 @@ onBeforeMount(async () => {
   <div class="home">
     <h1 class="visually-hidden">Home</h1>
 
-    <DoThisNextCard
-      v-if="isGroupAdmin && groupId"
-      :groupId="groupId"
-      @finished="inviteSection?.focus()"
-    />
-
-    <section
-      v-if="group?.groupInfo?.inviteCode"
-      ref="inviteSection"
-      class="invite"
-      tabindex="-1"
-      aria-labelledby="invite-eyebrow"
-      data-testid="invite"
-    >
-      <span id="invite-eyebrow" class="invite-eyebrow">Invite members</span>
-      <p class="invite-line">Anyone with this link joins your chapter</p>
-      <InviteLink
-        :code="group.groupInfo.inviteCode"
-        :referralCode="currentUserReferralCode"
-      >
-        <a
-          class="invite-scripts"
-          :href="NTHS_RECRUITMENT_TEMPLATES_URL"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="invite-scripts"
-          v-ph:nthshq="'home.recruitment_templates'"
-        >
-          Invite scripts
-        </a>
-      </InviteLink>
-    </section>
-
     <Callout v-if="loadFailed" variant="warning">
       <template v-slot:content>
         <span data-testid="impact-error">
@@ -105,7 +68,16 @@ onBeforeMount(async () => {
     <ImpactCard v-else :impact="isLoading ? undefined : impact" />
 
     <div v-if="isGroupAdmin" class="admin-grid" :class="{ single: loadFailed }">
-      <MembersTable v-bind="membersTableProps" />
+      <div class="main-column">
+        <RightNowCard
+          v-if="impact && !isRosterLoading && !rosterLoadFailed"
+          :impact="impact"
+          :memberCount="currentMembers.length"
+          :inviteCode="group?.groupInfo?.inviteCode"
+          :referralCode="currentUserReferralCode"
+        />
+        <MembersTable v-bind="membersTableProps" />
+      </div>
       <div v-if="!loadFailed" class="side-column">
         <TopMembersBoard
           :members="members"
@@ -145,28 +117,6 @@ onBeforeMount(async () => {
 .visually-hidden {
   @include visually-hidden;
 }
-.invite {
-  @include nths-card;
-  background: $c-nths-sky;
-}
-.invite-eyebrow {
-  @include nths-card-eyebrow;
-  color: $c-information-blue;
-}
-.invite-scripts {
-  text-align: center;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.2;
-  padding: 2px 0;
-  color: $c-information-blue;
-}
-.invite-line {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.35;
-  margin: 10px 0 14px;
-}
 .impact-row {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
@@ -190,6 +140,11 @@ onBeforeMount(async () => {
   &.single {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+.main-column {
+  display: grid;
+  gap: 26px;
+  min-width: 0;
 }
 .side-column {
   display: grid;

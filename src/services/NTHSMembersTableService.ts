@@ -86,7 +86,7 @@ function memberSortValue(
     case 'training':
       return Number(member.trainingComplete)
     case 'first':
-      return Number(member.periodSessions.allTime > 0)
+      return Number(member.periodSessions.thisSchoolYear > 0)
     case 'days':
       return daysSince(member.lastActiveAt, now) ?? Infinity
   }

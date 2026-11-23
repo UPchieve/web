@@ -63,10 +63,6 @@ function hours(thisSchoolYear: number, thisWeek = 0) {
   return { ...NO_PERIOD_ACTIVITY, thisSchoolYear, thisWeek }
 }
 
-function sessions(allTime: number) {
-  return { ...NO_PERIOD_ACTIVITY, allTime }
-}
-
 const ann = member({
   userId: 'a',
   firstName: 'Ann',
@@ -81,7 +77,7 @@ const bob = member({
   periodHours: hours(20),
   safetyApproved: false,
   lastActiveAt: undefined,
-  periodSessions: sessions(0),
+  periodSessions: { ...NO_PERIOD_ACTIVITY, allTime: 2 },
 })
 const cy = member({
   userId: 'c',

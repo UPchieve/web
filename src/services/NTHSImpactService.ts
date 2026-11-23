@@ -29,6 +29,35 @@ export function standingFor(impact: NTHSChapterImpactPublic): Standing {
     : 'official'
 }
 
+export type NextStep = {
+  kind: 'invite' | 'first-session' | 'hours'
+  gap: number
+}
+
+/** The one step that moves the chapter toward its goals; an hours gap is in whole minutes. */
+export function nextStepFor(
+  impact: NTHSChapterImpactPublic,
+  memberCount: number
+): NextStep | null {
+  const { goals, schoolYearToDate } = impact
+  if (memberCount < goals.membersTutoring) {
+    return { kind: 'invite', gap: goals.membersTutoring - memberCount }
+  }
+  if (schoolYearToDate.membersTutoring < goals.membersTutoring) {
+    return {
+      kind: 'first-session',
+      gap: goals.membersTutoring - schoolYearToDate.membersTutoring,
+    }
+  }
+  if (impact.official && schoolYearToDate.hoursTutored < goals.hoursTutored) {
+    const minutes = (goals.hoursTutored - schoolYearToDate.hoursTutored) * 60
+    // Subtracting fractional hours leaves float noise; without the epsilon an
+    // exact 1035 can come out as 1035.0000000000001 and round up to 1036.
+    return { kind: 'hours', gap: Math.ceil(minutes - 1e-6) }
+  }
+  return null
+}
+
 // One decimal place turns a few minutes of tutoring into '0', which reads as
 // none at all.
 export const UNDER_ONE_TENTH_HOURS_LABEL = '<0.1'

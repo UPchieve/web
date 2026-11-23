@@ -4,8 +4,7 @@ import { NTHSChapterPage } from './nths-chapter.js'
 export class NTHSChapterHQPage extends NTHSChapterPage {
   constructor(page) {
     super(page)
-    this.inviteLink = page.getByTestId('invite-link-url')
-    this.copyButton = page.getByRole('button', { name: 'Copy link' })
+    this.copyButton = page.getByTestId('right-now-copy')
     this.copiedButton = page.getByRole('button', { name: 'Copied' })
     this.nameInput = page.locator('#nths-group-name')
     this.leaveTeamButton = page.getByTestId('leave-team-button')

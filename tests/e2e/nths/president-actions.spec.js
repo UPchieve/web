@@ -71,7 +71,6 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
   }) => {
     await test.step('Copy the invite link, from Home', async () => {
       await hq.goHome()
-      await expect(hq.inviteLink).toHaveText(/\/join-team\/.+/)
       await hq.copyButton.click()
       await expect(hq.copiedButton).toBeVisible()
     })

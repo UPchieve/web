@@ -114,7 +114,7 @@ const rows = computed(() =>
       marks: [
         { label: 'Screen', done: member.safetyApproved },
         { label: 'Training', done: member.trainingComplete },
-        { label: '1st', done: member.periodSessions.allTime > 0 },
+        { label: '1st', done: member.periodSessions.thisSchoolYear > 0 },
       ],
       days: daysSince(member.lastActiveAt, props.now),
     }
@@ -431,6 +431,16 @@ onKeyStroke('Tab', (event) => {
                     }"
                     aria-hidden="true"
                   />
+                  <v-tooltip
+                    v-if="column.key === 'first'"
+                    activator="parent"
+                    location="bottom end"
+                    :offset="6"
+                    max-width="280"
+                    open-on-focus
+                  >
+                    Tutored at least once this school year
+                  </v-tooltip>
                 </button>
               </th>
             </tr>

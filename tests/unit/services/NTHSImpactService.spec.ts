@@ -3,6 +3,7 @@ import {
   formatDecimalHours,
   formatProgressHours,
   meterPercent,
+  nextStepFor,
   standingFor,
 } from '@/services/NTHSImpactService'
 import { impact } from '../fixtures/nths'
@@ -41,6 +42,90 @@ describe('standingFor', () => {
         })
       )
     ).toBe(standing)
+  })
+})
+
+describe('nextStepFor', () => {
+  it.each([
+    {
+      name: 'invite, 3 short with no members',
+      members: 0,
+      tutoring: 0,
+      hours: 0,
+      official: false,
+      step: { kind: 'invite', gap: 3 },
+    },
+    {
+      name: 'invite, 1 short',
+      members: 2,
+      tutoring: 2,
+      hours: 30,
+      official: true,
+      step: { kind: 'invite', gap: 1 },
+    },
+    {
+      name: 'first session, 2 short, ahead of hours',
+      members: 3,
+      tutoring: 1,
+      hours: 5,
+      official: true,
+      step: { kind: 'first-session', gap: 2 },
+    },
+    {
+      name: 'first session for a pending chapter',
+      members: 5,
+      tutoring: 2,
+      hours: 1,
+      official: false,
+      step: { kind: 'first-session', gap: 1 },
+    },
+    {
+      name: 'hours as minutes, exact',
+      members: 3,
+      tutoring: 3,
+      hours: 22.75,
+      official: true,
+      step: { kind: 'hours', gap: 1035 },
+    },
+    {
+      name: 'hours rounded up to the whole minute',
+      members: 3,
+      tutoring: 3,
+      hours: 39.99,
+      official: true,
+      step: { kind: 'hours', gap: 1 },
+    },
+    {
+      name: 'nothing once every goal is met',
+      members: 3,
+      tutoring: 3,
+      hours: 40,
+      official: true,
+      step: null,
+    },
+    {
+      name: 'nothing for a pending chapter with 3 tutoring',
+      members: 3,
+      tutoring: 3,
+      hours: 2,
+      official: false,
+      step: null,
+    },
+  ])('gives $name', ({ members, tutoring, hours, official, step }) => {
+    expect(
+      nextStepFor(
+        impact({
+          official,
+          schoolYearToDate: {
+            studentsHelped: 2,
+            sessionsCompleted: 4,
+            hoursTutored: hours,
+            membersTutoring: tutoring,
+          },
+        }),
+        members
+      )
+    ).toEqual(step)
   })
 })
 

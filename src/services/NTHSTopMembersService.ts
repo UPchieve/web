@@ -17,7 +17,7 @@ export type TopMembersBoard = {
   viewerRow?: TopMemberRow
 }
 
-function formatMinutes(totalMinutes: number): string {
+export function formatMinutes(totalMinutes: number): string {
   return minutesToHoursAndMinutes(
     totalMinutes,
     ({ hours, minutes }) => `${hours}h ${minutes}m`

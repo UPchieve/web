@@ -1,10 +1,6 @@
-import {
-  NTHS_RECRUITMENT_TEMPLATES_URL,
-  type AffiliationStatus,
-} from '@/services/NTHSGroupService'
+import type { AffiliationStatus } from '@/services/NTHSGroupService'
 import vuetify from '@/plugins/vuetify'
 import { useNthsStore } from '@/stores/nths'
-import DoThisNextCard from '@/components/NTHS/HQ/DoThisNextCard.vue'
 import NTHSHomeView from '@/views/NTHS/Tabs/NTHSHomeView.vue'
 import {
   enableAutoUnmount,
@@ -23,13 +19,11 @@ vi.mock('vue-router', async (importOriginal) => ({
 
 const getNTHSChapterImpact = vi.fn()
 const getNTHSChapterRoster = vi.fn()
-const getNTHSChecklist = vi.fn()
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   default: {
     getNTHSChapterImpact: (groupId: string) => getNTHSChapterImpact(groupId),
     getNTHSChapterRoster: (groupId: string) => getNTHSChapterRoster(groupId),
-    getNTHSChecklist: (groupId: string) => getNTHSChecklist(groupId),
   },
 }))
 
@@ -89,7 +83,7 @@ async function getWrapper(
   return wrapper
 }
 
-const DO_THIS_NEXT = '[data-testid="do-this-next"]'
+const RIGHT_NOW = '[data-testid="right-now"]'
 
 beforeEach(() => {
   vi.setSystemTime(NOW)
@@ -99,29 +93,6 @@ beforeEach(() => {
   getNTHSChapterRoster.mockResolvedValue(
     rosterResponse([member({ userId: 'user-1' })])
   )
-  getNTHSChecklist.mockReset()
-  getNTHSChecklist.mockResolvedValue({
-    checklist: {
-      sections: [
-        {
-          id: 1,
-          title: 'Get started',
-          order: 1,
-          items: [
-            {
-              key: 'invite-members',
-              order: 1,
-              title: 'Invite members',
-              resources: [],
-              checkable: true,
-              skippable: true,
-              status: 'incomplete',
-            },
-          ],
-        },
-      ],
-    },
-  })
 })
 
 afterEach(() => {
@@ -149,19 +120,6 @@ describe('NTHSHomeView', () => {
     }
   )
 
-  it('gives a member the invite link and scripts', async () => {
-    const wrapper = await getWrapper('member')
-
-    expect(wrapper.findComponent({ name: 'InviteLink' }).props()).toMatchObject(
-      {
-        code: 'ABC123',
-        referralCode: 'PERSON123',
-      }
-    )
-    const link = wrapper.find('[data-testid="invite-scripts"]')
-    expect(link.attributes('href')).toBe(NTHS_RECRUITMENT_TEMPLATES_URL)
-  })
-
   it.each([
     { roleName: 'admin', goals: true, contribution: false },
     { roleName: 'member', goals: false, contribution: true },
@@ -182,18 +140,37 @@ describe('NTHSHomeView', () => {
     const wrapper = await getWrapper()
 
     expect(wrapper.find('[data-testid="impact-error"]').exists()).toBe(true)
-    expect(wrapper.findComponent({ name: 'InviteLink' }).exists()).toBe(true)
   })
 
   it.each([
     { roleName: 'admin', shown: true },
     { roleName: 'member', shown: false },
   ])(
-    'shows the admin-only sections to $roleName: $shown',
+    'shows the Right now card to $roleName: $shown',
     async ({ roleName, shown }) => {
       const wrapper = await getWrapper(roleName)
 
-      expect(wrapper.find(DO_THIS_NEXT).exists()).toBe(shown)
+      expect(wrapper.find(RIGHT_NOW).exists()).toBe(shown)
+    }
+  )
+
+  it('shows an admin no Right now card while the roster loads', async () => {
+    getNTHSChapterRoster.mockReturnValue(new Promise(() => {}))
+    const wrapper = await getWrapper()
+
+    expect(wrapper.find(RIGHT_NOW).exists()).toBe(false)
+  })
+
+  it.each([
+    { failing: getNTHSChapterImpact },
+    { failing: getNTHSChapterRoster },
+  ])(
+    'shows an admin no Right now card when a request fails',
+    async ({ failing }) => {
+      failing.mockRejectedValue(new Error('boom'))
+      const wrapper = await getWrapper()
+
+      expect(wrapper.find(RIGHT_NOW).exists()).toBe(false)
     }
   )
 
@@ -214,22 +191,4 @@ describe('NTHSHomeView', () => {
       )
     }
   )
-
-  it('loads the rest of Home without waiting for the checklist', async () => {
-    getNTHSChecklist.mockReturnValue(new Promise(() => {}))
-    const wrapper = await getWrapper('admin')
-
-    expect(wrapper.find(DO_THIS_NEXT).exists()).toBe(false)
-    expect(wrapper.findComponent({ name: 'InviteLink' }).exists()).toBe(true)
-    expect(wrapper.find('[data-testid="impact-students"]').text()).toBe('2')
-  })
-
-  it('moves focus to Invite members once DoThisNextCard finishes', async () => {
-    const wrapper = await getWrapper('admin', 'user-1', 'AFFILIATED')
-
-    wrapper.findComponent(DoThisNextCard).vm.$emit('finished')
-
-    const invite = wrapper.find('[data-testid="invite"]').element
-    await vi.waitFor(() => expect(document.activeElement).toBe(invite))
-  })
 })
