@@ -1,12 +1,16 @@
 <script lang="ts" setup>
 import { useStore } from 'vuex'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import Menu from '@/components/Menu.vue'
 import { useRouter } from 'vue-router'
 import AuthService from '@/services/AuthService'
+import UserService from '@/services/UserService'
+import LoggerService from '@/services/LoggerService'
 import UserAvatar from '@/components/UserAvatarMenu/UserAvatar.vue'
 import UserModeToggle from '@/components/UserAvatarMenu/UserModeToggle.vue'
+import { useSessionOfferStore } from '@/stores/session-offer'
 import { IonToast } from '@ionic/vue'
 
 const props = withDefaults(
@@ -77,8 +81,56 @@ function onSwitchedMode() {
 }
 
 function onSwitchModeError(message: string) {
+  isConfirmingLeaveQueue.value = false
   errorMessage.value = message
   isMenuOpen.value = true
+}
+
+const { isInQueue } = storeToRefs(useSessionOfferStore())
+const userType = computed(() => store.getters['user/userType'])
+const isConfirmingLeaveQueue = ref(false)
+const stayButton = ref<HTMLButtonElement>()
+
+watch(
+  () => props.isMenuOpen,
+  (isOpen) => {
+    if (!isOpen) return
+    isConfirmingLeaveQueue.value = false
+  }
+)
+
+async function onSwitchModeClick() {
+  if (userType.value === 'volunteer' && isInQueue.value) {
+    isConfirmingLeaveQueue.value = true
+    await nextTick()
+    stayButton.value?.focus()
+    return
+  }
+  await switchMode()
+}
+
+function stayInQueue() {
+  isConfirmingLeaveQueue.value = false
+}
+
+async function switchMode() {
+  const targetMode = userType.value === 'student' ? 'volunteer' : 'student'
+  const isOnDashboard = router.currentRoute.value.path === '/dashboard'
+  try {
+    await UserService.switchActiveRole({ $store: store }, targetMode)
+    if (!isOnDashboard) {
+      await router.push('/dashboard')
+    }
+    onSwitchedMode()
+  } catch (err) {
+    LoggerService.noticeError(
+      'Failed to switch account modes via UserModeToggle',
+      err
+    )
+    onSwitchModeError(
+      `Couldn't switch to ${targetMode} mode. Try refreshing the page.`
+    )
+  }
 }
 const errorMessage = ref<string>('')
 function resetErrorMessage() {
@@ -110,6 +162,40 @@ function resetErrorMessage() {
     >
       <template v-slot:content>
         <div
+          v-if="isConfirmingLeaveQueue"
+          :class="[
+            'leave-queue-confirmation',
+            { 'leave-queue-confirmation--mobile': isMobileMode },
+          ]"
+          role="alertdialog"
+          aria-labelledby="leave-queue-confirmation-message"
+          data-testid="leave-queue-confirmation"
+        >
+          <p id="leave-queue-confirmation-message">
+            Leave queue and switch to Student Mode.
+          </p>
+          <div class="leave-queue-confirmation__buttons">
+            <button
+              ref="stayButton"
+              type="button"
+              class="confirmation-btn confirmation-btn--secondary"
+              @click="stayInQueue"
+              data-testid="leave-queue-stay"
+            >
+              Stay
+            </button>
+            <button
+              type="button"
+              class="confirmation-btn confirmation-btn--primary"
+              @click="switchMode"
+              data-testid="leave-queue-confirm"
+            >
+              Switch
+            </button>
+          </div>
+        </div>
+        <div
+          v-else
           :class="[
             'menu-content-container',
             { 'menu-content-container--mobile': isMobileMode },
@@ -127,8 +213,7 @@ function resetErrorMessage() {
             id="mode-toggle"
             class="user-menu-toggle"
             v-if="!isStudentCoachModeBlocked && isStudentVolunteer"
-            @switchModeError="onSwitchModeError"
-            @switchedMode="onSwitchedMode"
+            @switchMode="onSwitchModeClick"
           />
           <!--          On desktop, show error in a toast-->
           <IonToast
@@ -295,6 +380,64 @@ hr {
 
 .user-menu-toggle {
   margin-bottom: 12px;
+}
+
+.leave-queue-confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 228px;
+  padding: 3px;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: $font-weight-medium;
+    line-height: 1.3;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  &--mobile {
+    width: 100%;
+    padding: 8px;
+    gap: 16px;
+
+    p {
+      @include font-category('body');
+    }
+
+    .leave-queue-confirmation__buttons {
+      gap: 12px;
+    }
+
+    .confirmation-btn {
+      @include font-category('button');
+      flex: 1;
+      min-height: 44px;
+    }
+  }
+}
+
+.confirmation-btn {
+  padding: 4px 12px;
+  border-radius: $radius-lg;
+  font-size: 14px;
+  font-weight: $font-weight-medium;
+
+  &--secondary {
+    color: var(--secondary-text-color);
+    border: 1px solid $c-border-grey;
+  }
+
+  &--primary {
+    color: white;
+    background-color: $c-information-blue;
+  }
 }
 
 .anchored-error-toast {

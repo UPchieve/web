@@ -8,6 +8,8 @@ import router from '@/router'
 import { mount, DOMWrapper, VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { useAppSidebarStore } from '@/stores/app/sidebar'
+import { useSessionOfferStore } from '@/stores/session-offer'
+import UserService from '@/services/UserService'
 
 describe('Navigation', () => {
   const DEFAULT_USER_STATE = {
@@ -29,6 +31,8 @@ describe('Navigation', () => {
   afterEach(() => {
     mounted?.unmount()
     mounted = undefined
+    document.querySelectorAll('ion-modal').forEach((modal) => modal.remove())
+    vi.restoreAllMocks()
   })
 
   function getWrapper(options = {}) {
@@ -126,6 +130,10 @@ describe('Navigation', () => {
   })
 
   it('Closes the menu and collapses the drawer after switching modes', async () => {
+    const switchSpy = vi
+      .spyOn(UserService, 'switchActiveRole')
+      .mockResolvedValue(undefined)
+    vi.spyOn(router, 'push').mockResolvedValue(undefined)
     const { component } = getWrapper({
       isMenuOpen: true,
       app: { getters: { mobileMode: () => true } },
@@ -135,11 +143,94 @@ describe('Navigation', () => {
     await vi.waitFor(() => expect(modeToggle().exists()).toBe(true))
     await expandDrawer()
 
-    modeToggle().vm.$emit('switchedMode')
-    await nextTick()
+    modeToggle().vm.$emit('switchMode')
 
-    expect(isDrawerCollapsed()).toBe(true)
+    await vi.waitFor(() => expect(isDrawerCollapsed()).toBe(true))
+    expect(switchSpy).toHaveBeenCalledWith(expect.anything(), 'volunteer')
     expect(component.emitted('update:isMenuOpen')).toContainEqual([false])
+  })
+
+  describe('when a coach in the queue switches to student mode', () => {
+    const COACH_OPTIONS = {
+      isMenuOpen: true,
+      user: {
+        getters: {
+          isStudentVolunteer: () => true,
+          userType: () => 'volunteer',
+        },
+      },
+    }
+
+    async function requestSwitch() {
+      useSessionOfferStore().queueJoiningState = 'joined'
+      const result = getWrapper(COACH_OPTIONS)
+      const modeToggle = () => result.component.findComponent(UserModeToggle)
+      await vi.waitFor(() => expect(modeToggle().exists()).toBe(true))
+      modeToggle().vm.$emit('switchMode')
+      await nextTick()
+      await nextTick()
+      return result
+    }
+
+    const confirmation = (wrapper: DOMWrapper<Element>) =>
+      wrapper.find('[data-testid="leave-queue-confirmation"]')
+
+    it('replaces the menu content with the confirmation', async () => {
+      const switchSpy = vi.spyOn(UserService, 'switchActiveRole')
+      const { wrapper } = await requestSwitch()
+
+      expect(confirmation(wrapper).text()).toContain(
+        'Leave queue and switch to Student Mode.'
+      )
+      expect(wrapper.find('[data-testid="menu-row-profile"]').exists()).toBe(
+        false
+      )
+      expect(document.activeElement).toBe(
+        wrapper.find('[data-testid="leave-queue-stay"]').element
+      )
+      expect(switchSpy).not.toHaveBeenCalled()
+    })
+
+    it('goes back to the menu when the coach stays', async () => {
+      const switchSpy = vi.spyOn(UserService, 'switchActiveRole')
+      const { wrapper } = await requestSwitch()
+
+      await wrapper.find('[data-testid="leave-queue-stay"]').trigger('click')
+
+      expect(confirmation(wrapper).exists()).toBe(false)
+      expect(wrapper.find('[data-testid="menu-row-profile"]').exists()).toBe(
+        true
+      )
+      expect(switchSpy).not.toHaveBeenCalled()
+    })
+
+    it('switches to student mode when the coach confirms', async () => {
+      const switchSpy = vi
+        .spyOn(UserService, 'switchActiveRole')
+        .mockResolvedValue(undefined)
+      vi.spyOn(router, 'push').mockResolvedValue(undefined)
+      const { wrapper, component } = await requestSwitch()
+
+      await wrapper.find('[data-testid="leave-queue-confirm"]').trigger('click')
+
+      expect(switchSpy).toHaveBeenCalledWith(expect.anything(), 'student')
+      await vi.waitFor(() =>
+        expect(component.emitted('update:isMenuOpen')).toContainEqual([false])
+      )
+    })
+
+    it('dismisses the confirmation when the menu is closed', async () => {
+      const { wrapper, setProps } = await requestSwitch()
+
+      await setProps({ isMenuOpen: false })
+      await setProps({ isMenuOpen: true })
+      await nextTick()
+
+      expect(confirmation(wrapper).exists()).toBe(false)
+      expect(wrapper.find('[data-testid="menu-row-profile"]').exists()).toBe(
+        true
+      )
+    })
   })
 
   it('hides the mode toggle when coach mode is blocked', async () => {
