@@ -180,10 +180,19 @@ function selectNext(step: number) {
           <span class="sline" aria-hidden="true">
             Your chapter has tutored for
             <span class="flip" data-testid="impact-hours"
-              ><span v-for="(char, i) in allTimeHours" :key="i" class="tile">{{
-                char
-              }}</span></span
-            >
+              ><span
+                v-for="(char, i) in allTimeHours"
+                :key="`${i}-${char}`"
+                class="tile"
+                >{{ char
+                }}<template v-if="/[1-9]/.test(char)"
+                  ><span class="half under" />
+                  <span class="half top" />
+                  <span
+                    class="half bottom"
+                    data-testid="impact-hours-flip"
+                    :data-digit="char" /></template></span
+            ></span>
             {{ allTimeUnit }}.
           </span>
         </p>
@@ -365,15 +374,74 @@ p {
   display: inline-block;
   width: 40px;
   height: 56px;
-  line-height: 56px;
+  line-height: 54px;
   text-align: center;
   border: 1px solid $c-border-grey;
   border-radius: 7px;
-  background: #eaf6fd;
+  background: #eaf6fd
+    linear-gradient(
+      transparent 27px,
+      rgba(23, 29, 60, 0.07) 27px 28px,
+      transparent 28px
+    );
   color: #171d3c;
   font-size: 40px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
+  position: relative;
+  perspective: 240px;
+}
+.half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 27px;
+  overflow: hidden;
+  background: #eaf6fd;
+
+  &::after {
+    content: '0';
+    display: block;
+  }
+  &.top {
+    top: 0;
+    border-radius: 6px 6px 0 0;
+    transform-origin: bottom;
+    animation: fold-down 0.14s ease-in forwards;
+  }
+  &.under,
+  &.bottom {
+    top: 27px;
+    border-radius: 0 0 6px 6px;
+    box-shadow: inset 0 1px rgba(23, 29, 60, 0.07);
+
+    &::after {
+      margin-top: -27px;
+    }
+  }
+  &.bottom {
+    transform-origin: top;
+    animation: fold-in 0.14s 0.14s ease-out backwards;
+
+    &::after {
+      content: attr(data-digit);
+    }
+  }
+}
+@keyframes fold-down {
+  to {
+    transform: rotateX(-90deg);
+  }
+}
+@keyframes fold-in {
+  from {
+    transform: rotateX(90deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .half {
+    display: none;
+  }
 }
 .stats {
   display: flex;

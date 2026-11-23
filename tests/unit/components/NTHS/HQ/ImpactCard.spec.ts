@@ -53,4 +53,27 @@ describe('ImpactCard', () => {
 
     expect(numbers(wrapper)).toEqual(shown)
   })
+
+  it.each([
+    { hours: 58.4, text: '58', flipped: ['5', '8'] },
+    { hours: 105, text: '105', flipped: ['1', '5'] },
+    { hours: 0.5, text: '<1', flipped: ['1'] },
+    { hours: 0, text: '0', flipped: [] },
+  ])(
+    'flips only the nonzero digit tiles of $text',
+    async ({ hours, text, flipped }) => {
+      const wrapper = mount(ImpactCard, {
+        props: {
+          impact: impact({
+            allTime: { ...IMPACT.allTime, hoursTutored: hours },
+          }),
+        },
+      })
+      await wrapper.find('[data-testid="impact-tab-all"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="impact-hours"]').text()).toBe(text)
+      const flips = wrapper.findAll('[data-testid="impact-hours-flip"]')
+      expect(flips.map((f) => f.attributes('data-digit'))).toEqual(flipped)
+    }
+  )
 })
