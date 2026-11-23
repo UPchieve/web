@@ -77,6 +77,8 @@ export type NTHSRosterMemberPublic = {
   // Zero unless an admin's request names a range.
   rangeHours: number
   rangeSessions: number
+  subjects: string[]
+  studentsHelpedThisYear: number
   lastActiveAt?: DateString
 }
 export type NTHSChapterRosterPublic = {

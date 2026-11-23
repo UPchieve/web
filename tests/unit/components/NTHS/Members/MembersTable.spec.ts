@@ -110,8 +110,31 @@ describe('MembersTable', () => {
         !adminColumns
       )
       expect(wrapper.find(sortButton('days')).exists()).toBe(!adminColumns)
+      expect(wrapper.find('[data-testid="member-subjects"]').exists()).toBe(
+        adminColumns
+      )
+      expect(wrapper.find('[data-testid="member-students"]').exists()).toBe(
+        !adminColumns
+      )
     }
   )
+
+  it('shows a member the students helped and a count of subjects', () => {
+    const wrapper = table({
+      isGroupAdmin: false,
+      members: [
+        member({
+          userId: 'x',
+          firstName: 'Xi',
+          subjects: ['Algebra', 'Biology'],
+          studentsHelpedThisYear: 4,
+        }),
+      ],
+    })
+    const row = wrapper.find(ROW)
+    expect(row.find('[data-testid="member-students"]').text()).toBe('4')
+    expect(row.find('[data-testid="member-subject-count"]').text()).toBe('2')
+  })
 
   it.each([
     {
@@ -347,7 +370,8 @@ describe('MembersTable', () => {
       const elements: Record<string, HTMLElement> = {
         expand: wrapper.find(EXPAND).element as HTMLElement,
         region: wrapper.find(SCROLL).element as HTMLElement,
-        lastHeading: wrapper.find(sortButton('first')).element as HTMLElement,
+        lastHeading: wrapper.find(sortButton('subjects'))
+          .element as HTMLElement,
       }
       elements[from].focus()
       const event = new KeyboardEvent('keydown', {
@@ -402,7 +426,7 @@ describe('MembersTable', () => {
 
       expect(event.defaultPrevented).toBe(true)
       const expected = shiftKey
-        ? wrapper.find(sortButton('first')).element
+        ? wrapper.find(sortButton('subjects')).element
         : wrapper.find(EXPAND).element
       expect(document.activeElement).toBe(expected)
     }
@@ -508,11 +532,49 @@ describe('MembersTable', () => {
     )
   })
 
+  const COUNTED = [
+    { ...ME, studentsHelpedThisYear: 3, subjects: ['Algebra', 'Biology'] },
+    { ...OTHER, studentsHelpedThisYear: 0, subjects: [] },
+    { ...ANA, studentsHelpedThisYear: 4, subjects: ['Algebra'] },
+    {
+      ...CAL,
+      studentsHelpedThisYear: 1,
+      subjects: ['Art', 'Biology', 'Chemistry'],
+    },
+    {
+      ...DEE,
+      studentsHelpedThisYear: 2,
+      subjects: ['Art', 'Algebra', 'Math', 'Physics'],
+    },
+  ]
+
   it.each([
     {
-      choices: ['hours'],
+      key: 'hours',
       names: ['Cal R.', 'Dee R.', 'Zoe R. (you)', 'Ben R.', 'Ana R.'],
     },
+    {
+      key: 'students',
+      names: ['Ana R.', 'Zoe R. (you)', 'Dee R.', 'Cal R.', 'Ben R.'],
+    },
+    {
+      key: 'subjects',
+      names: ['Dee R.', 'Cal R.', 'Zoe R. (you)', 'Ana R.', 'Ben R.'],
+    },
+  ])(
+    'sorts most first from the Sort by select by $key',
+    async ({ key, names }) => {
+      const wrapper = table({ isGroupAdmin: false, members: COUNTED })
+
+      await wrapper
+        .find('[data-testid="members-table-sort-select"]')
+        .setValue(key)
+
+      expect(shownNames(wrapper)).toEqual(names)
+    }
+  )
+
+  it.each([
     {
       choices: ['status'],
       names: ['Ben R.', 'Zoe R. (you)', 'Cal R.', 'Dee R.', 'Ana R.'],
@@ -533,12 +595,23 @@ describe('MembersTable', () => {
   })
 
   it.each([
-    { isGroupAdmin: true, options: ['', 'name', 'status', 'hours'] },
-    { isGroupAdmin: false, options: ['', 'name', 'hours', 'days'] },
+    {
+      isGroupAdmin: true,
+      options: ['', 'name', 'status', 'hours', 'subjects'],
+    },
+    {
+      isGroupAdmin: false,
+      options: ['', 'name', 'hours', 'students', 'subjects', 'days'],
+    },
+    {
+      isGroupAdmin: true,
+      range: { firstDay: new Date(2026, 9, 5), lastDay: new Date(2026, 9, 11) },
+      options: ['', 'name', 'hours', 'sessions', 'role', 'status', 'subjects'],
+    },
   ])(
     'offers $options in the Sort by select when admin is $isGroupAdmin',
-    ({ isGroupAdmin, options }) => {
-      const select = table({ isGroupAdmin }).find(
+    ({ isGroupAdmin, range, options }) => {
+      const select = table({ isGroupAdmin, range }).find(
         '[data-testid="members-table-sort-select"]'
       ).element as HTMLSelectElement
 
@@ -709,6 +782,7 @@ describe('MembersTable', () => {
         'Screen',
         'Training',
         '1st',
+        'Subjects',
       ])
       expect(shownNames(wrapper)).toEqual([
         'Ada R.',

@@ -220,6 +220,42 @@ describe('sortMembers', () => {
     expect(names(sortMembers(roster, sort, NOW, 'home'))).toEqual(expected)
   })
 
+  const helpers = [
+    member({
+      userId: 'a',
+      firstName: 'Ann',
+      subjects: ['Art'],
+      studentsHelpedThisYear: 0,
+    }),
+    member({
+      userId: 'b',
+      firstName: 'Bob',
+      subjects: [],
+      studentsHelpedThisYear: 2,
+    }),
+    member({
+      userId: 'c',
+      firstName: 'Cy',
+      subjects: ['Algebra', 'Biology'],
+      studentsHelpedThisYear: 5,
+    }),
+    member({
+      userId: 'd',
+      firstName: 'Dee',
+      subjects: ['Art', 'Math'],
+      studentsHelpedThisYear: 1,
+    }),
+  ]
+
+  it.each<[MemberSort, string[]]>([
+    [{ key: 'students', direction: 'desc' }, ['Cy', 'Bob', 'Dee', 'Ann']],
+    [{ key: 'students', direction: 'asc' }, ['Ann', 'Dee', 'Bob', 'Cy']],
+    [{ key: 'subjects', direction: 'asc' }, ['Bob', 'Ann', 'Cy', 'Dee']],
+    [{ key: 'subjects', direction: 'desc' }, ['Cy', 'Dee', 'Ann', 'Bob']],
+  ])('orders by %j as %j', (sort, expected) => {
+    expect(names(sortMembers(helpers, sort, NOW, 'home'))).toEqual(expected)
+  })
+
   const leaders = [
     member({ userId: 'm', firstName: 'Mo' }),
     member({

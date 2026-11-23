@@ -178,6 +178,17 @@ describe('downloadRosterCsv', () => {
     expect(rows.map((row) => row.Role)).toEqual(['Admin', 'Vice President'])
   })
 
+  it('writes every subject name joined by commas, empty for none', () => {
+    const rows = csvRows(
+      [
+        member({ userId: 'a', subjects: ['Algebra', 'Biology'] }),
+        member({ userId: 'b' }),
+      ],
+      undefined
+    )
+    expect(rows.map((row) => row.Subjects)).toEqual(['Algebra, Biology', ''])
+  })
+
   it('downloads the roster file with the formula guard and a UTF-8 BOM', () => {
     csvRows([member()], undefined)
     expect(exportToCsv).toHaveBeenCalledWith(
@@ -249,6 +260,7 @@ describe('downloadRosterCsv', () => {
         [`Sessions (${SCHOOL_YEAR_LABEL} school year)`, 4],
         [`Hours (${SCHOOL_YEAR_LABEL} school year)`, 3.5],
         ...RANGE_CSV_HEADERS[period].map((header, i) => [header, [1, 0.5][i]]),
+        ['Subjects', ''],
         ['Last active', ''],
       ])
     }

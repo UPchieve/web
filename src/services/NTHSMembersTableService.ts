@@ -80,6 +80,8 @@ export type MemberSortKey =
   | 'training'
   | 'first'
   | 'days'
+  | 'students'
+  | 'subjects'
 
 export const MEMBER_SORT_KEYS: MemberSortKey[] = [
   'name',
@@ -91,6 +93,8 @@ export const MEMBER_SORT_KEYS: MemberSortKey[] = [
   'training',
   'first',
   'days',
+  'students',
+  'subjects',
 ]
 
 export type MemberSort = {
@@ -156,6 +160,10 @@ function memberSortValue(
       return Number(member.periodSessions.thisSchoolYear > 0)
     case 'days':
       return daysSince(member.lastActiveAt, now) ?? Infinity
+    case 'students':
+      return member.studentsHelpedThisYear
+    case 'subjects':
+      return member.subjects.length
   }
 }
 

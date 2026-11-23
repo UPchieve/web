@@ -10,6 +10,7 @@ import SortArrowIcon from '@/assets/sort-arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import { avatarColor } from '@/components/NTHS/member-avatar'
 import RosterRowMenu from '@/components/NTHS/Members/RosterRowMenu.vue'
+import SubjectList from '@/components/NTHS/Members/SubjectList.vue'
 import { useInviteLink } from '@/composables/useInviteLink'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import {
@@ -84,6 +85,8 @@ const SORT_LABELS: Record<MemberSortKey, string> = {
   training: 'Training',
   first: '1st',
   days: 'Days since last session',
+  students: 'Students helped',
+  subjects: 'Subjects',
 }
 
 const scope = computed(() => (props.range ? 'range' : 'home'))
@@ -153,6 +156,8 @@ const rows = computed(() =>
         { label: '1st', done: member.periodSessions.thisSchoolYear > 0 },
       ],
       days: daysSince(member.lastActiveAt, props.now),
+      students: member.studentsHelpedThisYear,
+      subjects: member.subjects,
     }
   })
 )
@@ -168,6 +173,7 @@ const columns = computed<{ key: MemberSortKey; align: string }[]>(() => {
       { key: 'screen', align: '' },
       { key: 'training', align: '' },
       { key: 'first', align: '' },
+      { key: 'subjects', align: 'l' },
     ]
   }
   return props.isGroupAdmin
@@ -178,18 +184,22 @@ const columns = computed<{ key: MemberSortKey; align: string }[]>(() => {
         { key: 'screen', align: '' },
         { key: 'training', align: '' },
         { key: 'first', align: '' },
+        { key: 'subjects', align: 'l' },
       ]
     : [
         { key: 'name', align: 'l' },
         { key: 'hours', align: 'r' },
+        { key: 'students', align: 'r' },
+        { key: 'subjects', align: 'r' },
         { key: 'days', align: 'r' },
       ]
 })
 const selectKeys = computed<MemberSortKey[]>(() => {
-  if (props.range) return ['name', 'hours', 'sessions', 'role', 'status']
+  if (props.range)
+    return ['name', 'hours', 'sessions', 'role', 'status', 'subjects']
   return props.isGroupAdmin
-    ? ['name', 'status', 'hours']
-    : ['name', 'hours', 'days']
+    ? ['name', 'status', 'hours', 'subjects']
+    : ['name', 'hours', 'students', 'subjects', 'days']
 })
 
 const selectValue = computed(() =>
@@ -239,7 +249,12 @@ function sortBy(key: MemberSortKey) {
 function selectSort(event: Event) {
   const key = (event.target as HTMLSelectElement).value as MemberSortKey | ''
   activeSort.value = key
-    ? { key, direction: key === 'hours' || key === 'sessions' ? 'desc' : 'asc' }
+    ? {
+        key,
+        direction: ['hours', 'sessions', 'students', 'subjects'].includes(key)
+          ? 'desc'
+          : 'asc',
+      }
     : DEFAULT_MEMBER_SORT
 }
 
@@ -488,8 +503,13 @@ onKeyStroke('Tab', (event) => {
               <col class="c-mark" />
               <col class="c-mark" />
               <col class="c-mark" />
+              <col class="c-subj" />
             </template>
-            <col v-else class="c-days" />
+            <template v-else>
+              <col class="c-students" />
+              <col class="c-num" />
+              <col class="c-days" />
+            </template>
             <col v-if="range" class="c-menu" />
           </colgroup>
           <thead>
@@ -597,21 +617,43 @@ onKeyStroke('Tab', (event) => {
                     <span class="sr">{{ mark.done ? 'Done' : 'Not yet' }}</span>
                   </span>
                 </td>
+                <td
+                  class="l subj"
+                  data-label="Subjects"
+                  data-testid="member-subjects"
+                >
+                  <SubjectList :subjects="row.subjects" />
+                </td>
               </template>
-              <td
-                v-else
-                class="r"
-                data-label="Days since last session"
-                data-testid="member-days"
-              >
-                <template v-if="row.days !== undefined">{{
-                  row.days
-                }}</template>
-                <template v-else>
-                  <span aria-hidden="true">&mdash;</span>
-                  <span class="sr">{{ NEVER_ACTIVE_LABEL }}</span>
-                </template>
-              </td>
+              <template v-else>
+                <td
+                  class="r"
+                  data-label="Students helped"
+                  data-testid="member-students"
+                >
+                  {{ row.students }}
+                </td>
+                <td
+                  class="r"
+                  data-label="Subjects"
+                  data-testid="member-subject-count"
+                >
+                  {{ row.subjects.length }}
+                </td>
+                <td
+                  class="r"
+                  data-label="Days since last session"
+                  data-testid="member-days"
+                >
+                  <template v-if="row.days !== undefined">{{
+                    row.days
+                  }}</template>
+                  <template v-else>
+                    <span aria-hidden="true">&mdash;</span>
+                    <span class="sr">{{ NEVER_ACTIVE_LABEL }}</span>
+                  </template>
+                </td>
+              </template>
               <td v-if="range" class="menu">
                 <RosterRowMenu
                   :member="row.member"
@@ -783,15 +825,15 @@ onKeyStroke('Tab', (event) => {
 }
 .table {
   width: 100%;
-  min-width: 784px;
+  min-width: 1004px;
   table-layout: fixed;
   border-collapse: collapse;
 }
 .table.member {
-  min-width: 500px;
+  min-width: 730px;
 }
 .table.range {
-  min-width: 900px;
+  min-width: 1120px;
 
   .c-hrs {
     width: 96px;
@@ -821,8 +863,14 @@ onKeyStroke('Tab', (event) => {
 .c-num {
   width: 90px;
 }
+.c-students {
+  width: 140px;
+}
 .c-role {
   width: 130px;
+}
+.c-subj {
+  width: 220px;
 }
 .c-menu {
   width: 48px;
@@ -1124,6 +1172,10 @@ tbody th {
     &::before {
       display: none;
     }
+  }
+  .table td.subj {
+    flex-basis: 100%;
+    padding-right: 0;
   }
   .table td[data-label='Screen'],
   .table td[data-label='Training'],

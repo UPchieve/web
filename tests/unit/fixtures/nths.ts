@@ -42,6 +42,8 @@ export function member(
     },
     rangeHours: 0,
     rangeSessions: 0,
+    subjects: [],
+    studentsHelpedThisYear: 0,
     lastActiveAt: '2026-10-14T00:00:00.000Z',
     ...overrides,
   }

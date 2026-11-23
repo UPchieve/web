@@ -155,6 +155,7 @@ export function downloadRosterCsv(
         [`Hours (${schoolYearLabel} school year)`]:
           member.periodHours.thisSchoolYear,
         ...rangeColumns,
+        Subjects: member.subjects.join(', '),
         'Last active': csvCalendarDate(member.lastActiveAt),
       }
     }),
