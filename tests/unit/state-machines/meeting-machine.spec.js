@@ -250,6 +250,25 @@ describe('MeetingMachine', () => {
       ).toBe(true)
     })
 
+    it('joins the media room to view a partner screen share while banned', async () => {
+      isBanned = true
+      mockMachine = await initalizeMeetingMachine()
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      mockMachine.send({ type: 'partner_shared_screen' })
+
+      expect(
+        mockMachine
+          .getSnapshot()
+          .matches('Active.ScreenShareControl.ViewingPartnerScreenShare')
+      ).toBe(true)
+      expect(
+        mockMachine
+          .getSnapshot()
+          .matches('Active.MediaRouter.FetchingChimeMeeting')
+      ).toBe(true)
+    })
+
     it('Stop MicControl after moderation infraction', async () => {
       isBanned = false
       mockMachine = await initalizeMeetingMachine()

@@ -376,17 +376,32 @@ export function create() {
               },
               ViewOnly: {
                 on: {
-                  partner_shared_screen: {
-                    target: 'ViewingPartnerScreenShare',
-                    actions: [
-                      assign({ showPartnerScreenShare: () => true }),
-                      () => {
-                        AnalyticsService.captureEvent(
-                          EVENTS.SCREENSHARE_USER_VIEWED_SCREENSHARE
-                        )
-                      },
-                    ],
-                  },
+                  partner_shared_screen: [
+                    {
+                      guard: 'hasNotJoinedMediaRoom',
+                      target: 'ViewingPartnerScreenShare',
+                      actions: [
+                        'fetchMediaRoom',
+                        assign({ showPartnerScreenShare: () => true }),
+                        () => {
+                          AnalyticsService.captureEvent(
+                            EVENTS.SCREENSHARE_USER_VIEWED_SCREENSHARE
+                          )
+                        },
+                      ],
+                    },
+                    {
+                      target: 'ViewingPartnerScreenShare',
+                      actions: [
+                        assign({ showPartnerScreenShare: () => true }),
+                        () => {
+                          AnalyticsService.captureEvent(
+                            EVENTS.SCREENSHARE_USER_VIEWED_SCREENSHARE
+                          )
+                        },
+                      ],
+                    },
+                  ],
                   not_banned: {
                     target: 'CheckingEligibility',
                   },
