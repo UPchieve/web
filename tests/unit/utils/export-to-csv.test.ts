@@ -45,6 +45,11 @@ describe('exportToCsv', () => {
     expect(body(csv!)).toEqual(['"Jo, ""JJ"""', '"two', 'lines"', '"cr\r"'])
   })
 
+  it('quotes a header holding a comma and leaves plain headers as they were', async () => {
+    const csv = await csvFrom([{ 'Sessions (Nov 1, 2026)': 2, name: 'Alex' }])
+    expect(csv).toBe('"Sessions (Nov 1, 2026)",name\n2,Alex')
+  })
+
   it.each(['=', '+', '-', '@', '\t', '\r'])(
     'guards a string cell starting with %j against formula injection when asked',
     async (lead) => {

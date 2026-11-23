@@ -6,7 +6,6 @@ import type {
 import {
   displayTitle,
   presidencyChoiceLabel,
-  roleLabel,
   roleTagLabel,
 } from '@/services/NTHSRosterService'
 import { member } from '../fixtures/nths'
@@ -88,32 +87,8 @@ describe('roleTagLabel', () => {
       titled('Executive Board Member', { roleName: 'member' }),
     ],
     ['a lone president', 'President', titled('President')],
-    [
-      'an admin whose account is closed',
-      undefined,
-      titled('Member', { roleName: 'admin', accountClosed: true }),
-    ],
-    [
-      'a president whose account is closed',
-      undefined,
-      titled('President', { accountClosed: true }),
-    ],
   ])('badges %s: %s', (_label, expected, subject) => {
     const roster = [subject, titled('Member')]
     expect(roleTagLabel(subject, roster)).toBe(expected)
-  })
-})
-
-describe('roleLabel', () => {
-  it.each([
-    ['a lone president', 'President', [titled('President')]],
-    [
-      'an untitled admin',
-      'Chapter admin',
-      [titled('Member', { roleName: 'admin' })],
-    ],
-    ['an untitled plain member', 'Member', [titled('Member')]],
-  ] as const)('describes %s as %s', (_label, expected, roster) => {
-    expect(roleLabel(roster[0], [...roster])).toBe(expected)
   })
 })

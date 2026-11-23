@@ -22,7 +22,12 @@ const tabs = computed(() =>
   [
     { to: '/groups/home', name: 'home', label: 'Home' },
     { to: '/groups/to-do', name: 'to_do', label: 'To do', adminOnly: true },
-    { to: '/groups/members', name: 'members', label: 'Members' },
+    {
+      to: '/groups/members',
+      name: 'members',
+      label: 'Members',
+      adminOnly: true,
+    },
     { to: '/groups/resources', name: 'resources', label: 'Resources' },
     { to: '/groups/setup', name: 'setup', label: 'Chapter setup' },
   ].filter(({ adminOnly }) => !adminOnly || props.isGroupAdmin)

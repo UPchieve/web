@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, ref, watch } from 'vue'
-import { useElementSize } from '@vueuse/core'
+import { computed, onBeforeMount, ref, shallowRef, watch } from 'vue'
 import { useStore } from 'vuex'
-import Loader from '@/components/Loader.vue'
-import LargeButton from '@/components/LargeButton.vue'
-import RosterCards from '@/components/NTHS/Members/RosterCards.vue'
-import RosterFilterChips from '@/components/NTHS/Members/RosterFilterChips.vue'
-import RosterSortControl from '@/components/NTHS/Members/RosterSortControl.vue'
-import RosterTable from '@/components/NTHS/Members/RosterTable.vue'
-import { useChapterImpact } from '@/composables/useChapterImpact'
+import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
+import RosterRangePicker from '@/components/NTHS/Members/RosterRangePicker.vue'
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import { useRosterPreferences } from '@/composables/useRosterPreferences'
 import LoggerService from '@/services/LoggerService'
@@ -20,163 +14,101 @@ import {
   type NTHSRosterMemberPublic,
   type NTHSTitle,
 } from '@/services/NTHSGroupService'
-import { formatProgressHours } from '@/services/NTHSImpactService'
 import {
   displayTitle,
-  downloadRosterCsv,
-  filterRoster,
   memberDisplayName,
-  nextRosterSort,
-  ROSTER_PERIOD_LABELS,
-  ROSTER_PERIOD_PHRASES,
-  ROSTER_PERIODS,
-  rosterFilterCounts,
-  rosterPeriodStarts,
-  sortRoster,
+  periodRange,
+  rangeBounds,
   titleChoices,
-  type RosterFilter,
   type RosterMemberAction,
   type RosterPeriod,
-  type RosterSortKey,
+  type RosterRange,
 } from '@/services/NTHSRosterService'
-import { plural } from '@/utils/plural'
 import { useNthsStore } from '@/stores/nths'
+import { dayjs } from '@/utils/time-utils'
 
 const store = useStore()
 const nths = useNthsStore()
 const group = computed(() => nths.NTHSGroups?.[0])
 const groupId = computed(() => group.value?.groupInfo?.id)
 const currentUserId = computed(() => store.state.user.user.id)
-const isGroupAdmin = computed(() => nths.hasAdminRole)
+const referralCode = computed(() => store.state.user.user.referralCode)
 
 const {
   members,
-  currentMembers,
   schoolYear,
   isLoading,
+  isReloading,
   loadFailed,
   load,
   refresh: refreshRoster,
   patchMember,
   dropMember,
 } = useChapterRoster()
-const {
-  impact,
-  isLoading: isImpactLoading,
-  loadFailed: impactLoadFailed,
-  load: loadImpact,
-  refresh: refreshImpact,
-} = useChapterImpact()
 
-// Read once per page load: the period starts sent to the API and Last active
-// both come from it, so a row cannot change underneath the viewer.
 const now = new Date()
-
-const activeFilter = ref<RosterFilter>('all')
-const { period: activePeriod, sort: activeSort } = useRosterPreferences(
-  currentUserId.value
+const today = dayjs(now).startOf('day').toDate()
+const foundedOn = computed(() =>
+  dayjs(group.value?.groupInfo?.createdAt).startOf('day').toDate()
 )
-const openMenuUserId = ref<string>()
+
+const { period, sort } = useRosterPreferences(currentUserId.value)
+const pickedDays = shallowRef<RosterRange>()
 const busyUserIds = ref(new Set<string>())
 const errorMessage = ref('')
 
-// Must match RosterTable.vue's own min-width: below it the table would clip
-// rather than scroll usefully, so cards take over.
-const ROSTER_TABLE_MIN_WIDTH = 880
-const rosterAreaRef = ref<HTMLElement>()
-const { width: rosterAreaWidth } = useElementSize(rosterAreaRef)
-const isStacked = computed(() => rosterAreaWidth.value < ROSTER_TABLE_MIN_WIDTH)
+// This school year's first day comes from the roster, so that quick pick has
+// no range until the first load returns.
+const range = computed<RosterRange | undefined>(() => {
+  if (!period.value) return pickedDays.value
+  if (period.value === 'thisSchoolYear' && !schoolYear.value) return undefined
+  const schoolYearStartsOn = new Date(schoolYear.value?.startsAt ?? now)
+  return periodRange(period.value, now, foundedOn.value, schoolYearStartsOn)
+})
+const bounds = computed(() => range.value && rangeBounds(range.value))
+
+// Stays true through the second load, so the table never renders the first
+// response's zero counts under a range.
+const settling = ref(true)
 
 onBeforeMount(async () => {
-  if (groupId.value) {
-    await Promise.all([load(groupId.value, now), loadImpact(groupId.value)])
+  if (!groupId.value) {
+    settling.value = false
+    return
   }
+  const waitsForSchoolYear = !range.value
+  await load(groupId.value, now, bounds.value)
+  if (waitsForSchoolYear && !loadFailed.value) {
+    await load(groupId.value, now, bounds.value)
+  }
+  settling.value = false
 })
 
+function refreshInRange() {
+  void refreshRoster(groupId.value, now, bounds.value)
+}
+
+// Keyed by value: each roster response recomputes the range with equal dates.
 watch(
-  () => group.value?.renewal?.prompt,
-  () => {
-    if (groupId.value) {
-      void refreshRoster(groupId.value, now)
+  () =>
+    bounds.value &&
+    `${bounds.value.startsAt.toISOString()}/${bounds.value.endsAt.toISOString()}`,
+  (key, oldKey) => {
+    if (key && oldKey) {
+      void load(groupId.value, now, bounds.value)
     }
   }
 )
 
-const rosterLoaded = computed(() => !isLoading.value && !loadFailed.value)
-const impactLoaded = computed(
-  () => !isImpactLoading.value && !impactLoadFailed.value
-)
+watch(() => group.value?.renewal?.prompt, refreshInRange)
 
-const counts = computed(() =>
-  rosterFilterCounts(members.value, activePeriod.value)
-)
-const visibleMembers = computed(() =>
-  sortRoster(
-    filterRoster(members.value, activeFilter.value, activePeriod.value),
-    activeSort.value,
-    activePeriod.value
-  )
-)
-// The viewer is always a current member, so a count of 1 means nobody else
-// has joined yet.
-const onlyViewerOnRoster = computed(() => currentMembers.value.length <= 1)
-const activeMemberCount = computed(() => currentMembers.value.length)
-const tutoredInPeriodCount = computed(
-  () =>
-    currentMembers.value.filter((m) => m.periodHours[activePeriod.value] > 0)
-      .length
-)
-// Read from the same /impact endpoint as Home. The roster's own sums leave
-// departed members out, so summing rows would disagree with Home.
-const tutoredThisYearCount = computed(
-  () => impact.value?.schoolYearToDate.membersTutoring ?? 0
-)
-// The member count comes from the roster alone, so it still shows if /impact
-// is slow or fails; the impact-derived segments only join it once loaded.
-const summary = computed(() => {
-  const memberCount = `${activeMemberCount.value} active ${plural(activeMemberCount.value, 'member')}`
-  if (!impactLoaded.value || !impact.value) return memberCount
-  // Floored like Home's hours meter, so the two never disagree.
-  const hours = formatProgressHours(impact.value.schoolYearToDate.hoursTutored)
-  return `${memberCount} · ${tutoredThisYearCount.value} tutored this year · ${hours} ${plural(hours, 'hour')} this school year`
-})
-
-function selectPeriod(period: RosterPeriod) {
-  activePeriod.value = period
-  openMenuUserId.value = undefined
+function pickPeriod(picked: RosterPeriod) {
+  period.value = picked
 }
 
-function selectFilter(filter: RosterFilter) {
-  activeFilter.value = filter
-  openMenuUserId.value = undefined
-}
-
-function sortBy(key: RosterSortKey) {
-  activeSort.value = nextRosterSort(activeSort.value, key)
-}
-
-function downloadCsv() {
-  downloadRosterCsv(visibleMembers.value, {
-    roster: members.value,
-    period: activePeriod.value,
-    periodStarts: rosterPeriodStarts(now),
-    schoolYearLabel: schoolYear.value!.label,
-  })
-}
-
-function toggleMenu(userId: string) {
-  openMenuUserId.value = openMenuUserId.value === userId ? undefined : userId
-}
-
-// The previous row's outside-click listener is still attached during the click
-// that opens another row, so its close must not clear the new row's menu.
-function closeMenu(userId: string) {
-  if (openMenuUserId.value === userId) openMenuUserId.value = undefined
-}
-
-function refreshAfterMembershipChange() {
-  refreshRoster(groupId.value, now)
-  refreshImpact(groupId.value)
+function pickDays(firstDay: Date, lastDay: Date) {
+  pickedDays.value = { firstDay, lastDay }
+  period.value = undefined
 }
 
 async function updateMember(
@@ -194,7 +126,7 @@ async function updateMember(
       update
     )
     patchMember(member.userId, patch)
-    refreshRoster(groupId.value, now)
+    refreshInRange()
     if (member.userId === currentUserId.value) {
       nths
         .refreshNTHSGroups()
@@ -269,7 +201,6 @@ function onMemberAction(
   member: NTHSRosterMemberPublic,
   action: RosterMemberAction
 ) {
-  openMenuUserId.value = undefined
   switch (action) {
     case 'make_admin':
       return makeAdmin(member)
@@ -296,7 +227,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
     },
     onRemoved: () => {
       dropMember(member.userId)
-      refreshAfterMembershipChange()
+      refreshInRange()
     },
     onCancel: () => {},
     isRemovingSelf: false,
@@ -306,12 +237,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
 
 <template>
   <div class="members">
-    <div class="page-header">
-      <h1 class="page-title">Members</h1>
-      <p v-if="rosterLoaded" class="page-subtitle" data-testid="roster-summary">
-        {{ summary }}
-      </p>
-    </div>
+    <h1 class="page-title">Members</h1>
 
     <p
       v-if="errorMessage"
@@ -322,120 +248,33 @@ function removeMember(member: NTHSRosterMemberPublic) {
       {{ errorMessage }}
     </p>
 
-    <section
-      v-if="rosterLoaded && members.length"
-      class="activity"
-      data-testid="member-activity"
+    <MembersTable
+      v-model:sort="sort"
+      :members="members"
+      :currentUserId="currentUserId"
+      :isGroupAdmin="nths.hasAdminRole"
+      :inviteCode="group?.groupInfo?.inviteCode"
+      :referralCode="referralCode"
+      :now="now"
+      :isLoading="isLoading || settling"
+      :isReloading="isReloading"
+      :loadFailed="loadFailed"
+      :schoolYearLabel="schoolYear?.label ?? ''"
+      :range="range"
+      :busyUserIds="busyUserIds"
+      @act="onMemberAction"
     >
-      <div class="activity-text">
-        <p class="activity-eyebrow">Member activity</p>
-        <p class="activity-headline" data-testid="member-activity-headline">
-          {{ tutoredInPeriodCount }} of {{ activeMemberCount }}
-          {{ plural(activeMemberCount, 'member') }}
-          {{ activeMemberCount === 1 ? 'has' : 'have' }} tutored
-          {{ ROSTER_PERIOD_PHRASES[activePeriod] }}.
-        </p>
-      </div>
-      <div class="periods" role="group" aria-label="Period">
-        <button
-          v-for="period in ROSTER_PERIODS"
-          :key="period"
-          type="button"
-          class="period"
-          :class="{ active: period === activePeriod }"
-          :aria-pressed="period === activePeriod"
-          :data-testid="`roster-period-${period}`"
-          v-ph:nthshq="`members.period.${period}`"
-          @click="selectPeriod(period)"
-        >
-          {{ ROSTER_PERIOD_LABELS[period] }}
-        </button>
-      </div>
-    </section>
-    <p
-      v-if="rosterLoaded && impactLoadFailed && members.length"
-      class="notice"
-      data-testid="impact-error"
-    >
-      We couldn't load this year's numbers. Refresh to try again.
-    </p>
-
-    <Loader v-if="isLoading" />
-    <p v-else-if="loadFailed" class="notice" data-testid="roster-load-error">
-      We couldn't load your members. Refresh the page to try again.
-    </p>
-    <template v-else>
-      <p
-        v-if="onlyViewerOnRoster"
-        class="notice"
-        data-testid="roster-invite-nudge"
-      >
-        No one else has joined yet. Share your invite link from Home.
-      </p>
-      <div class="roster-controls">
-        <RosterFilterChips
-          :modelValue="activeFilter"
-          :counts="counts"
-          :period="activePeriod"
-          @update:modelValue="selectFilter"
+      <template #range>
+        <RosterRangePicker
+          v-if="range"
+          :range="range"
+          :earliestDay="foundedOn"
+          :latestDay="today"
+          @pickPeriod="pickPeriod"
+          @pickDays="pickDays"
         />
-        <RosterSortControl v-if="isStacked" v-model="activeSort" />
-      </div>
-
-      <div ref="rosterAreaRef" class="roster-area">
-        <p
-          v-if="!visibleMembers.length"
-          class="notice"
-          data-testid="roster-empty"
-        >
-          No members match this filter.
-        </p>
-        <RosterCards
-          v-else-if="isStacked"
-          :members="visibleMembers"
-          :roster="members"
-          :now="now"
-          :period="activePeriod"
-          :currentUserId="currentUserId"
-          :canManage="isGroupAdmin"
-          :openMenuUserId="openMenuUserId"
-          :busyUserIds="busyUserIds"
-          :sort="activeSort"
-          @sort="sortBy"
-          @toggleMenu="toggleMenu"
-          @closeMenu="closeMenu"
-          @act="onMemberAction"
-        />
-        <RosterTable
-          v-else
-          :members="visibleMembers"
-          :roster="members"
-          :now="now"
-          :period="activePeriod"
-          :currentUserId="currentUserId"
-          :canManage="isGroupAdmin"
-          :openMenuUserId="openMenuUserId"
-          :busyUserIds="busyUserIds"
-          :sort="activeSort"
-          @sort="sortBy"
-          @toggleMenu="toggleMenu"
-          @closeMenu="closeMenu"
-          @act="onMemberAction"
-        />
-      </div>
-
-      <div v-if="isGroupAdmin && visibleMembers.length" class="export">
-        <LargeButton
-          variant="secondary"
-          :showArrow="false"
-          data-testid="download-csv"
-          v-ph:nthshq="'members.download_csv'"
-          @click="downloadCsv"
-        >
-          Download CSV
-        </LargeButton>
-      </div>
-    </template>
+      </template>
+    </MembersTable>
   </div>
 </template>
 
@@ -446,79 +285,8 @@ function removeMember(member: NTHSRosterMemberPublic) {
 .page-title {
   @include nths-page-title;
 }
-.page-subtitle {
-  @include nths-page-subtitle;
-}
-.activity {
-  @include nths-card(20px 24px);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px;
-}
-.activity-text {
-  flex: 1;
-  min-width: 200px;
-}
-.periods {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.period {
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-  line-height: 1.2;
-  background: $upchieve-white;
-  border: 1px solid $c-border-grey;
-  color: $c-soft-black;
-  white-space: nowrap;
-  cursor: pointer;
-
-  &:focus-visible {
-    outline: 2px solid $c-information-blue;
-    outline-offset: 2px;
-  }
-
-  @include breakpoint-below('tiny') {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-}
-.period.active {
-  background: $c-nths-navy;
-  border-color: $c-nths-navy;
-  color: $upchieve-white;
-  font-weight: 500;
-}
-.activity-eyebrow {
-  @include nths-card-eyebrow;
-  color: $c-nths-navy;
-  margin: 0;
-}
-.activity-headline {
-  font-size: 17px;
-  font-weight: 500;
-  line-height: 1.35;
-  margin: 6px 0 0;
-}
-.notice {
-  @include nths-notice;
-}
 .error {
   @include nths-error-box;
   margin: 0;
-}
-.roster-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.export {
-  display: flex;
-  justify-content: flex-end;
 }
 </style>

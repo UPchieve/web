@@ -16,7 +16,10 @@ import type {
   Role,
 } from './NTHSGroupService'
 import type { NTHSUnlistedSchool } from './NTHSApplicationService'
-import type { CalendarRosterPeriod } from './NTHSRosterService'
+import type {
+  CalendarRosterPeriod,
+  RosterRangeBounds,
+} from './NTHSRosterService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
 import type { DateString, ISODateString, Uuid } from '@/types/shared'
@@ -1791,19 +1794,27 @@ export default {
   },
   getNTHSChapterRoster(
     groupId: string,
-    periodStarts?: Record<CalendarRosterPeriod, Date>
+    periodStarts?: Record<CalendarRosterPeriod, Date>,
+    range?: RosterRangeBounds
   ) {
     return httpGetDeprecated<NTHSChapterRosterResponse>(
       `${API_ROOT}/nths-groups/${groupId}/roster`,
-      periodStarts
+      range
         ? {
             params: {
-              weekStartsAt: periodStarts.thisWeek.toISOString(),
-              lastTwoWeeksStartsAt: periodStarts.lastTwoWeeks.toISOString(),
-              monthStartsAt: periodStarts.thisMonth.toISOString(),
+              rangeStartsAt: range.startsAt.toISOString(),
+              rangeEndsAt: range.endsAt.toISOString(),
             },
           }
-        : undefined
+        : periodStarts
+          ? {
+              params: {
+                weekStartsAt: periodStarts.thisWeek.toISOString(),
+                lastTwoWeeksStartsAt: periodStarts.lastTwoWeeks.toISOString(),
+                monthStartsAt: periodStarts.thisMonth.toISOString(),
+              },
+            }
+          : undefined
     ).catch(this._axiosErrorHandler)
   },
   createActionForNTHSGroup(groupId: string, action: NTHSActionName) {

@@ -8,7 +8,7 @@ export class NTHSChapterHQPage extends NTHSChapterPage {
     this.copiedButton = page.getByRole('button', { name: 'Copied' })
     this.nameInput = page.locator('#nths-group-name')
     this.leaveTeamButton = page.getByTestId('leave-team-button')
-    this.allMembersChip = page.getByTestId('roster-chip-all')
+    this.allMembersChip = page.getByTestId('members-table-chip-everyone')
     this.rosterError = page.getByTestId('roster-error')
     this.confirmRemoveButton = page.getByTestId('confirm-remove-member')
   }
@@ -34,14 +34,16 @@ export class NTHSChapterHQPage extends NTHSChapterPage {
   }
 
   memberRow(userId) {
-    return this.page.getByTestId(`roster-row-${userId}`)
+    return this.page
+      .getByTestId('members-table-row')
+      .filter({ has: this.memberActions(userId) })
   }
 
   memberActions(userId) {
     return this.page.getByTestId(`member-actions-${userId}`)
   }
 
-  /** The number inside the "All members (N)" chip. */
+  /** The number inside the "Everyone (N)" chip. */
   async allMembersCount() {
     const label = await this.allMembersChip.textContent()
     return Number(label.match(/\((\d+)\)/)[1])

@@ -1,5 +1,5 @@
 import { useRosterPreferences } from '@/composables/useRosterPreferences'
-import { DEFAULT_ROSTER_SORT } from '@/services/NTHSRosterService'
+import { DEFAULT_MEMBER_SORT } from '@/services/NTHSMembersTableService'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
@@ -16,7 +16,7 @@ describe('useRosterPreferences', () => {
     const { period, sort } = useRosterPreferences(USER_ID)
 
     expect(period.value).toBe('thisWeek')
-    expect(sort.value).toEqual(DEFAULT_ROSTER_SORT)
+    expect(sort.value).toEqual(DEFAULT_MEMBER_SORT)
   })
 
   it("does not show one user's saved choice to another user on the same browser", async () => {
@@ -27,7 +27,21 @@ describe('useRosterPreferences', () => {
 
     const { period, sort } = useRosterPreferences('other-user')
     expect(period.value).toBe('thisWeek')
-    expect(sort.value).toEqual(DEFAULT_ROSTER_SORT)
+    expect(sort.value).toEqual(DEFAULT_MEMBER_SORT)
+  })
+
+  it('restores a quick pick and sort, and starts on this week after days picked on the calendar', async () => {
+    const first = useRosterPreferences(USER_ID)
+    first.period.value = 'thisMonth'
+    first.sort.value = { key: 'sessions', direction: 'desc' }
+    await nextTick()
+    expect(useRosterPreferences(USER_ID).period.value).toBe('thisMonth')
+
+    first.period.value = undefined
+    await nextTick()
+    const { period, sort } = useRosterPreferences(USER_ID)
+    expect(period.value).toBe('thisWeek')
+    expect(sort.value).toEqual({ key: 'sessions', direction: 'desc' })
   })
 
   it.each([
@@ -45,7 +59,7 @@ describe('useRosterPreferences', () => {
     const { period, sort } = useRosterPreferences(USER_ID)
 
     expect(period.value).toBe('thisWeek')
-    expect(sort.value).toEqual(DEFAULT_ROSTER_SORT)
+    expect(sort.value).toEqual(DEFAULT_MEMBER_SORT)
   })
 
   it('keeps a valid stored period when the stored sort is invalid', () => {
@@ -57,7 +71,7 @@ describe('useRosterPreferences', () => {
     const { period, sort } = useRosterPreferences(USER_ID)
 
     expect(period.value).toBe('allTime')
-    expect(sort.value).toEqual(DEFAULT_ROSTER_SORT)
+    expect(sort.value).toEqual(DEFAULT_MEMBER_SORT)
   })
 
   it('uses the defaults and keeps working when storage throws', async () => {
@@ -70,7 +84,7 @@ describe('useRosterPreferences', () => {
 
     const { period, sort } = useRosterPreferences(USER_ID)
     expect(period.value).toBe('thisWeek')
-    expect(sort.value).toEqual(DEFAULT_ROSTER_SORT)
+    expect(sort.value).toEqual(DEFAULT_MEMBER_SORT)
 
     const consoleError = vi.spyOn(console, 'error')
     period.value = 'thisMonth'

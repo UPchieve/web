@@ -1,11 +1,13 @@
 import {
   filterMembers,
+  memberFilters,
   memberStatus,
   nextMemberSort,
   sortMembers,
   type MemberFilter,
   type MemberSort,
   type MemberSortKey,
+  type MembersTableScope,
 } from '@/services/NTHSMembersTableService'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import { describe, expect, it } from 'vitest'
@@ -52,7 +54,41 @@ describe('memberStatus', () => {
         periodHours: { ...NO_PERIOD_ACTIVITY, thisWeek },
       })
 
-      expect(memberStatus(subject)).toBe(expected)
+      expect(memberStatus(subject, 'home')).toBe(expected)
+    }
+  )
+
+  it.each([
+    {
+      accountClosed: true,
+      trainingComplete: false,
+      rangeHours: 2,
+      expected: 'account-closed',
+    },
+    {
+      accountClosed: false,
+      trainingComplete: false,
+      rangeHours: 2,
+      expected: 'needs-training',
+    },
+    {
+      accountClosed: false,
+      trainingComplete: true,
+      rangeHours: 0.5,
+      expected: 'active',
+    },
+    {
+      accountClosed: false,
+      trainingComplete: true,
+      rangeHours: 0,
+      expected: 'no-hours',
+    },
+  ])(
+    'is $expected over a range for closed $accountClosed, training $trainingComplete, $rangeHours hours in the range',
+    ({ accountClosed, trainingComplete, rangeHours, expected }) => {
+      const subject = member({ accountClosed, trainingComplete, rangeHours })
+
+      expect(memberStatus(subject, 'range')).toBe(expected)
     }
   )
 })
@@ -102,14 +138,38 @@ function names(rows: NTHSRosterMemberPublic[]) {
   return rows.map((row) => row.firstName)
 }
 
+const closed = member({
+  userId: 'e',
+  firstName: 'Eve',
+  accountClosed: true,
+  trainingComplete: false,
+})
+const ranged = [
+  { ...dee, rangeHours: 2, rangeSessions: 1 },
+  cy,
+  bob,
+  { ...ann, userId: 'y', rangeHours: 0 },
+  closed,
+]
+
 describe('filterMembers', () => {
-  it.each<[MemberFilter, string[]]>([
-    ['everyone', ['Dee', 'Cy', 'Bob', 'Ann']],
-    ['needs-training', ['Cy']],
-    ['needs-approval', ['Bob']],
-    ['no-hours-this-week', ['Dee']],
-  ])('%s shows %j', (filter, expected) => {
-    expect(names(filterMembers(roster, filter))).toEqual(expected)
+  it.each<[MembersTableScope, MemberFilter, string[]]>([
+    ['home', 'everyone', ['Dee', 'Cy', 'Bob', 'Ann']],
+    ['home', 'needs-training', ['Cy']],
+    ['home', 'needs-approval', ['Bob']],
+    ['home', 'no-hours-this-week', ['Dee']],
+    ['range', 'everyone', ['Dee', 'Cy', 'Bob', 'Ann', 'Eve']],
+    ['range', 'needs-training', ['Cy']],
+    ['range', 'needs-approval', ['Bob']],
+    ['range', 'no-hours', ['Ann']],
+  ])('%s %s shows %j', (scope, filter, expected) => {
+    const members = scope === 'range' ? ranged : roster
+    expect(names(filterMembers(members, filter, scope))).toEqual(expected)
+  })
+
+  it('offers the no-hours filter of its scope', () => {
+    expect(memberFilters('home').at(-1)).toBe('no-hours-this-week')
+    expect(memberFilters('range').at(-1)).toBe('no-hours')
   })
 })
 
@@ -157,6 +217,42 @@ describe('sortMembers', () => {
     [{ key: 'days', direction: 'asc' }, ['Ann', 'Dee', 'Cy', 'Bob']],
     [{ key: 'days', direction: 'desc' }, ['Bob', 'Cy', 'Ann', 'Dee']],
   ])('orders by %j as %j', (sort, expected) => {
-    expect(names(sortMembers(roster, sort, NOW))).toEqual(expected)
+    expect(names(sortMembers(roster, sort, NOW, 'home'))).toEqual(expected)
+  })
+
+  const leaders = [
+    member({ userId: 'm', firstName: 'Mo' }),
+    member({
+      userId: 'v',
+      firstName: 'Vi',
+      roleName: 'admin',
+      title: 'Vice President',
+    }),
+    member({ userId: 'x', firstName: 'Xi', roleName: 'admin' }),
+    member({
+      userId: 'p',
+      firstName: 'Pa',
+      roleName: 'admin',
+      title: 'President',
+    }),
+    member({ userId: 'b', firstName: 'Bo', title: 'Executive Board Member' }),
+  ]
+
+  it.each<[MemberSort, string[]]>([
+    [{ key: 'role', direction: 'asc' }, ['Pa', 'Vi', 'Bo', 'Xi', 'Mo']],
+    [{ key: 'role', direction: 'desc' }, ['Mo', 'Xi', 'Bo', 'Vi', 'Pa']],
+  ])('orders roles by %j as %j', (sort, expected) => {
+    expect(names(sortMembers(leaders, sort, NOW, 'range'))).toEqual(expected)
+  })
+
+  it.each<[MemberSort, string[]]>([
+    [{ key: 'hours', direction: 'desc' }, ['Dee', 'Ann', 'Bob', 'Cy', 'Eve']],
+    [
+      { key: 'sessions', direction: 'desc' },
+      ['Dee', 'Ann', 'Bob', 'Cy', 'Eve'],
+    ],
+    [{ key: 'status', direction: 'asc' }, ['Dee', 'Ann', 'Bob', 'Cy', 'Eve']],
+  ])('orders a range by %j as %j', (sort, expected) => {
+    expect(names(sortMembers(ranged, sort, NOW, 'range'))).toEqual(expected)
   })
 })

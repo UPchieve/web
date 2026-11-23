@@ -143,18 +143,16 @@ describe('response interceptor', () => {
 })
 
 describe('nthsAdminOnly route guard', () => {
-  it('redirects a plain member away from the to-do tab but lets them reach members', async () => {
-    useNthsStore().setNTHSGroups(nthsGroupWithRole('member'))
+  it.each(['/groups/to-do', '/groups/members'])(
+    'sends a plain member from %s to home and lets an admin stay',
+    async (path) => {
+      useNthsStore().setNTHSGroups(nthsGroupWithRole('member'))
+      expect(await visit(path)).toBe('/groups/home')
 
-    expect(await visit('/groups/to-do')).toBe('/groups/home')
-    expect(await visit('/groups/members')).toBe('/groups/members')
-  })
-
-  it('lets an admin reach the to-do tab', async () => {
-    useNthsStore().setNTHSGroups(nthsGroupWithRole('admin'))
-
-    expect(await visit('/groups/to-do')).toBe('/groups/to-do')
-  })
+      useNthsStore().setNTHSGroups(nthsGroupWithRole('admin'))
+      expect(await visit(path)).toBe(path)
+    }
+  )
 })
 
 describe('blocked student-volunteer route guard', () => {
@@ -191,9 +189,10 @@ describe('legacy NTHS tab redirects', () => {
     store.state.featureFlags.toggleFlags[
       POSTHOG_FEATURE_FLAGS.BLOCK_STUDENT_COACH_MODE
     ] = false
-    // Any NTHS group, of either role, satisfies the parent /groups route
-    // guard (nthsRouteGuard('group')) so these redirects can land at all.
-    useNthsStore().setNTHSGroups(nthsGroupWithRole('member'))
+    // Any NTHS group satisfies the parent /groups route guard
+    // (nthsRouteGuard('group')) so these redirects can land at all; an admin
+    // also passes the Members tab's own guard.
+    useNthsStore().setNTHSGroups(nthsGroupWithRole('admin'))
   })
 
   it.each([

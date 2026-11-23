@@ -8,6 +8,11 @@ const FORMULA_INJECTION_LEAD = /^[=+\-@\t\r]/
 // garbles accented names.
 const UTF8_BOM = '\uFEFF'
 
+function quoteCell(text) {
+  const escaped = text.replace(/"/g, '""')
+  return /("|,|\r|\n)/.test(escaped) ? `"${escaped}"` : escaped
+}
+
 // The formula guard skips non-string cells, so a number like -3 stays numeric.
 // Admin reports leave it off and write their values unchanged.
 function toCsv(
@@ -19,7 +24,7 @@ function toCsv(
   if (rows[0] instanceof Map) keys = [...rows[0].keys()]
   else keys = Object.keys(rows[0])
   const csvContent =
-    keys.join(separator) +
+    keys.map((k) => quoteCell(String(k))).join(separator) +
     lineEnding +
     rows
       .map((row) => {
@@ -33,14 +38,9 @@ function toCsv(
               FORMULA_INJECTION_LEAD.test(cell)
             )
               cell = `'${cell}`
-            cell =
-              cell instanceof Date
-                ? cell.toLocaleString()
-                : cell.toString().replace(/"/g, '""')
-            if (cell.search(/("|,|\r|\n)/g) >= 0) {
-              cell = `"${cell}"`
-            }
-            return cell
+            return quoteCell(
+              cell instanceof Date ? cell.toLocaleString() : cell.toString()
+            )
           })
           .join(separator)
       })

@@ -157,8 +157,8 @@ const nthsRouteGuard =
     return redirect ? next(redirect) : next()
   }
 
-// The tab strip hides To do from a member; this keeps a typed URL or an old
-// bookmark from rendering a view whose endpoints would 403.
+// The tab strip hides To do and Members from a member; this keeps a typed URL
+// or an old bookmark from rendering a view meant for admins.
 const nthsAdminOnly: NavigationGuard = (_to, _from, next) => {
   if (useNthsStore().hasAdminRole) {
     next()
@@ -1095,6 +1095,7 @@ const routes: RouteRecordRaw[] = [
         path: '/groups/members',
         name: 'NTHSMembersView',
         component: NTHSMembersView,
+        beforeEnter: [nthsAdminOnly],
       },
       {
         path: '/groups/resources',

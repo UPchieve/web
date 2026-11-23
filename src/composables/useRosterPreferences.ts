@@ -1,26 +1,27 @@
 import { ref, watch } from 'vue'
 import {
-  DEFAULT_ROSTER_SORT,
-  ROSTER_PERIODS,
-  ROSTER_SORT_KEYS,
-  type RosterPeriod,
-  type RosterSort,
-} from '@/services/NTHSRosterService'
+  DEFAULT_MEMBER_SORT,
+  MEMBER_SORT_KEYS,
+  type MemberSort,
+} from '@/services/NTHSMembersTableService'
+import { ROSTER_PERIODS, type RosterPeriod } from '@/services/NTHSRosterService'
 
 const DEFAULT_ROSTER_PERIOD: RosterPeriod = 'thisWeek'
 
-type RosterView = { period: RosterPeriod; sort: RosterSort }
+// Days picked on the calendar are not stored, so the next visit starts on the
+// default period.
+type RosterView = { period: RosterPeriod | undefined; sort: MemberSort }
 
 const DEFAULT_VIEW: RosterView = {
   period: DEFAULT_ROSTER_PERIOD,
-  sort: DEFAULT_ROSTER_SORT,
+  sort: DEFAULT_MEMBER_SORT,
 }
 
 function storageKey(userId: string): string {
   return `${userId}-nths-roster-view`
 }
 
-function isSortDirection(value: unknown): value is RosterSort['direction'] {
+function isSortDirection(value: unknown): value is MemberSort['direction'] {
   return value === 'asc' || value === 'desc'
 }
 
@@ -40,9 +41,9 @@ function readView(userId: string): RosterView {
   const period =
     ROSTER_PERIODS.find((p) => p === stored?.period) ?? DEFAULT_VIEW.period
 
-  const key = ROSTER_SORT_KEYS.find((k) => k === stored?.sort?.key)
+  const key = MEMBER_SORT_KEYS.find((k) => k === stored?.sort?.key)
   const direction = stored?.sort?.direction
-  const sort: RosterSort =
+  const sort: MemberSort =
     key && isSortDirection(direction) ? { key, direction } : DEFAULT_VIEW.sort
 
   return { period, sort }

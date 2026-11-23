@@ -40,6 +40,8 @@ export function member(
       thisSchoolYear: 3,
       allTime: 5,
     },
+    rangeHours: 0,
+    rangeSessions: 0,
     lastActiveAt: '2026-10-14T00:00:00.000Z',
     ...overrides,
   }

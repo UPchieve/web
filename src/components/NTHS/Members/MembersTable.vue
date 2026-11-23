@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onKeyStroke } from '@vueuse/core'
-import { computed, nextTick, ref, shallowRef } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import CheckIcon from '@/assets/check.svg'
 import CopyIcon from '@/assets/copy-icon.svg'
 import DownloadIcon from '@/assets/download.svg'
@@ -9,12 +9,15 @@ import ExpandIcon from '@/assets/image-expand.svg'
 import SortArrowIcon from '@/assets/sort-arrow.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import { avatarColor } from '@/components/NTHS/member-avatar'
+import RosterRowMenu from '@/components/NTHS/Members/RosterRowMenu.vue'
 import { useInviteLink } from '@/composables/useInviteLink'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import {
   DEFAULT_MEMBER_SORT,
   filterMembers,
-  MEMBER_FILTERS,
+  memberFilters,
+  memberHours,
+  memberSessions,
   memberStatus,
   nextMemberSort,
   sortMembers,
@@ -28,7 +31,10 @@ import {
   downloadRosterCsv,
   memberDisplayName,
   NEVER_ACTIVE_LABEL,
-  rosterPeriodStarts,
+  roleTagLabel,
+  rosterMemberActions,
+  type RosterMemberAction,
+  type RosterRange,
 } from '@/services/NTHSRosterService'
 import {
   formatHoursMinutes,
@@ -44,20 +50,35 @@ const props = defineProps<{
   referralCode: string
   now: Date
   isLoading?: boolean
+  isReloading?: boolean
   loadFailed?: boolean
   schoolYearLabel: string
+  // Set on the Members tab, whose hours, sessions and status follow it.
+  range?: RosterRange
+  busyUserIds?: ReadonlySet<string>
 }>()
+const emit = defineEmits<{
+  act: [member: NTHSRosterMemberPublic, action: RosterMemberAction]
+}>()
+const activeSort = defineModel<MemberSort>('sort', {
+  default: () => DEFAULT_MEMBER_SORT,
+})
 
 const STATUSES: Record<MemberStatus, { label: string; tone: string }> = {
+  'account-closed': { label: 'Account closed', tone: 'closed' },
   'needs-training': { label: 'Needs training', tone: 'bad' },
   'needs-approval': { label: 'Needs approval', tone: 'bad' },
   'active-this-week': { label: 'Active this week', tone: 'good' },
   'no-hours-this-week': { label: 'No hours this week', tone: 'warn' },
+  active: { label: 'Active', tone: 'good' },
+  'no-hours': { label: 'No hours', tone: 'warn' },
 }
 
 const SORT_LABELS: Record<MemberSortKey, string> = {
   name: 'Name',
   hours: 'Vol hours',
+  sessions: 'Sessions',
+  role: 'Role',
   status: 'Status',
   screen: 'Screen',
   training: 'Training',
@@ -65,9 +86,16 @@ const SORT_LABELS: Record<MemberSortKey, string> = {
   days: 'Days since last session',
 }
 
+const scope = computed(() => (props.range ? 'range' : 'home'))
+
+function phKey(name: string) {
+  return props.range ? `members.${name}` : `home.members_${name}`
+}
+
 const isLoaded = computed(() => !props.isLoading && !props.loadFailed)
 const isAlone = computed(
   () =>
+    !props.range &&
     props.isGroupAdmin &&
     (props.members.length === 0 ||
       (props.members.length === 1 &&
@@ -75,9 +103,12 @@ const isAlone = computed(
 )
 const showsTable = computed(() => isLoaded.value && !isAlone.value)
 const showsTools = computed(() => showsTable.value && props.isGroupAdmin)
+const currentCount = computed(
+  () => props.members.filter((member) => !member.accountClosed).length
+)
 const title = computed(() =>
   showsTable.value
-    ? `${props.members.length} ${plural(props.members.length, 'Member')}`
+    ? `${currentCount.value} ${plural(currentCount.value, 'Member')}`
     : 'Members'
 )
 
@@ -92,24 +123,29 @@ const ranks = computed(
 )
 
 const activeFilter = ref<MemberFilter>('everyone')
-const activeSort = shallowRef<MemberSort>(DEFAULT_MEMBER_SORT)
+const openMenuUserId = ref<string>()
 const visibleMembers = computed(() =>
   sortMembers(
-    filterMembers(props.members, activeFilter.value),
+    filterMembers(props.members, activeFilter.value, scope.value),
     activeSort.value,
-    props.now
+    props.now,
+    scope.value
   )
 )
 const rows = computed(() =>
   visibleMembers.value.map((member) => {
     const name = memberDisplayName(member)
-    const status = STATUSES[memberStatus(member)]
+    const status = STATUSES[memberStatus(member, scope.value)]
     return {
+      member,
       userId: member.userId,
       name: member.userId === props.currentUserId ? `${name} (you)` : name,
-      rank: ranks.value.get(member.userId),
+      initial: member.firstName.charAt(0).toUpperCase(),
+      rank: props.range ? undefined : ranks.value.get(member.userId),
       color: avatarColor(member.userId),
-      hours: formatHoursMinutes(member.periodHours.thisSchoolYear),
+      hours: formatHoursMinutes(memberHours(member, scope.value)),
+      sessions: memberSessions(member, scope.value),
+      role: roleTagLabel(member, props.members) ?? 'Member',
       status,
       marks: [
         { label: 'Screen', done: member.safetyApproved },
@@ -121,8 +157,20 @@ const rows = computed(() =>
   })
 )
 
-const columns = computed<{ key: MemberSortKey; align: string }[]>(() =>
-  props.isGroupAdmin
+const columns = computed<{ key: MemberSortKey; align: string }[]>(() => {
+  if (props.range) {
+    return [
+      { key: 'name', align: 'l' },
+      { key: 'hours', align: 'r' },
+      { key: 'sessions', align: 'r' },
+      { key: 'role', align: 'l' },
+      { key: 'status', align: 'l' },
+      { key: 'screen', align: '' },
+      { key: 'training', align: '' },
+      { key: 'first', align: '' },
+    ]
+  }
+  return props.isGroupAdmin
     ? [
         { key: 'name', align: 'l' },
         { key: 'hours', align: 'r' },
@@ -136,17 +184,44 @@ const columns = computed<{ key: MemberSortKey; align: string }[]>(() =>
         { key: 'hours', align: 'r' },
         { key: 'days', align: 'r' },
       ]
-)
-const selectKeys = computed<MemberSortKey[]>(() =>
-  props.isGroupAdmin ? ['name', 'status', 'hours'] : ['name', 'hours', 'days']
-)
+})
+const selectKeys = computed<MemberSortKey[]>(() => {
+  if (props.range) return ['name', 'hours', 'sessions', 'role', 'status']
+  return props.isGroupAdmin
+    ? ['name', 'status', 'hours']
+    : ['name', 'hours', 'days']
+})
 
 const selectValue = computed(() =>
-  activeSort.value !== DEFAULT_MEMBER_SORT &&
-  selectKeys.value.includes(activeSort.value.key)
+  !(
+    activeSort.value.key === DEFAULT_MEMBER_SORT.key &&
+    activeSort.value.direction === DEFAULT_MEMBER_SORT.direction
+  ) && selectKeys.value.includes(activeSort.value.key)
     ? activeSort.value.key
     : ''
 )
+
+function selectFilter(filter: MemberFilter) {
+  activeFilter.value = filter
+  openMenuUserId.value = undefined
+}
+
+function toggleMenu(userId: string) {
+  openMenuUserId.value = openMenuUserId.value === userId ? undefined : userId
+}
+
+// The previous row's outside-click listener is still attached during the click
+// that opens another row, so its close must not clear the new row's menu.
+function closeMenu(userId: string) {
+  if (openMenuUserId.value === userId) {
+    openMenuUserId.value = undefined
+  }
+}
+
+function act(member: NTHSRosterMemberPublic, action: RosterMemberAction) {
+  openMenuUserId.value = undefined
+  emit('act', member, action)
+}
 
 function filterLabel(filter: MemberFilter) {
   return filter === 'everyone' ? 'Everyone' : STATUSES[filter].label
@@ -164,7 +239,7 @@ function sortBy(key: MemberSortKey) {
 function selectSort(event: Event) {
   const key = (event.target as HTMLSelectElement).value as MemberSortKey | ''
   activeSort.value = key
-    ? { key, direction: key === 'hours' ? 'desc' : 'asc' }
+    ? { key, direction: key === 'hours' || key === 'sessions' ? 'desc' : 'asc' }
     : DEFAULT_MEMBER_SORT
 }
 
@@ -173,8 +248,7 @@ const justDownloaded = ref(false)
 function download() {
   downloadRosterCsv(visibleMembers.value, {
     roster: props.members,
-    period: 'thisSchoolYear',
-    periodStarts: rosterPeriodStarts(props.now),
+    range: props.range,
     schoolYearLabel: props.schoolYearLabel,
   })
   justDownloaded.value = true
@@ -214,6 +288,12 @@ function toggleExpanded() {
   }
 }
 
+// Vuetify menus teleport outside the card; their own focus handling owns Tab
+// and Escape while focus is inside one.
+function focusIsInMenu() {
+  return !!document.activeElement?.closest('.v-overlay-container')
+}
+
 function wrapTab(event: KeyboardEvent) {
   const elements = Array.from(
     card.value?.querySelectorAll<HTMLElement>(
@@ -237,12 +317,12 @@ function wrapTab(event: KeyboardEvent) {
 }
 
 onKeyStroke('Escape', () => {
-  if (isExpanded.value) {
+  if (isExpanded.value && !focusIsInMenu()) {
     collapse()
   }
 })
 onKeyStroke('Tab', (event) => {
-  if (isExpanded.value) {
+  if (isExpanded.value && !focusIsInMenu()) {
     wrapTab(event)
   }
 })
@@ -264,7 +344,7 @@ onKeyStroke('Tab', (event) => {
       class="team"
       :class="{ full: isExpanded }"
       aria-labelledby="members-table-title"
-      :aria-busy="isLoading"
+      :aria-busy="isLoading || isReloading"
       data-testid="members-table"
       :role="isExpanded ? 'dialog' : undefined"
       :aria-modal="isExpanded ? 'true' : undefined"
@@ -286,7 +366,7 @@ onKeyStroke('Tab', (event) => {
               :aria-label="isExpanded ? 'Collapse table' : 'Expand table'"
               :aria-pressed="isExpanded"
               data-testid="members-table-expand"
-              v-ph:nthshq="'home.members_expand'"
+              v-ph:nthshq="phKey('expand')"
               @click="toggleExpanded"
             >
               <CollapseIcon v-if="isExpanded" class="icon" aria-hidden="true" />
@@ -301,7 +381,7 @@ onKeyStroke('Tab', (event) => {
             :disabled="justDownloaded || !visibleMembers.length"
             :aria-label="justDownloaded ? 'Downloaded' : 'Download member list'"
             data-testid="members-table-download"
-            v-ph:nthshq="'home.members_download'"
+            v-ph:nthshq="phKey('download')"
             @click="download"
           >
             <CheckIcon v-if="justDownloaded" class="icon" aria-hidden="true" />
@@ -320,19 +400,20 @@ onKeyStroke('Tab', (event) => {
         aria-labelledby="members-table-show"
       >
         <span id="members-table-show" class="show">Show</span>
+        <slot name="range" />
         <button
-          v-for="filter in MEMBER_FILTERS"
+          v-for="filter in memberFilters(scope)"
           :key="filter"
           type="button"
           class="chip"
           :class="{ on: filter === activeFilter }"
           :aria-pressed="filter === activeFilter"
           :data-testid="`members-table-chip-${filter}`"
-          v-ph:nthshq="`home.members_filter.${filter}`"
-          @click="activeFilter = filter"
+          v-ph:nthshq="phKey(`filter.${filter}`)"
+          @click="selectFilter(filter)"
         >
           {{ filterLabel(filter) }} ({{
-            filterMembers(members, filter).length
+            filterMembers(members, filter, scope).length
           }})
         </button>
       </div>
@@ -342,7 +423,7 @@ onKeyStroke('Tab', (event) => {
           :value="selectValue"
           autocomplete="off"
           data-testid="members-table-sort-select"
-          v-ph:nthshq="'home.members_sort_select'"
+          v-ph:nthshq="phKey('sort_select')"
           @change="selectSort"
         >
           <option value="">Default order</option>
@@ -369,7 +450,7 @@ onKeyStroke('Tab', (event) => {
           type="button"
           class="invite"
           :aria-label="`Copy invite link ${link}`"
-          v-ph:nthshq="'home.members_copy_invite'"
+          v-ph:nthshq="phKey('copy_invite')"
           @click="copyLink"
         >
           <span class="url">{{ link }}</span>
@@ -390,22 +471,32 @@ onKeyStroke('Tab', (event) => {
         aria-label="Members table"
         data-testid="members-table-scroll"
       >
-        <table class="table" :class="{ member: !isGroupAdmin }">
+        <table
+          class="table"
+          :class="{ member: !isGroupAdmin && !range, range: !!range }"
+        >
           <colgroup>
             <col class="c-av" />
             <col />
             <col class="c-hrs" />
-            <template v-if="isGroupAdmin">
+            <template v-if="range">
+              <col class="c-num" />
+              <col class="c-role" />
+            </template>
+            <template v-if="range || isGroupAdmin">
               <col class="c-status" />
               <col class="c-mark" />
               <col class="c-mark" />
               <col class="c-mark" />
             </template>
             <col v-else class="c-days" />
+            <col v-if="range" class="c-menu" />
           </colgroup>
           <thead>
             <tr>
-              <th class="av"><span class="sr">Rank</span></th>
+              <th class="av">
+                <span v-if="!range" class="sr">Rank</span>
+              </th>
               <th
                 v-for="column in columns"
                 :key="column.key"
@@ -417,7 +508,7 @@ onKeyStroke('Tab', (event) => {
                   type="button"
                   class="sort"
                   :data-testid="`members-table-sort-${column.key}`"
-                  v-ph:nthshq="`home.members_sort.${column.key}`"
+                  v-ph:nthshq="phKey(`sort.${column.key}`)"
                   @click="sortBy(column.key)"
                 >
                   {{ SORT_LABELS[column.key] }}
@@ -443,6 +534,7 @@ onKeyStroke('Tab', (event) => {
                   </v-tooltip>
                 </button>
               </th>
+              <th v-if="range"><span class="sr">Actions</span></th>
             </tr>
           </thead>
           <tbody>
@@ -457,7 +549,8 @@ onKeyStroke('Tab', (event) => {
                   :style="{ background: row.color }"
                   aria-hidden="true"
                 >
-                  <template v-if="row.rank"
+                  <template v-if="range">{{ row.initial }}</template>
+                  <template v-else-if="row.rank"
                     ><span class="hash">#</span>{{ row.rank }}</template
                   >
                   <template v-else>&mdash;</template>
@@ -465,7 +558,7 @@ onKeyStroke('Tab', (event) => {
               </td>
               <th scope="row" class="l name" data-testid="member-name">
                 {{ row.name
-                }}<span class="sr">{{
+                }}<span v-if="!range" class="sr">{{
                   row.rank ? `, rank ${row.rank}` : ', not ranked yet'
                 }}</span>
               </th>
@@ -476,7 +569,19 @@ onKeyStroke('Tab', (event) => {
               >
                 {{ row.hours }}
               </td>
-              <template v-if="isGroupAdmin">
+              <template v-if="range">
+                <td
+                  class="r"
+                  data-label="Sessions"
+                  data-testid="member-sessions"
+                >
+                  {{ row.sessions }}
+                </td>
+                <td class="l" data-label="Role" data-testid="member-role">
+                  {{ row.role }}
+                </td>
+              </template>
+              <template v-if="range || isGroupAdmin">
                 <td class="l" data-label="Status" data-testid="member-status">
                   <span class="pill" :class="row.status.tone">{{
                     row.status.label
@@ -506,6 +611,17 @@ onKeyStroke('Tab', (event) => {
                   <span aria-hidden="true">&mdash;</span>
                   <span class="sr">{{ NEVER_ACTIVE_LABEL }}</span>
                 </template>
+              </td>
+              <td v-if="range" class="menu">
+                <RosterRowMenu
+                  :member="row.member"
+                  :actions="rosterMemberActions(row.member, currentUserId)"
+                  :open="openMenuUserId === row.userId"
+                  :busy="busyUserIds?.has(row.userId)"
+                  @toggle="toggleMenu(row.userId)"
+                  @close="closeMenu(row.userId)"
+                  @act="(action) => act(row.member, action)"
+                />
               </td>
             </tr>
           </tbody>
@@ -674,6 +790,19 @@ onKeyStroke('Tab', (event) => {
 .table.member {
   min-width: 500px;
 }
+.table.range {
+  min-width: 900px;
+
+  .c-hrs {
+    width: 96px;
+  }
+  .c-status {
+    width: 140px;
+  }
+  .c-mark {
+    width: 80px;
+  }
+}
 .c-av {
   width: 48px;
 }
@@ -688,6 +817,15 @@ onKeyStroke('Tab', (event) => {
 }
 .c-days {
   width: 210px;
+}
+.c-num {
+  width: 90px;
+}
+.c-role {
+  width: 130px;
+}
+.c-menu {
+  width: 48px;
 }
 th,
 td {
@@ -747,6 +885,11 @@ tbody th {
   background: rgba($c-volunteer, 0.4);
   border-color: $c-nths-gold;
   color: $c-soft-black;
+}
+.pill.closed {
+  background: $c-background-grey;
+  border-color: $c-border-grey;
+  color: $c-secondary-grey;
 }
 .pill.bad {
   background: rgba($c-error-red, 0.12);
@@ -886,6 +1029,7 @@ tbody th {
   }
   .table,
   .table.member,
+  .table.range,
   .table tbody {
     display: block;
     min-width: 0;
@@ -914,6 +1058,17 @@ tbody th {
   .table td.av {
     flex: none;
     margin-right: 8px;
+  }
+  .table.range tr {
+    position: relative;
+  }
+  .table.range td.hrs {
+    margin-right: 40px;
+  }
+  .table td.menu {
+    position: absolute;
+    top: 16px;
+    right: 16px;
   }
   .table tbody th.name {
     flex: 1 1 calc(100% - 48px);

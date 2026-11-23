@@ -63,6 +63,7 @@ function focusItem(index: number) {
 
 function onKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
+    event.stopPropagation()
     emit('close')
     button.value?.focus()
     return

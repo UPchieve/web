@@ -9,6 +9,7 @@ import LoggerService from '@/services/LoggerService'
 import {
   isPeriodStartRejection,
   rosterPeriodStarts,
+  type RosterRangeBounds,
 } from '@/services/NTHSRosterService'
 
 export function useChapterRoster() {
@@ -20,15 +21,26 @@ export function useChapterRoster() {
   const schoolYear = ref<NTHSSchoolYearPublic>()
   const isLoading = ref(true)
   const loadFailed = ref(false)
+  // A later load keeps the rows on screen, so a range change leaves the table
+  // and its controls mounted.
+  const isReloading = ref(false)
+  let hasLoaded = false
 
-  async function fetchRoster(groupId: string, now: Date) {
+  async function fetchRoster(
+    groupId: string,
+    now: Date,
+    range?: RosterRangeBounds
+  ) {
     try {
       return await NetworkService.getNTHSChapterRoster(
         groupId,
-        rosterPeriodStarts(now)
+        range ? undefined : rosterPeriodStarts(now),
+        range
       )
     } catch (err) {
-      if (!isPeriodStartRejection(err)) throw err
+      if (range || !isPeriodStartRejection(err)) {
+        throw err
+      }
       return NetworkService.getNTHSChapterRoster(groupId)
     }
   }
@@ -38,34 +50,54 @@ export function useChapterRoster() {
     schoolYear.value = roster.schoolYear
   }
 
-  async function load(groupId: string, now: Date) {
-    isLoading.value = true
+  // Two quick role changes start overlapping requests, and the older one can
+  // resolve last with stale data, so only the newest writes.
+  let latestRefreshId = 0
+
+  async function load(groupId: string, now: Date, range?: RosterRangeBounds) {
+    const refreshId = ++latestRefreshId
+    isLoading.value = !hasLoaded
+    isReloading.value = hasLoaded
     loadFailed.value = false
     try {
-      const response = await fetchRoster(groupId, now)
-      applyRoster(response.data.roster)
+      const response = await fetchRoster(groupId, now, range)
+      if (refreshId === latestRefreshId) {
+        applyRoster(response.data.roster)
+        hasLoaded = true
+      }
     } catch (err) {
-      loadFailed.value = true
+      if (refreshId === latestRefreshId) {
+        loadFailed.value = true
+      }
       LoggerService.noticeError(err, 'Could not load the NTHS chapter roster')
     } finally {
-      isLoading.value = false
+      if (refreshId === latestRefreshId) {
+        isLoading.value = false
+        isReloading.value = false
+      }
     }
   }
 
-  // Two quick role changes start overlapping refreshes, and the older one can
-  // resolve last with stale roles, so only the newest writes.
-  let latestRefreshId = 0
-
-  async function refresh(groupId: string, now: Date) {
+  async function refresh(
+    groupId: string,
+    now: Date,
+    range?: RosterRangeBounds
+  ) {
     const refreshId = ++latestRefreshId
     try {
-      const response = await fetchRoster(groupId, now)
+      const response = await fetchRoster(groupId, now, range)
       if (refreshId === latestRefreshId) applyRoster(response.data.roster)
     } catch (err) {
       LoggerService.noticeError(
         err,
         'Could not refresh the NTHS chapter roster'
       )
+    } finally {
+      // A refresh can supersede a pending load, whose own reset is then skipped.
+      if (refreshId === latestRefreshId) {
+        isLoading.value = false
+        isReloading.value = false
+      }
     }
   }
 
@@ -86,6 +118,7 @@ export function useChapterRoster() {
     currentMembers,
     schoolYear,
     isLoading,
+    isReloading,
     loadFailed,
     load,
     refresh,

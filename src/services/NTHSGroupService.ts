@@ -74,6 +74,9 @@ export type NTHSRosterMemberPublic = {
     allTime: number
   }
   periodSessions: NTHSRosterMemberPublic['periodHours']
+  // Zero unless an admin's request names a range.
+  rangeHours: number
+  rangeSessions: number
   lastActiveAt?: DateString
 }
 export type NTHSChapterRosterPublic = {

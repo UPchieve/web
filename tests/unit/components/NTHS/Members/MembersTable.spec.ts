@@ -4,6 +4,7 @@ import { enableAutoUnmount, mount, type VueWrapper } from '@vue/test-utils'
 import { page } from '@vitest/browser/context'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
+import type { RosterRange } from '@/services/NTHSRosterService'
 import { member, NO_PERIOD_ACTIVITY } from '../../../fixtures/nths'
 
 const NOW = new Date('2026-10-15T12:00:00.000Z')
@@ -45,9 +46,13 @@ function table(
     isLoading?: boolean
     loadFailed?: boolean
     schoolYearLabel?: string
-  } = {}
+    range?: RosterRange
+    sort?: { key: 'name'; direction: 'asc' }
+  } = {},
+  slots: Record<string, string> = {}
 ) {
   return mount(MembersTable, {
+    slots,
     props: {
       members: [ME, OTHER],
       currentUserId: 'me',
@@ -276,6 +281,25 @@ describe('MembersTable', () => {
       ).toEqual(marks)
     }
   )
+
+  it('leaves Escape and Tab to a menu that has focus outside the card', async () => {
+    const wrapper = table()
+    await wrapper.find(EXPAND).trigger('click')
+    const container = document.body.appendChild(document.createElement('div'))
+    container.className = 'v-overlay-container'
+    const inMenu = container.appendChild(document.createElement('button'))
+    inMenu.focus()
+
+    for (const key of ['Escape', 'Tab'])
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', { key, bubbles: true })
+      )
+    await nextTick()
+
+    expect(wrapper.find(EXPAND).attributes('aria-pressed')).toBe('true')
+    expect(document.activeElement).toBe(inMenu)
+    container.remove()
+  })
 
   it('collapses on Escape and returns focus to the expand button', async () => {
     const wrapper = table()
@@ -532,6 +556,16 @@ describe('MembersTable', () => {
     expect(select.value).toBe('')
   })
 
+  it('shows Default order for an equal copy of the default sort, such as a remembered one', () => {
+    const select = table({
+      members: TEAM,
+      sort: { key: 'name', direction: 'asc' },
+    }).find('[data-testid="members-table-sort-select"]')
+      .element as HTMLSelectElement
+
+    expect(select.value).toBe('')
+  })
+
   it.each([
     { sort: 'hours', value: 'hours' },
     { sort: 'training', value: '' },
@@ -625,5 +659,172 @@ describe('MembersTable', () => {
         ).toBe(disabled)
       }
     )
+  })
+
+  describe('with a range', () => {
+    const RANGE: RosterRange = {
+      firstDay: new Date(2026, 9, 5),
+      lastDay: new Date(2026, 9, 11),
+    }
+    const PRESIDENT = member({
+      userId: 'pres',
+      firstName: 'Pat',
+      roleName: 'admin',
+      title: 'President',
+      rangeHours: 1.5,
+      rangeSessions: 2,
+    })
+    const ADMIN = member({ userId: 'adm', firstName: 'Ada', roleName: 'admin' })
+    const CLOSED = member({
+      userId: 'gone',
+      firstName: 'Gus',
+      accountClosed: true,
+    })
+    const QUIET = member({
+      userId: 'quiet',
+      firstName: 'Quinn',
+      periodSessions: { ...NO_PERIOD_ACTIVITY, thisSchoolYear: 1 },
+    })
+    const RANGED = [PRESIDENT, ADMIN, CLOSED, QUIET]
+
+    function cells(wrapper: VueWrapper, testId: string) {
+      return wrapper
+        .findAll(`[data-testid="${testId}"]`)
+        .map((cell) => cell.text())
+    }
+
+    it('shows hours, sessions, role and status over the range, by name with no rank', () => {
+      const wrapper = table({ members: RANGED, range: RANGE })
+
+      expect(
+        wrapper
+          .findAll('[data-testid^="members-table-th-"]')
+          .map((th) => th.text())
+      ).toEqual([
+        'Name',
+        'Vol hours',
+        'Sessions',
+        'Role',
+        'Status',
+        'Screen',
+        'Training',
+        '1st',
+      ])
+      expect(shownNames(wrapper)).toEqual([
+        'Ada R.',
+        'Gus R.',
+        'Pat R.',
+        'Quinn R.',
+      ])
+      expect(wrapper.find(ROW).text()).not.toContain('#')
+      expect(cells(wrapper, 'member-hours')).toEqual([
+        '0h 0m',
+        '0h 0m',
+        '1h 30m',
+        '0h 0m',
+      ])
+      expect(cells(wrapper, 'member-sessions')).toEqual(['0', '0', '2', '0'])
+      expect(cells(wrapper, 'member-role')).toEqual([
+        'Admin',
+        'Member',
+        'President',
+        'Member',
+      ])
+      expect(cells(wrapper, 'member-status')).toEqual([
+        'No hours',
+        'Account closed',
+        'Active',
+        'No hours',
+      ])
+    })
+
+    it('keeps a lone admin in the table and counts only current members in the title', () => {
+      const wrapper = table({ members: [ME, CLOSED], range: RANGE })
+
+      expect(wrapper.find(PROMPT).exists()).toBe(false)
+      expect(wrapper.find(ROW).exists()).toBe(true)
+      expect(wrapper.find('[data-testid="members-table-title"]').text()).toBe(
+        '1 Member'
+      )
+    })
+
+    it('marks a first session from the school year whatever the range holds', () => {
+      const wrapper = table({ members: [QUIET], range: RANGE })
+
+      expect(cells(wrapper, 'member-marks')[2]).toBe('Done')
+    })
+
+    it('offers the range filters beside the range control', () => {
+      const wrapper = table(
+        { members: RANGED, range: RANGE },
+        { range: '<button data-testid="range-slot">Range</button>' }
+      )
+
+      expect(wrapper.find('[data-testid="range-slot"]').exists()).toBe(true)
+      expect(wrapper.find(chip('no-hours')).text()).toBe('No hours (2)')
+      expect(wrapper.find(chip('no-hours-this-week')).exists()).toBe(false)
+    })
+
+    it('reports a sort change so the page can remember it', async () => {
+      const wrapper = table({ members: RANGED, range: RANGE })
+
+      await wrapper.find(sortButton('sessions')).trigger('click')
+
+      expect(wrapper.emitted('update:sort')).toEqual([
+        [{ key: 'sessions', direction: 'asc' }],
+      ])
+    })
+
+    it('emits the action chosen from a row menu and closes it', async () => {
+      const wrapper = table({ members: RANGED, range: RANGE })
+
+      await wrapper.find('[data-testid="member-actions-adm"]').trigger('click')
+      await wrapper
+        .find('[data-testid="member-remove-admin-adm"]')
+        .trigger('click')
+
+      expect(wrapper.emitted('act')).toEqual([[ADMIN, 'remove_admin']])
+      expect(
+        wrapper
+          .find('[data-testid="member-actions-adm"]')
+          .attributes('aria-expanded')
+      ).toBe('false')
+    })
+
+    it('closes only the row menu on Escape when the table is expanded', async () => {
+      const wrapper = table({ members: RANGED, range: RANGE })
+      await wrapper.find(EXPAND).trigger('click')
+      const actions = wrapper.find('[data-testid="member-actions-adm"]')
+      await actions.trigger('click')
+
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      )
+      await nextTick()
+
+      expect(actions.attributes('aria-expanded')).toBe('false')
+      expect(wrapper.find(EXPAND).attributes('aria-pressed')).toBe('true')
+    })
+
+    it('downloads only the rows shown', async () => {
+      const blobs: Blob[] = []
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob) => {
+        blobs.push(blob as Blob)
+        return 'blob:test'
+      })
+      vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
+        () => {}
+      )
+      const wrapper = table({ members: RANGED, range: RANGE })
+      await wrapper.find(chip('no-hours')).trigger('click')
+
+      await wrapper.find(DOWNLOAD).trigger('click')
+
+      const [, ...lines] = (await blobs[0].text()).split('\r\n')
+      expect(lines.filter(Boolean).map((line) => line.split(',')[0])).toEqual([
+        'Ada R.',
+        'Quinn R.',
+      ])
+    })
   })
 })

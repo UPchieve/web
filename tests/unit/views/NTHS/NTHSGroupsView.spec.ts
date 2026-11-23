@@ -159,7 +159,11 @@ describe('NTHSGroupsView', () => {
   })
 
   it.each([
-    { role: 'member', shows: ['/groups/members'], hides: ['/groups/to-do'] },
+    {
+      role: 'member',
+      shows: ['/groups/home'],
+      hides: ['/groups/to-do', '/groups/members'],
+    },
     { role: 'admin', shows: ['/groups/members', '/groups/to-do'], hides: [] },
   ])('shows $role the right tabs', async ({ role, shows, hides }) => {
     const wrapper = await getWrapper('/groups/home', role)
@@ -172,8 +176,7 @@ describe('NTHSGroupsView', () => {
   })
 
   // This gate is the only thing on the client stopping an uncleared member
-  // from rendering the tab strip or the routed view; the router applies no
-  // guard of its own to /groups/members.
+  // from rendering the tab strip or the routed view.
   describe('the page content gate', () => {
     it.each([
       {

@@ -1,6 +1,5 @@
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import LoggerService from '@/services/LoggerService'
-import { rosterPeriodStarts } from '@/services/NTHSRosterService'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { member, rosterResponse } from '../fixtures/nths'
 
@@ -34,13 +33,29 @@ describe('useChapterRoster', () => {
     await load('group-1', NOW)
 
     expect(getNTHSChapterRoster).toHaveBeenCalledTimes(2)
-    expect(getNTHSChapterRoster.mock.calls[0][1]).toEqual(
-      rosterPeriodStarts(NOW)
-    )
+    expect(getNTHSChapterRoster.mock.calls[0][1]).toEqual({
+      thisWeek: new Date(2026, 9, 12),
+      lastTwoWeeks: new Date(2026, 9, 5),
+      thisMonth: new Date(2026, 9, 1),
+    })
     expect(getNTHSChapterRoster.mock.calls[1]).toEqual(['group-1'])
     expect(loadFailed.value).toBe(false)
     expect(isLoading.value).toBe(false)
     expect(members.value).toEqual(MEMBERS)
+  })
+
+  it('keeps the rows on screen while a later load runs', async () => {
+    getNTHSChapterRoster.mockResolvedValue(rosterResponse(MEMBERS))
+    const { members, isLoading, isReloading, load } = useChapterRoster()
+    await load('group-1', NOW)
+
+    const pending = load('group-1', NOW)
+
+    expect(isLoading.value).toBe(false)
+    expect(isReloading.value).toBe(true)
+    expect(members.value).toEqual(MEMBERS)
+    await pending
+    expect(isReloading.value).toBe(false)
   })
 
   it('does not retry, and reports failure, for a rejection that is not the period-start 422', async () => {
@@ -65,6 +80,32 @@ describe('useChapterRoster', () => {
     expect(loadFailed.value).toBe(true)
   })
 
+  it('fails instead of retrying without the range, which would count 0 for everyone', async () => {
+    getNTHSChapterRoster.mockRejectedValue(periodStartRejection())
+    const { loadFailed, load } = useChapterRoster()
+
+    await load('group-1', NOW, {
+      startsAt: new Date('2026-10-01'),
+      endsAt: NOW,
+    })
+
+    expect(getNTHSChapterRoster).toHaveBeenCalledTimes(1)
+    expect(loadFailed.value).toBe(true)
+  })
+
+  it('asks for the range without the period starts', async () => {
+    getNTHSChapterRoster.mockResolvedValue(rosterResponse(MEMBERS))
+    const range = { startsAt: new Date('2026-10-01'), endsAt: NOW }
+
+    await useChapterRoster().load('group-1', NOW, range)
+
+    expect(getNTHSChapterRoster).toHaveBeenCalledWith(
+      'group-1',
+      undefined,
+      range
+    )
+  })
+
   describe('refresh', () => {
     it('updates members without flipping isLoading, so a caller can refetch in the background', async () => {
       getNTHSChapterRoster.mockResolvedValue(rosterResponse(MEMBERS))
@@ -77,6 +118,21 @@ describe('useChapterRoster', () => {
       await refreshPromise
 
       expect(members.value).toEqual([])
+      expect(isLoading.value).toBe(false)
+    })
+
+    it('ends loading when a refresh supersedes the load in flight', async () => {
+      let resolveLoad!: (value: unknown) => void
+      getNTHSChapterRoster
+        .mockReturnValueOnce(new Promise((resolve) => (resolveLoad = resolve)))
+        .mockResolvedValueOnce(rosterResponse(MEMBERS))
+      const { isLoading, load, refresh } = useChapterRoster()
+
+      const loading = load('group-1', NOW)
+      await refresh('group-1', NOW)
+      resolveLoad(rosterResponse([]))
+      await loading
+
       expect(isLoading.value).toBe(false)
     })
 
