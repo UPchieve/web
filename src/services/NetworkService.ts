@@ -9,6 +9,7 @@ import type {
   NTHSActionName,
   NTHSChapterImpactResponse,
   NTHSChapterRosterResponse,
+  NTHSHomeContentResponse,
   NTHSMemberUpdate,
   NTHSRenewalAcceptResponse,
   NTHSRenewalCommitments,
@@ -413,6 +414,12 @@ export function getPastVolunteers() {
 export function getNTHSChecklist(groupId: string) {
   return httpGet<NTHSChecklistResponse>(
     `${API_ROOT}/nths-groups/${groupId}/checklist`
+  )
+}
+
+export function getNTHSHomeContent(groupId: string) {
+  return httpGet<NTHSHomeContentResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/home-content`
   )
 }
 

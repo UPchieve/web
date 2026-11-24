@@ -54,6 +54,33 @@ export type NTHSChapterImpactResponse = {
   impact: NTHSChapterImpactPublic
 }
 
+export type NTHSHomeLink = {
+  title: string
+  body: string
+  link: string
+  forMembers: boolean
+}
+export type NTHSHomeContentResponse = {
+  tips: string[]
+  links: NTHSHomeLink[]
+}
+
+const MS_PER_DAY = 86_400_000
+
+export function tipForDay(tips: string[], date: Date): string | undefined {
+  if (!tips.length) return undefined
+  const localDay = Math.floor(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / MS_PER_DAY
+  )
+  return tips[localDay % tips.length]
+}
+
+export function isAppPath(link: string) {
+  return (
+    link.startsWith('/') && !link.startsWith('//') && !/[\\\t\n\r]/.test(link)
+  )
+}
+
 export type NTHSRosterMemberPublic = {
   userId: Uuid
   firstName: string

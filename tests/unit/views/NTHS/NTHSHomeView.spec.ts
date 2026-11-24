@@ -19,8 +19,10 @@ vi.mock('vue-router', async (importOriginal) => ({
 
 const getNTHSChapterImpact = vi.fn()
 const getNTHSChapterRoster = vi.fn()
+const getNTHSHomeContent = vi.fn()
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/NetworkService')>()),
+  getNTHSHomeContent: (groupId: string) => getNTHSHomeContent(groupId),
   default: {
     getNTHSChapterImpact: (groupId: string) => getNTHSChapterImpact(groupId),
     getNTHSChapterRoster: (groupId: string) => getNTHSChapterRoster(groupId),
@@ -85,8 +87,26 @@ async function getWrapper(
 
 const RIGHT_NOW = '[data-testid="right-now"]'
 
+const EVERYONE = {
+  title: 'Everyone',
+  body: '',
+  link: 'https://x.org',
+  forMembers: true,
+}
+const HOME_CONTENT = {
+  tips: ['Tip of the day'],
+  links: [
+    { title: 'Staff', body: '', link: '/groups/resources', forMembers: false },
+    EVERYONE,
+  ],
+}
+const TIP = '[data-testid="tip"]'
+const LINKS = '[data-testid="resource-links"]'
+
 beforeEach(() => {
   vi.setSystemTime(NOW)
+  getNTHSHomeContent.mockReset()
+  getNTHSHomeContent.mockResolvedValue(HOME_CONTENT)
   getNTHSChapterImpact.mockReset()
   getNTHSChapterImpact.mockResolvedValue({ data: { impact: IMPACT } })
   getNTHSChapterRoster.mockReset()
@@ -189,6 +209,24 @@ describe('NTHSHomeView', () => {
       expect(wrapper.findAll('[data-testid="members-table-row"]')).toHaveLength(
         2
       )
+    }
+  )
+
+  it('shows an admin the tip', async () => {
+    const wrapper = await getWrapper('admin')
+
+    expect(wrapper.find(TIP).exists()).toBe(true)
+  })
+
+  it.each(['admin', 'member'])(
+    'keeps Home and hides both cards when the content fails for a %s',
+    async (roleName) => {
+      getNTHSHomeContent.mockRejectedValue(new Error('boom'))
+      const wrapper = await getWrapper(roleName)
+
+      expect(wrapper.find('[data-testid="members-table"]').exists()).toBe(true)
+      expect(wrapper.find(TIP).exists()).toBe(false)
+      expect(wrapper.find(LINKS).exists()).toBe(false)
     }
   )
 })

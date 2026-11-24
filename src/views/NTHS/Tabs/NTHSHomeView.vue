@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { computed, onBeforeMount } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import { useStore } from 'vuex'
 import Callout from '@/components/Callout.vue'
 import ContributionCard from '@/components/NTHS/HQ/ContributionCard.vue'
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
 import ImpactCard from '@/components/NTHS/HQ/ImpactCard.vue'
+import ResourceLinksCard from '@/components/NTHS/HQ/ResourceLinksCard.vue'
 import RightNowCard from '@/components/NTHS/HQ/RightNowCard.vue'
+import TipCard from '@/components/NTHS/HQ/TipCard.vue'
 import TopMembersBoard from '@/components/NTHS/HQ/TopMembersBoard.vue'
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
+import { getNTHSHomeContent } from '@/services/NetworkService'
+import {
+  tipForDay,
+  type NTHSHomeContentResponse,
+} from '@/services/NTHSGroupService'
 import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
@@ -35,6 +42,16 @@ const {
 
 const now = new Date()
 
+const homeContent = ref<NTHSHomeContentResponse>()
+const tip = computed(() =>
+  homeContent.value ? tipForDay(homeContent.value.tips, now) : undefined
+)
+const resourceLinks = computed(() => homeContent.value?.links ?? [])
+
+async function loadHomeContent(id: string) {
+  homeContent.value = await getNTHSHomeContent(id).catch(() => undefined)
+}
+
 const membersTableProps = computed(() => ({
   members: currentMembers.value,
   currentUserId: currentUserId.value,
@@ -49,7 +66,11 @@ const membersTableProps = computed(() => ({
 
 onBeforeMount(async () => {
   if (groupId.value) {
-    await Promise.all([load(groupId.value), loadRoster(groupId.value, now)])
+    await Promise.all([
+      load(groupId.value),
+      loadRoster(groupId.value, now),
+      loadHomeContent(groupId.value),
+    ])
   }
 })
 </script>
@@ -86,6 +107,8 @@ onBeforeMount(async () => {
           :loadFailed="rosterLoadFailed"
         />
         <GoodStandingCard :impact="isLoading ? undefined : impact" />
+        <TipCard v-if="tip" :tip="tip" />
+        <ResourceLinksCard v-if="resourceLinks.length" :links="resourceLinks" />
       </div>
     </div>
     <template v-else>
@@ -105,6 +128,7 @@ onBeforeMount(async () => {
         />
       </div>
       <MembersTable v-bind="membersTableProps" />
+      <ResourceLinksCard v-if="resourceLinks.length" :links="resourceLinks" />
     </template>
   </div>
 </template>
