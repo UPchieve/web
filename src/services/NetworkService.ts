@@ -13,6 +13,7 @@ import type {
   NTHSMemberUpdate,
   NTHSRenewalAcceptResponse,
   NTHSRenewalCommitments,
+  NTHSResourcesResponse,
   NTHSTitle,
   Role,
 } from './NTHSGroupService'
@@ -420,6 +421,12 @@ export function getNTHSChecklist(groupId: string) {
 export function getNTHSHomeContent(groupId: string) {
   return httpGet<NTHSHomeContentResponse>(
     `${API_ROOT}/nths-groups/${groupId}/home-content`
+  )
+}
+
+export function getNTHSResources(groupId: string) {
+  return httpGet<NTHSResourcesResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/resources`
   )
 }
 

@@ -65,6 +65,20 @@ export type NTHSHomeContentResponse = {
   links: NTHSHomeLink[]
 }
 
+export type NTHSResourceCard = {
+  title: string
+  body: string
+  link: string
+  icon: string
+}
+export type NTHSResourceGroup = {
+  title: string
+  subtitle: string
+  icon: string
+  cards: NTHSResourceCard[]
+}
+export type NTHSResourcesResponse = { groups: NTHSResourceGroup[] }
+
 const MS_PER_DAY = 86_400_000
 
 export function tipForDay(tips: string[], date: Date): string | undefined {
@@ -115,7 +129,6 @@ export type NTHSChapterRosterPublic = {
 }
 export type NTHSChapterRosterResponse = { roster: NTHSChapterRosterPublic }
 
-export const NTHS_ORIENTATION_URL = 'https://nationaltutor.org/orientation'
 export const NTHS_RESOURCES_URL = 'https://nationaltutor.org/resources'
 export const NTHS_RECRUITMENT_TEMPLATES_URL =
   'https://nationaltutor.org/resources/recruitment-templates'
