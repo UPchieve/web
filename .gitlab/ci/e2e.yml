@@ -35,8 +35,6 @@
     REDIS_PORT: 6379
     NODE_ENV: test_e2e_ci
     E2E_CACHE_POLICY: pull
-    # Graffiti won't start without a whiteboard token key. This is a test-only Ed25519 key.
-    WHITEBOARD_AUTH_TOKEN_PUBLIC: '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAQVmOkiZksZnDpqvWkGZEdTk0d3yB8Mp03CTmwRC2xc8=\n-----END PUBLIC KEY-----\n'
   before_script:
     - echo 'Set up high-line...'
     - corepack enable pnpm
@@ -74,8 +72,15 @@
     - curl -fsSL https://go.dev/dl/go1.25.14.linux-amd64.tar.gz | tar -C /usr/local -xz
     - git clone --depth=1 https://gitlab.com/upchieve/graffiti.git /tmp/graffiti
     - CGO_ENABLED=0 /usr/local/go/bin/go build -C /tmp/graffiti -o /usr/local/bin/graffiti
-    # New Relic's agent won't start without a 40-character key. New Relic rejects this one.
-    - PORT=5503 NEW_RELIC_LICENSE_KEY=0000000000000000000000000000000000000000 graffiti > $CI_PROJECT_DIR/graffiti.log 2>&1 &
+    # Use the public half of Subway's E2E signing key pair for Graffiti.
+    - |
+      WHITEBOARD_AUTH_TOKEN_PUBLIC="$(node -e 'const dotenv = require("dotenv"); const result = dotenv.config({ path: ".env.e2e", processEnv: {} }); if (result.error) throw result.error; process.stdout.write(result.parsed.WHITEBOARD_AUTH_TOKEN_PUBLIC || "")')"
+      if [ -z "$WHITEBOARD_AUTH_TOKEN_PUBLIC" ]; then
+        echo 'WHITEBOARD_AUTH_TOKEN_PUBLIC is missing from Subway .env.e2e' >&2
+        exit 1
+      fi
+      # New Relic's agent requires a 40-character key; it rejects this test value.
+      WHITEBOARD_AUTH_TOKEN_PUBLIC="$WHITEBOARD_AUTH_TOKEN_PUBLIC" PORT=5503 NEW_RELIC_LICENSE_KEY=0000000000000000000000000000000000000000 graffiti > "$CI_PROJECT_DIR/graffiti.log" 2>&1 &
     - curl -sf --retry 15 --retry-connrefused --retry-delay 1 http://localhost:5503/graffiti/healthz || (cat $CI_PROJECT_DIR/graffiti.log; exit 1)
     - echo 'Start subway server...'
     - pnpm run e2e:backend > $CI_PROJECT_DIR/subway.log 2>&1 &
