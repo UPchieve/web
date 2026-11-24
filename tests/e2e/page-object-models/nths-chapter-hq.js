@@ -18,15 +18,10 @@ export class NTHSChapterHQPage extends NTHSChapterPage {
     await this.page.waitForURL('**/groups/home')
   }
 
-  async goMembers() {
-    await this.page.goto('/groups/members')
-    await this.page.waitForURL('**/groups/members')
+  async goManage() {
+    await this.page.goto('/groups/manage')
+    await this.page.waitForURL('**/groups/manage')
     await expect(this.allMembersChip).toBeVisible()
-  }
-
-  async goSetup() {
-    await this.page.goto('/groups/setup')
-    await this.page.waitForURL('**/groups/setup')
   }
 
   checklistCheckbox(itemName) {

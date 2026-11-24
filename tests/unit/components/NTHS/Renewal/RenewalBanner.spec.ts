@@ -70,7 +70,7 @@ async function mountBanner(
   vi.spyOn(nths, 'refreshNTHSGroups').mockImplementation(refreshNTHSGroups)
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: ['/groups/home', '/groups/members'].map((path) => ({
+    routes: ['/groups/home', '/groups/manage'].map((path) => ({
       path,
       component: { render: () => h('div') },
     })),
@@ -138,11 +138,11 @@ describe('RenewalBanner', () => {
     { prompt: 'step-up', shown: true },
     { prompt: 'member-countdown', shown: true },
   ] as const)(
-    'on the Members tab, $prompt shows: $shown',
+    'on Manage, $prompt shows: $shown',
     async ({ prompt, shown }) => {
       const { wrapper, router } = await mountBanner(prompt)
 
-      await router.push('/groups/members')
+      await router.push('/groups/manage')
       await flushPromises()
 
       expect(has(wrapper, 'renewal-banner')).toBe(shown)
@@ -154,13 +154,13 @@ describe('RenewalBanner', () => {
     { prompt: 'confirm-return', button: 'renewal-banner-secondary' },
     { prompt: 'confirm-reminder', button: 'renewal-banner-primary' },
   ] as const)(
-    'goes to the Members tab from $prompt',
+    'goes to Manage from $prompt',
     async ({ prompt, button }) => {
       const { wrapper, router } = await mountBanner(prompt)
 
       await click(wrapper, button)
 
-      expect(router.currentRoute.value.path).toBe('/groups/members')
+      expect(router.currentRoute.value.path).toBe('/groups/manage')
     }
   )
 

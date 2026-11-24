@@ -256,12 +256,14 @@ export type RosterMemberAction =
   | 'change_title'
   | 'remove_admin'
   | 'remove'
+  | 'leave'
 
 export const ROSTER_MEMBER_ACTION_LABELS: Record<RosterMemberAction, string> = {
   make_admin: 'Make admin',
   change_title: 'Change title',
   remove_admin: 'Remove admin',
   remove: 'Remove',
+  leave: 'Leave chapter',
 }
 
 export function rosterMemberActions(
@@ -269,7 +271,7 @@ export function rosterMemberActions(
   viewerId: string
 ): RosterMemberAction[] {
   if (member.accountClosed) return ['remove']
-  if (member.userId === viewerId) return ['change_title']
+  if (member.userId === viewerId) return ['change_title', 'leave']
   const roleAction = member.roleName === 'admin' ? 'remove_admin' : 'make_admin'
   return [roleAction, 'change_title', 'remove']
 }

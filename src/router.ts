@@ -90,11 +90,9 @@ const NTHSGroupsView = () => import('./views/NTHS/NTHSGroupsView.vue')
 const NTHSCreateGroupView = () => import('./views/NTHS/NTHSCreateGroupView.vue')
 const NTHSHomeView = () => import('./views/NTHS/Tabs/NTHSHomeView.vue')
 const NTHSToDoView = () => import('./views/NTHS/Tabs/NTHSToDoView.vue')
-const NTHSMembersView = () => import('./views/NTHS/Tabs/NTHSMembersView.vue')
+const NTHSManageView = () => import('./views/NTHS/Tabs/NTHSManageView.vue')
 const NTHSResourcesView = () =>
   import('./views/NTHS/Tabs/NTHSResourcesView.vue')
-const NTHSChapterSetupView = () =>
-  import('./views/NTHS/Tabs/NTHSChapterSetupView.vue')
 const NTHSApplicationView = () => import('@/views/NTHS/NTHSApplicationView.vue')
 const NTHSApplicationFormView = () =>
   import('@/views/NTHS/NTHSApplicationFormView.vue')
@@ -157,7 +155,7 @@ const nthsRouteGuard =
     return redirect ? next(redirect) : next()
   }
 
-// The tab strip hides To do and Members from a member; this keeps a typed URL
+// The tab strip hides To Do and Manage from a member; this keeps a typed URL
 // or an old bookmark from rendering a view meant for admins.
 const nthsAdminOnly: NavigationGuard = (_to, _from, next) => {
   if (useNthsStore().hasAdminRole) {
@@ -1067,9 +1065,8 @@ const routes: RouteRecordRaw[] = [
         volunteer: [
           NTHSHomeView,
           NTHSToDoView,
-          NTHSMembersView,
+          NTHSManageView,
           NTHSResourcesView,
-          NTHSChapterSetupView,
           NTHSApplicationView,
           NTHSCreateGroupView,
           NTHSApplicationPending,
@@ -1092,9 +1089,9 @@ const routes: RouteRecordRaw[] = [
         beforeEnter: [nthsAdminOnly],
       },
       {
-        path: '/groups/members',
-        name: 'NTHSMembersView',
-        component: NTHSMembersView,
+        path: '/groups/manage',
+        name: 'NTHSManageView',
+        component: NTHSManageView,
         beforeEnter: [nthsAdminOnly],
       },
       {
@@ -1102,15 +1099,12 @@ const routes: RouteRecordRaw[] = [
         name: 'NTHSResourcesView',
         component: NTHSResourcesView,
       },
-      {
-        path: '/groups/setup',
-        name: 'NTHSChapterSetupView',
-        component: NTHSChapterSetupView,
-      },
       { path: '', redirect: '/groups/home' },
       { path: '/groups/dashboard', redirect: '/groups/home' },
-      { path: '/groups/manage-team', redirect: '/groups/members' },
-      { path: '/groups/settings', redirect: '/groups/setup' },
+      { path: '/groups/members', redirect: '/groups/manage' },
+      { path: '/groups/setup', redirect: '/groups/manage' },
+      { path: '/groups/manage-team', redirect: '/groups/manage' },
+      { path: '/groups/settings', redirect: '/groups/manage' },
     ],
   },
   {

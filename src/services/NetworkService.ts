@@ -1750,11 +1750,6 @@ export default {
       {}
     ).catch(this._axiosErrorHandler)
   },
-  getNTHSGroupMembers(groupId: string) {
-    return httpGetDeprecated(
-      `${API_ROOT}/nths-groups/${groupId}/members`
-    ).catch(this._axiosErrorHandler)
-  },
   updateNTHSGroupMember(
     groupId: string,
     userId: string,

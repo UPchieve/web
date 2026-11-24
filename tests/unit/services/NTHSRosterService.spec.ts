@@ -325,7 +325,7 @@ describe('rosterMemberActions', () => {
       ['remove_admin', 'change_title', 'remove'],
     ],
     ['a closed account', { accountClosed: true }, ['remove']],
-    ["the viewer's own row", { userId: 'viewer' }, ['change_title']],
+    ["the viewer's own row", { userId: 'viewer' }, ['change_title', 'leave']],
   ])('offers %s these actions', (_label, overrides, expected) => {
     expect(rosterMemberActions(member(overrides), 'viewer')).toEqual(expected)
   })

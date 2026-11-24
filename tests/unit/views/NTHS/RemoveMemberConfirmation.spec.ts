@@ -35,19 +35,13 @@ const SOLE_ADMIN_ERROR = new NetworkError(
   { status: 422 }
 )
 
-function getWrapper(isRemovingSelf = false, cachedMembers?: (typeof MEMBER)[]) {
+function getWrapper(isRemovingSelf = false) {
   const nths = useNthsStore()
-  nths.NTHSGroupMembers = cachedMembers
-    ? { [MEMBER.nthsGroupId]: cachedMembers }
-    : {}
-  const setNTHSGroupMembers = vi
-    .spyOn(nths, 'setNTHSGroupMembers')
-    .mockImplementation(() => {})
   vi.spyOn(nths, 'fetchNthsData').mockImplementation(async () => [])
   const wrapper = mount(RemoveMemberConfirmation, {
     props: { memberToRemove: MEMBER, isRemovingSelf },
   })
-  return { wrapper, setNTHSGroupMembers }
+  return { wrapper }
 }
 
 let noticeError: ReturnType<typeof vi.spyOn>
@@ -134,31 +128,4 @@ describe('RemoveMemberConfirmation', () => {
     await flushPromises()
     expect(wrapper.emitted('removed')).toHaveLength(1)
   })
-
-  it.each([
-    ['a cached roster', [MEMBER, { ...MEMBER, userId: 'jordan' }], ['jordan']],
-    ['no cached roster', undefined, undefined],
-  ])(
-    'with %s, commits the roster with the member filtered out only when a cache exists',
-    async (_label, cachedMembers, expectedRemainingIds) => {
-      updateNTHSGroupMember.mockResolvedValue(undefined)
-      const { wrapper, setNTHSGroupMembers } = getWrapper(false, cachedMembers)
-
-      await wrapper
-        .find('[data-testid="confirm-remove-member"]')
-        .trigger('click')
-      await flushPromises()
-
-      if (expectedRemainingIds) {
-        expect(setNTHSGroupMembers).toHaveBeenCalledTimes(1)
-        const [payload] = setNTHSGroupMembers.mock.calls[0]
-        expect(
-          payload.groupMembers.map((m: { userId: string }) => m.userId)
-        ).toEqual(expectedRemainingIds)
-      } else {
-        expect(setNTHSGroupMembers).not.toHaveBeenCalled()
-      }
-      expect(wrapper.emitted('removed')).toHaveLength(1)
-    }
-  )
 })

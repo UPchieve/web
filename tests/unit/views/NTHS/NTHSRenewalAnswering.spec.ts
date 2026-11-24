@@ -103,7 +103,7 @@ async function mountHq(
     history: createMemoryHistory(),
     routes: [
       { path: '/groups/home', component: routed('routed-home') },
-      { path: '/groups/members', component: routed('routed-members') },
+      { path: '/groups/manage', component: routed('routed-manage') },
     ],
   })
   router.push('/groups/home')

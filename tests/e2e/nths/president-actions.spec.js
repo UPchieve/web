@@ -66,7 +66,7 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
     hq = new NTHSChapterHQPage(page)
   })
 
-  test('a president can copy the invite link, tick the checklist, rename the chapter, change a role, remove a member and open Leave Team', async ({
+  test('a president can copy the invite link, tick the checklist, rename the chapter, change a role, remove a member and open Leave chapter', async ({
     page,
   }) => {
     await test.step('Copy the invite link, from Home', async () => {
@@ -75,7 +75,7 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       await expect(hq.copiedButton).toBeVisible()
     })
 
-    await test.step('Tick a checklist item, from To do', async () => {
+    await test.step('Tick a checklist item, from To Do', async () => {
       await hq.goto()
       const orientation = hq.checklistCheckbox('Complete President Orientation')
       await expect(orientation).not.toBeChecked()
@@ -90,8 +90,8 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       ).toBeChecked()
     })
 
-    await test.step('Edit the chapter name, from Chapter setup', async () => {
-      await hq.goSetup()
+    await test.step('Edit the chapter name, from Manage', async () => {
+      await hq.goManage()
       const newName = `Renamed ${Date.now()}`
       await hq.nameInput.fill(newName)
       await hq.nameInput.press('Enter')
@@ -100,8 +100,8 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       await expect(hq.nameInput).toHaveValue(newName)
     })
 
-    await test.step("Change a member's role, from Members", async () => {
-      await hq.goMembers()
+    await test.step("Change a member's role, from Manage", async () => {
+      await hq.goManage()
       const promoted = members[0]
       await hq.openMemberMenu(promoted.id)
       await page.getByTestId(`member-make-admin-${promoted.id}`).click()
@@ -112,7 +112,7 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       await expect(hq.memberRow(promoted.id)).toContainText('Vice President')
     })
 
-    await test.step('Remove a member, from Members', async () => {
+    await test.step('Remove a member, from Manage', async () => {
       const removed = members[1]
       const before = await hq.allMembersCount()
       await hq.openMemberMenu(removed.id)
@@ -127,14 +127,10 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       await expect(hq.memberRow(removed.id)).toHaveCount(0)
     })
 
-    await test.step('Open Leave Team, from Chapter setup', async () => {
-      // Runs after the removal so Leave Team has to find the current member
-      // in the changed roster.
-      await hq.goSetup()
+    await test.step('Open Leave chapter, from Manage', async () => {
+      await hq.goManage()
       await hq.leaveTeamButton.click()
-      await expect(
-        page.getByRole('button', { name: 'Leave chapter' })
-      ).toBeVisible()
+      await expect(page.getByTestId('confirm-remove-self')).toBeVisible()
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(hq.leaveTeamButton).toBeVisible()
     })

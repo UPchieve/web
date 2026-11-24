@@ -171,7 +171,7 @@ function choose(action: RosterMemberAction) {
         :key="action"
         type="button"
         class="item"
-        :class="{ danger: action === 'remove' }"
+        :class="{ danger: action === 'remove' || action === 'leave' }"
         role="menuitem"
         tabindex="-1"
         :data-testid="`member-${action.replaceAll('_', '-')}-${member.userId}`"

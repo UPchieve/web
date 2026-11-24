@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref, shallowRef, watch } from 'vue'
 import { useStore } from 'vuex'
+import ChapterSettings from '@/components/NTHS/HQ/ChapterSettings.vue'
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
 import RosterRangePicker from '@/components/NTHS/Members/RosterRangePicker.vue'
 import { useChapterRoster } from '@/composables/useChapterRoster'
@@ -10,6 +11,7 @@ import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
 import {
   LEADERSHIP_TITLES,
+  type GroupMember,
   type NTHSMemberUpdate,
   type NTHSRosterMemberPublic,
   type NTHSTitle,
@@ -85,6 +87,7 @@ onBeforeMount(async () => {
 })
 
 function refreshInRange() {
+  if (!groupId.value) return
   void refreshRoster(groupId.value, now, bounds.value)
 }
 
@@ -94,7 +97,7 @@ watch(
     bounds.value &&
     `${bounds.value.startsAt.toISOString()}/${bounds.value.endsAt.toISOString()}`,
   (key, oldKey) => {
-    if (key && oldKey) {
+    if (key && oldKey && groupId.value) {
       void load(groupId.value, now, bounds.value)
     }
   }
@@ -210,7 +213,20 @@ function onMemberAction(
       return removeAdmin(member)
     case 'remove':
       return removeMember(member)
+    case 'leave':
+      return leaveChapter()
   }
+}
+
+function leaveChapter() {
+  if (!groupId.value) return
+  ModalService.showLeaveTeamModal({
+    isRemovingSelf: true,
+    memberToRemove: {
+      userId: currentUserId.value,
+      nthsGroupId: groupId.value,
+    } as GroupMember,
+  })
 }
 
 function removeMember(member: NTHSRosterMemberPublic) {
@@ -236,7 +252,7 @@ function removeMember(member: NTHSRosterMemberPublic) {
 </script>
 
 <template>
-  <div class="members">
+  <div class="manage">
     <h1 class="page-title">Members</h1>
 
     <p
@@ -275,11 +291,13 @@ function removeMember(member: NTHSRosterMemberPublic) {
         />
       </template>
     </MembersTable>
+
+    <ChapterSettings @leave="leaveChapter" />
   </div>
 </template>
 
 <style scoped lang="scss">
-.members {
+.manage {
   @include nths-tab-column(1060px);
 }
 .page-title {

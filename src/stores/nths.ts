@@ -21,7 +21,6 @@ import type {
 
 export const useNthsStore = defineStore('nths', () => {
   const NTHSGroups = ref<any[]>([])
-  const NTHSGroupMembers = ref<Record<string, any>>({})
   const NTHSChecklistData = ref<NTHSChecklistPublic | null>(null)
   const NTHSCandidateApplicationStatus = ref<any>(undefined)
   const approvalExpiresAt = ref<string | null>(null)
@@ -53,9 +52,6 @@ export const useNthsStore = defineStore('nths', () => {
 
   function setNTHSGroups(groups: any[]) {
     NTHSGroups.value = groups
-  }
-  function setNTHSGroupMembers(data: { groupId: string; groupMembers: any }) {
-    NTHSGroupMembers.value[data.groupId] = data.groupMembers
   }
   function setNTHSChecklist(checklist: NTHSChecklistPublic) {
     NTHSChecklistData.value = checklist
@@ -144,11 +140,6 @@ export const useNthsStore = defineStore('nths', () => {
 
     syncNTHSStatusToGleap()
     return groups
-  }
-  async function fetchNTHSGroupMembers(groupId: string) {
-    const response: any = await NetworkService.getNTHSGroupMembers(groupId)
-    const groupMembers = response.data?.members ?? []
-    setNTHSGroupMembers({ groupId, groupMembers })
   }
   async function acceptNTHSRenewalPresidency({
     groupId,
@@ -242,14 +233,12 @@ export const useNthsStore = defineStore('nths', () => {
 
   return {
     NTHSGroups,
-    NTHSGroupMembers,
     NTHSChecklistData,
     NTHSCandidateApplicationStatus,
     approvalExpiresAt,
     canApplyForNTHSPresident,
     NTHSApplicationIneligibilityReasons,
     setNTHSGroups,
-    setNTHSGroupMembers,
     setNTHSChecklist,
     setNTHSChecklistItemProgress,
     setNTHSGroupName,
@@ -261,7 +250,6 @@ export const useNthsStore = defineStore('nths', () => {
     setNTHSApplicationIneligibilityReasons,
     refreshNTHSGroups,
     fetchNthsData,
-    fetchNTHSGroupMembers,
     acceptNTHSRenewalPresidency,
     fetchNTHSChecklist,
     updateNTHSChecklistItemProgress,

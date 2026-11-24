@@ -143,7 +143,7 @@ describe('response interceptor', () => {
 })
 
 describe('nthsAdminOnly route guard', () => {
-  it.each(['/groups/to-do', '/groups/members'])(
+  it.each(['/groups/to-do', '/groups/manage'])(
     'sends a plain member from %s to home and lets an admin stay',
     async (path) => {
       useNthsStore().setNTHSGroups(nthsGroupWithRole('member'))
@@ -191,15 +191,17 @@ describe('legacy NTHS tab redirects', () => {
     ] = false
     // Any NTHS group satisfies the parent /groups route guard
     // (nthsRouteGuard('group')) so these redirects can land at all; an admin
-    // also passes the Members tab's own guard.
+    // also passes the Manage tab's own guard.
     useNthsStore().setNTHSGroups(nthsGroupWithRole('admin'))
   })
 
   it.each([
     { from: '/groups/dashboard', to: '/groups/home' },
-    { from: '/groups/manage-team', to: '/groups/members' },
-    { from: '/groups/settings', to: '/groups/setup' },
     { from: '/groups/apply-preview', to: '/groups/home' },
+    { from: '/groups/members', to: '/groups/manage' },
+    { from: '/groups/setup', to: '/groups/manage' },
+    { from: '/groups/manage-team', to: '/groups/manage' },
+    { from: '/groups/settings', to: '/groups/manage' },
   ])('sends $from to $to', async ({ from, to }) => {
     expect(await visit(from)).toBe(to)
   })

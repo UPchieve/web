@@ -95,13 +95,12 @@ async function getWrapper(
         // This test asserts on the routed view's content, so it needs a
         // render function; a template-string stub renders nothing without a
         // runtime template compiler, unlike the untested route stubs above.
-        path: '/groups/members',
+        path: '/groups/manage',
         component: {
-          render: () => h('div', { 'data-testid': 'routed-members' }),
+          render: () => h('div', { 'data-testid': 'routed-manage' }),
         },
       },
       { path: '/groups/resources', component: { template: '<div />' } },
-      { path: '/groups/setup', component: { template: '<div />' } },
     ],
   })
   router.push(initialPath)
@@ -141,7 +140,7 @@ describe('NTHSGroupsView', () => {
     const wrapper = await getWrapper('/groups/home')
     expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(1)
 
-    await wrapper.vm.$router.push('/groups/members')
+    await wrapper.vm.$router.push('/groups/manage')
     await flushPromises()
     expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(2)
   })
@@ -161,18 +160,24 @@ describe('NTHSGroupsView', () => {
   it.each([
     {
       role: 'member',
-      shows: ['/groups/home'],
-      hides: ['/groups/to-do', '/groups/members'],
+      tabs: ['/groups/home', '/groups/resources'],
     },
-    { role: 'admin', shows: ['/groups/members', '/groups/to-do'], hides: [] },
-  ])('shows $role the right tabs', async ({ role, shows, hides }) => {
+    {
+      role: 'admin',
+      tabs: [
+        '/groups/home',
+        '/groups/to-do',
+        '/groups/resources',
+        '/groups/manage',
+      ],
+    },
+  ])('shows $role exactly these tabs, in order', async ({ role, tabs }) => {
     const wrapper = await getWrapper('/groups/home', role)
 
     const hrefs = wrapper
       .findAll('nav.tabs a')
       .map((tab) => tab.attributes('href'))
-    for (const href of shows) expect(hrefs).toContain(href)
-    for (const href of hides) expect(hrefs).not.toContain(href)
+    expect(hrefs).toEqual(tabs)
   })
 
   // This gate is the only thing on the client stopping an uncleared member
@@ -206,7 +211,7 @@ describe('NTHSGroupsView', () => {
     ])(
       'gates the tabs and routed view behind a warning for $name',
       async ({ role, overrides, hidden }) => {
-        const wrapper = await getWrapper('/groups/members', role, overrides)
+        const wrapper = await getWrapper('/groups/manage', role, overrides)
 
         expect(wrapper.find('[data-testid="hide-page-content"]').exists()).toBe(
           hidden
@@ -218,7 +223,7 @@ describe('NTHSGroupsView', () => {
         expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(
           hidden ? 0 : 1
         )
-        expect(wrapper.find('[data-testid="routed-members"]').exists()).toBe(
+        expect(wrapper.find('[data-testid="routed-manage"]').exists()).toBe(
           !hidden
         )
       }
@@ -290,11 +295,10 @@ describe('NTHSGroupsView', () => {
       }
     )
 
-    it('opens the self-leave confirmation without fetching members', async () => {
+    it('opens the self-leave confirmation', async () => {
       const spy = vi
         .spyOn(ModalService, 'showLeaveTeamModal')
         .mockImplementation(() => undefined as never)
-      const fetchMembers = vi.spyOn(NetworkService, 'getNTHSGroupMembers')
       const wrapper = await getWrapper('/groups/home', 'admin', {
         occupation: [],
       })
@@ -303,11 +307,10 @@ describe('NTHSGroupsView', () => {
         isRemovingSelf: true,
         memberToRemove: { userId: 'user-1', nthsGroupId: 'group-123' },
       })
-      expect(fetchMembers).not.toHaveBeenCalled()
     })
 
     it('clears the notice once a high school occupation is saved', async () => {
-      const wrapper = await getWrapper('/groups/members', 'member', {
+      const wrapper = await getWrapper('/groups/manage', 'member', {
         occupation: [],
       })
       expect(wrapper.find('[data-testid="hide-page-content"]').exists()).toBe(
@@ -320,7 +323,7 @@ describe('NTHSGroupsView', () => {
       expect(wrapper.find('[data-testid="hide-page-content"]').exists()).toBe(
         false
       )
-      expect(wrapper.find('[data-testid="routed-members"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="routed-manage"]').exists()).toBe(true)
     })
   })
 
@@ -329,7 +332,7 @@ describe('NTHSGroupsView', () => {
       const wrapper = await getWrapper('/groups/home')
       expect(refreshNTHSGroups).toHaveBeenCalledTimes(1)
 
-      await wrapper.vm.$router.push('/groups/members')
+      await wrapper.vm.$router.push('/groups/manage')
       await flushPromises()
       await wrapper.vm.$router.push('/groups/home')
       await flushPromises()
@@ -355,7 +358,7 @@ describe('NTHSGroupsView', () => {
       const wrapper = await getWrapper('/groups/home')
       refreshNTHSGroups.mockImplementation(removeCoachFromChapter)
 
-      await wrapper.vm.$router.push('/groups/members')
+      await wrapper.vm.$router.push('/groups/manage')
       await flushPromises()
 
       expect(fetchNthsData).toHaveBeenCalled()

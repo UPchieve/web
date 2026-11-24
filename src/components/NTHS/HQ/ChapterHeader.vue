@@ -20,16 +20,15 @@ const router = useRouter()
 
 const tabs = computed(() =>
   [
-    { to: '/groups/home', name: 'home', label: 'Home' },
-    { to: '/groups/to-do', name: 'to_do', label: 'To do', adminOnly: true },
+    { to: '/groups/home', name: 'home', label: 'Headquarters' },
+    { to: '/groups/to-do', name: 'to_do', label: 'To Do', adminOnly: true },
+    { to: '/groups/resources', name: 'resources', label: 'Resources' },
     {
-      to: '/groups/members',
-      name: 'members',
-      label: 'Members',
+      to: '/groups/manage',
+      name: 'manage',
+      label: 'Manage',
       adminOnly: true,
     },
-    { to: '/groups/resources', name: 'resources', label: 'Resources' },
-    { to: '/groups/setup', name: 'setup', label: 'Chapter setup' },
   ].filter(({ adminOnly }) => !adminOnly || props.isGroupAdmin)
 )
 
@@ -39,8 +38,7 @@ const { justCopied, copyLink } = useInviteLink(
 )
 
 // On narrow screens the tabs scroll sideways. A page opened directly on a later
-// tab (e.g. the checklist's "Edit in Chapter setup") would otherwise show its
-// active tab off-screen.
+// tab would otherwise show its active tab off-screen.
 const tabsNav = ref<HTMLElement | null>(null)
 function revealActiveTab() {
   tabsNav.value

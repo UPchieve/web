@@ -31,13 +31,13 @@ export class NTHSChapterPage {
   }
 
   async schoolApprovalIsSettled() {
-    await this.page.goto('/groups/setup')
-    await this.page.waitForURL('**/groups/setup')
+    await this.page.goto('/groups/manage')
+    await this.page.waitForURL('**/groups/manage')
   }
 
   async openPathChooser() {
-    await this.page.goto('/groups/setup')
-    await this.page.waitForURL('**/groups/setup')
+    await this.page.goto('/groups/manage')
+    await this.page.waitForURL('**/groups/manage')
     await expect(this.schoolApprovedPath).toBeVisible()
     await expect(this.communityPath).toBeVisible()
     await expect(this.chooseSchoolApprovedButton).toBeVisible()
@@ -45,8 +45,8 @@ export class NTHSChapterPage {
   }
 
   async openPathChooserAfterDenial() {
-    await this.page.goto('/groups/setup')
-    await this.page.waitForURL('**/groups/setup')
+    await this.page.goto('/groups/manage')
+    await this.page.waitForURL('**/groups/manage')
     await expect(this.denialNotice).toBeVisible()
     await expect(this.tryAgainButton).toBeVisible()
     await expect(this.stayCommunityButton).toBeVisible()

@@ -37,10 +37,6 @@ async function removeTeamMember() {
     const groupId = props.memberToRemove.nthsGroupId
     if (props.isRemovingSelf) {
       await NetworkService.leaveNthsChapter(props.memberToRemove.nthsGroupId)
-      nths.setNTHSGroupMembers({
-        groupId,
-        groupMembers: [],
-      })
       await nths.fetchNthsData()
       await router.push('/dashboard')
     } else {
@@ -51,20 +47,6 @@ async function removeTeamMember() {
           isActive: false,
         }
       )
-      // The Members tab reads the roster endpoint and never fills
-      // the store's NTHSGroupMembers, so only filter the cache when Chapter
-      // setup has loaded it; setting [] would leave its Leave Team button with
-      // no current member.
-      const cached = nths.NTHSGroupMembers?.[groupId]
-      if (cached) {
-        nths.setNTHSGroupMembers({
-          groupId,
-          groupMembers: cached.filter(
-            (member: GroupMember) =>
-              member.userId !== props.memberToRemove.userId
-          ),
-        })
-      }
     }
     emit('removed')
   } catch (err) {

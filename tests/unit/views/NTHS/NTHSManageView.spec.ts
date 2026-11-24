@@ -1,4 +1,4 @@
-import NTHSMembersView from '@/views/NTHS/Tabs/NTHSMembersView.vue'
+import NTHSManageView from '@/views/NTHS/Tabs/NTHSManageView.vue'
 import vuetify from '@/plugins/vuetify'
 import LoggerService from '@/services/LoggerService'
 import { titleChoices } from '@/services/NTHSRosterService'
@@ -23,6 +23,7 @@ vi.mock('@/services/NetworkService', async (importOriginal) => ({
 const showNthsUserManagementModal = vi.fn()
 const showNthsMemberTitleModal = vi.fn()
 const showConfirm = vi.fn()
+const showLeaveTeamModal = vi.fn()
 vi.mock('@/services/ModalService', () => ({
   default: {
     showNthsUserManagementModal: (props: unknown) =>
@@ -30,6 +31,7 @@ vi.mock('@/services/ModalService', () => ({
     showNthsMemberTitleModal: (props: unknown) =>
       showNthsMemberTitleModal(props),
     showConfirm: (...args: unknown[]) => showConfirm(...args),
+    showLeaveTeamModal: (props: unknown) => showLeaveTeamModal(props),
   },
 }))
 
@@ -54,9 +56,9 @@ function storeFor(viewerId = 'president') {
         createdAt: new Date(2025, 8, 2, 15).toISOString(),
       },
       memberInfo: { roleName: 'admin' },
+      renewal: { prompt: 'none' },
     },
   ]
-  nths.NTHSGroupMembers = {}
   vi.spyOn(nths, 'refreshNTHSGroups').mockImplementation(() =>
     refreshNTHSGroups()
   )
@@ -70,7 +72,7 @@ function storeFor(viewerId = 'president') {
 enableAutoUnmount(afterEach)
 
 async function getWrapper({ viewerId = 'president' } = {}) {
-  const wrapper = mount(NTHSMembersView, {
+  const wrapper = mount(NTHSManageView, {
     global: { plugins: [storeFor(viewerId), vuetify] },
     attachTo: 'body',
   })
@@ -89,6 +91,7 @@ beforeEach(() => {
   showNthsMemberTitleModal.mockReset()
   showNthsMemberTitleModal.mockResolvedValue('Member')
   showConfirm.mockReset()
+  showLeaveTeamModal.mockReset()
   getNTHSChapterRoster.mockResolvedValue(rosterResponse(MEMBERS))
 })
 
@@ -104,6 +107,12 @@ function row(wrapper: Wrapper, userId: string) {
   return rows(wrapper).find((candidate) =>
     candidate.find(`[data-testid="member-actions-${userId}"]`).exists()
   )!
+}
+
+async function clickInOrder(wrapper: Wrapper, testIds: string[]) {
+  for (const testId of testIds) {
+    await wrapper.find(`[data-testid="${testId}"]`).trigger('click')
+  }
 }
 
 function chipCount(wrapper: Wrapper, filter: string) {
@@ -133,7 +142,7 @@ async function openRangePicker(wrapper: Wrapper) {
   await flushPromises()
 }
 
-describe('NTHSMembersView', () => {
+describe('NTHSManageView', () => {
   describe('range', () => {
     it('opens on this week, from Monday through today', async () => {
       await getWrapper()
@@ -342,6 +351,23 @@ describe('NTHSMembersView', () => {
       }
     )
 
+    it.each([
+      ['own row', ['member-actions-president', 'member-leave-president']],
+      ['Leave chapter card', ['leave-team-button']],
+    ])(
+      'opens the self-leave confirmation from the %s',
+      async (_place, testIds) => {
+        const wrapper = await getWrapper()
+
+        await clickInOrder(wrapper, testIds)
+
+        expect(showLeaveTeamModal).toHaveBeenCalledWith({
+          isRemovingSelf: true,
+          memberToRemove: { userId: 'president', nthsGroupId: 'group-123' },
+        })
+      }
+    )
+
     it('sends nothing when the title choice is cancelled', async () => {
       showNthsMemberTitleModal.mockResolvedValue(undefined)
       const wrapper = await getWrapper()
@@ -523,17 +549,16 @@ describe('NTHSMembersView', () => {
     })
   })
 
-  describe('permissions', () => {
-    it('offers an admin only a title change on their own row', async () => {
-      const wrapper = await getWrapper()
-      await wrapper
-        .find('[data-testid="member-actions-president"]')
-        .trigger('click')
-      expect(
-        wrapper
-          .findAll('[role="menuitem"]')
-          .map((item) => item.attributes('data-testid'))
-      ).toEqual(['member-change-title-president'])
-    })
+  it('stays up without roster requests once the viewer leaves the chapter', async () => {
+    const wrapper = await getWrapper()
+    getNTHSChapterRoster.mockClear()
+
+    useNthsStore().NTHSGroups = []
+    await flushPromises()
+
+    expect(getNTHSChapterRoster).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="leave-team-button"]').exists()).toBe(
+      false
+    )
   })
 })

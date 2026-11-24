@@ -68,8 +68,8 @@ function dismissHandoff() {
   )
 }
 
-function goToMembers() {
-  void router.push('/groups/members')
+function goToManage() {
+  void router.push('/groups/manage')
 }
 
 type Banner = {
@@ -90,25 +90,25 @@ const BANNERS: Partial<
       : {
           title: `Get your chapter ready for ${schoolYear.value}`,
           body: `Time to set up your ${schoolYear.value} leaders! Make them admins and update their titles, especially the incoming President.`,
-          primaryLabel: 'Go to Members',
+          primaryLabel: 'Go to Manage',
           variant: 'information',
-          onPrimary: goToMembers,
+          onPrimary: goToManage,
           secondary: { label: 'Dismiss', onClick: dismissHandoff },
         },
   'confirm-return': (r) => ({
     title: `Confirm your chapter is continuing in ${schoolYear.value}`,
-    body: `Welcome back for a new school year! ✨ Make sure you've updated titles and admin roles on the Members tab, then confirm your chapter is still active by ${renewalDate(r.closesOn)}.`,
+    body: `Welcome back for a new school year! ✨ Make sure you've updated titles and admin roles on the Manage tab, then confirm your chapter is still active by ${renewalDate(r.closesOn)}.`,
     primaryLabel: 'Confirm',
     variant: 'information',
     onPrimary: accept,
-    secondary: { label: 'Go to Members', onClick: goToMembers },
+    secondary: { label: 'Go to Manage', onClick: goToManage },
   }),
   'confirm-reminder': (r) => ({
     title: `Action required by ${renewalDate(r.closesOn)}: choose a president 🚨`,
-    body: `Make sure your chapter has chosen a president and updated their title on the Members tab, so they can confirm. If your president doesn't confirm by ${renewalDate(r.closesOn)}, the chapter will close.`,
-    primaryLabel: 'Go to Members',
+    body: `Make sure your chapter has chosen a president and updated their title on the Manage tab, so they can confirm. If your president doesn't confirm by ${renewalDate(r.closesOn)}, the chapter will close.`,
+    primaryLabel: 'Go to Manage',
     variant: 'information',
-    onPrimary: goToMembers,
+    onPrimary: goToManage,
   }),
   'member-countdown': (r) => ({
     title: renewalCountdownTitle(renewalDaysLeft(r.closesOn)),
