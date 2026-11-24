@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useNthsStore } from '@/stores/nths'
 import Spinner from '@/components/Spinner.vue'
-import ExternalPage from '@/assets/ExternalPage.svg'
 import HQSection from './HQ/HQSection.vue'
+import RequirementMeter from './HQ/RequirementMeter.vue'
+import {
+  checkableCount,
+  doneCount,
+  isProcessed as processed,
+  phaseLabel,
+  startOpenSectionId,
+} from '@/services/NTHSChecklistService'
 import LoggerService from '@/services/LoggerService'
+import { isAppPath } from '@/services/NTHSGroupService'
 import type {
   NTHSChecklistItemPublic,
   NTHSChecklistItemStatus,
@@ -19,18 +28,11 @@ const nths = useNthsStore()
 const savingItems = ref(new Set<string>())
 const itemErrors = ref<Record<string, string>>({})
 
-const processed = ({ status }: NTHSChecklistItemPublic) =>
-  status === 'complete' || status === 'skipped'
-const doneCount = (items: NTHSChecklistItemPublic[]) =>
-  items.filter((item) => item.checkable && processed(item)).length
-const checkableCount = (items: NTHSChecklistItemPublic[]) =>
-  items.filter((item) => item.checkable).length
-const sectionComplete = (items: NTHSChecklistItemPublic[]) =>
-  checkableCount(items) > 0 && doneCount(items) === checkableCount(items)
+const openAtStart = startOpenSectionId(props.checklist)
 const collapsedSections = ref(
   new Set(
     props.checklist.sections
-      .filter((section) => sectionComplete(section.items))
+      .filter((section) => section.id !== openAtStart)
       .map((section) => section.id)
   )
 )
@@ -72,20 +74,41 @@ const toggleComplete = (item: NTHSChecklistItemPublic) =>
   updateStatus(item, item.status === 'complete' ? 'incomplete' : 'complete')
 const toggleSkipped = (item: NTHSChecklistItemPublic) =>
   updateStatus(item, item.status === 'skipped' ? 'incomplete' : 'skipped')
-const dueDate = (value: string) =>
-  new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(
-    new Date(value)
-  )
 </script>
 
 <template>
   <div class="sections">
-    <HQSection
-      v-for="section in checklist.sections"
-      :key="section.id"
-      :eyebrow="section.title"
-    >
-      <template #header-end>
+    <HQSection v-for="section in checklist.sections" :key="section.id">
+      <div class="head" :class="{ 'no-meter': !checkableCount(section.items) }">
+        <div class="head-text">
+          <p class="eyebrow">
+            <span aria-hidden="true">✦</span>
+            {{ phaseLabel(checklist.sections, section.id) }}
+            <span v-if="section.timeframe" class="timeframe">
+              {{ section.timeframe }}
+            </span>
+          </p>
+          <h2 class="section-title">{{ section.title }}</h2>
+          <p v-if="section.intro" class="intro">{{ section.intro }}</p>
+        </div>
+        <RequirementMeter
+          v-if="checkableCount(section.items)"
+          class="head-meter"
+          :label="`${section.title} progress`"
+          :value="doneCount(section.items)"
+          :goal="checkableCount(section.items)"
+        >
+          <div class="meter-row">
+            <span class="count">
+              <strong>{{ doneCount(section.items) }}</strong> of
+              {{ checkableCount(section.items) }} done
+            </span>
+            <span class="left">
+              {{ checkableCount(section.items) - doneCount(section.items) }}
+              left
+            </span>
+          </div>
+        </RequirementMeter>
         <button
           type="button"
           class="section-toggle"
@@ -97,17 +120,13 @@ const dueDate = (value: string) =>
           :data-testid="`checklist-section-toggle-${section.id}`"
           @click="toggleSection(section.id)"
         >
-          <span v-if="checkableCount(section.items)" class="count">
-            {{ doneCount(section.items) }} of
-            {{ checkableCount(section.items) }} done
-          </span>
           <span
             class="chevron"
             :class="{ collapsed: collapsedSections.has(section.id) }"
             aria-hidden="true"
           />
         </button>
-      </template>
+      </div>
 
       <div
         v-if="!collapsedSections.has(section.id)"
@@ -149,24 +168,26 @@ const dueDate = (value: string) =>
             <p v-if="item.description" class="description">
               {{ item.description }}
             </p>
-            <p v-if="item.dueDate" class="due-date">
-              Due {{ dueDate(item.dueDate) }}
-            </p>
             <div v-if="item.resources.length" class="resources">
-              <span class="resources-label">Resources:</span>
               <template
                 v-for="resource in item.resources"
                 :key="`${item.key}-${resource.label}`"
               >
+                <RouterLink
+                  v-if="resource.url && isAppPath(resource.url)"
+                  :to="resource.url"
+                  :data-testid="`checklist-resource-${item.key}`"
+                >
+                  {{ resource.label }} <span aria-hidden="true">→</span>
+                </RouterLink>
                 <a
-                  v-if="resource.url"
+                  v-else-if="resource.url"
                   :href="resource.url"
                   target="_blank"
                   rel="noopener noreferrer"
                   :data-testid="`checklist-resource-${item.key}`"
                 >
-                  {{ resource.label }}
-                  <ExternalPage class="icon" aria-hidden="true" />
+                  {{ resource.label }} <span aria-hidden="true">→</span>
                 </a>
                 <span v-else>{{ resource.label }}</span>
               </template>
@@ -197,23 +218,97 @@ const dueDate = (value: string) =>
 .sections {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
-.count {
-  color: $c-secondary-grey;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
+.head {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 300px) auto;
+  grid-template-areas: 'text meter toggle';
+  align-items: start;
+  gap: 12px 24px;
+}
+.head-text {
+  grid-area: text;
+}
+.head.no-meter {
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'text toggle';
+}
+.head-meter {
+  grid-area: meter;
+  align-self: center;
 }
 .section-toggle {
+  grid-area: toggle;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 0;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: 0;
   background: transparent;
 }
+@media (max-width: 600px) {
+  .head {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'text toggle'
+      'meter meter';
+  }
+  .head.no-meter {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'text toggle';
+  }
+  .head-meter {
+    padding: 0 24px;
+  }
+}
+.eyebrow {
+  @include nths-section-eyebrow;
+  font-weight: 500;
+  letter-spacing: 0.96px;
+  color: $c-soft-black;
+  margin: 0;
+}
+.timeframe {
+  margin-left: 6px;
+  color: $c-secondary-grey;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.section-title {
+  margin: 6px 0 0;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 30px;
+}
+.intro {
+  color: $c-secondary-grey;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 6px 0 0;
+}
+.meter-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: $c-secondary-grey;
+}
+.count strong {
+  color: $c-soft-black;
+  font-weight: 700;
+}
+.left {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+}
 .chevron {
+  display: block;
   width: 9px;
   height: 9px;
   border-right: 2px solid $c-nths-navy;
@@ -241,15 +336,14 @@ const dueDate = (value: string) =>
 }
 .checkbox,
 .checkbox-placeholder {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
-  margin-top: 1px;
 }
 .checkbox {
   appearance: none;
-  background: $upchieve-white;
-  border: 2px solid $border-grey;
+  background: $c-background-grey;
+  border: 0;
   border-radius: 4px;
 }
 .checkbox:checked {
@@ -261,50 +355,37 @@ const dueDate = (value: string) =>
   background-size: 12px;
 }
 .title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 24px;
 }
 .title.done {
   color: $c-secondary-grey;
   text-decoration: line-through;
 }
 .details {
-  margin-left: 34px;
+  margin-left: 38px;
 }
-.description,
-.due-date {
+.description {
   color: $c-secondary-grey;
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 4px 0 0;
-}
-.due-date {
-  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0;
 }
 .resources {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 12px;
-  margin-top: 10px;
-  font-size: 12px;
-}
-.resources-label {
-  color: $c-secondary-grey;
-  font-weight: 600;
-  text-transform: uppercase;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 500;
 }
 .resources a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.icon {
-  width: 12px;
-  height: 12px;
+  color: $c-information-blue;
+  text-decoration: underline;
 }
 .skip {
-  margin-top: 10px;
+  margin-top: 2px;
   padding: 0;
   border: 0;
   background: transparent;

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
 import Checklist from '@/components/NTHS/Checklist.vue'
+import DoThisNowCard from '@/components/NTHS/DoThisNowCard.vue'
+import { doThisNowPick } from '@/services/NTHSChecklistService'
 import Spinner from '@/components/Spinner.vue'
 import LoggerService from '@/services/LoggerService'
 import { useNthsStore } from '@/stores/nths'
@@ -10,6 +12,10 @@ const group = computed(() => nths.NTHSGroups?.[0])
 const checklist = computed(() => nths.NTHSChecklistData)
 const hasItems = computed(() =>
   checklist.value?.sections.some(({ items }) => items.length > 0)
+)
+
+const pick = computed(() =>
+  checklist.value ? doThisNowPick(checklist.value) : undefined
 )
 
 const isLoading = ref(true)
@@ -32,20 +38,15 @@ onBeforeMount(async () => {
 
 <template>
   <div class="to-do">
-    <div class="page-header">
-      <h1 class="page-title">Your checklist</h1>
-      <p class="page-subtitle">Finish these to get your chapter running.</p>
-    </div>
-
+    <h1 class="visually-hidden">To Do</h1>
     <Spinner v-if="isLoading" data-testid="checklist-loading" />
     <p v-else-if="loadFailed" class="notice" data-testid="checklist-error">
       We couldn't load your checklist. Refresh the page to try again.
     </p>
-    <Checklist
-      v-else-if="checklist && hasItems"
-      :groupId="group.groupInfo.id"
-      :checklist="checklist"
-    />
+    <template v-else-if="checklist && hasItems">
+      <DoThisNowCard v-if="pick" :item="pick" />
+      <Checklist :groupId="group.groupInfo.id" :checklist="checklist" />
+    </template>
     <p v-else class="notice" data-testid="checklist-empty">
       There is nothing on your checklist right now.
     </p>
@@ -56,13 +57,10 @@ onBeforeMount(async () => {
 .to-do {
   @include nths-tab-column(900px);
 }
-.page-title {
-  @include nths-page-title;
-}
-.page-subtitle {
-  @include nths-page-subtitle;
-}
 .notice {
   @include nths-notice;
+}
+.visually-hidden {
+  @include visually-hidden;
 }
 </style>

@@ -20,13 +20,15 @@ const valueText = computed(() => `${shown.value} of ${props.goal}`)
 
 <template>
   <div class="meter">
-    <div class="meter-row">
-      <span class="meter-label">{{ label }}</span>
-      <span class="meter-value" data-testid="meter-value">
-        {{ shown }}
-        <span v-if="!loading" class="meter-goal">of {{ goal }}</span>
-      </span>
-    </div>
+    <slot>
+      <div class="meter-row">
+        <span class="meter-label">{{ label }}</span>
+        <span class="meter-value" data-testid="meter-value">
+          {{ shown }}
+          <span v-if="!loading" class="meter-goal">of {{ goal }}</span>
+        </span>
+      </div>
+    </slot>
     <div
       class="track"
       role="progressbar"

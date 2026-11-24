@@ -1,5 +1,5 @@
 import Checklist from '@/components/NTHS/Checklist.vue'
-import { flushPromises, mount } from '@vue/test-utils'
+import { flushPromises, mount, RouterLinkStub } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { useNthsStore } from '@/stores/nths'
 import type {
@@ -40,22 +40,47 @@ function getWrapper(item = ITEM) {
     update,
     wrapper: mount(Checklist, {
       props: { groupId: GROUP_ID, checklist: checklistWith(item) },
+      global: { stubs: { RouterLink: RouterLinkStub } },
     }),
   }
 }
 
 describe('Checklist', () => {
-  it('renders backend sections, descriptions, due dates and resources', () => {
+  it('renders sections, descriptions and resource links without a row due date', () => {
     const { wrapper } = getWrapper()
 
     expect(wrapper.text()).toContain('Recruit')
     expect(wrapper.text()).toContain(ITEM.description)
-    expect(wrapper.text()).toContain('Due')
+    expect(wrapper.text()).not.toContain('Due')
+    expect(wrapper.text()).not.toContain('Resources:')
+    expect(
+      wrapper.get('[data-testid="checklist-resource-invite-members"]').text()
+    ).toContain('Recruitment guide')
     expect(
       wrapper
         .get('[data-testid="checklist-resource-invite-members"]')
         .attributes('href')
     ).toBe('https://example.com')
+  })
+
+  it('opens an app page in the same tab and an outside link in a new tab', () => {
+    const { wrapper } = getWrapper({
+      ...ITEM,
+      resources: [
+        { label: 'Members', url: '/groups/manage' },
+        { label: 'Recruitment guide', url: 'https://example.com' },
+      ],
+    })
+
+    const [appLink, outsideLink] = wrapper.findAll(
+      '[data-testid="checklist-resource-invite-members"]'
+    )
+    expect(wrapper.getComponent(RouterLinkStub).props('to')).toBe(
+      '/groups/manage'
+    )
+    expect(appLink.attributes('target')).toBeUndefined()
+    expect(outsideLink.attributes('href')).toBe('https://example.com')
+    expect(outsideLink.attributes('target')).toBe('_blank')
   })
 
   it('toggles sections independently', async () => {
@@ -100,16 +125,32 @@ describe('Checklist', () => {
     expect(wrapper.get('#checklist-section-1').exists()).toBe(true)
   })
 
-  it('excludes uncheckable items from progress and keeps informational sections open', async () => {
-    const informationalItem = {
-      ...ITEM,
-      checkable: false,
-      status: 'incomplete' as const,
-    }
-    const { wrapper } = getWrapper(informationalItem)
+  it('shows the timeframe, intro and counts of each section head', () => {
+    const info = { ...secondItem, checkable: false }
+    const wrapper = mount(Checklist, {
+      props: {
+        groupId: GROUP_ID,
+        checklist: {
+          sections: [
+            {
+              id: 1,
+              title: 'Recruit',
+              order: 1,
+              timeframe: 'Weeks 1-3',
+              intro: 'Find your people.',
+              items: [ITEM],
+            },
+            { id: 2, title: 'Habits', order: 2, items: [info] },
+          ],
+        },
+      },
+    })
 
-    expect(wrapper.text()).not.toContain('0 of 1 done')
-    expect(wrapper.get('#checklist-section-1').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Weeks 1-3')
+    expect(wrapper.text()).toContain('Find your people.')
+    expect(wrapper.text()).toContain('0 of 1 done')
+    expect(wrapper.text()).toContain('1 left')
+    expect(wrapper.text()).not.toContain('0 of 0')
   })
 
   it('counts only checkable items in mixed sections', async () => {
