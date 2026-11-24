@@ -35,6 +35,8 @@
     REDIS_PORT: 6379
     NODE_ENV: test_e2e_ci
     E2E_CACHE_POLICY: pull
+    # Graffiti won't start without a whiteboard token key. This is a test-only Ed25519 key.
+    WHITEBOARD_AUTH_TOKEN_PUBLIC: '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAQVmOkiZksZnDpqvWkGZEdTk0d3yB8Mp03CTmwRC2xc8=\n-----END PUBLIC KEY-----\n'
   before_script:
     - echo 'Set up high-line...'
     - corepack enable pnpm
