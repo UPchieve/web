@@ -428,6 +428,7 @@ import ModerationService from '@/services/ModerationService'
 import { WhiteboardNullTool } from './WhiteboardNullTool'
 import WhiteboardAiTutorButton from './WhiteboardAiTutorButton.vue'
 import NetworkService from '@/services/NetworkService'
+import { useWhiteboardToken } from '@/composables/useWhiteboardToken'
 import { processImage, getImageTooLargeMessage } from '@/utils/image-pipeline'
 import { BYTES_PER_MEGABYTE } from '@/utils/bytes'
 import { secondsInMs } from '@/utils/time-utils'
@@ -542,6 +543,7 @@ export default {
       heartBeatConnection: null,
       pendingHeartBeatId: null,
       heartBeatTimeout: null,
+      whiteboardToken: null,
       EVENTS,
       // Zwibbler.
       zwibblerCtx: null,
@@ -640,9 +642,21 @@ export default {
     },
   },
   async mounted() {
+    if (this.isZwibserveSession) {
+      this.whiteboardToken = useWhiteboardToken(this.sessionId)
+    }
     this.loadZwibbler()
   },
   methods: {
+    handleInitialTokenError(err) {
+      this.isConnected = false
+      this.loadingText = null
+      this.zwibblerCtx.setConfig('readOnly', true)
+      LoggerService.noticeError(err, {
+        sessionId: this.sessionId,
+        isZwibserveSession: this.isZwibserveSession,
+      })
+    },
     initZwibserveHeartBeat(zwibblerWsConnection) {
       this.clearHeartBeat()
       this.heartBeatConnection = zwibblerWsConnection
@@ -1471,12 +1485,12 @@ export default {
       )
 
       try {
+        if (this.isZwibserveSession) {
+          await this.whiteboardToken.refresh()
+        }
         await this.joinSharedSessionWithRetry()
       } catch (err) {
-        LoggerService.noticeError(err, {
-          sessionId: this.sessionId,
-          isZwibserveSession: this.isZwibserveSession,
-        })
+        this.handleInitialTokenError(err)
       }
     },
 
@@ -1580,6 +1594,7 @@ export default {
     await this.$store.dispatch('socket/resetPartnerImageUploadStatus')
     this.removeListeners()
     this.clearHeartBeat()
+    this.whiteboardToken?.dispose()
     // Zwibbler cleanup.
     // This method doesn't exist in zwibbler-demo.js
     if (this.zwibblerCtx?.leaveSharedSession) {
