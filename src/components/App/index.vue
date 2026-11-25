@@ -318,6 +318,11 @@ export default {
           this.$store.dispatch('socket/connect')
         }
 
+        const userProps = this.getUserPropsForAnalytics()
+        await AnalyticsService.identify(currentUserValue.id, userProps)
+        FeatureFlagService.setPersonPropertiesForFlags(userProps)
+        LoggerService.identify(currentUserValue.id)
+
         await this.getUserProductFlags()
 
         if (this.shouldForceStudentMode) {
@@ -330,11 +335,6 @@ export default {
           })
           await toast.present()
         }
-
-        const userProps = this.getUserPropsForAnalytics()
-        AnalyticsService.identify(currentUserValue.id, userProps)
-        LoggerService.identify(currentUserValue.id)
-        FeatureFlagService.setPersonPropertiesForFlags(userProps)
 
         if (this.mobileMode && !this.isMobileApp && this.isStudent) {
           this.showBanner({

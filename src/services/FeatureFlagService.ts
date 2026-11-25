@@ -3,18 +3,41 @@ import config from '@/config'
 import { POSTHOG_FEATURE_FLAGS } from '@/consts'
 import LoggerService from '@/services/LoggerService'
 import axios from 'axios'
+import type { AnalyticPersonPropertiesPublic } from '@/types/analytics'
 
 const FIVE_MINUTES_IN_MS = 1000 * 60 * 5
 
+type FeatureFlagInitOptions = {
+  id: string
+  featureFlags?: Record<string, boolean | string>
+  featureFlagPayloads?: Record<string, unknown>
+  personProperties?: Partial<AnalyticPersonPropertiesPublic>
+  isIdentifiedID?: boolean
+}
+
 class FeatureFlagService {
-  static async init(id, featureFlags, featureFlagPayloads, personProperties) {
+  static async init({
+    id,
+    featureFlags,
+    featureFlagPayloads,
+    personProperties,
+    isIdentifiedID = false,
+  }: FeatureFlagInitOptions) {
     return new Promise((resolve) => {
       posthog.init(config.posthogToken, {
         api_host: 'https://p.upchieve.org',
         ui_host: 'https://app.posthog.com',
         persistence: 'localStorage+cookie',
         async loaded() {
-          FeatureFlagService.setPersonProperties(personProperties)
+          // PostHog might still have a previous account saved in local storage.
+          // Make sure we use the logged in account before reading flags or
+          // updating person properties
+          if (isIdentifiedID) {
+            posthog.identify(id)
+          }
+          if (personProperties) {
+            FeatureFlagService.setPersonProperties(personProperties)
+          }
 
           FeatureFlagService.listenForFlagReload()
           resolve()
@@ -23,6 +46,7 @@ class FeatureFlagService {
           distinctID: id,
           featureFlags,
           featureFlagPayloads,
+          isIdentifiedID,
         },
         on_xhr_error: (req) => {
           LoggerService.noticeError(
@@ -116,14 +140,9 @@ class FeatureFlagService {
 }
 
 class DevFeatureFlagService {
-  static async init(id: string, featureFlags: any, featureFlagPayloads: any) {
+  static async init(options: FeatureFlagInitOptions) {
     // eslint-disable-next-line no-console
-    console.info(
-      'FeatureFlagService.init',
-      id,
-      featureFlags,
-      featureFlagPayloads
-    )
+    console.info('FeatureFlagService.init', options)
     DevFeatureFlagService.configureFlagPolling()
   }
 

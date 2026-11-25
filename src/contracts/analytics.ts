@@ -6,7 +6,9 @@ export type FeatureFlagResponse =
       featureFlags: Record<string, string | boolean>
       featureFlagPayloads: Record<string, unknown>
       personProperties: Partial<AnalyticPersonPropertiesPublic>
+      isIdentifiedID?: boolean
     }
   | {
       id: string
+      isIdentifiedID?: boolean
     }
