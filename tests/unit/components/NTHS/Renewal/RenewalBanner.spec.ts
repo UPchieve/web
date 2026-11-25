@@ -137,32 +137,26 @@ describe('RenewalBanner', () => {
     { prompt: 'confirm-reminder', shown: false },
     { prompt: 'step-up', shown: true },
     { prompt: 'member-countdown', shown: true },
-  ] as const)(
-    'on Manage, $prompt shows: $shown',
-    async ({ prompt, shown }) => {
-      const { wrapper, router } = await mountBanner(prompt)
+  ] as const)('on Manage, $prompt shows: $shown', async ({ prompt, shown }) => {
+    const { wrapper, router } = await mountBanner(prompt)
 
-      await router.push('/groups/manage')
-      await flushPromises()
+    await router.push('/groups/manage')
+    await flushPromises()
 
-      expect(has(wrapper, 'renewal-banner')).toBe(shown)
-    }
-  )
+    expect(has(wrapper, 'renewal-banner')).toBe(shown)
+  })
 
   it.each([
     { prompt: 'handoff-banner', button: 'renewal-banner-primary' },
     { prompt: 'confirm-return', button: 'renewal-banner-secondary' },
     { prompt: 'confirm-reminder', button: 'renewal-banner-primary' },
-  ] as const)(
-    'goes to Manage from $prompt',
-    async ({ prompt, button }) => {
-      const { wrapper, router } = await mountBanner(prompt)
+  ] as const)('goes to Manage from $prompt', async ({ prompt, button }) => {
+    const { wrapper, router } = await mountBanner(prompt)
 
-      await click(wrapper, button)
+    await click(wrapper, button)
 
-      expect(router.currentRoute.value.path).toBe('/groups/manage')
-    }
-  )
+    expect(router.currentRoute.value.path).toBe('/groups/manage')
+  })
 
   it.each([
     {
