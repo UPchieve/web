@@ -4,24 +4,12 @@ import LargeButton from '@/components/LargeButton.vue'
 import EditableName from '@/components/NTHS/EditableName.vue'
 import HQSection from '@/components/NTHS/HQ/HQSection.vue'
 import SchoolAffiliation from '@/components/NTHS/SchoolAffiliation.vue'
-import type { AffiliationStatus } from '@/services/NTHSGroupService'
 import { useNthsStore } from '@/stores/nths'
 
 const emit = defineEmits<{ (e: 'leave'): void }>()
 
 const nths = useNthsStore()
 const group = computed(() => nths.NTHSGroups?.[0])
-
-const SCHOOL_PATH_STATUSES: AffiliationStatus[] = [
-  'PENDING_SCHOOL_AFFILIATION',
-  'PENDING_UPCHIEVE_VERIFICATION',
-  'AFFILIATED',
-]
-const nameHelp = computed(() =>
-  SCHOOL_PATH_STATUSES.includes(group.value?.schoolAffiliationStatus)
-    ? 'School chapters use "NTHS at [School]." Write out the school\'s full name.'
-    : 'Community chapters pick their own name, then add "a chapter of NTHS" — like "Bay Area Tutors: a chapter of NTHS."'
-)
 </script>
 
 <template>
@@ -31,7 +19,7 @@ const nameHelp = computed(() =>
 
     <HQSection>
       <h3 class="question">Chapter name</h3>
-      <p class="help">{{ nameHelp }}</p>
+      <p class="help">The name shown on your chapter page and to members.</p>
       <EditableName
         class="name-editor"
         :groupName="group.groupInfo?.name"
@@ -49,7 +37,10 @@ const nameHelp = computed(() =>
     <HQSection class="leave">
       <div>
         <h3 class="question">Leave chapter</h3>
-        <p class="help">Leaving removes your access to Chapter HQ.</p>
+        <p class="help">
+          Leaving your chapter is permanent and removes your access to chapter
+          tools and your members' data.
+        </p>
       </div>
       <LargeButton
         variant="danger"
@@ -92,8 +83,14 @@ const nameHelp = computed(() =>
 }
 .leave {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+
+  @media (max-width: 700px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>

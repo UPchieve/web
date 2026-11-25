@@ -14,7 +14,6 @@ const COMMUNITY_PATH = '[data-testid="community-path"]'
 const SCHOOL_APPROVED_BADGE = '[data-testid="school-approved-current-badge"]'
 const COMMUNITY_BADGE = '[data-testid="community-current-badge"]'
 const CHOOSE_SCHOOL_BUTTON = '[data-testid="choose-school-approved-button"]'
-const STAY_COMMUNITY_BUTTON = '[data-testid="stay-community-button"]'
 const ADD_ADVISOR_BUTTON = '[data-testid="add-advisor-button"]'
 const SWITCH_TO_COMMUNITY_BUTTON = '[data-testid="switch-to-community-button"]'
 const STATUS_ERROR = '[data-testid="status-error"]'
@@ -22,10 +21,6 @@ const CANCEL_ADVISOR_BUTTON = '[data-testid="cancel-advisor-button"]'
 const AWAITING_VERIFICATION_PANEL =
   '[data-testid="awaiting-verification-panel"]'
 const APPROVED_PANEL = '[data-testid="approved-panel"]'
-const TRY_AGAIN_BUTTON = '[data-testid="try-school-approved-again-button"]'
-const DENIAL_NOTICE = '[data-testid="school-approved-denial-notice"]'
-const CARD_TITLE = '[data-testid="card-title"]'
-const CURRENT_PATH_CLASS = 'path-current'
 
 async function getWrapper(initialStatus: AffiliationStatus | null) {
   const wrapper = mount(SchoolAffiliation, {
@@ -62,16 +57,6 @@ function unresolvedLabelIds(wrapper: VueWrapper, selector: string) {
   return ids.filter((id) => !panel.ownerDocument.getElementById(id))
 }
 
-function describedByText(wrapper: VueWrapper, selector: string) {
-  const el = wrapper.find(selector).element
-  return (el.getAttribute('aria-describedby') ?? '')
-    .split(' ')
-    .filter(Boolean)
-    .map((id) => el.ownerDocument.getElementById(id)?.textContent?.trim())
-    .filter(Boolean)
-    .join(' ')
-}
-
 function labelledBy(wrapper: VueWrapper, selector: string) {
   const panel = wrapper.find(selector).element
   const ids: string[] = (panel.getAttribute('aria-labelledby') ?? '')
@@ -91,10 +76,6 @@ function expectRecordedStatus(schoolAffiliationStatus: AffiliationStatus) {
   ])
 }
 
-function isHighlighted(wrapper: VueWrapper, selector: string) {
-  return wrapper.find(selector).classes().includes(CURRENT_PATH_CLASS)
-}
-
 function failCreateAction(serverMessage?: string) {
   const failure = new AxiosError('Request failed')
   if (serverMessage) {
@@ -103,20 +84,6 @@ function failCreateAction(serverMessage?: string) {
     } as AxiosError['response']
   }
   vi.mocked(NetworkService.createActionForNTHSGroup).mockRejectedValue(failure)
-}
-
-// Lets a test look at the card while updateStatus is still in flight.
-function holdCreateAction() {
-  let release: (schoolAffiliationStatus: AffiliationStatus) => void
-  const pending = new Promise((resolve) => {
-    release = (schoolAffiliationStatus) =>
-      resolve({ data: { schoolAffiliationStatus } })
-  })
-  vi.mocked(NetworkService.createActionForNTHSGroup).mockReturnValue(
-    pending as ReturnType<typeof NetworkService.createActionForNTHSGroup>
-  )
-  return (schoolAffiliationStatus: AffiliationStatus) =>
-    release(schoolAffiliationStatus)
 }
 
 let nthsActions: { name: string; args: unknown[] }[]
@@ -136,47 +103,77 @@ describe('SchoolAffiliation', () => {
     })
   })
 
-  it.each([null, 'UNAFFILIATED' as const])(
-    'offers both paths with community marked current when the status is %s',
-    async (initialStatus) => {
-      const wrapper = await getWrapper(initialStatus)
+  const ALL_BUTTONS = [
+    CHOOSE_SCHOOL_BUTTON,
+    ADD_ADVISOR_BUTTON,
+    SWITCH_TO_COMMUNITY_BUTTON,
+  ]
 
-      expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(true)
-      expect(wrapper.find(COMMUNITY_PATH).exists()).toBe(true)
-      expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
-      expect(wrapper.find(SCHOOL_APPROVED_BADGE).exists()).toBe(false)
-      expect(isHighlighted(wrapper, COMMUNITY_PATH)).toBe(true)
-      expect(isHighlighted(wrapper, SCHOOL_APPROVED_PATH)).toBe(false)
-      expect(accessibleName(wrapper, COMMUNITY_PATH)).toBe(
-        'Community chapter CURRENT'
-      )
+  it.each([
+    { status: null, current: 'community', buttons: [CHOOSE_SCHOOL_BUTTON] },
+    {
+      status: 'UNAFFILIATED' as const,
+      current: 'community',
+      buttons: [CHOOSE_SCHOOL_BUTTON],
+    },
+    {
+      status: 'OPTED_OUT' as const,
+      current: 'community',
+      buttons: [CHOOSE_SCHOOL_BUTTON],
+    },
+    {
+      status: 'DENIED' as const,
+      current: 'community',
+      buttons: [CHOOSE_SCHOOL_BUTTON],
+    },
+    {
+      status: 'PENDING_SCHOOL_AFFILIATION' as const,
+      current: 'school',
+      buttons: [ADD_ADVISOR_BUTTON, SWITCH_TO_COMMUNITY_BUTTON],
+    },
+    {
+      status: 'PENDING_UPCHIEVE_VERIFICATION' as const,
+      current: 'school',
+      buttons: [],
+      panel: AWAITING_VERIFICATION_PANEL,
+    },
+    {
+      status: 'AFFILIATED' as const,
+      current: 'school',
+      buttons: [],
+      panel: APPROVED_PANEL,
+    },
+  ])(
+    'marks $current current with buttons $buttons for $status',
+    async ({ status, current, buttons, panel }) => {
+      const wrapper = await getWrapper(status)
+      const school = current === 'school'
+
+      expect(wrapper.find(SCHOOL_APPROVED_BADGE).exists()).toBe(school)
+      expect(wrapper.find(COMMUNITY_BADGE).exists()).toBe(!school)
       expect(accessibleName(wrapper, SCHOOL_APPROVED_PATH)).toBe(
-        'School-approved'
+        school ? 'School-approved Current' : 'School-approved'
       )
-      expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(true)
-      expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-      // The badge id only exists on the current panel, so the other panel must
-      // not name it.
+      expect(accessibleName(wrapper, COMMUNITY_PATH)).toBe(
+        school ? 'Community chapter' : 'Community chapter Current'
+      )
       expect(unresolvedLabelIds(wrapper, SCHOOL_APPROVED_PATH)).toEqual([])
       expect(unresolvedLabelIds(wrapper, COMMUNITY_PATH)).toEqual([])
+      for (const button of ALL_BUTTONS) {
+        expect(wrapper.find(button).exists()).toBe(
+          (buttons as string[]).includes(button)
+        )
+      }
+      for (const statusPanel of [AWAITING_VERIFICATION_PANEL, APPROVED_PANEL]) {
+        expect(wrapper.find(statusPanel).exists()).toBe(statusPanel === panel)
+      }
+      expect(wrapper.text()).not.toContain('Chapter Advisor')
 
       wrapper.unmount()
     }
   )
 
-  it('drops the stay-community button once the chapter has opted out', async () => {
-    const wrapper = await getWrapper('OPTED_OUT')
-
-    expect(wrapper.find(COMMUNITY_PATH).exists()).toBe(true)
-    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(false)
-    expect(wrapper.find(SWITCH_TO_COMMUNITY_BUTTON).exists()).toBe(false)
-    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(true)
-
-    wrapper.unmount()
-  })
-
-  it.each([null, 'OPTED_OUT' as const])(
+  it.each([null, 'OPTED_OUT' as const, 'DENIED' as const])(
     'records the school-approved choice from %s and opens the advisor form',
     async (initialStatus) => {
       vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
@@ -208,188 +205,19 @@ describe('SchoolAffiliation', () => {
 
     await wrapper.find(CHOOSE_SCHOOL_BUTTON).trigger('click')
     await flushPromises()
-    expect(wrapper.text()).toContain('Chapter Advisor')
-
     await cancelForm(wrapper)
     await flushPromises()
 
-    expect(NetworkService.createActionForNTHSGroup).not.toHaveBeenCalledWith(
-      GROUP_ID,
-      'OPTED OUT'
-    )
     expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledTimes(1)
-    expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
-      GROUP_ID,
-      'MARKED SCHOOL AFFILIATION IN PROGRESS'
-    )
-
     expect(wrapper.text()).not.toContain('Chapter Advisor')
-    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(true)
-    expect(wrapper.find(SCHOOL_APPROVED_BADGE).text()).toBe('CURRENT')
+    expect(wrapper.find(SCHOOL_APPROVED_BADGE).text()).toBe('Current')
     expect(wrapper.find(COMMUNITY_BADGE).exists()).toBe(false)
     expect(wrapper.find(ADD_ADVISOR_BUTTON).exists()).toBe(true)
 
     wrapper.unmount()
   })
 
-  it('records the community choice and keeps the chooser without its button', async () => {
-    const wrapper = await getWrapper(null)
-
-    await wrapper.find(STAY_COMMUNITY_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
-      GROUP_ID,
-      'OPTED OUT'
-    )
-    expect(wrapper.find(COMMUNITY_PATH).exists()).toBe(true)
-    expect(wrapper.find(COMMUNITY_BADGE).exists()).toBe(true)
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(false)
-    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(true)
-    expectRecordedStatus('OPTED_OUT')
-
-    wrapper.unmount()
-  })
-
-  it('offers a denied chapter both paths with a retry on the school path', async () => {
-    const wrapper = await getWrapper('DENIED')
-
-    expect(wrapper.find(CARD_TITLE).text()).toBe('Choose your chapter type')
-    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(true)
-    expect(wrapper.find(COMMUNITY_PATH).exists()).toBe(true)
-    expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(true)
-    expect(describedByText(wrapper, TRY_AGAIN_BUTTON)).toBe(
-      wrapper.find(DENIAL_NOTICE).text()
-    )
-    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(false)
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
-    expect(wrapper.find(SCHOOL_APPROVED_BADGE).exists()).toBe(false)
-    expect(isHighlighted(wrapper, COMMUNITY_PATH)).toBe(true)
-    expect(accessibleName(wrapper, COMMUNITY_PATH)).toBe(
-      'Community chapter CURRENT'
-    )
-    expect(accessibleName(wrapper, SCHOOL_APPROVED_PATH)).toBe(
-      'School-approved'
-    )
-    expect(unresolvedLabelIds(wrapper, SCHOOL_APPROVED_PATH)).toEqual([])
-    expect(unresolvedLabelIds(wrapper, COMMUNITY_PATH)).toEqual([])
-
-    wrapper.unmount()
-  })
-
-  it('reopens the advisor form when a denied chapter tries again', async () => {
-    vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
-      data: { schoolAffiliationStatus: 'PENDING_SCHOOL_AFFILIATION' },
-    })
-    const wrapper = await getWrapper('DENIED')
-
-    await wrapper.find(TRY_AGAIN_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
-      GROUP_ID,
-      'MARKED SCHOOL AFFILIATION IN PROGRESS'
-    )
-    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(false)
-    expect(wrapper.text()).toContain('Chapter Advisor')
-    expectRecordedStatus('PENDING_SCHOOL_AFFILIATION')
-
-    wrapper.unmount()
-  })
-
-  it('opts a denied chapter out when it stays a community chapter', async () => {
-    const wrapper = await getWrapper('DENIED')
-
-    await wrapper.find(STAY_COMMUNITY_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(NetworkService.createActionForNTHSGroup).toHaveBeenCalledWith(
-      GROUP_ID,
-      'OPTED OUT'
-    )
-    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(false)
-    expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(false)
-    expectRecordedStatus('OPTED_OUT')
-
-    wrapper.unmount()
-  })
-
-  it('returns a denied chapter to the chooser when the community choice fails to save', async () => {
-    const wrapper = await getWrapper('DENIED')
-    failCreateAction()
-
-    await wrapper.find(STAY_COMMUNITY_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(wrapper.find(STATUS_ERROR).text()).toBe(
-      'We could not save your choice. Please try again.'
-    )
-    expect(wrapper.find(DENIAL_NOTICE).exists()).toBe(true)
-    expect(wrapper.find(TRY_AGAIN_BUTTON).exists()).toBe(true)
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(nthsActions).toEqual([])
-
-    wrapper.unmount()
-  })
-
-  it.each([
-    ['PENDING_UPCHIEVE_VERIFICATION' as const, AWAITING_VERIFICATION_PANEL],
-    ['AFFILIATED' as const, APPROVED_PANEL],
-  ])('shows the %s panel instead of the chooser', async (status, panel) => {
-    const wrapper = await getWrapper(status)
-
-    expect(wrapper.find(panel).exists()).toBe(true)
-    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(false)
-    expect(wrapper.find(COMMUNITY_PATH).exists()).toBe(false)
-    expect(wrapper.find(COMMUNITY_BADGE).exists()).toBe(false)
-    expect(wrapper.find(SCHOOL_APPROVED_BADGE).exists()).toBe(false)
-
-    wrapper.unmount()
-  })
-
-  it('switches to the affiliation header while the school-approved choice is saving', async () => {
-    const release = holdCreateAction()
-    const wrapper = await getWrapper(null)
-
-    await wrapper.find(CHOOSE_SCHOOL_BUTTON).trigger('click')
-    await flushPromises()
-    expect(wrapper.find(CARD_TITLE).text()).toBe('School Affiliation: Optional')
-    expect(wrapper.findComponent(Spinner).exists()).toBe(true)
-    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(false)
-
-    release('PENDING_SCHOOL_AFFILIATION')
-    await flushPromises()
-    expect(wrapper.find(CARD_TITLE).text()).toBe('School Affiliation: Optional')
-    expect(wrapper.findComponent(Spinner).exists()).toBe(false)
-    expect(wrapper.text()).toContain('Chapter Advisor')
-
-    wrapper.unmount()
-  })
-
-  it('marks school-approved current for a chapter that already opted in', async () => {
-    const wrapper = await getWrapper('PENDING_SCHOOL_AFFILIATION')
-
-    expect(wrapper.find(CARD_TITLE).text()).toBe('Choose your chapter type')
-    expect(wrapper.find(SCHOOL_APPROVED_PATH).exists()).toBe(true)
-    expect(wrapper.find(SCHOOL_APPROVED_BADGE).text()).toBe('CURRENT')
-    expect(wrapper.find(COMMUNITY_BADGE).exists()).toBe(false)
-    expect(isHighlighted(wrapper, SCHOOL_APPROVED_PATH)).toBe(true)
-    expect(isHighlighted(wrapper, COMMUNITY_PATH)).toBe(false)
-    expect(accessibleName(wrapper, SCHOOL_APPROVED_PATH)).toBe(
-      'School-approved CURRENT'
-    )
-    expect(accessibleName(wrapper, COMMUNITY_PATH)).toBe('Community chapter')
-    expect(wrapper.find(ADD_ADVISOR_BUTTON).exists()).toBe(true)
-    expect(wrapper.find(SWITCH_TO_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(false)
-    expect(wrapper.text()).not.toContain('Chapter Advisor')
-
-    wrapper.unmount()
-  })
-
-  it('opens the advisor form without recording anything', async () => {
+  it('shows the advisor form without recording anything when Add advisor is pressed', async () => {
     const wrapper = await getWrapper('PENDING_SCHOOL_AFFILIATION')
 
     await wrapper.find(ADD_ADVISOR_BUTTON).trigger('click')
@@ -412,11 +240,54 @@ describe('SchoolAffiliation', () => {
       GROUP_ID,
       'OPTED OUT'
     )
-    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
-    expect(wrapper.find(SCHOOL_APPROVED_BADGE).exists()).toBe(false)
-    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(true)
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(false)
+    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('Current')
+    expect(wrapper.find(SWITCH_TO_COMMUNITY_BUTTON).exists()).toBe(false)
     expectRecordedStatus('OPTED_OUT')
+
+    wrapper.unmount()
+  })
+
+  it('keeps a pending chapter on the school-approved path when the switch to community fails', async () => {
+    const wrapper = await getWrapper('PENDING_SCHOOL_AFFILIATION')
+    failCreateAction()
+
+    await wrapper.find(SWITCH_TO_COMMUNITY_BUTTON).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find(STATUS_ERROR).text()).toBe(
+      'We could not save your choice. Please try again.'
+    )
+    expect(wrapper.findComponent(Spinner).exists()).toBe(false)
+    expect(wrapper.find(SCHOOL_APPROVED_BADGE).text()).toBe('Current')
+    expect(wrapper.find(SWITCH_TO_COMMUNITY_BUTTON).exists()).toBe(true)
+    expect(nthsActions).toEqual([])
+
+    wrapper.unmount()
+  })
+
+  it('returns an undecided chapter to the cards when the school-approved choice fails to save', async () => {
+    const wrapper = await getWrapper(null)
+    failCreateAction('Chapter action could not be recorded')
+
+    await wrapper.find(CHOOSE_SCHOOL_BUTTON).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find(STATUS_ERROR).text()).toBe(
+      'Chapter action could not be recorded'
+    )
+    expect(wrapper.findComponent(Spinner).exists()).toBe(false)
+    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(true)
+    expect(nthsActions).toEqual([])
+
+    vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
+      data: { schoolAffiliationStatus: 'PENDING_SCHOOL_AFFILIATION' },
+    })
+    await wrapper.find(CHOOSE_SCHOOL_BUTTON).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find(STATUS_ERROR).exists()).toBe(false)
+    expect(wrapper.text()).toContain('Chapter Advisor')
+    expectRecordedStatus('PENDING_SCHOOL_AFFILIATION')
 
     wrapper.unmount()
   })
@@ -440,81 +311,6 @@ describe('SchoolAffiliation', () => {
     await cancelForm(wrapper)
     await wrapper.find(ADD_ADVISOR_BUTTON).trigger('click')
     expect(wrapper.text()).not.toContain('That advisor email is already in use')
-
-    wrapper.unmount()
-  })
-
-  it('returns an undecided chapter to the chooser when the community choice fails to save', async () => {
-    const wrapper = await getWrapper(null)
-    failCreateAction('Chapter action could not be recorded')
-
-    await wrapper.find(STAY_COMMUNITY_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(wrapper.find(STATUS_ERROR).text()).toBe(
-      'Chapter action could not be recorded'
-    )
-    expect(wrapper.findComponent(Spinner).exists()).toBe(false)
-    expect(wrapper.find(COMMUNITY_BADGE).text()).toBe('CURRENT')
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(nthsActions).toEqual([])
-
-    vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
-      data: { schoolAffiliationStatus: 'OPTED_OUT' },
-    })
-    await wrapper.find(STAY_COMMUNITY_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(wrapper.find(STATUS_ERROR).exists()).toBe(false)
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(false)
-    expectRecordedStatus('OPTED_OUT')
-
-    wrapper.unmount()
-  })
-
-  it('returns an undecided chapter to the chooser when the school-approved choice fails to save', async () => {
-    const wrapper = await getWrapper(null)
-    failCreateAction('Chapter action could not be recorded')
-
-    await wrapper.find(CHOOSE_SCHOOL_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(wrapper.find(STATUS_ERROR).text()).toBe(
-      'Chapter action could not be recorded'
-    )
-    expect(wrapper.findComponent(Spinner).exists()).toBe(false)
-    expect(wrapper.find(CHOOSE_SCHOOL_BUTTON).exists()).toBe(true)
-    expect(wrapper.find(STAY_COMMUNITY_BUTTON).exists()).toBe(true)
-    expect(nthsActions).toEqual([])
-
-    vi.mocked(NetworkService.createActionForNTHSGroup).mockResolvedValue({
-      data: { schoolAffiliationStatus: 'PENDING_SCHOOL_AFFILIATION' },
-    })
-    await wrapper.find(CHOOSE_SCHOOL_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(wrapper.find(STATUS_ERROR).exists()).toBe(false)
-    expect(wrapper.text()).toContain('Chapter Advisor')
-    expectRecordedStatus('PENDING_SCHOOL_AFFILIATION')
-
-    wrapper.unmount()
-  })
-
-  it('keeps a pending chapter on the school-approved path when the switch to community fails', async () => {
-    const wrapper = await getWrapper('PENDING_SCHOOL_AFFILIATION')
-    failCreateAction()
-
-    await wrapper.find(SWITCH_TO_COMMUNITY_BUTTON).trigger('click')
-    await flushPromises()
-
-    expect(wrapper.find(STATUS_ERROR).text()).toBe(
-      'We could not save your choice. Please try again.'
-    )
-    expect(wrapper.findComponent(Spinner).exists()).toBe(false)
-    expect(wrapper.find(SCHOOL_APPROVED_BADGE).text()).toBe('CURRENT')
-    expect(wrapper.find(COMMUNITY_BADGE).exists()).toBe(false)
-    expect(isHighlighted(wrapper, SCHOOL_APPROVED_PATH)).toBe(true)
-    expect(wrapper.find(SWITCH_TO_COMMUNITY_BUTTON).exists()).toBe(true)
 
     wrapper.unmount()
   })

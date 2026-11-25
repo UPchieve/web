@@ -1,17 +1,19 @@
 import EditableName from '@/components/NTHS/EditableName.vue'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
-import {
-  DOMWrapper,
-  enableAutoUnmount,
-  flushPromises,
-  mount,
-} from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useNthsStore } from '@/stores/nths'
 
 const GROUP_ID = 'group-123'
 const SAVED_NAME = 'NTHS at Lincoln High School'
+
+const FEEDBACK = '[data-testid="name-feedback"]'
+const SAVE_BUTTON = '[data-testid="save-name-button"]'
+const LENGTH = '[data-testid="name-length"]'
+const INPUT = '[data-testid="name-input"]'
+const FORM = '[data-testid="name-form"]'
 
 const setNTHSGroupName = vi.fn()
 
@@ -42,26 +44,12 @@ describe('EditableName', () => {
     setNTHSGroupName.mockClear()
   })
 
-  it.each([
-    {
-      via: 'blur',
-      interact: (input: DOMWrapper<HTMLInputElement>) => input.trigger('blur'),
-    },
-    {
-      // The Enter handler calls blur(), which fires a blur event only on a
-      // focused element.
-      via: 'Enter',
-      interact: (input: DOMWrapper<HTMLInputElement>) => {
-        input.element.focus()
-        return input.trigger('keydown', { key: 'Enter' })
-      },
-    },
-  ])('saves the trimmed name on $via', async ({ interact }) => {
+  it('saves the trimmed name from Save name and confirms it', async () => {
+    vi.useFakeTimers()
     const wrapper = getWrapper()
-    const input = wrapper.find('input')
 
-    await input.setValue('  Bay Area Tutors  ')
-    await interact(input)
+    await wrapper.find(INPUT).setValue('  Bay Area Tutors  ')
+    await wrapper.find(SAVE_BUTTON).trigger('click')
     await flushPromises()
 
     expect(editGroup).toHaveBeenCalledWith({
@@ -72,43 +60,59 @@ describe('EditableName', () => {
       groupId: GROUP_ID,
       groupName: 'Bay Area Tutors',
     })
-    expect(wrapper.find('[data-testid="name-feedback"]').text()).toBe('Saved')
+    expect(wrapper.find(FEEDBACK).text()).toBe('Chapter name updated.')
+
+    vi.advanceTimersByTime(3000)
+    await nextTick()
+    expect(wrapper.find(FEEDBACK).text()).toBe('')
+    vi.useRealTimers()
   })
 
-  it('makes no request when the name is unchanged', async () => {
+  it('does not save a changed name on blur', async () => {
     const wrapper = getWrapper()
 
-    await wrapper.find('input').trigger('blur')
+    await wrapper.find(INPUT).setValue('Bay Area Tutors')
+    await wrapper.find(INPUT).trigger('blur')
     await flushPromises()
 
     expect(editGroup).not.toHaveBeenCalled()
+    expect(wrapper.find(SAVE_BUTTON).attributes('disabled')).toBeUndefined()
   })
 
-  it('puts the saved name back on Escape', async () => {
+  it('caps the name at 64 characters', () => {
     const wrapper = getWrapper()
-    const input = wrapper.find('input')
 
-    await input.setValue('Something else')
-    await input.trigger('keydown', { key: 'Escape' })
-
-    expect(input.element.value).toBe(SAVED_NAME)
+    expect(wrapper.find(INPUT).attributes('maxlength')).toBe('64')
   })
 
-  it('refuses a blank name and restores the saved one', async () => {
+  it('shows the length only from 10 characters short of the cap', async () => {
     const wrapper = getWrapper()
-    const input = wrapper.find('input')
+    const input = wrapper.find(INPUT)
 
-    await input.setValue('   ')
-    await input.trigger('blur')
-    await flushPromises()
+    await input.setValue('a'.repeat(53))
+    expect(wrapper.find(LENGTH).exists()).toBe(false)
 
-    expect(editGroup).not.toHaveBeenCalled()
-    expect(input.element.value).toBe(SAVED_NAME)
-    expect(input.attributes('aria-invalid')).toBe('true')
-    expect(
-      wrapper.find(`#${input.attributes('aria-describedby')}`).exists()
-    ).toBe(true)
+    await input.setValue('a'.repeat(54))
+    expect(wrapper.find(LENGTH).text()).toBe('54/64 characters')
   })
+
+  it.each([
+    ['unchanged', SAVED_NAME],
+    ['unchanged apart from spaces', `  ${SAVED_NAME} `],
+    ['blank', '   '],
+  ])(
+    'disables Save name and sends nothing when the name is %s',
+    async (_, value) => {
+      const wrapper = getWrapper()
+      const button = wrapper.find(SAVE_BUTTON)
+
+      await wrapper.find(INPUT).setValue(value)
+      await wrapper.find(FORM).trigger('submit')
+
+      expect(button.attributes('disabled')).toBeDefined()
+      expect(editGroup).not.toHaveBeenCalled()
+    }
+  )
 
   it.each([
     {
@@ -160,14 +164,15 @@ describe('EditableName', () => {
         .spyOn(LoggerService, 'noticeError')
         .mockImplementation(() => {})
       const wrapper = getWrapper()
-      const input = wrapper.find('input')
+      const input = wrapper.find(INPUT)
 
       await input.setValue('Bay Area Tutors')
-      await input.trigger('blur')
+      await wrapper.find(FORM).trigger('submit')
       await flushPromises()
 
       expect(input.element.value).toBe('Bay Area Tutors')
       expect(wrapper.text()).toContain(shown)
+      expect(wrapper.find(SAVE_BUTTON).attributes('disabled')).toBeUndefined()
       if (loggedWith === undefined) {
         expect(noticeError).not.toHaveBeenCalled()
       } else {
@@ -176,56 +181,4 @@ describe('EditableName', () => {
       }
     }
   )
-
-  it('re-sends a rejected name once it changes', async () => {
-    editGroup.mockRejectedValueOnce({
-      response: { status: 422, data: { err: 'Team name must be unique' } },
-    })
-    const wrapper = getWrapper()
-    const input = wrapper.find('input')
-
-    await input.setValue('Bay Area Tutors')
-    await input.trigger('blur')
-    await flushPromises()
-    expect(editGroup).toHaveBeenCalledTimes(1)
-
-    await input.trigger('blur')
-    await flushPromises()
-    expect(editGroup).toHaveBeenCalledTimes(1)
-
-    await input.setValue('Bay Area Tutoring Club')
-    await input.trigger('blur')
-    await flushPromises()
-
-    expect(editGroup).toHaveBeenCalledTimes(2)
-    expect(editGroup).toHaveBeenLastCalledWith({
-      groupId: GROUP_ID,
-      name: 'Bay Area Tutoring Club',
-    })
-  })
-
-  it('keeps the typed name and its save while a save is in flight', async () => {
-    let resolveSave: (value: { data: { group: { name: string } } }) => void
-    editGroup.mockReturnValue(
-      new Promise((resolve) => {
-        resolveSave = resolve
-      })
-    )
-    const wrapper = getWrapper()
-    const input = wrapper.find('input')
-
-    await input.setValue('Bay Area Tutors')
-    await input.trigger('blur')
-    await input.trigger('blur')
-    await input.trigger('keydown', { key: 'Escape' })
-
-    expect(input.element.value).toBe('Bay Area Tutors')
-    expect(editGroup).toHaveBeenCalledTimes(1)
-
-    resolveSave!({ data: { group: { name: 'Bay Area Tutors' } } })
-    await flushPromises()
-
-    expect(input.element.value).toBe('Bay Area Tutors')
-    expect(wrapper.find('[data-testid="name-feedback"]').text()).toBe('Saved')
-  })
 })

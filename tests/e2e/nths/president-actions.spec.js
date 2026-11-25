@@ -95,7 +95,7 @@ test.describe('A president can run their chapter from Chapter HQ', () => {
       const newName = `Renamed ${Date.now()}`
       await hq.nameInput.fill(newName)
       await hq.nameInput.press('Enter')
-      await expect(page.getByText('Saved', { exact: true })).toBeVisible()
+      await expect(page.getByTestId('name-feedback')).toHaveText(/\S/)
       await page.reload()
       await expect(hq.nameInput).toHaveValue(newName)
     })

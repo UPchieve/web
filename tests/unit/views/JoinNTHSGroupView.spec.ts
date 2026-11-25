@@ -108,6 +108,59 @@ describe('JoinNTHSGroupView', () => {
     expect(wrapper.find('[data-testid="button-submit"]').exists()).toBe(true)
   })
 
+  describe('former member', () => {
+    beforeEach(() => {
+      mockedNetworkService.joinVolunteerToNTHSGroup.mockRejectedValue({
+        response: {
+          status: 403,
+          data: { err: 'server text', code: 'NTHS_FORMER_MEMBER' },
+        },
+      })
+    })
+
+    it('shows the cannot-rejoin screen instead of the join form', async () => {
+      const wrapper = mountView({ id: 'user-1' })
+      await flushPromises()
+
+      expect(
+        wrapper.find('[data-testid="chapter-former-member"]').exists()
+      ).toBe(true)
+      expect(wrapper.find('[data-testid="button-submit"]').exists()).toBe(false)
+
+      await wrapper
+        .find('[data-testid="button-go-to-dashboard"]')
+        .trigger('click')
+      expect(push).toHaveBeenCalledWith('/dashboard')
+    })
+
+    it('shows the code form when the visitor says it is not their team', async () => {
+      const wrapper = mountView({ id: 'user-1' })
+      await flushPromises()
+
+      await wrapper.find('[data-testid="link-not-your-team"]').trigger('click')
+
+      expect(
+        wrapper.find('[data-testid="chapter-former-member"]').exists()
+      ).toBe(false)
+      expect(wrapper.findComponent({ name: 'FormInput' }).exists()).toBe(true)
+    })
+
+    it('shows other join refusals as an error on the join form', async () => {
+      mockedNetworkService.joinVolunteerToNTHSGroup.mockRejectedValue({
+        response: { status: 422, data: { err: 'Invalid invite code' } },
+      })
+      const wrapper = mountView({ id: 'user-1' })
+      await flushPromises()
+
+      expect(
+        wrapper.find('[data-testid="chapter-former-member"]').exists()
+      ).toBe(false)
+      expect(
+        wrapper.findComponent({ name: 'FormErrors' }).props('errors')
+      ).toEqual(['Invalid invite code'])
+    })
+  })
+
   describe('closed chapter', () => {
     beforeEach(() => {
       mockedNetworkService.getNTHSGroupByCode.mockResolvedValue({

@@ -32,6 +32,7 @@ const inviteCode = ref<string | undefined>(
 )
 const askForInviteCode = ref<boolean>(!inviteCode.value)
 const isLoading = ref(true)
+const isFormerMember = ref(false)
 const team = ref<{ name: string; closedAt?: string | null }>({ name: '' })
 const isSignedIn = computed(() => !!$store.state.user.user?.id)
 
@@ -94,6 +95,7 @@ onBeforeMount(async () => {
 
 function removeTeam() {
   askForInviteCode.value = true
+  isFormerMember.value = false
   inviteCode.value = ''
   team.value = { name: '' }
   $router.replace('/join-team')
@@ -136,6 +138,7 @@ const closedLoginPath = computed(() =>
 
 async function addVolunteerToTeam() {
   isLoading.value = true
+  errorMessage.value = ''
 
   AnalyticsService.captureEvent(EVENTS.VOLUNTEER_CLICKED_JOIN_TEAM, {
     inviteCode: inviteCode.value,
@@ -191,7 +194,9 @@ async function addVolunteerToTeam() {
     }
   } catch (err) {
     const is4xxError = err.response?.status >= 400 && err.response?.status < 500
-    if (is4xxError && err.response?.data?.err) {
+    if (err.response?.data?.code === 'NTHS_FORMER_MEMBER') {
+      isFormerMember.value = true
+    } else if (is4xxError && err.response?.data?.err) {
       errorMessage.value = err.response?.data.err
     } else {
       errorMessage.value =
@@ -209,7 +214,37 @@ async function addVolunteerToTeam() {
 
     <form-errors v-if="errorMessage" :errors="[errorMessage]" />
 
-    <div v-if="team.closedAt && !isLoading" data-testid="chapter-closed">
+    <div
+      v-if="isFormerMember && !isLoading"
+      data-testid="chapter-former-member"
+    >
+      <h1>You can't rejoin {{ team.name || 'this chapter' }}</h1>
+      <p class="mt-4">
+        Members who leave a chapter or are removed from it can't join it again.
+        You can still join a different NTHS chapter with its invite link.
+      </p>
+      <p class="mt-4">You can still tutor and earn volunteer hours!</p>
+      <button
+        type="button"
+        class="uc-form-button"
+        data-testid="button-go-to-dashboard"
+        v-ph:nths="'join_former_member.dashboard'"
+        @click="$router.push('/dashboard')"
+      >
+        Tutoring dashboard
+      </button>
+      <p class="sub mt-3">
+        <a
+          class="uc-link"
+          data-testid="link-not-your-team"
+          v-ph:nths="'join_former_member.different_code'"
+          @click="removeTeam"
+          >Not your team? Enter a different code</a
+        >
+      </p>
+    </div>
+
+    <div v-else-if="team.closedAt && !isLoading" data-testid="chapter-closed">
       <h1>{{ team.name }} isn't accepting new members</h1>
       <p class="mt-4">
         Thanks so much for your interest in {{ team.name }}. Unfortunately, this

@@ -25,60 +25,28 @@ const { snapshot, send } = useMachine(SchoolAffiliationMachine, {
   },
 })
 
-const isSeekingSchoolApproval = computed(() =>
-  snapshot.value.matches('AwaitingAdvisorDetails')
-)
-
 const isAddingAdvisorInfo = computed(
   () =>
     snapshot.value.matches('AddingAdvisorInfo') ||
     snapshot.value.matches('SubmittingAdvisorInfo')
 )
 
-const isDenied = computed(() => snapshot.value.matches('Denied'))
-
-const isChoosingPath = computed(
+const isSchoolCurrent = computed(
   () =>
-    snapshot.value.matches('Undecided') ||
-    snapshot.value.matches('OptedOut') ||
-    isDenied.value ||
-    isSeekingSchoolApproval.value
+    snapshot.value.matches('AwaitingAdvisorDetails') ||
+    snapshot.value.matches('AwaitingUPchieveVerification') ||
+    snapshot.value.matches('Approved')
 )
 
-const CHOOSER_HEADER = 'Choose your chapter type'
-const AFFILIATION_HEADER = 'School Affiliation: Optional'
-
-const opensOnAffiliationHeader: Record<AffiliationStatus, boolean> = {
-  PENDING_SCHOOL_AFFILIATION: false,
-  PENDING_UPCHIEVE_VERIFICATION: true,
-  AFFILIATED: true,
-  DENIED: false,
-  OPTED_OUT: false,
-  UNAFFILIATED: false,
-}
-
-const cardHeader = computed(() => {
-  // The machine boots into Initial and only leaves it once setInitialState's
-  // actor resolves, but schoolAffiliationStatus was already seeded into
-  // context from props, so we can read the eventual panel straight off it
-  // instead of waiting for the transition.
-  if (snapshot.value.matches('Initial')) {
-    const status = snapshot.value.context.schoolAffiliationStatus
-    return status && opensOnAffiliationHeader[status]
-      ? AFFILIATION_HEADER
-      : CHOOSER_HEADER
-  }
-  return isChoosingPath.value || snapshot.value.matches('OptingOut')
-    ? CHOOSER_HEADER
-    : AFFILIATION_HEADER
-})
+const showCards = computed(
+  () =>
+    isSchoolCurrent.value ||
+    snapshot.value.matches('Undecided') ||
+    snapshot.value.matches('OptedOut') ||
+    snapshot.value.matches('Denied')
+)
 
 const uid = useId()
-const schoolPathTitleId = `${uid}-school-approved-title`
-const schoolPathBadgeId = `${uid}-school-approved-badge`
-const communityPathTitleId = `${uid}-community-title`
-const communityPathBadgeId = `${uid}-community-badge`
-const schoolPathNoticeId = `${uid}-school-approved-notice`
 
 type PathButton = {
   label: string
@@ -87,50 +55,36 @@ type PathButton = {
   event: SchoolAffiliationEvent
 }
 
-const CHOOSE_SCHOOL_APPROVED: PathButton = {
-  label: 'Choose school-approved',
-  variant: 'primary-blue',
+const TRY_SCHOOL_APPROVAL: PathButton = {
+  label: 'Try for school approval',
+  variant: 'secondary',
   testid: 'choose-school-approved-button',
   event: { type: 'OPT_IN' },
 }
 const ADD_ADVISOR: PathButton = {
-  label: 'Add your advisor',
+  label: 'Add advisor',
   variant: 'primary-blue',
   testid: 'add-advisor-button',
   event: { type: 'ADD_ADVISOR' },
 }
-const STAY_COMMUNITY: PathButton = {
-  label: 'Stay a community chapter',
-  variant: 'outlined',
-  testid: 'stay-community-button',
-  event: { type: 'OPT_OUT' },
-}
 const SWITCH_TO_COMMUNITY: PathButton = {
   label: 'Switch to community chapter',
-  variant: 'outlined',
+  variant: 'secondary',
   testid: 'switch-to-community-button',
   event: { type: 'OPT_OUT' },
 }
-const TRY_SCHOOL_APPROVED_AGAIN: PathButton = {
-  label: 'Try again',
-  variant: 'primary-blue',
-  testid: 'try-school-approved-again-button',
-  event: { type: 'OPT_IN' },
-}
 
 const schoolApprovedButton = computed(() => {
-  if (isSeekingSchoolApproval.value) return ADD_ADVISOR
-  if (isDenied.value) return TRY_SCHOOL_APPROVED_AGAIN
-  return CHOOSE_SCHOOL_APPROVED
+  if (snapshot.value.matches('AwaitingAdvisorDetails')) return ADD_ADVISOR
+  if (isSchoolCurrent.value) return undefined
+  return TRY_SCHOOL_APPROVAL
 })
 
-const communityButton = computed(() => {
-  if (isSeekingSchoolApproval.value) return SWITCH_TO_COMMUNITY
-  if (snapshot.value.matches('Undecided') || isDenied.value)
-    return STAY_COMMUNITY
-  // An opted-out chapter is already where this button would put it.
-  return undefined
-})
+const communityButton = computed(() =>
+  snapshot.value.matches('AwaitingAdvisorDetails')
+    ? SWITCH_TO_COMMUNITY
+    : undefined
+)
 
 type ChapterPath = {
   type: 'school_approved' | 'community'
@@ -139,7 +93,6 @@ type ChapterPath = {
   titleId: string
   badgeId: string
   title: string
-  denialNotice?: { text: string; id: string; testid: string }
   body: string
   bullets: string[]
   isCurrent: boolean
@@ -151,48 +104,40 @@ const paths = computed<ChapterPath[]>(() => [
     type: 'school_approved',
     testid: 'school-approved-path',
     badgeTestid: 'school-approved-current-badge',
-    titleId: schoolPathTitleId,
-    badgeId: schoolPathBadgeId,
+    titleId: `${uid}-school-approved-title`,
+    badgeId: `${uid}-school-approved-badge`,
     title: 'School-approved',
-    denialNotice: isDenied.value
-      ? {
-          text: "Your school didn't approve this chapter. You can try again with a new advisor at the same school.",
-          id: schoolPathNoticeId,
-          testid: 'school-approved-denial-notice',
-        }
-      : undefined,
-    body: "A teacher or school staff member is a formal advisor. You follow your school's requirement for starting school clubs.",
+    body: "A teacher or staff member is your advisor. You follow your school's club rules, and get some perks:",
     bullets: [
-      "Use your school's name, meet in a school room, table at the club fair",
-      'Your advisor signs off on facilities and events (not tutoring, that still happens on UPchieve)',
-      'We email your advisor for you and support you through school approval',
+      "Use your school's name and meet on campus",
+      'Advisor approves events and space (tutoring stays on UPchieve)',
+      'We email your advisor helpful information',
     ],
-    isCurrent: isSeekingSchoolApproval.value,
+    isCurrent: isSchoolCurrent.value,
     button: schoolApprovedButton.value,
   },
   {
     type: 'community',
     testid: 'community-path',
     badgeTestid: 'community-current-badge',
-    titleId: communityPathTitleId,
-    badgeId: communityPathBadgeId,
+    titleId: `${uid}-community-title`,
+    badgeId: `${uid}-community-badge`,
     title: 'Community chapter',
-    body: 'Community chapters are a group of friends, teammates, or peers from school who meet outside the school building.',
+    body: 'Friends, teammates, or classmates who meet outside school.',
     bullets: [
-      'No school sign-off, no adult required',
-      'Name your chapter, or leave it numbered',
-      'Meet online or in person, but members must be people you know in real life',
+      'No school sign-off or adult needed',
+      'Name your chapter, or keep the default name',
+      'Meet online or in person, with people you know',
     ],
-    isCurrent: !isSeekingSchoolApproval.value,
+    isCurrent: !isSchoolCurrent.value,
     button: communityButton.value,
   },
 ])
 </script>
 
 <template>
-  <HQSection>
-    <h2 class="card-title" data-testid="card-title">{{ cardHeader }}</h2>
-    <Spinner class="spinner" v-if="snapshot.hasTag('loading')" />
+  <div class="affiliation">
+    <Spinner v-if="snapshot.hasTag('loading')" />
 
     <p
       v-if="snapshot.context.submitError && !isAddingAdvisorInfo"
@@ -202,68 +147,71 @@ const paths = computed<ChapterPath[]>(() => [
       {{ snapshot.context.submitError }}
     </p>
 
-    <div class="chooser" v-if="isChoosingPath">
-      <p class="card-text chooser-explainer">
-        There are two types of official NTHS chapters: school-approved and
-        community. Getting your school to officially approve NTHS as a club is a
-        bonus, it unlocks meeting space and school announcements, but it isn't
-        required to run a chapter. You can switch your chapter type anytime in
-        the first year. Chapters often start as a community chapter while they
-        wait for school approval.
-      </p>
-
-      <div class="paths">
-        <div
-          v-for="path in paths"
-          :key="path.testid"
-          class="path"
-          :class="{ 'path-current': path.isCurrent }"
-          role="group"
-          :aria-labelledby="
-            path.isCurrent ? `${path.titleId} ${path.badgeId}` : path.titleId
-          "
-          :data-testid="path.testid"
-        >
-          <div class="path-heading">
-            <div class="header" :id="path.titleId">{{ path.title }}</div>
-            <span
-              v-if="path.isCurrent"
-              class="badge"
-              :id="path.badgeId"
-              :data-testid="path.badgeTestid"
-              >CURRENT</span
-            >
-          </div>
-          <p
-            v-if="path.denialNotice"
-            class="card-text path-notice"
-            :id="path.denialNotice.id"
-            :data-testid="path.denialNotice.testid"
+    <div class="paths" v-if="showCards">
+      <HQSection
+        v-for="path in paths"
+        :key="path.testid"
+        class="path"
+        role="group"
+        :aria-labelledby="
+          path.isCurrent ? `${path.titleId} ${path.badgeId}` : path.titleId
+        "
+        :data-testid="path.testid"
+      >
+        <div class="path-heading">
+          <h3 class="header" :id="path.titleId">{{ path.title }}</h3>
+          <span
+            v-if="path.isCurrent"
+            class="badge"
+            :id="path.badgeId"
+            :data-testid="path.badgeTestid"
+            >Current</span
           >
-            {{ path.denialNotice.text }}
-          </p>
-          <p class="card-text">{{ path.body }}</p>
-          <ul class="card-text">
-            <li v-for="bullet in path.bullets" :key="bullet">{{ bullet }}</li>
-          </ul>
-          <div class="path-footer" v-if="path.button">
-            <LargeButton
-              :variant="path.button.variant"
-              :showArrow="false"
-              :data-testid="path.button.testid"
-              v-ph:nthshq="`setup.chapter_type.${path.type}`"
-              :aria-describedby="path.denialNotice?.id"
-              @click="send(path.button.event)"
-            >
-              {{ path.button.label }}
-            </LargeButton>
-          </div>
         </div>
-      </div>
+        <p class="card-text">{{ path.body }}</p>
+        <ul class="card-text">
+          <li v-for="bullet in path.bullets" :key="bullet">{{ bullet }}</li>
+        </ul>
+
+        <div
+          v-if="path.type === 'school_approved' && snapshot.matches('Approved')"
+          class="status"
+          data-testid="approved-panel"
+        >
+          <div class="status-header">🎉 Approved</div>
+          Your chapter is officially affiliated with your school.
+        </div>
+        <div
+          v-if="
+            path.type === 'school_approved' &&
+            snapshot.matches('AwaitingUPchieveVerification')
+          "
+          class="status"
+          data-testid="awaiting-verification-panel"
+        >
+          <div class="status-header">✓ Submitted for Approval</div>
+          Your chapter's school affiliation request has been sent to your school
+          administrators for verification. We will update your approval status
+          here.
+        </div>
+
+        <div class="path-footer" v-if="path.button">
+          <LargeButton
+            :variant="path.button.variant"
+            :showArrow="false"
+            :data-testid="path.button.testid"
+            v-ph:nthshq="`setup.chapter_type.${path.type}`"
+            @click="send(path.button.event)"
+          >
+            {{ path.button.label }}
+          </LargeButton>
+        </div>
+      </HQSection>
     </div>
-    <div class="max-width" v-if="isAddingAdvisorInfo">
+
+    <HQSection v-if="isAddingAdvisorInfo" class="advisor">
       <div>
-        <div class="header">Chapter Advisor</div>
+        <h3 class="header">Chapter Advisor</h3>
         <p class="card-text" v-if="hasSchoolOnRecord">
           Add a faculty advisor who can verify your chapter's affiliation.
         </p>
@@ -285,92 +233,44 @@ const paths = computed<ChapterPath[]>(() => [
         :submitting="snapshot.matches('SubmittingAdvisorInfo')"
         :schoolAlreadyKnown="hasSchoolOnRecord"
       />
-    </div>
-
-    <div
-      class="max-width status"
-      v-if="snapshot.matches('Approved')"
-      data-testid="approved-panel"
-    >
-      <div class="body">
-        <div class="header">🎉 Approved</div>
-        Your chapter is officially affiliated with your school.
-      </div>
-    </div>
-
-    <div
-      class="max-width status"
-      v-if="snapshot.matches('AwaitingUPchieveVerification')"
-      data-testid="awaiting-verification-panel"
-    >
-      <div class="body">
-        <div class="header">✓ Submitted for Approval</div>
-        Your chapter's school affiliation request has been sent to your school
-        administrators for verification. We will update your approval status
-        here.
-      </div>
-    </div>
-  </HQSection>
+    </HQSection>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-.card-title {
-  @include nths-card-title;
-  margin-bottom: 12px;
+.affiliation {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 .form {
-  min-width: 400px;
-}
-.spinner {
-  min-width: 400px;
+  max-width: 480px;
 }
 .card-text {
   text-align: left;
-}
-.chooser-explainer {
-  @include nths-page-subtitle;
+  margin: 0;
 }
 .error-text {
   color: $c-error-red;
 }
 .header {
+  @include nths-card-title;
+  margin: 0;
   text-align: left;
-  font-weight: 500;
-}
-.body {
-  border-radius: 8px;
-  background-color: $border-grey;
-  border: 1px solid rgb(184, 184, 184);
-
-  padding: 1em;
-  text-align: left;
-}
-.max-width {
-  max-width: 400px;
-}
-.chooser {
-  display: flex;
-  flex-direction: column;
 }
 .paths {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  padding-top: 0.5em;
+
+  @media (max-width: 700px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .path {
-  flex: 1 1 280px;
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
-  border: 1px solid $border-grey;
-  padding: 1em;
-  text-align: left;
-}
-.path-current {
-  border-color: $c-success-green;
-  background-color: $selected-green;
+  gap: 10px;
 }
 .path-heading {
   display: flex;
@@ -380,26 +280,32 @@ const paths = computed<ChapterPath[]>(() => [
 }
 .path-footer {
   margin-top: auto;
-  padding-top: 1em;
-}
-.path-notice {
-  border-radius: 8px;
-  background-color: $border-grey;
-  border: 1px solid rgb(184, 184, 184);
-  padding: 0.75em;
-  margin-bottom: 0.75em;
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
 }
 .badge {
-  background-color: $c-success-green;
-  color: $c-soft-black;
-  border-radius: 12px;
-  padding: 2px 10px;
-  font-size: 12px;
-  font-weight: $font-weight-bold;
-  letter-spacing: 0.04em;
+  @include nths-badge;
+  border-radius: 9999px;
+  background: $c-information-blue;
+  color: $upchieve-white;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
-
+.status {
+  border-radius: 8px;
+  background-color: $c-nths-sky;
+  padding: 12px 14px;
+  text-align: left;
+}
+.status-header {
+  font-weight: 500;
+}
 ul {
-  padding-left: 16px;
+  margin: 0;
+  padding-left: 18px;
+}
+li + li {
+  margin-top: 6px;
 }
 </style>

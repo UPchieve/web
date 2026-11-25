@@ -6,7 +6,7 @@ export class NTHSChapterHQPage extends NTHSChapterPage {
     super(page)
     this.copyButton = page.getByTestId('right-now-copy')
     this.copiedButton = page.getByRole('button', { name: 'Copied' })
-    this.nameInput = page.locator('#nths-group-name')
+    this.nameInput = page.getByTestId('name-input')
     this.leaveTeamButton = page.getByTestId('leave-team-button')
     this.allMembersChip = page.getByTestId('members-table-chip-everyone')
     this.rosterError = page.getByTestId('roster-error')

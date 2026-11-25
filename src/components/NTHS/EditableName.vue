@@ -1,9 +1,14 @@
 <script lang="ts" setup>
+import LargeButton from '@/components/LargeButton.vue'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import { isErrorWithResponse } from '@/utils/error-utils'
-import { ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useNthsStore } from '@/stores/nths'
+
+const UPDATED_MESSAGE_MS = 2500
+const MAX_LENGTH = 64
+const COUNTER_FROM_LENGTH = MAX_LENGTH - 10
 
 const nths = useNthsStore()
 const props = defineProps<{
@@ -13,10 +18,25 @@ const props = defineProps<{
 
 const name = ref(props.groupName)
 const errorMessage = ref('')
-const status = ref<'idle' | 'saving' | 'saved'>('idle')
-// A rejected value is re-sent on every later blur unless it's remembered here -
-// the field keeps the text but isn't touched again until it changes.
-const lastRejectedValue = ref<string>()
+const saving = ref(false)
+const updated = ref(false)
+let updatedTimer: ReturnType<typeof setTimeout> | undefined
+
+const showLength = computed(() => name.value.length >= COUNTER_FROM_LENGTH)
+const describedBy = computed(
+  () =>
+    [
+      errorMessage.value && 'nths-group-name-error',
+      showLength.value && 'nths-group-name-length',
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined
+)
+
+const canSave = computed(() => {
+  const trimmed = name.value.trim()
+  return !saving.value && !!trimmed && trimmed !== props.groupName
+})
 
 watch(
   () => props.groupName,
@@ -25,43 +45,18 @@ watch(
   }
 )
 
+onBeforeUnmount(() => clearTimeout(updatedTimer))
+
 function onInput() {
   errorMessage.value = ''
-  status.value = 'idle'
-  lastRejectedValue.value = undefined
-}
-
-function revert() {
-  name.value = props.groupName
-  errorMessage.value = ''
-}
-
-function revertOnEscape() {
-  // The in-flight save will commit and overwrite this anyway, so reverting
-  // here would just flash the old name before the save resolves.
-  if (status.value === 'saving') return
-  revert()
-}
-
-function blurOnEnter(event: KeyboardEvent) {
-  ;(event.target as HTMLInputElement).blur()
+  updated.value = false
 }
 
 async function save() {
-  if (status.value === 'saving') return
+  if (!canSave.value) return
   const trimmed = name.value.trim()
-  if (trimmed === props.groupName) {
-    name.value = props.groupName
-    return
-  }
-  if (!trimmed) {
-    revert()
-    errorMessage.value = 'Your chapter needs a name.'
-    return
-  }
-  if (trimmed === lastRejectedValue.value) return
-
-  status.value = 'saving'
+  saving.value = true
+  errorMessage.value = ''
   try {
     const result = await NetworkService.editNTHSGroup({
       groupId: props.groupId,
@@ -71,15 +66,15 @@ async function save() {
       groupId: props.groupId,
       groupName: result.data.group.name,
     })
-    status.value = 'saved'
+    updated.value = true
+    clearTimeout(updatedTimer)
+    updatedTimer = setTimeout(() => (updated.value = false), UPDATED_MESSAGE_MS)
   } catch (e) {
-    status.value = 'idle'
     if (
       isErrorWithResponse(e) &&
       e.response.data?.err?.includes('Team name must be unique')
     ) {
       errorMessage.value = e.response.data.err
-      lastRejectedValue.value = trimmed
     } else {
       // Raw server text isn't fit for presidents to read. A proxy 502/504 sends an
       // HTML body, so data.err can be missing.
@@ -88,37 +83,63 @@ async function save() {
         isErrorWithResponse(e) ? (e.response.data?.err ?? e) : e
       )
     }
+  } finally {
+    saving.value = false
   }
 }
 </script>
 
 <template>
-  <div class="editable-name">
+  <form
+    class="editable-name"
+    autocomplete="off"
+    data-testid="name-form"
+    @submit.prevent="save"
+  >
     <label class="label" for="nths-group-name">Chapter name</label>
-    <input
-      id="nths-group-name"
-      v-model="name"
-      class="name-input"
-      type="text"
-      autocomplete="off"
-      placeholder="NTHS at Lincoln High School"
-      v-ph:nthshq="'setup.rename'"
-      :readonly="status === 'saving'"
-      :aria-invalid="!!errorMessage"
-      :aria-describedby="errorMessage ? 'nths-group-name-error' : undefined"
-      @input="onInput"
-      @blur="save"
-      @keydown.enter.prevent="blurOnEnter"
-      @keydown.esc="revertOnEscape"
-    />
+    <div class="row">
+      <input
+        id="nths-group-name"
+        data-testid="name-input"
+        v-model="name"
+        class="name-input"
+        type="text"
+        autocomplete="off"
+        :maxlength="MAX_LENGTH"
+        placeholder="NTHS at Lincoln High School"
+        v-ph:nthshq="'setup.rename'"
+        :readonly="saving"
+        :aria-invalid="!!errorMessage"
+        :aria-describedby="describedBy"
+        @input="onInput"
+      />
+      <LargeButton
+        class="save"
+        variant="secondary"
+        type="submit"
+        :showArrow="false"
+        :disabled="!canSave"
+        data-testid="save-name-button"
+        v-ph:nthshq="'setup.rename_save'"
+        >Save name</LargeButton
+      >
+    </div>
     <p class="feedback" aria-live="polite" data-testid="name-feedback">
       <span v-if="errorMessage" id="nths-group-name-error" class="error">
         {{ errorMessage }}
       </span>
-      <span v-else-if="status === 'saving'">Saving…</span>
-      <span v-else-if="status === 'saved'">Saved</span>
+      <span v-else-if="updated">Chapter name updated.</span>
     </p>
-  </div>
+    <p
+      v-if="showLength"
+      id="nths-group-name-length"
+      class="counter"
+      data-testid="name-length"
+    >
+      {{ name.length }}/{{ MAX_LENGTH
+      }}<span class="visually-hidden"> characters</span>
+    </p>
+  </form>
 </template>
 
 <style lang="scss" scoped>
@@ -132,8 +153,15 @@ async function save() {
 .label {
   @include visually-hidden;
 }
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
 .name-input {
-  width: 100%;
+  flex: 1 1 240px;
+  min-width: 0;
   box-sizing: border-box;
   border: 1px solid $border-grey;
   border-radius: 8px;
@@ -161,5 +189,15 @@ async function save() {
 }
 .error {
   color: $c-error-red;
+}
+.counter {
+  margin: -20px 0 0;
+  align-self: flex-end;
+  font-size: 14px;
+  line-height: 20px;
+  color: $c-secondary-grey;
+}
+.visually-hidden {
+  @include visually-hidden;
 }
 </style>

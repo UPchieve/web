@@ -3,7 +3,6 @@ import { getClient } from '../db.ts'
 import { loginAs } from '../utils.ts'
 import {
   createNthsPresident,
-  denySchoolAffiliation,
   schoolAffiliationStatusOf,
 } from '../nths-utils.ts'
 import { NTHSChapterPage } from '../page-object-models/nths-chapter.js'
@@ -22,21 +21,6 @@ test.describe('NTHS school approval choice', () => {
     chapterPage = new NTHSChapterPage(page)
   })
 
-  test('president stays a community chapter', async ({ page }) => {
-    await chapterPage.openPathChooser()
-    await chapterPage.stayCommunity()
-
-    await chapterPage.schoolApprovalIsSettled()
-    expect(await schoolAffiliationStatusOf(dbClient, chapter.groupId)).toBe(
-      'OPTED_OUT'
-    )
-
-    await page.reload()
-    await expect(chapterPage.communityCurrentBadge).toBeVisible()
-    await expect(chapterPage.stayCommunityButton).toHaveCount(0)
-    await chapterPage.schoolApprovalIsSettled()
-  })
-
   test('president seeks school approval', async () => {
     await chapterPage.openPathChooser()
     await chapterPage.chooseSchoolApproved()
@@ -47,16 +31,21 @@ test.describe('NTHS school approval choice', () => {
     )
   })
 
-  test('denied president switches to a community chapter', async () => {
-    await denySchoolAffiliation(dbClient, chapter.groupId)
+  test('president switches from school approval to a community chapter', async ({
+    page,
+  }) => {
+    await chapterPage.openPathChooser()
+    await chapterPage.chooseSchoolApproved()
+    await chapterPage.cancelAdvisorForm()
+    await chapterPage.switchToCommunity()
 
-    await chapterPage.openPathChooserAfterDenial()
-    await chapterPage.stayCommunity()
-
-    await chapterPage.schoolApprovalIsSettled()
     expect(await schoolAffiliationStatusOf(dbClient, chapter.groupId)).toBe(
       'OPTED_OUT'
     )
+
+    await page.reload()
+    await expect(chapterPage.communityCurrentBadge).toBeVisible()
+    await expect(chapterPage.chooseSchoolApprovedButton).toBeVisible()
   })
 
   test('president backs out of the advisor form and stays pending', async ({
