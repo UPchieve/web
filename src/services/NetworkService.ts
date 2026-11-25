@@ -26,6 +26,16 @@ import type {
 } from './NTHSRosterService'
 import type { AdvisorInfo } from '@/components/NTHS/SchoolAffiliation/school-affiliation-machine'
 import type { CurrentSessionPublic } from '@/types/sessions'
+import type { TeacherAccountFormData } from '@/services/SignUpService/TeacherSignUpService'
+import type { VolunteerAccountFormData } from '@/services/SignUpService/VolunteerSignUpService'
+import type {
+  VERIFICATION_METHOD,
+  VERIFICATION_TYPE,
+  volunteerReportReasonOptions,
+  studentReportReasonOptions,
+} from '@/consts'
+import { toQueryString, type QueryParamValue } from '@/utils/to-query-string'
+import type { InputName } from '@/services/SignUpService/StudentSignUpService'
 import type { DateString, ISODateString, Uuid } from '@/types/shared'
 import type {
   TutorBotAddMessagePayload,
@@ -184,7 +194,7 @@ export async function httpGetDeprecated<T>(path: string, config?: object) {
 // the handling the error through `_errorHandler` and `_axiosErrorHandler`
 export async function httpPostDeprecated<T>(
   path: string,
-  data: object,
+  data?: object,
   config?: AxiosRequestConfig
 ) {
   return axiosInstance.post<T>(path, data, config)
@@ -525,11 +535,78 @@ export function adminNTHSUpdateMember(
   )
 }
 
+type SessionReportQuery = {
+  joinedBefore: QueryParamValue
+  joinedAfter: QueryParamValue
+  sessionRangeFrom: QueryParamValue
+  sessionRangeTo: QueryParamValue
+  highSchoolId: QueryParamValue
+  studentPartnerOrg: QueryParamValue
+  studentPartnerSite: QueryParamValue
+  sponsorOrg: QueryParamValue
+}
+
+type PartnerReportQuery = {
+  startDate: QueryParamValue
+  endDate: QueryParamValue
+  partnerOrg: QueryParamValue
+}
+
+type SessionReportReason =
+  | (typeof volunteerReportReasonOptions)[number]
+  | (typeof studentReportReasonOptions)[number]
+
+type StudentRegistrationData = {
+  [K in Exclude<InputName, InputName.SIGNUP_SOURCE_ID>]?: string | null
+} & {
+  signupSourceId?: string | number | null
+  otherSignupSource?: string
+  college?: string
+}
+
+type ProfileUpdate = {
+  city?: string
+  college?: string
+  company?: string
+  country?: string
+  gradeLevel?: string
+  isDeactivated?: boolean
+  mutedSubjectAlerts?: string[]
+  occupation?: string[]
+  preferredLanguage?: string
+  publicProfileKeys?: string[]
+  schoolId?: string | null
+  smsConsent?: boolean
+  state?: string
+  userId?: Uuid
+}
+
+type AdminUserUpdate = {
+  firstName: string
+  lastName: string
+  email: string
+  partnerOrg: string
+  partnerSite: string
+  isVerified: boolean
+  banType: string
+  isDeactivated: boolean
+  isApproved: boolean
+  partnerSchool: string
+  schoolId: string
+}
+
+type VolunteerRegistrationData = Omit<VolunteerAccountFormData, 'partnerKey'>
+
+type VerificationMethod =
+  (typeof VERIFICATION_METHOD)[keyof typeof VERIFICATION_METHOD]
+
+type RetryHandler = (res: unknown, abort: () => void) => void
+
 export default {
   _successHandler(res) {
     return Promise.resolve(res)
   },
-  _errorHandler(res) {
+  _errorHandler(res: unknown) {
     return Promise.reject(res)
   },
   _axiosErrorHandler(res: AxiosError): never {
@@ -555,7 +632,7 @@ export default {
   },
   _faultTolerantHttp<T>(
     method: 'get' | 'post',
-    onRetry: (res: any, fn: () => void) => void,
+    onRetry: RetryHandler,
     url: string,
     data?: T & AxiosRequestConfig<T>
   ) {
@@ -619,7 +696,7 @@ export default {
   updateNTHSChecklistItemProgress,
   acceptNTHSRenewalPresidency,
   setShareInfoModalDismissed,
-  getVolunteerPartner(partnerId) {
+  getVolunteerPartner(partnerId: string) {
     return httpGetDeprecated(
       `${AUTH_ROOT}/partner/volunteer?partnerId=${encodeURIComponent(
         partnerId
@@ -637,7 +714,7 @@ export default {
       this._errorHandler
     )
   },
-  async registerOpenVolunteer(data: any) {
+  async registerOpenVolunteer(data: VolunteerRegistrationData) {
     const config = await getAdditionalConfig('registerVolunteer')
     return httpPostDeprecated(
       `${AUTH_ROOT}/register/volunteer/open`,
@@ -645,7 +722,9 @@ export default {
       config
     ).then(this._successHandler, this._errorHandler)
   },
-  async registerPartnerVolunteer(data: any) {
+  async registerPartnerVolunteer(
+    data: VolunteerRegistrationData & { volunteerPartnerOrg: string }
+  ) {
     const config = await getAdditionalConfig('registerVolunteer')
     return httpPostDeprecated(
       `${AUTH_ROOT}/register/volunteer/partner`,
@@ -653,7 +732,7 @@ export default {
       config
     ).then(this._successHandler, this._errorHandler)
   },
-  async registerStudent(data: any) {
+  async registerStudent(data: StudentRegistrationData) {
     const config = await getAdditionalConfig('registerStudent')
     return httpPostDeprecated(
       `${AUTH_ROOT}/register/student`,
@@ -661,7 +740,7 @@ export default {
       config
     ).then(this._successHandler, this._errorHandler)
   },
-  async registerTeacher(data: any) {
+  async registerTeacher(data: TeacherAccountFormData) {
     const config = await getAdditionalConfig('registerTeacher')
     return httpPostDeprecated(
       `${AUTH_ROOT}/register/teacher`,
@@ -669,14 +748,19 @@ export default {
       config
     ).then(this._successHandler, this._errorHandler)
   },
-  async sendReset(data: any) {
+  async sendReset(data: { email: string }) {
     const config = await getAdditionalConfig('sendReset')
     return httpPostDeprecated(`${AUTH_ROOT}/reset/send`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  async confirmReset(data) {
+  async confirmReset(data: {
+    token: string
+    email: string
+    password: string
+    newpassword: string
+  }) {
     const config = await getAdditionalConfig('resetPassword')
     return httpPostDeprecated(`${AUTH_ROOT}/reset/confirm`, data, config).then(
       this._successHandler,
@@ -695,26 +779,44 @@ export default {
       this._errorHandler
     )
   },
-  async sendVerification(data) {
+  async sendVerification(data: {
+    sendTo: string
+    verificationMethod: VerificationMethod
+    verificationType?: VERIFICATION_TYPE | ''
+    userId?: Uuid
+    firstName?: string
+  }) {
     const config = await getAdditionalConfig('sendVerification')
     return httpPostDeprecated(`${API_ROOT}/verify/v2/send`, data, config).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  confirmVerification(data) {
+  confirmVerification(data: {
+    sendTo: string
+    verificationMethod: VerificationMethod
+    verificationCode: string
+    verificationType?: VERIFICATION_TYPE | ''
+    forSignup?: boolean
+    userId?: Uuid
+  }) {
     return httpPostDeprecated(`${API_ROOT}/verify/confirm`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  sendContact(data) {
+  sendContact(data: {
+    topic: string
+    userEmail: string
+    message: string
+    userId?: Uuid
+  }) {
     return httpPostDeprecated(`${CONTACT_API_ROOT}/send`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  setProfile(data) {
+  setProfile(data: ProfileUpdate) {
     return httpPutDeprecated(`${API_ROOT}/user`, data).then(
       this._successHandler,
       this._errorHandler
@@ -726,7 +828,7 @@ export default {
   deleteAccount() {
     return httpDeleteDeprecated(`${API_ROOT}/user`)
   },
-  getVolunteersAvailability(data) {
+  getVolunteersAvailability(data: string) {
     return httpGetDeprecated(
       `${API_ROOT}/volunteers/availability/${data}`
     ).then(this._successHandler, this._errorHandler)
@@ -749,7 +851,7 @@ export default {
       this._errorHandler
     )
   },
-  getReferredBy(referralCode) {
+  getReferredBy(referralCode: string) {
     return httpGetDeprecated(`${REFERRAL_API_ROOT}/${referralCode}`).then(
       this._successHandler,
       this._errorHandler
@@ -786,7 +888,7 @@ export default {
       session: CurrentSessionPublic
     }>(`${API_ROOT}/session/${sessionId}/open-to-all`, {})
   },
-  async joinSession(data: { sessionId: string; joinedFrom?: string }) {
+  async joinSession(data: { sessionId: Uuid; joinedFrom?: string }) {
     try {
       return await httpPostDeprecated<{
         session: CurrentSessionPublic
@@ -796,7 +898,7 @@ export default {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
-  async endSession(data) {
+  async endSession(data: { sessionId: Uuid }) {
     try {
       return await httpPostDeprecated<{
         sessionId: Uuid
@@ -806,7 +908,7 @@ export default {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
-  checkSession(data, onRetry) {
+  checkSession(data: object, onRetry: RetryHandler) {
     return this._faultTolerantHttp(
       'post',
       onRetry,
@@ -824,7 +926,7 @@ export default {
       return this._axiosErrorHandler(err as AxiosError)
     }
   },
-  getRecapSessionForDms(data) {
+  getRecapSessionForDms(data: { sessionId: Uuid }) {
     return httpPostDeprecated(`${API_ROOT}/session/recap-dms`, data).then(
       this._successHandler,
       this._errorHandler
@@ -836,20 +938,30 @@ export default {
       this._errorHandler
     )
   },
-  getSession(sessionId) {
+  getSession(sessionId: Uuid) {
     return httpGetDeprecated(`${API_ROOT}/session/${sessionId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  reportSession({ sessionId, reportReason, reportMessage, source }) {
+  reportSession({
+    sessionId,
+    reportReason,
+    reportMessage,
+    source,
+  }: {
+    sessionId: Uuid
+    reportReason: SessionReportReason
+    reportMessage: string
+    source?: 'session' | 'recap'
+  }) {
     return httpPostDeprecated(`${API_ROOT}/session/${sessionId}/report`, {
       reportReason,
       reportMessage,
       source,
     }).then(this._successHandler, this._errorHandler)
   },
-  uploadSessionImage({ sessionId, image }) {
+  uploadSessionImage({ sessionId, image }: { sessionId?: Uuid; image: File }) {
     const formData = new FormData()
     formData.append('image', image)
 
@@ -858,12 +970,12 @@ export default {
       formData
     ).then(this._successHandler, this._errorHandler)
   },
-  async getAssignmentDocuments(assignmentId) {
+  async getAssignmentDocuments(assignmentId: Uuid) {
     return httpGetDeprecated(
       `${API_ROOT}/assignment/${assignmentId}/documents`
     ).then(this._successHandler, this._errorHandler)
   },
-  timedOutSession(sessionId, data) {
+  timedOutSession(sessionId: Uuid, data: { timeout: number }) {
     return httpPostDeprecated(
       `${API_ROOT}/session/${sessionId}/timed-out`,
       data
@@ -882,8 +994,21 @@ export default {
     firstTimeStudent,
     firstTimeVolunteer,
     isReported,
+  }: {
+    page: number
+    showBannedUsers: QueryParamValue
+    showTestUsers: QueryParamValue
+    sessionActivityFrom: QueryParamValue
+    sessionActivityTo: QueryParamValue
+    minMessagesSent: QueryParamValue
+    minSessionLength: QueryParamValue
+    studentRating: QueryParamValue
+    volunteerRating: QueryParamValue
+    firstTimeStudent: QueryParamValue
+    firstTimeVolunteer: QueryParamValue
+    isReported: QueryParamValue
   }) {
-    const queryParams = new URLSearchParams({
+    const queryParams = toQueryString({
       page,
       showBannedUsers,
       showTestUsers,
@@ -896,54 +1021,63 @@ export default {
       firstTimeStudent,
       firstTimeVolunteer,
       isReported,
-    }).toString()
+    })
 
     return httpGetDeprecated(`${API_ROOT}/sessions?${queryParams}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminGetSession(sessionId) {
+  adminGetSession(sessionId: Uuid) {
     return httpGetDeprecated(`${API_ROOT}/session/${sessionId}/admin`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminReviewPendingVolunteer({ volunteerId, data }) {
+  adminReviewPendingVolunteer({
+    volunteerId,
+    data,
+  }: {
+    volunteerId: Uuid
+    data: { photoIdStatus: string; volunteerId: Uuid }
+  }) {
     return httpPostDeprecated(
       `${API_ROOT}/volunteers/review/${volunteerId}`,
       data
     ).then(this._successHandler, this._errorHandler)
   },
-  adminGetVolunteersToReview(page) {
+  adminGetVolunteersToReview(page: number) {
     return httpGetDeprecated(`${API_ROOT}/volunteers/review?page=${page}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminGetSessionNotifications(sessionId) {
+  adminGetSessionNotifications(sessionId: Uuid) {
     return httpGetDeprecated(
       `${API_ROOT}/session/${sessionId}/notifications`
     ).then(this._successHandler, this._errorHandler)
   },
-  adminGetSessionsToReview(page, studentFirstName) {
+  adminGetSessionsToReview(page: number, studentFirstName: string) {
     return httpGetDeprecated(
       `${API_ROOT}/session/review?page=${page}&studentFirstName=${studentFirstName}`
     ).then(this._successHandler, this._errorHandler)
   },
-  adminUpdateSession(sessionId, data) {
+  adminUpdateSession(
+    sessionId: Uuid,
+    data: { reviewed: boolean; toReview: boolean }
+  ) {
     return httpPutDeprecated(`${API_ROOT}/session/${sessionId}`, data).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminGetUser(userId, page) {
+  adminGetUser(userId: Uuid, page: number) {
     return httpGetDeprecated(`${API_ROOT}/user/${userId}?page=${page}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminUpdateUser(userId, data) {
+  adminUpdateUser(userId: Uuid, data: AdminUserUpdate) {
     return httpPutDeprecated(`${API_ROOT}/user/${userId}`, data).then(
       this._successHandler,
       this._errorHandler
@@ -957,8 +1091,16 @@ export default {
     email,
     partnerOrg,
     school,
+  }: {
+    page: QueryParamValue
+    userId: QueryParamValue
+    firstName: QueryParamValue
+    lastName: QueryParamValue
+    email: QueryParamValue
+    partnerOrg: QueryParamValue
+    school: QueryParamValue
   }) {
-    const queryParams = new URLSearchParams({
+    const queryParams = toQueryString({
       page,
       userId,
       firstName,
@@ -966,51 +1108,74 @@ export default {
       email,
       partnerOrg,
       school,
-    }).toString()
+    })
 
     return httpGetDeprecated(`${API_ROOT}/users?${queryParams}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminGetIneligibleStudents(page) {
+  adminGetIneligibleStudents(page: number) {
     return httpGetDeprecated(
       `${ELIGIBILITY_API_ROOT}/ineligible-students?page=${page}`
     ).then(this._successHandler, this._errorHandler)
   },
-  adminGetSchool(schoolId) {
+  adminGetSchool(schoolId: Uuid) {
     return httpGetDeprecated(`${ADMIN_ROOT}/school/${schoolId}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminGetSchools({ name, state, city, ncesId, isPartner, page }) {
-    const queryParams = new URLSearchParams({
+  adminGetSchools({
+    name,
+    state,
+    city,
+    ncesId,
+    isPartner,
+    page,
+  }: {
+    name: QueryParamValue
+    state: QueryParamValue
+    city: QueryParamValue
+    ncesId: QueryParamValue
+    isPartner: QueryParamValue
+    page: number
+  }) {
+    const queryParams = toQueryString({
       name,
       state,
       city,
       ncesId,
       isPartner,
       page,
-    }).toString()
+    })
     return httpGetDeprecated(`${ADMIN_ROOT}/schools?${queryParams}`).then(
       this._successHandler,
       this._errorHandler
     )
   },
-  adminUpdateSchool(schoolId, data) {
+  adminUpdateSchool(
+    schoolId: Uuid,
+    data: {
+      name: string
+      city: string
+      state: string
+      zip: string
+      isApproved: boolean
+    }
+  ) {
     return httpPutDeprecated(
       `${ELIGIBILITY_API_ROOT}/school/${schoolId}`,
       data
     ).then(this._successHandler, this._errorHandler)
   },
-  adminUpdateSchoolApproval(data) {
+  adminUpdateSchoolApproval(data: { schoolId: Uuid; isApproved: boolean }) {
     return httpPostDeprecated(
       `${ELIGIBILITY_API_ROOT}/school/approval`,
       data
     ).then(this._successHandler, this._errorHandler)
   },
-  adminUpdateSchoolPartnerStatus(data) {
+  adminUpdateSchoolPartnerStatus(data: { schoolId: Uuid; isPartner: boolean }) {
     return httpPostDeprecated(
       `${ELIGIBILITY_API_ROOT}/school/partner`,
       data
@@ -1022,7 +1187,7 @@ export default {
       this._errorHandler
     )
   },
-  adminUploadRosterStudents(data) {
+  adminUploadRosterStudents(data: FormData) {
     return httpPostDeprecated(`${ADMIN_ROOT}/roster-students`, data).then(
       this._successHandler,
       this._errorHandler
@@ -1051,8 +1216,8 @@ export default {
     studentPartnerOrg,
     studentPartnerSite,
     sponsorOrg,
-  }) {
-    const queryParams = new URLSearchParams({
+  }: SessionReportQuery) {
+    const queryParams = toQueryString({
       joinedBefore,
       joinedAfter,
       sessionRangeFrom,
@@ -1061,7 +1226,7 @@ export default {
       studentPartnerOrg,
       studentPartnerSite,
       sponsorOrg,
-    }).toString()
+    })
     return httpGetDeprecated(
       `${API_ROOT}/reports/session-report?${queryParams}`,
       {
@@ -1078,8 +1243,8 @@ export default {
     studentPartnerOrg,
     studentPartnerSite,
     sponsorOrg,
-  }) {
-    const queryParams = new URLSearchParams({
+  }: SessionReportQuery) {
+    const queryParams = toQueryString({
       joinedBefore,
       joinedAfter,
       sessionRangeFrom,
@@ -1088,7 +1253,7 @@ export default {
       studentPartnerOrg,
       studentPartnerSite,
       sponsorOrg,
-    }).toString()
+    })
     return httpGetDeprecated(
       `${API_ROOT}/reports/usage-report?${queryParams}`,
       {
@@ -1096,12 +1261,16 @@ export default {
       }
     ).then(this._successHandler, this._errorHandler)
   },
-  adminGetVolunteerTelecomReport({ startDate, endDate, partnerOrg }) {
-    const queryParams = new URLSearchParams({
+  adminGetVolunteerTelecomReport({
+    startDate,
+    endDate,
+    partnerOrg,
+  }: PartnerReportQuery) {
+    const queryParams = toQueryString({
       startDate,
       endDate,
       partnerOrg,
-    }).toString()
+    })
     return httpGetDeprecated(
       `${API_ROOT}/reports/volunteer-telecom-report?${queryParams}`,
       {
@@ -1109,12 +1278,16 @@ export default {
       }
     ).then(this._successHandler, this._errorHandler)
   },
-  adminGetPartnerAnalyticsReport({ startDate, endDate, partnerOrg }) {
-    const queryParams = new URLSearchParams({
+  adminGetPartnerAnalyticsReport({
+    startDate,
+    endDate,
+    partnerOrg,
+  }: PartnerReportQuery) {
+    const queryParams = toQueryString({
       startDate,
       endDate,
       partnerOrg,
-    }).toString()
+    })
     return httpGetDeprecated(
       `${API_ROOT}/reports/partner-analytics-report?${queryParams}`,
       {
@@ -1146,12 +1319,12 @@ export default {
       this._errorHandler
     )
   },
-  adminGetZipCodes(zipCode) {
+  adminGetZipCodes(zipCode: string) {
     return httpGetDeprecated(
       `${ELIGIBILITY_API_ROOT}/zip-codes/${zipCode}`
     ).then(this._successHandler, this._errorHandler)
   },
-  adminGetUserIdFromEmail(email) {
+  adminGetUserIdFromEmail(email: string) {
     return httpGetDeprecated(`${API_ROOT}/user/email/${email}`).then(
       this._successHandler,
       this._errorHandler

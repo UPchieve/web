@@ -968,7 +968,7 @@ export const EVENTS = {
 export const VERIFICATION_METHOD = {
   SMS: 'sms',
   EMAIL: 'email',
-}
+} as const
 
 export enum POSTHOG_FEATURE_FLAGS {
   POLL_FLAGS = 'polling-flags',
@@ -1137,3 +1137,16 @@ export const SHARED_ONLINE_STATUS_DESCRIPTION =
 
 export const BIG_FUTURE_INTRO_COPY =
   "UPchieve and BigFuture are working together to connect you to 100% FREE, online college counseling and tutoring available 24/7! Students who can't afford a tutor are eligible. Create your account now!"
+
+// TODO: Options should be hydrated via the database
+export const volunteerReportReasonOptions = [
+  '[Immediate ban] Student extremely rude/inappropriate',
+  'I am worried for the immediate safety of this student',
+] as const
+
+export const studentReportReasonOptions = [
+  'Coach asked me to connect off of UPchieve',
+  'Coach made me feel uncomfortable or unsafe',
+  'Coach used inappropriate language',
+  'Coach talked about inappropriate and offensive topics',
+] as const

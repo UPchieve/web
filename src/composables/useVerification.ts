@@ -39,7 +39,9 @@ export function useVerification(data: UseVerificationPayload = {}) {
   const phoneInput = ref<PhoneResults>({ isValid: false })
   const proxyEmail = ref('')
   const verificationCode = ref('')
-  const verificationType = ref(data.verificationType ?? '')
+  const verificationType = ref<VERIFICATION_TYPE | ''>(
+    data.verificationType ?? ''
+  )
   const hasResentCode = ref(false)
   const error = ref('')
 

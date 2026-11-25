@@ -48,20 +48,11 @@ import AnalyticsService from '@/services/AnalyticsService'
 import LargeButton from '@/components/LargeButton.vue'
 import FormSelect from '@/components/FormInputs/FormSelect.vue'
 import { mapState, mapGetters } from 'vuex'
-import { EVENTS } from '@/consts'
-
-// TODO: Options should be hydrated via the database
-const volunteerReportReasonOptions = [
-  '[Immediate ban] Student extremely rude/inappropriate',
-  'I am worried for the immediate safety of this student',
-]
-
-const studentReportReasonOptions = [
-  'Coach asked me to connect off of UPchieve',
-  'Coach made me feel uncomfortable or unsafe',
-  'Coach used inappropriate language',
-  'Coach talked about inappropriate and offensive topics',
-]
+import {
+  EVENTS,
+  volunteerReportReasonOptions,
+  studentReportReasonOptions,
+} from '@/consts'
 
 const studentGuidelineLink =
   'https://help.upchieve.org/en/articles/24-coach-community-guidelines'
