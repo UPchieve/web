@@ -13,6 +13,19 @@ describe('`app/modal` store', () => {
     expect(store.componentProps).toEqual({})
   })
 
+  it('show counts a new opening, not a swap while a modal is open', () => {
+    const store = useAppModalStore()
+    store.show({ component: 'ConfirmModal' })
+    const opened = store.showCount
+
+    store.show({ component: 'NotificationsModal' })
+    expect(store.showCount).toBe(opened)
+
+    store.hide()
+    store.show({ component: 'ConfirmModal' })
+    expect(store.showCount).toBe(opened + 1)
+  })
+
   it('update merges into the existing props', () => {
     const store = useAppModalStore()
     store.show({

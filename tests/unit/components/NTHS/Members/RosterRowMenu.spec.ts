@@ -27,6 +27,16 @@ describe('RosterRowMenu', () => {
     expect(wrapper.find(`#${controlsId}`).exists()).toBe(true)
   })
 
+  it('names the trigger for its member', () => {
+    const wrapper = mount(RosterRowMenu, {
+      props: { member: MEMBER, actions: [...ACTIONS], open: false },
+    })
+
+    expect(wrapper.find(TRIGGER).attributes('aria-label')).toBe(
+      'Actions for Sam Q.'
+    )
+  })
+
   it('does not emit toggle from a trigger click while busy', async () => {
     const wrapper = mount(RosterRowMenu, {
       props: {

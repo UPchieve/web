@@ -68,12 +68,14 @@ const { group } = useChapterContext()
   @include nths-page-title;
 }
 .question {
-  @include nths-card-title;
+  @include nths-settings-title;
   margin: 0;
 }
 .help {
-  @include nths-page-subtitle;
-  margin-top: 4px;
+  @include nths-body-text;
+  font-weight: 400;
+  color: $c-soft-black;
+  margin: 4px 0 0;
 }
 .card {
   @include nths-section-card;

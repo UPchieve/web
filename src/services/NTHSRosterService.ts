@@ -3,6 +3,9 @@ import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths
 import exportToCsv from '@/utils/export-to-csv'
 import { dayjs } from '@/utils/time-utils'
 
+export const ROSTER_LOAD_ERROR =
+  "We couldn't load your members. Refresh the page to try again."
+
 export type RosterPeriod = keyof NTHSChapterRosterMemberPublic['periodHours']
 
 export const ROSTER_PERIODS: RosterPeriod[] = [

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import InformationIcon from '@/assets/information.svg'
+import InformationIcon from '@/assets/nths/information-outline.svg'
 import TargetIcon from '@/assets/nths/target.svg'
 import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import {

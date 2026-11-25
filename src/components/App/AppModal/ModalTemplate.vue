@@ -2,6 +2,10 @@
   <div
     class="ModalTemplate"
     ref="modalTemplateContainer"
+    role="dialog"
+    data-testid="modal-dialog"
+    aria-modal="true"
+    :aria-labelledby="titleId"
     :class="{ 'ModalTemplate--important': important }"
     @click="closeModal"
     @keydown="checkKeyEvent"
@@ -47,6 +51,7 @@
 </template>
 
 <script>
+import { useId } from 'vue'
 import { mapActions } from 'pinia'
 import { useAppModalStore } from '@/stores/app/modal'
 import { mapGetters } from 'vuex'
@@ -71,19 +76,39 @@ export default {
     modalComponentName: String,
   },
   emits: ['accept', 'cancel'],
+  setup() {
+    return { fallbackTitleId: useId() }
+  },
+  data() {
+    return {
+      titleId: undefined,
+    }
+  },
+  beforeCreate() {
+    this.opener = document.activeElement
+  },
   mounted() {
     const body = document.querySelector('body')
     body.classList.add('disable-scroll')
 
-    // focus on first focusable child element, to put the focus in the trap
-    const elemToFocusOn = this.$refs.modalTemplateContainer.querySelectorAll(
-      FOCUSABLE_ELEMENT_SELECTOR
-    )[0]
+    const container = this.$refs.modalTemplateContainer
+    this.syncTitleId()
+    // The heading can render after an async load or a ModalService update().
+    this.titleObserver = new MutationObserver(this.syncTitleId)
+    this.titleObserver.observe(container, { childList: true, subtree: true })
+
+    const elemToFocusOn =
+      container.querySelector('input[type="radio"]:checked') ??
+      container.querySelectorAll(FOCUSABLE_ELEMENT_SELECTOR)[0]
     if (elemToFocusOn) elemToFocusOn.focus()
   },
   beforeUnmount() {
+    this.titleObserver?.disconnect()
     const body = document.querySelector('body')
     body.classList.remove('disable-scroll')
+    if (this.opener?.isConnected) {
+      this.opener.focus()
+    }
   },
   computed: {
     ...mapGetters({ mobileMode: 'app/mobileMode' }),
@@ -98,6 +123,14 @@ export default {
   },
   methods: {
     ...mapActions(useAppModalStore, { hideAppModal: 'hide' }),
+    syncTitleId() {
+      const title =
+        this.$refs.modalTemplateContainer?.querySelector('legend, h1, h2, h3')
+      if (title) {
+        title.id ||= this.fallbackTitleId
+      }
+      this.titleId = title?.id
+    },
     handleCancel() {
       this.$emit('cancel')
       this.hideAppModal()
@@ -109,6 +142,17 @@ export default {
       if (key === 'Escape' || target.classList.contains('ModalTemplate')) {
         this.handleCancel()
       }
+    },
+    // Shift+Tab from any radio leaves its whole group, so the group counts as
+    // the first stop when its first radio opens the list.
+    isFirstStop(target, first) {
+      if (target === first) return true
+      return (
+        target.type === 'radio' &&
+        first.type === 'radio' &&
+        !!target.name &&
+        target.name === first.name
+      )
     },
     checkKeyEvent(event) {
       // based on tab key trap at:
@@ -142,7 +186,7 @@ export default {
       } else if (
         event.key === 'Tab' &&
         event.shiftKey === true &&
-        event.target === focusableList[0]
+        this.isFirstStop(event.target, focusableList[0])
       ) {
         event.preventDefault()
         focusableList[last].focus()

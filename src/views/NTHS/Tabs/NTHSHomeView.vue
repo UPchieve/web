@@ -14,6 +14,7 @@ import { injectChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import { getNTHSHomeContent } from '@/services/NetworkService'
 import { tipForDay } from '@/services/NTHSGroupService'
+import { ROSTER_LOAD_ERROR } from '@/services/NTHSRosterService'
 import type { NTHSHomeContent } from '@upchieve/api-contracts/nths-groups'
 import { useNthsStore } from '@/stores/nths'
 
@@ -57,7 +58,6 @@ const membersTableProps = computed(() => ({
   referralCode: currentUserReferralCode.value,
   now,
   isLoading: isRosterLoading.value,
-  loadFailed: rosterLoadFailed.value,
   schoolYearLabel: schoolYear.value?.label ?? '',
 }))
 
@@ -77,53 +77,67 @@ onBeforeMount(async () => {
 
     <Callout v-if="loadFailed" variant="warning">
       <template v-slot:content>
-        <span data-testid="impact-error">
+        <span role="alert" data-testid="impact-error">
           We couldn't load your chapter numbers. Refresh the page to try again.
         </span>
       </template>
     </Callout>
     <ImpactCard v-else :impact="impact" />
 
-    <div v-if="isGroupAdmin" class="admin-grid" :class="{ single: loadFailed }">
+    <div v-if="isGroupAdmin" class="admin-grid">
       <div class="main-column">
         <RightNowCard
-          v-if="impact && !isRosterLoading && !rosterLoadFailed"
+          v-if="!loadFailed && !rosterLoadFailed"
           :impact="impact"
+          :isLoading="!impact || isRosterLoading"
           :memberCount="currentMembers.length"
           :inviteCode="group?.groupInfo?.inviteCode"
           :referralCode="currentUserReferralCode"
         />
-        <MembersTable v-bind="membersTableProps" />
+        <Callout v-if="rosterLoadFailed" variant="warning">
+          <template v-slot:content>
+            <span data-testid="roster-error">{{ ROSTER_LOAD_ERROR }}</span>
+          </template>
+        </Callout>
+        <MembersTable v-else v-bind="membersTableProps" />
       </div>
-      <div v-if="!loadFailed" class="side-column">
+      <div class="side-column">
         <TopMembersBoard
+          v-if="!rosterLoadFailed"
           :members="members"
           :currentUserId="currentUserId"
           :isLoading="isRosterLoading"
-          :loadFailed="rosterLoadFailed"
         />
-        <GoodStandingCard :impact="impact" />
+        <GoodStandingCard v-if="!loadFailed" :impact="impact" />
         <TipCard v-if="tip" :tip="tip" />
         <ResourceLinksCard v-if="resourceLinks.length" :links="resourceLinks" />
       </div>
     </div>
     <template v-else>
-      <div v-if="!loadFailed" class="impact-row">
+      <div
+        v-if="!rosterLoadFailed"
+        class="impact-row"
+        :class="{ 'impact-row--single': loadFailed }"
+      >
         <ContributionCard
+          v-if="!loadFailed"
           :members="currentMembers"
           :currentUserId="currentUserId"
           :impact="impact"
           :isLoading="isRosterLoading"
-          :loadFailed="rosterLoadFailed"
         />
         <TopMembersBoard
           :members="members"
           :currentUserId="currentUserId"
           :isLoading="isRosterLoading"
-          :loadFailed="rosterLoadFailed"
         />
       </div>
-      <MembersTable v-bind="membersTableProps" />
+      <Callout v-if="rosterLoadFailed" variant="warning">
+        <template v-slot:content>
+          <span data-testid="roster-error">{{ ROSTER_LOAD_ERROR }}</span>
+        </template>
+      </Callout>
+      <MembersTable v-else v-bind="membersTableProps" />
       <ResourceLinksCard v-if="resourceLinks.length" :links="resourceLinks" />
     </template>
   </div>
@@ -143,6 +157,10 @@ onBeforeMount(async () => {
   @include breakpoint-below('large') {
     grid-template-columns: 1fr;
   }
+
+  &--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .admin-grid {
   display: grid;
@@ -151,10 +169,6 @@ onBeforeMount(async () => {
   gap: 32px;
 
   @include breakpoint-below('large') {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  &.single {
     grid-template-columns: minmax(0, 1fr);
   }
 }

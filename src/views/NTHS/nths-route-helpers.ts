@@ -1,4 +1,5 @@
 import type { Store } from 'vuex'
+import type { RouteLocationNormalized, RouteLocationRaw } from 'vue-router'
 import AnalyticsService from '@/services/AnalyticsService'
 import LoggerService from '@/services/LoggerService'
 import { EVENTS } from '@/consts'
@@ -22,6 +23,13 @@ export const NTHS_ROUTES = {
   toDo: '/groups/to-do',
   resources: '/groups/resources',
   manage: '/groups/manage',
+} as const
+
+export const NTHS_TAB_LABELS = {
+  [NTHS_ROUTES.home]: 'Headquarters',
+  [NTHS_ROUTES.toDo]: 'To Do',
+  [NTHS_ROUTES.resources]: 'Resources',
+  [NTHS_ROUTES.manage]: 'Manage',
 } as const
 
 export const NTHS_DESTINATION_PATHS: Record<NTHSDestination, string> = {
@@ -83,22 +91,38 @@ export function nthsDestination(
 }
 
 // Every NTHS route asks the same question, so they all defer to nthsDestination.
-// Returns the path to redirect to, or undefined when the coach belongs at
+// Returns where to redirect, or undefined when the coach belongs at
 // destination and the navigation should proceed.
 export async function resolveNthsRoute(
   store: Store<any>,
   destination: NTHSDestination,
-  attemptedPath: string
-): Promise<string | undefined> {
+  attempted: AttemptedRoute
+): Promise<RouteLocationRaw | undefined> {
   const loaded = await loadNTHSData()
   const belongsAt = nthsDestination(store)
   // A failed load leaves the store empty, which looks the same as an ineligible
   // coach. Skip the analytics event here since it would record a network error
   // as an eligibility block.
-  if (!belongsAt && !loaded) return '/dashboard'
-  if (!belongsAt) return redirectBlockedApplicant(attemptedPath)
+  if (!belongsAt && !loaded) return loadFailedRoute(attempted)
+  if (!belongsAt) return redirectBlockedApplicant(attempted.path)
   if (belongsAt === destination) return
   return NTHS_DESTINATION_PATHS[belongsAt]
+}
+
+type AttemptedRoute = Pick<RouteLocationNormalized, 'path' | 'query' | 'hash'>
+
+// The failure page sits at the URL the coach asked for, so a reload or a try
+// again retries the same page.
+export function loadFailedRoute(attempted: AttemptedRoute): RouteLocationRaw {
+  return {
+    name: 'NTHSLoadFailed',
+    // vue-router encodes params itself, so the segments go in decoded.
+    params: {
+      attempted: attempted.path.split('/').slice(2).map(decodeURIComponent),
+    },
+    query: attempted.query,
+    hash: attempted.hash,
+  }
 }
 
 export function redirectBlockedApplicant(attemptedPath: string): string {

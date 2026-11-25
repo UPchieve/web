@@ -33,6 +33,7 @@ import {
   downloadRosterCsv,
   memberDisplayName,
   NEVER_ACTIVE_LABEL,
+  ROSTER_LOAD_ERROR,
   roleTagLabel,
   rosterMemberActions,
   type RosterMemberAction,
@@ -105,6 +106,13 @@ const isAlone = computed(
 )
 const showsTable = computed(() => isLoaded.value && !isAlone.value)
 const showsTools = computed(() => showsTable.value && props.isGroupAdmin)
+// A failed range reload keeps the picker so the range can be changed back, but
+// not the filter chips, whose counts would come from the previous range.
+const showsFilterRow = computed(
+  () =>
+    showsTools.value ||
+    (!!props.range && props.loadFailed && props.isGroupAdmin)
+)
 const currentCount = computed(
   () => props.members.filter((member) => !member.accountClosed).length
 )
@@ -268,7 +276,7 @@ function download() {
   justDownloaded.value = true
 }
 
-const { link, justCopied, copyLink } = useInviteLink(
+const { displayLink, justCopied, copyLink } = useInviteLink(
   () => props.inviteCode ?? '',
   () => props.referralCode
 )
@@ -405,28 +413,32 @@ onKeyStroke('Tab', (event) => {
       </div>
 
       <div
-        v-if="showsTools"
+        v-if="showsFilterRow"
         class="chips"
         role="group"
         aria-labelledby="members-table-show"
       >
         <span id="members-table-show" class="show">Show</span>
-        <slot name="range" />
-        <button
-          v-for="filter in memberFilters(scope)"
-          :key="filter"
-          type="button"
-          class="chip"
-          :class="{ on: filter === activeFilter }"
-          :aria-pressed="filter === activeFilter"
-          :data-testid="`members-table-chip-${filter}`"
-          v-ph:nthshq="phKey(`filter.${filter}`)"
-          @click="selectFilter(filter)"
-        >
-          {{ filterLabel(filter) }} ({{
-            filterMembers(members, filter, scope).length
-          }})
-        </button>
+        <div v-if="$slots.range" class="range-slot">
+          <slot name="range" />
+        </div>
+        <template v-if="showsTools">
+          <button
+            v-for="filter in memberFilters(scope)"
+            :key="filter"
+            type="button"
+            class="chip"
+            :class="{ on: filter === activeFilter }"
+            :aria-pressed="filter === activeFilter"
+            :data-testid="`members-table-chip-${filter}`"
+            v-ph:nthshq="phKey(`filter.${filter}`)"
+            @click="selectFilter(filter)"
+          >
+            {{ filterLabel(filter) }} ({{
+              filterMembers(members, filter, scope).length
+            }})
+          </button>
+        </template>
       </div>
       <label v-if="showsTable" class="msort">
         <span>Sort by</span>
@@ -445,8 +457,11 @@ onKeyStroke('Tab', (event) => {
       </label>
 
       <p v-if="loadFailed" class="note" data-testid="members-table-error">
-        We couldn't load your members. Refresh the page to try again.
+        {{ ROSTER_LOAD_ERROR }}
       </p>
+      <div v-else-if="isLoading" class="skeleton" aria-hidden="true">
+        <span v-for="n in 3" :key="n" class="skeleton-row"></span>
+      </div>
       <div
         v-else-if="isLoaded && isAlone"
         class="zero"
@@ -460,11 +475,11 @@ onKeyStroke('Tab', (event) => {
         <button
           type="button"
           class="invite"
-          :aria-label="`Copy invite link ${link}`"
+          :aria-label="`Copy invite link ${displayLink}`"
           v-ph:nthshq="phKey('copy_invite')"
           @click="copyLink"
         >
-          <span class="url">{{ link }}</span>
+          <span class="url">{{ displayLink }}</span>
           <span class="state" aria-live="polite">
             <template v-if="justCopied">
               <span class="copied">Copied</span>
@@ -719,6 +734,9 @@ onKeyStroke('Tab', (event) => {
   @include nths-page-subtitle;
   margin-top: 16px;
 }
+.skeleton {
+  @include nths-skeleton-rows(48px, 16px);
+}
 .zero {
   display: flex;
   flex-direction: column;
@@ -884,6 +902,7 @@ tbody th {
 }
 .hrs {
   font-weight: 500;
+  white-space: nowrap;
 }
 .rank-badge {
   display: inline-block;
@@ -1054,6 +1073,14 @@ tbody th {
 @include breakpoint-below('medium') {
   .msort {
     display: flex;
+  }
+  .chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .chips > .show,
+  .chips > .range-slot {
+    grid-column: 1 / -1;
   }
   .chip {
     min-height: 44px;

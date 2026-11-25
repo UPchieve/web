@@ -170,6 +170,14 @@ describe('NTHSHomeView', () => {
     expect(wrapper.find('[data-testid="impact-error"]').exists()).toBe(true)
   })
 
+  it('keeps the tip and resources for an admin when the numbers fail to load', async () => {
+    getNTHSChapterImpact.mockRejectedValue(new Error('boom'))
+    const wrapper = await getWrapper('admin')
+
+    expect(wrapper.find(TIP).exists()).toBe(true)
+    expect(wrapper.find(LINKS).exists()).toBe(true)
+  })
+
   it.each([
     { roleName: 'admin', shown: true },
     { roleName: 'member', shown: false },
@@ -182,11 +190,38 @@ describe('NTHSHomeView', () => {
     }
   )
 
-  it('shows an admin no Right now card while the roster loads', async () => {
+  it('shows an admin a Right now placeholder while the roster loads', async () => {
     getNTHSChapterRoster.mockReturnValue(new Promise(() => {}))
     const wrapper = await getWrapper()
 
     expect(wrapper.find(RIGHT_NOW).exists()).toBe(false)
+    expect(wrapper.find('[data-testid="right-now-loading"]').exists()).toBe(
+      true
+    )
+  })
+
+  it('shows an admin neither a card nor a placeholder once the chapter has met its goals', async () => {
+    getNTHSChapterImpact.mockResolvedValue({
+      impact: impact({
+        schoolYearToDate: {
+          studentsHelped: 6,
+          sessionsCompleted: 9,
+          hoursTutored: 40,
+          membersTutoring: 3,
+        },
+      }),
+    })
+    getNTHSChapterRoster.mockResolvedValue(
+      rosterResponse(
+        ['user-1', 'user-2', 'user-3'].map((userId) => member({ userId }))
+      )
+    )
+    const wrapper = await getWrapper()
+
+    expect(wrapper.find(RIGHT_NOW).exists()).toBe(false)
+    expect(wrapper.find('[data-testid="right-now-loading"]').exists()).toBe(
+      false
+    )
   })
 
   it.each([
@@ -199,6 +234,26 @@ describe('NTHSHomeView', () => {
       const wrapper = await getWrapper()
 
       expect(wrapper.find(RIGHT_NOW).exists()).toBe(false)
+      expect(wrapper.find('[data-testid="right-now-loading"]').exists()).toBe(
+        false
+      )
+    }
+  )
+
+  it.each(['admin', 'member'])(
+    'shows a %s one roster message when the roster fails to load',
+    async (roleName) => {
+      getNTHSChapterRoster.mockRejectedValue(new Error('boom'))
+      const wrapper = await getWrapper(roleName)
+
+      expect(wrapper.findAll('[data-testid="roster-error"]')).toHaveLength(1)
+      expect(
+        wrapper
+          .find(
+            '[data-testid="members-table-error"], [data-testid="top-members"]'
+          )
+          .exists()
+      ).toBe(false)
     }
   )
 

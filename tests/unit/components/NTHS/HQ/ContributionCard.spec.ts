@@ -14,7 +14,7 @@ function tutor(userId: string, hours: number, overrides = {}) {
 
 function card(
   members: ReturnType<typeof tutor>[],
-  props: { loadFailed?: boolean; isLoading?: boolean } = {}
+  props: { isLoading?: boolean } = {}
 ) {
   const store = createStore({
     modules: {
@@ -67,17 +67,6 @@ describe('ContributionCard', () => {
     const wrapper = card([tutor('me', 1), tutor('a', 1)])
 
     expect(text(wrapper, 'contribution-legend-others')).toMatch(/^1 member ·/)
-  })
-
-  it('shows only the failure line when the roster failed to load', () => {
-    const wrapper = card([tutor('me', 1)], { loadFailed: true })
-
-    expect(wrapper.find('[data-testid="contribution-error"]').exists()).toBe(
-      true
-    )
-    expect(wrapper.find('[data-testid="contribution-hours"]').exists()).toBe(
-      false
-    )
   })
 
   it('keeps the card, with an empty bar, while the roster loads', () => {

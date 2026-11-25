@@ -18,8 +18,12 @@ export const useAppModalStore = defineStore('app/modal', () => {
   const modalTemplateProps = ref<ModalTemplateProps>({})
   const componentProps = ref<ComponentProps>({})
   const isShown = ref(false)
+  const showCount = ref(0)
 
   function show(payload: AppModalPayload = {}) {
+    if (!isShown.value) {
+      showCount.value++
+    }
     isShown.value = true
     component.value = payload.component ?? null
     modalTemplateProps.value = payload.data ?? {}
@@ -49,6 +53,7 @@ export const useAppModalStore = defineStore('app/modal', () => {
     modalTemplateProps,
     componentProps,
     isShown,
+    showCount,
     show,
     update,
     hide,

@@ -256,7 +256,7 @@ describe('NTHSManageView', () => {
       )
     })
 
-    it('shows the error rather than the old range when the refetch fails', async () => {
+    it('shows the error and keeps the range picker when the refetch fails', async () => {
       const wrapper = await getWrapper()
       getNTHSChapterRoster.mockRejectedValueOnce(new Error('network down'))
       await openRangePicker(wrapper)
@@ -268,6 +268,12 @@ describe('NTHSManageView', () => {
       expect(wrapper.find('[data-testid="members-table-row"]').exists()).toBe(
         false
       )
+      expect(wrapper.find('[data-testid="roster-range-button"]').exists()).toBe(
+        true
+      )
+      expect(
+        wrapper.find('[data-testid^="members-table-chip-"]').exists()
+      ).toBe(false)
     })
 
     it('counts all time from the founding day', async () => {

@@ -17,7 +17,6 @@ const props = defineProps<{
   currentUserId: string
   impact: NTHSChapterImpactPublic | undefined
   isLoading?: boolean
-  loadFailed?: boolean
 }>()
 
 const store = useStore()
@@ -42,7 +41,7 @@ const bar = computed(() =>
 const otherCount = computed(
   () => props.members.filter((m) => m.userId !== props.currentUserId).length
 )
-const show = computed(() => props.loadFailed || isBusy.value || !!viewer.value)
+const show = computed(() => isBusy.value || !!viewer.value)
 const barHours = computed(() =>
   isBusy.value ? 0 : Math.max(ownHours.value, chapterHours.value)
 )
@@ -56,52 +55,43 @@ const valueText = computed(
   <section
     v-if="show"
     class="contribution"
-    :class="{ 'is-loading': isBusy && !loadFailed }"
+    :class="{ 'is-loading': isBusy }"
     aria-labelledby="contribution-title"
-    :aria-busy="isBusy && !loadFailed"
+    :aria-busy="isBusy"
     data-testid="contribution"
   >
     <h2 id="contribution-title" class="eyebrow">Your contribution</h2>
-    <p v-if="loadFailed" class="note" data-testid="contribution-error">
-      We couldn't load your contribution. Refresh the page to try again.
+    <p class="figure" data-testid="contribution-hours">
+      {{ formatHoursMinutes(ownHours) }}
     </p>
-    <template v-else>
-      <p class="figure" data-testid="contribution-hours">
-        {{ formatHoursMinutes(ownHours) }}
-      </p>
-      <div class="track-wrap">
-        <div
-          class="track"
-          role="progressbar"
-          aria-label="Hours tutored"
-          aria-valuemin="0"
-          :aria-valuemax="goalHours"
-          :aria-valuenow="Math.min(barHours, goalHours)"
-          :aria-valuetext="isBusy ? undefined : valueText"
-          data-testid="contribution-bar"
-        >
-          <span class="fill own" :style="{ width: `${bar.ownWidth}%` }" />
-          <span class="fill rest" :style="{ width: `${bar.restWidth}%` }" />
-        </div>
-        <span class="marker" :style="{ '--at': `${bar.ownWidth}%` }">
-          <component
-            :is="avatar?.component"
-            class="avatar"
-            aria-hidden="true"
-          />
-        </span>
+    <div class="track-wrap">
+      <div
+        class="track"
+        role="progressbar"
+        aria-label="Hours tutored"
+        aria-valuemin="0"
+        :aria-valuemax="goalHours"
+        :aria-valuenow="Math.min(barHours, goalHours)"
+        :aria-valuetext="isBusy ? undefined : valueText"
+        data-testid="contribution-bar"
+      >
+        <span class="fill own" :style="{ width: `${bar.ownWidth}%` }" />
+        <span class="fill rest" :style="{ width: `${bar.restWidth}%` }" />
       </div>
-      <ul class="legend">
-        <li data-testid="contribution-legend-you">
-          <span class="swatch own" />You · {{ formatHoursMinutes(ownHours) }}
-        </li>
-        <li data-testid="contribution-legend-others">
-          <span class="swatch rest" />{{ otherCount }}
-          {{ plural(otherCount, 'member') }} ·
-          {{ formatHoursMinutes(bar.restHours) }}
-        </li>
-      </ul>
-    </template>
+      <span class="marker" :style="{ '--at': `${bar.ownWidth}%` }">
+        <component :is="avatar?.component" class="avatar" aria-hidden="true" />
+      </span>
+    </div>
+    <ul class="legend">
+      <li data-testid="contribution-legend-you">
+        <span class="swatch own" />You · {{ formatHoursMinutes(ownHours) }}
+      </li>
+      <li data-testid="contribution-legend-others">
+        <span class="swatch rest" />{{ otherCount }}
+        {{ plural(otherCount, 'member') }} ·
+        {{ formatHoursMinutes(bar.restHours) }}
+      </li>
+    </ul>
   </section>
 </template>
 
@@ -112,13 +102,6 @@ const valueText = computed(
 .eyebrow {
   @include nths-card-eyebrow;
   margin: 0;
-  color: $c-secondary-grey;
-}
-.note {
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.5;
-  margin: 8px 0 0;
   color: $c-secondary-grey;
 }
 .figure {

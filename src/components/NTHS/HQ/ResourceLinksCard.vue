@@ -71,12 +71,12 @@ defineProps<{ links: NTHSHomeLink[] }>()
   flex-shrink: 0;
   width: 28px;
   height: 28px;
-  border: 1px solid $c-border-grey;
+  border: 1.5px solid $c-information-blue;
   border-radius: 50%;
 }
 .arrow-icon {
   width: 12px;
   height: 12px;
-  fill: $c-soft-black;
+  fill: $c-information-blue;
 }
 </style>

@@ -14,7 +14,7 @@ function tutor(userId: string, hours: number) {
 
 function board(
   members: ReturnType<typeof tutor>[],
-  props: { isLoading?: boolean; loadFailed?: boolean } = {}
+  props: { isLoading?: boolean } = {}
 ) {
   return mount(TopMembersBoard, {
     props: { members, currentUserId: 'me', ...props },
@@ -42,18 +42,12 @@ describe('TopMembersBoard', () => {
     expect(wrapper.find(VIEWER_ROW).text()).not.toContain('#')
   })
 
-  it.each([
-    { props: { isLoading: true }, error: false },
-    { props: { loadFailed: true }, error: true },
-  ])('shows no rows or empty paragraph for $props', ({ props, error }) => {
-    const wrapper = board([tutor('a', 3)], props)
+  it('shows no rows or empty paragraph while loading', () => {
+    const wrapper = board([tutor('a', 3)], { isLoading: true })
 
     expect(wrapper.find(ROW).exists()).toBe(false)
     expect(wrapper.find('[data-testid="top-members-empty"]').exists()).toBe(
       false
-    )
-    expect(wrapper.find('[data-testid="top-members-error"]').exists()).toBe(
-      error
     )
   })
 })

@@ -251,12 +251,16 @@ const paths = computed<ChapterPath[]>(() => [
 .card-text {
   text-align: left;
   margin: 0;
+
+  &:not(.error-text) {
+    @include nths-body-text;
+  }
 }
 .error-text {
   color: $c-error-red;
 }
 .header {
-  @include nths-card-title;
+  @include nths-settings-title;
   margin: 0;
   text-align: left;
 }

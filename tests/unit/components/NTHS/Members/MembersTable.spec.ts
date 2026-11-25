@@ -196,13 +196,12 @@ describe('MembersTable', () => {
     }
   )
 
-  it('shows the invite link with the referral code in the prompt', () => {
+  it('shows the invite code in the prompt', () => {
     const link = table({ members: [ME] })
       .find(PROMPT)
       .text()
 
     expect(link).toContain('ABC123')
-    expect(link).toContain('PERSON123')
   })
 
   it('shows no invite prompt while the roster loads', () => {
@@ -838,6 +837,22 @@ describe('MembersTable', () => {
       expect(wrapper.find(chip('no-hours')).text()).toBe('No hours (2)')
       expect(wrapper.find(chip('no-hours-this-week')).exists()).toBe(false)
     })
+
+    it.each([
+      { isGroupAdmin: true, picker: true },
+      { isGroupAdmin: false, picker: false },
+    ])(
+      'keeps the range control but no filters after a failed reload, for an admin: $isGroupAdmin',
+      ({ isGroupAdmin, picker }) => {
+        const wrapper = table(
+          { members: RANGED, range: RANGE, loadFailed: true, isGroupAdmin },
+          { range: '<button data-testid="range-slot">Range</button>' }
+        )
+
+        expect(wrapper.find('[data-testid="range-slot"]').exists()).toBe(picker)
+        expect(wrapper.find(chip('everyone')).exists()).toBe(false)
+      }
+    )
 
     it('reports a sort change so the page can remember it', async () => {
       const wrapper = table({ members: RANGED, range: RANGE })

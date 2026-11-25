@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, useSlots } from 'vue'
+import type { Anchor } from 'vuetify'
 
 withDefaults(
   defineProps<{
@@ -8,6 +9,7 @@ withDefaults(
     buttonAriaLabel?: string
     menuRole?: string
     menuAriaLabel?: string
+    location?: Anchor
     testId?: string
   }>(),
   {
@@ -15,6 +17,7 @@ withDefaults(
     buttonAriaLabel: undefined,
     menuRole: undefined,
     menuAriaLabel: undefined,
+    location: 'bottom end',
     testId: 'dropdown-menu',
   }
 )
@@ -28,7 +31,7 @@ const hasLeadingIcon = computed(() => !!slots['leading-icon'])
 <template>
   <v-menu
     v-model="isOpen"
-    location="bottom end"
+    :location="location"
     :offset="8"
     :close-on-content-click="false"
   >
@@ -98,9 +101,13 @@ const hasLeadingIcon = computed(() => !!slots['leading-icon'])
       color: $c-information-blue;
     }
 
-    &--open,
+    &--open {
+      border-color: $c-information-blue;
+    }
+
     &:focus-visible {
-      outline: none;
+      outline: 2px solid $c-information-blue;
+      outline-offset: 2px;
       border-color: $c-information-blue;
     }
   }

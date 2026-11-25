@@ -5,6 +5,7 @@
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import {
+  memberDisplayName,
   ROSTER_MEMBER_ACTION_LABELS,
   type RosterMemberAction,
 } from '@/services/NTHSRosterService'
@@ -151,7 +152,7 @@ function choose(action: RosterMemberAction) {
       class="dots"
       :class="{ open }"
       :aria-disabled="busy"
-      aria-label="Member actions"
+      :aria-label="`Actions for ${memberDisplayName(member)}`"
       aria-haspopup="menu"
       :aria-expanded="open"
       :aria-controls="open ? `member-menu-${member.userId}` : undefined"

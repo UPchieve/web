@@ -195,6 +195,8 @@ describe('redirectBlockedApplicant', () => {
 })
 
 describe('resolveNthsRoute', () => {
+  const attempted = (path: string) => ({ path, query: {}, hash: '' })
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -226,7 +228,11 @@ describe('resolveNthsRoute', () => {
     'lets %s through for someone who belongs there',
     async (path, destination) => {
       await expect(
-        resolveNthsRoute(fakeStore(STORE_FOR[destination]), destination, path)
+        resolveNthsRoute(
+          fakeStore(STORE_FOR[destination]),
+          destination,
+          attempted(path)
+        )
       ).resolves.toBeUndefined()
     }
   )
@@ -236,7 +242,11 @@ describe('resolveNthsRoute', () => {
     async (path, destination) => {
       const elsewhere = destination === 'apply' ? 'pending' : 'apply'
       await expect(
-        resolveNthsRoute(fakeStore(STORE_FOR[elsewhere]), destination, path)
+        resolveNthsRoute(
+          fakeStore(STORE_FOR[elsewhere]),
+          destination,
+          attempted(path)
+        )
       ).resolves.toBe(
         elsewhere === 'apply' ? '/groups/apply' : '/groups/application-pending'
       )
@@ -248,7 +258,7 @@ describe('resolveNthsRoute', () => {
       resolveNthsRoute(
         fakeStore({ status: 'applied', applicationPageOn: false }),
         'pending',
-        '/groups/application-pending'
+        attempted('/groups/application-pending')
       )
     ).resolves.toBeUndefined()
   })
@@ -258,7 +268,7 @@ describe('resolveNthsRoute', () => {
       resolveNthsRoute(
         fakeStore({ canApply: false, reasons: ['banned'] }),
         'apply',
-        '/groups/apply'
+        attempted('/groups/apply')
       )
     ).resolves.toBe('/dashboard')
     expect(AnalyticsService.captureEvent).toHaveBeenCalledWith(
@@ -273,13 +283,29 @@ describe('resolveNthsRoute', () => {
     const store = fakeStore({ canApply: false, reasons: [] })
     vi.mocked(useNthsStore().fetchNthsData).mockRejectedValue(new Error('down'))
 
-    await expect(
-      resolveNthsRoute(store, 'apply', '/groups/apply')
-    ).resolves.toBe('/dashboard')
+    await resolveNthsRoute(store, 'apply', attempted('/groups/apply'))
     expect(AnalyticsService.captureEvent).not.toHaveBeenCalledWith(
       EVENTS.NTHS_APPLICATION_BLOCKED,
       expect.anything()
     )
+  })
+
+  it('keeps a coach on the page they asked for when the load fails', async () => {
+    const store = fakeStore({ canApply: false })
+    vi.mocked(useNthsStore().fetchNthsData).mockRejectedValue(new Error('down'))
+
+    await expect(
+      resolveNthsRoute(store, 'apply', {
+        path: '/groups/apply/form%20x',
+        query: { x: '1' },
+        hash: '#top',
+      })
+    ).resolves.toEqual({
+      name: 'NTHSLoadFailed',
+      params: { attempted: ['apply', 'form x'] },
+      query: { x: '1' },
+      hash: '#top',
+    })
   })
 
   it('loads before deciding, so a cold store does not send everyone away', async () => {
@@ -289,7 +315,7 @@ describe('resolveNthsRoute', () => {
       return []
     })
     await expect(
-      resolveNthsRoute(store, 'apply', '/groups/apply')
+      resolveNthsRoute(store, 'apply', attempted('/groups/apply'))
     ).resolves.toBeUndefined()
   })
 })

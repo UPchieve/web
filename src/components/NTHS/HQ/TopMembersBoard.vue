@@ -8,18 +8,16 @@ const props = defineProps<{
   members: NTHSChapterRosterMemberPublic[]
   currentUserId: string
   isLoading?: boolean
-  loadFailed?: boolean
 }>()
 
 const PLACE_CLASSES = ['first', 'second', 'third']
 
-const isLoaded = computed(() => !props.isLoading && !props.loadFailed)
 const board = computed(() =>
-  isLoaded.value
-    ? topMembersBoard(props.members, props.currentUserId)
-    : { rows: [] }
+  props.isLoading
+    ? { rows: [] }
+    : topMembersBoard(props.members, props.currentUserId)
 )
-const isEmpty = computed(() => isLoaded.value && !board.value.rows.length)
+const isEmpty = computed(() => !props.isLoading && !board.value.rows.length)
 </script>
 
 <template>
@@ -30,9 +28,9 @@ const isEmpty = computed(() => isLoaded.value && !board.value.rows.length)
     data-testid="top-members"
   >
     <h2 id="top-members-title" class="eyebrow">Top members</h2>
-    <p v-if="loadFailed" class="note" data-testid="top-members-error">
-      We couldn't load your top members. Refresh the page to try again.
-    </p>
+    <div v-if="isLoading" class="skeleton" aria-hidden="true">
+      <span v-for="n in 3" :key="n" class="skeleton-row"></span>
+    </div>
     <p v-else-if="isEmpty" class="note" data-testid="top-members-empty">
       No hours logged yet. The first tutoring hour puts a member on the board.
     </p>
@@ -97,6 +95,9 @@ const isEmpty = computed(() => isLoaded.value && !board.value.rows.length)
   border-radius: 8px;
   background: $upchieve-white;
   color: $c-secondary-grey;
+}
+.skeleton {
+  @include nths-skeleton-rows(52px, 8px);
 }
 .board {
   display: grid;

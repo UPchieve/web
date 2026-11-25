@@ -6,7 +6,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import StandingChip from '@/components/NTHS/HQ/StandingChip.vue'
 import { useInviteLink } from '@/composables/useInviteLink'
 import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
-import { NTHS_ROUTES } from '@/views/NTHS/nths-route-helpers'
+import { NTHS_ROUTES, NTHS_TAB_LABELS } from '@/views/NTHS/nths-route-helpers'
 
 const props = defineProps<{
   name?: string
@@ -21,13 +21,26 @@ const router = useRouter()
 
 const tabs = computed(() =>
   [
-    { to: NTHS_ROUTES.home, name: 'home', label: 'Headquarters' },
-    { to: NTHS_ROUTES.toDo, name: 'to_do', label: 'To Do', adminOnly: true },
-    { to: NTHS_ROUTES.resources, name: 'resources', label: 'Resources' },
+    {
+      to: NTHS_ROUTES.home,
+      name: 'home',
+      label: NTHS_TAB_LABELS[NTHS_ROUTES.home],
+    },
+    {
+      to: NTHS_ROUTES.toDo,
+      name: 'to_do',
+      label: NTHS_TAB_LABELS[NTHS_ROUTES.toDo],
+      adminOnly: true,
+    },
+    {
+      to: NTHS_ROUTES.resources,
+      name: 'resources',
+      label: NTHS_TAB_LABELS[NTHS_ROUTES.resources],
+    },
     {
       to: NTHS_ROUTES.manage,
       name: 'manage',
-      label: 'Manage',
+      label: NTHS_TAB_LABELS[NTHS_ROUTES.manage],
       adminOnly: true,
     },
   ].filter(({ adminOnly }) => !adminOnly || props.isGroupAdmin)
@@ -65,9 +78,11 @@ watch(
     <div class="identity">
       <img class="seal" src="@/assets/nths/nths-logo.svg?url" alt="" />
       <div class="identity-text">
-        <div v-if="!gated && impact" class="chip-row">
-          <span class="status-label">Chapter status:</span>
-          <StandingChip :impact="impact" />
+        <div v-if="!gated" class="chip-row">
+          <template v-if="impact">
+            <span class="status-label">Chapter status:</span>
+            <StandingChip :impact="impact" />
+          </template>
         </div>
         <div class="title-line">
           <p class="chapter-name">{{ name }}</p>
@@ -87,6 +102,9 @@ watch(
               </span>
             </span>
           </LargeButton>
+          <span class="visually-hidden" aria-live="polite">{{
+            justCopied ? 'Copied' : ''
+          }}</span>
         </div>
       </div>
     </div>
@@ -152,6 +170,9 @@ $fade: 40px;
   @include visually-hidden;
 }
 .chip-row {
+  // Reserves the chip's height so nothing moves when it arrives.
+  min-height: 24px;
+
   @media #{$narrow} {
     grid-column: 2;
     grid-row: 1;

@@ -206,3 +206,47 @@ describe('legacy NTHS tab redirects', () => {
     expect(await visit(from)).toBe(to)
   })
 })
+
+describe('NTHS load failure page', () => {
+  beforeEach(() => {
+    useNthsStore().setNTHSGroups([])
+    vi.spyOn(useNthsStore(), 'fetchNthsData').mockRejectedValue(
+      new Error('boom')
+    )
+  })
+
+  it('keeps the coach on the page they asked for when the load fails', async () => {
+    await visit('/dashboard')
+    await visit('/groups/home')
+    expect(router.currentRoute.value.name).toBe('NTHSLoadFailed')
+    expect(router.currentRoute.value.fullPath).toBe('/groups/home')
+  })
+
+  it('keeps a coach in student mode on the page they asked for when the switch to coach fails', async () => {
+    const studentMode = {
+      ...volunteer,
+      userType: 'student',
+      roleContext: { roles: ['student', 'volunteer'] },
+    }
+    NetworkService.user = vi
+      .fn()
+      .mockResolvedValue({ data: { user: studentMode } })
+    NetworkService.switchActiveRole = vi
+      .fn()
+      .mockRejectedValue(new Error('boom'))
+    store.state.user.user = { ...studentMode }
+
+    await visit('/groups/home')
+
+    expect(router.currentRoute.value.name).toBe('NTHSLoadFailed')
+    expect(router.currentRoute.value.fullPath).toBe('/groups/home')
+  })
+
+  it('redirects a typed unknown /groups URL instead of showing the failure page', async () => {
+    useNthsStore().setNTHSGroups(nthsGroupWithRole('admin'))
+    await visit('/dashboard')
+    const notFoundPath = await visit('/no-such-page')
+    await visit('/dashboard')
+    expect(await visit('/groups/foo')).toBe(notFoundPath)
+  })
+})

@@ -2,6 +2,7 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import { useChapterContext } from '@/composables/useChapterContext'
 import NTHSLink from '@/components/NTHS/HQ/NTHSLink.vue'
+import Spinner from '@/components/Spinner.vue'
 import ResourceIcon from '@/components/NTHS/HQ/ResourceIcon.vue'
 import { getNTHSResources } from '@/services/NetworkService'
 import { isAppPath, NTHS_RESOURCES_URL } from '@/services/NTHSGroupService'
@@ -47,7 +48,9 @@ onBeforeMount(async () => {
   <div class="resources">
     <h1 class="visually-hidden">Resources</h1>
 
-    <ul v-if="groups.length" class="groups">
+    <Spinner v-if="!loaded" data-testid="resources-loading" />
+
+    <ul v-else-if="groups.length" class="groups">
       <li
         v-for="(group, index) in groups"
         :key="index"
@@ -115,7 +118,7 @@ onBeforeMount(async () => {
       </li>
     </ul>
 
-    <p v-else-if="loaded" class="fallback" data-testid="resources-fallback">
+    <p v-else class="fallback" data-testid="resources-fallback">
       <a
         v-ph:nthshq="'resources.fallback'"
         :href="NTHS_RESOURCES_URL"

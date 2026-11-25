@@ -5,13 +5,17 @@ import { RouterView, useRouter } from 'vue-router'
 import { useDocumentVisibility } from '@vueuse/core'
 import LargeButton from '@/components/LargeButton.vue'
 import Callout from '@/components/Callout.vue'
+import DocumentTitle from '@/components/DocumentTitle.vue'
 import ChapterHeader from '@/components/NTHS/HQ/ChapterHeader.vue'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
 import LoggerService from '@/services/LoggerService'
 import { useChapterContext } from '@/composables/useChapterContext'
 import { provideChapterImpact } from '@/composables/useChapterImpact'
 import { renewalWarningLine } from '@/services/NTHSRenewalService'
-import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
+import {
+  NTHS_TAB_LABELS,
+  resolveNthsRoute,
+} from '@/views/NTHS/nths-route-helpers'
 import { useNthsStore } from '@/stores/nths'
 
 const store = useStore()
@@ -41,6 +45,13 @@ const hidePageContentReason = computed(function ():
 
   if (store.getters['volunteer/isOnboardedAndApproved']) return
   return 'not ready to tutor'
+})
+
+const documentTitle = computed(() => {
+  const tab = (NTHS_TAB_LABELS as Record<string, string>)[
+    router.currentRoute.value.path
+  ]
+  return tab ? `${tab} | Chapter HQ` : 'Chapter HQ'
 })
 
 const chapterName = computed(
@@ -91,7 +102,7 @@ async function refreshNTHSData(): Promise<void> {
       const redirect = await resolveNthsRoute(
         store,
         'group',
-        router.currentRoute.value.path
+        router.currentRoute.value
       )
       if (redirect && !isUnmounted) {
         await router.replace(redirect)
@@ -138,6 +149,7 @@ watch(useDocumentVisibility(), (visibility) => {
 
 <template>
   <div class="chapter-hq">
+    <DocumentTitle :title="documentTitle" />
     <ChapterHeader
       :name="group?.groupInfo?.name"
       :isGroupAdmin="isGroupAdmin"

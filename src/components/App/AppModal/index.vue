@@ -1,6 +1,9 @@
 <template>
   <!-- To simplify, we could just bring the ModalTemplate into this component. -->
+  <!-- A hide() then show() in one tick keeps AppModal mounted; the key remounts
+       ModalTemplate so it captures the new opener. -->
   <modal-template
+    :key="showCount"
     v-on:cancel="onCancel"
     v-on:accept="onAccept"
     :back-text="modalData.backText"
@@ -86,6 +89,7 @@ export default {
       modalComponent: 'component',
       modalData: 'modalTemplateProps',
       modalComponentProps: 'componentProps',
+      showCount: 'showCount',
     }),
   },
   mounted() {

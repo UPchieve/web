@@ -100,6 +100,7 @@ const NTHSApplicationPending = () =>
   import('./views/NTHS/NTHSApplicationPending.vue')
 const NTHSApplicationExpired = () =>
   import('./views/NTHS/NTHSApplicationExpired.vue')
+const NTHSLoadFailed = () => import('./views/NTHS/NTHSLoadFailed.vue')
 const StandaloneBotChatView = () =>
   import('./views/BotConversationsView/StandaloneBotChatView.vue')
 const Totp = () => import('./views/Totp/index.vue')
@@ -125,6 +126,7 @@ const AdminDirectMessageReview = () =>
 
 import {
   resolveNthsRoute,
+  loadFailedRoute,
   type NTHSDestination,
 } from './views/NTHS/nths-route-helpers'
 import Gleap from 'gleap'
@@ -151,7 +153,7 @@ const autoflowRedirect: NavigationGuard = (_to, _from, next) => {
 const nthsRouteGuard =
   (destination: NTHSDestination): NavigationGuard =>
   async (to, _from, next) => {
-    const redirect = await resolveNthsRoute(store, destination, to.path)
+    const redirect = await resolveNthsRoute(store, destination, to)
     return redirect ? next(redirect) : next()
   }
 
@@ -165,7 +167,7 @@ const nthsAdminOnly: NavigationGuard = (_to, _from, next) => {
   }
 }
 
-const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {
+const switchToVolunteerOrCancel: NavigationGuard = async (to, _from, next) => {
   if (store.getters['featureFlags/isStudentCoachModeBlocked']) {
     const toast = await toastController.create({
       message:
@@ -182,7 +184,7 @@ const switchToVolunteerOrCancel: NavigationGuard = async (_to, _from, next) => {
       await UserService.switchActiveRole({ $store: store }, 'volunteer')
       next() // switch and continue
     } catch {
-      next('/dashboard')
+      next(to.path.startsWith('/groups') ? loadFailedRoute(to) : '/dashboard')
     }
   } else {
     next('/dashboard') // not a volunteer at all, prevent nav
@@ -1106,6 +1108,15 @@ const routes: RouteRecordRaw[] = [
       { path: '/groups/manage-team', redirect: '/groups/manage' },
       { path: '/groups/settings', redirect: '/groups/manage' },
     ],
+  },
+  {
+    path: '/groups/:attempted(.*)*',
+    name: 'NTHSLoadFailed',
+    component: NTHSLoadFailed,
+    // Typed unknown /groups URLs land here too and redirect like Not Found.
+    // A failed load only redirects here from a URL that resolves elsewhere.
+    beforeEnter: (to, _from, next) =>
+      router.resolve(to.path).name === 'NTHSLoadFailed' ? next('/') : next(),
   },
   {
     path: '/ai-tutor-conversations/:conversationId?',

@@ -11,7 +11,8 @@ import { formatMinutes } from '@/utils/time-utils'
 import { NTHS_ROUTES } from '@/views/NTHS/nths-route-helpers'
 
 const props = defineProps<{
-  impact: NTHSChapterImpactPublic
+  impact?: NTHSChapterImpactPublic
+  isLoading?: boolean
   memberCount: number
   inviteCode?: string
   referralCode: string
@@ -22,10 +23,12 @@ const { justCopied, copyLink } = useInviteLink(
   () => props.referralCode
 )
 
-const step = computed(() => nextStepFor(props.impact, props.memberCount))
+const step = computed(() =>
+  props.impact ? nextStepFor(props.impact, props.memberCount) : undefined
+)
 
 const line = computed(() => {
-  if (!step.value) return ''
+  if (!props.impact || !step.value) return ''
   const { kind, gap } = step.value
   if (kind === 'invite') {
     return props.memberCount <= 1
@@ -40,7 +43,13 @@ const line = computed(() => {
 </script>
 
 <template>
-  <Transition name="card" appear>
+  <div
+    v-if="isLoading"
+    class="loading"
+    aria-hidden="true"
+    data-testid="right-now-loading"
+  ></div>
+  <Transition v-else name="card" appear>
     <section
       v-if="step"
       class="right-now"
@@ -91,7 +100,7 @@ const line = computed(() => {
 }
 .eyebrow {
   @include nths-card-eyebrow;
-  color: $c-nths-warm-fg;
+  color: $c-nths-alert-red;
   margin: 0;
 }
 .big {
@@ -110,6 +119,18 @@ const line = computed(() => {
   margin-top: 16px;
   font-size: 14px;
   color: $c-information-blue;
+}
+// The invite step's card height at each width, as its text wraps.
+.loading {
+  @include nths-skeleton;
+  height: 196px;
+
+  @include breakpoint-below('large') {
+    height: 224px;
+  }
+  @include breakpoint-below('small') {
+    height: 274px;
+  }
 }
 .card-enter-active,
 .card-leave-active {

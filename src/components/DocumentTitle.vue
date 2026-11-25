@@ -3,6 +3,14 @@
 export default {
   name: 'document-title',
   props: ['title'],
+  // The immediate title watcher runs before created, so the old title has to
+  // be read earlier.
+  beforeCreate() {
+    this.previousTitle = document.title
+  },
+  beforeUnmount() {
+    document.title = this.previousTitle
+  },
   watch: {
     title: {
       immediate: true,

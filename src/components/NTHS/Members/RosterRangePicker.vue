@@ -66,6 +66,7 @@ function pickDays() {
     :label="rangeLabel(range)"
     :button-aria-label="`Date range: ${rangeLabel(range)}`"
     menu-aria-label="Date range"
+    location="bottom start"
     active
     test-id="roster-range"
   >

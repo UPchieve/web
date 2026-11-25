@@ -21,7 +21,7 @@ const variantClasses = computed(() => ({
 
 <template>
   <div class="main-container" :class="variantClasses">
-    <div class="icon-container">
+    <div class="icon-container" aria-hidden="true">
       <slot name="icon" class="icon" v-if="!props.variant" />
       <component :is="variantIcon" v-else class="icon" />
     </div>
