@@ -454,10 +454,7 @@ export default {
         setTimeout(() => {
           if (!this.isConnectedToWhiteboard) {
             this.failedLoadingWhiteboard()
-            // This method doesn't exist in zwibbler-demo.js
-            if (this.zwibblerCtx?.leaveSharedSession) {
-              this.zwibblerCtx.leaveSharedSession()
-            }
+            this.zwibblerCtx.leaveSharedSession()
           }
         }, 1000 * 20)
 
@@ -487,9 +484,7 @@ export default {
   async beforeUnmount() {
     socket.emit('sessions/recap:leave', { sessionId: this.session.id })
     this.$store.commit('user/setRecapSession', {})
-    if (this.zwibblerCtx?.leaveSharedSession) {
-      await this.zwibblerCtx.leaveSharedSession()
-    }
+    await this.zwibblerCtx?.leaveSharedSession()
     this.zwibblerCtx?.destroy()
   },
   methods: {

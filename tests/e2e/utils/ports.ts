@@ -11,9 +11,9 @@
 // environments.
 //
 // Copies live outside this file and cannot import it: the vite build reads
-// .env.test_e2e locally and .env.test_e2e_ci under CI, .gitlab-ci.yml polls
-// http://localhost:3001/healthz, and subway's own .env.e2e and
-// docker-compose.yml hold the values this file mirrors.
+// .env.test_e2e, .gitlab-ci.yml polls http://localhost:3001/healthz, and
+// subway's own .env.e2e and docker-compose.yml hold the values this file
+// mirrors.
 
 export const subwayPort = process.env.E2E_SUBWAY_PORT || '3001'
 export const highLinePort = process.env.E2E_HIGH_LINE_PORT || '8081'

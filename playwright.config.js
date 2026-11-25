@@ -68,7 +68,7 @@ const localServers = [
     stdout: 'pipe',
     stderr: 'pipe',
     env: {
-      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+      NODE_ENV: 'test_e2e',
       SUBWAY_POSTHOG_LOCAL_FLAGS: 'zwibserve',
     },
     gracefulShutdown: {
@@ -77,7 +77,7 @@ const localServers = [
     },
   },
   {
-    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port ${highLinePort}`,
+    command: `pnpm run build --mode test_e2e &&  pnpm run preview --mode test_e2e --port ${highLinePort}`,
     name: 'HIGH-LINE SERVE',
     url: highLineUrl,
     reuseExistingServer: false,
@@ -85,7 +85,7 @@ const localServers = [
     stderr: 'pipe',
     timeout: 60000,
     env: {
-      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+      NODE_ENV: 'test_e2e',
     },
     gracefulShutdown: {
       signal: 'SIGTERM', // Sends a Ctrl+C signal to your server
@@ -96,7 +96,7 @@ const localServers = [
 
 const ciServers = [
   {
-    command: `pnpm run build --mode ${process.env.CI ? 'test_e2e_ci' : 'test_e2e'} &&  pnpm run preview --port ${highLinePort} > high-line.log 2>&1`,
+    command: `pnpm run build --mode test_e2e &&  pnpm run preview --mode test_e2e --port ${highLinePort} > high-line.log 2>&1`,
     name: 'HIGH-LINE SERVE',
     url: highLineUrl,
     reuseExistingServer: false,
@@ -104,7 +104,7 @@ const ciServers = [
     stderr: 'pipe',
     timeout: 60000,
     env: {
-      NODE_ENV: process.env.CI ? 'test_e2e_ci' : 'test_e2e',
+      NODE_ENV: 'test_e2e',
     },
     gracefulShutdown: {
       signal: 'SIGTERM', // Sends a Ctrl+C signal to your server

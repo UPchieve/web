@@ -160,10 +160,6 @@ export const loginAs = async (
   user: AuthPayload,
   landingUrl = '**/dashboard'
 ) => {
-  // The e2e build's Zwibbler demo calls alert() on each whiteboard mount. With no
-  // listener, Playwright dismisses it without catching a failed dismiss, which
-  // fails the test with "No dialog is showing".
-  page.on('dialog', (dialog) => dialog.dismiss().catch(() => {}))
   const login = new Login(page)
   await login.goto()
   await login.loginWith(user)

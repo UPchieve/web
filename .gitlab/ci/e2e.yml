@@ -33,7 +33,7 @@
     POSTGRES_PORT: 5432
     REDIS_HOST: redis
     REDIS_PORT: 6379
-    NODE_ENV: test_e2e_ci
+    NODE_ENV: test_e2e
     E2E_CACHE_POLICY: pull
   before_script:
     - echo 'Set up high-line...'

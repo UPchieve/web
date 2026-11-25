@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config'
+import { loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import svgLoader from 'vite-svg-loader'
 import path from 'path'
@@ -7,6 +8,7 @@ import { playwright } from '@vitest/browser-playwright'
 import { analyzer } from 'vite-bundle-analyzer'
 import { visualizer } from 'rollup-plugin-visualizer'
 import vuetify from 'vite-plugin-vuetify'
+import staticWebAppConfig from './public/staticwebapp.config.json' with { type: 'json' }
 
 let svgoPrefixId = 0
 
@@ -90,6 +92,37 @@ export default defineConfig({
         }
         const tags = [...fontLinks].join('\n  ')
         return html.replace('</head>', `\n ${tags}\n</head>`)
+      },
+    },
+    {
+      name: 'production-csp',
+      apply: 'serve',
+      config(_, { mode }) {
+        const env = loadEnv(mode, process.cwd(), 'VUE_APP_')
+        const localSelf = [
+          env.VUE_APP_SERVER_ROOT,
+          env.VUE_APP_WEBSOCKET_ADDRESS,
+          env.VUE_APP_MAIN_WEBSOCKET_ROOT,
+          env.VUE_APP_ZWIBBLER_COLLAB_SERVER_ROOT,
+        ].reduce(
+          (sources, url) =>
+            url ? `${sources} ${new URL(url).origin}` : sources,
+          "'self'"
+        )
+        const csp = staticWebAppConfig.globalHeaders['Content-Security-Policy']
+        return {
+          server: {
+            headers: {
+              'Content-Security-Policy': csp
+                // In production the API, sockets and whiteboard share the
+                // app's origin, so 'self' covers them. Locally each has its
+                // own port.
+                .replaceAll("'self'", localSelf)
+                // The Vue devtools panel shows its logo from vuejs.org.
+                .replace('img-src', 'img-src https://vuejs.org'),
+            },
+          },
+        }
       },
     },
     vuetify(),

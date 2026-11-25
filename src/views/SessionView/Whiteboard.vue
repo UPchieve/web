@@ -1385,13 +1385,10 @@ export default {
         // TODO: _Is_ there a way to access the WS connection in a less sketchy way?
         // The Zwibbler WS connection is on different properties depending on the build you are using.
         // In order, try:
-        // - public/static/zwibbler-demo.js
         // - (CDN) march2024/zwibbler2.js
         // - (CDN) june2021/zwibbler2.js
         const zwibblerWsConnection =
-          this.zwibblerCtx?.zc?.Pb?.Pb ??
-          this.zwibblerCtx?.kc?.Ac?.Ac ??
-          this.zwibblerCtx?.Ec?.rc?.rc
+          this.zwibblerCtx?.kc?.Ac?.Ac ?? this.zwibblerCtx?.Ec?.rc?.rc
 
         if (zwibblerWsConnection) {
           if (this.isZwibserveSession) {
@@ -1596,10 +1593,7 @@ export default {
     this.clearHeartBeat()
     this.whiteboardToken?.dispose()
     // Zwibbler cleanup.
-    // This method doesn't exist in zwibbler-demo.js
-    if (this.zwibblerCtx?.leaveSharedSession) {
-      this.zwibblerCtx.leaveSharedSession()
-    }
+    this.zwibblerCtx.leaveSharedSession()
     this.zwibblerCtx.destroy()
     this.zwibblerCtx = null
     useSessionStore().setZwibbler(null)

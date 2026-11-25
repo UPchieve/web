@@ -381,9 +381,7 @@ export default {
   },
 
   async beforeUnmount() {
-    if (this.zwibblerCtx?.leaveSharedSession) {
-      await this.zwibblerCtx.leaveSharedSession()
-    }
+    await this.zwibblerCtx?.leaveSharedSession()
     this.zwibblerCtx?.destroy()
   },
 }
