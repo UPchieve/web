@@ -307,7 +307,11 @@ export default {
             !unlockedSubjects.includes(session.subTopic) && !session.isExclusive
         )
       } else {
-        return state.allOpenSessions
+        const userId = rootState.user.user.id
+        return state.allOpenSessions.filter(
+          (session) =>
+            !session.isExclusive || session.requestedVolunteerId === userId
+        )
       }
     },
     exclusiveSessions: (state, getters, rootState) => {

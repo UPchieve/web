@@ -97,6 +97,81 @@ describe('handleIncomingSessions', () => {
     expect(mockSetAllOpenSessions).toHaveBeenCalledWith(expect.anything(), [])
   })
 
+  describe('lockedOpenSessions with requests a student made for a specific coach', () => {
+    const openSession = {
+      id: 'open',
+      subTopic: 'usHistory',
+      student: { firstname: 'Ada' },
+      isExclusive: false,
+    }
+    const requestForAnotherCoach = {
+      ...openSession,
+      id: 'for-another-coach',
+      isExclusive: true,
+      requestedVolunteerId: 'another-coach',
+    }
+    const requestForThisCoach = {
+      ...openSession,
+      id: 'for-this-coach',
+      isExclusive: true,
+      requestedVolunteerId: 'coach',
+    }
+
+    async function getOpenSessionIds(user: Record<string, unknown>) {
+      setActivePinia(createPinia())
+      const store = getStore({
+        user: {
+          state: {
+            user: {
+              id: 'coach',
+              userType: 'volunteer',
+              isApproved: true,
+              subjects: [],
+              mutedSubjectAlerts: [],
+              ...user,
+            },
+          },
+        },
+        featureFlags: {
+          getters: { isCombinedOnboardingChecklistEnabled: () => true },
+        },
+        volunteer: { state: { tickIntervalId: 1, allOpenSessions: [] } },
+      })
+
+      await store.dispatch('volunteer/handleIncomingSessions', {
+        context: mockVueContext,
+        sessions: [openSession, requestForAnotherCoach, requestForThisCoach],
+      })
+
+      const ids = (getter: string) =>
+        store.getters[`volunteer/${getter}`].map(({ id }) => id)
+      return {
+        locked: ids('lockedOpenSessions'),
+        available: ids('availableSessions'),
+        exclusive: ids('exclusiveSessions'),
+      }
+    }
+
+    it('hides requests for another coach from a coach who is not ready to tutor', async () => {
+      const { locked } = await getOpenSessionIds({ isOnboarded: false })
+
+      expect(locked).toEqual(['open', 'for-this-coach'])
+    })
+
+    it('hides requests for another coach from a coach who is ready to tutor', async () => {
+      const lists = await getOpenSessionIds({
+        isOnboarded: true,
+        subjects: ['usHistory'],
+      })
+
+      expect(lists).toEqual({
+        locked: [],
+        available: ['open'],
+        exclusive: ['for-this-coach'],
+      })
+    })
+  })
+
   it.todo('Does not send web notifications for old sessions')
   it.todo(
     'Does not include test user or shadowbanned user sessions unless current user is an admin'
