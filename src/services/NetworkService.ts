@@ -1990,8 +1990,8 @@ export default {
       inviteCode,
     }).then(this._successHandler, this._errorHandler)
   },
-  createNTHSGroup() {
-    return httpPostDeprecated(`${API_ROOT}/nths-groups/new`, {}).then(
+  createNTHSGroup(name: string) {
+    return httpPostDeprecated(`${API_ROOT}/nths-groups/new`, { name }).then(
       this._successHandler,
       this._errorHandler
     )

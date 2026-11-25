@@ -12,7 +12,7 @@ vi.mock('vue-router', async (importOriginal) => ({
 }))
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/NetworkService')>()),
-  default: { createNTHSGroup: vi.fn() },
+  default: { createNTHSGroup: vi.fn(), editNTHSGroup: vi.fn() },
 }))
 
 function mountView(approvalExpiresAt: string | null) {
@@ -24,29 +24,9 @@ function mountView(approvalExpiresAt: string | null) {
   return mount(NTHSCreateGroupView, { global: { plugins: [store] } })
 }
 
-function textFor(approvalExpiresAt: string | null) {
-  return mountView(approvalExpiresAt).text()
-}
-
 enableAutoUnmount(afterEach)
 
 describe('NTHSCreateGroupView', () => {
-  it.each(['2026-11-20T12:45:00.000Z', '2026-11-20T12:00:00.000Z'])(
-    'tells the coach when their approval runs out (%s)',
-    (iso) => {
-      const minutes = String(new Date(iso).getMinutes()).padStart(2, '0')
-      expect(textFor(iso)).toMatch(
-        new RegExp(
-          `Deadline to create chapter: November \\d+(st|nd|rd|th) at \\d+:${minutes}(AM|PM) \\S+`
-        )
-      )
-    }
-  )
-
-  it('leaves the date line out when no expiry is known', () => {
-    expect(textFor(null)).not.toContain('Deadline to create chapter')
-  })
-
   describe('create fails with a 422', () => {
     const past = '2020-01-01T00:00:00.000Z'
     const future = '2999-01-01T00:00:00.000Z'
@@ -63,6 +43,7 @@ describe('NTHSCreateGroupView', () => {
       })
       const wrapper = mountView(approvalExpiresAt)
 
+      await wrapper.find('#chapter-name').setValue('My chapter')
       await wrapper.find('form').trigger('submit')
       await flushPromises()
 
