@@ -1,19 +1,20 @@
 import type {
   NTHSChapterImpactPublic,
-  NTHSRosterMemberPublic,
-} from '@/services/NTHSGroupService'
+  NTHSChapterRosterMemberPublic,
+} from '@upchieve/api-contracts/nths-groups'
 
-export const NO_PERIOD_ACTIVITY: NTHSRosterMemberPublic['periodHours'] = {
-  thisWeek: 0,
-  lastTwoWeeks: 0,
-  thisMonth: 0,
-  thisSchoolYear: 0,
-  allTime: 0,
-}
+export const NO_PERIOD_ACTIVITY: NTHSChapterRosterMemberPublic['periodHours'] =
+  {
+    thisWeek: 0,
+    lastTwoWeeks: 0,
+    thisMonth: 0,
+    thisSchoolYear: 0,
+    allTime: 0,
+  }
 
 export function member(
-  overrides: Partial<NTHSRosterMemberPublic> = {}
-): NTHSRosterMemberPublic {
+  overrides: Partial<NTHSChapterRosterMemberPublic> = {}
+): NTHSChapterRosterMemberPublic {
   return {
     userId: 'u1',
     firstName: 'Alex',
@@ -24,8 +25,6 @@ export function member(
     trainingComplete: true,
     safetyApproved: true,
     accountClosed: false,
-    sessionsThisYear: 3,
-    hoursThisYear: 2.5,
     periodHours: {
       thisWeek: 1,
       lastTwoWeeks: 1.5,
@@ -74,14 +73,12 @@ export function impact(
   }
 }
 
-export function rosterResponse(members: NTHSRosterMemberPublic[]) {
+export function rosterResponse(members: NTHSChapterRosterMemberPublic[]) {
   return {
-    data: {
-      roster: {
-        groupId: 'group-123',
-        schoolYear,
-        members,
-      },
+    roster: {
+      groupId: 'group-123',
+      schoolYear,
+      members,
     },
   }
 }

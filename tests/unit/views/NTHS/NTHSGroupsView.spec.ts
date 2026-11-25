@@ -5,19 +5,25 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ModalService from '@/services/ModalService'
 import LoggerService from '@/services/LoggerService'
-import NetworkService from '@/services/NetworkService'
 import userModule, { type UserStoreState } from '@/store/modules/user'
 import { createStore, type Store } from 'vuex'
 import { h } from 'vue'
 import { useAppModalStore } from '@/stores/app/modal'
 import { useNthsStore } from '@/stores/nths'
 import { impact } from '../../fixtures/nths'
+import { injectChapterImpact } from '@/composables/useChapterImpact'
 
 type UserOverrides = {
   occupation?: string[] | null
   isOnboardedAndApproved?: boolean
   renewalPrompt?: string
 }
+
+const getImpact = vi.fn()
+vi.mock('@/services/NetworkService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/NetworkService')>()),
+  getNTHSChapterImpact: (groupId: string) => getImpact(groupId),
+}))
 
 const fetchNthsData = vi.fn()
 const refreshNTHSGroups = vi.fn()
@@ -89,7 +95,20 @@ async function getWrapper(
     history: createMemoryHistory(),
     routes: [
       { path: '/dashboard', component: { template: '<div />' } },
-      { path: '/groups/home', component: { template: '<div />' } },
+      {
+        path: '/groups/home',
+        component: {
+          setup() {
+            const { impact } = injectChapterImpact()
+            return () =>
+              h(
+                'div',
+                { 'data-testid': 'routed-home-hours' },
+                impact.value?.schoolYearToDate.hoursTutored
+              )
+          },
+        },
+      },
       { path: '/groups/to-do', component: { template: '<div />' } },
       {
         // This test asserts on the routed view's content, so it needs a
@@ -121,9 +140,7 @@ describe('NTHSGroupsView', () => {
     refreshNTHSGroups.mockReset().mockResolvedValue([{}])
     useAppModalStore().hide()
     vi.restoreAllMocks()
-    vi.spyOn(NetworkService, 'getNTHSChapterImpact').mockResolvedValue({
-      data: { impact: impact() },
-    } as never)
+    getImpact.mockReset().mockResolvedValue({ impact: impact() })
   })
 
   it.each(['member', 'admin'])(
@@ -136,13 +153,20 @@ describe('NTHSGroupsView', () => {
     }
   )
 
+  it('shares the impact it loaded with the routed tab', async () => {
+    const wrapper = await getWrapper('/groups/home')
+
+    expect(wrapper.find('[data-testid="routed-home-hours"]').text()).toBe('7.5')
+  })
+
   it('reloads the impact on each tab change', async () => {
     const wrapper = await getWrapper('/groups/home')
-    expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(1)
+    expect(getImpact).toHaveBeenCalledTimes(1)
+    expect(getImpact).toHaveBeenCalledWith('group-123')
 
     await wrapper.vm.$router.push('/groups/manage')
     await flushPromises()
-    expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(2)
+    expect(getImpact).toHaveBeenCalledTimes(2)
   })
 
   it('copies the join link from the header', async () => {
@@ -220,9 +244,7 @@ describe('NTHSGroupsView', () => {
         expect(wrapper.find('[data-testid="header-invite"]').exists()).toBe(
           !hidden
         )
-        expect(NetworkService.getNTHSChapterImpact).toHaveBeenCalledTimes(
-          hidden ? 0 : 1
-        )
+        expect(getImpact).toHaveBeenCalledTimes(hidden ? 0 : 1)
         expect(wrapper.find('[data-testid="routed-manage"]').exists()).toBe(
           !hidden
         )

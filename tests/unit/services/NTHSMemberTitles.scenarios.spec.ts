@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type {
-  NTHSRosterMemberPublic,
-  NTHSTitle,
-} from '@/services/NTHSGroupService'
+import type { NTHSTitle } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import {
   displayTitle,
   presidencyChoiceLabel,
@@ -13,8 +11,8 @@ import { member } from '../fixtures/nths'
 let nextId = 0
 function titled(
   title: NTHSTitle,
-  overrides: Partial<NTHSRosterMemberPublic> = {}
-): NTHSRosterMemberPublic {
+  overrides: Partial<NTHSChapterRosterMemberPublic> = {}
+): NTHSChapterRosterMemberPublic {
   nextId += 1
   return member({
     userId: `member-${nextId}`,

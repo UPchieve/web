@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import InformationIcon from '@/assets/information.svg'
 import TargetIcon from '@/assets/nths/target.svg'
-import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import {
   formatProgressHours,
   LOADING_IMPACT_PLACEHOLDER,

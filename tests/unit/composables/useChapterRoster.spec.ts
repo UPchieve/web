@@ -5,9 +5,7 @@ import { member, rosterResponse } from '../fixtures/nths'
 
 const getNTHSChapterRoster = vi.fn()
 vi.mock('@/services/NetworkService', () => ({
-  default: {
-    getNTHSChapterRoster: (...args: unknown[]) => getNTHSChapterRoster(...args),
-  },
+  getNTHSChapterRoster: (...args: unknown[]) => getNTHSChapterRoster(...args),
 }))
 
 const NOW = new Date('2026-10-15T12:00:00.000Z')

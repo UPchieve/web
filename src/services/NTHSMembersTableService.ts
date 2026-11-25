@@ -1,4 +1,4 @@
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import { daysSince, memberDisplayName } from '@/services/NTHSRosterService'
 
 // Home's table counts this week for its status and the school year for its
@@ -15,7 +15,7 @@ export type MemberStatus =
   | 'no-hours'
 
 export function memberStatus(
-  member: NTHSRosterMemberPublic,
+  member: NTHSChapterRosterMemberPublic,
   scope: MembersTableScope
 ): MemberStatus {
   if (member.accountClosed) return 'account-closed'
@@ -44,16 +44,16 @@ export function memberFilters(scope: MembersTableScope): MemberFilter[] {
 }
 
 export function filterMembers(
-  members: NTHSRosterMemberPublic[],
+  members: NTHSChapterRosterMemberPublic[],
   filter: MemberFilter,
   scope: MembersTableScope
-): NTHSRosterMemberPublic[] {
+): NTHSChapterRosterMemberPublic[] {
   if (filter === 'everyone') return members
   return members.filter((member) => memberStatus(member, scope) === filter)
 }
 
 export function memberHours(
-  member: NTHSRosterMemberPublic,
+  member: NTHSChapterRosterMemberPublic,
   scope: MembersTableScope
 ): number {
   return scope === 'range'
@@ -62,7 +62,7 @@ export function memberHours(
 }
 
 export function memberSessions(
-  member: NTHSRosterMemberPublic,
+  member: NTHSChapterRosterMemberPublic,
   scope: MembersTableScope
 ): number {
   return scope === 'range'
@@ -124,7 +124,7 @@ const STATUS_SORT_RANK: Record<MemberStatus, number> = {
   'account-closed': 4,
 }
 
-function roleSortRank(member: NTHSRosterMemberPublic): number {
+function roleSortRank(member: NTHSChapterRosterMemberPublic): number {
   if (member.accountClosed) return 4
   switch (member.title) {
     case 'President':
@@ -138,7 +138,7 @@ function roleSortRank(member: NTHSRosterMemberPublic): number {
 }
 
 function memberSortValue(
-  member: NTHSRosterMemberPublic,
+  member: NTHSChapterRosterMemberPublic,
   key: Exclude<MemberSortKey, 'name'>,
   now: Date,
   scope: MembersTableScope
@@ -168,8 +168,8 @@ function memberSortValue(
 }
 
 function compareNames(
-  a: NTHSRosterMemberPublic,
-  b: NTHSRosterMemberPublic
+  a: NTHSChapterRosterMemberPublic,
+  b: NTHSChapterRosterMemberPublic
 ): number {
   return (
     memberDisplayName(a).localeCompare(memberDisplayName(b)) ||
@@ -178,11 +178,11 @@ function compareNames(
 }
 
 export function sortMembers(
-  members: NTHSRosterMemberPublic[],
+  members: NTHSChapterRosterMemberPublic[],
   sort: MemberSort,
   now: Date,
   scope: MembersTableScope
-): NTHSRosterMemberPublic[] {
+): NTHSChapterRosterMemberPublic[] {
   const { key } = sort
   const sign = sort.direction === 'desc' ? -1 : 1
   const byName = [...members].sort(compareNames)

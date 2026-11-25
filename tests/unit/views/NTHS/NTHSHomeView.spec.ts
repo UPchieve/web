@@ -1,6 +1,7 @@
 import type { AffiliationStatus } from '@/services/NTHSGroupService'
 import vuetify from '@/plugins/vuetify'
 import { useNthsStore } from '@/stores/nths'
+import { provideChapterImpact } from '@/composables/useChapterImpact'
 import NTHSHomeView from '@/views/NTHS/Tabs/NTHSHomeView.vue'
 import {
   enableAutoUnmount,
@@ -10,6 +11,7 @@ import {
 } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStore } from 'vuex'
+import { defineComponent, h } from 'vue'
 import { impact, member, rosterResponse } from '../../fixtures/nths'
 
 vi.mock('vue-router', async (importOriginal) => ({
@@ -23,10 +25,8 @@ const getNTHSHomeContent = vi.fn()
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/NetworkService')>()),
   getNTHSHomeContent: (groupId: string) => getNTHSHomeContent(groupId),
-  default: {
-    getNTHSChapterImpact: (groupId: string) => getNTHSChapterImpact(groupId),
-    getNTHSChapterRoster: (groupId: string) => getNTHSChapterRoster(groupId),
-  },
+  getNTHSChapterImpact: (groupId: string) => getNTHSChapterImpact(groupId),
+  getNTHSChapterRoster: (groupId: string) => getNTHSChapterRoster(groupId),
 }))
 
 const NOW = new Date('2026-10-15T00:00:00.000Z')
@@ -66,6 +66,14 @@ function storeFor(
 }
 let store: ReturnType<typeof storeFor>
 
+// Chapter HQ's header loads the impact and Home reads it.
+const HomeUnderHeader = defineComponent({
+  setup() {
+    void provideChapterImpact().load('group-123')
+    return () => h(NTHSHomeView)
+  },
+})
+
 enableAutoUnmount(afterEach)
 
 async function getWrapper(
@@ -74,7 +82,7 @@ async function getWrapper(
   schoolAffiliationStatus: AffiliationStatus | null = null
 ) {
   store = storeFor(roleName, userId, schoolAffiliationStatus)
-  const wrapper = mount(NTHSHomeView, {
+  const wrapper = mount(HomeUnderHeader, {
     global: {
       plugins: [store, vuetify],
       stubs: { RouterLink: RouterLinkStub, transition: false },
@@ -108,7 +116,7 @@ beforeEach(() => {
   getNTHSHomeContent.mockReset()
   getNTHSHomeContent.mockResolvedValue(HOME_CONTENT)
   getNTHSChapterImpact.mockReset()
-  getNTHSChapterImpact.mockResolvedValue({ data: { impact: IMPACT } })
+  getNTHSChapterImpact.mockResolvedValue({ impact: IMPACT })
   getNTHSChapterRoster.mockReset()
   getNTHSChapterRoster.mockResolvedValue(
     rosterResponse([member({ userId: 'user-1' })])
@@ -125,7 +133,7 @@ describe('NTHSHomeView', () => {
     async (roleName) => {
       const wrapper = await getWrapper(roleName)
 
-      expect(getNTHSChapterImpact).toHaveBeenCalledWith('group-123')
+      expect(getNTHSChapterImpact).toHaveBeenCalledTimes(1)
       expect(wrapper.find('[data-testid="impact-students"]').text()).toBe('2')
       expect(wrapper.find('[data-testid="impact-sessions"]').text()).toBe('4')
     }

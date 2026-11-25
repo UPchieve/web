@@ -1,4 +1,4 @@
-import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 
 export type Standing = 'pending' | 'official' | 'official-good-standing'
 

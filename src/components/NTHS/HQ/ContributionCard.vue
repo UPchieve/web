@@ -3,8 +3,8 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import type {
   NTHSChapterImpactPublic,
-  NTHSRosterMemberPublic,
-} from '@/services/NTHSGroupService'
+  NTHSChapterRosterMemberPublic,
+} from '@upchieve/api-contracts/nths-groups'
 import {
   contributionBar,
   findOpenViewer,
@@ -13,7 +13,7 @@ import { plural } from '@/utils/plural'
 import { formatHoursMinutes } from '@/utils/time-utils'
 
 const props = defineProps<{
-  members: NTHSRosterMemberPublic[]
+  members: NTHSChapterRosterMemberPublic[]
   currentUserId: string
   impact: NTHSChapterImpactPublic | undefined
   isLoading?: boolean

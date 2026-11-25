@@ -7,16 +7,18 @@ import type { ImpactStudyCampaign } from '@/types'
 import type {
   NTHSAcceptanceReason,
   NTHSActionName,
-  NTHSChapterImpactResponse,
-  NTHSChapterRosterResponse,
-  NTHSHomeContentResponse,
   NTHSMemberUpdate,
   NTHSRenewalAcceptResponse,
   NTHSRenewalCommitments,
-  NTHSResourcesResponse,
   NTHSTitle,
   Role,
 } from './NTHSGroupService'
+import type {
+  NTHSChapterImpactResponse,
+  NTHSChapterRosterResponse,
+  NTHSHomeContent,
+  NTHSResources,
+} from '@upchieve/api-contracts/nths-groups'
 import type { NTHSUnlistedSchool } from './NTHSApplicationService'
 import type {
   CalendarRosterPeriod,
@@ -419,14 +421,44 @@ export function getNTHSChecklist(groupId: string) {
 }
 
 export function getNTHSHomeContent(groupId: string) {
-  return httpGet<NTHSHomeContentResponse>(
+  return httpGet<NTHSHomeContent>(
     `${API_ROOT}/nths-groups/${groupId}/home-content`
   )
 }
 
 export function getNTHSResources(groupId: string) {
-  return httpGet<NTHSResourcesResponse>(
-    `${API_ROOT}/nths-groups/${groupId}/resources`
+  return httpGet<NTHSResources>(`${API_ROOT}/nths-groups/${groupId}/resources`)
+}
+
+export function getNTHSChapterImpact(groupId: string) {
+  return httpGet<NTHSChapterImpactResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/impact`
+  )
+}
+
+export function getNTHSChapterRoster(
+  groupId: string,
+  periodStarts?: Record<CalendarRosterPeriod, Date>,
+  range?: RosterRangeBounds
+) {
+  return httpGet<NTHSChapterRosterResponse>(
+    `${API_ROOT}/nths-groups/${groupId}/roster`,
+    range
+      ? {
+          params: {
+            rangeStartsAt: range.startsAt.toISOString(),
+            rangeEndsAt: range.endsAt.toISOString(),
+          },
+        }
+      : periodStarts
+        ? {
+            params: {
+              weekStartsAt: periodStarts.thisWeek.toISOString(),
+              lastTwoWeeksStartsAt: periodStarts.lastTwoWeeks.toISOString(),
+              monthStartsAt: periodStarts.thisMonth.toISOString(),
+            },
+          }
+        : undefined
   )
 }
 
@@ -1795,36 +1827,6 @@ export default {
     return httpPutDeprecated(`${API_ROOT}/nths-groups/${groupId}`, {
       name,
     }).then(this._successHandler, this._errorHandler)
-  },
-  getNTHSChapterImpact(groupId: string) {
-    return httpGetDeprecated<NTHSChapterImpactResponse>(
-      `${API_ROOT}/nths-groups/${groupId}/impact`
-    ).catch(this._axiosErrorHandler)
-  },
-  getNTHSChapterRoster(
-    groupId: string,
-    periodStarts?: Record<CalendarRosterPeriod, Date>,
-    range?: RosterRangeBounds
-  ) {
-    return httpGetDeprecated<NTHSChapterRosterResponse>(
-      `${API_ROOT}/nths-groups/${groupId}/roster`,
-      range
-        ? {
-            params: {
-              rangeStartsAt: range.startsAt.toISOString(),
-              rangeEndsAt: range.endsAt.toISOString(),
-            },
-          }
-        : periodStarts
-          ? {
-              params: {
-                weekStartsAt: periodStarts.thisWeek.toISOString(),
-                lastTwoWeeksStartsAt: periodStarts.lastTwoWeeks.toISOString(),
-                monthStartsAt: periodStarts.thisMonth.toISOString(),
-              },
-            }
-          : undefined
-    ).catch(this._axiosErrorHandler)
   },
   createActionForNTHSGroup(groupId: string, action: NTHSActionName) {
     return httpPostDeprecated(`${API_ROOT}/nths-groups/${groupId}/actions`, {

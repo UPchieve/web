@@ -9,7 +9,7 @@ import {
   type MemberSortKey,
   type MembersTableScope,
 } from '@/services/NTHSMembersTableService'
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import { describe, expect, it } from 'vitest'
 import { member, NO_PERIOD_ACTIVITY } from '../fixtures/nths'
 
@@ -134,7 +134,7 @@ const dee = member({
 })
 const roster = [dee, cy, bob, ann]
 
-function names(rows: NTHSRosterMemberPublic[]) {
+function names(rows: NTHSChapterRosterMemberPublic[]) {
   return rows.map((row) => row.firstName)
 }
 

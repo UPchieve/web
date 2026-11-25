@@ -12,9 +12,9 @@ import NetworkService from '@/services/NetworkService'
 import {
   LEADERSHIP_TITLES,
   type NTHSMemberUpdate,
-  type NTHSRosterMemberPublic,
   type NTHSTitle,
 } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import {
   displayTitle,
   memberDisplayName,
@@ -111,9 +111,9 @@ function pickDays(firstDay: Date, lastDay: Date) {
 }
 
 async function updateMember(
-  member: NTHSRosterMemberPublic,
+  member: NTHSChapterRosterMemberPublic,
   update: NTHSMemberUpdate,
-  patch: Partial<NTHSRosterMemberPublic>,
+  patch: Partial<NTHSChapterRosterMemberPublic>,
   failureMessage: string
 ) {
   busyUserIds.value.add(member.userId)
@@ -141,11 +141,11 @@ async function updateMember(
   }
 }
 
-function roleFailureMessage(member: NTHSRosterMemberPublic) {
+function roleFailureMessage(member: NTHSChapterRosterMemberPublic) {
   return `Something went wrong while updating ${member.firstName}'s role. Please refresh the page and try again.`
 }
 
-async function makeAdmin(member: NTHSRosterMemberPublic) {
+async function makeAdmin(member: NTHSChapterRosterMemberPublic) {
   const title = await ModalService.showNthsMemberTitleModal({
     heading: `Make ${memberDisplayName(member)} an admin`,
     choices: titleChoices(member, members.value, true),
@@ -161,7 +161,7 @@ async function makeAdmin(member: NTHSRosterMemberPublic) {
   )
 }
 
-async function changeTitle(member: NTHSRosterMemberPublic) {
+async function changeTitle(member: NTHSChapterRosterMemberPublic) {
   const title = await ModalService.showNthsMemberTitleModal({
     heading: `Change ${memberDisplayName(member)}'s title`,
     choices: titleChoices(member, members.value, member.roleName === 'admin'),
@@ -177,7 +177,7 @@ async function changeTitle(member: NTHSRosterMemberPublic) {
   )
 }
 
-async function removeAdmin(member: NTHSRosterMemberPublic) {
+async function removeAdmin(member: NTHSChapterRosterMemberPublic) {
   const losesTitle = LEADERSHIP_TITLES.includes(member.title)
   if (losesTitle) {
     const confirmed = await ModalService.showConfirm(
@@ -197,7 +197,7 @@ async function removeAdmin(member: NTHSRosterMemberPublic) {
 }
 
 function onMemberAction(
-  member: NTHSRosterMemberPublic,
+  member: NTHSChapterRosterMemberPublic,
   action: RosterMemberAction
 ) {
   switch (action) {
@@ -214,7 +214,7 @@ function onMemberAction(
   }
 }
 
-function removeMember(member: NTHSRosterMemberPublic) {
+function removeMember(member: NTHSChapterRosterMemberPublic) {
   errorMessage.value = ''
   ModalService.showNthsUserManagementModal({
     isLoading: false,

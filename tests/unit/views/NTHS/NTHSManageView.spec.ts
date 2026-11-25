@@ -13,8 +13,8 @@ const updateNTHSGroupMember = vi.fn()
 const refreshNTHSGroups = vi.fn()
 vi.mock('@/services/NetworkService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/NetworkService')>()),
+  getNTHSChapterRoster: (...args: unknown[]) => getNTHSChapterRoster(...args),
   default: {
-    getNTHSChapterRoster: (...args: unknown[]) => getNTHSChapterRoster(...args),
     updateNTHSGroupMember: (...args: unknown[]) =>
       updateNTHSGroupMember(...args),
   },

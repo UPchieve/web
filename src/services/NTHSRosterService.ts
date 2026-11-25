@@ -1,11 +1,9 @@
-import type {
-  NTHSRosterMemberPublic,
-  NTHSTitle,
-} from '@/services/NTHSGroupService'
+import type { NTHSTitle } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import exportToCsv from '@/utils/export-to-csv'
 import { dayjs } from '@/utils/time-utils'
 
-export type RosterPeriod = keyof NTHSRosterMemberPublic['periodHours']
+export type RosterPeriod = keyof NTHSChapterRosterMemberPublic['periodHours']
 
 export const ROSTER_PERIODS: RosterPeriod[] = [
   'thisWeek',
@@ -114,7 +112,7 @@ function csvCalendarDate(value: string | undefined): string {
 type RosterCsvOptions = {
   // Unfiltered, so a co-president the filter hides still makes the other one
   // read as co-president.
-  roster: NTHSRosterMemberPublic[]
+  roster: NTHSChapterRosterMemberPublic[]
   range?: RosterRange
   schoolYearLabel: string
 }
@@ -129,7 +127,7 @@ function csvRangeLabel(range: RosterRange): string {
 
 // Takes the already-filtered rows, so the export cannot disagree with the table.
 export function downloadRosterCsv(
-  rows: NTHSRosterMemberPublic[],
+  rows: NTHSChapterRosterMemberPublic[],
   { roster, range, schoolYearLabel }: RosterCsvOptions
 ): void {
   exportToCsv(
@@ -165,7 +163,7 @@ export function downloadRosterCsv(
 }
 
 export function memberDisplayName(
-  member: Pick<NTHSRosterMemberPublic, 'firstName' | 'lastInitial'>
+  member: Pick<NTHSChapterRosterMemberPublic, 'firstName' | 'lastInitial'>
 ): string {
   // users.last_name is NOT NULL, so LEFT(last_name, 1) yields '' rather than null.
   return member.lastInitial
@@ -182,7 +180,7 @@ type NTHSDisplayTitle =
 type PresidencyLabel = Extract<NTHSDisplayTitle, 'President' | 'Co-President'>
 
 function isCurrentPresident(
-  member: Pick<NTHSRosterMemberPublic, 'title' | 'accountClosed'>
+  member: Pick<NTHSChapterRosterMemberPublic, 'title' | 'accountClosed'>
 ): boolean {
   return member.title === 'President' && !member.accountClosed
 }
@@ -192,8 +190,8 @@ function presidencyLabel(presidentCount: number): PresidencyLabel {
 }
 
 export function displayTitle(
-  member: Pick<NTHSRosterMemberPublic, 'title' | 'accountClosed'>,
-  roster: Pick<NTHSRosterMemberPublic, 'title' | 'accountClosed'>[]
+  member: Pick<NTHSChapterRosterMemberPublic, 'title' | 'accountClosed'>,
+  roster: Pick<NTHSChapterRosterMemberPublic, 'title' | 'accountClosed'>[]
 ): NTHSDisplayTitle | undefined {
   if (member.accountClosed) return undefined
   if (member.title === 'President')
@@ -204,7 +202,10 @@ export function displayTitle(
 // Leaves out the member being edited, so a sole president editing their own
 // title is offered "President".
 export function presidencyChoiceLabel(
-  roster: Pick<NTHSRosterMemberPublic, 'userId' | 'title' | 'accountClosed'>[],
+  roster: Pick<
+    NTHSChapterRosterMemberPublic,
+    'userId' | 'title' | 'accountClosed'
+  >[],
   editingUserId: string
 ): PresidencyLabel {
   const others = roster.filter(
@@ -213,13 +214,13 @@ export function presidencyChoiceLabel(
   return presidencyLabel(others.length + 1)
 }
 
-function storedTitle(member: NTHSRosterMemberPublic) {
+function storedTitle(member: NTHSChapterRosterMemberPublic) {
   return member.title === 'Member' ? undefined : member.title
 }
 
 export function roleTagLabel(
-  member: NTHSRosterMemberPublic,
-  roster: NTHSRosterMemberPublic[]
+  member: NTHSChapterRosterMemberPublic,
+  roster: NTHSChapterRosterMemberPublic[]
 ): string | undefined {
   const title = member.accountClosed
     ? storedTitle(member)
@@ -231,8 +232,11 @@ export function roleTagLabel(
 export type TitleChoice = { title: NTHSTitle; label: string }
 
 export function titleChoices(
-  member: Pick<NTHSRosterMemberPublic, 'userId'>,
-  roster: Pick<NTHSRosterMemberPublic, 'userId' | 'title' | 'accountClosed'>[],
+  member: Pick<NTHSChapterRosterMemberPublic, 'userId'>,
+  roster: Pick<
+    NTHSChapterRosterMemberPublic,
+    'userId' | 'title' | 'accountClosed'
+  >[],
   asAdmin: boolean
 ): TitleChoice[] {
   const leadership: TitleChoice[] = asAdmin
@@ -267,7 +271,7 @@ export const ROSTER_MEMBER_ACTION_LABELS: Record<RosterMemberAction, string> = {
 }
 
 export function rosterMemberActions(
-  member: NTHSRosterMemberPublic,
+  member: NTHSChapterRosterMemberPublic,
   viewerId: string
 ): RosterMemberAction[] {
   if (member.accountClosed) return ['remove']

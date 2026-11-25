@@ -12,7 +12,7 @@ import { avatarColor } from '@/components/NTHS/member-avatar'
 import RosterRowMenu from '@/components/NTHS/Members/RosterRowMenu.vue'
 import SubjectList from '@/components/NTHS/Members/SubjectList.vue'
 import { useInviteLink } from '@/composables/useInviteLink'
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import {
   DEFAULT_MEMBER_SORT,
   defaultDirection,
@@ -43,7 +43,7 @@ import { plural } from '@/utils/plural'
 import { formatHoursMinutes } from '@/utils/time-utils'
 
 const props = defineProps<{
-  members: NTHSRosterMemberPublic[]
+  members: NTHSChapterRosterMemberPublic[]
   currentUserId: string
   isGroupAdmin: boolean
   inviteCode?: string
@@ -58,7 +58,7 @@ const props = defineProps<{
   busyUserIds?: ReadonlySet<string>
 }>()
 const emit = defineEmits<{
-  act: [member: NTHSRosterMemberPublic, action: RosterMemberAction]
+  act: [member: NTHSChapterRosterMemberPublic, action: RosterMemberAction]
 }>()
 const activeSort = defineModel<MemberSort>('sort', {
   default: () => DEFAULT_MEMBER_SORT,
@@ -229,7 +229,10 @@ function closeMenu(userId: string) {
   }
 }
 
-function act(member: NTHSRosterMemberPublic, action: RosterMemberAction) {
+function act(
+  member: NTHSChapterRosterMemberPublic,
+  action: RosterMemberAction
+) {
   openMenuUserId.value = undefined
   emit('act', member, action)
 }

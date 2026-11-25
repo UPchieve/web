@@ -6,6 +6,7 @@ const HAS_SEEN_VOLUNTEER_HOURS = 'has-seen-volunteer-calculator'
 const HAS_SEEN_SHOW_ONLINE_STATUS_MODAL = 'has-seen-show-online-status-modal'
 const NTHS_APPLICATION_DRAFT = 'nths-application-draft'
 const NTHS_RENEWAL_HANDOFF_DISMISSED = 'nths-renewal-handoff-dismissed'
+const NTHS_ROSTER_VIEW = 'nths-roster-view'
 
 function get(key: string, storage: Storage = localStorage) {
   const r = storage.getItem(key)
@@ -112,5 +113,28 @@ export function setDismissedNTHSRenewalHandoff(
     set(nthsRenewalHandoffKey(userId, groupId, schoolYear), true)
   } catch {
     // best effort, as in getNTHSApplicationDraft
+  }
+}
+
+// Keeps the key the roster view was first saved under, so existing choices survive.
+function nthsRosterViewKey(userId: string): string {
+  return `${userId}-${NTHS_ROSTER_VIEW}`
+}
+
+export function getNTHSRosterView(userId: string): unknown {
+  if (!userId) return undefined
+  try {
+    return get(nthsRosterViewKey(userId))
+  } catch {
+    return undefined
+  }
+}
+
+export function setNTHSRosterView(userId: string, view: unknown): void {
+  if (!userId) return
+  try {
+    set(nthsRosterViewKey(userId), view)
+  } catch {
+    // Storage can be missing, full or blocked; the choice still applies for this visit.
   }
 }

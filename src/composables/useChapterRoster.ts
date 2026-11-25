@@ -1,10 +1,10 @@
 import { computed, ref } from 'vue'
-import NetworkService from '@/services/NetworkService'
+import { getNTHSChapterRoster } from '@/services/NetworkService'
 import type {
   NTHSChapterRosterPublic,
-  NTHSRosterMemberPublic,
+  NTHSChapterRosterMemberPublic,
   NTHSSchoolYearPublic,
-} from '@/services/NTHSGroupService'
+} from '@upchieve/api-contracts/nths-groups'
 import LoggerService from '@/services/LoggerService'
 import {
   isPeriodStartRejection,
@@ -13,7 +13,7 @@ import {
 } from '@/services/NTHSRosterService'
 
 export function useChapterRoster() {
-  const members = ref<NTHSRosterMemberPublic[]>([])
+  const members = ref<NTHSChapterRosterMemberPublic[]>([])
   // A closed account is not a current member, though its row stays in the roster.
   const currentMembers = computed(() =>
     members.value.filter((member) => !member.accountClosed)
@@ -32,7 +32,7 @@ export function useChapterRoster() {
     range?: RosterRangeBounds
   ) {
     try {
-      return await NetworkService.getNTHSChapterRoster(
+      return await getNTHSChapterRoster(
         groupId,
         range ? undefined : rosterPeriodStarts(now),
         range
@@ -41,7 +41,7 @@ export function useChapterRoster() {
       if (range || !isPeriodStartRejection(err)) {
         throw err
       }
-      return NetworkService.getNTHSChapterRoster(groupId)
+      return getNTHSChapterRoster(groupId)
     }
   }
 
@@ -62,7 +62,7 @@ export function useChapterRoster() {
     try {
       const response = await fetchRoster(groupId, now, range)
       if (refreshId === latestRefreshId) {
-        applyRoster(response.data.roster)
+        applyRoster(response.roster)
         hasLoaded = true
       }
     } catch (err) {
@@ -87,7 +87,7 @@ export function useChapterRoster() {
     try {
       const response = await fetchRoster(groupId, now, range)
       if (refreshId === latestRefreshId) {
-        applyRoster(response.data.roster)
+        applyRoster(response.roster)
       }
     } catch (err) {
       LoggerService.noticeError(
@@ -105,7 +105,10 @@ export function useChapterRoster() {
 
   // The view patches this list before its background refresh lands, so the
   // Status column and the chip counts move with the row that changed.
-  function patchMember(userId: string, patch: Partial<NTHSRosterMemberPublic>) {
+  function patchMember(
+    userId: string,
+    patch: Partial<NTHSChapterRosterMemberPublic>
+  ) {
     members.value = members.value.map((member) =>
       member.userId === userId ? { ...member, ...patch } : member
     )

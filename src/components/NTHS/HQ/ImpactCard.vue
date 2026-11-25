@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
 import starUrl from '@/assets/nths/impact-star.svg?url'
-import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import {
   formatProgressHours,
   LOADING_IMPACT_PLACEHOLDER,

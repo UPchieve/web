@@ -5,9 +5,7 @@ import { impact } from '../fixtures/nths'
 
 const getNTHSChapterImpact = vi.fn()
 vi.mock('@/services/NetworkService', () => ({
-  default: {
-    getNTHSChapterImpact: (...args: unknown[]) => getNTHSChapterImpact(...args),
-  },
+  getNTHSChapterImpact: (...args: unknown[]) => getNTHSChapterImpact(...args),
 }))
 
 const IMPACT = impact({
@@ -23,12 +21,20 @@ const IMPACT = impact({
 
 beforeEach(() => {
   getNTHSChapterImpact.mockReset()
+  vi.spyOn(LoggerService, 'noticeError').mockImplementation(() => {})
 })
 
+function pending() {
+  let settle!: { resolve: (v: unknown) => void; reject: (e: unknown) => void }
+  const promise = new Promise(
+    (resolve, reject) => (settle = { resolve, reject })
+  )
+  return { promise, settle }
+}
+
 describe('useChapterImpact', () => {
-  it('reports failure when the request fails', async () => {
+  it('reports failure when the first load fails', async () => {
     getNTHSChapterImpact.mockRejectedValueOnce(new Error('network down'))
-    vi.spyOn(LoggerService, 'noticeError').mockImplementation(() => {})
     const { loadFailed, load } = useChapterImpact()
 
     await load('group-1')
@@ -36,39 +42,79 @@ describe('useChapterImpact', () => {
     expect(loadFailed.value).toBe(true)
   })
 
-  describe('refresh', () => {
-    it('updates impact without flipping isLoading, so a caller can refetch in the background', async () => {
-      getNTHSChapterImpact.mockResolvedValue({ data: { impact: IMPACT } })
-      const { impact, isLoading, load, refresh } = useChapterImpact()
-      await load('group-1')
+  it('keeps the shown numbers and reports no failure when a later load fails', async () => {
+    getNTHSChapterImpact
+      .mockResolvedValueOnce({ impact: IMPACT })
+      .mockRejectedValueOnce(new Error('network down'))
+    const { impact, loadFailed, load } = useChapterImpact()
 
-      const updated = {
-        ...IMPACT,
-        schoolYearToDate: { ...IMPACT.schoolYearToDate, membersTutoring: 2 },
-      }
-      getNTHSChapterImpact.mockResolvedValueOnce({ data: { impact: updated } })
-      const refreshPromise = refresh('group-1')
-      expect(isLoading.value).toBe(false)
-      await refreshPromise
+    await load('group-1')
+    await load('group-1')
 
-      expect(impact.value).toEqual(updated)
-      expect(isLoading.value).toBe(false)
-    })
+    expect(impact.value).toEqual(IMPACT)
+    expect(loadFailed.value).toBe(false)
+  })
 
-    it('keeps the newest refresh when an older one resolves after it', async () => {
-      const newer = { ...IMPACT, groupId: 'newer' }
-      let resolveOlder!: (value: unknown) => void
-      getNTHSChapterImpact
-        .mockReturnValueOnce(new Promise((resolve) => (resolveOlder = resolve)))
-        .mockResolvedValueOnce({ data: { impact: newer } })
-      const { impact, refresh } = useChapterImpact()
+  it('clears an earlier failure when the next load starts, then shows its numbers', async () => {
+    const next = pending()
+    getNTHSChapterImpact
+      .mockRejectedValueOnce(new Error('network down'))
+      .mockReturnValueOnce(next.promise)
+    const { impact, loadFailed, load } = useChapterImpact()
+    await load('group-1')
 
-      const olderRefresh = refresh('group-1')
-      await refresh('group-1')
-      resolveOlder({ data: { impact: IMPACT } })
-      await olderRefresh
+    const nextLoad = load('group-1')
+    expect(loadFailed.value).toBe(false)
+    next.settle.resolve({ impact: IMPACT })
+    await nextLoad
 
-      expect(impact.value).toEqual(newer)
-    })
+    expect(impact.value).toEqual(IMPACT)
+  })
+
+  it('keeps the newest numbers when an older load resolves after it', async () => {
+    const newer = { ...IMPACT, groupId: 'newer' }
+    const older = pending()
+    getNTHSChapterImpact
+      .mockReturnValueOnce(older.promise)
+      .mockResolvedValueOnce({ impact: newer })
+    const { impact, load } = useChapterImpact()
+
+    const olderLoad = load('group-1')
+    await load('group-1')
+    older.settle.resolve({ impact: IMPACT })
+    await olderLoad
+
+    expect(impact.value).toEqual(newer)
+  })
+
+  it('reports no failure when an older load fails while a newer one is in flight', async () => {
+    const older = pending()
+    getNTHSChapterImpact
+      .mockReturnValueOnce(older.promise)
+      .mockReturnValueOnce(new Promise(() => {}))
+    const { loadFailed, load } = useChapterImpact()
+
+    const olderLoad = load('group-1')
+    void load('group-1')
+    older.settle.reject(new Error('network down'))
+    await olderLoad
+
+    expect(loadFailed.value).toBe(false)
+  })
+
+  it("shows an older load's numbers when the newer one failed with none shown", async () => {
+    const older = pending()
+    getNTHSChapterImpact
+      .mockReturnValueOnce(older.promise)
+      .mockRejectedValueOnce(new Error('network down'))
+    const { impact, loadFailed, load } = useChapterImpact()
+
+    const olderLoad = load('group-1')
+    await load('group-1')
+    older.settle.resolve({ impact: IMPACT })
+    await olderLoad
+
+    expect(impact.value).toEqual(IMPACT)
+    expect(loadFailed.value).toBe(false)
   })
 })

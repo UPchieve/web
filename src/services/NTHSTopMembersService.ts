@@ -1,4 +1,4 @@
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import { memberDisplayName } from '@/services/NTHSRosterService'
 import { formatHoursMinutes, formatMinutes } from '@/utils/time-utils'
 
@@ -18,9 +18,9 @@ export type TopMembersBoard = {
 }
 
 export function findOpenViewer(
-  members: NTHSRosterMemberPublic[],
+  members: NTHSChapterRosterMemberPublic[],
   currentUserId: string
-): NTHSRosterMemberPublic | undefined {
+): NTHSChapterRosterMemberPublic | undefined {
   return members.find(
     (member) => member.userId === currentUserId && !member.accountClosed
   )
@@ -41,8 +41,8 @@ export function contributionBar(
 }
 
 export function rankMembers(
-  members: NTHSRosterMemberPublic[]
-): NTHSRosterMemberPublic[] {
+  members: NTHSChapterRosterMemberPublic[]
+): NTHSChapterRosterMemberPublic[] {
   return members
     .filter(
       (member) => !member.accountClosed && member.periodHours.thisSchoolYear > 0
@@ -67,7 +67,7 @@ export function minutesToOvertake(
 }
 
 export function topMembersBoard(
-  members: NTHSRosterMemberPublic[],
+  members: NTHSChapterRosterMemberPublic[],
   currentUserId: string
 ): TopMembersBoard {
   const ranked = rankMembers(members)

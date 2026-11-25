@@ -1,44 +1,50 @@
-import { ref } from 'vue'
-import NetworkService from '@/services/NetworkService'
-import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import { inject, provide, ref, type InjectionKey } from 'vue'
+import { getNTHSChapterImpact } from '@/services/NetworkService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import LoggerService from '@/services/LoggerService'
 
 export function useChapterImpact() {
   const impact = ref<NTHSChapterImpactPublic>()
-  const isLoading = ref(true)
   const loadFailed = ref(false)
+  // Overlapping loads can settle out of order, so the newest writes, or any
+  // success while no numbers are shown.
+  let latestLoadId = 0
 
+  // Numbers already on screen stay through a failed load, with no failure shown.
   async function load(groupId: string) {
-    isLoading.value = true
+    const loadId = ++latestLoadId
     loadFailed.value = false
     try {
-      const response = await NetworkService.getNTHSChapterImpact(groupId)
-      impact.value = response.data.impact
-    } catch (err) {
-      loadFailed.value = true
-      LoggerService.noticeError(err, 'Could not load the NTHS chapter impact')
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  // Overlapping refreshes can resolve out of order, so only the newest writes.
-  let latestRefreshId = 0
-
-  async function refresh(groupId: string) {
-    const refreshId = ++latestRefreshId
-    try {
-      const response = await NetworkService.getNTHSChapterImpact(groupId)
-      if (refreshId === latestRefreshId) {
-        impact.value = response.data.impact
+      const response = await getNTHSChapterImpact(groupId)
+      if (loadId === latestLoadId || !impact.value) {
+        impact.value = response.impact
+        loadFailed.value = false
       }
     } catch (err) {
-      LoggerService.noticeError(
-        err,
-        'Could not refresh the NTHS chapter impact'
-      )
+      if (loadId === latestLoadId && !impact.value) {
+        loadFailed.value = true
+      }
+      LoggerService.noticeError(err, 'Could not load the NTHS chapter impact')
     }
   }
 
-  return { impact, isLoading, loadFailed, load, refresh }
+  return { impact, loadFailed, load }
+}
+
+type ChapterImpact = ReturnType<typeof useChapterImpact>
+
+const CHAPTER_IMPACT_KEY: InjectionKey<ChapterImpact> = Symbol('chapterImpact')
+
+export function provideChapterImpact(): ChapterImpact {
+  const chapterImpact = useChapterImpact()
+  provide(CHAPTER_IMPACT_KEY, chapterImpact)
+  return chapterImpact
+}
+
+export function injectChapterImpact(): ChapterImpact {
+  const chapterImpact = inject(CHAPTER_IMPACT_KEY)
+  if (!chapterImpact) {
+    throw new Error('injectChapterImpact needs provideChapterImpact above it')
+  }
+  return chapterImpact
 }

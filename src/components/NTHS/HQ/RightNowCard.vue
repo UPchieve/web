@@ -3,10 +3,8 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import LargeButton from '@/components/LargeButton.vue'
 import { useInviteLink } from '@/composables/useInviteLink'
-import {
-  NTHS_RECRUITMENT_TEMPLATES_URL,
-  type NTHSChapterImpactPublic,
-} from '@/services/NTHSGroupService'
+import { NTHS_RECRUITMENT_TEMPLATES_URL } from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import { nextStepFor } from '@/services/NTHSImpactService'
 import { plural } from '@/utils/plural'
 import { formatMinutes } from '@/utils/time-utils'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import { standingFor, STANDING_LABELS } from '@/services/NTHSImpactService'
 
 const props = defineProps<{ impact: NTHSChapterImpactPublic }>()

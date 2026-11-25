@@ -4,18 +4,15 @@ import { useChapterContext } from '@/composables/useChapterContext'
 import NTHSLink from '@/components/NTHS/HQ/NTHSLink.vue'
 import ResourceIcon from '@/components/NTHS/HQ/ResourceIcon.vue'
 import { getNTHSResources } from '@/services/NetworkService'
-import {
-  isAppPath,
-  NTHS_RESOURCES_URL,
-  type NTHSResourcesResponse,
-} from '@/services/NTHSGroupService'
+import { isAppPath, NTHS_RESOURCES_URL } from '@/services/NTHSGroupService'
+import type { NTHSResources } from '@upchieve/api-contracts/nths-groups'
 import { useStore } from 'vuex'
 import ChevronDownIcon from '@/assets/chevron-down.svg'
 import ArrowUpRightIcon from '@/assets/icons/resources/arrow-up-right.svg'
 
 const { groupId } = useChapterContext()
 
-const resources = ref<NTHSResourcesResponse>()
+const resources = ref<NTHSResources>()
 const loaded = ref(false)
 const groups = computed(() => resources.value?.groups ?? [])
 

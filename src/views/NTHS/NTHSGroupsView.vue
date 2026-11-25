@@ -9,7 +9,7 @@ import ChapterHeader from '@/components/NTHS/HQ/ChapterHeader.vue'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
 import LoggerService from '@/services/LoggerService'
 import { useChapterContext } from '@/composables/useChapterContext'
-import { useChapterImpact } from '@/composables/useChapterImpact'
+import { provideChapterImpact } from '@/composables/useChapterImpact'
 import { renewalWarningLine } from '@/services/NTHSRenewalService'
 import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
 import { useNthsStore } from '@/stores/nths'
@@ -102,12 +102,12 @@ async function refreshNTHSData(): Promise<void> {
   }
 }
 
-const { impact, refresh: refreshImpact } = useChapterImpact()
+const { impact, load: loadImpact } = provideChapterImpact()
 
 function loadHeaderImpact() {
   const groupId = group.value?.groupInfo?.id
   if (!groupId || hidePageContentReason.value) return
-  void refreshImpact(groupId)
+  void loadImpact(groupId)
 }
 watch(
   [() => group.value?.groupInfo?.id, hidePageContentReason],

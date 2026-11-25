@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ArrowIcon from '@/assets/arrow.svg'
 import NTHSLink from '@/components/NTHS/HQ/NTHSLink.vue'
-import type { NTHSHomeLink } from '@/services/NTHSGroupService'
+import type { NTHSHomeLink } from '@upchieve/api-contracts/nths-groups'
 
 defineProps<{ links: NTHSHomeLink[] }>()
 </script>

@@ -4,6 +4,10 @@ import {
   MEMBER_SORT_KEYS,
   type MemberSort,
 } from '@/services/NTHSMembersTableService'
+import {
+  getNTHSRosterView,
+  setNTHSRosterView,
+} from '@/services/BrowserStorageService'
 import { ROSTER_PERIODS, type RosterPeriod } from '@/services/NTHSRosterService'
 
 const DEFAULT_ROSTER_PERIOD: RosterPeriod = 'thisWeek'
@@ -17,10 +21,6 @@ const DEFAULT_VIEW: RosterView = {
   sort: DEFAULT_MEMBER_SORT,
 }
 
-function storageKey(userId: string): string {
-  return `${userId}-nths-roster-view`
-}
-
 function isSortDirection(value: unknown): value is MemberSort['direction'] {
   return value === 'asc' || value === 'desc'
 }
@@ -28,15 +28,13 @@ function isSortDirection(value: unknown): value is MemberSort['direction'] {
 // A malformed period and a malformed sort are independent mistakes, so one
 // falls back to its default without taking the other down with it.
 function readView(userId: string): RosterView {
-  let stored: {
-    period?: unknown
-    sort?: { key?: unknown; direction?: unknown }
-  } | null
-  try {
-    stored = JSON.parse(localStorage.getItem(storageKey(userId)) ?? 'null')
-  } catch {
-    return DEFAULT_VIEW
-  }
+  const stored = getNTHSRosterView(userId) as
+    | {
+        period?: unknown
+        sort?: { key?: unknown; direction?: unknown }
+      }
+    | null
+    | undefined
 
   const period =
     ROSTER_PERIODS.find((p) => p === stored?.period) ?? DEFAULT_VIEW.period
@@ -54,14 +52,7 @@ export function useRosterPreferences(userId: string) {
   const period = ref(initial.period)
   const sort = ref(initial.sort)
   watch([period, sort], ([newPeriod, newSort]) => {
-    try {
-      localStorage.setItem(
-        storageKey(userId),
-        JSON.stringify({ period: newPeriod, sort: newSort })
-      )
-    } catch {
-      // Storage can be missing, full or blocked; the choice still applies for this visit.
-    }
+    setNTHSRosterView(userId, { period: newPeriod, sort: newSort })
   })
   return { period, sort }
 }

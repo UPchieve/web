@@ -10,13 +10,11 @@ import TipCard from '@/components/NTHS/HQ/TipCard.vue'
 import TopMembersBoard from '@/components/NTHS/HQ/TopMembersBoard.vue'
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
 import { useChapterContext } from '@/composables/useChapterContext'
-import { useChapterImpact } from '@/composables/useChapterImpact'
+import { injectChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import { getNTHSHomeContent } from '@/services/NetworkService'
-import {
-  tipForDay,
-  type NTHSHomeContentResponse,
-} from '@/services/NTHSGroupService'
+import { tipForDay } from '@/services/NTHSGroupService'
+import type { NTHSHomeContent } from '@upchieve/api-contracts/nths-groups'
 import { useNthsStore } from '@/stores/nths'
 
 const nths = useNthsStore()
@@ -29,7 +27,7 @@ const {
 } = useChapterContext()
 const isGroupAdmin = computed(() => nths.hasAdminRole)
 
-const { impact, isLoading, loadFailed, load } = useChapterImpact()
+const { impact, loadFailed } = injectChapterImpact()
 const {
   members,
   currentMembers,
@@ -41,7 +39,7 @@ const {
 
 const now = new Date()
 
-const homeContent = ref<NTHSHomeContentResponse>()
+const homeContent = ref<NTHSHomeContent>()
 const tip = computed(() =>
   homeContent.value ? tipForDay(homeContent.value.tips, now) : undefined
 )
@@ -66,7 +64,6 @@ const membersTableProps = computed(() => ({
 onBeforeMount(async () => {
   if (groupId.value) {
     await Promise.all([
-      load(groupId.value),
       loadRoster(groupId.value, now),
       loadHomeContent(groupId.value),
     ])
@@ -85,7 +82,7 @@ onBeforeMount(async () => {
         </span>
       </template>
     </Callout>
-    <ImpactCard v-else :impact="isLoading ? undefined : impact" />
+    <ImpactCard v-else :impact="impact" />
 
     <div v-if="isGroupAdmin" class="admin-grid" :class="{ single: loadFailed }">
       <div class="main-column">
@@ -105,7 +102,7 @@ onBeforeMount(async () => {
           :isLoading="isRosterLoading"
           :loadFailed="rosterLoadFailed"
         />
-        <GoodStandingCard :impact="isLoading ? undefined : impact" />
+        <GoodStandingCard :impact="impact" />
         <TipCard v-if="tip" :tip="tip" />
         <ResourceLinksCard v-if="resourceLinks.length" :links="resourceLinks" />
       </div>
@@ -115,7 +112,7 @@ onBeforeMount(async () => {
         <ContributionCard
           :members="currentMembers"
           :currentUserId="currentUserId"
-          :impact="isLoading ? undefined : impact"
+          :impact="impact"
           :isLoading="isRosterLoading"
           :loadFailed="rosterLoadFailed"
         />

@@ -1,5 +1,5 @@
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
-import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import { impact } from '../../../fixtures/nths'
 import vuetify from '@/plugins/vuetify'
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils'

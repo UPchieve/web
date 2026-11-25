@@ -3,14 +3,14 @@
 // bottom sheet, too heavy for a short row action menu that
 // needs to stay anchored next to its trigger inside a scrolling table.
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import {
   ROSTER_MEMBER_ACTION_LABELS,
   type RosterMemberAction,
 } from '@/services/NTHSRosterService'
 
 const props = defineProps<{
-  member: NTHSRosterMemberPublic
+  member: NTHSChapterRosterMemberPublic
   actions: RosterMemberAction[]
   open: boolean
   busy?: boolean

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import {
   daysSince,
   downloadRosterCsv,
@@ -35,7 +35,7 @@ function quickPick(period: RosterPeriod, now = CSV_NOW): RosterRange {
 }
 
 function csvRows(
-  rows: NTHSRosterMemberPublic[],
+  rows: NTHSChapterRosterMemberPublic[],
   range: RosterRange | undefined,
   roster = rows
 ): Record<string, string | number>[] {

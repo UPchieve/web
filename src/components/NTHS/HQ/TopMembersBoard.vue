@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import trophyUrl from '@/assets/nths/top-members-trophy.svg?url'
-import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterRosterMemberPublic } from '@upchieve/api-contracts/nths-groups'
 import { topMembersBoard } from '@/services/NTHSTopMembersService'
 
 const props = defineProps<{
-  members: NTHSRosterMemberPublic[]
+  members: NTHSChapterRosterMemberPublic[]
   currentUserId: string
   isLoading?: boolean
   loadFailed?: boolean

@@ -5,7 +5,7 @@ import UserPlusIcon from '@/assets/user-plus.svg'
 import LargeButton from '@/components/LargeButton.vue'
 import StandingChip from '@/components/NTHS/HQ/StandingChip.vue'
 import { useInviteLink } from '@/composables/useInviteLink'
-import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import type { NTHSChapterImpactPublic } from '@upchieve/api-contracts/nths-groups'
 import { NTHS_ROUTES } from '@/views/NTHS/nths-route-helpers'
 
 const props = defineProps<{

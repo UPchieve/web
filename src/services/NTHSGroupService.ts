@@ -1,5 +1,3 @@
-import type { DateString, Uuid } from '@/types/shared'
-
 export type Role = 'admin' | 'member'
 
 // Mirrors server/constants/nths-titles.ts in subway; 'Member' means no title.
@@ -31,54 +29,6 @@ export type GroupMember = {
 
 export const NTHS_APPLY_URL = 'https://nationaltutor.org/apply'
 
-// NTHS Chapter HQ payloads, mirroring server/public/nths.ts.
-export type NTHSSchoolYearPublic = {
-  label: string
-  startsAt: DateString
-  endsAt: DateString
-}
-export type NTHSImpactTotalsPublic = {
-  studentsHelped: number
-  sessionsCompleted: number
-  hoursTutored: number
-}
-export type NTHSChapterImpactPublic = {
-  groupId: Uuid
-  schoolYear: NTHSSchoolYearPublic
-  schoolYearToDate: NTHSImpactTotalsPublic & { membersTutoring: number }
-  allTime: NTHSImpactTotalsPublic
-  goals: { hoursTutored: number; membersTutoring: number }
-  official: boolean
-}
-export type NTHSChapterImpactResponse = {
-  impact: NTHSChapterImpactPublic
-}
-
-export type NTHSHomeLink = {
-  title: string
-  body: string
-  link: string
-  forMembers: boolean
-}
-export type NTHSHomeContentResponse = {
-  tips: string[]
-  links: NTHSHomeLink[]
-}
-
-export type NTHSResourceCard = {
-  title: string
-  body: string
-  link: string
-  icon: string
-}
-export type NTHSResourceGroup = {
-  title: string
-  subtitle: string
-  icon: string
-  cards: NTHSResourceCard[]
-}
-export type NTHSResourcesResponse = { groups: NTHSResourceGroup[] }
-
 const MS_PER_DAY = 86_400_000
 
 export function tipForDay(tips: string[], date: Date): string | undefined {
@@ -94,40 +44,6 @@ export function isAppPath(link: string) {
     link.startsWith('/') && !link.startsWith('//') && !/[\\\t\n\r]/.test(link)
   )
 }
-
-export type NTHSRosterMemberPublic = {
-  userId: Uuid
-  firstName: string
-  lastInitial: string
-  roleName: Role
-  title: NTHSTitle
-  joinedAt: DateString
-  trainingComplete: boolean
-  safetyApproved: boolean
-  accountClosed: boolean
-  sessionsThisYear: number
-  hoursThisYear: number
-  periodHours: {
-    thisWeek: number
-    lastTwoWeeks: number
-    thisMonth: number
-    thisSchoolYear: number
-    allTime: number
-  }
-  periodSessions: NTHSRosterMemberPublic['periodHours']
-  // Zero unless an admin's request names a range.
-  rangeHours: number
-  rangeSessions: number
-  subjects: string[]
-  studentsHelpedThisYear: number
-  lastActiveAt?: DateString
-}
-export type NTHSChapterRosterPublic = {
-  groupId: Uuid
-  schoolYear: NTHSSchoolYearPublic
-  members: NTHSRosterMemberPublic[]
-}
-export type NTHSChapterRosterResponse = { roster: NTHSChapterRosterPublic }
 
 export const NTHS_RESOURCES_URL = 'https://nationaltutor.org/resources'
 export const NTHS_RECRUITMENT_TEMPLATES_URL =

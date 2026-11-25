@@ -1,4 +1,4 @@
-import type { NTHSResourcesResponse } from '@/services/NTHSGroupService'
+import type { NTHSResources } from '@upchieve/api-contracts/nths-groups'
 import { useNthsStore } from '@/stores/nths'
 import NTHSResourcesView from '@/views/NTHS/Tabs/NTHSResourcesView.vue'
 import {
@@ -16,7 +16,7 @@ vi.mock('@/services/NetworkService', async (importOriginal) => ({
   getNTHSResources: (groupId: string) => getNTHSResources(groupId),
 }))
 
-const RESPONSE: NTHSResourcesResponse = {
+const RESPONSE: NTHSResources = {
   groups: [
     {
       title: 'Recruit',
