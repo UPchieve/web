@@ -132,7 +132,8 @@ function selectNext(step: number) {
           <div class="gtop">
             <span>0</span>
             <span class="next"
-              >Goal: {{ goal }} {{ plural(goal, 'hour') }}</span
+              >Goal: <span class="goal-hours">{{ goal }}</span>
+              {{ plural(goal, 'hour') }}</span
             >
           </div>
           <div class="track">
@@ -458,24 +459,32 @@ p {
 
 .is-loading {
   .big,
-  .lbl,
-  .sub,
   .sub strong,
-  .gtop span,
-  .sentence,
+  .goal-hours,
   .tile,
   .stat b,
-  .stat span {
-    color: transparent;
+  .ruler {
+    @include nths-skeleton;
   }
-  .big,
-  .lbl,
-  .sub,
-  .gtop span,
-  .stat b,
-  .stat span {
-    background: $c-border-grey;
-    border-radius: 4px;
+  .big {
+    width: fit-content;
+    min-width: 2.5ch;
+  }
+  .stat b {
+    width: fit-content;
+    min-width: 2ch;
+  }
+  .sub strong,
+  .goal-hours {
+    display: inline-block;
+    min-width: 2ch;
+  }
+  .tile,
+  .ruler {
+    border-color: transparent;
+  }
+  .here {
+    visibility: hidden;
   }
 }
 </style>

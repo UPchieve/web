@@ -12,6 +12,23 @@ $c-nths-cream: #fff7df;
 $c-nths-gold: #fdc216;
 $c-nths-warm-fg: #8a3d14;
 
+@mixin nths-skeleton {
+  color: transparent;
+  background: rgba(23, 29, 60, 0.1);
+  border-radius: 4px;
+  animation: nths-skeleton-pulse 1.2s ease-in-out infinite alternate;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  @keyframes nths-skeleton-pulse {
+    to {
+      opacity: 0.4;
+    }
+  }
+}
+
 @mixin nths-card($padding: 24px 26px) {
   background: $upchieve-white;
   border: 1px solid $c-border-grey;

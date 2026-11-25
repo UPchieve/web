@@ -144,9 +144,7 @@ const canHover = window.matchMedia('(hover: hover)').matches
 .is-loading {
   :deep(.meter-label),
   :deep(.meter-value) {
-    color: transparent;
-    background: $c-border-grey;
-    border-radius: 4px;
+    @include nths-skeleton;
   }
 }
 </style>

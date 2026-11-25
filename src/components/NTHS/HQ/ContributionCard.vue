@@ -197,9 +197,7 @@ const valueText = computed(
 .is-loading {
   .figure,
   .legend {
-    color: transparent;
-    background: $c-border-grey;
-    border-radius: 4px;
+    @include nths-skeleton;
     width: fit-content;
   }
   .swatch {
