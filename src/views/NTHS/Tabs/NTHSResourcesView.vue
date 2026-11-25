@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { useChapterContext } from '@/composables/useChapterContext'
+import NTHSLink from '@/components/NTHS/HQ/NTHSLink.vue'
 import ResourceIcon from '@/components/NTHS/HQ/ResourceIcon.vue'
 import { getNTHSResources } from '@/services/NetworkService'
 import {
@@ -8,13 +9,11 @@ import {
   NTHS_RESOURCES_URL,
   type NTHSResourcesResponse,
 } from '@/services/NTHSGroupService'
-import { useNthsStore } from '@/stores/nths'
 import { useStore } from 'vuex'
 import ChevronDownIcon from '@/assets/chevron-down.svg'
 import ArrowUpRightIcon from '@/assets/icons/resources/arrow-up-right.svg'
 
-const nths = useNthsStore()
-const groupId = computed(() => nths.NTHSGroups?.[0]?.groupInfo?.id)
+const { groupId } = useChapterContext()
 
 const resources = ref<NTHSResourcesResponse>()
 const loaded = ref(false)
@@ -98,19 +97,10 @@ onBeforeMount(async () => {
           class="tiles"
         >
           <li v-for="(card, cardIndex) in group.cards" :key="cardIndex">
-            <component
-              :is="isAppPath(card.link) ? RouterLink : 'a'"
+            <NTHSLink
+              :href="card.link"
               class="tile"
               data-testid="resource-tile"
-              v-bind="
-                isAppPath(card.link)
-                  ? { to: card.link }
-                  : {
-                      href: card.link,
-                      target: '_blank',
-                      rel: 'noopener noreferrer',
-                    }
-              "
               v-ph:nthshq="'resources.link'"
             >
               <ResourceIcon :name="card.icon" class="tile-icon" />
@@ -122,7 +112,7 @@ onBeforeMount(async () => {
               <span v-if="!isAppPath(card.link)" class="visually-hidden"
                 >(opens in a new tab)</span
               >
-            </component>
+            </NTHSLink>
           </li>
         </ul>
       </li>
@@ -147,9 +137,6 @@ onBeforeMount(async () => {
 <style scoped lang="scss">
 .resources {
   @include nths-tab-column(1060px);
-}
-.visually-hidden {
-  @include visually-hidden;
 }
 .groups {
   list-style: none;

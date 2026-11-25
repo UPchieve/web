@@ -47,7 +47,9 @@ function place() {
 }
 
 function onDocumentClick(event: MouseEvent) {
-  if (!root.value?.contains(event.target as Node)) emit('close')
+  if (!root.value?.contains(event.target as Node)) {
+    emit('close')
+  }
 }
 
 function menuItems(): HTMLButtonElement[] {
@@ -130,7 +132,9 @@ watch(
 onBeforeUnmount(() => listen(false))
 
 function onTriggerClick() {
-  if (!props.busy) emit('toggle')
+  if (!props.busy) {
+    emit('toggle')
+  }
 }
 
 function choose(action: RosterMemberAction) {

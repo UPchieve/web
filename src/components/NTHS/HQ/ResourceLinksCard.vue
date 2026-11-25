@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
 import ArrowIcon from '@/assets/arrow.svg'
-import { isAppPath, type NTHSHomeLink } from '@/services/NTHSGroupService'
+import NTHSLink from '@/components/NTHS/HQ/NTHSLink.vue'
+import type { NTHSHomeLink } from '@/services/NTHSGroupService'
 
 defineProps<{ links: NTHSHomeLink[] }>()
 </script>
@@ -11,19 +11,10 @@ defineProps<{ links: NTHSHomeLink[] }>()
     <h2 id="resources-title" class="eyebrow">Resources</h2>
     <ul class="list">
       <li v-for="(item, index) in links" :key="index">
-        <component
-          :is="isAppPath(item.link) ? RouterLink : 'a'"
+        <NTHSLink
+          :href="item.link"
           class="row"
           data-testid="resource-link"
-          v-bind="
-            isAppPath(item.link)
-              ? { to: item.link }
-              : {
-                  href: item.link,
-                  target: '_blank',
-                  rel: 'noopener noreferrer',
-                }
-          "
           v-ph:nthshq="'home.resource_link'"
         >
           <span class="text">
@@ -33,7 +24,7 @@ defineProps<{ links: NTHSHomeLink[] }>()
           <span class="arrow" aria-hidden="true">
             <ArrowIcon class="arrow-icon" />
           </span>
-        </component>
+        </NTHSLink>
       </li>
     </ul>
   </section>
@@ -41,9 +32,7 @@ defineProps<{ links: NTHSHomeLink[] }>()
 
 <style scoped lang="scss">
 .eyebrow {
-  @include nths-section-eyebrow;
-  color: $c-secondary-grey;
-  margin: 0;
+  @include nths-quiet-eyebrow;
 }
 .list {
   list-style: none;

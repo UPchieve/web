@@ -1,6 +1,6 @@
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import { memberDisplayName } from '@/services/NTHSRosterService'
-import { minutesToHoursAndMinutes } from '@/utils/time-utils'
+import { formatHoursMinutes, formatMinutes } from '@/utils/time-utils'
 
 const TOP_BOARD_SIZE = 3
 
@@ -15,17 +15,6 @@ export type TopMemberRow = {
 export type TopMembersBoard = {
   rows: TopMemberRow[]
   viewerRow?: TopMemberRow
-}
-
-export function formatMinutes(totalMinutes: number): string {
-  return minutesToHoursAndMinutes(
-    totalMinutes,
-    ({ hours, minutes }) => `${hours}h ${minutes}m`
-  ) as string
-}
-
-export function formatHoursMinutes(hours: number): string {
-  return formatMinutes(Math.round(hours * 60))
 }
 
 export function findOpenViewer(

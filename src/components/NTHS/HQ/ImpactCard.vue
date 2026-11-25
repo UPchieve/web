@@ -225,9 +225,6 @@ function selectNext(step: number) {
 <style scoped lang="scss">
 $c-ruler-fill: #76e5fd;
 
-.visually-hidden {
-  @include visually-hidden;
-}
 p {
   margin: 0;
 }

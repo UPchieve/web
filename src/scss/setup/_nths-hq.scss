@@ -10,9 +10,6 @@ $c-nths-sky: #f1f8fe;
 $c-nths-track: #eef1f5;
 $c-nths-cream: #fff7df;
 $c-nths-gold: #fdc216;
-$c-nths-gold-fg: #5c4e17;
-$c-nths-deep-teal: #0a5f50;
-$c-nths-warm-bg: #fff1ea;
 $c-nths-warm-fg: #8a3d14;
 
 @mixin nths-card($padding: 24px 26px) {
@@ -20,6 +17,11 @@ $c-nths-warm-fg: #8a3d14;
   border: 1px solid $c-border-grey;
   border-radius: 8px;
   padding: $padding;
+}
+
+@mixin nths-section-card {
+  @include nths-card(22px 24px);
+  text-align: left;
 }
 
 @mixin nths-card-eyebrow {
@@ -36,6 +38,12 @@ $c-nths-warm-fg: #8a3d14;
   line-height: 1.2;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+@mixin nths-quiet-eyebrow {
+  @include nths-section-eyebrow;
+  color: $c-secondary-grey;
+  margin: 0;
 }
 
 @mixin nths-card-title {
@@ -93,9 +101,7 @@ $c-nths-warm-fg: #8a3d14;
 
 @mixin nths-answer-copy {
   .eyebrow {
-    @include nths-section-eyebrow;
-    color: $c-secondary-grey;
-    margin: 0;
+    @include nths-quiet-eyebrow;
   }
   .title {
     font-size: 20px;

@@ -9,7 +9,6 @@ import SchoolForm from './SchoolAffiliation/Form.vue'
 import { useMachine } from '@xstate/vue'
 import LargeButton from '@/components/LargeButton.vue'
 import Spinner from '@/components/Spinner.vue'
-import HQSection from './HQ/HQSection.vue'
 import { computed, useId } from 'vue'
 
 const props = defineProps<{
@@ -148,10 +147,10 @@ const paths = computed<ChapterPath[]>(() => [
     </p>
 
     <div class="paths" v-if="showCards">
-      <HQSection
+      <section
         v-for="path in paths"
         :key="path.testid"
-        class="path"
+        class="card path"
         role="group"
         :aria-labelledby="
           path.isCurrent ? `${path.titleId} ${path.badgeId}` : path.titleId
@@ -206,10 +205,10 @@ const paths = computed<ChapterPath[]>(() => [
             {{ path.button.label }}
           </LargeButton>
         </div>
-      </HQSection>
+      </section>
     </div>
 
-    <HQSection v-if="isAddingAdvisorInfo" class="advisor">
+    <section v-if="isAddingAdvisorInfo" class="card advisor">
       <div>
         <h3 class="header">Chapter Advisor</h3>
         <p class="card-text" v-if="hasSchoolOnRecord">
@@ -233,7 +232,7 @@ const paths = computed<ChapterPath[]>(() => [
         :submitting="snapshot.matches('SubmittingAdvisorInfo')"
         :schoolAlreadyKnown="hasSchoolOnRecord"
       />
-    </HQSection>
+    </section>
   </div>
 </template>
 
@@ -242,6 +241,9 @@ const paths = computed<ChapterPath[]>(() => [
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+.card {
+  @include nths-section-card;
 }
 .form {
   max-width: 480px;

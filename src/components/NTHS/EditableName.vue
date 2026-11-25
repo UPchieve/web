@@ -3,7 +3,8 @@ import LargeButton from '@/components/LargeButton.vue'
 import LoggerService from '@/services/LoggerService'
 import NetworkService from '@/services/NetworkService'
 import { isErrorWithResponse } from '@/utils/error-utils'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { refAutoReset } from '@vueuse/core'
 import { useNthsStore } from '@/stores/nths'
 
 const UPDATED_MESSAGE_MS = 2500
@@ -19,8 +20,7 @@ const props = defineProps<{
 const name = ref(props.groupName)
 const errorMessage = ref('')
 const saving = ref(false)
-const updated = ref(false)
-let updatedTimer: ReturnType<typeof setTimeout> | undefined
+const updated = refAutoReset(false, UPDATED_MESSAGE_MS)
 
 const showLength = computed(() => name.value.length >= COUNTER_FROM_LENGTH)
 const describedBy = computed(
@@ -45,8 +45,6 @@ watch(
   }
 )
 
-onBeforeUnmount(() => clearTimeout(updatedTimer))
-
 function onInput() {
   errorMessage.value = ''
   updated.value = false
@@ -67,8 +65,6 @@ async function save() {
       groupName: result.data.group.name,
     })
     updated.value = true
-    clearTimeout(updatedTimer)
-    updatedTimer = setTimeout(() => (updated.value = false), UPDATED_MESSAGE_MS)
   } catch (e) {
     if (
       isErrorWithResponse(e) &&
@@ -196,8 +192,5 @@ async function save() {
   font-size: 14px;
   line-height: 20px;
   color: $c-secondary-grey;
-}
-.visually-hidden {
-  @include visually-hidden;
 }
 </style>

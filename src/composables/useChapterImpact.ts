@@ -29,7 +29,9 @@ export function useChapterImpact() {
     const refreshId = ++latestRefreshId
     try {
       const response = await NetworkService.getNTHSChapterImpact(groupId)
-      if (refreshId === latestRefreshId) impact.value = response.data.impact
+      if (refreshId === latestRefreshId) {
+        impact.value = response.data.impact
+      }
     } catch (err) {
       LoggerService.noticeError(
         err,

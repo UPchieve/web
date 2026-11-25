@@ -5,20 +5,6 @@ import vuetify from '@/plugins/vuetify'
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const IMPACT: NTHSChapterImpactPublic = {
-  groupId: 'group-123',
-  schoolYear: { label: '2026–27', startsAt: '', endsAt: '' },
-  schoolYearToDate: {
-    studentsHelped: 2,
-    sessionsCompleted: 4,
-    hoursTutored: 3,
-    membersTutoring: 2,
-  },
-  allTime: { studentsHelped: 2, sessionsCompleted: 6, hoursTutored: 4.5 },
-  goals: { hoursTutored: 40, membersTutoring: 3 },
-  official: false,
-}
-
 describe('GoodStandingCard', () => {
   let mounted: VueWrapper | undefined
 
@@ -52,7 +38,7 @@ describe('GoodStandingCard', () => {
   })
 
   it('exposes the real numbers once loaded, with nothing hidden', () => {
-    const wrapper = card(IMPACT)
+    const wrapper = card(impact())
 
     expect(
       wrapper
@@ -101,7 +87,7 @@ describe('GoodStandingCard', () => {
           ? ({ matches: canHover } as MediaQueryList)
           : matchMedia(query)
       )
-      const wrapper = card(IMPACT)
+      const wrapper = card(impact())
       const button = wrapper.find('[data-testid="goals-info-button"]')
       const tooltip = wrapper.find('[data-testid="goals-tooltip"]')
 

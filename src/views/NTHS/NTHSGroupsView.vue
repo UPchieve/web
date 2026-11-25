@@ -4,12 +4,11 @@ import { useStore } from 'vuex'
 import { RouterView, useRouter } from 'vue-router'
 import { useDocumentVisibility } from '@vueuse/core'
 import LargeButton from '@/components/LargeButton.vue'
-import ModalService from '@/services/ModalService'
-import type { GroupMember } from '@/services/NTHSGroupService'
 import Callout from '@/components/Callout.vue'
 import ChapterHeader from '@/components/NTHS/HQ/ChapterHeader.vue'
 import RenewalBanner from '@/components/NTHS/Renewal/RenewalBanner.vue'
 import LoggerService from '@/services/LoggerService'
+import { useChapterContext } from '@/composables/useChapterContext'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { renewalWarningLine } from '@/services/NTHSRenewalService'
 import { resolveNthsRoute } from '@/views/NTHS/nths-route-helpers'
@@ -18,7 +17,11 @@ import { useNthsStore } from '@/stores/nths'
 const store = useStore()
 const nths = useNthsStore()
 const router = useRouter()
-const group = computed(() => nths.NTHSGroups?.[0])
+const {
+  group,
+  referralCode,
+  leaveChapter: onLeaveChapter,
+} = useChapterContext()
 const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const hidePageContentReason = computed(function ():
@@ -71,19 +74,6 @@ const profileAction = computed(() =>
 
 function goToDashboard() {
   router.push('/dashboard')
-}
-
-// The members list is refused to gated members, so the self member comes from the store.
-function onLeaveChapter() {
-  const nthsGroupId = group.value?.groupInfo?.id
-  if (!nthsGroupId) return
-  ModalService.showLeaveTeamModal({
-    isRemovingSelf: true,
-    memberToRemove: {
-      userId: store.state.user.user.id,
-      nthsGroupId,
-    } as GroupMember,
-  })
 }
 
 let isUnmounted = false
@@ -154,7 +144,7 @@ watch(useDocumentVisibility(), (visibility) => {
       :gated="!!hidePageContentReason"
       :impact="impact"
       :inviteCode="group?.groupInfo?.inviteCode"
-      :referralCode="store.state.user.user.referralCode"
+      :referralCode="referralCode"
     />
 
     <div class="content">

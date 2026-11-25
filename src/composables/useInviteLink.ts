@@ -1,5 +1,5 @@
-import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
-import { useClipboard } from '@vueuse/core'
+import { computed, toValue, type MaybeRefOrGetter } from 'vue'
+import { refAutoReset, useClipboard } from '@vueuse/core'
 import config from '@/config'
 import { EVENTS } from '@/consts'
 import AnalyticsService from '@/services/AnalyticsService'
@@ -12,7 +12,7 @@ export function useInviteLink(
     const query = new URLSearchParams({ referral: toValue(referralCode) })
     return `${config.appRoot}/join-team/${toValue(code)}?${query.toString()}`
   })
-  const justCopied = ref(false)
+  const justCopied = refAutoReset(false, 1000)
 
   function copyLink() {
     justCopied.value = true
@@ -24,10 +24,6 @@ export function useInviteLink(
     AnalyticsService.captureEvent(EVENTS.VOLUNTEER_COPIED_TEAM_LINK, {
       inviteCode: toValue(code),
     })
-
-    setTimeout(() => {
-      justCopied.value = false
-    }, 1000)
   }
 
   return { link, justCopied, copyLink }

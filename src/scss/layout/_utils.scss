@@ -1,6 +1,10 @@
 @import '../setup/helpers';
 @import '../setup/breakpoints';
 
+.visually-hidden {
+  @include visually-hidden;
+}
+
 .uc-column {
   @include flex-container(column);
   align-self: stretch;

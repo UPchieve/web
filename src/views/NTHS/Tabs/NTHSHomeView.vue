@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
-import { useStore } from 'vuex'
 import Callout from '@/components/Callout.vue'
 import ContributionCard from '@/components/NTHS/HQ/ContributionCard.vue'
 import GoodStandingCard from '@/components/NTHS/HQ/GoodStandingCard.vue'
@@ -10,6 +9,7 @@ import RightNowCard from '@/components/NTHS/HQ/RightNowCard.vue'
 import TipCard from '@/components/NTHS/HQ/TipCard.vue'
 import TopMembersBoard from '@/components/NTHS/HQ/TopMembersBoard.vue'
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
+import { useChapterContext } from '@/composables/useChapterContext'
 import { useChapterImpact } from '@/composables/useChapterImpact'
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import { getNTHSHomeContent } from '@/services/NetworkService'
@@ -19,15 +19,14 @@ import {
 } from '@/services/NTHSGroupService'
 import { useNthsStore } from '@/stores/nths'
 
-const store = useStore()
 const nths = useNthsStore()
 
-const group = computed(() => nths.NTHSGroups?.[0])
-const groupId = computed(() => group.value?.groupInfo?.id)
-const currentUserId = computed(() => store.state.user.user.id)
-const currentUserReferralCode = computed(
-  () => store.state.user.user.referralCode
-)
+const {
+  group,
+  groupId,
+  currentUserId,
+  referralCode: currentUserReferralCode,
+} = useChapterContext()
 const isGroupAdmin = computed(() => nths.hasAdminRole)
 
 const { impact, isLoading, loadFailed, load } = useChapterImpact()
@@ -137,9 +136,6 @@ onBeforeMount(async () => {
 .home {
   @include nths-tab-column(1020px);
   gap: 26px;
-}
-.visually-hidden {
-  @include visually-hidden;
 }
 .impact-row {
   display: grid;

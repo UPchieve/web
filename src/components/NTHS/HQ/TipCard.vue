@@ -11,9 +11,7 @@ defineProps<{ tip: string }>()
 
 <style scoped lang="scss">
 .eyebrow {
-  @include nths-section-eyebrow;
-  color: $c-secondary-grey;
-  margin: 0;
+  @include nths-quiet-eyebrow;
 }
 .line {
   font-family: Georgia, 'Times New Roman', serif;

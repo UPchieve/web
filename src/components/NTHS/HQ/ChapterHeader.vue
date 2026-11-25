@@ -6,6 +6,7 @@ import LargeButton from '@/components/LargeButton.vue'
 import StandingChip from '@/components/NTHS/HQ/StandingChip.vue'
 import { useInviteLink } from '@/composables/useInviteLink'
 import type { NTHSChapterImpactPublic } from '@/services/NTHSGroupService'
+import { NTHS_ROUTES } from '@/views/NTHS/nths-route-helpers'
 
 const props = defineProps<{
   name?: string
@@ -20,11 +21,11 @@ const router = useRouter()
 
 const tabs = computed(() =>
   [
-    { to: '/groups/home', name: 'home', label: 'Headquarters' },
-    { to: '/groups/to-do', name: 'to_do', label: 'To Do', adminOnly: true },
-    { to: '/groups/resources', name: 'resources', label: 'Resources' },
+    { to: NTHS_ROUTES.home, name: 'home', label: 'Headquarters' },
+    { to: NTHS_ROUTES.toDo, name: 'to_do', label: 'To Do', adminOnly: true },
+    { to: NTHS_ROUTES.resources, name: 'resources', label: 'Resources' },
     {
-      to: '/groups/manage',
+      to: NTHS_ROUTES.manage,
       name: 'manage',
       label: 'Manage',
       adminOnly: true,

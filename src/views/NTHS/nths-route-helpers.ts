@@ -12,12 +12,24 @@ export type NTHSDestination =
   | 'apply'
   | 'expired'
 
-export const NTHS_DESTINATION_PATHS: Record<NTHSDestination, string> = {
+export const NTHS_ROUTES = {
   group: '/groups',
   create: '/groups/create',
   pending: '/groups/application-pending',
   apply: '/groups/apply',
   expired: '/groups/application-expired',
+  home: '/groups/home',
+  toDo: '/groups/to-do',
+  resources: '/groups/resources',
+  manage: '/groups/manage',
+} as const
+
+export const NTHS_DESTINATION_PATHS: Record<NTHSDestination, string> = {
+  group: NTHS_ROUTES.group,
+  create: NTHS_ROUTES.create,
+  pending: NTHS_ROUTES.pending,
+  apply: NTHS_ROUTES.apply,
+  expired: NTHS_ROUTES.expired,
 }
 
 // Lives here rather than in SidebarLinks so the Record keeps a new destination

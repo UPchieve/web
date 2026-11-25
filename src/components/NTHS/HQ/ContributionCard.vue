@@ -8,9 +8,9 @@ import type {
 import {
   contributionBar,
   findOpenViewer,
-  formatHoursMinutes,
 } from '@/services/NTHSTopMembersService'
 import { plural } from '@/utils/plural'
+import { formatHoursMinutes } from '@/utils/time-utils'
 
 const props = defineProps<{
   members: NTHSRosterMemberPublic[]

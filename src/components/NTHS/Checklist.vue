@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
 import { useNthsStore } from '@/stores/nths'
 import Spinner from '@/components/Spinner.vue'
-import HQSection from './HQ/HQSection.vue'
+import NTHSLink from './HQ/NTHSLink.vue'
 import RequirementMeter from './HQ/RequirementMeter.vue'
 import {
   checkableCount,
@@ -13,7 +12,6 @@ import {
   startOpenSectionId,
 } from '@/services/NTHSChecklistService'
 import LoggerService from '@/services/LoggerService'
-import { isAppPath } from '@/services/NTHSGroupService'
 import type {
   NTHSChecklistItemPublic,
   NTHSChecklistItemStatus,
@@ -39,8 +37,11 @@ const collapsedSections = ref(
 
 function toggleSection(sectionId: number) {
   const collapsed = new Set(collapsedSections.value)
-  if (collapsed.has(sectionId)) collapsed.delete(sectionId)
-  else collapsed.add(sectionId)
+  if (collapsed.has(sectionId)) {
+    collapsed.delete(sectionId)
+  } else {
+    collapsed.add(sectionId)
+  }
   collapsedSections.value = collapsed
 }
 
@@ -78,7 +79,11 @@ const toggleSkipped = (item: NTHSChecklistItemPublic) =>
 
 <template>
   <div class="sections">
-    <HQSection v-for="section in checklist.sections" :key="section.id">
+    <section
+      v-for="section in checklist.sections"
+      :key="section.id"
+      class="card"
+    >
       <div class="head" :class="{ 'no-meter': !checkableCount(section.items) }">
         <div class="head-text">
           <p class="eyebrow">
@@ -173,22 +178,13 @@ const toggleSkipped = (item: NTHSChecklistItemPublic) =>
                 v-for="resource in item.resources"
                 :key="`${item.key}-${resource.label}`"
               >
-                <RouterLink
-                  v-if="resource.url && isAppPath(resource.url)"
-                  :to="resource.url"
-                  :data-testid="`checklist-resource-${item.key}`"
-                >
-                  {{ resource.label }} <span aria-hidden="true">→</span>
-                </RouterLink>
-                <a
-                  v-else-if="resource.url"
+                <NTHSLink
+                  v-if="resource.url"
                   :href="resource.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   :data-testid="`checklist-resource-${item.key}`"
                 >
                   {{ resource.label }} <span aria-hidden="true">→</span>
-                </a>
+                </NTHSLink>
                 <span v-else>{{ resource.label }}</span>
               </template>
             </div>
@@ -210,7 +206,7 @@ const toggleSkipped = (item: NTHSChecklistItemPublic) =>
           </div>
         </div>
       </div>
-    </HQSection>
+    </section>
   </div>
 </template>
 
@@ -219,6 +215,9 @@ const toggleSkipped = (item: NTHSChecklistItemPublic) =>
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+.card {
+  @include nths-section-card;
 }
 .head {
   display: grid;

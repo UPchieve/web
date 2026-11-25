@@ -2,7 +2,7 @@ import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import { daysSince, memberDisplayName } from '@/services/NTHSRosterService'
 
 // Home's table counts this week for its status and the school year for its
-// hours; the Members tab counts the range its picker selects for both.
+// hours; the Manage tab counts the range its picker selects for both.
 export type MembersTableScope = 'home' | 'range'
 
 export type MemberStatus =
@@ -70,20 +70,7 @@ export function memberSessions(
     : member.periodSessions.thisSchoolYear
 }
 
-export type MemberSortKey =
-  | 'name'
-  | 'hours'
-  | 'sessions'
-  | 'role'
-  | 'status'
-  | 'screen'
-  | 'training'
-  | 'first'
-  | 'days'
-  | 'students'
-  | 'subjects'
-
-export const MEMBER_SORT_KEYS: MemberSortKey[] = [
+export const MEMBER_SORT_KEYS = [
   'name',
   'hours',
   'sessions',
@@ -95,7 +82,9 @@ export const MEMBER_SORT_KEYS: MemberSortKey[] = [
   'days',
   'students',
   'subjects',
-]
+] as const
+
+export type MemberSortKey = (typeof MEMBER_SORT_KEYS)[number]
 
 export type MemberSort = {
   key: MemberSortKey
@@ -103,6 +92,17 @@ export type MemberSort = {
 }
 
 export const DEFAULT_MEMBER_SORT: MemberSort = { key: 'name', direction: 'asc' }
+
+const DESC_FIRST_SORT_KEYS: MemberSortKey[] = [
+  'hours',
+  'sessions',
+  'students',
+  'subjects',
+]
+
+export function defaultDirection(key: MemberSortKey): MemberSort['direction'] {
+  return DESC_FIRST_SORT_KEYS.includes(key) ? 'desc' : 'asc'
+}
 
 export function nextMemberSort(
   current: MemberSort,

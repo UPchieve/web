@@ -35,6 +35,17 @@ export function minutesToHoursAndMinutes(
   return formatFn ? formatFn({ hours, minutes }) : { hours, minutes }
 }
 
+export function formatMinutes(totalMinutes: number): string {
+  return minutesToHoursAndMinutes(
+    totalMinutes,
+    ({ hours, minutes }) => `${hours}h ${minutes}m`
+  ) as string
+}
+
+export function formatHoursMinutes(hours: number): string {
+  return formatMinutes(Math.round(hours * 60))
+}
+
 const DAYJS_AUGUST_MONTH = 7
 export function getCurrentSchoolYearStartDate(): Dayjs {
   const augustFirst = dayjs().month(DAYJS_AUGUST_MONTH).date(1)

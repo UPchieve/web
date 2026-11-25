@@ -86,7 +86,9 @@ export function useChapterRoster() {
     const refreshId = ++latestRefreshId
     try {
       const response = await fetchRoster(groupId, now, range)
-      if (refreshId === latestRefreshId) applyRoster(response.data.roster)
+      if (refreshId === latestRefreshId) {
+        applyRoster(response.data.roster)
+      }
     } catch (err) {
       LoggerService.noticeError(
         err,

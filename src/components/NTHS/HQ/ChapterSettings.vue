@@ -1,15 +1,12 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
 import LargeButton from '@/components/LargeButton.vue'
 import EditableName from '@/components/NTHS/EditableName.vue'
-import HQSection from '@/components/NTHS/HQ/HQSection.vue'
 import SchoolAffiliation from '@/components/NTHS/SchoolAffiliation.vue'
-import { useNthsStore } from '@/stores/nths'
+import { useChapterContext } from '@/composables/useChapterContext'
 
 const emit = defineEmits<{ (e: 'leave'): void }>()
 
-const nths = useNthsStore()
-const group = computed(() => nths.NTHSGroups?.[0])
+const { group } = useChapterContext()
 </script>
 
 <template>
@@ -17,7 +14,7 @@ const group = computed(() => nths.NTHSGroups?.[0])
     <hr class="divider" />
     <h2 class="section-title">Your chapter</h2>
 
-    <HQSection>
+    <section class="card">
       <h3 class="question">Chapter name</h3>
       <p class="help">The name shown on your chapter page and to members.</p>
       <EditableName
@@ -25,7 +22,7 @@ const group = computed(() => nths.NTHSGroups?.[0])
         :groupName="group.groupInfo?.name"
         :groupId="group.groupInfo.id"
       />
-    </HQSection>
+    </section>
 
     <SchoolAffiliation
       v-if="group.groupId"
@@ -34,7 +31,7 @@ const group = computed(() => nths.NTHSGroups?.[0])
       :hasSchoolOnRecord="!!group.hasSchoolOnRecord"
     />
 
-    <HQSection class="leave">
+    <section class="card leave">
       <div>
         <h3 class="question">Leave chapter</h3>
         <p class="help">
@@ -51,7 +48,7 @@ const group = computed(() => nths.NTHSGroups?.[0])
         @click="emit('leave')"
         >Leave chapter</LargeButton
       >
-    </HQSection>
+    </section>
   </div>
 </template>
 
@@ -77,6 +74,9 @@ const group = computed(() => nths.NTHSGroups?.[0])
 .help {
   @include nths-page-subtitle;
   margin-top: 4px;
+}
+.card {
+  @include nths-section-card;
 }
 .name-editor {
   margin-top: 14px;

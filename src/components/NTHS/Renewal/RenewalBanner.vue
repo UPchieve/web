@@ -6,6 +6,7 @@ import Callout from '@/components/Callout.vue'
 import LargeButton from '@/components/LargeButton.vue'
 import ModalService from '@/services/ModalService'
 import { useRenewalAccept } from '@/composables/useRenewalAccept'
+import { NTHS_ROUTES } from '@/views/NTHS/nths-route-helpers'
 import {
   hasDismissedNTHSRenewalHandoff,
   setDismissedNTHSRenewalHandoff,
@@ -69,7 +70,7 @@ function dismissHandoff() {
 }
 
 function goToManage() {
-  void router.push('/groups/manage')
+  void router.push(NTHS_ROUTES.manage)
 }
 
 type Banner = {
@@ -135,7 +136,7 @@ const HOME_ONLY_PROMPTS: NTHSRenewalPrompt[] = [
 const banner = computed(() => {
   const r = renewal.value
   if (!r) return
-  if (HOME_ONLY_PROMPTS.includes(r.prompt) && route.path !== '/groups/home')
+  if (HOME_ONLY_PROMPTS.includes(r.prompt) && route.path !== NTHS_ROUTES.home)
     return
   return BANNERS[r.prompt]?.(r)
 })

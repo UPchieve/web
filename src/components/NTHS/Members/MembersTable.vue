@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onKeyStroke } from '@vueuse/core'
+import { onKeyStroke, refAutoReset } from '@vueuse/core'
 import { computed, nextTick, ref } from 'vue'
 import CheckIcon from '@/assets/check.svg'
 import CopyIcon from '@/assets/copy-icon.svg'
@@ -15,6 +15,7 @@ import { useInviteLink } from '@/composables/useInviteLink'
 import type { NTHSRosterMemberPublic } from '@/services/NTHSGroupService'
 import {
   DEFAULT_MEMBER_SORT,
+  defaultDirection,
   filterMembers,
   memberFilters,
   memberHours,
@@ -37,11 +38,9 @@ import {
   type RosterMemberAction,
   type RosterRange,
 } from '@/services/NTHSRosterService'
-import {
-  formatHoursMinutes,
-  rankMembers,
-} from '@/services/NTHSTopMembersService'
+import { rankMembers } from '@/services/NTHSTopMembersService'
 import { plural } from '@/utils/plural'
+import { formatHoursMinutes } from '@/utils/time-utils'
 
 const props = defineProps<{
   members: NTHSRosterMemberPublic[]
@@ -54,7 +53,7 @@ const props = defineProps<{
   isReloading?: boolean
   loadFailed?: boolean
   schoolYearLabel: string
-  // Set on the Members tab, whose hours, sessions and status follow it.
+  // Set on the Manage tab, whose hours, sessions and status follow it.
   range?: RosterRange
   busyUserIds?: ReadonlySet<string>
 }>()
@@ -162,38 +161,40 @@ const rows = computed(() =>
   })
 )
 
-const columns = computed<{ key: MemberSortKey; align: string }[]>(() => {
-  if (props.range) {
-    return [
-      { key: 'name', align: 'l' },
-      { key: 'hours', align: 'r' },
-      { key: 'sessions', align: 'r' },
-      { key: 'role', align: 'l' },
-      { key: 'status', align: 'l' },
-      { key: 'screen', align: '' },
-      { key: 'training', align: '' },
-      { key: 'first', align: '' },
-      { key: 'subjects', align: 'l' },
-    ]
+const columns = computed<{ key: MemberSortKey; align: string; col?: string }[]>(
+  () => {
+    if (props.range) {
+      return [
+        { key: 'name', align: 'l' },
+        { key: 'hours', align: 'r', col: 'c-hrs' },
+        { key: 'sessions', align: 'r', col: 'c-num' },
+        { key: 'role', align: 'l', col: 'c-role' },
+        { key: 'status', align: 'l', col: 'c-status' },
+        { key: 'screen', align: '', col: 'c-mark' },
+        { key: 'training', align: '', col: 'c-mark' },
+        { key: 'first', align: '', col: 'c-mark' },
+        { key: 'subjects', align: 'l', col: 'c-subj' },
+      ]
+    }
+    return props.isGroupAdmin
+      ? [
+          { key: 'name', align: 'l' },
+          { key: 'hours', align: 'r', col: 'c-hrs' },
+          { key: 'status', align: 'l', col: 'c-status' },
+          { key: 'screen', align: '', col: 'c-mark' },
+          { key: 'training', align: '', col: 'c-mark' },
+          { key: 'first', align: '', col: 'c-mark' },
+          { key: 'subjects', align: 'l', col: 'c-subj' },
+        ]
+      : [
+          { key: 'name', align: 'l' },
+          { key: 'hours', align: 'r', col: 'c-hrs' },
+          { key: 'students', align: 'r', col: 'c-students' },
+          { key: 'subjects', align: 'r', col: 'c-num' },
+          { key: 'days', align: 'r', col: 'c-days' },
+        ]
   }
-  return props.isGroupAdmin
-    ? [
-        { key: 'name', align: 'l' },
-        { key: 'hours', align: 'r' },
-        { key: 'status', align: 'l' },
-        { key: 'screen', align: '' },
-        { key: 'training', align: '' },
-        { key: 'first', align: '' },
-        { key: 'subjects', align: 'l' },
-      ]
-    : [
-        { key: 'name', align: 'l' },
-        { key: 'hours', align: 'r' },
-        { key: 'students', align: 'r' },
-        { key: 'subjects', align: 'r' },
-        { key: 'days', align: 'r' },
-      ]
-})
+)
 const selectKeys = computed<MemberSortKey[]>(() => {
   if (props.range)
     return ['name', 'hours', 'sessions', 'role', 'status', 'subjects']
@@ -249,16 +250,11 @@ function sortBy(key: MemberSortKey) {
 function selectSort(event: Event) {
   const key = (event.target as HTMLSelectElement).value as MemberSortKey | ''
   activeSort.value = key
-    ? {
-        key,
-        direction: ['hours', 'sessions', 'students', 'subjects'].includes(key)
-          ? 'desc'
-          : 'asc',
-      }
+    ? { key, direction: defaultDirection(key) }
     : DEFAULT_MEMBER_SORT
 }
 
-const justDownloaded = ref(false)
+const justDownloaded = refAutoReset(false, 2000)
 
 function download() {
   downloadRosterCsv(visibleMembers.value, {
@@ -267,9 +263,6 @@ function download() {
     schoolYearLabel: props.schoolYearLabel,
   })
   justDownloaded.value = true
-  setTimeout(() => {
-    justDownloaded.value = false
-  }, 2000)
 }
 
 const { link, justCopied, copyLink } = useInviteLink(
@@ -492,24 +485,11 @@ onKeyStroke('Tab', (event) => {
         >
           <colgroup>
             <col class="c-av" />
-            <col />
-            <col class="c-hrs" />
-            <template v-if="range">
-              <col class="c-num" />
-              <col class="c-role" />
-            </template>
-            <template v-if="range || isGroupAdmin">
-              <col class="c-status" />
-              <col class="c-mark" />
-              <col class="c-mark" />
-              <col class="c-mark" />
-              <col class="c-subj" />
-            </template>
-            <template v-else>
-              <col class="c-students" />
-              <col class="c-num" />
-              <col class="c-days" />
-            </template>
+            <col
+              v-for="column in columns"
+              :key="column.key"
+              :class="column.col"
+            />
             <col v-if="range" class="c-menu" />
           </colgroup>
           <thead>

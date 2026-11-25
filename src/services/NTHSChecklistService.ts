@@ -28,7 +28,9 @@ export function doThisNowPick(
 export function phaseLabel(sections: Section[], sectionId: number): string {
   let phase = 0
   for (const section of sections) {
-    if (checkableCount(section.items) > 0) phase++
+    if (checkableCount(section.items) > 0) {
+      phase++
+    }
     if (section.id === sectionId) {
       return checkableCount(section.items) > 0 ? `Phase ${phase}` : 'All year'
     }

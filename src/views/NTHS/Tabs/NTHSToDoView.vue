@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
+import { useChapterContext } from '@/composables/useChapterContext'
 import Checklist from '@/components/NTHS/Checklist.vue'
 import DoThisNowCard from '@/components/NTHS/DoThisNowCard.vue'
 import { doThisNowPick } from '@/services/NTHSChecklistService'
@@ -8,7 +9,7 @@ import LoggerService from '@/services/LoggerService'
 import { useNthsStore } from '@/stores/nths'
 
 const nths = useNthsStore()
-const group = computed(() => nths.NTHSGroups?.[0])
+const { group } = useChapterContext()
 const checklist = computed(() => nths.NTHSChecklistData)
 const hasItems = computed(() =>
   checklist.value?.sections.some(({ items }) => items.length > 0)
@@ -59,8 +60,5 @@ onBeforeMount(async () => {
 }
 .notice {
   @include nths-notice;
-}
-.visually-hidden {
-  @include visually-hidden;
 }
 </style>

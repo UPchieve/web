@@ -8,8 +8,9 @@ import {
   type NTHSChapterImpactPublic,
 } from '@/services/NTHSGroupService'
 import { nextStepFor } from '@/services/NTHSImpactService'
-import { formatMinutes } from '@/services/NTHSTopMembersService'
 import { plural } from '@/utils/plural'
+import { formatMinutes } from '@/utils/time-utils'
+import { NTHS_ROUTES } from '@/views/NTHS/nths-route-helpers'
 
 const props = defineProps<{
   impact: NTHSChapterImpactPublic
@@ -77,7 +78,7 @@ const line = computed(() => {
       </div>
       <RouterLink
         class="more"
-        to="/groups/resources"
+        :to="NTHS_ROUTES.resources"
         v-ph:nthshq="'home.resources'"
       >
         More tips &amp; resources <span aria-hidden="true">→</span>

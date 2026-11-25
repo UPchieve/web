@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref, shallowRef, watch } from 'vue'
-import { useStore } from 'vuex'
 import ChapterSettings from '@/components/NTHS/HQ/ChapterSettings.vue'
 import MembersTable from '@/components/NTHS/Members/MembersTable.vue'
 import RosterRangePicker from '@/components/NTHS/Members/RosterRangePicker.vue'
+import { useChapterContext } from '@/composables/useChapterContext'
 import { useChapterRoster } from '@/composables/useChapterRoster'
 import { useRosterPreferences } from '@/composables/useRosterPreferences'
 import LoggerService from '@/services/LoggerService'
@@ -11,7 +11,6 @@ import ModalService from '@/services/ModalService'
 import NetworkService from '@/services/NetworkService'
 import {
   LEADERSHIP_TITLES,
-  type GroupMember,
   type NTHSMemberUpdate,
   type NTHSRosterMemberPublic,
   type NTHSTitle,
@@ -29,12 +28,9 @@ import {
 import { useNthsStore } from '@/stores/nths'
 import { dayjs } from '@/utils/time-utils'
 
-const store = useStore()
 const nths = useNthsStore()
-const group = computed(() => nths.NTHSGroups?.[0])
-const groupId = computed(() => group.value?.groupInfo?.id)
-const currentUserId = computed(() => store.state.user.user.id)
-const referralCode = computed(() => store.state.user.user.referralCode)
+const { group, groupId, currentUserId, referralCode, leaveChapter } =
+  useChapterContext()
 
 const {
   members,
@@ -216,17 +212,6 @@ function onMemberAction(
     case 'leave':
       return leaveChapter()
   }
-}
-
-function leaveChapter() {
-  if (!groupId.value) return
-  ModalService.showLeaveTeamModal({
-    isRemovingSelf: true,
-    memberToRemove: {
-      userId: currentUserId.value,
-      nthsGroupId: groupId.value,
-    } as GroupMember,
-  })
 }
 
 function removeMember(member: NTHSRosterMemberPublic) {
